@@ -175,3 +175,11 @@ Plataforma está diseñada específicamente para pequeñas y medianas empresas (
 - **vendors/libs/predis/**
 -> Libreria Redis para PHP
 
+
+## Demo de la plataforma
+
+URL Demo: [democoreengine.digitalcreations.cl](https://democoreengine.digitalcreations.cl/)<br/>
+Usuario: demo1@testmail.com<br/>
+Contraseña: 1234
+
+
