@@ -1,0 +1,35 @@
+/* primary */
+.btn-primary,.btn-outline-primary {outline: 0px solid;outline-color: var(--btn-primary-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-primary:hover,.btn-outline-primary:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* secondary */
+.btn-secondary,.btn-outline-secondary {outline: 0px solid;outline-color: var(--btn-secondary-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-secondary:hover,.btn-outline-secondary:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* success */
+.btn-success,.btn-outline-success {outline: 0px solid;outline-color: var(--btn-success-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-success:hover,.btn-outline-success:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* danger */
+.btn-danger,.btn-outline-danger {outline: 0px solid;outline-color: var(--btn-danger-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-danger:hover,.btn-outline-danger:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* warning */
+.btn-warning,.btn-outline-warning {outline: 0px solid;outline-color: var(--btn-warning-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-warning:hover,.btn-outline-warning:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* info */
+.btn-info,.btn-outline-info {outline: 0px solid;outline-color: var(--btn-info-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-info:hover,.btn-outline-info:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* dark */
+.btn-dark,.btn-outline-dark {outline: 0px solid;outline-color: var(--btn-dark-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-dark:hover,.btn-outline-dark:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* light */
+.btn-light,.btn-outline-light {outline: 0px solid;outline-color: var(--btn-light-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-light:hover,.btn-outline-light:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}
+
+/* link */
+.btn-link,.btn-outline-link {outline: 0px solid;outline-color: var(--btn-link-border);outline-offset: 0;transition: all 150ms cubic-bezier(.36, .63, .5, .73);}
+.btn-link:hover,.btn-outline-link:hover {outline: 1px solid;outline-color: rgba(255, 255, 255, 0);outline-offset: 15px;}

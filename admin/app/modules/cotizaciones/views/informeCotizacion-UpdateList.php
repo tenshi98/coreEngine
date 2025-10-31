@@ -1,0 +1,60 @@
+<section class="section" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
+    <div class="row">
+        <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title"><?php echo $data['TableTitle']; ?></h5>
+                    <div class="clearfix"></div>
+                    <div class="table-responsive">
+                        <table class="table table-sm table-hover datatable">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Entidad</th>
+                                    <th>Valor Total</th>
+                                    <th width="10">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                //Verifico si hay datos
+                                if(is_array($data['arrList'])&&!empty($data['arrList'])){
+                                    //Recorro
+                                    foreach($data['arrList'] AS $crud){ ?>
+                                        <tr>
+                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
+                                            <td>
+                                                <?php
+                                                $Entidad =  !empty($crud['EntidadesNombre'])
+                                                            ? $crud['EntidadesNombre'].' '.$crud['EntidadesApellido']
+                                                            : $crud['EntidadesRazonSocial'];
+                                                //imprimir
+                                                echo $Entidad;
+                                                ?>
+                                            </td>
+                                            <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 2); ?></td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <?php if($data['UserAccess']['LevelAccess']>=1){ ?>
+                                                        <button type="button" onclick="listTableDataView('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCotizacion']); ?>')"    class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
+                                                    <?php } ?>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    <?php } ?>
+                                <?php } ?>
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="clearfix"></div>
+<div class="d-grid gap-2 d-md-flex justify-content-md-end">
+    <a href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/listAll'; ?>" class="btn btn-danger float-end"><i class="bi bi-arrow-left-circle"></i> Volver</a>
+</div>
+<div class="clearfix"></div>

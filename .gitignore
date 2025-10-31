@@ -1,0 +1,98 @@
+# 🔐 Archivos de credenciales y secretos
+.env
+.env.*
+*.pem
+*.key
+*.crt
+*.p12
+*.jks
+*.keystore
+*.gpg
+*.asc
+*.enc
+*.token
+*.secret
+secrets.yml
+credentials.json
+auth.json
+*password*
+*secret*
+*token*
+
+# ⚙️ Configuración local y entornos
+*.local
+*.dev
+*.test
+config/*.local.*
+config/*.dev.*
+config/*.test.*
+
+# 🗃️ Bases de datos y backups
+*.sqlite
+*.db
+*.sql
+*.bak
+*.dump
+
+# 🧾 Archivos de log
+*.log
+logs/
+*.out
+*.err
+
+# 🧠 Archivos de sistema y editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 📦 Dependencias y compilados
+node_modules/
+vendor/
+dist/
+build/
+target/
+*.class
+*.jar
+*.war
+*.pyc
+__pycache__/
+
+# 🧪 Archivos de pruebas y cobertura
+coverage/
+*.lcov
+*.coverage
+.nyc_output/
+test-results/
+junit.xml
+
+# 🧹 Archivos temporales
+*.tmp
+*.temp
+*.cache
+.cache/
+*.pid
+
+# 🔄 Control de versiones externos
+.hg/
+.svn/
+CVS/
+**/.git/
+
+# 🐳 Contenedores y DevOps
+docker-compose.override.yml
+docker-compose.local.yml
+*.tfstate
+*.tfstate.backup
+*.terraform/
+*.lock.hcl
+
+# 👤 Archivos personales y de respaldo
+*.iml
+*.bak
+*.orig
+*.rej
+

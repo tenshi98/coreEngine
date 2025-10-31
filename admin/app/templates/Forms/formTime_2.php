@@ -1,0 +1,14 @@
+<div class="col-<?php echo $FormCol; ?> field" id="div_<?php echo $nameID; ?>">
+    <label class="form-label"><?php echo $placeholder; ?></label>
+    <?php echo $input_1; ?>
+    <input type="text" name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" class="form-control" value="<?php echo $value; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $requerido; ?> <?php echo $input_2; ?> >
+    <?php echo $input_3; ?>
+</div>
+
+<script type="text/javascript">
+    $("#<?php echo $nameID; ?>").clockpicker({
+        placement: "<?php echo $x_pos; ?>",
+        align: "left",
+        donetext: "Listo"
+    });
+</script>

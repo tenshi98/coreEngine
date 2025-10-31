@@ -1,0 +1,219 @@
+<div class="modal-header">
+    <?php
+    switch ($data['UserData']["sistemaModalSubtitle"]) {
+        case 1:
+            echo '
+            <h5 class="modal-title">
+                <i class="bi bi-card-checklist"></i> Ver Datos
+            </h5>';
+            break;
+        case 2:
+            echo '
+            <h5 class="modal-title modal-subtitle">
+                <div class="icon"><i class="bi bi-card-checklist"></i></div>
+                Ver Datos<br>
+                <small>Permite visualizar los datos de un elemento existente</small>
+            </h5>';
+            break;
+    } ?>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+</div>
+<div class="modal-body">
+
+    <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
+        <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100 active" id="view_tab_1" data-bs-toggle="tab" data-bs-target="#tab_id_1" type="button" role="tab" aria-controls="tab_id_1" aria-selected="true"><i class="bi bi-card-list"></i> Datos Básicos</button></li>
+        <?php if(is_array($data['arrItems'])&&!empty($data['arrItems'])){ ?>          <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_2" data-bs-toggle="tab" data-bs-target="#tab_id_2" type="button" role="tab" aria-controls="tab_id_2" aria-selected="false" tabindex="-1"><i class="bi bi-bounding-box"></i> Items</button></li><?php } ?>
+        <?php if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){ ?>  <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_3" data-bs-toggle="tab" data-bs-target="#tab_id_3" type="button" role="tab" aria-controls="tab_id_3" aria-selected="false" tabindex="-1"><i class="bi bi-box-seam"></i> Productos</button></li><?php } ?>
+        <?php if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){ ?>  <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_4" data-bs-toggle="tab" data-bs-target="#tab_id_4" type="button" role="tab" aria-controls="tab_id_4" aria-selected="false" tabindex="-1"><i class="bi bi-patch-check"></i> Servicios</button></li><?php } ?>
+        <?php if(is_array($data['arrGuias'])&&!empty($data['arrGuias'])){ ?>          <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_5" data-bs-toggle="tab" data-bs-target="#tab_id_5" type="button" role="tab" aria-controls="tab_id_5" aria-selected="false" tabindex="-1"><i class="bi bi-file-check"></i> Guias</button></li><?php } ?>
+        <?php if(is_array($data['arrPagos'])&&!empty($data['arrPagos'])){ ?>          <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_6" data-bs-toggle="tab" data-bs-target="#tab_id_6" type="button" role="tab" aria-controls="tab_id_6" aria-selected="false" tabindex="-1"><i class="bi bi-currency-dollar"></i> Pagos</button></li><?php } ?>
+        <li class="flex-grow-1">
+            <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-primary btn-sm" ><i class="bi bi-eye"></i> Ver Documento</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-secondary btn-sm" ><i class="bi bi-printer"></i> Imprimir</a>
+            </div>
+        </li>
+    </ul>
+
+    <div class="tab-content pt-2" id="tabId_560_Content">
+        <div class="tab-pane fade active show" id="tab_id_1" role="tabpanel" aria-labelledby="view_tab_1">
+            <?php require_once('gestionDocumentos-Resumen-Update.php'); ?>
+        </div>
+        <?php if(is_array($data['arrItems'])&&!empty($data['arrItems'])){ ?>
+            <div class="tab-pane fade" id="tab_id_2" role="tabpanel" aria-labelledby="view_tab_2">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                        <h5 class="card-title">Items</h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Item</th>
+                                        <th class="text-end">Cantidad</th>
+                                        <th class="text-end">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    //Recorro
+                                    foreach($data['arrItems'] AS $crud){ ?>
+                                        <tr>
+                                            <td><?php echo $crud['Item']; ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['Number'], 2); ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 2); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+        <?php if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){ ?>
+            <div class="tab-pane fade" id="tab_id_3" role="tabpanel" aria-labelledby="view_tab_3">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                        <h5 class="card-title">Productos</h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Tipo Movimiento</th>
+                                        <th>Bodega</th>
+                                        <th>Producto</th>
+                                        <th class="text-end">Cantidad</th>
+                                        <th class="text-end">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    //Recorro
+                                    foreach($data['arrProductos'] AS $crud){ ?>
+                                        <tr>
+                                            <td><?php echo $crud['TipoMovimiento']; ?></td>
+                                            <td><?php echo $crud['Bodega']; ?></td>
+                                            <td><?php echo $crud['ProductoNombre']; ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ProductoCantidad'], 2).' '.$crud['UnidadMedida']; ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['ProductoValor'], 2); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+        <?php if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){ ?>
+            <div class="tab-pane fade" id="tab_id_4" role="tabpanel" aria-labelledby="view_tab_4">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                        <h5 class="card-title">Servicios</h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Servicio</th>
+                                        <th class="text-end">Cantidad</th>
+                                        <th class="text-end">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    //Recorro
+                                    foreach($data['arrServicios'] AS $crud){ ?>
+                                        <tr>
+                                            <td><?php echo $crud['ServicioNombre']; ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ServicioCantidad'], 2); ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['ServicioValor'], 2); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+        <?php if(is_array($data['arrGuias'])&&!empty($data['arrGuias'])){ ?>
+            <div class="tab-pane fade" id="tab_id_5" role="tabpanel" aria-labelledby="view_tab_5">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                        <h5 class="card-title">Guias de Despacho</h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Documento</th>
+                                        <th class="text-end">Valor</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php
+                                    //Recorro
+                                    foreach($data['arrGuias'] AS $crud){ ?>
+                                        <tr>
+                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
+                                            <td><?php echo $crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacionRel']); ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 2); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+        <?php if(is_array($data['arrPagos'])&&!empty($data['arrPagos'])){ ?>
+            <div class="tab-pane fade" id="tab_id_6" role="tabpanel" aria-labelledby="view_tab_6">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
+                        <h5 class="card-title">Pagos Realizados</h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha Pago</th>
+                                        <th>Usuario Pago</th>
+                                        <th>Documento Pago</th>
+                                        <th class="text-end">Monto pago</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php //Recorro
+                                    foreach($data['arrPagos'] AS $crud){ ?>
+                                        <tr>
+                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaPago']); ?></td>
+                                            <td><?php echo $crud['UsuarioPago']; ?></td>
+                                            <td><?php echo $crud['DocPago'].' '.$crud['N_Doc']; ?></td>
+                                            <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['MontoPagado'], 2); ?></td>
+                                        </tr>
+                                    <?php } ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <?php } ?>
+    </div>
+</div>
+<?php
+if($data['UserData']["sistemaModalCloseBTN"]==2){
+    echo '
+    <div class="modal-footer">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bx bi-x-circle"></i> Cerrar</button>
+        </div>
+    </div>';
+}else{
+    echo '<style>.modal-body {max-height: 80vh;}</style>';
+} ?>

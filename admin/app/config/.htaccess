@@ -1,0 +1,23 @@
+#### Proteger el propio htaccess
+<Files .htaccess>
+Order allow,deny
+Deny from all
+</Files>
+#### denegar el acceso
+deny from all
+<Files "ConfigAPP.php">
+    Order allow,deny
+    Deny from all
+</Files>
+<Files "ConfigData.php">
+    Order allow,deny
+    Deny from all
+</Files>
+<Files "ConfigMail.php">
+    Order allow,deny
+    Deny from all
+</Files>
+<Files "ConfigToken.php">
+    Order allow,deny
+    Deny from all
+</Files>
