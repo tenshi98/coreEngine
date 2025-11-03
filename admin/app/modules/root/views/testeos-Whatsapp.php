@@ -12,11 +12,16 @@
                             //Se verifican si existen los datos
                             $x1 = $data['UserData']['Config_WhatsappToken'] ?? '';
                             $x2 = $data['UserData']['Config_WhatsappInstanceId'] ?? '';
+                            $x3 = '512f752c_ac4f_45a8_b5b5_2adcfe3ed73a';
+                            $x4 = '1tek_alerta_1';
 
                             //se dibujan los inputs
                             $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'WhatsappToken',       'Id' => 'Send_WhatsappToken',       'Value' => $x1, 'Required' => 2, 'Icon' => 'bi bi-puzzle']);
                             $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'WhatsappInstanceId',  'Id' => 'Send_WhatsappInstanceId',  'Value' => $x2, 'Required' => 2, 'Icon' => 'bi bi-puzzle']);
+                            $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Namespace',                'Name' => 'namespace',           'Id' => 'Send_namespace',           'Value' => $x3, 'Required' => 2, 'Icon' => 'bi bi-puzzle']);
+                            $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Template',                 'Name' => 'template',            'Id' => 'Send_template',            'Value' => $x4, 'Required' => 2, 'Icon' => 'bi bi-puzzle']);
                             $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',                  'Name' => 'Fono',                'Id' => 'Send_Fono',                'Value' => '',  'Required' => 2, 'Icon' => 'bi bi-telephone-fill']);
+                            $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Titulo',                   'Name' => 'Titulo',              'Id' => 'Send_Titulo',              'Value' => '',  'Required' => 2, 'Icon' => 'bi bi-puzzle']);
                             $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Mensaje',                  'Name' => 'Mensaje',             'Id' => 'Send_Mensaje',             'Value' => '',  'Required' => 2]);
 
                             ?>

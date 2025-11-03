@@ -244,8 +244,8 @@ class kanbanTareasTareas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponseTarea = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
             }
 
@@ -269,8 +269,8 @@ class kanbanTareasTareas extends ControllerBase {
                 'Post'      => $arrTareas
             ];
             //Ejecuto la query
-            $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-            $ResponseHist = $this->Base_insert($xParams);
+            $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+            $this->Base_insert($xParams);
 
             /******************************/
             //devuelvo el ultimo id
@@ -344,8 +344,8 @@ class kanbanTareasTareas extends ControllerBase {
                 $arrEstadoNew    = [];
                 $arrTrabajosNew    = [];
                 //Se guardan los datos
-                foreach ($arrEstadoTrabajo AS $task){    $arrEstadoNew[$task['ID']]   = $task['Nombre'];}
-                foreach ($arrTrabajos AS $task){         $arrTrabajosNew[$task['ID']] = $task['Nombre'];}
+                foreach ($arrEstadoTrabajo as $task){    $arrEstadoNew[$task['ID']]   = $task['Nombre'];}
+                foreach ($arrTrabajos as $task){         $arrTrabajosNew[$task['ID']] = $task['Nombre'];}
 
                 /******************************/
                 //Se hacen comparaciones
@@ -389,8 +389,8 @@ class kanbanTareasTareas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                    $ResponseHist = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                    $this->Base_insert($xParams);
                 }
 
                 /******************************/

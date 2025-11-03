@@ -57,11 +57,7 @@ class gestionDocumentosPagos extends ControllerBase {
         $arrLevel = $f3->get('SESSION.arrLevel');
 
         /******************************************/
-        //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';break;  //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -135,10 +131,7 @@ class gestionDocumentosPagos extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';break;  //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -222,10 +215,7 @@ class gestionDocumentosPagos extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';break;  //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -571,9 +561,21 @@ class gestionDocumentosPagos extends ControllerBase {
             'Post'      => $arrTareas
         ];
         //Ejecuto la query
-        $xParams       = ['DataCheck' => '', 'query' => $query];
-        $ResponseTarea = $this->Base_update($xParams);
+        $xParams = ['DataCheck' => '', 'query' => $query];
+        $this->Base_update($xParams);
 
+    }
+
+    /******************************************************************************/
+    //Se validan los datos
+    private function tsrxName(int $idTipo): string{
+        // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
+        $tsrxMap = [
+            1 => 'gestionDocumentosCompras',
+            2 => 'gestionDocumentosVentas'
+        ];
+        // Por defecto usar ventas si no viene un tipo válido
+        return $tsrxMap[$idTipo] ?? $tsrxMap[2];
     }
 
 }

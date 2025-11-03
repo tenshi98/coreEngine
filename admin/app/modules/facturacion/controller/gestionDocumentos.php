@@ -77,10 +77,8 @@ class gestionDocumentos extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';  $TipoMov = 'Compras';    break;//Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';   $TipoMov = 'Ventas';     break;//Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
+        $TipoMov  = $this->TipoMov($idTipo);
 
         /*******************************************************************/
         //Se genera la query
@@ -285,10 +283,8 @@ class gestionDocumentos extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';  $TipoMov = 'Compras';    break;//Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';   $TipoMov = 'Ventas';     break;//Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
+        $TipoMov  = $this->TipoMov($idTipo);
 
         /*******************************************************************/
         //Variables
@@ -814,10 +810,7 @@ class gestionDocumentos extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras'; break; //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -949,10 +942,7 @@ class gestionDocumentos extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras'; break; //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -1174,8 +1164,8 @@ class gestionDocumentos extends ControllerBase {
                         //Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idFacturacion', 'SubCarpeta' => '', 'Post' => $dataDelete];
                         //Ejecuto la query
-                        $xParams     = ['query' => $query];
-                        $ResponseDel = $this->Base_delete($xParams);
+                        $xParams = ['query' => $query];
+                        $this->Base_delete($xParams);
                     }
                 }
 
@@ -1358,8 +1348,8 @@ class gestionDocumentos extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponseItems = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
             }
 
@@ -1401,8 +1391,8 @@ class gestionDocumentos extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams           = ['DataCheck' => '', 'query' => $query];
-                    $ResponseProductos = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
                 /**********************************************************************/
                 //Movimiento de bodegas
@@ -1427,7 +1417,7 @@ class gestionDocumentos extends ControllerBase {
                     /*******************************************************/
                     //Se instancia
                     $bodegasMovimiento = new bodegasMovimiento();
-                    $DepData1  = $bodegasMovimiento->createMov($PostMovProd);
+                    $bodegasMovimiento->createMov($PostMovProd);
 
                 }
             }
@@ -1456,8 +1446,8 @@ class gestionDocumentos extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams           = ['DataCheck' => '', 'query' => $query];
-                    $ResponseServicios = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
             }
 
@@ -1510,8 +1500,8 @@ class gestionDocumentos extends ControllerBase {
                                 'Post'      => $arrTareas
                             ];
                             //Ejecuto la query
-                            $xParams             = ['DataCheck' => '', 'query' => $query];
-                            $ResponseGuiasUpdate = $this->Base_update($xParams);
+                            $xParams = ['DataCheck' => '', 'query' => $query];
+                            $this->Base_update($xParams);
 
                         }
                     }
@@ -1613,8 +1603,32 @@ class gestionDocumentos extends ControllerBase {
             'Post'      => $arrTareas
         ];
         //Ejecuto la query
-        $xParams       = ['DataCheck' => '', 'query' => $query];
-        $ResponseTarea = $this->Base_update($xParams);
+        $xParams = ['DataCheck' => '', 'query' => $query];
+        $this->Base_update($xParams);
+    }
+
+    /******************************************************************************/
+    //Se validan los datos
+    private function tsrxName(int $idTipo): string{
+        // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
+        $tsrxMap = [
+            1 => 'gestionDocumentosCompras',
+            2 => 'gestionDocumentosVentas'
+        ];
+        // Por defecto usar ventas si no viene un tipo válido
+        return $tsrxMap[$idTipo] ?? $tsrxMap[2];
+    }
+
+    /******************************************************************************/
+    //Se validan los datos
+    private function TipoMov(int $idTipo): string{
+        // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
+        $tsrxMap = [
+            1 => 'Compras',
+            2 => 'Ventas'
+        ];
+        // Por defecto usar ventas si no viene un tipo válido
+        return $tsrxMap[$idTipo] ?? $tsrxMap[2];
     }
 
 }

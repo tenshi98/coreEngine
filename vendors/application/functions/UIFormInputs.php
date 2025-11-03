@@ -79,7 +79,7 @@ class UIFormInputs {
 			// Verifica si el valor actual coincide con el ID del elemento
 			$isSelected = ($value == $select['ID']) ? 'selected="selected"' : '';
 			// Si alguna opción está seleccionada, se desactiva la selección por defecto
-			if ($isSelected) {$selectedx = '';}
+			if ($isSelected){$selectedx = '';}
 			// Construye la etiqueta <option> con el valor y el texto formateado
 			$Options .= '<option value="' . $select['ID'] . '" ' . $isSelected . '>' . $this->DataText->tituloMenu($select['Nombre']) . '</option>';
 		}
@@ -136,7 +136,7 @@ class UIFormInputs {
 				// Verifica si el valor actual coincide con el ID del elemento para marcarlo como seleccionado
 				$isSelected = ($value == $select['ID1']) ? 'selected="selected"' : '';
 				// Si alguna opción está seleccionada, se desactiva la selección por defecto
-				if ($isSelected) {$selectedx = '';}
+				if ($isSelected){$selectedx = '';}
 				// Construye la etiqueta <option> con el valor y el texto formateado
 				// Usa el método personalizado tituloMenu() para mostrar el nombre de la opción
 				$Options .= '<option value="' . $select['ID1'] . '" ' . $isSelected . '>' . $this->DataText->tituloMenu($select['Nombre1']) . '</option>';
@@ -198,7 +198,7 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Funcionalidad de select depend
-	private function selectInputScript($arrData, $value, $name1, $name2, $form_name, $FormAling){
+	private function selectInputScript($arrData, $value, $name1, $name2, $FormAling){
 		/********************************************************/
 		//Opero los datos
 		$newArray  = $this->CommonData->agruparPorClave ($arrData, 'ID2');    //transforma a array multinivel
@@ -2527,7 +2527,6 @@ class UIFormInputs {
 		*		'Value2'       => 'asd',           //Valor del input
 		*		'Required2'    => 2,               //Si input es requerido (1 al 2)
 		*		'arrData2'     => '',              //Datos recibidos
-		*		'FormName'     => '',              //Nombre del formulario
 		*	];
 		*===================================================================================================================
 		*/
@@ -2549,7 +2548,6 @@ class UIFormInputs {
 		$identificador2 = $Options['Id2'] ?? $name2;
 		$value2         = $Options['Value2'] ?? '';
 		$required2      = $Options['Required2'] ?? 1;
-		$form_name      = $Options['FormName'] ?? 'form1';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2615,7 +2613,7 @@ class UIFormInputs {
 			//generacion del input
 			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1,$name1, $nameID1, $value1, $selectProperties1, $arrData1, '');
 			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2,$name2, $nameID2, $selectProperties2);
-			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $form_name, $FormAling2);
+			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			/******************************************/
 			//Imprimir dato
@@ -2654,7 +2652,6 @@ class UIFormInputs {
 		*		'Value2'       => 'asd',           //Valor del input
 		*		'Required2'    => 2,               //Si input es requerido (1 al 2)
 		*		'arrData2'     => '',              //Datos recibidos
-		*		'FormName'     => '',              //Nombre del formulario
 		*	];
 		*===================================================================================================================
 		*/
@@ -2676,7 +2673,6 @@ class UIFormInputs {
 		$identificador2 = $Options['Id2'] ?? $name2;
 		$value2         = $Options['Value2'] ?? '';
 		$required2      = $Options['Required2'] ?? 1;
-		$form_name      = $Options['FormName'] ?? 'form1';
 		$BASE           = $Options['BASE'];
 
 		//Definir opciones válidas
@@ -2743,7 +2739,7 @@ class UIFormInputs {
 			//generacion del input
 			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1,$name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main');
 			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2,$name2, $nameID2, $selectProperties2);
-			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $form_name, $FormAling2);
+			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			//validacion si es requerido
 			$input .= ($required1 === 2) ? '<style>#div_'.$nameID1.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -3051,7 +3047,7 @@ class UIFormInputs {
 			//Recorro
 			foreach ($arrData as $select) {
 				$isSelected = ($value == $select['value']) ? 'selected="selected"' : '';
-				if ($isSelected) $selectedx = '';
+				if ($isSelected){$selectedx = '';}
 				$Options .= '<option value="'.$select['value'].'" '.$isSelected.'>'.$select['Nombre'].'</option>';
 			}
 			//Se generan opciones
@@ -3186,7 +3182,7 @@ class UIFormInputs {
 			//Recorro
 			for ($ini = $valor_ini; $ini <= $valor_fin; $ini++) {
 				$isSelected = ($value == $ini) ? 'selected="selected"' : '';
-				if ($isSelected) $selectedx = '';
+				if ($isSelected){$selectedx = '';}
 				$Options .= '<option value="'.$ini.'" '.$isSelected.'>'.$ini.'</option>';
 			}
 			$FormOptions  = '<option value="" '.$selectedx.'>Seleccione una Opción</option>';

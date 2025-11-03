@@ -47,7 +47,7 @@ class sistemaRutas extends ControllerBase {
                 //Se genera la query
                 $ListDataModule = method_exists($data, 'ListDataModule');
                 //si el metodo existe
-                if($ListDataModule==true){
+                if($ListDataModule===true){
                     $ControllerData = new $data;
                     //Se traen las rutas
                     for ($i=0; $i < 6; $i++) {

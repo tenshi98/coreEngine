@@ -30,14 +30,13 @@
 
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name'  => 'Nombre',       'Id'  => 'Edit_Nombre',     'Value'  => $x1,'Required' => 2]);
-                                $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',           'Name1' => 'idCiudad',     'Id1' => 'Edit_idCiudad',   'Value1' => $x2,'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                       'Placeholder2' => 'Comuna',           'Name2' => 'idComuna',     'Id2' => 'Edit_idComuna',   'Value2' => $x3,'Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                                                       'FormName' => 'FormEditData']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Dirección',         'Name' => 'Direccion',     'Id' => 'Edit_Direccion',   'Value' => $x4,'Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',     'Name'  => 'Nombre',    'Id'  => 'Edit_Nombre',     'Value'  => $x1,'Required'  => 2]);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',  'Id1' => 'Edit_idCiudad',   'Value1' => $x2,'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',  'Id2' => 'Edit_idComuna',   'Value2' => $x3,'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion', 'Id'  => 'Edit_Direccion',  'Value'  => $x4,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración']);
-                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => $x5,'Required' => 2,'arrData' => $data['arrEstado']]);
+                                $data['Fnc_FormInputs']->formSelect([  'Placeholder' => 'Estado', 'Name' => 'idEstado',  'Id' => 'Edit_idEstado',  'Value'  => $x5,'Required' => 2,'arrData' => $data['arrEstado']]);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idBodegas','Value' => $data['rowData']['idBodegas'],'Required' => 2]);

@@ -98,7 +98,7 @@ class validateSession {
 
         /******************************/
         //Si hay resultados y el estado es correcto, se recrea la sesion en el servidor
-        if($rowData!=false&&isset($rowData['idEstado'])&&$rowData['idEstado']==1){
+        if($rowData!==false&&isset($rowData['idEstado'])&&$rowData['idEstado']==1){
             //Se carga la clase del usuario
             $userSession = new userSession();
             //Se cargan los datos de la sesion

@@ -55,7 +55,6 @@ class FunctionsDataTime {
 		*/
 
 		/**********************  Validaciones   **********************/
-		//if(!$this->DataValidations->validarHora($Hora)){ return 'El dato ingresado no es una hora ('.$Hora.')';}
 		if($Hora=='00:00:00'){  return 'Sin Hora';}
 
 		/********************** Si todo esta ok **********************/

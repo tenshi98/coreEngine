@@ -125,8 +125,8 @@ class cotizacionInstaller extends ControllerBase {
             foreach ($arrTables as $table) {
                 /******************************/
                 //Se genera la query
-                $xParams  = ['query' => $table];
-                $Response = $this->Base_createTable($xParams);
+                $xParams = ['query' => $table];
+                $this->Base_createTable($xParams);
             }
         }
 
@@ -194,8 +194,8 @@ class cotizacionInstaller extends ControllerBase {
                         ];
                         //Ejecuto la query
                         //Ejecuto la query
-                        $xParams  = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                        $Response = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                        $this->Base_insert($xParams);
                     }
                 }
                 /************************************************/
@@ -256,7 +256,7 @@ class cotizacionInstaller extends ControllerBase {
             foreach ($arrPermDel as $sql) {
                 //Se ejecuta la query
                 $xParams = ['query' => $sql];
-                $result  = $this->Base_queryExecute($xParams);
+                $this->Base_queryExecute($xParams);
             }
         }
 
@@ -275,8 +275,8 @@ class cotizacionInstaller extends ControllerBase {
             //recorro
             foreach ($arrTableDel as $tblDel) {
                 //Se ejecuta la query
-                $xParams  = ['query' => $tblDel];
-                $Response = $this->Base_dropTable($xParams);
+                $xParams = ['query' => $tblDel];
+                $this->Base_dropTable($xParams);
             }
         }
 
@@ -366,6 +366,10 @@ class cotizacionInstaller extends ControllerBase {
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/informe/busqueda/listado/view/@id',  'RutaController' => 'cotizacionListado->View',       'Descripcion' => 'Mostrar Detallado',  'idLevelLimit' => 1, 'Controller' => 'informeCotizacion'];
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/informe/busqueda/listado/print/@id', 'RutaController' => 'cotizacionListado->Print',      'Descripcion' => 'Pantalla imprimir',  'idLevelLimit' => 1, 'Controller' => 'informeCotizacion'];
 
+                break;
+            /******************************************/
+            case 3:
+                //nada
                 break;
         }
 

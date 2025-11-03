@@ -444,8 +444,8 @@ class gestionCampanasCostos extends ControllerBase {
                     'Post'      => $arrTareas
                 ];
                 //Ejecuto la query
-                $xParams        = ['DataCheck' => $DataCheck, 'query' => $query];
-                $ResponseCostos = $this->Base_insert($xParams);
+                $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                $this->Base_insert($xParams);
 
                 /******************************************/
                 //Se actualizan los datos del costo

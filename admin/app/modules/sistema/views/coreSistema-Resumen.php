@@ -33,13 +33,12 @@
                                 $x7  = $data['rowData']['Sistema_NotiWhatsapp'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre', 'Name'  => 'Sistema_Nombre',   'Value'  => $x1,'Required'  => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',  'Name'  => 'Sistema_Email',    'Value'  => $x2,'Required'  => 1,'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',    'Name'  => 'Sistema_Rut',      'Value'  => $x3,'Required'  => 1,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad', 'Name1' => 'Sistema_idCiudad', 'Value1' => $x4,'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                       'Placeholder2' => 'Comuna', 'Name2' => 'Sistema_idComuna', 'Value2' => $x5,'Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                                                       'FormName' => 'FormEditData_1']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Dirección', 'Name' => 'Sistema_Direccion', 'Value' => $x6,'Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',    'Name'  => 'Sistema_Nombre',    'Value'  => $x1,'Required'  => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',     'Name'  => 'Sistema_Email',     'Value'  => $x2,'Required'  => 1,'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',       'Name'  => 'Sistema_Rut',       'Value'  => $x3,'Required'  => 1,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',    'Name1' => 'Sistema_idCiudad',  'Value1' => $x4,'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',    'Name2' => 'Sistema_idComuna',  'Value2' => $x5,'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección', 'Name'  => 'Sistema_Direccion', 'Value'  => $x6,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
                                 $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => $x7, 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
 

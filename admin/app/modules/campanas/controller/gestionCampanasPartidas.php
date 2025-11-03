@@ -402,7 +402,7 @@ class gestionCampanasPartidas extends ControllerBase {
 
         /*******************************************************************/
         //variables
-        $ndata_1 = isset($_POST['Producto_idProducto']) ? count($_POST['Producto_idProducto']) : 0;
+        $ndata_1   = isset($_POST['Producto_idProducto']) ? count($_POST['Producto_idProducto']) : 0;
         $ProdSelec = '0';
 
         /******************************/
@@ -1156,7 +1156,7 @@ class gestionCampanasPartidas extends ControllerBase {
                         //Variables
                         $ndata_2 = explode(",", $_POST['ProdSelec']);
                         //recorro los items
-                        foreach($ndata_2 AS $idProducto){
+                        foreach($ndata_2 as $idProducto){
                             if($idProducto!=0){
                                 /******************************/
                                 //Se agrega respuesta
@@ -1176,8 +1176,8 @@ class gestionCampanasPartidas extends ControllerBase {
                                     'Post'      => $arrTareasProd
                                 ];
                                 //Ejecuto la query
-                                $xParams           = ['DataCheck' => '', 'query' => $query];
-                                $ResponseProductos = $this->Base_insert($xParams);
+                                $xParams = ['DataCheck' => '', 'query' => $query];
+                                $this->Base_insert($xParams);
 
                             }
                         }
@@ -1225,7 +1225,7 @@ class gestionCampanasPartidas extends ControllerBase {
             $query = [
                 'data'      => 'idCampana,Fecha,Fecha_Dia,Fecha_Mes,Fecha_Ano,idEntidad,Cantidad,Beneficios,idEstadoPartida,idFacturacion,idUsuario',
                 'required'  => 'idCampana,Fecha,Fecha_Dia,Fecha_Mes,Fecha_Ano,idEntidad,idEstadoPartida,idUsuario',
-                'unique'    => 'idCampana-Fecha-idEntidad',
+                'unique'    => 'idCampana-Fecha-idEntidad-idEstadoPartida!=6',
                 'encode'    => '',
                 'table'     => 'campanas_listado_partidas',
                 'Post'      => $arrTareas
@@ -1259,8 +1259,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams           = ['DataCheck' => '', 'query' => $query];
-                    $ResponseProductos = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
 
                 /******************************************/
@@ -1323,8 +1323,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-                    $Response = $this->Base_update($xParams);
+                    $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                    $this->Base_update($xParams);
 
                 /******************************/
                 //Si se elimina producto
@@ -1334,7 +1334,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     $ActionSQL  = 'DELETE FROM `campanas_listado_partidas_productos` WHERE `idProdCamp` = '.$_POST['Producto_idProdCamp'][$j1];
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                 }
             }
             //Verifico si hay elementos
@@ -1364,8 +1364,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareasProd
                     ];
                     //Ejecuto la query
-                    $xParams           = ['DataCheck' => '', 'query' => $query];
-                    $ResponseProductos = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
             }
 
@@ -1429,8 +1429,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams           = ['DataCheck' => '', 'query' => $query];
-                    $ResponseProductos = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
                 //Verifico si hay elementos
                 if($nProdsNew!=0){
@@ -1457,8 +1457,8 @@ class gestionCampanasPartidas extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams           = ['DataCheck' => '', 'query' => $query];
-                        $ResponseProductos = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_insert($xParams);
                     }
                 }
 
@@ -1494,8 +1494,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponsePagos = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
 
                 }
             }else{
@@ -1598,7 +1598,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     //Sumo el total del valor de los productos
                     $totalProd = (isset($_POST['Producto_Valor'][$j1])) ? $totalProd + $_POST['Producto_Valor'][$j1] : $totalProd;
                     //Solo si hay cambios
-                    if(isset($_POST['Producto_Cantidad'][$j1],$_POST['Old_Producto_Cantidad'][$j1],$_POST['Producto_Valor'][$j1],$_POST['Old_Producto_Valor'][$j1])&&($_POST['Producto_Cantidad'][$j1]!=$_POST['Old_Producto_Cantidad'][$j1] OR $_POST['Producto_Valor'][$j1]!=$_POST['Old_Producto_Valor'][$j1])){
+                    if(isset($_POST['Producto_Cantidad'][$j1],$_POST['Old_Producto_Cantidad'][$j1],$_POST['Producto_Valor'][$j1],$_POST['Old_Producto_Valor'][$j1])&&($_POST['Producto_Cantidad'][$j1]!=$_POST['Old_Producto_Cantidad'][$j1] || $_POST['Producto_Valor'][$j1]!=$_POST['Old_Producto_Valor'][$j1])){
                         /******************************/
                         //Se agrega respuesta
                         $arrTareas = [
@@ -1619,8 +1619,8 @@ class gestionCampanasPartidas extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams  = ['DataCheck' => '', 'query' => $query];
-                        $Response = $this->Base_update($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_update($xParams);
                         /******************************/
                         //Cuento
                         $countProd++;
@@ -1657,7 +1657,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     $ActionSQL  = 'UPDATE `facturacion_listado` SET idEntidad = "'.$_POST['idEntidad'].'" WHERE idFacturacion = "'.$_POST['idFacturacion'].'" ';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                 }
 
                 /*******************************************************/
@@ -1667,7 +1667,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 $ActionSQL  = 'UPDATE `campanas_listado_partidas` SET '.$chainUpdate.' WHERE idExistencia = "'.$_POST['idExistencia'].'" ';
                 //Se ejecuta la query
                 $xParams = ['query' => $ActionSQL];
-                $result  = $this->Base_queryExecute($xParams);
+                $this->Base_queryExecute($xParams);
 
                 /******************************************/
                 //Se Actualizan datos solo si hay cambios
@@ -1679,7 +1679,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     //Se actualizan los datos de los productos en la factura
                     for($j1 = 0; $j1 < $nProds; $j1++){
                         //Solo si hay cambios
-                        if(isset($_POST['Producto_Cantidad'][$j1],$_POST['Old_Producto_Cantidad'][$j1],$_POST['Producto_Valor'][$j1],$_POST['Old_Producto_Valor'][$j1])&&($_POST['Producto_Cantidad'][$j1]!=$_POST['Old_Producto_Cantidad'][$j1] OR $_POST['Producto_Valor'][$j1]!=$_POST['Old_Producto_Valor'][$j1])){
+                        if(isset($_POST['Producto_Cantidad'][$j1],$_POST['Old_Producto_Cantidad'][$j1],$_POST['Producto_Valor'][$j1],$_POST['Old_Producto_Valor'][$j1])&&($_POST['Producto_Cantidad'][$j1]!=$_POST['Old_Producto_Cantidad'][$j1] || $_POST['Producto_Valor'][$j1]!=$_POST['Old_Producto_Valor'][$j1])){
                             /***************************************/
                             //Se actualizan las cantidades en las facturas
                             $ActionSQL  = 'UPDATE `facturacion_listado_productos` ';
@@ -1690,8 +1690,8 @@ class gestionCampanasPartidas extends ControllerBase {
                             $ActionSQL .= ' AND Number     = "'.$_POST['Old_Producto_Cantidad'][$j1].'"';
                             $ActionSQL .= ' AND ValorTotal = "'.$_POST['Old_Producto_Valor'][$j1].'"';
                             //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                            $xParams = ['query' => $ActionSQL];
+                            $this->Base_queryExecute($xParams);
                         }
                     }
                     /******************************************/
@@ -1733,15 +1733,15 @@ class gestionCampanasPartidas extends ControllerBase {
                     $ActionSQL .= 'WHERE idFacturacion = "'.$_POST['idFacturacion'].'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                     /***************************************/
                     //Se actualizan los datos solo si estan pagados
                     if(isset($rowFact['idPago'])&&$rowFact['idPago']!=''&&$rowFact['idEstadoPago']==2){
                         //Se actualizan las cantidades en las facturas
                         $ActionSQL  = 'UPDATE `facturacion_listado_pagos` SET MontoPagado = "'.$Fact_ValorTotal.'" WHERE idPago = "'.$rowFact['idPago'].'"';
                         //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                        $xParams = ['query' => $ActionSQL];
+                        $this->Base_queryExecute($xParams);
                     }
 
                     /*******************************************************/
@@ -1760,8 +1760,8 @@ class gestionCampanasPartidas extends ControllerBase {
                                 $ActionSQL .= 'SET Number = "'.$_POST['Producto_Cantidad'][$j1].'"';
                                 $ActionSQL .= 'WHERE idMovimiento = "'.$rowFact['idMovimiento'].'" AND idProducto = "'.$_POST['Producto_idProducto'][$j1].'"';
                                 //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                                $xParams = ['query' => $ActionSQL];
+                                $this->Base_queryExecute($xParams);
                             }
                         }
                         /*******************************************************/
@@ -1794,7 +1794,7 @@ class gestionCampanasPartidas extends ControllerBase {
 
                         /******************************/
                         //Recorro
-                        foreach($arrStocks AS $crud){
+                        foreach($arrStocks as $crud){
                             $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
                             $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
                         }
@@ -1829,8 +1829,8 @@ class gestionCampanasPartidas extends ControllerBase {
                                     'Post'      => $arrTareas
                                 ];
                                 //Ejecuto la query
-                                $xParams      = ['DataCheck' => '', 'query' => $query];
-                                $ResponseTarea = $this->Base_update($xParams);
+                                $xParams = ['DataCheck' => '', 'query' => $query];
+                                $this->Base_update($xParams);
                             }
                         }
                     }
@@ -1906,16 +1906,20 @@ class gestionCampanasPartidas extends ControllerBase {
                 }
                 /***************************************/
                 //Se generan datos
-                $WSP_encryptedId     = $this->Codification->simpleEncode($rowData['idExistencia'], 8080);
-                $WSP_Body['Phone']   = $this->DataNumbers->normalizarPhone($rowData['EntidadFono1']);
-                $WSP_Body['Cuerpo']  = 'Hola '.$EntidadWsp.'!!<br/>';
-                $WSP_Body['Cuerpo'] .= $_POST['Mensaje'].'<br/>';
-                $WSP_Body['Cuerpo'] .= 'Para reservar puede acceder al siguiente enlace '.ConfigAPP::SOFTWARE["URL"].'/partida/'.$WSP_encryptedId.'<br/><br/>';
-                $WSP_Body['Cuerpo'] .= 'Recuerda que puedes hacer nuevos pedidos a traves de nuestro canal de ventas';
+                $WSP_encryptedId      = $this->Codification->simpleEncode($rowData['idExistencia'], 8080);
+                $Config['Token']      = $UserData["Config_WhatsappToken"];
+                $Config['InstanceId'] = $UserData["Config_WhatsappInstanceId"];
+                $Config['Type']       = 2;
+                $Config['namespace']  = '512f752c_ac4f_45a8_b5b5_2adcfe3ed73a';
+                $Config['template']   = '1tek_alerta_1';
+                $WSP_Body['Phone']    = $this->DataNumbers->normalizarPhone($rowData['EntidadFono1']);
+                $WSP_Body['Entidad']  = $EntidadWsp;
+                $WSP_Body['Mensaje']  = $_POST['Mensaje'];
+                $WSP_Body['Link']     = ConfigAPP::SOFTWARE["URL"].'/partida/'.$WSP_encryptedId;
 
                 /***************************************/
                 //Se envia notificacion
-                $Result = $this->Notifications->sendWhatsappTemplate($UserData["Config_WhatsappToken"], $UserData["Config_WhatsappInstanceId"], 1, $WSP_Body);
+                $Result = $this->Notifications->sendWhatsappTemplate($Config, $WSP_Body);
 
                 /***************************************/
                 // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
@@ -1927,7 +1931,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     /******************************************/
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $resultExecute = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
 
                     /***************************************/
                     // Devuelvo $Response con código 200 (OK)
@@ -1994,7 +1998,7 @@ class gestionCampanasPartidas extends ControllerBase {
 
                 /***************************************/
                 //se recorren los datos dentro de la categoría
-                foreach ($arrList AS $crud){
+                foreach ($arrList as $crud){
                     /***************************************/
                     //Se obtiene el nombre o la razón social
                     $EntidadWsp = '';
@@ -2009,16 +2013,20 @@ class gestionCampanasPartidas extends ControllerBase {
                     }
                     /***************************************/
                     //Se generan datos
-                    $WSP_encryptedId     = $this->Codification->simpleEncode($crud['idExistencia'], 8080);
-                    $WSP_Body['Phone']   = $this->DataNumbers->normalizarPhone($crud['EntidadFono1']);
-                    $WSP_Body['Cuerpo']  = 'Hola '.$EntidadWsp.'!!<br/>';
-                    $WSP_Body['Cuerpo'] .= $_POST['Mensaje'].'<br/>';
-                    $WSP_Body['Cuerpo'] .= 'Para reservar puede acceder al siguiente enlace '.ConfigAPP::SOFTWARE["URL"].'/partida/'.$WSP_encryptedId.'<br/><br/>';
-                    $WSP_Body['Cuerpo'] .= 'Recuerda que puedes hacer nuevos pedidos a traves de nuestro canal de ventas';
+                    $WSP_encryptedId      = $this->Codification->simpleEncode($crud['idExistencia'], 8080);
+                    $Config['Token']      = $UserData["Config_WhatsappToken"];
+                    $Config['InstanceId'] = $UserData["Config_WhatsappInstanceId"];
+                    $Config['Type']       = 2;
+                    $Config['namespace']  = '512f752c_ac4f_45a8_b5b5_2adcfe3ed73a';
+                    $Config['template']   = '1tek_alerta_1';
+                    $WSP_Body['Phone']    = $this->DataNumbers->normalizarPhone($crud['EntidadFono1']);
+                    $WSP_Body['Entidad']  = $EntidadWsp;
+                    $WSP_Body['Mensaje']  = $_POST['Mensaje'];
+                    $WSP_Body['Link']     = ConfigAPP::SOFTWARE["URL"].'/partida/'.$WSP_encryptedId;
 
                     /***************************************/
                     //Se envia notificacion
-                    $Result = $this->Notifications->sendWhatsappTemplate($UserData["Config_WhatsappToken"], $UserData["Config_WhatsappInstanceId"], 1, $WSP_Body);
+                    $Result = $this->Notifications->sendWhatsappTemplate($Config, $WSP_Body);
 
                     /***************************************/
                     //si se envia correctamente
@@ -2038,7 +2046,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     //Ejecuto la query
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
 
                     /***************************************/
                     // Devuelvo true con código 200 (OK)
@@ -2106,12 +2114,12 @@ class gestionCampanasPartidas extends ControllerBase {
                     $ActionSQL = 'DELETE FROM `campanas_listado_partidas` WHERE idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                     //Se borran los datos
                     $ActionSQL = 'DELETE FROM `campanas_listado_partidas_productos` WHERE idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                     break;
                 /*********************************
                 6 - Partida Entregada */
@@ -2123,12 +2131,12 @@ class gestionCampanasPartidas extends ControllerBase {
                     $ActionSQL = 'DELETE FROM `campanas_listado_partidas` WHERE idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                     //Se borran los datos
                     $ActionSQL = 'DELETE FROM `campanas_listado_partidas_productos` WHERE idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                     //Verifico su existencia
                     if(isset($rowCampana['idFacturacion'])&&$rowCampana['idFacturacion']!=''){
                         /*******************************************************/
@@ -2195,7 +2203,7 @@ class gestionCampanasPartidas extends ControllerBase {
 
                         /******************************/
                         //Recorro
-                        foreach($arrStocks AS $crud){
+                        foreach($arrStocks as $crud){
                             $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
                             $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
                         }
@@ -2203,39 +2211,30 @@ class gestionCampanasPartidas extends ControllerBase {
                         /*******************************************************/
                         /*                 ELIMINACION DATOS                   */
                         /*******************************************************/
-                        /******************************************/
-                        //Se borran los datos
-                        $ActionSQL = 'DELETE FROM `facturacion_listado` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"';
-                        //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
-                        //Se borran los datos
-                        $ActionSQL = 'DELETE FROM `facturacion_listado_productos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"';
-                        //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
-                        //Se borran los datos
-                        $ActionSQL = 'DELETE FROM `facturacion_listado_pagos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"';
-                        //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
-                        /******************************************/
-                        //Se borran los datos
-                        $ActionSQL = 'DELETE FROM `bodegas_movimientos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"';
-                        //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
-                        //Se borran los datos
-                        $ActionSQL = 'DELETE FROM `bodegas_movimientos_productos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"';
-                        //Se ejecuta la query
-                    $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                        $arrTableDel  = array();
+                        $arrTableDel[] = ['table' => 'DELETE FROM `facturacion_listado` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"'];
+                        $arrTableDel[] = ['table' => 'DELETE FROM `facturacion_listado_productos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"'];
+                        $arrTableDel[] = ['table' => 'DELETE FROM `facturacion_listado_pagos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"'];
+                        $arrTableDel[] = ['table' => 'DELETE FROM `bodegas_movimientos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"'];
+                        $arrTableDel[] = ['table' => 'DELETE FROM `bodegas_movimientos_productos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"'];
+
+                        /************************************************/
+                        //Verifico si existe
+                        if($arrTableDel){
+                            //recorro
+                            foreach ($arrTableDel as $ActionSQL) {
+                                //Se ejecuta la query
+                                $xParams = ['query' => $ActionSQL];
+                                $this->Base_queryExecute($xParams);
+                            }
+                        }
+
                         /*******************************************************/
                         /*                ACTUALIZACION DATOS                  */
                         /*******************************************************/
                         /******************************/
                         //Se recorren los productos
-                        foreach($arrProductos AS $crud){
+                        foreach($arrProductos as $crud){
                             /******************************/
                             //Se suma la cantidad
                             $NewCantidad = $arrProdStock[$crud['idProducto']]['Cantidad'] + $crud['Number'];
@@ -2261,8 +2260,8 @@ class gestionCampanasPartidas extends ControllerBase {
                                     'Post'      => $arrTareas
                                 ];
                                 //Ejecuto la query
-                                $xParams      = ['DataCheck' => '', 'query' => $query];
-                                $ResponseTarea = $this->Base_update($xParams);
+                                $xParams = ['DataCheck' => '', 'query' => $query];
+                                $this->Base_update($xParams);
                             }
                         }
                     }
@@ -2334,7 +2333,7 @@ class gestionCampanasPartidas extends ControllerBase {
             /******************************************/
             //Se ejecuta la query
             $xParams = ['query' => $ActionSQL];
-            $result  = $this->Base_queryExecute($xParams);
+            $this->Base_queryExecute($xParams);
 
             /*******************************************************/
             /*              SE ELIMINAN LAS PARTIDAS               */
@@ -2514,8 +2513,8 @@ class gestionCampanasPartidas extends ControllerBase {
                     'Post'      => $arrTareas
                 ];
                 //Ejecuto la query
-                $xParams       = ['DataCheck' => '', 'query' => $query];
-                $ResponseTarea = $this->Base_insert($xParams);
+                $xParams = ['DataCheck' => '', 'query' => $query];
+                $this->Base_insert($xParams);
 
                 /******************************/
                 //Se Actualizan los stocks
@@ -2539,8 +2538,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponseTarea = $this->Base_update($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_update($xParams);
 
                 }else{
                     /******************************/
@@ -2560,8 +2559,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponseTarea = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
 
                 }
             }
@@ -2602,8 +2601,8 @@ class gestionCampanasPartidas extends ControllerBase {
                     'Post'      => $arrTareas
                 ];
                 //Ejecuto la query
-                $xParams       = ['DataCheck' => '', 'query' => $query];
-                $ResponseTarea = $this->Base_insert($xParams);
+                $xParams = ['DataCheck' => '', 'query' => $query];
+                $this->Base_insert($xParams);
                 /******************************/
                 //Se Actualizan los stocks
                 //verifico si existe el dato en el stock
@@ -2626,8 +2625,8 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponseTarea = $this->Base_update($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_update($xParams);
 
                 }else{
                     /******************************/
@@ -2647,12 +2646,11 @@ class gestionCampanasPartidas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
-                    $ResponseTarea = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
             }
         }
-
     }
 
 

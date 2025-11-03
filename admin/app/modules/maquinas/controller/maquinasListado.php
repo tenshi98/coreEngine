@@ -657,8 +657,8 @@ class maquinasListado extends ControllerBase {
                         //Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idMaquina', 'SubCarpeta' => '', 'Post' => $dataDelete];
                         //Ejecuto la query
-                        $xParams     = ['query' => $query];
-                        $ResponseDel = $this->Base_delete($xParams);
+                        $xParams = ['query' => $query];
+                        $this->Base_delete($xParams);
                     }
                 }
 

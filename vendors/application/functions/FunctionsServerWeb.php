@@ -60,7 +60,7 @@ class FunctionsServerWeb {
 	}
 
 	/************************************************************************************************************/
-	public function getBaseUrl($atRoot=FALSE, $atCore=FALSE, $parse=FALSE): string{
+	public function getBaseUrl($atRoot=false, $atCore=false, $parse=false): string{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -82,15 +82,15 @@ class FunctionsServerWeb {
 
 		/********************** Si todo esta ok **********************/
 		if (isset($_SERVER['HTTP_HOST'])) {
-			$http = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
-			$hostname = $_SERVER['HTTP_HOST'];
-			$dir =  str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
+			$http       = isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off' ? 'https' : 'http';
+			$hostname   = $_SERVER['HTTP_HOST'];
+			$dir        =  str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
 
-			$core = preg_split('@/@', str_replace($_SERVER['DOCUMENT_ROOT'], '', realpath(dirname(__FILE__))), 1, PREG_SPLIT_NO_EMPTY);
-			$core = $core[0];
+			$core       = preg_split('@/@', str_replace($_SERVER['DOCUMENT_ROOT'], '', realpath(dirname(__FILE__))), 1, PREG_SPLIT_NO_EMPTY);
+			$core       = $core[0];
 
-			$tmplt = $atRoot ? ($atCore ? "%s://%s/%s/" : "%s://%s/") : ($atCore ? "%s://%s/%s/" : "%s://%s%s");
-			$end = $atRoot ? ($atCore ? $core : $hostname) : ($atCore ? $core : $dir);
+			$tmplt      = $atRoot ? ($atCore ? "%s://%s/%s/" : "%s://%s/") : ($atCore ? "%s://%s/%s/" : "%s://%s%s");
+			$end        = $atRoot ? ($atCore ? $core : $hostname) : ($atCore ? $core : $dir);
 			$getBaseUrl = sprintf( $tmplt, $http, $hostname, $end );
 		}else{
 			$getBaseUrl = 'https://localhost/';
@@ -98,7 +98,9 @@ class FunctionsServerWeb {
 
 		if ($parse) {
 			$getBaseUrl = parse_url($getBaseUrl);
-			if (isset($getBaseUrl['path'])) if ($getBaseUrl['path'] == '/') $getBaseUrl['path'] = '';
+			if (isset($getBaseUrl['path']) && $getBaseUrl['path'] === '/') {
+				$getBaseUrl['path'] = '';
+			}
 		}
 
 		/**********************  Retorno datos  **********************/
@@ -207,7 +209,7 @@ class FunctionsServerWeb {
 
 		// Validar que la URL sea HTTPS
 		if (!filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https') {
-			throw new Exception("URL inválida o no segura. Solo se permite HTTPS.");
+			return ['success' => false, 'error' => "URL inválida o no segura. Solo se permite HTTPS."];
 		}
 
 		// Configurar contexto con timeout y sin seguir redirecciones
@@ -223,28 +225,26 @@ class FunctionsServerWeb {
 		// Obtener contenido
 		$contenido = @file_get_contents($url, false, $context);
 		if ($contenido === false) {
-			throw new Exception("No se pudo obtener el archivo XML.");
+			return ['success' => false, 'error' => "No se pudo obtener el archivo XML."];
 		}
 
 		// Verificar que el contenido sea XML válido
 		libxml_use_internal_errors(true);
 		$xml = simplexml_load_string($contenido);
 		if ($xml === false) {
-			throw new Exception("El contenido recibido no es un XML válido.");
+			return ['success' => false, 'error' => "El contenido recibido no es un XML válido."];
 		}
 
 		// Verificar integridad con hash SHA-256
 		$hash = hash('sha256', $contenido);
 		if (!$hash || strlen($hash) !== 64) {
-			throw new Exception("Error al verificar la integridad del archivo XML.");
+			return ['success' => false, 'error' => "Error al verificar la integridad del archivo XML."];
 		}
 
 		// Retornar datos como array y hash de integridad
-		return [
-			'datos'           => json_decode(json_encode($xml), true),
-			'hash_integridad' => $hash
-		];
+		return ['success' => true, 'data' => json_decode(json_encode($xml), true), 'hash_integridad' => $hash];
+
 	}
 
 }
-?>
+

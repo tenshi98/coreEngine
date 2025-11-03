@@ -27,24 +27,15 @@
                     //se dibujan los inputs
                     $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales']);
                     $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Cada usuario nuevo creado lleva por defecto la contraseña 1234');
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',               'Name' => 'email',         'Value' => '',  'Required' => 2,  'Icon' => 'bx bx-mail-send']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',              'Name' => 'Nombre',        'Value' => '',  'Required' => 2]);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',                 'Name' => 'Rut',           'Value' => '',  'Required' => 1,  'Icon' => 'bi bi-person-circle']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Nacimiento', 'Name' => 'fNacimiento',   'Value' => '',  'Required' => 1,  'Icon' => 'bi bi-calendar3']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono',                'Name' => 'Fono',          'Value' => '',  'Required' => 1,  'Icon' => 'bi bi-telephone-fill']);
-                    $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',             'Name1' => 'idCiudad',     'Value1' => '', 'Required1' => 1, 'arrData1' => $data['arrCiudad'],
-                                                                           'Placeholder2' => 'Comuna',             'Name2' => 'idComuna',     'Value2' => '', 'Required2' => 1, 'arrData2' => $data['arrComuna'],
-                                                                           'FormName' => 'FormNewData']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Dirección',           'Name' => 'Direccion',     'Value' => '',  'Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo de Usuario',     'Name' => 'idTipoUsuario', 'Value' => '',  'Required' => 2,'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
-
-                    /*
-                    $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-x']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-facebook']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-instagram']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-linkedin']);
-                    */
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',               'Name'  => 'email',         'Value'  => '',  'Required'  => 2,  'Icon' => 'bx bx-mail-send']);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',        'Value'  => '',  'Required'  => 2]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',           'Value'  => '',  'Required'  => 1,  'Icon' => 'bi bi-person-circle']);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento',   'Value'  => '',  'Required'  => 1,  'Icon' => 'bi bi-calendar3']);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono',                'Name'  => 'Fono',          'Value'  => '',  'Required'  => 1,  'Icon' => 'bi bi-telephone-fill']);
+                    $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',      'Value1' => '',  'Required1' => 1,  'arrData1' => $data['arrCiudad'],
+                                                                          'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',      'Value2' => '',  'Required2' => 1,  'arrData2' => $data['arrComuna']]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',     'Value'  => '',  'Required'  => 1,  'Icon' => 'bi bi-geo-alt-fill']);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Tipo de Usuario',     'Name'  => 'idTipoUsuario', 'Value'  => '',  'Required'  => 2,  'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password',       'Value' => '1234', 'Required' => 2]);//password por defecto

@@ -6,12 +6,9 @@ class TemplateRenderer{
     private $templatePath;
     private $data = [];
 
-    public function __construct(){
-    }
-
     public function templatePath($templatePath){
         if (!file_exists($templatePath)) {
-            throw new Exception("PLantilla no encontrada: " . $templatePath);
+            return "PLantilla no encontrada: " . $templatePath;
         }
         $this->templatePath = $templatePath;
     }
@@ -31,4 +28,3 @@ class TemplateRenderer{
     }
 }
 
-?>

@@ -52,10 +52,9 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',         'Value'  => $x2,'Required'  => 2,'Icon' => 'bi bi-person-circle']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento', 'Value'  => $x3,'Required'  => 1,'Icon' => 'bi bi-calendar3']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono',                'Name'  => 'Fono',        'Value'  => $x4,'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',    'Value1' => $x5,'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                       'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',    'Value2' => $x6,'Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                                                       'FormName' => 'FormData']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Dirección', 'Name' => 'Direccion', 'Value' => $x7,'Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',    'Value1' => $x5,'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',    'Value2' => $x6,'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',   'Value'  => $x7,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => $x8, 'Required' => 1, 'Icon' => 'bi bi-x']);

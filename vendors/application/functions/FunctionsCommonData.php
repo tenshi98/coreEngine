@@ -122,19 +122,13 @@ class FunctionsCommonData {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se recorre el nuevo arreglo
-		* 	$CommonData->parseDataSeparator('uno,dos,tres');
+		* 	$CommonData->parseDataCommas('uno,dos,tres');
 		*
 		*=================================================    Parametros   =================================================
 		* @input   string     $Data   Cadena con los datos
 		* @return  array
 		*===================================================================================================================
 		*/
-
-		/********************** Si todo esta ok **********************/
-		// This regular expression splits the string by a comma (,)
-		// AND any surrounding whitespace (\s*).
-		// The PREG_SPLIT_NO_EMPTY flag ensures empty array elements (from
-		// multiple consecutive commas or leading/trailing commas) are removed.
 
 		/**********************  Retorno datos  **********************/
 		return preg_split('/\s*,\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
@@ -159,16 +153,40 @@ class FunctionsCommonData {
 		*===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
-		// This regular expression splits the string by a middle dash (,)
-		// AND any surrounding whitespace (\s*).
-		// The PREG_SPLIT_NO_EMPTY flag ensures empty array elements (from
-		// multiple consecutive middle dash or leading/trailing middle dash) are removed.
-
 		/**********************  Retorno datos  **********************/
 		return preg_split('/\s*-\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
 
     }
+
+	/******************************************************************************/
+    public function parseDataSymbol($Data): array{
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Se le entrega una cadena separada por !=|<=|>=|=|<|> y devuelve un array con los elementos ya separados
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//se recorre el nuevo arreglo
+		* 	$CommonData->parseDataSymbol('uno=dos!=tres');
+		*
+		*=================================================    Parametros   =================================================
+		* @input   string     $Data   Cadena con los datos
+		* @return  array
+		*===================================================================================================================
+		*/
+
+		/********************** Si todo esta ok **********************/
+		//Valida !=|<=|>=
+		$Data = preg_split('/\s*(?:!=|<=|>=)\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
+		//Valida =|<|>
+		$Data = preg_split('/\s*(?:=|<|>)\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
+
+		/**********************  Retorno datos  **********************/
+		return $Data;
+
+    }
+
 
 }
 

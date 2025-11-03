@@ -12,9 +12,9 @@ class FunctionsDataDate {
 	/************************************************************************************************************/
 	//Definiciones
 	private $DataValidations;
-	const OptionsMesLargo  = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
-	const OptionsMesCorto  = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-	const OptionsDiaSemana = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
+	const optionsMesLargo  = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+	const optionsMesCorto  = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+	const optionsDiaSemana = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
 
 	/************************************************************************************************************/
 	//Instancias
@@ -54,7 +54,7 @@ class FunctionsDataDate {
 		$mes_c   = new DateTime($Fecha);
 		$dia     = $mes_c->format('d');
 		$ano     = $mes_c->format('Y');
-		$mes     = self::OptionsMesLargo[$mes_c->format('m') - 1];
+		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
 		return $mes.' '.$dia.' del '.$ano;
@@ -87,7 +87,7 @@ class FunctionsDataDate {
 		$mes_c   = new DateTime($Fecha);
 		$dia     = $mes_c->format('d');
 		$ano     = $mes_c->format('Y');
-		$mes     = self::OptionsMesLargo[$mes_c->format('m') - 1];
+		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
 		return $dia.' de '.$mes.' de '.$ano;
@@ -119,7 +119,7 @@ class FunctionsDataDate {
 		/********************** Si todo esta ok **********************/
 		$mes_c   = new DateTime($Fecha);
 		$dia     = $mes_c->format('d');
-		$mes     = self::OptionsMesLargo[$mes_c->format('m') - 1];
+		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
 		return $dia.' '.$mes;
@@ -263,7 +263,7 @@ class FunctionsDataDate {
 		/********************** Si todo esta ok **********************/
 		$mes_c   = new DateTime($Fecha);
 		$ano     = $mes_c->format('Y');
-		$mes     = self::OptionsMesLargo[$mes_c->format('m') - 1];
+		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
 		return $mes.' del '.$ano;
@@ -384,7 +384,7 @@ class FunctionsDataDate {
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		return self::OptionsDiaSemana[$this->fecha2NDiaSemana($Fecha) - 1];
+		return self::optionsDiaSemana[$this->fecha2NDiaSemana($Fecha) - 1];
 
 	}
 
@@ -472,7 +472,7 @@ class FunctionsDataDate {
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		return self::OptionsMesLargo[$this->fecha2NMes($Fecha) - 1];
+		return self::optionsMesLargo[$this->fecha2NMes($Fecha) - 1];
 
 	}
 
@@ -500,7 +500,7 @@ class FunctionsDataDate {
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		return self::OptionsMesCorto[$this->fecha2NMes($Fecha) - 1];
+		return self::optionsMesCorto[$this->fecha2NMes($Fecha) - 1];
 
 	}
 
@@ -621,7 +621,7 @@ class FunctionsDataDate {
 		$dia     = $NewFecha->format('d');
 		$ano     = $NewFecha->format('Y');
 		$hora    = $NewFecha->format('H:i:s');
-		$mes     = self::OptionsMesLargo[$NewFecha->format('m') - 1];
+		$mes     = self::optionsMesLargo[$NewFecha->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
 		return $mes.' '.$dia.' del '.$ano.' '.$hora;
@@ -629,7 +629,12 @@ class FunctionsDataDate {
 	}
 
 
-	/************************************************************************************************************/
+	/*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Internos                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+    /************************************************************************************************************/
 	private function _validateDate($Fecha){
 
 		/**********************  Validaciones   **********************/

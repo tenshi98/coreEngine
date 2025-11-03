@@ -64,7 +64,7 @@ class userSession extends ControllerBase {
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
         }
         //Se verifica si se trata de hacer fuerza bruta en el ingreso
-        if ($this->checkBrute($Email, $IP_Client) == true) {
+        if ($this->checkBrute($Email, $IP_Client) === true) {
             $errors[] = ["message" => "Demasiados accesos fallidos, usuario bloqueado por 2 horas"];
         }
         //Se obtiene la uicacion
@@ -111,7 +111,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Si no hay resultados
-        if($rowData==false){
+        if($rowData===false){
             //Se guarda registro
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
             //Mensaje
@@ -155,7 +155,7 @@ class userSession extends ControllerBase {
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
         }
         //Se verifica si se trata de hacer fuerza bruta en el ingreso
-        if ($this->checkBrute($Email, $IP_Client) == true) {
+        if ($this->checkBrute($Email, $IP_Client) === true) {
             $errors[] = ["message" => "Demasiados accesos fallidos, usuario bloqueado por 2 horas"];
         }
         //Se obtiene la uicacion
@@ -197,7 +197,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Si no hay resultados
-        if($rowData==false){
+        if($rowData===false){
             //Se guarda registro
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
             //Mensaje
@@ -428,8 +428,8 @@ class userSession extends ControllerBase {
         }elseif($num_rows > ConfigAPP::APP["checkBruteMaxConections"]){
             //Le envio al servidor la tarea de enviarlo al black list
             //se envian los datos
-            $Server    = new FunctionsServerSecurity();
-            $resultado = $Server->sendIPtoBlackList($IP_Client);
+            $Server = new FunctionsServerSecurity();
+            $Server->sendIPtoBlackList($IP_Client);
             //dar respuesta de bloqueo
             $result = true;
         }else{
@@ -469,7 +469,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Ejecuto la query
-        $result = $this->QBuilder->queryInsert($query, $this->DBConn);
+        $this->QBuilder->queryInsert($query, $this->DBConn);
 
     }
     /******************************************************************************/
@@ -529,7 +529,7 @@ class userSession extends ControllerBase {
                 'Post'      => $arrData,
             ];
             //Ejecuto la query
-            $resultAccess = $this->QBuilder->queryInsert($query, $this->DBConn);
+            $this->QBuilder->queryInsert($query, $this->DBConn);
 
             /***************************************************/
             /*        Se actualiza el ingreso del usuario      */
@@ -553,8 +553,8 @@ class userSession extends ControllerBase {
                 'Post'      => $arrData,
             ];
             //Ejecuto la query
-            $xParams            = ['DataCheck' => '', 'query' => $query];
-            $resultUpdateAccess = $this->Base_update($xParams);
+            $xParams = ['DataCheck' => '', 'query' => $query];
+            $this->Base_update($xParams);
         }
 
         /***************************************************/

@@ -19,12 +19,11 @@
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Razón Social',      'Name'  => 'RazonSocial',    'Id'  => 'Search_RazonSocial',   'Value'  => '','Required' => 1]);
                     //Comun
                     $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',           'Name1' => 'idCiudad',       'Id1' => 'Search_idCiudad',      'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                           'Placeholder2' => 'Comuna',           'Name2' => 'idComuna',       'Id2' => 'Search_idComuna',      'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                                           'FormName' => 'FormSearchData']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Dirección',         'Name'  => 'Direccion',       'Id'  => 'Search_Direccion',    'Value'  => '','Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Sector',            'Name'  => 'idSector',        'Id'  => 'Search_idSector',     'Value'  => '','Required' => 1,'arrData' => $data['arrSector'], 'BASE' => $BASE]);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',             'Name'  => 'Email',           'Id'  => 'Search_Email',        'Value'  => '','Required' => 1,'Icon' => 'bx bx-mail-send']);
-                    $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',            'Name'  => 'idEstado',        'Id'  => 'Search_idEstado',     'Value'  => '','Required' => 1,'arrData' => $data['arrEstado']]);
+                                                                         'Placeholder2' => 'Comuna',           'Name2' => 'idComuna',       'Id2' => 'Search_idComuna',      'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder'  => 'Dirección',        'Name'  => 'Direccion',      'Id'  => 'Search_Direccion',     'Value'  => '','Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder'  => 'Sector',           'Name'  => 'idSector',       'Id'  => 'Search_idSector',      'Value'  => '','Required'  => 1,'arrData' => $data['arrSector'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 2, 'Placeholder'  => 'Email',            'Name'  => 'Email',          'Id'  => 'Search_Email',         'Value'  => '','Required'  => 1,'Icon' => 'bx bx-mail-send']);
+                    $data['Fnc_FormInputs']->formSelect([                'Placeholder'  => 'Estado',           'Name'  => 'idEstado',       'Id'  => 'Search_idEstado',      'Value'  => '','Required'  => 1,'arrData' => $data['arrEstado']]);
 
                     ?>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">

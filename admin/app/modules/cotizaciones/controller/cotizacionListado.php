@@ -708,10 +708,6 @@ class cotizacionListado extends ControllerBase {
     public function Insert($f3){
 
         /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-
-        /*******************************************************************/
         //variables
         $ndata_1 = isset($_POST['Item_Item']) ? count($_POST['Item_Item']) : 0;
         $ndata_2 = isset($_POST['Producto_idProducto']) ? count($_POST['Producto_idProducto']) : 0;
@@ -821,8 +817,8 @@ class cotizacionListado extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => '', 'query' => $query];
-                        $ResponseItems = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_insert($xParams);
                     }
                 }
 
@@ -852,8 +848,8 @@ class cotizacionListado extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams           = ['DataCheck' => '', 'query' => $query];
-                        $ResponseProductos = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_insert($xParams);
                     }
                 }
 
@@ -881,8 +877,8 @@ class cotizacionListado extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams           = ['DataCheck' => '', 'query' => $query];
-                        $ResponseServicios = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_insert($xParams);
                     }
                 }
 
@@ -985,8 +981,8 @@ class cotizacionListado extends ControllerBase {
                         //Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idCotizacion', 'SubCarpeta' => '', 'Post' => $dataDelete];
                         //Ejecuto la query
-                        $xParams     = ['query' => $query];
-                        $ResponseDel = $this->Base_delete($xParams);
+                        $xParams = ['query' => $query];
+                        $this->Base_delete($xParams);
                     }
                 }
 
@@ -1111,8 +1107,8 @@ class cotizacionListado extends ControllerBase {
             'Post'      => $arrTareas
         ];
         //Ejecuto la query
-        $xParams       = ['DataCheck' => '', 'query' => $query];
-        $ResponseTarea = $this->Base_update($xParams);
+        $xParams = ['DataCheck' => '', 'query' => $query];
+        $this->Base_update($xParams);
     }
 
 }

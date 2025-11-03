@@ -282,6 +282,11 @@ class FunctionsServerServer {
 						return ['success' => false, 'data' => 'Verifique el dato solicitado, no es una URL.'];
 					}
 					break;
+				/*************************/
+				//otro comando
+				case 3:
+					//otro comando
+					break;
 			}
 
 			//Se ejecuta comando a la terminal del servidor

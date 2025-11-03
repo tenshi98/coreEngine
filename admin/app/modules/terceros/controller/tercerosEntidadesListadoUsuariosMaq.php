@@ -166,8 +166,8 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                                     'Post'        => $Post
                                 ];
                                 //Ejecuto la query
-                                $xParams  = ['query' => $query];
-                                $Response = $this->Base_delete($xParams);
+                                $xParams = ['query' => $query];
+                                $this->Base_delete($xParams);
 
                                 break;
                         }
@@ -198,9 +198,8 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                                     'Post'      => $Post
                                 ];
                                 //Ejecuto la query
-                                //Ejecuto la query
-                        $xParams  = ['DataCheck' => '', 'query' => $query];
-                        $Response = $this->Base_insert($xParams);
+                                $xParams  = ['DataCheck' => '', 'query' => $query];
+                                $this->Base_insert($xParams);
                                 break;
 
                         }

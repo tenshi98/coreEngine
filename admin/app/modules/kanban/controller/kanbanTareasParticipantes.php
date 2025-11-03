@@ -71,7 +71,7 @@ class kanbanTareasParticipantes extends ControllerBase {
 
         //Recorro
         $xWhere = 'idTipoUsuario!=1 AND idEstado=1';
-        foreach ($arrExistentes AS $usr){
+        foreach ($arrExistentes as $usr){
             $xWhere .= ' AND idUsuario!='.$usr['idUsuario'];
         }
 
@@ -157,8 +157,8 @@ class kanbanTareasParticipantes extends ControllerBase {
                         'Post'      => $arrParticipantes
                     ];
                     //Ejecuto la query
-                    $xParams      = ['DataCheck' => '', 'query' => $query];
-                    $ResponsePart = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $this->Base_insert($xParams);
                 }
             }
             /******************************/
@@ -181,8 +181,8 @@ class kanbanTareasParticipantes extends ControllerBase {
                 'Post'      => $arrTareas
             ];
             //Ejecuto la query
-            $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-            $ResponseHist = $this->Base_insert($xParams);
+            $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+            $this->Base_insert($xParams);
 
             /******************************/
             //devuelvo el ultimo id
@@ -250,8 +250,8 @@ class kanbanTareasParticipantes extends ControllerBase {
                     'Post'      => $arrTareas
                 ];
                 //Ejecuto la query
-                $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                $ResponseHist = $this->Base_insert($xParams);
+                $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                $this->Base_insert($xParams);
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
                 echo Response::sendData(200, $Response);

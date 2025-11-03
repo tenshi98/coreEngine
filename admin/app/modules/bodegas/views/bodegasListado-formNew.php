@@ -26,9 +26,8 @@
                     <?php
                     //se dibujan los inputs
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',     'Name'  => 'Nombre',     'Value'  => '','Required'  => 2]);
-                    $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',   'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                           'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',   'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                                           'FormName' => 'FormNewData']);
+                    $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',   'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                          'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',   'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion',  'Value'  => '','Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); //Activo

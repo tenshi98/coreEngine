@@ -25,7 +25,7 @@ class FunctionsServerSocial {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-	public function sendWhatsappTemplate($Token, $InstanceId, $Type, $Body): array{
+	public function sendWhatsappTemplate($Config, $Body): array{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -37,30 +37,26 @@ class FunctionsServerSocial {
 		* 	$ServerSocial->sendWhatsappTemplate('asdertcvbtrtr', '356644', 1, array());
 		*
 		*=================================================    Parametros   =================================================
-		* @input   string   $Token        Token de la plataforma
-		* @input   string   $InstanceId   Instancia a utilizar
-		* @input   string   $Type         Plantilla del mensaje a utilizar
-		* @input   string   $Body         Arreglo con los datos, como minimo el fono y el cuerpo
-		* @return  string
+		* @input   array   $Config       Configuracion de whatsapp
+		* @input   array   $Body         Arreglo con los datos, como minimo el fono y el cuerpo
+		* @return  array
 		*===================================================================================================================
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($Token) || $Token==''){           return ['success' => false, 'error' => 'No ha ingresado el Token'];}
-		if(!isset($InstanceId) || $InstanceId==''){ return ['success' => false, 'error' => 'No ha ingresado el InstanceId'];}
-		if(!isset($Type) || $Type==''){             return ['success' => false, 'error' => 'No ha ingresado el Type'];}
+		if(!is_array($Config) || empty($Config)){   return ['success' => false, 'error' => 'No ha ingresado el Body'];}
 		if(!is_array($Body) || empty($Body)){       return ['success' => false, 'error' => 'No ha ingresado el Body'];}
 
 		/********************** Si todo esta ok **********************/
 		//Se arma el mensaje
-		switch ($Type) {
+		switch ($Config['Type']) {
 			/*********************************************************/
-			//Alertas solo un dato
+			//Template con solo el titulo y el mensaje
 			case 1:
 				$data = [
-					"token"     => $Token,
-					"namespace" => "512f752c_ac4f_45a8_b5b5_2adcfe3ed73a",
-					"template"  => "1tek_alerta_1",
+					"token"     => $Config['Token'],
+					"namespace" => $Config['namespace'],
+					"template"  => $Config['template'],
 					"language" => [
 						"policy" => "deterministic",
 						"code"   => "es"
@@ -69,7 +65,32 @@ class FunctionsServerSocial {
 						[
 							"type" => "body",
 							"parameters" => [
-								["type" => "text", "text" => $this->formatWhatsappText($Body['Cuerpo'])],
+								["type" => "text", "text" => $this->formatWhatsappText($Body['Titulo'])],
+								["type" => "text", "text" => $this->formatWhatsappText($Body['Mensaje'])],
+							]
+						]
+					],
+					"phone" => $this->DataNumbers->normalizarPhone($Body['Phone'])
+				];
+				break;
+			/*********************************************************/
+			//Template con el nombre de la persona, el mensaje y el enlace
+			case 2:
+				$data = [
+					"token"     => $Config['Token'],
+					"namespace" => $Config['namespace'],
+					"template"  => $Config['template'],
+					"language" => [
+						"policy" => "deterministic",
+						"code"   => "es"
+					],
+					"params" => [
+						[
+							"type" => "body",
+							"parameters" => [
+								["type" => "text", "text" => $this->formatWhatsappText($Body['Entidad'])],
+								["type" => "text", "text" => $this->formatWhatsappText($Body['Mensaje'])],
+								["type" => "text", "text" => $this->formatWhatsappText($Body['Link'])],
 							]
 						]
 					],
@@ -80,7 +101,7 @@ class FunctionsServerSocial {
 			//Alertas Admin
 			case 999:
 				$data = [
-					"token"     => $Token,
+					"token"     => $Config['Token'],
 					"namespace" => "512f752c_ac4f_45a8_b5b5_2adcfe3ed73a",
 					"template"  => "alerta_iot",
 					"language" => [
@@ -103,6 +124,11 @@ class FunctionsServerSocial {
 					"phone" => $this->DataNumbers->normalizarPhone($Body['Phone'])
 				];
 				break;
+			/*********************************************************/
+			//Alertas Admin
+			case 1000:
+				//otra
+				break;
 
 		}
 		//Se transforman a un array json
@@ -110,7 +136,7 @@ class FunctionsServerSocial {
 
 		/**************************************/
 		//Se hace el envio
-		$url = 'https://api.1msg.io/'.$InstanceId.'/sendTemplate';
+		$url = 'https://api.1msg.io/'.$Config['InstanceId'].'/sendTemplate';
 		$ch = curl_init($url);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));

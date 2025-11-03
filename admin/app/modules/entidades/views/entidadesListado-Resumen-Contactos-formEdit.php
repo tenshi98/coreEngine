@@ -43,15 +43,14 @@
         $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',             'Name'  => 'Email',           'Id' => 'EditContacto_Email',           'Value'  => $x4,  'Required' => 1,'Icon' => 'bx bx-mail-send']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',               'Name'  => 'Rut',             'Id' => 'EditContacto_Rut',             'Value'  => $x5,  'Required' => 1,'Icon' => 'bi bi-person-circle']);
         $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
-        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',           'Name'  => 'Fono1',           'Id' => 'EditContacto_Fono1',           'Value'  => $x6,  'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Teléfono',          'Name'  => 'Fono2',           'Id' => 'EditContacto_Fono2',           'Value'  => $x7,  'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-        $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',           'Name1' => 'idCiudad',        'Id1'=> 'EditContacto_idCiudad',        'Value1' => $x8,  'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                               'Placeholder2' => 'Comuna',           'Name2' => 'idComuna',        'Id2'=> 'EditContacto_idComuna',        'Value2' => $x9,  'Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                               'FormName' => 'FormEditContacto']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Dirección',         'Name'  => 'Direccion',       'Id' => 'EditContacto_Direccion',       'Value'  => $x10, 'Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo Contacto',     'Name'  => 'idTipoContacto',  'Id' => 'EditContacto_idTipoContacto',  'Value'  => $x11, 'Required' => 2,'arrData' => $data['arrTipoContacto'], 'BASE' => $BASE]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Cargo',             'Name'  => 'Cargo',           'Id' => 'EditContacto_Cargo',           'Value'  => $x12, 'Required' => 1]);
-        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',            'Name'  => 'idEstado',        'Id' => 'EditContacto_idEstado',        'Value'  => $x13, 'Required' => 2,'arrData' => $data['arrEstado']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Celular',           'Name'  => 'Fono1',           'Id' => 'EditContacto_Fono1',           'Value'  => $x6,  'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Teléfono',          'Name'  => 'Fono2',           'Id' => 'EditContacto_Fono2',           'Value'  => $x7,  'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+        $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',            'Name1' => 'idCiudad',        'Id1'=> 'EditContacto_idCiudad',        'Value1' => $x8,  'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                              'Placeholder2' => 'Comuna',            'Name2' => 'idComuna',        'Id2'=> 'EditContacto_idComuna',        'Value2' => $x9,  'Required2' => 1,'arrData2' => $data['arrComuna']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',         'Name'  => 'Direccion',       'Id' => 'EditContacto_Direccion',       'Value'  => $x10, 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Tipo Contacto',     'Name'  => 'idTipoContacto',  'Id' => 'EditContacto_idTipoContacto',  'Value'  => $x11, 'Required'  => 2,'arrData' => $data['arrTipoContacto'], 'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Cargo',             'Name'  => 'Cargo',           'Id' => 'EditContacto_Cargo',           'Value'  => $x12, 'Required'  => 1]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder'  => 'Estado',            'Name'  => 'idEstado',        'Id' => 'EditContacto_idEstado',        'Value'  => $x13, 'Required'  => 2,'arrData' => $data['arrEstado']]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idContacto','Value' => $data['rowData']['idContacto'],'Required' => 2]);

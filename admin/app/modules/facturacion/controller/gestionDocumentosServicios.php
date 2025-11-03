@@ -54,10 +54,7 @@ class gestionDocumentosServicios extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';break;  //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -130,10 +127,7 @@ class gestionDocumentosServicios extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';break;  //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -212,10 +206,7 @@ class gestionDocumentosServicios extends ControllerBase {
 
         /******************************************/
         //Se verifica movimiento
-        switch ($idTipo) {
-            case 1: $tsrxName = 'gestionDocumentosCompras';break;  //Compras
-            case 2: $tsrxName = 'gestionDocumentosVentas';break;   //Ventas
-        }
+        $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
         //Se genera la query
@@ -452,6 +443,18 @@ class gestionDocumentosServicios extends ControllerBase {
         ];
         //Devuelvo
         return $DataChecking;
+    }
+
+    /******************************************************************************/
+    //Se validan los datos
+    private function tsrxName(int $idTipo): string{
+        // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
+        $tsrxMap = [
+            1 => 'gestionDocumentosCompras',
+            2 => 'gestionDocumentosVentas'
+        ];
+        // Por defecto usar ventas si no viene un tipo válido
+        return $tsrxMap[$idTipo] ?? $tsrxMap[2];
     }
 
 

@@ -352,7 +352,7 @@ class bodegasMovimientoProductos extends ControllerBase {
 
             /******************************/
             //Recorro
-            foreach($arrStocks AS $crud){
+            foreach($arrStocks as $crud){
                 $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
                 $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
             }
@@ -386,8 +386,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                        $ResponseTarea = $this->Base_update($xParams);
+                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $this->Base_update($xParams);
 
                     }else{
                         /******************************/
@@ -407,8 +407,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                        $ResponseTarea = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $this->Base_insert($xParams);
 
                     }
                     break;
@@ -438,8 +438,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                        $ResponseTarea = $this->Base_update($xParams);
+                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $this->Base_update($xParams);
                     }else{
                         /******************************/
                         //Se agrega respuesta
@@ -458,8 +458,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                        $ResponseTarea = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $this->Base_insert($xParams);
                     }
                     break;
             }
@@ -556,8 +556,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'Post'      => $arrTareas
                             ];
                             //Ejecuto la query
-                            $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                            $ResponseTarea = $this->Base_update($xParams);
+                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $this->Base_update($xParams);
 
                         }else{
                             /******************************/
@@ -577,8 +577,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'Post'      => $arrTareas
                             ];
                             //Ejecuto la query
-                            $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                            $ResponseTarea = $this->Base_insert($xParams);
+                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $this->Base_insert($xParams);
 
                         }
                         break;
@@ -608,8 +608,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'Post'      => $arrTareas
                             ];
                             //Ejecuto la query
-                            $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                            $ResponseTarea = $this->Base_update($xParams);
+                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $this->Base_update($xParams);
                         }else{
                             /******************************/
                             //Se agrega respuesta
@@ -628,8 +628,8 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'Post'      => $arrTareas
                             ];
                             //Ejecuto la query
-                            $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
-                            $ResponseTarea = $this->Base_insert($xParams);
+                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $this->Base_insert($xParams);
                         }
                         break;
                 }

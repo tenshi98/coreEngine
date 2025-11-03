@@ -104,8 +104,8 @@ class entidadesInstaller extends ControllerBase {
             foreach ($arrTables as $table) {
                 /******************************/
                 //Se genera la query
-                $xParams  = ['query' => $table];
-                $Response = $this->Base_createTable($xParams);
+                $xParams = ['query' => $table];
+                $this->Base_createTable($xParams);
             }
         }
 
@@ -173,8 +173,8 @@ class entidadesInstaller extends ControllerBase {
                         ];
                         //Ejecuto la query
                         //Ejecuto la query
-                        $xParams  = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                        $Response = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                        $this->Base_insert($xParams);
                     }
                 }
                 /************************************************/
@@ -235,7 +235,7 @@ class entidadesInstaller extends ControllerBase {
             foreach ($arrPermDel as $sql) {
                 //Se ejecuta la query
                 $xParams = ['query' => $sql];
-                $result  = $this->Base_queryExecute($xParams);
+                $this->Base_queryExecute($xParams);
             }
         }
 
@@ -256,8 +256,8 @@ class entidadesInstaller extends ControllerBase {
             //recorro
             foreach ($arrTableDel as $tblDel) {
                 //Se ejecuta la query
-                $xParams  = ['query' => $tblDel];
-                $Response = $this->Base_dropTable($xParams);
+                $xParams = ['query' => $tblDel];
+                $this->Base_dropTable($xParams);
             }
         }
 
@@ -360,6 +360,10 @@ class entidadesInstaller extends ControllerBase {
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/listado/documentos/update',             'RutaController' => 'entidadesListadoDocumentos->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'];
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'administracion/entidades/listado/documentos',                    'RutaController' => 'entidadesListadoDocumentos->Delete',         'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'];
 
+                break;
+            /******************************************/
+            case 3:
+                //
                 break;
         }
 

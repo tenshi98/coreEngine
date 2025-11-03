@@ -32,34 +32,42 @@ class CheckData{
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
     /******************************************************************************/
-    public function checkData($DataCheck){
-
-        /******************************************/
+    public function checkingData($DataCheck){
         /*
-            Formato de la query
-            $DataCheck = [
-                'emptyData'                 => 'mainPassword,oldPassword,password,rePassword', -> Se validan datos vacios al ejecutar formulario
-                'encode'                    => 'oldPassword',                                  -> Codificar los datos
-                'ValidarEmail'              => 'email',                                        -> Validacion si es email
-                'ValidarNumero'             => '',                                             -> Validacion si es un numero
-                'ValidarEntero'             => '',                                             -> Validacion si es un numero entero
-                'ValidarRut'                => 'Rut',                                          -> Validacion si es un Rut
-                'ValidarPatente'            => '',                                             -> Validacion si es una patente
-                'ValidarFecha'              => 'fNacimiento',                                  -> Validacion si es una fecha
-                'ValidarHora'               => '',                                             -> Validacion si es una hora
-                'ValidarURL'                => '',                                             -> Validacion si es una url
-                'ValidarLargoMinimo'        => '',                                             -> Validacion de los datos
-                'ValidarLargoMinimoN'       => 3,
-                'ValidarLargoMaximo'        => '',
-                'ValidarLargoMaximoN'       => 255,
-                'ValidarPalabrasCensuradas' => '',                                             -> Validacion si hay palabras censuradas
-                'ValidarEspaciosVacios'     => 'password',                                     -> Validacion si hay espacios en los datos ingresados
-                'ValidarMayusculas'         => '',                                             -> Validacion si hay letras mayusculas dentro del texto
-                'ValidarCoincidencias'      => 'mainPassword-oldPassword,password-rePassword', -> Validacion si los datos son iguales
-                'Post'                      => $DataPOST,                                      -> Datos entregados
-            ];
-
-        */
+		*=================================================     Detalles    =================================================
+		*
+		* Permite hacer validacion de datos a traves de un arreglo
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//Formato de la query
+        *   $DataCheck = [
+        *       'emptyData'                 => 'mainPassword,oldPassword,password,rePassword', -> Se validan datos vacios al ejecutar formulario
+        *       'encode'                    => 'oldPassword',                                  -> Codificar los datos
+        *       'ValidarEmail'              => 'email',                                        -> Validacion si es email
+        *       'ValidarNumero'             => '',                                             -> Validacion si es un numero
+        *       'ValidarEntero'             => '',                                             -> Validacion si es un numero entero
+        *       'ValidarRut'                => 'Rut',                                          -> Validacion si es un Rut
+        *       'ValidarPatente'            => '',                                             -> Validacion si es una patente
+        *       'ValidarFecha'              => 'fNacimiento',                                  -> Validacion si es una fecha
+        *       'ValidarHora'               => '',                                             -> Validacion si es una hora
+        *       'ValidarURL'                => '',                                             -> Validacion si es una url
+        *       'ValidarLargoMinimo'        => '',                                             -> Validacion de los datos
+        *       'ValidarLargoMinimoN'       => 3,
+        *       'ValidarLargoMaximo'        => '',
+        *       'ValidarLargoMaximoN'       => 255,
+        *       'ValidarPalabrasCensuradas' => '',                                             -> Validacion si hay palabras censuradas
+        *       'ValidarEspaciosVacios'     => 'password',                                     -> Validacion si hay espacios en los datos ingresados
+        *       'ValidarMayusculas'         => '',                                             -> Validacion si hay letras mayusculas dentro del texto
+        *       'ValidarCoincidencias'      => 'mainPassword-oldPassword,password-rePassword', -> Validacion si los datos son iguales
+        *       'Post'                      => $DataPOST,                                      -> Datos entregados
+        *   ];
+		*
+		*=================================================    Parametros   =================================================
+		* @input   array    $DataCheck   Arreglo con los datos a validar
+		* @return  array
+		*===================================================================================================================
+		*/
 
         /******************************************/
         //Variables
@@ -190,21 +198,6 @@ class CheckData{
                             if (count($arrCoin) > 0 && count(array_unique($arrCoin)) !== 1) {
                                 $errors[] = ["message" => $field['msgText']];
                             }
-
-
-                            //Se separan los datos
-                            /*$arrData2 = $this->CommonData->parseDataSeparator($data); //Separacion por guiones
-                            // Recolectar valores no vacíos de los campos a comparar
-                            $arrCoin = [];
-                            foreach ($arrData2 as $data2) {
-                                if (!empty($DataCheck['Post'][$data2])) {
-                                    $arrCoin[] = $DataCheck['Post'][$data2];
-                                }
-                            }
-                            // Si hay al menos un valor, verificar si todos son iguales
-                            if (count($arrCoin) > 0 && count(array_unique($arrCoin)) !== 1) {
-                                $errors[] = ["message" => $field['msgText']];
-                            }*/
                         }
                         break;
                 }

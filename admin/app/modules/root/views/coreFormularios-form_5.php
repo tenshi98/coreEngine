@@ -46,25 +46,24 @@
                 $xvalue2 = '';
                 //input
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Selects']);
-                $data['Fnc_FormInputs']->formSelect([              'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelect',              'Name' => 'formSelect',              'Id' => 'IDInput_5_17','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad']]);
-                $data['Fnc_FormInputs']->formSelectFilter([       'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectFilter',       'Name' => 'formSelectFilter',       'Id' => 'IDInput_5_18','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad'], 'BASE' => $BASE]);
-                $data['Fnc_FormInputs']->formSelectGroup([        'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectGroup',        'Name' => 'formSelectGroup',        'Id' => 'IDInput_5_19','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup']]);
-                $data['Fnc_FormInputs']->formSelectGroupFilter([ 'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectGroupFilter', 'Name' => 'formSelectGroupFilter', 'Id' => 'IDInput_5_20','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup'], 'BASE' => $BASE]);
-                $data['Fnc_FormInputs']->formSelectMultiple([            'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'form_multiple1',           'Name' => 'form_multiple2[]',         'Id' => 'IDInput_5_21','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad']]);
-                $data['Fnc_FormInputs']->formSelectMultipleGroup([      'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectMultipleGroup',      'Name' => 'formSelectMultipleGroup[]',    'Id' => 'IDInput_5_22','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup']]);
+                $data['Fnc_FormInputs']->formSelect([               'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelect',               'Name' => 'formSelect',                 'Id' => 'IDInput_5_17','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad']]);
+                $data['Fnc_FormInputs']->formSelectFilter([         'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectFilter',         'Name' => 'formSelectFilter',           'Id' => 'IDInput_5_18','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad'], 'BASE' => $BASE]);
+                $data['Fnc_FormInputs']->formSelectGroup([          'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectGroup',          'Name' => 'formSelectGroup',            'Id' => 'IDInput_5_19','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup']]);
+                $data['Fnc_FormInputs']->formSelectGroupFilter([    'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectGroupFilter',    'Name' => 'formSelectGroupFilter',      'Id' => 'IDInput_5_20','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup'], 'BASE' => $BASE]);
+                $data['Fnc_FormInputs']->formSelectMultiple([       'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'form_multiple1',           'Name' => 'form_multiple2[]',           'Id' => 'IDInput_5_21','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad']]);
+                $data['Fnc_FormInputs']->formSelectMultipleGroup([  'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectMultipleGroup',  'Name' => 'formSelectMultipleGroup[]',  'Id' => 'IDInput_5_22','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup']]);
 
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 5,'Texto' => 'formSelectDepend']);
-                $data['Fnc_FormInputs']->formSelectDepend(['FormAling1' => 2,'FormCol1' => 12,'Placeholder1' => 'Ciudad','Name1' => 'idCiudad','Id1' => 'IDInput_5_23','Value1' => $xvalue2,'Required1' => 2,'arrData1' => $data['arrCiudad'],
-                                                             'FormAling2' => 2,'FormCol2' => 12,'Placeholder2' => 'Comuna','Name2' => 'idComuna','Id2' => 'IDInput_5_24','Value2' => $xvalue2,'Required2' => 2,'arrData2' => $data['arrComuna'],
-                                                             'FormName' => 'form3']);
+                $data['Fnc_FormInputs']->formSelectDepend([  'FormAling1' => 2,'FormCol1' => 12,'Placeholder1' => 'Ciudad','Name1' => 'idCiudad','Id1' => 'IDInput_5_23','Value1' => $xvalue2,'Required1' => 2,'arrData1' => $data['arrCiudad'],
+                                                             'FormAling2' => 2,'FormCol2' => 12,'Placeholder2' => 'Comuna','Name2' => 'idComuna','Id2' => 'IDInput_5_24','Value2' => $xvalue2,'Required2' => 2,'arrData2' => $data['arrComuna'],]);
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 5,'Texto' => 'formSelectDependFilter']);
                 $data['Fnc_FormInputs']->formSelectDependFilter(['FormAling1' => 2,'FormCol1' => 12,'Placeholder1' => 'Ciudad','Name1' => 'idCiudad','Id1' => 'IDInput_5_25','Value1' => $xvalue2,'Required1' => 2,'arrData1' => $data['arrCiudad'],
-                                                                'FormAling2' => 2,'FormCol2' => 12,'Placeholder2' => 'Comuna','Name2' => 'idComuna','Id2' => 'IDInput_5_26','Value2' => $xvalue2,'Required2' => 2,'arrData2' => $data['arrComuna'],
-                                                                'FormName' => 'form3', 'BASE' => $BASE]);
+                                                                 'FormAling2' => 2,'FormCol2' => 12,'Placeholder2' => 'Comuna','Name2' => 'idComuna','Id2' => 'IDInput_5_26','Value2' => $xvalue2,'Required2' => 2,'arrData2' => $data['arrComuna'],
+                                                                 'BASE' => $BASE]);
                 $data['Fnc_FormInputs']->formSelectCountry([ 'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectCountry','Name' => 'formSelectCountry','Id' => 'IDInput_5_27','Value' => $xvalue2,'Required' => 2, 'BASE' => $BASE]);
-                $data['Fnc_FormInputs']->formSelectnAuto([  'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectnAuto', 'Name' => 'formSelectnAuto', 'Id' => 'IDInput_5_28','Value' => $xvalue, 'Required' => 2,'ValorInicio' => 1,'ValorFin' => 25]);
+                $data['Fnc_FormInputs']->formSelectnAuto([   'FormAling' => 5,'FormCol' => 12,'Placeholder' => 'formSelectnAuto', 'Name' => 'formSelectnAuto', 'Id' => 'IDInput_5_28','Value' => $xvalue, 'Required' => 2,'ValorInicio' => 1,'ValorFin' => 25]);
 
-                
+
                 ?>
 
                 <div class="text-center">

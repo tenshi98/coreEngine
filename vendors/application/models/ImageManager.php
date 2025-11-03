@@ -10,24 +10,32 @@ class ImageManager{
 
 	/******************************************************************************/
 	public function optimize($Options){
-
-		/******************************************/
         /*
-            Formato de las opciones
-            $Options = [
-				'FileOriginal' => 'file.jpg'  //Nombre original del archivo
-				'FileNew'      => 'new_file'  //Nombre deseado
-				'rutaArchivo'  => 'img/'      //Ruta al archivo
-				'Formato'      => 'png'       //Formato
-				'quality'      => ''          //Calidad
-				'max_width'    => '640'       //Ancho maximo deseado
-				'max_height'   => ''          //Alto maximo deseado
-				'IMGFilter'    => 'grises'    //Filtro
-				'IMGRotate'    => '25'        //Rotacion
-				'IMGFlip'      => ''          //Voltear
-			];
-
-        */
+		*=================================================     Detalles    =================================================
+		*
+		* Permite optimizar el formato de la imagen
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//Formato de las opciones
+        *    $Options = [
+		*		'FileOriginal' => 'file.jpg'  //Nombre original del archivo
+		*		'FileNew'      => 'new_file'  //Nombre deseado
+		*		'rutaArchivo'  => 'img/'      //Ruta al archivo
+		*		'Formato'      => 'png'       //Formato
+		*		'quality'      => ''          //Calidad
+		*		'max_width'    => '640'       //Ancho maximo deseado
+		*		'max_height'   => ''          //Alto maximo deseado
+		*		'IMGFilter'    => 'grises'    //Filtro
+		*		'IMGRotate'    => '25'        //Rotacion
+		*		'IMGFlip'      => ''          //Voltear
+		*	];
+		*
+		*=================================================    Parametros   =================================================
+		* @input   array    $Options   Parametros
+		* @return  bool
+		*===================================================================================================================
+		*/
 
 		/**********************  Definiciones   **********************/
 		//Definicion de Valores

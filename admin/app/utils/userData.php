@@ -27,7 +27,7 @@ $f3->route('PUT /perfil/delFiles', 'miUsuario->delFiles');  //Permite eliminar e
 /*******************************************************************************************************************/
 $PermisosList = $f3->get('SESSION.arrPermisos');
 //recorro
-foreach ($PermisosList AS $permiso){
+foreach ($PermisosList as $permiso){
     //verifico si existe
     if(isset($permiso['Metodo'],$permiso['RutaWeb'],$permiso['RutaController'])&&$permiso['Metodo']!=''&&$permiso['RutaWeb']!=''&&$permiso['RutaController']!=''){
         //Se crea ruta

@@ -304,8 +304,10 @@ class testeos extends ControllerBase {
         $FNC_DataOperations       = new FunctionsDataOperations;
 
         /**********  FunctionsConvertions  **********/
+        $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                [''],                                                   'string',  '(1.5 -> Devuelve Sin Dato ingresado)');
+        $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                ['a'],                                                  'string',  '(a -> Devuelve El dato ingresado no es un numero)');
         $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                [1.5],                                                  'string',  '(1.5 -> Devuelve 01:30:00)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                ['a'],                                                  'string',  '(1.5 -> Devuelve 01:30:00)');
+        
         $this->runTest($test, 'FunctionsConvertions',             'minutos2horas',               [65],                                                   'string',  '(65 -> Devuelve 01:05:00)');
         $this->runTest($test, 'FunctionsConvertions',             'minutos2horas',               ['a'],                                                  'string',  '(65 -> Devuelve 01:05:00)');
         $this->runTest($test, 'FunctionsConvertions',             'segundos2horas',              [3600],                                                 'string',  '(3600 -> Devuelve 01:00:00)');
@@ -816,14 +818,19 @@ class testeos extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /******************************/
-            $WSP_WhatsappToken       = $_POST['WhatsappToken'];
-            $WSP_WhatsappInstanceId  = $_POST['WhatsappInstanceId'];
-            $WSP_Body['Phone']       = $this->DataNumbers->normalizarPhone($_POST['Fono']);
-            $WSP_Body['Cuerpo']      = $_POST['Mensaje'];
+            //Se generan datos
+            $Config['Token']      = $_POST['WhatsappToken'];
+            $Config['InstanceId'] = $_POST['WhatsappInstanceId'];
+            $Config['Type']       = 1;
+            $Config['namespace']  = $_POST['namespace'];
+            $Config['template']   = $_POST['template'];
+            $WSP_Body['Phone']    = $this->DataNumbers->normalizarPhone($_POST['Fono']);
+            $WSP_Body['Titulo']   = $_POST['Titulo'];
+            $WSP_Body['Mensaje']  = $_POST['Mensaje'];
 
             /***************************************/
             //Se envia notificacion
-            $Result = $this->Notifications->sendWhatsappTemplate($WSP_WhatsappToken, $WSP_WhatsappInstanceId, 1, $WSP_Body);
+            $Result = $this->Notifications->sendWhatsappTemplate($Config, $WSP_Body);
 
             /***************************************/
             //si se envia correctamente
@@ -868,7 +875,7 @@ class testeos extends ControllerBase {
                 $response  = $this->ServerIA->senDataIA($api_key, $data);
 
                 //Se consigue la respuesta
-                if($response['success']==true){
+                if($response['success']===true){
                     //Se decodifica la respuesta
                     $decoded_response = json_decode($response['data'], true);
                     //Se muestra el resultado

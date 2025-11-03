@@ -7,12 +7,11 @@
                     <h5 class="search-title text-center"><i class="bi bi-search"></i> Filtrar Datos</h5>
                     <?php
                     //se dibujan los inputs
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name'  => 'Nombre',         'Id'  => 'Search_Nombre',        'Value'  => '','Required' => 1]);
-                    $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',           'Name1' => 'idCiudad',       'Id1' => 'Search_idCiudad',      'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                           'Placeholder2' => 'Comuna',           'Name2' => 'idComuna',       'Id2' => 'Search_idComuna',      'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                                           'FormName' => 'FormSearchData']);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Dirección',         'Name' => 'Direccion',       'Id'  => 'Search_Direccion',     'Value'  => '','Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
-                    $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',            'Name'  => 'idEstado',       'Id'  => 'Search_idEstado',      'Value'  => '','Required' => 1,'arrData' => $data['arrEstado']]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',      'Name'  => 'Nombre',     'Id'  => 'Search_Nombre',     'Value'  => '','Required'  => 1]);
+                    $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',      'Name1' => 'idCiudad',   'Id1' => 'Search_idCiudad',   'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                          'Placeholder2' => 'Comuna',      'Name2' => 'idComuna',   'Id2' => 'Search_idComuna',   'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',   'Name'  => 'Direccion',  'Id'  => 'Search_Direccion',  'Value'  => '','Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                    $data['Fnc_FormInputs']->formSelect([                 'Placeholder'  => 'Estado',      'Name'  => 'idEstado',   'Id'  => 'Search_idEstado',   'Value'  => '','Required'  => 1,'arrData' => $data['arrEstado']]);
 
                     ?>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">

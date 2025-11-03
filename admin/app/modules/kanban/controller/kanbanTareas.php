@@ -888,8 +888,8 @@ class kanbanTareas extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => '', 'query' => $query];
-                        $ResponseTarea = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_insert($xParams);
                     }
                 }
                 /******************************/
@@ -913,8 +913,8 @@ class kanbanTareas extends ControllerBase {
                             'Post'      => $arrParticipantes
                         ];
                         //Ejecuto la query
-                        $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                        $ResponsePart = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                        $this->Base_insert($xParams);
                     }
                 }
 
@@ -938,8 +938,8 @@ class kanbanTareas extends ControllerBase {
                     'Post'      => $arrTareas
                 ];
                 //Ejecuto la query
-                $xParams      = ['DataCheck' => '', 'query' => $query];
-                $ResponseHist = $this->Base_insert($xParams);
+                $xParams = ['DataCheck' => '', 'query' => $query];
+                $this->Base_insert($xParams);
 
                 /******************************/
                 // Si es un ID numérico, se envía con código 200 (OK)
@@ -1019,8 +1019,8 @@ class kanbanTareas extends ControllerBase {
                 $arrPrioridadNew = [];
                 $arrEstadoNew    = [];
                 //Se guardan los datos
-                foreach ($arrPrioridad AS $task){       $arrPrioridadNew[$task['ID']] = $task['Nombre'];}
-                foreach ($arrEstadoCierre AS $task){    $arrEstadoNew[$task['ID']]    = $task['Nombre'];}
+                foreach ($arrPrioridad as $task){       $arrPrioridadNew[$task['ID']] = $task['Nombre'];}
+                foreach ($arrEstadoCierre as $task){    $arrEstadoNew[$task['ID']]    = $task['Nombre'];}
 
                 /******************************/
                 //Se hacen comparaciones
@@ -1065,8 +1065,8 @@ class kanbanTareas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                    $ResponseHist = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                    $this->Base_insert($xParams);
 
                 }
 
@@ -1157,8 +1157,8 @@ class kanbanTareas extends ControllerBase {
                         'Post'      => $arrTareas
                     ];
                     //Ejecuto la query
-                    $xParams      = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                    $ResponseHist = $this->Base_insert($xParams);
+                    $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                    $this->Base_insert($xParams);
                     /******************************/
                     // Devuelvo $Response con código 200 (OK)
                     echo Response::sendData(200, $Response);
@@ -1213,8 +1213,8 @@ class kanbanTareas extends ControllerBase {
                         //Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idKanban', 'SubCarpeta' => '', 'Post' => $dataDelete];
                         //Ejecuto la query
-                        $xParams     = ['query' => $query];
-                        $ResponseDel = $this->Base_delete($xParams);
+                        $xParams = ['query' => $query];
+                        $this->Base_delete($xParams);
                     }
                 }
 

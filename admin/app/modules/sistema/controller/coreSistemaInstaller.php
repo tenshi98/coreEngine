@@ -53,7 +53,6 @@ class coreSistemaInstaller extends ControllerBase {
 
         /******************************************/
         //Variables
-        $arrTables    = array();
         $arrPermisos  = array();
 
         /*******************************************************/
@@ -109,9 +108,8 @@ class coreSistemaInstaller extends ControllerBase {
                             'Post'      => $rutas
                         ];
                         //Ejecuto la query
-                        //Ejecuto la query
-                        $xParams  = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
-                        $Response = $this->Base_insert($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                        $this->Base_insert($xParams);
                     }
                 }
                 /************************************************/
@@ -172,7 +170,7 @@ class coreSistemaInstaller extends ControllerBase {
             foreach ($arrPermDel as $sql) {
                 //Se ejecuta la query
                 $xParams = ['query' => $sql];
-                $result  = $this->Base_queryExecute($xParams);
+                $this->Base_queryExecute($xParams);
             }
         }
 

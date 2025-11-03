@@ -184,7 +184,6 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
 		if(!$this->DataValidations->validarHora($hora)){ return 'El dato ingresado no es una hora ('.$hora.')';}
-		//if(!$this->DataValidations->validarHora($horaSuma)){ return 'El dato ingresado no es una hora ('.$horaSuma.')';}
 
 		/********************** Si todo esta ok **********************/
 		//Separo la hora

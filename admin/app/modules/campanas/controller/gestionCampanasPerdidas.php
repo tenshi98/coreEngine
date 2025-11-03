@@ -322,8 +322,8 @@ class gestionCampanasPerdidas extends ControllerBase {
                 'Post'      => $arrTareas
             ];
             //Ejecuto la query
-            $xParams         = ['DataCheck' => $DataCheck, 'query' => $query];
-            $ResponsePerdida = $this->Base_insert($xParams);
+            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+            $this->Base_insert($xParams);
             /******************************************/
             //Se actualizan los datos del costo
             $gestionCampanas = new gestionCampanas();
@@ -427,8 +427,8 @@ class gestionCampanasPerdidas extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => '', 'query' => $query];
-                        $ResponseTarea = $this->Base_update($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_update($xParams);
 
                     }
                     /*******************************************************/
@@ -441,7 +441,7 @@ class gestionCampanasPerdidas extends ControllerBase {
                     $ActionSQL .= 'WHERE idMovimiento = "'.$_POST['idMovimiento'].'" AND idProducto = "'.$_POST['Old_idProducto'].'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
 
                 }
 
@@ -565,8 +565,8 @@ class gestionCampanasPerdidas extends ControllerBase {
                             'Post'      => $arrTareas
                         ];
                         //Ejecuto la query
-                        $xParams       = ['DataCheck' => '', 'query' => $query];
-                        $ResponseTarea = $this->Base_update($xParams);
+                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $this->Base_update($xParams);
 
                     }
                     /*******************************************************/
@@ -577,12 +577,12 @@ class gestionCampanasPerdidas extends ControllerBase {
                     $ActionSQL = 'DELETE FROM `bodegas_movimientos` WHERE idMovimiento = "'.$rowCostos['idMovimiento'].'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                     //Se borran los datos
                     $ActionSQL = 'DELETE FROM `bodegas_movimientos_productos` WHERE idMovimiento = "'.$rowCostos['idMovimiento'].'"';
                     //Se ejecuta la query
                     $xParams = ['query' => $ActionSQL];
-                    $result  = $this->Base_queryExecute($xParams);
+                    $this->Base_queryExecute($xParams);
                 }
 
                 /******************************************/

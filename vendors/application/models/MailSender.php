@@ -107,7 +107,7 @@ class MailSender{
                 $headers[] = 'Api-Key: '.ConfigMail::SendingBlueSender["SERVERAPI"];
                 $headers[] = 'Content-Type: application/json';
                 curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-                $result = curl_exec($ch);
+                curl_exec($ch);
                 curl_close($ch);
 
                 return true;
@@ -130,14 +130,18 @@ class MailSender{
 
     }
 
-    /******************************************************************************/
+    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Internos                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
     /******************************************************************************/
     private function validateMail($query){
 
         /******************************************/
         //Se verifica si hay datos
-        if(!isset($query['data']) OR $query['data']==''){         return false; }
-        if(!isset($query['template']) OR $query['template']==''){ return false; }
+        if(!isset($query['data']) || $query['data']==''){         return false; }
+        if(!isset($query['template']) || $query['template']==''){ return false; }
 
         /******************************************/
         //Variables
@@ -181,7 +185,7 @@ class MailSender{
         //Creacion del mensaje n base a una plantilla
         $message = $this->templateEmail($TemplateData, $query['template'], $query['Post']);
         //Se hace el envio
-        $sent  = $smtp->send($message, TRUE);
+        $sent  = $smtp->send($message, true);
         //Se guardan registros
         $mylog = $smtp->log();
         //envio correcto
@@ -215,7 +219,7 @@ class MailSender{
                     //Se imprimen los iconos de las redes sociales
                     $Social_icon = '';
                     foreach ($icons as $key => [$img, $alt]) {
-                        if (!empty($UserData[$key])) {
+                        if (!empty($TemplateData[$key])) {
                             $Social_icon .= '<td style="padding-top: 3px; padding-right: 20px;"><a target="_blank" rel="noopener noreferrer" href="'.$TemplateData[$key].'" ><img src="'.$TemplateData['baseUrl'].'/img/social_icons/'.$img.'" width="16" alt="'.$alt.'" draggable="false"></a></td>';
                         }
                     }
@@ -229,6 +233,11 @@ class MailSender{
                     $this->TemplateRender->assign('Social_icon', $Social_icon);
                     $this->TemplateRender->assign('Asunto', $Data['Asunto']);
                     $this->TemplateRender->assign('Mensaje', $Data['Mensaje']);
+                    break;
+                /******************************************/
+                //Otra opcion
+                case 3:
+                    //
                     break;
 
             }

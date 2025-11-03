@@ -194,7 +194,7 @@ class ControllerBase {
 
         /********************** Si todo esta ok **********************/
         //Ejecuto el chequeo
-        $checkData = $this->checkData->checkData($DataCheck);
+        $checkData = $this->checkData->checkingData($DataCheck);
         if ($checkData!==false) { return $checkData;}
 
         /**********************  Retorno datos  **********************/
@@ -249,7 +249,7 @@ class ControllerBase {
 
         /********************** Si todo esta ok **********************/
         //Ejecuto el chequeo
-        $checkData = $this->checkData->checkData($DataCheck);
+        $checkData = $this->checkData->checkingData($DataCheck);
         if ($checkData!==false) { return $checkData;}
 
         /**********************  Retorno datos  **********************/
@@ -601,55 +601,46 @@ class ControllerBase {
 		*/
 
         /********************** Si todo esta ok **********************/
+        //Variable vacia
+        $parts    = [];
         //Verifico que no venga vacio
         if($WhereData!=''){
-            //Variables
-            $separator = ($whereInt != '') ? ' AND ' : '';
-            //Separacion por comas
-            $arrWhere = $this->CommonData->parseDataCommas($WhereData);
+            //Se separan los datos
+            $arrWhere = $this->CommonData->parseDataCommas($WhereData); //Separacion por comas
             //Verifico el tipo
             switch ($Type) {
                 /***********************************/
                 //Tipo Integer
                 case 1:
-                    //recorro los campos a validar
-                    foreach ($arrWhere as $where) {
-                        //verifico si existe el dato
-                        if (!empty($_POST[$where])) {
-                            //se agrega dato a cadena
-                            $whereInt .= $separator.$Transx.'.'.$where." = '".$this->clearData($_POST[$where])."'";
-                            //separador
-                            $separator = ' AND ';
+                    //Se recorren los datos separados
+                    foreach ($arrWhere as $field) {
+                        // Se verifican los datos del post
+                        if (!empty($_POST[$field])) {
+                            $parts[] = $Transx.'.'.$field." = '".$this->clearData($_POST[$field])."'";
                         }
                     }
                     break;
                 /***********************************/
                 //Tipo String
                 case 2:
-                    //recorro los campos a validar
-                    foreach ($arrWhere as $where) {
-                        //verifico si existe el dato
-                        if (!empty($_POST[$where])) {
-                            //se agrega dato a cadena
-                            $whereInt .= $separator.$Transx.'.'.$where." LIKE '%".$this->clearData($_POST[$where])."%'";
-                            //separador
-                            $separator = ' AND ';
+                    //Se recorren los datos separados
+                    foreach ($arrWhere as $field) {
+                        // Se verifican los datos del post
+                        if (!empty($_POST[$field])) {
+                            $parts[] = $Transx.'.'.$field." LIKE '%".$this->clearData($_POST[$field])."%'";
                         }
                     }
                     break;
                 /***********************************/
                 //Tipo Between
                 case 3:
-                    //recorro los campos a validar
-                    foreach ($arrWhere as $where) {
+                    //Se recorren los datos separados
+                    foreach ($arrWhere as $field) {
                         //Separacion por guiones
-                        $arrData = $this->CommonData->parseDataSeparator($where);
-                        //verifico si existe el dato
+                        $arrData = $this->CommonData->parseDataSeparator($field); //Separacion por guiones
+                        // Se verifican los datos del post
                         if (!empty($_POST[$arrData[1]])&&!empty($_POST[$arrData[2]])) {
-                            //se agrega dato a cadena
-                            $whereInt .= $separator.$Transx.'.'.$arrData[0]." BETWEEN '".$_POST[$arrData[1]]."' AND '".$_POST[$arrData[2]]."'";
-                            //separador
-                            $separator = ' AND ';
+                            $parts[] = $Transx.'.'.$arrData[0]." BETWEEN '".$_POST[$arrData[1]]."' AND '".$_POST[$arrData[2]]."'";
                         }
                     }
                     break;
@@ -657,8 +648,12 @@ class ControllerBase {
         }
 
         /**********************  Retorno datos  **********************/
+        //Se agregan los datos al where
+        $subWhere   = $parts ? implode(' AND ', $parts) : '';
+        //Se validan si hay datos de la consulta, sino se mantiene la herencia anterior
+        $DataReturn = ($subWhere != '') ? $whereInt.' AND '.$subWhere : $whereInt;
         //Devuelvo
-        return $whereInt;
+        return ($whereInt != '') ? $DataReturn : $subWhere;
     }
 
     /************************************************************************************************************/
@@ -728,8 +723,13 @@ class ControllerBase {
                 }
                 break;
             /**********************************/
-            //Vista de la API
+            //Vista de la API con sesion
             case 2:
+                echo $view->render('../app/templates/api-vew.php');  // Vista
+                break;
+            /**********************************/
+            //Vista de la API con token
+            case 3:
                 echo $view->render('../app/templates/api-vew.php');  // Vista
                 break;
         }
@@ -778,12 +778,21 @@ class ControllerBase {
                     case 2:
                         echo $view->render('../app/templates/user-error.php');  // Vista
                         break;
+                    //Otra vista
+                    case 3:
+                        //otra vista
+                        break;
 
                 }
                 break;
             /**********************************/
-            //Vista de la API
+            //Vista de la API con sesion
             case 2:
+                echo $view->render('../app/templates/api-vew.php');  // Vista
+                break;
+            /**********************************/
+            //Vista de la API con token
+            case 3:
                 echo $view->render('../app/templates/api-vew.php');  // Vista
                 break;
         }

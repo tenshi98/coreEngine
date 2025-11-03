@@ -89,8 +89,8 @@ class usuariosListadoPermisos extends ControllerBase {
                                     'Post'        => $Post
                                 ];
                                 //Ejecuto la query
-                                $xParams  = ['query' => $query];
-                                $Response = $this->Base_delete($xParams);
+                                $xParams = ['query' => $query];
+                                $this->Base_delete($xParams);
 
                                 break;
                         }
@@ -122,9 +122,8 @@ class usuariosListadoPermisos extends ControllerBase {
                                     'Post'      => $Post
                                 ];
                                 //Ejecuto la query
-                                //Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-        $Response = $this->Base_insert($xParams);
+                                $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                                $this->Base_insert($xParams);
                                 break;
 
                             /*******************************************************************/
@@ -142,8 +141,8 @@ class usuariosListadoPermisos extends ControllerBase {
                                     'Post'      => $Post,
                                 ];
                                 //Ejecuto la query
-                                $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-                                $Response = $this->Base_update($xParams);
+                                $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                                $this->Base_update($xParams);
                                 break;
                         }
                         break;

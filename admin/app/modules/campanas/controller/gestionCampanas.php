@@ -1073,8 +1073,8 @@ class gestionCampanas extends ControllerBase {
                         //Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idCampana', 'SubCarpeta' => '', 'Post' => $dataDelete];
                         //Ejecuto la query
-                        $xParams     = ['query' => $query];
-                        $ResponseDel = $this->Base_delete($xParams);
+                        $xParams = ['query' => $query];
+                        $this->Base_delete($xParams);
                     }
                 }
 
@@ -1193,8 +1193,8 @@ class gestionCampanas extends ControllerBase {
             'Post'      => $arrTareas
         ];
         //Ejecuto la query
-        $xParams       = ['DataCheck' => '', 'query' => $query];
-        $ResponseTarea = $this->Base_update($xParams);
+        $xParams = ['DataCheck' => '', 'query' => $query];
+        $this->Base_update($xParams);
 
     }
 

@@ -46,7 +46,7 @@ class sistemaInstalacion extends ControllerBase {
                 //Se genera la query
                 $ListDataModule = method_exists($data, 'ListDataModule');
                 //si el metodo existe
-                if($ListDataModule==true){
+                if($ListDataModule===true){
                     $ControllerData = new $data;
                     $arrModules[]   = $ControllerData->ListDataModule();
                 }
@@ -109,7 +109,7 @@ class sistemaInstalacion extends ControllerBase {
                 //Se genera la query
                 $ListDataModule = method_exists($data, 'ListDataModule');
                 //si el metodo existe
-                if($ListDataModule==true){
+                if($ListDataModule===true){
                     $ControllerData = new $data;
                     $arrModules[]   = $ControllerData->ListDataModule();
                 }
@@ -154,7 +154,7 @@ class sistemaInstalacion extends ControllerBase {
             //Se consulta
             $DataModule = method_exists($dataPut['Controller'], 'InstallModule');
             //si el metodo existe
-            if($DataModule==true){
+            if($DataModule===true){
                 //Se llama y ejecuta la instalacion
                 $ControllerData = new $dataPut['Controller'];
                 $Response       = $ControllerData->InstallModule();
@@ -186,7 +186,7 @@ class sistemaInstalacion extends ControllerBase {
             //Se consulta
             $DataModule = method_exists($dataPut['Controller'], 'UninstallModule');
             //si el metodo existe
-            if($DataModule==true){
+            if($DataModule===true){
                 //Se llama y ejecuta la instalacion
                 $ControllerData = new $dataPut['Controller'];
                 $Response       = $ControllerData->UninstallModule();

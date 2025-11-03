@@ -64,7 +64,7 @@ class UIWidgetsCommon {
 
 		/******************************************/
 		//Se verifica la recepcion de datos
-		if($XMLData['success']==true){
+		if($XMLData['success']===true){
 			//Se recorren los datos
 			foreach($XMLData['data'] as $data){
 				//Imprimo los datos
@@ -395,9 +395,9 @@ class UIWidgetsCommon {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($BaseURL) || $BaseURL==''){  return $this->printAlertData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Dirección base del archivo.');}
-		if(!isset($Route) || $Route==''){      return $this->printAlertData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta a la carpeta contenedora.');}
-		if(!isset($File) || $File==''){        return $this->printAlertData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Nombre del archivo.');}
+		if(!isset($BaseURL) || $BaseURL==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Dirección base del archivo.');}
+		if(!isset($Route) || $Route==''){      echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta a la carpeta contenedora.');}
+		if(!isset($File) || $File==''){        echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Nombre del archivo.');}
 
 		/********************** Si todo esta ok **********************/
 		/****************************************/
@@ -653,8 +653,6 @@ class UIWidgetsCommon {
 			echo $alerts;
 		}
 
-        /********************** Si todo esta ok **********************/
-        
     }
 
 

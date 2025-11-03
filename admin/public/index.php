@@ -2,7 +2,7 @@
 /**********************************************************************************************************************************/
 /*                                                          Seguridad                                                             */
 /**********************************************************************************************************************************/
-require_once('../app/utils/RateLimit.php'); //Limitador de visitas
+require_once('../app/utils/rateLimit.php'); //Limitador de visitas
 
 /**********************************************************************************************************************************/
 /*                                                       Include classes                                                          */
@@ -35,7 +35,7 @@ foreach ($arrDirectory as $x_Directory) {
 }
 
 //Base
-$f3 = require('../../vendors/fatfree/base.php'); //Base
+$f3 = require_once('../../vendors/fatfree/base.php'); //Base
 $f3->set('AUTOLOAD',$Autoload);                  //Autoload
 
 /**********************************************************************************************************************************/
@@ -62,20 +62,20 @@ $UserSesion   = (!$f3->get('SESSION.TokenUser') || !$f3->get('SESSION.TokenExpir
 /*                                                        Usuarios Logueados                                                      */
 /**********************************************************************************************************************************/
 //Solo si esta activa la sesion
-if($UserSesion==true){
+if($UserSesion===true){
 
-    require_once('../app/utils/UserAdmin.php'); //Rutas de los administradores
-    require_once('../app/utils/UserData.php');  //Rutas de los usuarios normales
-    require_once('../app/utils/ApiList.php');   //Rutas de los administradores
+    require_once('../app/utils/userAdmin.php'); //Rutas de los administradores
+    require_once('../app/utils/userData.php');  //Rutas de los usuarios normales
+    require_once('../app/utils/apiList.php');   //Rutas de los administradores
 
 }
 /**********************************************************************************************************************************/
 /*                                                       Usuarios Visitantes                                                      */
 /**********************************************************************************************************************************/
 //Rutas de los usuarios no ingresados
-require_once('../app/utils/CronList.php');   //Rutas de los crones
-require_once('../app/utils/UserGuest.php');  //Rutas de los usuarios no loegueados
-require_once('../app/utils/LoadErrors.php'); //Manejo de los errores
+require_once('../app/utils/cronList.php');   //Rutas de los crones
+require_once('../app/utils/userGuest.php');  //Rutas de los usuarios no loegueados
+require_once('../app/utils/loadErrors.php'); //Manejo de los errores
 
 //Ejecuta
 $f3->run();

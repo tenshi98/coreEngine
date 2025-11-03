@@ -28,14 +28,13 @@
         $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',             'Name'  => 'Email',           'Id' => 'NewContacto_Email',           'Value'  => '','Required' => 1,'Icon' => 'bx bx-mail-send']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',               'Name'  => 'Rut',             'Id' => 'NewContacto_Rut',             'Value'  => '','Required' => 1,'Icon' => 'bi bi-person-circle']);
         $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
-        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',           'Name'  => 'Fono1',           'Id' => 'NewContacto_Fono1',           'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Teléfono',          'Name'  => 'Fono2',           'Id' => 'NewContacto_Fono2',           'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-        $data['Fnc_FormInputs']->formSelectDepend([          'Placeholder1' => 'Ciudad',           'Name1' => 'idCiudad',        'Id1'=> 'NewContacto_idCiudad',        'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                               'Placeholder2' => 'Comuna',           'Name2' => 'idComuna',        'Id2'=> 'NewContacto_idComuna',        'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna'],
-                                                               'FormName' => 'FormNewContacto']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Dirección',         'Name'  => 'Direccion',       'Id' => 'NewContacto_Direccion',       'Value'  => '','Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo Contacto',     'Name'  => 'idTipoContacto',  'Id' => 'NewContacto_idTipoContacto',  'Value'  => '','Required' => 2,'arrData' => $data['arrTipoContacto'], 'BASE' => $BASE]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Cargo',             'Name'  => 'Cargo',           'Id' => 'NewContacto_Cargo',           'Value'  => '','Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Celular',           'Name'  => 'Fono1',           'Id' => 'NewContacto_Fono1',           'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Teléfono',          'Name'  => 'Fono2',           'Id' => 'NewContacto_Fono2',           'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+        $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',            'Name1' => 'idCiudad',        'Id1'=> 'NewContacto_idCiudad',        'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                              'Placeholder2' => 'Comuna',            'Name2' => 'idComuna',        'Id2'=> 'NewContacto_idComuna',        'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',         'Name'  => 'Direccion',       'Id' => 'NewContacto_Direccion',       'Value'  => '','Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Tipo Contacto',     'Name'  => 'idTipoContacto',  'Id' => 'NewContacto_idTipoContacto',  'Value'  => '','Required'  => 2,'arrData' => $data['arrTipoContacto'], 'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Cargo',             'Name'  => 'Cargo',           'Id' => 'NewContacto_Cargo',           'Value'  => '','Required'  => 1]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
