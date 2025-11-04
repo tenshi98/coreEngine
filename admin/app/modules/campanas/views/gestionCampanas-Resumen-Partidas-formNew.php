@@ -60,7 +60,7 @@ $RandName = 'rand_'.rand(1, 999999);
 <div style="display: none;">
     <div id="<?php echo 'clone_productos_'.$RandName; ?>" class="prod_container container" style="margin-bottom: 15px;">
         <div class="row">
-            <div class="col-6"><?php $data['Fnc_FormInputs']->formSelect(['FormAling' => 4,'FormCol' => 12, 'Placeholder' => 'Producto',  'Name' => 'Producto_idProducto[]',  'Value' => '','Required' => 2,'arrData' => $data['arrProductos']]); ?></div>
+            <div class="col-11"><?php $data['Fnc_FormInputs']->formSelect(['FormAling' => 4,'FormCol' => 12, 'Placeholder' => 'Producto',  'Name' => 'Producto_idProducto[]',  'Value' => '','Required' => 2,'arrData' => $data['arrProductos']]); ?></div>
             <div class="col-1"><button class="btn btn-danger remove_productos"><i class="bi bi-trash"></i></button></div>
         </div>
     </div>
