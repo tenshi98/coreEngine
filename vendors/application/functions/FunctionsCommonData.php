@@ -177,10 +177,8 @@ class FunctionsCommonData {
 		*/
 
 		/********************** Si todo esta ok **********************/
-		//Valida !=|<=|>=
-		$Data = preg_split('/\s*(?:!=|<=|>=)\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
-		//Valida =|<|>
-		$Data = preg_split('/\s*(?:=|<|>)\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
+		//Valida !=|<=|>=|=|<|> en orden
+		$Data = preg_split('/\s*(?:!=|<=|>=|=|<|>)\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
 
 		/**********************  Retorno datos  **********************/
 		return $Data;
