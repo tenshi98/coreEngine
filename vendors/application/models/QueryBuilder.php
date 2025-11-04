@@ -855,7 +855,7 @@ class QueryBuilder{
             //Se recorren los datos separados
             foreach ($arrWhere as $field) {
                 // Se verifican los datos del post
-                if (!empty($SIS_Post[$field])) {
+                if (isset($SIS_Post[$field])&&$SIS_Post[$field]!='') {
                     $parts[] = $field . " != '" . $this->clearData($SIS_Post[$field]) . "'";
                 }
             }
@@ -882,7 +882,7 @@ class QueryBuilder{
                 //Se recorren los datos separados
                 foreach ($arrData2 as $field) {
                     // Se verifica que el dato POST exista
-                    if (!empty($SIS_Post[$field])) {
+                    if (isset($SIS_Post[$field])&&$SIS_Post[$field]!='') {
                         $parts_data[]  = $field;
                         $parts_where[] = $field . " = '" . $this->clearData($SIS_Post[$field]) . "'";
                     // En el caso de que sea una validacion distinta a los datos enviados por POST
@@ -905,24 +905,26 @@ class QueryBuilder{
             //si no hay subgrupo se ejecuta normalmente
             }else{
                 //verifico si existe el dato
-                if (!empty($SIS_Post[$data])) {
+                if (isset($SIS_Post[$data])&&$SIS_Post[$data]!='') {
                     //Guardo los datos
                     $DataInternal  = $data;
                     $whereInternal = ($whereInternal!='') ? $whereInternal.' AND '.$data." = '".$this->clearData($SIS_Post[$data])."'" : $data." = '".$this->clearData($SIS_Post[$data])."'";
                 }
             }
             /******************************************/
-            //se ejecuta la query
-            $query = [
-                'data'  => $DataInternal,
-                'table' => $SIS_Table,
-                'where' => $whereInternal
-            ];
-            //Ejecuto la query
-            $ndata = $this->queryNRows($query, $DBConn);
-            //si hay un dato
-            if($ndata > 0) {$errors[] = ["message" => "Los datos que intenta ingresar ya existen en el Sistema"];}
-
+            //valido si hay datos
+            if($DataInternal!=''){
+                //se ejecuta la query
+                $query = [
+                    'data'  => $DataInternal,
+                    'table' => $SIS_Table,
+                    'where' => $whereInternal
+                ];
+                //Ejecuto la query
+                $ndata = $this->queryNRows($query, $DBConn);
+                //si hay un dato
+                if($ndata > 0) {$errors[] = ["message" => "Los datos que intenta ingresar ya existen en el Sistema"];}
+            }
         }
 
         //si no hay errores
