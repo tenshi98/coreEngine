@@ -19,22 +19,34 @@
         if(is_array($data['arrPartidas'])&&!empty($data['arrPartidas'])){
             //Cantidad Productos
             for ($i=1; $i <= 10; $i++) {
+                //Variables para los totales
+                $TotalNombre[$i]      = '';
+                $TotalUnimed[$i]      = '';
+                $TotalCantidad[$i]    = 0;
+                $TotalValor[$i]       = 0;
+                //Variables para los subtotales
                 $SubTotalNombre[$i]   = '';
                 $SubTotalUnimed[$i]   = '';
                 $SubTotalCantidad[$i] = 0;
                 $SubTotalValor[$i]    = 0;
                 //Estados
                 for ($x=0; $x <= 6; $x++) {
+                    //Variables para los totales
+                    $TotalProdCantidad[$i][$x]    = 0;
+                    $TotalProdValor[$i][$x]       = 0;
+                    $TotalProdEstado[$i][$x]      = '';
+                    //Variables para los subtotales
                     $SubTotalProdCantidad[$i][$x] = 0;
                     $SubTotalProdValor[$i][$x]    = 0;
                     $SubTotalProdEstado[$i][$x]   = '';
                 }
             }
+
             //filtro
             $newData  = $data['Fnc_CommonData']->agruparPorClave ($data['arrPartidas'], 'Fecha' );
             $ProdData = $data['Fnc_CommonData']->agruparPorClave ($data['arrPartidasProd'], 'idExistencia' );
             //Recorro
-            foreach ($newData AS $Fecha=>$datos){
+            foreach ($newData as $Fecha=>$datos){
                 //Datos para borrado masivo
                 $Del_idCampana       = $data['Fnc_Codification']->encryptDecrypt('encrypt', $datos[0]['idCampana']);
                 $Del_Fecha           = $data['Fnc_Codification']->encryptDecrypt('encrypt', $Fecha);
@@ -56,7 +68,7 @@
                     </td>
                 </tr>';
                 //se recorren los datos dentro de la categoría
-                foreach ($datos AS $crud){
+                foreach ($datos as $crud){
                     /********************************/
                     //Se obtiene el nombre o la razón social
                     $Entidad  = '';
@@ -82,7 +94,22 @@
                     $P_Producto   = '';
                     $P_Cantidad   = '';
                     $P_Beneficios = '';
-                    foreach ($ProdData[$crud['idExistencia']] AS $dataP){
+                    //Se vacian los datos
+                    //Cantidad Productos
+                    for ($i=1; $i <= 10; $i++) {
+                        $SubTotalNombre[$i]   = '';
+                        $SubTotalUnimed[$i]   = '';
+                        $SubTotalCantidad[$i] = 0;
+                        $SubTotalValor[$i]    = 0;
+                        //Estados
+                        for ($x=0; $x <= 6; $x++) {
+                            $SubTotalProdCantidad[$i][$x] = 0;
+                            $SubTotalProdValor[$i][$x]    = 0;
+                            $SubTotalProdEstado[$i][$x]   = '';
+                        }
+                    }
+                    //Se recorren datos
+                    foreach ($ProdData[$crud['idExistencia']] as $dataP){
                         $P_Producto   .= $dataP['Producto'].'<br/>';
                         $P_Cantidad   .= $data['Fnc_DataNumbers']->Cantidades($dataP['Cantidad'], 2).' '.$dataP['Unimed'].'<br/>';
                         $P_Beneficios .= $data['Fnc_DataNumbers']->Valores($dataP['Beneficios'], 2).'<br/>';
@@ -94,6 +121,14 @@
                         $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
                         $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
                         $SubTotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
+                        //Variables
+                        $TotalNombre[$dataP['idProducto']]                                 = $dataP['Producto'];
+                        $TotalUnimed[$dataP['idProducto']]                                 = $dataP['Unimed'];
+                        $TotalCantidad[$dataP['idProducto']]                               = $TotalCantidad[$dataP['idProducto']] + $dataP['Cantidad'];
+                        $TotalValor[$dataP['idProducto']]                                  = $TotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
+                        $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
+                        $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
+                        $TotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
                     }
                     ?>
                     <tr class="<?php echo $crud['EstadoPartidaColor']; ?>">
@@ -168,23 +203,50 @@
                     </tr>
                     <?php
                 }
+                /*****************************************/
+                //SUBTOTALES
+                //Cantidad Productos
+                for ($i=1; $i <= 10; $i++) {
+                    if(isset($SubTotalNombre[$i])&&$SubTotalNombre[$i]!=''){
+                        echo '<tr class="table-info"><td colspan="7"><strong>'.$SubTotalNombre[$i].'</strong></td></tr>';
+                        //Estados
+                        for ($x=0; $x <= 6; $x++) {
+                            if(isset($SubTotalProdEstado[$i][$x])&&$SubTotalProdEstado[$i][$x]!=''){
+                                echo '
+                                <tr>
+                                    <td class="text-end" colspan="4">'.$SubTotalProdEstado[$i][$x].'</td>
+                                    <td class="text-end">'.$data['Fnc_DataNumbers']->Cantidades($SubTotalProdCantidad[$i][$x], 2).' '.$SubTotalUnimed[$i].'</td>
+                                    <td class="text-end">'.$data['Fnc_DataNumbers']->Valores($SubTotalProdValor[$i][$x], 2).'</td>
+                                    <td></td>
+                                </tr>';
+                            }
+                        }
+                        echo '
+                        <tr>
+                            <td class="text-end" colspan="4"><strong>Total General</strong></td>
+                            <td class="text-end">'.$data['Fnc_DataNumbers']->Cantidades($SubTotalCantidad[$i], 2).' '.$SubTotalUnimed[$i].'</td>
+                            <td class="text-end">'.$data['Fnc_DataNumbers']->Valores($SubTotalValor[$i], 2).'</td>
+                            <td></td>
+                        </tr>';
+                    }
+                }
             }
         }
         /*****************************************/
-        //SUBTOTALES
+        //TOTALES
         echo '<tr><td colspan="7"><br/><br/><br/><br/><br/><br/></td></tr>';
         //Cantidad Productos
         for ($i=1; $i <= 10; $i++) {
-            if(isset($SubTotalNombre[$i])&&$SubTotalNombre[$i]!=''){
-                echo '<tr class="table-secondary"><td colspan="7"><strong>'.$SubTotalNombre[$i].'</strong></td></tr>';
+            if(isset($TotalNombre[$i])&&$TotalNombre[$i]!=''){
+                echo '<tr class="table-secondary"><td colspan="7"><strong>'.$TotalNombre[$i].'</strong></td></tr>';
                 //Estados
                 for ($x=0; $x <= 6; $x++) {
-                    if(isset($SubTotalProdEstado[$i][$x])&&$SubTotalProdEstado[$i][$x]!=''){
+                    if(isset($TotalProdEstado[$i][$x])&&$TotalProdEstado[$i][$x]!=''){
                         echo '
                         <tr>
-                            <td class="text-end" colspan="4">'.$SubTotalProdEstado[$i][$x].'</td>
-                            <td class="text-end">'.$data['Fnc_DataNumbers']->Cantidades($SubTotalProdCantidad[$i][$x], 2).' '.$SubTotalUnimed[$i].'</td>
-                            <td class="text-end">'.$data['Fnc_DataNumbers']->Valores($SubTotalProdValor[$i][$x], 2).'</td>
+                            <td class="text-end" colspan="4">'.$TotalProdEstado[$i][$x].'</td>
+                            <td class="text-end">'.$data['Fnc_DataNumbers']->Cantidades($TotalProdCantidad[$i][$x], 2).' '.$TotalUnimed[$i].'</td>
+                            <td class="text-end">'.$data['Fnc_DataNumbers']->Valores($TotalProdValor[$i][$x], 2).'</td>
                             <td></td>
                         </tr>';
                     }
@@ -192,8 +254,8 @@
                 echo '
                 <tr>
                     <td class="text-end" colspan="4"><strong>Total General</strong></td>
-                    <td class="text-end">'.$data['Fnc_DataNumbers']->Cantidades($SubTotalCantidad[$i], 2).' '.$SubTotalUnimed[$i].'</td>
-                    <td class="text-end">'.$data['Fnc_DataNumbers']->Valores($SubTotalValor[$i], 2).'</td>
+                    <td class="text-end">'.$data['Fnc_DataNumbers']->Cantidades($TotalCantidad[$i], 2).' '.$TotalUnimed[$i].'</td>
+                    <td class="text-end">'.$data['Fnc_DataNumbers']->Valores($TotalValor[$i], 2).'</td>
                     <td></td>
                 </tr>';
             }
