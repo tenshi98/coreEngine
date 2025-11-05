@@ -42,7 +42,7 @@
                                             <td>'.$Documento.'</td>
                                             <td>
                                                 <div class="btn-group" role="group">
-                                                        <a href="'.$BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']).'" class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>
+                                                    <a target="new" href="'.$BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']).'" class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>
                                                 </div>
                                             </td>
                                         </tr>';
