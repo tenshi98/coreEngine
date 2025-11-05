@@ -31,7 +31,7 @@
 
                                             <div class="col-12">
                                                 <input type="hidden" name="nombre" id="nombre">
-                                                <button class="btn btn-primary w-100" type="submit"><i class="bi bi-person"></i> Iniciar Sesión</button>
+                                                <button class="btn btn-secondary w-100" type="submit"><i class="bi bi-person"></i> Iniciar Sesión</button>
                                             </div>
                                         </form>
                                     </div>
@@ -49,7 +49,7 @@
 
                                             <div class="col-12">
                                                 <input type="hidden" name="nombre" id="nombre">
-                                                <button class="btn btn-danger w-100" type="submit"><i class="ri-mail-line"></i> Recuperar contraseña</button>
+                                                <button class="btn btn-secondary w-100" type="submit"><i class="ri-mail-line"></i> Recuperar contraseña</button>
                                             </div>
                                         </form>
                                     </div>
@@ -66,6 +66,43 @@
     </div>
 
 </main>
+
+<style>
+
+body {
+  margin: 0;
+  padding: 0;
+  background-image: url('<?php echo $BASE.'/img/login_bg.png'; ?>'); /* Cambia esto por la URL de tu imagen */
+  background-size: cover;        /* Escala la imagen para cubrir todo el contenedor */
+  background-repeat: no-repeat;  /* Evita que se repita */
+  background-position: center;   /* Centra la imagen */
+  min-height: 100vh;             /* Asegura que el body tenga al menos el alto de la pantalla */
+  background-color: #809fbe;
+}
+.card {
+  background: transparent;
+  backdrop-filter: blur(10px);
+  border: 1px solid #4d5669;
+}
+.card .nav-tabs-bordered {
+  border-bottom: 2px solid transparent;
+}
+.card .nav-tabs-bordered .nav-link {
+  color: #4d5669;
+}
+.card .nav-tabs-bordered .nav-link.active {
+  color: #fcfcfc;
+  background-color: transparent;
+  border-bottom: 2px solid #3e4452
+}
+.card .card-title,
+.card .text-center,
+.card .form-label {
+  color: #fcfcfc;
+}
+
+</style>
+
 
 <script>
     /******************************************/
