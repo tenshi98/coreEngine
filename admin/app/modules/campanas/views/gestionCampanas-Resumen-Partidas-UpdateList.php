@@ -94,20 +94,6 @@
                     $P_Producto   = '';
                     $P_Cantidad   = '';
                     $P_Beneficios = '';
-                    //Se vacian los datos
-                    //Cantidad Productos
-                    for ($i=1; $i <= 10; $i++) {
-                        $SubTotalNombre[$i]   = '';
-                        $SubTotalUnimed[$i]   = '';
-                        $SubTotalCantidad[$i] = 0;
-                        $SubTotalValor[$i]    = 0;
-                        //Estados
-                        for ($x=0; $x <= 6; $x++) {
-                            $SubTotalProdCantidad[$i][$x] = 0;
-                            $SubTotalProdValor[$i][$x]    = 0;
-                            $SubTotalProdEstado[$i][$x]   = '';
-                        }
-                    }
                     //Se recorren datos
                     foreach ($ProdData[$crud['idExistencia']] as $dataP){
                         $P_Producto   .= $dataP['Producto'].'<br/>';
@@ -194,7 +180,6 @@
                                     //Se verifica si hay fono
                                     if(isset($crud['EntidadFono1'])&&$crud['EntidadFono1']!=''){
                                         echo '<button type="button" onclick="tabPartidasCall( \''.$crud['EntidadFono1'].'\', \''.$Entidad.'\')"  class="btn btn-secondary btn-sm tooltiplink" data-title="Llamar al Telefono '.$crud['EntidadFono1'].'"><i class="bi bi-telephone"></i> Llamar</button>';
-                                        //echo '<a class="btn btn-secondary btn-sm tooltiplink" data-title="Llamar al Telefono '.$crud['EntidadFono1'].'" href="tel:'.$crud['EntidadFono1'].'"><i class="bi bi-telephone"></i> Llamar</a>';
                                     }
 
                                 echo '</div>';
@@ -230,6 +215,21 @@
                         </tr>';
                     }
                 }
+                /*****************************************/
+                //Se vacian los datos
+                //Cantidad Productos
+                for ($i=1; $i <= 10; $i++) {
+                    $SubTotalNombre[$i]   = '';
+                    $SubTotalUnimed[$i]   = '';
+                    $SubTotalCantidad[$i] = 0;
+                    $SubTotalValor[$i]    = 0;
+                    //Estados
+                    for ($x=0; $x <= 6; $x++) {
+                        $SubTotalProdCantidad[$i][$x] = 0;
+                        $SubTotalProdValor[$i][$x]    = 0;
+                        $SubTotalProdEstado[$i][$x]   = '';
+                    }
+                }
             }
         }
         /*****************************************/
@@ -263,9 +263,6 @@
 
     </tbody>
 </table>
-
-
-
 
 
 <script>
