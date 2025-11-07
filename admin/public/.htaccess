@@ -1,4 +1,3 @@
-
 #### Proteger el propio htaccess
 <Files .htaccess>
     Order allow,deny
