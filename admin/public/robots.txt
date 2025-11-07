@@ -39,6 +39,22 @@ Disallow: /hc/*
 Disallow: /new/*
 Disallow: /lara/*
 Disallow: /api/*
+Disallow: chosen.php
+Disallow: mah.php
+Disallow: goods.php
+Disallow: /manager/*
+Disallow: /shell
+Disallow: /webshell
+Disallow: shell.php
+Disallow: webshell.php
+Disallow: /cron/*
+Disallow: tiny.php
+Disallow: .env
+Disallow: .git/*
+Disallow: /wp-content/
+Disallow: --.php
+Disallow: /%22/vendor/*
+Disallow: /vendor/*
 
 # Opcional: Indicamos la ubicación del archivo security.txt
 # Esto ayuda a investigadores de seguridad a contactarnos si encuentran vulnerabilidades
