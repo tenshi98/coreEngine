@@ -20,7 +20,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
                                     //Recorro
-                                    foreach ($data['arrList'] AS $crud){
+                                    foreach ($data['arrList'] as $crud){
                                         //Para la lista
                                         $Documento    = $crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacion']);
                                         $Documento   .= ' Fecha '.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']);
