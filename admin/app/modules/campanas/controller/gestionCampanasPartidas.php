@@ -2212,19 +2212,19 @@ class gestionCampanasPartidas extends ControllerBase {
                         /*                 ELIMINACION DATOS                   */
                         /*******************************************************/
                         $arrTableDel  = array();
-                        $arrTableDel[] = ['table' => 'DELETE FROM `facturacion_listado` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"'];
-                        $arrTableDel[] = ['table' => 'DELETE FROM `facturacion_listado_productos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"'];
-                        $arrTableDel[] = ['table' => 'DELETE FROM `facturacion_listado_pagos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"'];
-                        $arrTableDel[] = ['table' => 'DELETE FROM `bodegas_movimientos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"'];
-                        $arrTableDel[] = ['table' => 'DELETE FROM `bodegas_movimientos_productos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"'];
+                        $arrTableDel[] = 'DELETE FROM `facturacion_listado` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"';
+                        $arrTableDel[] = 'DELETE FROM `facturacion_listado_productos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"';
+                        $arrTableDel[] = 'DELETE FROM `facturacion_listado_pagos` WHERE idFacturacion = "'.$rowCampana['idFacturacion'].'"';
+                        $arrTableDel[] = 'DELETE FROM `bodegas_movimientos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"';
+                        $arrTableDel[] = 'DELETE FROM `bodegas_movimientos_productos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"';
 
                         /************************************************/
                         //Verifico si existe
                         if($arrTableDel){
                             //recorro
-                            foreach ($arrTableDel as $ActionSQL) {
+                            foreach ($arrTableDel as $sql) {
                                 //Se ejecuta la query
-                                $xParams = ['query' => $ActionSQL];
+                                $xParams = ['query' => $sql];
                                 $this->Base_queryExecute($xParams);
                             }
                         }
