@@ -96,3 +96,5 @@ docker-compose.local.yml
 *.orig
 *.rej
 
+# 🔄 Ignorar contenido carpetas
+/admin/public/security
