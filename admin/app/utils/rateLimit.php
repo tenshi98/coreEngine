@@ -1,7 +1,7 @@
 <?php
 /**********************  Configuracion  **********************/
 $tipo     = 1;                        // Tipo de validacion
-$limit    = 10;                       // número máximo de solicitudes
+$limit    = 20;                       // número máximo de solicitudes
 $window   = 5;                        // ventana de tiempo en segundos
 $ip       = $_SERVER['REMOTE_ADDR'];  // Identificador único por IP
 /**********************    Verificar    **********************/
