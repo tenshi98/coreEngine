@@ -72,7 +72,7 @@
 body {
   margin: 0;
   padding: 0;
-  background-image: url('<?php echo $BASE.'/img/login_bg.png'; ?>'); /* Cambia esto por la URL de tu imagen */
+  background-image: url('<?php echo $BASE.'/img/login_bg.jpg'; ?>'); /* Cambia esto por la URL de tu imagen */
   background-size: cover;        /* Escala la imagen para cubrir todo el contenedor */
   background-repeat: no-repeat;  /* Evita que se repita */
   background-position: center;   /* Centra la imagen */
