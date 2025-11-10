@@ -169,7 +169,8 @@
                                         /*************************************/
                                         case 3: //Campaña Revisada
                                         case 4: //Campaña Confirmada
-                                            echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')" class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
+                                            echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')"                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
+                                            echo '<button type="button" onclick="tabPartidasDel( \''.$encryptedId.'\', \''.$Entidad.'\')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i> Borrar</button>';
                                             break;
                                         /*************************************/
                                         //Campaña Rechazada
