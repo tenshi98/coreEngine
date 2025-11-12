@@ -57,11 +57,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -95,11 +91,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -136,11 +128,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -186,11 +174,7 @@ class ControllerBase {
         $query      = $params['query'] ?? '';
         $showQuery  = $params['showQuery'] ?? false;
         $novalidate = $params['novalidate'] ?? false;
-        $newBDConn  = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn     = $params['newBDConn'] ?? $this->DBConn;
 
         /********************** Si todo esta ok **********************/
         //Ejecuto el chequeo
@@ -241,11 +225,7 @@ class ControllerBase {
         $query      = $params['query'] ?? '';
         $showQuery  = $params['showQuery'] ?? false;
         $novalidate = $params['novalidate'] ?? false;
-        $newBDConn  = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn     = $params['newBDConn'] ?? $this->DBConn;
 
         /********************** Si todo esta ok **********************/
         //Ejecuto el chequeo
@@ -282,11 +262,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -318,11 +294,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -353,11 +325,7 @@ class ControllerBase {
         /**********************     Valores     **********************/
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -388,11 +356,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -420,11 +384,7 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $showQuery = $params['showQuery'] ?? false;
-        $newBDConn = $params['newBDConn'] ?? null;
-
-        /********************** Si todo esta ok **********************/
-        //Verifico que base de datos se va a utilizar
-        $DBConn = $newBDConn ?? $this->DBConn;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
