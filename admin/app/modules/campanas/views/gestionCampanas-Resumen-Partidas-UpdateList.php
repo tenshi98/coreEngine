@@ -96,25 +96,28 @@
                     $P_Beneficios = '';
                     //Se recorren datos
                     foreach ($ProdData[$crud['idExistencia']] as $dataP){
-                        $P_Producto   .= $dataP['Producto'].'<br/>';
-                        $P_Cantidad   .= $data['Fnc_DataNumbers']->Cantidades($dataP['Cantidad'], 2).' '.$dataP['Unimed'].'<br/>';
-                        $P_Beneficios .= $data['Fnc_DataNumbers']->Valores($dataP['Beneficios'], 2).'<br/>';
-                        //Variables
-                        $SubTotalNombre[$dataP['idProducto']]                                 = $dataP['Producto'];
-                        $SubTotalUnimed[$dataP['idProducto']]                                 = $dataP['Unimed'];
-                        $SubTotalCantidad[$dataP['idProducto']]                               = $SubTotalCantidad[$dataP['idProducto']] + $dataP['Cantidad'];
-                        $SubTotalValor[$dataP['idProducto']]                                  = $SubTotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
-                        $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
-                        $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
-                        $SubTotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
-                        //Variables
-                        $TotalNombre[$dataP['idProducto']]                                 = $dataP['Producto'];
-                        $TotalUnimed[$dataP['idProducto']]                                 = $dataP['Unimed'];
-                        $TotalCantidad[$dataP['idProducto']]                               = $TotalCantidad[$dataP['idProducto']] + $dataP['Cantidad'];
-                        $TotalValor[$dataP['idProducto']]                                  = $TotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
-                        $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
-                        $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
-                        $TotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
+                        //Se verifica si existen datos
+                        if(isset($dataP['idProducto'])&&$dataP['idProducto']!=''){
+                            $P_Producto   .= $dataP['Producto'].'<br/>';
+                            $P_Cantidad   .= $data['Fnc_DataNumbers']->Cantidades($dataP['Cantidad'], 2).' '.$dataP['Unimed'].'<br/>';
+                            $P_Beneficios .= $data['Fnc_DataNumbers']->Valores($dataP['Beneficios'], 2).'<br/>';
+                            //Variables
+                            $SubTotalNombre[$dataP['idProducto']]                                 = $dataP['Producto'];
+                            $SubTotalUnimed[$dataP['idProducto']]                                 = $dataP['Unimed'];
+                            $SubTotalCantidad[$dataP['idProducto']]                               = $SubTotalCantidad[$dataP['idProducto']] + $dataP['Cantidad'];
+                            $SubTotalValor[$dataP['idProducto']]                                  = $SubTotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
+                            $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
+                            $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
+                            $SubTotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
+                            //Variables
+                            $TotalNombre[$dataP['idProducto']]                                 = $dataP['Producto'];
+                            $TotalUnimed[$dataP['idProducto']]                                 = $dataP['Unimed'];
+                            $TotalCantidad[$dataP['idProducto']]                               = $TotalCantidad[$dataP['idProducto']] + $dataP['Cantidad'];
+                            $TotalValor[$dataP['idProducto']]                                  = $TotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
+                            $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
+                            $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
+                            $TotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
+                        }
                     }
                     ?>
                     <tr class="<?php echo $crud['EstadoPartidaColor']; ?>">
