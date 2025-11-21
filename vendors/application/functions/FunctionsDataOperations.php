@@ -1,8 +1,10 @@
 <?php
+
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
-class FunctionsDataOperations {
+class FunctionsDataOperations
+{
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
@@ -16,7 +18,8 @@ class FunctionsDataOperations {
 
 	/************************************************************************************************************/
 	//Instancias
-	public function __construct() {
+	public function __construct()
+	{
 		$this->DataValidations = new FunctionsDataValidations();
 		$this->Convertions     = new FunctionsConvertions();
 	}
@@ -27,7 +30,8 @@ class FunctionsDataOperations {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-	public function dividirHoras($hora,int $divisor): int {
+	public function dividirHoras($hora, int $divisor): int
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -47,21 +51,23 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarHora($hora)){       return 'El dato ingresado no es una hora ('.$hora.')';}
+		if (!$this->DataValidations->validarHora($hora)) {
+			return 'El dato ingresado no es una hora (' . $hora . ')';
+		}
 		if (!$this->DataValidations->validarNumero($divisor) || !$this->DataValidations->validarEntero($divisor)) {
-            return 'Verificar que el dato ingresado sea un numero';
-        }
+			return 'Verificar que el dato ingresado sea un numero';
+		}
 
 		/********************** Si todo esta ok **********************/
 		$minutos = $this->Convertions->horas2minutos($hora);
 
 		/**********************  Retorno datos  **********************/
-		return $minutos/$divisor;
-
+		return $minutos / $divisor;
 	}
 
 	/************************************************************************************************************/
-	public function multiplicarHoras($hora,int $multiplicador): string {
+	public function multiplicarHoras($hora, int $multiplicador): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -80,10 +86,12 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarHora($hora)){ return 'El dato ingresado no es una hora ('.$hora.')';}
+		if (!$this->DataValidations->validarHora($hora)) {
+			return 'El dato ingresado no es una hora (' . $hora . ')';
+		}
 		if (!$this->DataValidations->validarNumero($multiplicador) || !$this->DataValidations->validarEntero($multiplicador)) {
-            return 'Verificar que el dato ingresado sea un numero';
-        }
+			return 'Verificar que el dato ingresado sea un numero';
+		}
 
 		/********************** Si todo esta ok **********************/
 		// 1. Convertir la hora al total de segundos.
@@ -103,11 +111,11 @@ class FunctionsDataOperations {
 		/**********************  Retorno datos  **********************/
 		// 4. Formatear y devolver el resultado.
 		return sprintf("%02d:%02d:%02d", $horas, $minutos, $segundos);
-
 	}
 
 	/************************************************************************************************************/
-	public function restarhoras($hora, $horaResta): string{
+	public function restarhoras($hora, $horaResta): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -128,18 +136,18 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
 		if (!$this->DataValidations->validarHora($hora) || !$this->DataValidations->validarHora($horaResta)) {
-            return 'Verificar que el dato ingresado sea una hora';
-        }
+			return 'Verificar que el dato ingresado sea una hora';
+		}
 
 		/********************** Si todo esta ok **********************/
 		//Se verifica cual es el mayor
-		if(strtotime($hora)>strtotime($horaResta)){
+		if (strtotime($hora) > strtotime($horaResta)) {
 			$horaResta  = $this->sumarhoras($horaResta, '24:00:00');
 		}
 
 		//Separo la hora
-		$hora      = explode(":",$hora);
-		$horaResta = explode(":",$horaResta);
+		$hora      = explode(":", $hora);
+		$horaResta = explode(":", $horaResta);
 
 		//obtengo valores por separado
 		$horai = $hora[0];
@@ -152,19 +160,19 @@ class FunctionsDataOperations {
 		$segf  = $horaResta[2];
 
 		//transformo a segundos
-		$ini   = ((($horai*60)*60)+($mini*60)+$segi);
-		$fin   = ((($horaf*60)*60)+($minf*60)+$segf);
+		$ini   = ((($horai * 60) * 60) + ($mini * 60) + $segi);
+		$fin   = ((($horaf * 60) * 60) + ($minf * 60) + $segf);
 
 		//ejecuto operacion
-		$dif   = $fin-$ini;
+		$dif   = $fin - $ini;
 
 		/**********************  Retorno datos  **********************/
 		return $this->Convertions->segundos2horas($dif);
-
 	}
 
 	/************************************************************************************************************/
-	public function sumarhoras($hora,$horaSuma): string{
+	public function sumarhoras($hora, $horaSuma): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -183,12 +191,14 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarHora($hora)){ return 'El dato ingresado no es una hora ('.$hora.')';}
+		if (!$this->DataValidations->validarHora($hora)) {
+			return 'El dato ingresado no es una hora (' . $hora . ')';
+		}
 
 		/********************** Si todo esta ok **********************/
 		//Separo la hora
-		$hora     = explode(":",$hora);
-		$horaSuma = explode(":",$horaSuma);
+		$hora     = explode(":", $hora);
+		$horaSuma = explode(":", $horaSuma);
 
 		//obtengo valores por separado
 		$horai = $hora[0];
@@ -201,19 +211,19 @@ class FunctionsDataOperations {
 		$segf  = $horaSuma[2];
 
 		//transformo a segundos
-		$ini   = ((($horai*60)*60)+($mini*60)+$segi);
-		$fin   = ((($horaf*60)*60)+($minf*60)+$segf);
+		$ini   = ((($horai * 60) * 60) + ($mini * 60) + $segi);
+		$fin   = ((($horaf * 60) * 60) + ($minf * 60) + $segf);
 
 		//ejecuto operacion
-		$dif   = $fin+$ini;
+		$dif   = $fin + $ini;
 
 		/**********************  Retorno datos  **********************/
 		return $this->Convertions->segundos2horas($dif);
-
 	}
 
 	/************************************************************************************************************/
-	public function sumarDias($Fecha,int $nDias): string{
+	public function sumarDias($Fecha, int $nDias): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -232,19 +242,21 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarFecha($Fecha)){   return 'El dato ingresado no es una fecha ('.$Fecha.')';}
+		if (!$this->DataValidations->validarFecha($Fecha)) {
+			return 'El dato ingresado no es una fecha (' . $Fecha . ')';
+		}
 		if (!$this->DataValidations->validarNumero($nDias) || !$this->DataValidations->validarEntero($nDias)) {
-            return 'Verificar que el dato ingresado sea un numero';
-        }
+			return 'Verificar que el dato ingresado sea un numero';
+		}
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		return date('Y-m-d', strtotime( '+'.$nDias.' day' , strtotime($Fecha)));
-
+		return date('Y-m-d', strtotime('+' . $nDias . ' day', strtotime($Fecha)));
 	}
 
 	/************************************************************************************************************/
-	public function restarDias($Fecha,int $nDias): string{
+	public function restarDias($Fecha, int $nDias): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -263,19 +275,21 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarFecha($Fecha)){   return 'El dato ingresado no es una fecha ('.$Fecha.')';}
+		if (!$this->DataValidations->validarFecha($Fecha)) {
+			return 'El dato ingresado no es una fecha (' . $Fecha . ')';
+		}
 		if (!$this->DataValidations->validarNumero($nDias) || !$this->DataValidations->validarEntero($nDias)) {
-            return 'Verificar que el dato ingresado sea un numero';
-        }
+			return 'Verificar que el dato ingresado sea un numero';
+		}
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		return date('Y-m-d', strtotime( '-'.$nDias.' day' , strtotime($Fecha)));
-
+		return date('Y-m-d', strtotime('-' . $nDias . ' day', strtotime($Fecha)));
 	}
 
 	/************************************************************************************************************/
-	public function obtenerEdad($fechaNacimiento): string{
+	public function obtenerEdad($fechaNacimiento): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -293,7 +307,9 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarFecha($fechaNacimiento)){ return 'Las fechas ingresadas no tienen formato fecha';}
+		if (!$this->DataValidations->validarFecha($fechaNacimiento)) {
+			return 'Las fechas ingresadas no tienen formato fecha';
+		}
 
 		/********************** Si todo esta ok **********************/
 		$nacimiento = new DateTime($fechaNacimiento);
@@ -301,12 +317,12 @@ class FunctionsDataOperations {
 		$diferencia = $ahora->diff($nacimiento);
 
 		/**********************  Retorno datos  **********************/
-		return $diferencia->format("%y").' años, '.$diferencia->format("%m").' meses';
-
+		return $diferencia->format("%y") . ' años, ' . $diferencia->format("%m") . ' meses';
 	}
 
 	/************************************************************************************************************/
-	public function obtenerNumeroAnos($fechaNacimiento): string{
+	public function obtenerNumeroAnos($fechaNacimiento): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -324,7 +340,9 @@ class FunctionsDataOperations {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!$this->DataValidations->validarFecha($fechaNacimiento)){ return 'Las fechas ingresadas no tienen formato fecha';}
+		if (!$this->DataValidations->validarFecha($fechaNacimiento)) {
+			return 'Las fechas ingresadas no tienen formato fecha';
+		}
 
 		/********************** Si todo esta ok **********************/
 		$nacimiento = new DateTime($fechaNacimiento);
@@ -333,11 +351,11 @@ class FunctionsDataOperations {
 
 		/**********************  Retorno datos  **********************/
 		return $diferencia->format("%y");
-
 	}
 
 	/************************************************************************************************************/
-	public function diasTranscurridos($fechaInicio,$fechaTermino): string | float | int {
+	public function diasTranscurridos($fechaInicio, $fechaTermino): string | float | int
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -357,17 +375,17 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
 		if (!$this->DataValidations->validarFecha($fechaInicio) || !$this->DataValidations->validarFecha($fechaTermino)) {
-            return 'Verificar que el dato ingresado sea una fecha';
-        }
+			return 'Verificar que el dato ingresado sea una fecha';
+		}
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		return floor(abs((strtotime($fechaInicio)-strtotime($fechaTermino))/86400));
-
+		return floor(abs((strtotime($fechaInicio) - strtotime($fechaTermino)) / 86400));
 	}
 
 	/************************************************************************************************************/
-	public function horasTranscurridas($fechaInicio, $fechaTermino, $horaInicio, $horaTermino): string{
+	public function horasTranscurridas($fechaInicio, $fechaTermino, $horaInicio, $horaTermino): string
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -389,36 +407,36 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
 		if (!$this->DataValidations->validarFecha($fechaInicio) || !$this->DataValidations->validarFecha($fechaTermino)) {
-            return 'Verificar que el dato ingresado sea una fecha';
-        }
+			return 'Verificar que el dato ingresado sea una fecha';
+		}
 		if (!$this->DataValidations->validarHora($horaInicio) || !$this->DataValidations->validarHora($horaTermino)) {
-            return 'Verificar que el dato ingresado sea una hora';
-        }
+			return 'Verificar que el dato ingresado sea una hora';
+		}
 
 		/********************** Si todo esta ok **********************/
-		$n_dias     = $this->diasTranscurridos($fechaInicio,$fechaTermino); //calculo diferencia de dias
+		$n_dias     = $this->diasTranscurridos($fechaInicio, $fechaTermino); //calculo diferencia de dias
 		$HorasTrans = $this->restarhoras($horaInicio, $horaTermino);      //calculo del tiempo transcurrido
 		//Sumo el tiempo por los dias transcurridos
-		if($n_dias!=0){
-			if($n_dias>=2){
-				$n_dias_temp  = $n_dias-1;
-				$horas_trans  = $this->multiplicarHoras('24:00:00',$n_dias_temp);
-				$HorasTrans   = $this->sumarhoras($HorasTrans,$horas_trans);
+		if ($n_dias != 0) {
+			if ($n_dias >= 2) {
+				$n_dias_temp  = $n_dias - 1;
+				$horas_trans  = $this->multiplicarHoras('24:00:00', $n_dias_temp);
+				$HorasTrans   = $this->sumarhoras($HorasTrans, $horas_trans);
 			}
-			if($n_dias==1&&$horaInicio<$horaTermino){
-				$horas_trans  = $this->multiplicarHoras('24:00:00',$n_dias);
-				$HorasTrans   = $this->sumarhoras($HorasTrans,$horas_trans);
+			if ($n_dias == 1 && $horaInicio < $horaTermino) {
+				$horas_trans  = $this->multiplicarHoras('24:00:00', $n_dias);
+				$HorasTrans   = $this->sumarhoras($HorasTrans, $horas_trans);
 			}
 		}
 
 		/**********************  Retorno datos  **********************/
 		//devuelvo la cantidad de horas transcurridas
 		return $HorasTrans;
-
 	}
 
 	/************************************************************************************************************/
-	public function diferenciaMeses( $fechaInicio, $fechaTermino ): string | int {
+	public function diferenciaMeses($fechaInicio, $fechaTermino): string | int
+	{
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -438,8 +456,8 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
 		if (!$this->DataValidations->validarFecha($fechaInicio) || !$this->DataValidations->validarFecha($fechaTermino)) {
-            return 'Verificar que el dato ingresado sea una fecha';
-        }
+			return 'Verificar que el dato ingresado sea una fecha';
+		}
 
 		/********************** Si todo esta ok **********************/
 		$datetime1 = new DateTime($fechaInicio);
@@ -448,11 +466,9 @@ class FunctionsDataOperations {
 		//operaciones
 		$interval      = $datetime2->diff($datetime1); // obtenemos la diferencia entre las dos fechas
 		$intervalMeses = $interval->format("%m");      // obtenemos la diferencia en meses
-		$intervalAnos  = $interval->format("%y")*12;   // obtenemos la diferencia en años y la multiplicamos por 12 para tener los meses
+		$intervalAnos  = $interval->format("%y") * 12;   // obtenemos la diferencia en años y la multiplicamos por 12 para tener los meses
 
 		/**********************  Retorno datos  **********************/
 		return $intervalMeses + $intervalAnos;
-
 	}
-
 }
