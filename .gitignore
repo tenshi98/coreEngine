@@ -28,9 +28,7 @@ config/*.dev.*
 config/*.test.*
 
 # 🗃️ Bases de datos y backups
-*.sqlite
 *.db
-*.sql
 *.bak
 *.dump
 
