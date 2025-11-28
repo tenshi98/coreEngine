@@ -233,7 +233,7 @@ La carpeta `coreEngine/admin/app/config/` contiene todos los archivos que tienen
 - `Mail`: Contiene las plantillas utilizadas en los correos
 - `Widgets`: Contiene la visualización de los widgets del sistema
 
-### 1. utils
+### 6. utils
 
 **Ubicación**: `admin/app/utils/`
 
