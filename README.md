@@ -1,7 +1,128 @@
 # coreEngine
-Plataforma está diseñada específicamente para pequeñas y medianas empresas (PyMEs) con infraestructura de alojamiento estándar, compatible con entornos LAMP/LEMP (servidores Apache o Nginx, PHP y MySQL)
 
-## Estructura de Archivos
+Plataforma está diseñada específicamente para pequeñas y medianas empresas (PyMEs) con infraestructura de alojamiento estándar, compatible con entornos LAMP/LEMP (servidores Apache o Nginx, PHP y MySQL).
+
+## 📋 Tabla de Contenidos
+
+- [Características](#-características)
+- [Requisitos](#-requisitos)
+- [Instalación](#-instalación)
+- [Configuración](#-configuración)
+- [Estructura del Proyecto](#-estructura-del-proyecto)
+- [Módulos](#-módulos)
+- [Troubleshooting](#-troubleshooting)
+- [Demo](#-demo)
+
+## ✨ Características
+
+- **Caché Redis**: Almacenamiento en caché de dispositivos con fallback automático a MySQL
+- **Rate Limiting**: Control de frecuencia de requests configurable
+- **Validación Robusta**: Validación completa de datos de entrada
+- **Logging Completo**: Logs, requests inválidos, sistema y errores
+- **Arquitectura Modular**: Fácil mantenimiento y extensión
+- **Abstracción de BD**: Migración simple a otros motores de base de datos
+- **Manejo de Errores**: Registro de errores en base de datos y archivos
+
+## 📦 Requisitos
+
+### Técnicos
+- **PHP**: 7.0 o superior
+- **MySQL**: 5.7 o superior
+- **Redis**: 3.0 o superior
+- **Extensiones PHP**:
+  - `pdo_mysql`
+  - `json`
+  - `mbstring`
+
+### Servidor Web
+- Apache 2.4+ con `mod_rewrite` habilitado
+- Nginx 1.10+ (configuración alternativa)
+
+## 🚀 Instalación
+
+### 1. Clonar o Descargar el Proyecto
+
+```bash
+git clone https://github.com/tenshi98/coreEngine.git
+```
+
+### 2. Instalar Base de Datos
+
+```bash
+# Conectar a MySQL
+mysql -u root -p
+
+# Ejecutar schema
+mysql -u root -p < database/schema.sql
+
+# (Opcional) Cargar datos de prueba
+mysql -u root -p < database/testData.sql
+```
+
+### 3. Configurar Servidor Web
+
+Los archivos `.htaccess` ya están incluidos. Asegúrate de que `mod_rewrite` esté habilitado:
+
+```bash
+sudo a2enmod rewrite
+sudo service apache2 restart
+```
+
+## ⚙️ Configuración
+
+### Configuración Principal
+
+La carpeta `coreEngine/admin/app/config/` contiene todos los archivos que tienen la configuración del sistema.
+
+### Archivo ConfigAPP.php
+
+| Parámetro | Descripción | Default |
+|-----------|-------------|---------|
+| `SoftwareName` | Nombre del software | coreEngine |
+| `SoftwareSlogan` | Slogan del software | Software Modular |
+| `CompanyName` | Nombre de la compañía | coreEngine |
+| `CompanyEmail` | Email de la compañía | coreEngine@coreEngine.cl |
+| `CompanyCredits` | Créditos | Todos los derechos reservados |
+| `URL` | URL base de la plataforma | https://example.cl |
+| `N_MaxItems` | N° max de registros sin paginar | 1000 |
+| `uploadFolder` | Carpeta de subida de archivos | 'public/upload/' |
+| `checkBruteConections` | N° max de intentos de login fallidos antes de banear | 5 |
+| `checkBruteMaxConections` | N° max de intentos de login fallidos antes de enviar a la lista negra | 20 |
+
+### Archivo ConfigData.php
+
+| Parámetro | Descripción | Default |
+|-----------|-------------|---------|
+| `HOSTNAME` | Host de MySQL | localhost |
+| `USERNAME` | Usuario de MySQL | userAdmin |
+| `PASSWORD` | Password de MySQL | userPassword |
+| `DATABASE` | Nombre de la base de datos | dataBase |
+| `PORT` | Puerto de MySQL | 3306 |
+| `ROUTE` | Host | '/absolute/path/to/your/database.sqlite' |
+| `HOST` | Host | 127.0.0.1:27017 |
+
+### Archivo ConfigMail.php
+
+| Parámetro | Descripción | Default |
+|-----------|-------------|---------|
+| `SERVERURL` | URL del servidor de correo | smtp.mail.com |
+| `SERVERPORT` | Puerto del servidor de correo | 465 |
+| `SERVERSECURE` | Codificacion del servidor de correo | SSL |
+| `USEREMAIL` | Dirección Email por defecto | joebloggs@gmail.com |
+| `USERNAME` | Usuario Email por defecto | joebloggs |
+| `PASSWORD` | Password Email por defecto | mypass |
+| `SERVERAPI` | Api para los servicios externos de envios de correo | api |
+
+### Archivo ConfigToken.php
+
+| Parámetro | Descripción |
+|-----------|-------------|
+| `TOKEN_AUTHENTICATION` | enable/disable token authentication |
+| `SECRET_KEY` | Secret key for token encryption |
+| `TIME_TO_LIVE` | token life time |
+| `KEY_1` | Host |
+
+## 📁 Estructura del Proyecto
 
 ```
 .
@@ -63,123 +184,113 @@ Plataforma está diseñada específicamente para pequeñas y medianas empresas (
     └── libs/
         ├── php-jwt/
         └── predis/
-
 ```
-## Descripción Estructura de Archivos
 
-- **admin/app/apis/apiSession/**
--> Manejo del login y del logout de la API
+## 🔧 Módulos
 
-- **admin/app/config/ConfigAPP.php**
--> Archivo de configuración con los datos básicos relacionados con la aplicación, tales como su nombre, slogan, email, etc
+### 1. apis
 
-- **admin/app/config/ConfigData.php**
--> Archivo de configuración de las conexiones a las bases de datos
+**Ubicación**: `admin/app/apis/`
 
-- **admin/app/config/ConfigMail.php**
--> Archivo de configuración de las cuentas de email a utilizar para las funciones de mensajería (recuperación de contraseña, notificaciones, etc)
+**Propósito**: Lógica de resolución de las APIS integradas en la plataforma.
 
-- **admin/app/config/ConfigToken.php**
--> Archivo de configuración con los tokens utilizados para la codificación y decodificación de datos
+### 2. config
 
-- **admin/app/crones/cronList/**
--> Es la carpeta que contiene todos los controladores de los crones
+**Ubicación**: `admin/app/config/`
 
-- **admin/app/helpers/userSession.php**
--> Archivo encargado de las sesiones del usuario, se encarga de cargar los datos básicos, los permisos y las rutas de acceso a las transacciones, asi mismo se encarga de la actualización de los datos de sesión de los usuarios cuando éstos modifiquen sus datos
+**Propósito**: Configuración general de la plataforma.
 
-- **admin/app/helpers/validateSession.php**
--> Archivo encargado de validar si el acceso de un usuario esta respaldado con un inicio de sesión correspondiente, valida token e IP de la maquina que se conecta
+**Archivos**:
+- `ConfigAPP.php`: Archivo de configuración con los datos básicos relacionados con la aplicación, tales como su nombre, slogan, email, etc.
+- `ConfigData.php`: Archivo de configuración de las conexiones a las bases de datos.
+- `ConfigMail.php`: Archivo de configuración de las cuentas de email a utilizar para las funciones de mensajería (recuperación de contraseña, notificaciones, etc).
+- `ConfigToken.php`: Archivo de configuración con los tokens utilizados para la codificación y decodificación de datos.
 
-- **admin/app/modules/bodegas/**
--> Módulo de gestión de bodega, posee su propia estructura interna y trabaja de forma independiente a los otros módulos, pose un instalador que permite copiar el modulo e instalarlo en otro proyecto, el instalador genera las tablas, los permisos y sus rutas de acceso
+### 3. crones
 
-- **admin/app/modules/campanas/**
--> Módulo de campañas, posee las mismas características del modulo anterior, la única diferencia es que este modulo posee dependencias, las cuales son listadas en la interfaz de instalación de módulos, depende principalmente del modulo de bodega, de entidades y compra-ventas
+**Ubicación**: `admin/app/crones/`
 
-- **admin/app/templates/Forms/**
--> Contiene la visualización de los distintos inputs correspondiente al tema utilizado por la plataforma (bootstrap, tailwind, etc)
+**Propósito**: Manejo de los crones de la plataforma.
 
-- **admin/app/templates/Mail/**
--> Contiene las plantillas utilizadas en los correos
+### 4. helpers
 
-- **admin/app/templates/Widgets/**
--> Contiene la visualización de los widgets del sistema
+**Ubicación**: `admin/app/helpers/`
 
-- **admin/app/templates/api-view.php**
--> Archivo con la lógica de encriptación de la API, por defecto JSON
+**Propósito**: Manejo de sesiones y validacion de usuarios
 
-- **admin/app/utils/ApiList.php**
--> Archivo que genera las rutas para las APIS del sistema, estas dependen de los permisos del usuario
+**Archivos**:
+- `userSession.php`: Archivo encargado de las sesiones del usuario, se encarga de cargar los datos básicos, los permisos y las rutas de acceso a las transacciones, asi mismo se encarga de la actualización de los datos de sesión de los usuarios cuando éstos modifiquen sus datos
+- `validateSession.php`: rchivo encargado de validar si el acceso de un usuario esta respaldado con un inicio de sesión correspondiente, valida token e IP de la maquina que se conecta
 
-- **admin/app/utils/CronList.php**
--> Archivo que contiene las rutas a los crones del sistema
+### 5. templates
 
-- **admin/app/utils/LoadErrors.php**
--> Archivo con la lógica encargada de redirigir a la pagina de error en caso de un acceso no autorizado o de cierre de sesión por token invalido
+**Ubicación**: `admin/app/templates/`
 
-- **admin/app/utils/RateLimit.php**
--> Mini sistema encargado de contar cuantas veces una IP se conecta al servidor en un determinado tiempo antes de bloquearlo, por defecto trabaja con una carpeta llamada security dentro de la carpeta public donde guarda los accesos en archivos físicos en formato JSON, pero también se puede configurar para que trabaje con Redis (lo mas optimo)
+**Propósito**: Manejo de las plantillas de la interfaz de la plataforma, permite hacer cambio fácil entre frameworks css.
 
-- **admin/app/utils/UserAdmin.php**
--> Archivo que se encarga de listar todas las rutas y permisos que tienen los administradores
+**Carpetas**:
+- `Forms`: Contiene la visualización de los distintos inputs correspondiente al tema utilizado por la plataforma (bootstrap, tailwind, etc)
+- `Mail`: Contiene las plantillas utilizadas en los correos
+- `Widgets`: Contiene la visualización de los widgets del sistema
 
-- **admin/app/utils/UserData.php**
--> Archivo que se encarga de listar todas las rutas y permisos que tienen los usuarios normales en base a sus permisos
+### 1. utils
 
-- **admin/app/utils/UserGuest.php**
--> Archivo que se encarga de listar todas las rutas y permisos que tienen los usuarios no logeados (el index, login, recover password, etc)
+**Ubicación**: `admin/app/utils/`
 
-- **admin/public/css/**
--> Carpeta con las hojas de estilo de la plataforma
+**Propósito**: Manejo de las utilidades del sistema
 
-- **admin/public/img/**
--> Carpeta con las imágenes de la plataforma
+**Archivos**:
+- `ApiList.php`: Archivo que genera las rutas para las APIS del sistema, estas dependen de los permisos del usuario
+- `CronList.php`: Archivo que contiene las rutas a los crones del sistema
+- `LoadErrors.php`: Archivo con la lógica encargada de redirigir a la pagina de error en caso de un acceso no autorizado o de cierre de sesión por token invalido
+- `RateLimit.php`: Mini sistema encargado de contar cuantas veces una IP se conecta al servidor en un determinado tiempo antes de bloquearlo, por defecto trabaja con una carpeta llamada security dentro de la carpeta public donde guarda los accesos en archivos físicos en formato JSON, pero también se puede configurar para que trabaje con Redis (lo mas optimo)
+- `UserAdmin.php`: Archivo que se encarga de listar todas las rutas y permisos que tienen los administradores
+- `UserData.php`: Archivo que se encarga de listar todas las rutas y permisos que tienen los usuarios normales en base a sus permisos
+- `UserGuest.php`: Archivo que se encarga de listar todas las rutas y permisos que tienen los usuarios no logeados (el index, login, recover password, etc)
 
-- **admin/public/js/**
--> Carpeta con los script de la plataforma
+## 🐛 Troubleshooting
 
-- **admin/public/security/**
--> Carpeta dentro de la cual se guardan las conexiones de las IP
+### Error: "Error al conectar con MySQL"
 
-- **admin/public/upload/**
--> Carpeta de subida de archivos (logo de la plataforma, imagen del usuario, archivos relacionados a los módulos, etc)
+**Solución**:
+- Verificar que MySQL esté corriendo
+- Verificar que la base de datos exista
+- Verificar permisos del usuario
 
-- **admin/public/vendor/**
--> Librerías encargadas de dar la funcionalidad a la plataforma
+```bash
+mysql -u root -p -e "SHOW DATABASES;"
+mysql -u root -p -e "GRANT ALL ON telemetria.* TO 'tu_usuario'@'localhost';"
+```
 
-- **admin/public/index.php**
--> Archivo de acceso a la plataforma, desde aquí se rutean las direcciones ingresadas
+## 📦 Demo
 
-- **admin/public/robots.txt**
--> Archivo encargado de evitar el acceso de los robots, las IAs de exploracion, etc. Permite indicarle a una maquina que no se quiere que se lea un x archivo, no se listen las carpetas, etc
+### Demo de la plataforma
 
-- **vendors/application/controller/**
--> Contiene las clases padre desde donde los módulos trabajan
+| Dato | Descripción |
+|-----------|-------------|
+| URL Demo | [democoreengine.digitalcreations.cl](https://democoreengine.digitalcreations.cl/) |
+| Usuario | demo1@testmail.com |
+| Contraseña | 1234 |
 
-- **vendors/application/functions/**
--> Contiene las clases utilitarias para la plataforma, tales como validaciones de formato de datos, formateo de datos, generación y visualización de archivos, conexiones a otras APIS, etc
+## 📝 Notas Adicionales
 
-- **vendors/application/models/**
--> Contiene las clases padre desde donde los módulos trabajan
+### Seguridad
 
-- **vendors/application/utils/**
--> Contiene las clases para la conexion a la base de datos, recuperacion de datos de los Request, etc
+- Todos los queries usan prepared statements
+- Validación estricta de entrada
+- Headers de seguridad en `.htaccess`
+- Rate limiting para prevenir abuso
+- Logs de requests sospechosos
 
-- **vendors/fatfree/**
--> Libreria Fat Free Framework (F3)
+### Performance
 
-- **vendors/libs/php-jwt/**
--> Libreria JWT para PHP
+- Índices optimizados en tablas
+- Conexiones persistentes
+- TTL configurable para caché
 
-- **vendors/libs/predis/**
--> Libreria Redis para PHP
+### Mantenimiento
 
-
-## Demo de la plataforma
-
-URL Demo: [democoreengine.digitalcreations.cl](https://democoreengine.digitalcreations.cl/)<br/>
-Usuario: demo1@testmail.com<br/>
-Contraseña: 1234
-
+- Logs con rotación automática
+- Código documentado
+- Arquitectura modular
 
