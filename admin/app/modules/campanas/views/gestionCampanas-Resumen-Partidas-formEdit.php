@@ -184,6 +184,16 @@ $RandName = 'rand_'.rand(1, 999999);
             //datos para el whatsapp
             let Cliente         = $("#FormEditPartida [name='ClienteWhatsapp']").val();
             let idEstadoPartida = $("#FormEditPartida [name='idEstadoPartida']").val();
+            let Prod_mensaje    = '';
+            //trato de obtener las cantidades
+            try {
+                let Prod_cantidades = $("#FormEditPartida [name='Producto_Cantidad[]'], #FormEditPartida [name='NewProducto_Cantidad[]']").map(function(){ return $(this).val().toString().trim(); }).get().filter(v=>v!=='');
+                let Prod_valores    = $("#FormEditPartida [name='Producto_Valor[]'], #FormEditPartida [name='NewProducto_Valor[]']").map(function(){ return $(this).val().toString().trim(); }).get().map(v=>parseFloat(v.replace(',', '.'))||0);
+                Prod_mensaje        = Prod_cantidades + "Kg. por " + return_value (Prod_valores);
+            } catch (error) {
+                //nada
+            }
+
             //opciones
             const Options     = {
                 UpdateDiv : [
@@ -196,7 +206,8 @@ $RandName = 'rand_'.rand(1, 999999);
                 callFNCData:{
                     "Fono": '<?php echo $data['rowData']['EntidadFono']; ?>',
                     "Cliente": Cliente,
-                    "idEstadoPartida": idEstadoPartida
+                    "idEstadoPartida": idEstadoPartida,
+                    "Prod_mensaje": Prod_mensaje
                 },
             };
             //Se envian los datos al formulario

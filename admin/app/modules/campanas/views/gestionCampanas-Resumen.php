@@ -765,7 +765,7 @@
             }).then((result2) => {
                 if (result2.isConfirmed) {
                     //URL
-                    let urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Data.Fono+"&text=Hola+"+Data.Cliente+"!!%0ATu+pedido+de+<?php echo ConfigAPP::SOFTWARE['SoftwareName']; ?>+ha+sido+entregado&type=phone_number&app_absent=0";
+                    let urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Data.Fono+"&text=Hola+"+Data.Cliente+"!!%0ATu+pedido+de+<?php echo ConfigAPP::SOFTWARE['SoftwareName']; ?>+ha+sido+entregado."+Data.Prod_mensaje+".+gracias&type=phone_number&app_absent=0";
                     //Abrir nuevo tab
                     window.open(urlWhatsapp, '_blank');
                 }
