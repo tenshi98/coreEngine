@@ -49,7 +49,6 @@ desktop.ini
 
 # 📦 Dependencias y compilados
 node_modules/
-vendor/
 dist/
 build/
 target/
