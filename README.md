@@ -98,8 +98,8 @@ La carpeta `coreEngine/admin/app/config/` contiene todos los archivos que tienen
 | `PASSWORD` | Password de MySQL | userPassword |
 | `DATABASE` | Nombre de la base de datos | dataBase |
 | `PORT` | Puerto de MySQL | 3306 |
-| `ROUTE` | Host | '/absolute/path/to/your/database.sqlite' |
-| `HOST` | Host | 127.0.0.1:27017 |
+| `ROUTE` | Host sqlite | '/absolute/path/to/your/database.sqlite' |
+| `HOST` | Host Redis | 127.0.0.1:27017 |
 
 ### Archivo ConfigMail.php
 
@@ -111,7 +111,7 @@ La carpeta `coreEngine/admin/app/config/` contiene todos los archivos que tienen
 | `USEREMAIL` | Dirección Email por defecto | joebloggs@gmail.com |
 | `USERNAME` | Usuario Email por defecto | joebloggs |
 | `PASSWORD` | Password Email por defecto | mypass |
-| `SERVERAPI` | Api para los servicios externos de envios de correo | api |
+| `SERVERAPI` | Token Api para los servicios externos de envios de correo | Token |
 
 ### Archivo ConfigToken.php
 
@@ -120,7 +120,7 @@ La carpeta `coreEngine/admin/app/config/` contiene todos los archivos que tienen
 | `TOKEN_AUTHENTICATION` | enable/disable token authentication |
 | `SECRET_KEY` | Secret key for token encryption |
 | `TIME_TO_LIVE` | token life time |
-| `KEY_1` | Host |
+| `KEY_1` | Token para uso interno |
 
 ## 📁 Estructura del Proyecto
 
@@ -259,7 +259,7 @@ La carpeta `coreEngine/admin/app/config/` contiene todos los archivos que tienen
 
 ```bash
 mysql -u root -p -e "SHOW DATABASES;"
-mysql -u root -p -e "GRANT ALL ON telemetria.* TO 'tu_usuario'@'localhost';"
+mysql -u root -p -e "GRANT ALL ON core_engine.* TO 'tu_usuario'@'localhost';"
 ```
 
 ## 📦 Demo
