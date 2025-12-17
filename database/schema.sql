@@ -1,3 +1,15 @@
+-- ============================================================================
+-- Schema de Base de Datos para el Sistema
+-- Motor: MySQL 5.7+
+-- Descripción: Estructura completa para almacenar datos
+-- ============================================================================
+
+-- Crear base de datos si no existe
+CREATE DATABASE IF NOT EXISTS core_engine
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE core_engine;
 
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
