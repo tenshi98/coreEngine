@@ -75,7 +75,7 @@
         }).then((result2) => {
             if (result2.isConfirmed) {
                 //Se genera URL
-                let urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Fono+"&text=Hola+"+Entidad+"!!!%0APaso+por+aquí+para+recordarte+la+transferencia+del/los+documentos:%0A"+Documentos+"Por+un+total+de+"+Total+".%0AMuchas+gracias!🥑🥑🥑🥑&type=phone_number&app_absent=0";
+                let urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Fono+"&text=Hola+"+Entidad+"!!!%0ATe+dejo+detalle+de+las+paltas+pendientes+de+pago:%0A"+Documentos+"%0A%0ATotal+a+transferir+"+Total+".%0A%0A🥑🥑Muchas+gracias!🥑🥑&type=phone_number&app_absent=0";
                 //Se abre pestaña de whatsapp con el mensaje
                 window.open(urlWhatsapp, '_blank');
             }

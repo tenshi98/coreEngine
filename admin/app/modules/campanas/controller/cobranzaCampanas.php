@@ -158,13 +158,20 @@ class cobranzaCampanas extends ControllerBase {
                 entidades_listado.Nick AS EntidadNick,
                 entidades_listado.Fono1 AS EntidadFono1,
                 core_documentos_mercantiles.Nombre AS Documento,
-                campanas_listado.Nombre AS Campana',
+                campanas_listado.Nombre AS Campana,
+
+                campanas_listado_partidas.idExistencia,
+                productos_listado.Nombre AS ProductoNombre,
+                campanas_listado_partidas_productos.Cantidad AS ProductoCantidad,
+                campanas_listado_partidas_productos.Beneficios AS ProductoBeneficios',
             'table'   => 'facturacion_listado',
             'join'    => '
-                LEFT JOIN entidades_listado             ON entidades_listado.idEntidad                = facturacion_listado.idEntidad
-                LEFT JOIN core_documentos_mercantiles   ON core_documentos_mercantiles.idDocumentos   = facturacion_listado.idDocumentos
-                LEFT JOIN campanas_listado_partidas     ON campanas_listado_partidas.idFacturacion    = facturacion_listado.idFacturacion
-                LEFT JOIN campanas_listado              ON campanas_listado.idCampana                 = campanas_listado_partidas.idCampana',
+                LEFT JOIN entidades_listado                    ON entidades_listado.idEntidad                         = facturacion_listado.idEntidad
+                LEFT JOIN core_documentos_mercantiles          ON core_documentos_mercantiles.idDocumentos            = facturacion_listado.idDocumentos
+                LEFT JOIN campanas_listado_partidas            ON campanas_listado_partidas.idFacturacion             = facturacion_listado.idFacturacion
+                LEFT JOIN campanas_listado_partidas_productos  ON campanas_listado_partidas_productos.idExistencia    = campanas_listado_partidas.idExistencia
+                LEFT JOIN campanas_listado                     ON campanas_listado.idCampana                          = campanas_listado_partidas.idCampana
+                LEFT JOIN productos_listado                    ON productos_listado.idProducto                        = campanas_listado_partidas_productos.idProducto',
             'where'   => $whereInt2,
             'group'   => '',
             'having'  => '',
