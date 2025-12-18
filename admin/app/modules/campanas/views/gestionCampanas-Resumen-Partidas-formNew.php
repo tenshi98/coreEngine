@@ -31,10 +31,10 @@ $RandName = 'rand_'.rand(1, 999999);
         $data['Fnc_FormInputs']->formSelectFilter([ 'Placeholder' => 'Entidad',        'Name' => 'idEntidad', 'Id' => 'NewPartida_idEntidad', 'Value' => '', 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
 
         //datos ocultos para la campaña
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCampana',       'Value' => $data['rowData']['idCampana'],  'Required' => 2]);  //Campaña relacionada
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCampana',       'Value' => $data['rowData']['idCampana'],            'Required' => 2]);  //Campaña relacionada
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha',           'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoPartida', 'Value' => 1,                              'Required' => 2]);  //Recién Creado
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],    'Required' => 2]);  //Usuario que lo creo
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoPartida', 'Value' => 1,                                        'Required' => 2]);  //Recién Creado
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],              'Required' => 2]);  //Usuario que lo creo
 
         ?>
 

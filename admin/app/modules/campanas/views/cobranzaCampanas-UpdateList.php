@@ -38,23 +38,16 @@
                                             $Documento   .= ' (Monto: '.$data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 0);
                                             $Documento   .= '/Pagado: '.$data['Fnc_DataNumbers']->Valores($crud['MontoPagado'], 0).')';
                                             $Documento   .= '<br>';
-                                            //Para el whatsapp
-                                            //Si es una persona natural
-                                            if(isset($crud['EntidadNombre'])&&$crud['EntidadNombre']!=''){
-                                                $WhatsappDoc   .= 'Compra con fecha '.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']);
-                                                $WhatsappDoc   .= ' (Monto: '.$data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 0);
-                                                $WhatsappDoc   .= '/Pagado: '.$data['Fnc_DataNumbers']->Valores($crud['MontoPagado'], 0).')';
-                                                $WhatsappDoc   .= '%0A';
-                                            //si es empresa
-                                            }else{
-                                                $WhatsappDoc   .= $crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacion']);
-                                                $WhatsappDoc   .= ' Fecha '.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']);
-                                                $WhatsappDoc   .= ' (Monto: '.$data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 0);
-                                                $WhatsappDoc   .= '/Pagado: '.$data['Fnc_DataNumbers']->Valores($crud['MontoPagado'], 0).')';
-                                                $WhatsappDoc   .= '%0A';
-                                            }
+
                                             //Se guarda monto
                                             $WhatsappVal = $WhatsappVal + ($crud['ValorTotal'] - $crud['MontoPagado']);
+
+                                            //Mensaje de whatsapp
+                                            $WhatsappDoc   .= $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']);
+                                            $WhatsappDoc   .= ' '.$data['Fnc_DataNumbers']->Cantidades($crud['ProductoCantidad'], 0).' kg';
+                                            $WhatsappDoc   .= ' por '.$data['Fnc_DataNumbers']->Valores($crud['ProductoBeneficios'], 0);
+                                            $WhatsappDoc   .= '%0A';
+
                                         }
                                         //Se formatea
                                         $WhatsappValTotal = $data['Fnc_DataNumbers']->Valores($WhatsappVal, 0);
