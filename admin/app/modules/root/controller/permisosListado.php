@@ -802,7 +802,6 @@ class permisosListado extends ControllerBase {
             'Post'      => $newPermiso
         ];
         //Ejecuto la query
-        //Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 

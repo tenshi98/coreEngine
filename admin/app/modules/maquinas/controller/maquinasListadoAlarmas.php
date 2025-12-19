@@ -274,7 +274,6 @@ class maquinasListadoAlarmas extends ControllerBase {
             ]
         ];
         //Ejecuto la query
-        //Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
