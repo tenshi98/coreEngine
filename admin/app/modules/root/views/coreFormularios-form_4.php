@@ -10,11 +10,11 @@
                 <?php
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Normales']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Texto normal',      'Name' => 'Nombre',  'Id' => 'IDInput_4_1','Required' => 2]);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',  'Id' => 'IDInput_4_2','Required' => 3]);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 2,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Email',             'Name' => 'email',   'Id' => 'IDInput_4_3','Required' => 2,'Icon' => 'bx bx-mail-send']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Contraseñas',       'Name' => 'password','Id' => 'IDInput_4_4','Required' => 2,'Icon' => 'bi bi-key']);
-                $data['Fnc_FormInputs']->formInputDatalist(['FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Input Datalist','Name' => 'formInputDatalist','Id' => 'IDInput_4_29','Required' => 2,'Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Texto normal',      'Name' => 'Nombre',            'Id' => 'IDInput_4_1', 'Required' => 2]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',            'Id' => 'IDInput_4_2', 'Required' => 3]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 2,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Email',             'Name' => 'email',             'Id' => 'IDInput_4_3', 'Required' => 2,'Icon' => 'bx bx-mail-send']);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Contraseñas',       'Name' => 'password',          'Id' => 'IDInput_4_4', 'Required' => 2,'Icon' => 'bi bi-key']);
+                $data['Fnc_FormInputs']->formInputDatalist([        'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Input Datalist',    'Name' => 'formInputDatalist', 'Id' => 'IDInput_4_29','Required' => 2,'Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Especificos']);
@@ -25,7 +25,7 @@
                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Numeros enteros positivos', 'Name' => 'Numeros1',      'Id' => 'IDInput_4_6','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 5,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Numeros reales',            'Name' => 'Numeros2',      'Id' => 'IDInput_4_7','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 6,'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'Numeros enteros',           'Name' => 'Numeros3',      'Id' => 'IDInput_4_8','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
-                $data['Fnc_FormInputs']->formNumberSpinner([ 'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'number_spinner',            'Name' => 'number_spinner','Id' => 'IDInput_4_9','Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0,'Required' => 2]);
+                $data['Fnc_FormInputs']->formNumberSpinner([        'FormAling' => 4,'FormCol' => 12,'Placeholder' => 'number_spinner',            'Name' => 'number_spinner','Id' => 'IDInput_4_9','Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Fecha y Hora']);

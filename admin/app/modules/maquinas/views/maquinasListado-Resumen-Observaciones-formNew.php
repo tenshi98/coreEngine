@@ -25,7 +25,7 @@
         $data['Fnc_FormInputs']->formTextarea(['Placeholder' => 'Observacion','Name' => 'Observacion',  'Id' => 'NewObs_Observacion',  'Value' => '','Required' => 2]);
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina',    'Value' => $data['rowData']['idMaquina'],            'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina',     'Value' => $data['rowData']['idMaquina'],            'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion', 'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);
         ?>
     </div>

@@ -34,18 +34,18 @@
 
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Item',         'Name' => 'Item',                 'Id' => 'NewPerdida_Item',                 'Value' => '',  'Required' => 2]);
-        $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Producto',     'Name' => 'idProducto',           'Id' => 'NewPerdida_idProducto',           'Value' => '',  'Required' => 1, 'arrData' => $data['arrProductos'], 'BASE' => $BASE]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',     'Name' => 'Cantidad',      'Id' => 'NewPerdida_Cantidad',      'Value' => '',  'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',  'Name' => 'Perdidas',  'Id' => 'NewPerdida_Perdidas',  'Value' => '',  'Required' => 2,'Icon' => 'bi bi-currency-dollar']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Item',         'Name' => 'Item',          'Id' => 'NewPerdida_Item',          'Value' => '',  'Required' => 2]);
+        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Producto',     'Name' => 'idProducto',    'Id' => 'NewPerdida_idProducto',    'Value' => '',  'Required' => 1, 'arrData' => $data['arrProductos'], 'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',     'Name' => 'Cantidad',      'Id' => 'NewPerdida_Cantidad',      'Value' => '',  'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',  'Name' => 'Perdidas',      'Id' => 'NewPerdida_Perdidas',      'Value' => '',  'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
 
         //datos ocultos para el costo
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCampana',       'Value' => $data['rowData']['idCampana'],             'Required' => 2]);  //Campaña relacionada
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipo',          'Value' => 2,                                         'Required' => 2]);  //Perdida
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_fecha',  'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);  //Hora de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_fecha',  'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);  //Hora de creacion automatica
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoPago',    'Value' => 1,                                         'Required' => 2]);  //No Pagado
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso

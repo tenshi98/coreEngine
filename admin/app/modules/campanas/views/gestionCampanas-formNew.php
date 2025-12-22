@@ -26,13 +26,13 @@
                     <?php
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',          'Name' => 'Fecha',         'Id' => 'New_Fecha',         'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',        'Id' => 'New_Nombre',        'Value' => '', 'Required' => 2]);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Bodega',         'Name' => 'idBodegas',     'Id' => 'New_idBodegas',     'Value' => '', 'Required' => 2, 'arrData' => $data['arrBodegas'],   'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Bodega',         'Name' => 'idBodegas',     'Id' => 'New_idBodegas',     'Value' => '', 'Required' => 2, 'arrData' => $data['arrBodegas'],   'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
                     $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',  'Name' => 'Observaciones', 'Id' => 'New_Observaciones', 'Value' => '', 'Required' => 1]);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',   'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',    'Value' => 1,                                         'Required' => 2]);  //Abierto
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',  'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',  'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
 
                     ?>
                 </div>

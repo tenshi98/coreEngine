@@ -7,11 +7,11 @@
                     <h5 class="search-title text-center"><i class="bi bi-search"></i> Filtrar Datos</h5>
                     <?php
                     //se dibujan los inputs
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo',              'Name'  => 'idTipoProducto',   'Id'  => 'Search_idTipoProducto', 'Value'  => '','Required' => 1,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Categoria',         'Name'  => 'idCategoria',      'Id'  => 'Search_idCategoria',    'Value'  => '','Required' => 1,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo',              'Name'  => 'idTipoProducto',   'Id'  => 'Search_idTipoProducto', 'Value'  => '','Required' => 1,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',         'Name'  => 'idCategoria',      'Id'  => 'Search_idCategoria',    'Value'  => '','Required' => 1,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name'  => 'Nombre',           'Id'  => 'Search_Nombre',         'Value'  => '','Required' => 1]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',             'Name'  => 'Marca',            'Id'  => 'Search_Marca',          'Value'  => '','Required' => 1]);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Unidad Medida',     'Name'  => 'idUniMed',         'Id'  => 'Search_idUniMed',       'Value'  => '','Required' => 1,'arrData' => $data['arrUnimed'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Unidad Medida',     'Name'  => 'idUniMed',         'Id'  => 'Search_idUniMed',       'Value'  => '','Required' => 1,'arrData' => $data['arrUnimed'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',            'Name'  => 'Codigo',           'Id'  => 'Search_Codigo',         'Value'  => '','Required' => 1,'Icon' => 'ri-barcode-line']);
                     $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',            'Name'  => 'idEstado',         'Id'  => 'Search_idEstado',       'Value'  => '','Required' => 1,'arrData' => $data['arrEstado']]);
 

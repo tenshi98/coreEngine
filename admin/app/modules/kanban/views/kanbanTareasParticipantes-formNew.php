@@ -27,11 +27,11 @@ $RandName = 'rand_'.rand(1, 999999);
     <div class="modal-body">
         <?php
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',  'Value' => $data['UserData']['UserID'],'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',   'Value' => $data['rowData']['idKanban'],'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',  'Value' => $data['UserData']['UserID'],   'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',   'Value' => $data['rowData']['idKanban'],  'Required' => 2]);
         //Datos antiguos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual', 'Value' => $data['Fnc_ServerServer']->fechaActual(),'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',  'Value' => $data['Fnc_ServerServer']->horaActual(),'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual', 'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',  'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);
         ?>
 
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">

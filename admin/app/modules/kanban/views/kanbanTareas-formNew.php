@@ -36,13 +36,13 @@ $RandName = 'rand_'.rand(1, 999999);
                     $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',   'Name' => 'Descripcion',  'Id' => 'NewTarea_Descripcion',  'Value' => '', 'Required' => 2]);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanbanEstado', 'Value' => 1,'Required' => 2]); //Primer panel
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoCierre', 'Value' => 1,'Required' => 2]); //abierta
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion',  'Value' => $data['Fnc_ServerServer']->fechaActual(),'Required' => 2]);
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',      'Value' => $data['UserData']['UserID'],'Required' => 2]);
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanbanEstado', 'Value' => 1,                                        'Required' => 2]); //Primer panel
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoCierre', 'Value' => 1,                                        'Required' => 2]); //abierta
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion',  'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',      'Value' => $data['UserData']['UserID'],              'Required' => 2]);
                     //Datos antiguos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual', 'Value' => $data['Fnc_ServerServer']->fechaActual(),'Required' => 2]);
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',  'Value' => $data['Fnc_ServerServer']->horaActual(),'Required' => 2]);
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual', 'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',  'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);
                     ?>
 
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">

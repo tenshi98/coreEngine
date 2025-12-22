@@ -10,8 +10,8 @@
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Inicio',  'Name' => 'Fecha_Inicio',  'Id' => 'Search_Fecha_Inicio',  'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Termino', 'Name' => 'Fecha_Termino', 'Id' => 'Search_Fecha_Termino', 'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',           'Name' => 'Nombre',        'Id' => 'Search_Nombre',        'Value' => '', 'Required' => 1]);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Bodega',           'Name' => 'idBodegas',     'Id' => 'Search_idBodegas',     'Value' => '', 'Required' => 1, 'arrData' => $data['arrBodegas'],   'BASE' => $BASE]);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Usuario Creador',  'Name' => 'idUsuario',     'Id' => 'Search_idUsuario',     'Value' => '', 'Required' => 1, 'arrData' => $data['arrUsuarios'],  'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Bodega',           'Name' => 'idBodegas',     'Id' => 'Search_idBodegas',     'Value' => '', 'Required' => 1, 'arrData' => $data['arrBodegas'],   'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Usuario Creador',  'Name' => 'idUsuario',     'Id' => 'Search_idUsuario',     'Value' => '', 'Required' => 1, 'arrData' => $data['arrUsuarios'],  'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',           'Name' => 'idEstado',      'Id' => 'Search_idEstado',      'Value' => '', 'Required' => 1, 'arrData' => $data['arrEstados']]);
 
                     ?>

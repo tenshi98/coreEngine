@@ -25,7 +25,7 @@
                 <div class="modal-body">
                     <?php
                     //se dibujan los inputs
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Categoria',  'Name'  => 'idCategoria', 'Value'  => '','Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',  'Name'  => 'idCategoria', 'Value'  => '','Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',     'Name'  => 'Nombre',      'Value'  => '','Required' => 2]);
 
                     //datos ocultos

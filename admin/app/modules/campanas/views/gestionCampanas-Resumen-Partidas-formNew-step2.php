@@ -71,7 +71,7 @@
         <?php
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCampana',       'Value' => $data['rowData']['idCampana'],             'Required' => 2]);  //Campaña
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha',           'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha',           'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoPartida', 'Value' => 1,                                         'Required' => 2]);  //Recién Creado
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'ProdSelec',       'Value' => $data['ProdSelec'],                        'Required' => 2]);  //Productos seleccionados anteriormente
@@ -90,7 +90,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    $("#FormNewPartidaStep2").submit(function(e) {
+    /*$("#FormNewPartidaStep2").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
         //verifico el resultado
@@ -116,5 +116,5 @@
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
-    });
+    });*/
 </script>

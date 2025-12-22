@@ -55,8 +55,8 @@ $RandName = 'rand_'.rand(1, 999999);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoIngreso', 'Value' => $data['idTipoIngreso'],                    'Required' => 2]);  //Tipo de movimiento
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);  //Hora de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);  //Hora de creacion automatica
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
 
                     ?>

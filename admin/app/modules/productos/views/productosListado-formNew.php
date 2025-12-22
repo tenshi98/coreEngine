@@ -25,11 +25,11 @@
                 <div class="modal-body">
                     <?php
                     //se dibujan los inputs
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo',            'Name' => 'idTipoProducto',  'Value' => '','Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Categoria',       'Name' => 'idCategoria',     'Value' => '','Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo',            'Name' => 'idTipoProducto',  'Value' => '','Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',       'Name' => 'idCategoria',     'Value' => '','Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',          'Name' => 'Nombre',          'Value' => '','Required' => 2]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',           'Name' => 'Marca',           'Value' => '','Required' => 1]);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Unidad Medida',   'Name' => 'idUniMed',        'Value' => '','Required' => 2,'arrData' => $data['arrUnimed'],    'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Unidad Medida',   'Name' => 'idUniMed',        'Value' => '','Required' => 2,'arrData' => $data['arrUnimed'],    'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); //Activo

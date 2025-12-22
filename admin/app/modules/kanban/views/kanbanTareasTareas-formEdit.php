@@ -40,10 +40,10 @@
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',  'Value' => $data['rowData']['idKanban'],'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTareas',  'Value' => $data['rowData']['idTareas'],'Required' => 2]);
         //Datos antiguos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Tarea',           'Value' => $x2,'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idEstadoTrabajo', 'Value' => $x3,'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual',        'Value' => $data['Fnc_ServerServer']->fechaActual(),'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',         'Value' => $data['Fnc_ServerServer']->horaActual(),'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Tarea',           'Value' => $x2,                                       'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idEstadoTrabajo', 'Value' => $x3,                                       'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual',        'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',         'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">

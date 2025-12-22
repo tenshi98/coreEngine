@@ -31,7 +31,7 @@
         $x5  = $data['rowData']['idEstado'] ?? '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Servicio',    'Name' => 'idServicio',   'Id' => 'EditPlanes_idServicio',  'Value' => $x1, 'Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Servicio',    'Name' => 'idServicio',   'Id' => 'EditPlanes_idServicio',  'Value' => $x1, 'Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'EditPlanes_Fecha',       'Value' => $x2, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 6,  'Placeholder' => 'Monto',       'Name' => 'Monto',        'Id' => 'EditPlanes_Monto',       'Value' => $x3, 'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
         $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'EditPlanes_Observacion', 'Value' => $x4, 'Required' => 1]);

@@ -29,7 +29,7 @@
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idFacturacion', 'Value' => $data['rowData']['idFacturacion'],         'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',     'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaPago',     'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaPago',     'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
 
         ?>
     </div>

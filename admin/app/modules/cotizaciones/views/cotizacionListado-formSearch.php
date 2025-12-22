@@ -8,7 +8,7 @@
                     <?php
                     //se dibujan los inputs
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero',              'Name' => 'idCotizacion',    'Id' => 'Search_idCotizacion',    'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'Search_idEntidad',       'Value' => '', 'Required' => 1, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'Search_idEntidad',       'Value' => '', 'Required' => 1, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Inicio',     'Name' => 'F_Inicio',        'Id' => 'Search_F_Inicio',        'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Termino',    'Name' => 'F_Termino',       'Id' => 'Search_F_Termino',       'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-calendar3']);
 

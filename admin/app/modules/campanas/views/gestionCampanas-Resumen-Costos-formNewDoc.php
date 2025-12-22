@@ -29,7 +29,7 @@ $RandName = 'rand_'.rand(1, 999999);
         <?php
         $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil', 'Name' => 'idDocumentos',    'Id' => 'NewCosto_idDocumentos',    'Value' => '', 'Required' => 2, 'arrData' => $data['arrDocumentos']]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'NewCosto_N_Doc',           'Value' => '', 'Required' => 1, 'Icon'    => 'bi bi-sort-numeric-down']);
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'NewCosto_idEntidad',       'Value' => '', 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'NewCosto_idEntidad',       'Value' => '', 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fecha',  'Id' => 'NewCosto_Creacion_fecha',  'Value' => '', 'Required' => 2, 'Icon'    => 'bi bi-calendar3']);
         $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',   'Id' => 'NewCosto_Observaciones',   'Value' => '', 'Required' => 1]);
 
@@ -39,8 +39,8 @@ $RandName = 'rand_'.rand(1, 999999);
         //datos ocultos para el documento
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipo',          'Value' => 1,                                         'Required' => 2]);  //Compra
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);  //Hora de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);  //Hora de creacion automatica
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoPago',    'Value' => 1,                                         'Required' => 2]);  //No Pagado
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso

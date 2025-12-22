@@ -27,7 +27,7 @@
         $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',              'Name' => 'Nombre',        'Id' => 'NewUsuario_Nombre',         'Value' => '',  'Required' => 2]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',                 'Name' => 'Rut',           'Id' => 'NewUsuario_Rut',            'Value' => '',  'Required' => 1,  'Icon' => 'bi bi-person-circle']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono',                'Name' => 'Fono',          'Id' => 'NewUsuario_Fono',           'Value' => '',  'Required' => 1,  'Icon' => 'bi bi-telephone-fill']);
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo de Usuario',     'Name' => 'idTipoUsuario', 'Id' => 'NewUsuario_idTipoUsuario',  'Value' => '',  'Required' => 2,'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo de Usuario',     'Name' => 'idTipoUsuario', 'Id' => 'NewUsuario_idTipoUsuario',  'Value' => '',  'Required' => 2,  'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);

@@ -26,7 +26,7 @@
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idServicio',    'Value' => $data['rowData']['idServicio'],            'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion', 'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion', 'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">

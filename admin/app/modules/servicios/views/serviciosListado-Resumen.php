@@ -33,7 +33,7 @@
 
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
-                                $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => $x1,'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => $x1,'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => $x2,'Required' => 2]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',         'Name' => 'Codigo',           'Id' => 'Edit_Codigo',            'Value' => $x3,'Required' => 1,'Icon' => 'ri-barcode-line']);
                                 $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => $x4,'Required' => 1]);

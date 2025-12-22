@@ -28,7 +28,7 @@
 
         //datos ocultos para el costo
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCampana',  'Value' => $data['rowData']['idCampana'],             'Required' => 2]);  //Campaña relacionada
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha',      'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha',      'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',  'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
 
         ?>

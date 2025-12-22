@@ -31,15 +31,15 @@ $RandName = 'rand_'.rand(1, 999999);
                     <?php
                     $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil', 'Name' => 'idDocumentos',    'Id' => 'New_idDocumentos',    'Value' => '', 'Required' => 2, 'arrData' => $data['arrDocumentos']]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'New_N_Doc',           'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'New_idEntidad',       'Value' => '', 'Required' => 2, 'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'New_idEntidad',       'Value' => '', 'Required' => 2, 'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fecha',  'Id' => 'New_Creacion_fecha',  'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',   'Id' => 'New_Observaciones',   'Value' => '', 'Required' => 1]);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipo',          'Value' => $data['idTipo'],                           'Required' => 2]);  //Tipo de movimiento
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);  //Hora de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);  //Hora de creacion automatica
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoPago',    'Value' => 1,                                         'Required' => 2]);  //No Pagado
 
                     ?>

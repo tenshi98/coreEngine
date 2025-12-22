@@ -28,7 +28,7 @@
                                 $x5 = $data['rowData']['Observaciones'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Entidad',               'Name' => 'idEntidad',       'Id' => 'Edit_idEntidad',       'Value' => $x3, 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',               'Name' => 'idEntidad',       'Id' => 'Edit_idEntidad',       'Value' => $x3, 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Cotización',   'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => $x4, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                                 $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',         'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => $x5, 'Required' => 1]);
 

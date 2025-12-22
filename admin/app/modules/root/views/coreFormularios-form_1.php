@@ -9,11 +9,11 @@
                 <?php
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Normales']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'Placeholder' => 'Texto normal',      'Name' => 'Nombre',  'Id' => 'IDInput_1_1', 'Required' => 2]);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',  'Id' => 'IDInput_1_2', 'Required' => 3]);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 2,'Placeholder' => 'Email',             'Name' => 'email',   'Id' => 'IDInput_1_3', 'Required' => 2,'Icon' => 'bx bx-mail-send']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 3,'Placeholder' => 'Contraseñas',       'Name' => 'password','Id' => 'IDInput_1_4', 'Required' => 2,'Icon' => 'bi bi-key']);
-                $data['Fnc_FormInputs']->formInputDatalist(['Placeholder' => 'Input Datalist','Name' => 'formInputDatalist','Id' => 'IDInput_1_29','Required' => 2,'Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'Placeholder' => 'Texto normal',      'Name' => 'Nombre',             'Id' => 'IDInput_1_1', 'Required' => 2]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',             'Id' => 'IDInput_1_2', 'Required' => 3]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 2,'Placeholder' => 'Email',             'Name' => 'email',              'Id' => 'IDInput_1_3', 'Required' => 2,'Icon' => 'bx bx-mail-send']);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 3,'Placeholder' => 'Contraseñas',       'Name' => 'password',           'Id' => 'IDInput_1_4', 'Required' => 2,'Icon' => 'bi bi-key']);
+                $data['Fnc_FormInputs']->formInputDatalist([        'Placeholder' => 'Input Datalist',     'Name' => 'formInputDatalist', 'Id' => 'IDInput_1_29','Required' => 2,'Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Especificos']);
@@ -24,7 +24,7 @@
                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,'Placeholder' => 'Numeros enteros positivos', 'Name' => 'Numeros1',      'Id' => 'IDInput_1_6','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 5,'Placeholder' => 'Numeros reales',            'Name' => 'Numeros2',      'Id' => 'IDInput_1_7','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 6,'Placeholder' => 'Numeros enteros',           'Name' => 'Numeros3',      'Id' => 'IDInput_1_8','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
-                $data['Fnc_FormInputs']->formNumberSpinner([ 'Placeholder' => 'number_spinner',            'Name' => 'number_spinner','Id' => 'IDInput_1_9','Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
+                $data['Fnc_FormInputs']->formNumberSpinner([        'Placeholder' => 'number_spinner',            'Name' => 'number_spinner','Id' => 'IDInput_1_9','Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Fecha y Hora']);
@@ -32,7 +32,7 @@
                 $data['Fnc_FormInputs']->formInput(['FormType' => 8, 'Placeholder' => 'form_input_date', 'Name' => 'form_input_date',  'Id' => 'IDInput_1_11','Required' => 2,'Icon' => 'bi bi-calendar-date']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 9, 'Placeholder' => 'time',            'Name' => 'time',             'Id' => 'IDInput_1_12','Required' => 2,'Icon' => 'bi bi-clock']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 10,'Placeholder' => 'form_time_picker','Name' => 'form_time_picker', 'Id' => 'IDInput_1_13','Required' => 2,'Icon' => 'bi bi-clock']);
-                $data['Fnc_FormInputs']->formTime([                  'Placeholder' => 'formTime',       'Name' => 'formTime',        'Id' => 'IDInput_1_14','Required' => 2,'Position' => 1,'Icon' => 'bi bi-clock']);
+                $data['Fnc_FormInputs']->formTime([                  'Placeholder' => 'formTime',        'Name' => 'formTime',         'Id' => 'IDInput_1_14','Required' => 2,'Position' => 1,'Icon' => 'bi bi-clock']);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Funcionales']);

@@ -31,7 +31,7 @@
             : '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Producto',        'Name' => 'idProducto',         'Id' => 'EditProd_idProducto', 'Value' => $x3,'Required' => 2,'arrData' => $data['arrProductos'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Producto',        'Name' => 'idProducto',         'Id' => 'EditProd_idProducto', 'Value' => $x3,'Required' => 2,'arrData' => $data['arrProductos'],   'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',        'Name' => 'Number',             'Id' => 'EditProd_Number',     'Value' => $x4,'Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',     'Name' => 'ValorTotal',         'Id' => 'EditProd_ValorTotal', 'Value' => $x5,'Required' => 2,'Icon' => 'bi bi-currency-dollar']);
 

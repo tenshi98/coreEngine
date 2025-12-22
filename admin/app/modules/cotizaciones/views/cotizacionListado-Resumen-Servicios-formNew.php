@@ -22,7 +22,7 @@
     <div class="modal-body">
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Servicio',     'Name' => 'idServicio',   'Id' => 'NewServ_idServicio',  'Value' => '','Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Servicio',     'Name' => 'idServicio',   'Id' => 'NewServ_idServicio',  'Value' => '','Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',     'Name' => 'Number',       'Id' => 'NewServ_Number',      'Value' => '','Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',  'Name' => 'ValorTotal',   'Id' => 'NewServ_ValorTotal',  'Value' => '','Required' => 2,'Icon' => 'bi bi-currency-dollar']);
 

@@ -37,11 +37,11 @@
 
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
-                                $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo',           'Name' => 'idTipoProducto',   'Id' => 'Edit_idTipoProducto',    'Value' => $x1,'Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
-                                $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => $x2,'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo',           'Name' => 'idTipoProducto',   'Id' => 'Edit_idTipoProducto',    'Value' => $x1,'Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => $x2,'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => $x3,'Required' => 2]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',          'Name' => 'Marca',            'Id' => 'Edit_Marca',             'Value' => $x4,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Unidad Medida',  'Name' => 'idUniMed',         'Id' => 'Edit_idUniMed',          'Value' => $x5,'Required' => 2,'arrData' => $data['arrUnimed'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Unidad Medida',  'Name' => 'idUniMed',         'Id' => 'Edit_idUniMed',          'Value' => $x5,'Required' => 2,'arrData' => $data['arrUnimed'], 'BASE' => $BASE]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',         'Name' => 'Codigo',           'Id' => 'Edit_Codigo',            'Value' => $x6,'Required' => 1,'Icon' => 'ri-barcode-line']);
                                 $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => $x7,'Required' => 1]);
 

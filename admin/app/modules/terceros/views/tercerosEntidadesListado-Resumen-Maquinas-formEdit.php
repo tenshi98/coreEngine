@@ -28,7 +28,7 @@
         $x4 = $data['rowData']['idEstado'] ?? '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Maquina',     'Name' => 'idMaquina',    'Id' => 'EditMaquinas_idMaquina',   'Value' => $x1, 'Required' => 2,'arrData' => $data['arrMaquinas'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Maquina',     'Name' => 'idMaquina',    'Id' => 'EditMaquinas_idMaquina',   'Value' => $x1, 'Required' => 2,'arrData' => $data['arrMaquinas'],   'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'EditMaquinas_Fecha',       'Value' => $x2, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
         $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'EditMaquinas_Observacion', 'Value' => $x3, 'Required' => 1]);
         $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',      'Name' => 'idEstado',     'Id' => 'EditMaquinas_idEstado',    'Value' => $x4, 'Required' => 2,'arrData' => $data['arrEstado']]);

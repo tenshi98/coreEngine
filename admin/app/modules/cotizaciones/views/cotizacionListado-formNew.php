@@ -29,14 +29,14 @@ $RandName = 'rand_'.rand(1, 999999);
                 </div>
                 <div class="modal-body">
                     <?php
-                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Entidad',               'Name' => 'idEntidad',       'Id' => 'New_idEntidad',       'Value' => '', 'Required' => 2, 'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',               'Name' => 'idEntidad',       'Id' => 'New_idEntidad',       'Value' => '', 'Required' => 2, 'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Cotización',   'Name' => 'Creacion_fecha',  'Id' => 'New_Creacion_fecha',  'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',         'Name' => 'Observaciones',   'Id' => 'New_Observaciones',   'Value' => '', 'Required' => 1]);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['UserData']['UserID'],               'Required' => 2]);  //Usuario que lo creo
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);  //Fecha de creacion automatica
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);  //Hora de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',      'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);  //Fecha de creacion automatica
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Creacion_hora',   'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);  //Hora de creacion automatica
 
                     ?>
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">

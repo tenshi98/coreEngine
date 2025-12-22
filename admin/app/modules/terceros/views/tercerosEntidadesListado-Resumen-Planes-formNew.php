@@ -22,7 +22,7 @@
     <div class="modal-body">
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Servicio',    'Name' => 'idServicio',   'Id' => 'NewPlanes_idServicio',  'Value' => '', 'Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Servicio',    'Name' => 'idServicio',   'Id' => 'NewPlanes_idServicio',  'Value' => '', 'Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'NewPlanes_Fecha',       'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 6,  'Placeholder' => 'Monto',       'Name' => 'Monto',        'Id' => 'NewPlanes_Monto',       'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
         $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'NewPlanes_Observacion', 'Value' => '', 'Required' => 1]);

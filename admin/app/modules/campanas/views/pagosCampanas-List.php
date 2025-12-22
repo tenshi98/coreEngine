@@ -13,10 +13,10 @@
                             $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil', 'Name' => 'idDocumentos',    'Id' => 'Search_idDocumentos',    'Value' => '', 'Required' => 1, 'arrData' => $data['arrDocumentos']]);
                             $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'Search_N_Doc',           'Value' => '', 'Required' => 1, 'Icon'    => 'bi bi-sort-numeric-down']);
                             $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Referencia',   'Name' => 'idFacturacion',   'Id' => 'Search_idFacturacion',   'Value' => '', 'Required' => 1, 'Icon'    => 'bi bi-sort-numeric-down']);
-                            $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'Search_idEntidad',       'Value' => '', 'Required' => 1, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                            $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'Search_idEntidad',       'Value' => '', 'Required' => 1, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
                             $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Inicio',     'Name' => 'F_Inicio',        'Id' => 'Search_F_Inicio',        'Value' => '', 'Required' => 1, 'Icon'    => 'bi bi-calendar3']);
                             $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Termino',    'Name' => 'F_Termino',       'Id' => 'Search_F_Termino',       'Value' => '', 'Required' => 1, 'Icon'    => 'bi bi-calendar3']);
-                            $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Campaña',             'Name' => 'idCampana',       'Id' => 'Search_idCampana',       'Value' => '', 'Required' => 1, 'arrData' => $data['arrCampanas'], 'BASE' => $BASE]);
+                            $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Campaña',             'Name' => 'idCampana',       'Id' => 'Search_idCampana',       'Value' => '', 'Required' => 1, 'arrData' => $data['arrCampanas'], 'BASE' => $BASE]);
 
                             ?>
                             <div class="d-grid gap-2 d-md-flex justify-content-md-center">

@@ -9,7 +9,7 @@
                     //se dibujan los inputs
                     $data['Fnc_FormInputs']->formInput(['FormType' => 2, 'Placeholder' => 'Email',            'Name' => 'email',         'Id' => 'Search_email',          'Value' => '', 'Required' => 1,  'Icon' => 'bx bx-mail-send']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Nombre',           'Name' => 'Nombre',        'Id' => 'Search_Nombre',         'Value' => '', 'Required' => 1]);
-                    $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'Search_idTipoUsuario',  'Value' => '', 'Required' => 1,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
+                    $data['Fnc_FormInputs']->formSelectFilter([          'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'Search_idTipoUsuario',  'Value' => '', 'Required' => 1, 'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
                     ?>
                     <div class="d-grid gap-2 d-md-flex justify-content-md-center">
