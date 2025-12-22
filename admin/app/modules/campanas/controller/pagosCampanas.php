@@ -130,7 +130,7 @@ class pagosCampanas extends ControllerBase {
         $WhereData_int     = 'idDocumentos,idEntidad,idFacturacion';  //Datos búsqueda exacta
         $WhereData_string  = 'N_Doc';                                 //Datos búsqueda relativa
         $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';     //Datos búsqueda Between
-        $WhereData_int2     = 'idCampana';                            //Datos búsqueda exacta
+        $WhereData_int2    = 'idCampana';                             //Datos búsqueda exacta
         $whereInt          = '';                                      //se crea cadena
         /******************************************/
         //agrego variable busqueda

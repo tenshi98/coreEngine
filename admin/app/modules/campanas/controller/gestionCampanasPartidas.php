@@ -1379,6 +1379,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 $_POST['IVA']             = $Beneficios - ($Beneficios/1.19);
                 $_POST['ValorTotal']      = $Beneficios;
                 $_POST['TotalProductos']  = $Beneficios;
+                $_POST['Observaciones']   = 'Documento generado desde una partida';
                 //Verifico si existe
                 if(isset($_POST['Creacion_fecha'])&&$_POST['Creacion_fecha']!=''){
                     $_POST['Creacion_Semana']  = $this->DataDate->fecha2NSemana($_POST['Creacion_fecha']);
@@ -1838,7 +1839,7 @@ class gestionCampanasPartidas extends ControllerBase {
 
                 /******************************************/
                 //Se actualizan los datos del costo
-                $gestionCampanas   = new gestionCampanas();
+                $gestionCampanas = new gestionCampanas();
                 $gestionCampanas->updateCostos(2, $_POST['idCampana']);
                 /******************************************/
                 // Devuelvo true con código 200 (OK)
@@ -2269,7 +2270,7 @@ class gestionCampanasPartidas extends ControllerBase {
                     break;
             }
             //Se actualizan los datos del costo
-		    $gestionCampanas   = new gestionCampanas();
+		    $gestionCampanas = new gestionCampanas();
             $gestionCampanas->updateCostos(2, $rowCampana['idCampana']);
 
             /******************************************/
