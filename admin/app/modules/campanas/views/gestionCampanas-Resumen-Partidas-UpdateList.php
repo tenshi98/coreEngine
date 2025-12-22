@@ -1,4 +1,4 @@
-<table class="table table-sm table-hover datatable" id="tableDataPartidas">
+<table class="table table-sm table-hover" id="tableDataPartidas">
     <thead>
         <tr>
             <th>Ubicacion</th>
