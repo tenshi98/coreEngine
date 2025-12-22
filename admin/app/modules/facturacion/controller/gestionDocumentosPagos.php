@@ -293,66 +293,10 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     //Crear
     public function Insert(){
-
-        /*******************************************************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-            facturacion_listado.idFacturacion,
-            facturacion_listado.ValorTotal,
-            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$_POST['idFacturacion'].') AS MontoPagado',
-            'table'   => 'facturacion_listado',
-            'join'    => '',
-            'where'   => 'idFacturacion = "'.$_POST['idFacturacion'].'"',
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        //Ejecuto la query
-        $xParams = ['query' => $query];
-        $rowData = $this->Base_GetByID($xParams);
-
-        /******************************/
-        //Se verifica si el monto es superior al valor del documento
-        if(isset($rowData['ValorTotal'], $_POST['MontoPagado'])&&$rowData['ValorTotal']<($rowData['MontoPagado']+$_POST['MontoPagado'])){
-            echo Response::sendData(500, 'Ha ingresado un monto superior al valor total del documento');
-        }else{
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
-            /******************************/
-            //Se genera la query
-            $query = [
-                'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
-                'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'facturacion_listado_pagos',
-                'Post'      => $_POST
-            ];
-            //Ejecuto la query
-            //Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-        $Response = $this->Base_insert($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if (is_numeric($Response)) {
-                /******************************/
-                // Se actualiza el estado de la factura
-                $this->updateFact($_POST['idFacturacion']);
-                /******************************/
-                // Si es un ID numérico, se envía con código 200 (OK)
-                echo Response::sendData(200, $Response);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
-            }
-
-        }
-
+        //Envio los datos recibidos
+        $resultado = $this->insertPago($_POST);
+        //Imprimo la respuesta
+        echo Response::sendData($resultado['status'], $resultado['Response']);
     }
 
     /******************************************************************************/
@@ -576,6 +520,68 @@ class gestionDocumentosPagos extends ControllerBase {
         ];
         // Por defecto usar ventas si no viene un tipo válido
         return $tsrxMap[$idTipo] ?? $tsrxMap[2];
+    }
+
+    /******************************************************************************/
+    //Se genera el pago
+    public function insertPago($Data){
+        /*******************************************************************/
+        //Se genera la query
+        $query = [
+            'data'    => '
+            facturacion_listado.idFacturacion,
+            facturacion_listado.ValorTotal,
+            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$Data['idFacturacion'].') AS MontoPagado',
+            'table'   => 'facturacion_listado',
+            'join'    => '',
+            'where'   => 'idFacturacion = "'.$Data['idFacturacion'].'"',
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        //Ejecuto la query
+        $xParams = ['query' => $query];
+        $rowData = $this->Base_GetByID($xParams);
+
+        /******************************/
+        //Se verifica si el monto es superior al valor del documento
+        if(isset($rowData['ValorTotal'], $Data['MontoPagado'])&&$rowData['ValorTotal']<($rowData['MontoPagado']+$Data['MontoPagado'])){
+            return ['status' => 500, 'Response' => 'Ha ingresado un monto superior al valor total del documento'];
+        }else{
+            /******************************/
+            //Se genera el chequeo
+            $DataCheck = $this->dataCheck($Data);
+
+            /******************************/
+            //Se genera la query
+            $query = [
+                'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
+                'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
+                'unique'    => '',
+                'encode'    => '',
+                'table'     => 'facturacion_listado_pagos',
+                'Post'      => $Data
+            ];
+            //Ejecuto la query
+            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+            $Response = $this->Base_insert($xParams);
+
+            /******************************/
+            // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
+            if (is_numeric($Response)) {
+                /******************************/
+                // Se actualiza el estado de la factura
+                $this->updateFact($Data['idFacturacion']);
+                /******************************/
+                // Si es un ID numérico, se envía con código 200 (OK)
+                return ['status' => 200, 'Response' => $Response];
+            } else {
+                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
+                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
+                return ['status' => 500, 'Response' => $Response];
+            }
+
+        }
     }
 
 }
