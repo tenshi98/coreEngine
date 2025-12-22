@@ -179,6 +179,17 @@ class gestionCampanasInstaller extends ControllerBase {
             'RutaWeb'        => 'gestionCampanas/pagos/listado',
             'RutaController' => 'pagosCampanas',
         ];
+        $arrPermisos[] = [
+            'idPermisosCat'  => '5',
+            'idEstado'       => '1',
+            'idTipo'         => '3',
+            'Nombre'         => 'Informe Pagos Simplificados',
+            'Descripcion'    => 'Permite filtrar los documentos con falta de pagos para ingresar los pagos de forma simplificada',
+            'idLevelLimit'   => '2',
+            'RutaWeb'        => 'gestionCampanas/pagosSimples/listado',
+            'RutaController' => 'pagosSimple',
+        ];
+
         /************************************************/
         /************************************************/
         //Verifico si existe
@@ -428,6 +439,14 @@ class gestionCampanasInstaller extends ControllerBase {
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'gestionCampanas/pagos/listado/pagos',                'RutaController' => 'gestionDocumentosPagos->Insert', 'Descripcion' => 'Crear Información',                            'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosPagos'];
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'gestionCampanas/pagos/listado/pagos/update',         'RutaController' => 'gestionDocumentosPagos->Update', 'Descripcion' => 'Editar por post (modificar y subir archivos)', 'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosPagos'];
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'gestionCampanas/pagos/listado/pagos',                'RutaController' => 'gestionDocumentosPagos->Delete', 'Descripcion' => 'Borrar dato y archivos',                       'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosPagos'];
+
+                break;
+            /******************************************/
+            case 5:
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'gestionCampanas/pagosSimples/listado/listAll',  'RutaController' => 'pagosSimple->listAll',      'Descripcion' => 'Filtro de búsqueda', 'idLevelLimit' => 1, 'Controller' => 'pagosSimple'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'gestionCampanas/pagosSimples/listado/search',   'RutaController' => 'pagosSimple->UpdateList',   'Descripcion' => 'Filtrar datos',      'idLevelLimit' => 1, 'Controller' => 'pagosSimple'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'gestionCampanas/pagosSimples/listado/pagos',    'RutaController' => 'pagosSimple->Insert',       'Descripcion' => 'Crear Información',  'idLevelLimit' => 2, 'Controller' => 'pagosSimple'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'gestionCampanas/pagosSimples/listado/view/@id', 'RutaController' => 'gestionDocumentos->View_2', 'Descripcion' => 'Mostrar Detallado',  'idLevelLimit' => 1, 'Controller' => 'gestionDocumentos'];
 
                 break;
         }
