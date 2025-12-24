@@ -2313,7 +2313,7 @@ class gestionCampanasPartidas extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'    => 'idExistencia',
+                'data'    => 'idExistencia,idFacturacion',
                 'table'   => 'campanas_listado_partidas',
                 'join'    => '',
                 'where'   => 'Fecha = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['Fecha']).'" AND idEstadoPartida = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idEstadoPartida']).'"',
@@ -2324,17 +2324,155 @@ class gestionCampanasPartidas extends ControllerBase {
             ];
             //Ejecuto la query
             $xParams     = ['query' => $query];
-            $arrPermisos = $this->Base_GetList($xParams);
+            $arrPartidas = $this->Base_GetList($xParams);
             /******************************/
             //Se arma la query
             $ActionSQL = 'DELETE FROM `campanas_listado_partidas_productos` WHERE idExistencia IN (0';
             //Se genera la consulta
-            if (!empty($arrPermisos)) {$ActionSQL .= ',' . implode(',', array_column($arrPermisos, 'idExistencia'));}
+            if (!empty($arrPartidas)) {$ActionSQL .= ',' . implode(',', array_column($arrPartidas, 'idExistencia'));}
             $ActionSQL .= ')';
             /******************************************/
             //Se ejecuta la query
             $xParams = ['query' => $ActionSQL];
             $this->Base_queryExecute($xParams);
+
+            /*******************************************************/
+            /*           ELIMINACION DATOS FACTURACION             */
+            /*******************************************************/
+            //Verifico si hay datos
+            if(is_array($arrPartidas)&&!empty($arrPartidas)){
+                //Recorro
+                foreach($arrPartidas AS $partida){
+                    //Verifico su existencia
+                    if(isset($partida['idFacturacion'])&&$partida['idFacturacion']!=''){
+                        /*******************************************************/
+                        /*                     CONSULTAS                       */
+                        /*******************************************************/
+                        //Datos de los productos
+                        $query = [
+                            'data'    => 'idBodegas,idProducto,Number',
+                            'table'   => 'facturacion_listado_productos',
+                            'join'    => '',
+                            'where'   => 'idFacturacion = "'.$partida['idFacturacion'].'"',
+                            'group'   => '',
+                            'having'  => '',
+                            'order'   => 'idProducto ASC',
+                            'limit'   => ConfigAPP::APP["N_MaxItems"]
+                        ];
+                        //Ejecuto la query
+                        $xParams      = ['query' => $query];
+                        $arrProductos = $this->Base_GetList($xParams);
+
+                        /******************************************/
+                        //Datos de la partida
+                        $query = [
+                            'data'    => 'idMovimiento',
+                            'table'   => 'bodegas_movimientos',
+                            'join'    => '',
+                            'where'   => 'idFacturacion = "'.$partida['idFacturacion'].'"',
+                            'group'   => '',
+                            'having'  => '',
+                            'order'   => ''
+                        ];
+                        //Ejecuto la query
+                        $xParams       = ['query' => $query];
+                        $rowMovimiento = $this->Base_GetByID($xParams);
+
+                        /******************************************/
+                        //Stocks
+                        /******************************/
+                        //Variables
+                        $chainx        = '0';
+                        $arrProdStock  = array();
+                        $BodegasID     = 0;
+                        /******************************/
+                        //Se recorren los productos
+                        foreach($arrProductos AS $crud){
+                            $chainx    .= ','.$crud['idProducto'];
+                            $BodegasID  = $crud['idBodegas'];
+                        }
+                        /******************************/
+                        //Se consultan los stocks
+                        $query = [
+                            'data'    => 'idStocks,idProducto,Cantidad_idBodegas_'.$BodegasID.' AS Cantidad',
+                            'table'   => 'bodegas_productos_stocks',
+                            'join'    => '',
+                            'where'   => 'idProducto IN ('.$chainx.')',
+                            'group'   => '',
+                            'having'  => '',
+                            'order'   => 'idProducto ASC',
+                            'limit'   => ConfigAPP::APP["N_MaxItems"]
+                        ];
+                        //Ejecuto la query
+                        $xParams   = ['query' => $query];
+                        $arrStocks = $this->Base_GetList($xParams);
+
+                        /******************************/
+                        //Recorro
+                        foreach($arrStocks as $crud){
+                            $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
+                            $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
+                        }
+
+                        /*******************************************************/
+                        /*                 ELIMINACION DATOS                   */
+                        /*******************************************************/
+                        $arrTableDel  = array();
+                        $arrTableDel[] = 'DELETE FROM `facturacion_listado` WHERE idFacturacion = "'.$partida['idFacturacion'].'"';
+                        $arrTableDel[] = 'DELETE FROM `facturacion_listado_productos` WHERE idFacturacion = "'.$partida['idFacturacion'].'"';
+                        $arrTableDel[] = 'DELETE FROM `facturacion_listado_pagos` WHERE idFacturacion = "'.$partida['idFacturacion'].'"';
+                        $arrTableDel[] = 'DELETE FROM `bodegas_movimientos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"';
+                        $arrTableDel[] = 'DELETE FROM `bodegas_movimientos_productos` WHERE idMovimiento = "'.$rowMovimiento['idMovimiento'].'"';
+
+                        /************************************************/
+                        //Verifico si existe
+                        if($arrTableDel){
+                            //recorro
+                            foreach ($arrTableDel as $sql) {
+                                //Se ejecuta la query
+                                $xParams = ['query' => $sql];
+                                $this->Base_queryExecute($xParams);
+                            }
+                        }
+
+                        /*******************************************************/
+                        /*                ACTUALIZACION DATOS                  */
+                        /*******************************************************/
+                        /******************************/
+                        //Se recorren los productos
+                        foreach($arrProductos as $crud){
+                            /******************************/
+                            //Se suma la cantidad
+                            $NewCantidad = $arrProdStock[$crud['idProducto']]['Cantidad'] + $crud['Number'];
+                            /******************************/
+                            //Se Actualizan los stocks
+                            //verifico si existe el dato en el stock
+                            if(isset($arrProdStock[$crud['idProducto']]['idStocks'])&&$arrProdStock[$crud['idProducto']]['idStocks']!=''){
+                                /******************************/
+                                //Se agrega respuesta
+                                $arrTareas = [
+                                    'idStocks'                               => $arrProdStock[$crud['idProducto']]['idStocks'],
+                                    'Cantidad_idBodegas_'.$crud['idBodegas'] => $NewCantidad,
+                                ];
+                                /******************************/
+                                //Se genera la query
+                                $query = [
+                                    'data'      => 'idStocks,Cantidad_idBodegas_'.$crud['idBodegas'],
+                                    'required'  => 'idStocks,Cantidad_idBodegas_'.$crud['idBodegas'],
+                                    'unique'    => '',
+                                    'encode'    => '',
+                                    'table'     => 'bodegas_productos_stocks',
+                                    'where'     => 'idStocks',
+                                    'Post'      => $arrTareas
+                                ];
+                                //Ejecuto la query
+                                $xParams = ['DataCheck' => '', 'query' => $query];
+                                $this->Base_update($xParams);
+                            }
+                        }
+                    }
+                }
+            }
 
             /*******************************************************/
             /*              SE ELIMINAN LAS PARTIDAS               */
