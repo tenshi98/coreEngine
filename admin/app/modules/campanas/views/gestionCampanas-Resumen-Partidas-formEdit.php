@@ -184,12 +184,16 @@ $RandName = 'rand_'.rand(1, 999999);
             //datos para el whatsapp
             let Cliente         = $("#FormEditPartida [name='ClienteWhatsapp']").val();
             let idEstadoPartida = $("#FormEditPartida [name='idEstadoPartida']").val();
-            let Prod_mensaje    = '';
+            let Prod_mensaje_1    = '';
+            let Prod_mensaje_2    = '';
+            let idConfirmWeb      = '<?php echo $data['rowData']['idConfirmWeb']; ?>';
+
             //trato de obtener las cantidades
             try {
                 let Prod_cantidades = $("#FormEditPartida [name='Producto_Cantidad[]'], #FormEditPartida [name='NewProducto_Cantidad[]']").map(function(){ return $(this).val().toString().trim(); }).get().filter(v=>v!=='');
                 let Prod_valores    = $("#FormEditPartida [name='Producto_Valor[]'], #FormEditPartida [name='NewProducto_Valor[]']").map(function(){ return $(this).val().toString().trim(); }).get().map(v=>parseFloat(v.replace(',', '.'))||0);
-                Prod_mensaje        = Prod_cantidades + "Kg. por " + return_value (Prod_valores);
+                Prod_mensaje_1        = Prod_cantidades + " Kg. de Palta hass de primera por un valor de " + return_value (Prod_valores)+" están en camino";
+                Prod_mensaje_2        = Prod_cantidades + " Kg. por " + return_value (Prod_valores);
             } catch (error) {
                 //nada
             }
@@ -207,7 +211,9 @@ $RandName = 'rand_'.rand(1, 999999);
                     "Fono": '<?php echo $data['rowData']['EntidadFono']; ?>',
                     "Cliente": Cliente,
                     "idEstadoPartida": idEstadoPartida,
-                    "Prod_mensaje": Prod_mensaje
+                    "Prod_mensaje_1": Prod_mensaje_1,
+                    "Prod_mensaje_2": Prod_mensaje_2,
+                    "idConfirmWeb": idConfirmWeb
                 },
             };
             //Se envian los datos al formulario

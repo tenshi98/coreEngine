@@ -94,31 +94,31 @@ class gestionCampanasInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'campanas_listado',
-            'data'       => '`idCampana` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`fecha_auto` date NOT NULL,`Fecha` date NOT NULL,`Fecha_Dia` int UNSIGNED NOT NULL,`Fecha_Mes` int UNSIGNED NOT NULL,`Fecha_Ano` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Costos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`Beneficios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`Perdidas` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`Margen` decimal(15, 2) NULL DEFAULT NULL,`idBodegas` int UNSIGNED NOT NULL',
+            'data'       => '`idCampana` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idEstado` int(10) unsigned NOT NULL,`fecha_auto` date NOT NULL,`Fecha` date NOT NULL,`Fecha_Dia` int(10) unsigned NOT NULL,`Fecha_Mes` int(10) unsigned NOT NULL,`Fecha_Ano` int(10) unsigned NOT NULL,`Nombre` varchar(255) NOT NULL,`Observaciones` text DEFAULT NULL,`Costos` decimal(15,2) unsigned DEFAULT NULL,`Beneficios` decimal(15,2) unsigned DEFAULT NULL,`Perdidas` decimal(15,2) unsigned DEFAULT NULL,`Margen` decimal(15,2) DEFAULT NULL,`idBodegas` int(10) unsigned NOT NULL',
             'primaryKey' => 'idCampana',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'campanas_listado_costos',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCampana` bigint UNSIGNED NOT NULL,`Fecha` date NOT NULL,`Item` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Costos` decimal(15, 2) UNSIGNED NOT NULL,`idFacturacion` bigint UNSIGNED NULL DEFAULT NULL,`idUsuario` int UNSIGNED NOT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idCampana` bigint(20) unsigned NOT NULL,`Fecha` date NOT NULL,`Item` text NOT NULL,`Costos` decimal(15,2) unsigned NOT NULL,`idFacturacion` bigint(20) unsigned DEFAULT NULL,`idUsuario` int(10) unsigned NOT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'campanas_listado_partidas',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCampana` bigint UNSIGNED NOT NULL,`Fecha` date NOT NULL,`Fecha_Dia` int UNSIGNED NOT NULL,`Fecha_Mes` int UNSIGNED NOT NULL,`Fecha_Ano` int UNSIGNED NOT NULL,`idEntidad` int UNSIGNED NOT NULL,`Beneficios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`idEstadoPartida` int UNSIGNED NOT NULL,`idFacturacion` bigint UNSIGNED NULL DEFAULT NULL,`idUsuario` int UNSIGNED NOT NULL,`ConfirmacionFecha` date NULL DEFAULT NULL,`ConfirmacionHora` time NULL DEFAULT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idCampana` bigint(20) unsigned NOT NULL,`Fecha` date NOT NULL,`Fecha_Dia` int(10) unsigned NOT NULL,`Fecha_Mes` int(10) unsigned NOT NULL,`Fecha_Ano` int(10) unsigned NOT NULL,`idEntidad` int(10) unsigned NOT NULL,`Beneficios` decimal(15,2) unsigned DEFAULT NULL,`idEstadoPartida` int(10) unsigned NOT NULL,`idFacturacion` bigint(20) unsigned DEFAULT NULL,`idUsuario` int(10) unsigned NOT NULL,`ConfirmacionFecha` date DEFAULT NULL,`ConfirmacionFecha_Dia` int(10) unsigned DEFAULT NULL,`ConfirmacionFecha_Mes` int(10) unsigned DEFAULT NULL,`ConfirmacionFecha_Ano` int(10) unsigned DEFAULT NULL,`ConfirmacionHora` time DEFAULT NULL,`VentaFecha` date DEFAULT NULL,`VentaFecha_Dia` int(10) unsigned DEFAULT NULL,`VentaFecha_Mes` int(10) unsigned DEFAULT NULL,`VentaFecha_Ano` int(10) unsigned DEFAULT NULL,`idConfirmWeb` int(10) unsigned DEFAULT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'campanas_listado_partidas_productos',
-            'data'       => '`idProdCamp` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idExistencia` bigint UNSIGNED NOT NULL,`idCampana` bigint UNSIGNED NOT NULL,`idProducto` int UNSIGNED NULL DEFAULT NULL,`Cantidad` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`Beneficios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
+            'data'       => '`idProdCamp` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idExistencia` bigint(20) unsigned NOT NULL,`idCampana` bigint(20) unsigned NOT NULL,`idProducto` int(10) unsigned DEFAULT NULL,`Cantidad` decimal(10,2) unsigned DEFAULT NULL,`Beneficios` decimal(15,2) unsigned DEFAULT NULL',
             'primaryKey' => 'idProdCamp',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'campanas_listado_perdidas',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCampana` bigint UNSIGNED NOT NULL,`Fecha` date NOT NULL,`Fecha_Dia` int UNSIGNED NOT NULL,`Fecha_Mes` int UNSIGNED NOT NULL,`Fecha_Ano` int UNSIGNED NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idProducto` int UNSIGNED NULL DEFAULT NULL,`Cantidad` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`Perdidas` decimal(15, 2) UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`idMovimiento` int UNSIGNED NULL DEFAULT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idCampana` bigint(20) unsigned NOT NULL,`Fecha` date NOT NULL,`Fecha_Dia` int(10) unsigned NOT NULL,`Fecha_Mes` int(10) unsigned NOT NULL,`Fecha_Ano` int(10) unsigned NOT NULL,`Item` varchar(255) NOT NULL,`idProducto` int(10) unsigned DEFAULT NULL,`Cantidad` decimal(10,2) unsigned DEFAULT NULL,`Perdidas` decimal(15,2) unsigned NOT NULL,`idUsuario` int(10) unsigned NOT NULL,`idMovimiento` int(10) unsigned DEFAULT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];

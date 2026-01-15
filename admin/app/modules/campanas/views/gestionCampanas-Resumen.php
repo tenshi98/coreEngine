@@ -750,8 +750,22 @@
     /*********************************************************************/
     /******************************************/
     function notiEntrega(Data) {
-        //Si el pedido fue cerrado se alerta la entrega
-        if(Data.idEstadoPartida==='6'){
+
+        //Variables
+        let urlWhatsapp = '';
+
+        //Se verifica estado para generar URL
+        //Campaña Confirmada y confirmada solo por el admin
+        if(Data.idEstadoPartida==='4' && Data.idConfirmWeb==='' && Data.Fono!==''){
+            urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Data.Fono+"&text=Hola+"+Data.Cliente+"!!%0ATu+pedido+<?php echo ConfigAPP::SOFTWARE['SoftwareName']; ?>+ha+sido+recepcionado."+Data.Prod_mensaje_1+".&type=phone_number&app_absent=0";
+        //Partida Entregada
+        } else if(Data.idEstadoPartida==='6' && Data.Fono!==''){
+            //URL
+            urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Data.Fono+"&text=Hola+"+Data.Cliente+"!!%0ATu+pedido+<?php echo ConfigAPP::SOFTWARE['SoftwareName']; ?>+ha+sido+entregado."+Data.Prod_mensaje_2+".+Gracias&type=phone_number&app_absent=0";
+        }
+
+        //Si hay un mensaje
+        if(urlWhatsapp!=''){
             Swal.fire({
                 title: "Enviar Notificacion",
                 text: "Esta a punto de enviar una notificacion a " + Data.Cliente + ", ¿Desea continuar?",
@@ -764,8 +778,6 @@
                 reverseButtons: true,
             }).then((result2) => {
                 if (result2.isConfirmed) {
-                    //URL
-                    let urlWhatsapp = "https://api.whatsapp.com/send/?phone="+Data.Fono+"&text=Hola+"+Data.Cliente+"!!%0ATu+pedido+de+<?php echo ConfigAPP::SOFTWARE['SoftwareName']; ?>+ha+sido+entregado."+Data.Prod_mensaje+".+gracias&type=phone_number&app_absent=0";
                     //Abrir nuevo tab
                     window.open(urlWhatsapp, '_blank');
                 }

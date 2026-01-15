@@ -171,8 +171,17 @@
                                             break;
                                         /*************************************/
                                         case 3: //Campaña Revisada
+                                            echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')"                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
+                                            echo '<button type="button" onclick="tabPartidasDel( \''.$encryptedId.'\', \''.$Entidad.'\')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i> Borrar</button>';
+                                            break;
+                                        /*************************************/
                                         case 4: //Campaña Confirmada
                                             echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')"                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
+                                            if(isset($crud['EntidadFono1'])&&$crud['EntidadFono1']!=''){
+                                                echo '<button type="button" onclick="tabPartidasSendInfo(\''.$WSP_ExistenciaID.'\', \''.$EntidadWsp.'\', \''.$WSP_encryptedId.'\', \''.$WSP_Fono.'\')" class="btn btn-success btn-sm tooltiplink" data-title="Reenviar Enviar Notificación Manual"><i class="bi bi-cursor"></i> Reenviar Noti Manual</button>';
+                                            }else{
+                                                echo '<button type="button" class="btn btn-warning btn-sm tooltiplink" data-title="No existe numero"><i class="bi bi-exclamation-triangle"></i> No existe numero</button>';
+                                            }
                                             echo '<button type="button" onclick="tabPartidasDel( \''.$encryptedId.'\', \''.$Entidad.'\')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i> Borrar</button>';
                                             break;
                                         /*************************************/

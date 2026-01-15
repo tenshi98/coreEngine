@@ -8,13 +8,15 @@ $arrProdID = array_unique(array_column($data['arrDataVentas'], 'idProducto'));
 //Se crean datos vacios
 foreach ($arrProdID as $prodID) {
     $xData[$prodID]['Producto'] = '';
-    $xData[$prodID]['Unimed'] = '';
+    $xData[$prodID]['Unimed']   = '';
     $xData[$prodID]['Cantidad'] = '';
+    $xData[$prodID]['Valores']  = '';
     $xData[$prodID]['Total']    = 0;
     $xData[$prodID]['Valor']    = 0;
     $xFechas  = '';
     foreach ($arrFechas as $fechas) {
         $xData[$prodID][$fechas]['Cantidad'] = '0';
+        $xData[$prodID][$fechas]['Valores']  = '0';
         $xFechas                            .= '"'.$fechas.'",';
     }
 }
@@ -24,6 +26,7 @@ foreach ($data['arrDataVentas'] as $crud) {
     $xData[$crud['idProducto']]['Producto']                      = $crud['Producto'];
     $xData[$crud['idProducto']]['Unimed']                        = $crud['Unimed'];
     $xData[$crud['idProducto']][$crud['VentaFecha']]['Cantidad'] = $data['Fnc_DataNumbers']->Cantidades($crud['Total'], 0);
+    $xData[$crud['idProducto']][$crud['VentaFecha']]['Valores']  = $data['Fnc_DataNumbers']->Cantidades($crud['Valor'], 0);
     $xData[$crud['idProducto']]['Total']                         = $xData[$crud['idProducto']]['Total'] + $crud['Total'];
     $xData[$crud['idProducto']]['Valor']                         = $xData[$crud['idProducto']]['Valor'] + $crud['Valor'];
 }
@@ -31,6 +34,7 @@ foreach ($data['arrDataVentas'] as $crud) {
 foreach ($arrProdID as $prodID) {
     foreach ($arrFechas as $fechas) {
         $xData[$prodID]['Cantidad'] .= $xData[$prodID][$fechas]['Cantidad'].',';
+        $xData[$prodID]['Valores']  .= $xData[$prodID][$fechas]['Valores'].',';
     }
 }
 
@@ -108,9 +112,11 @@ foreach ($arrProdID as $prodID) {
                         <p class="text-center"><strong><?php echo 'Ventas diarias de la campaña '.$data['rowData']['Nombre']?></strong></p>
 
                         <div id="reportsChart_4"></div>
+                        <div id="reportsChart_5"></div>
 
                         <script>
                             $(document).ready(function() {
+                                //Cantidades
                                 new ApexCharts(document.querySelector("#reportsChart_4"), {
                                     series: [
                                         <?php
@@ -134,6 +140,59 @@ foreach ($arrProdID as $prodID) {
                                         size: 4
                                     },
                                     colors: ['#4154f1', '#2eca6a', '#ff771d'],
+                                    fill: {
+                                        type: "gradient",
+                                        gradient: {
+                                            shadeIntensity: 1,
+                                            opacityFrom: 0.3,
+                                            opacityTo: 0.4,
+                                            stops: [0, 90, 100]
+                                        }
+                                    },
+                                    dataLabels: {
+                                        enabled: false
+                                    },
+                                    stroke: {
+                                        curve: 'smooth',
+                                        width: 2
+                                    },
+                                    xaxis: {
+                                        type: 'datetime',
+                                        categories: [<?php echo $xFechas; ?>]
+                                    },
+                                    tooltip: {
+                                        x: {
+                                            format: 'dd/MM/yyyy'
+                                        },
+                                    },
+                                    legend: {
+                                        show: false,
+                                    }
+                                }).render();
+                                //Valores
+                                new ApexCharts(document.querySelector("#reportsChart_5"), {
+                                    series: [
+                                        <?php
+                                        //Se recorre
+                                        foreach ($xData as $crud) {
+                                            echo '
+                                            {
+                                                name: "'.$crud['Producto'].'",
+                                                data: ['.$crud['Valores'].'],
+                                            },';
+                                        } ?>
+                                    ],
+                                    chart: {
+                                        height: 200,
+                                        type: 'area',
+                                        toolbar: {
+                                            show: false
+                                        },
+                                    },
+                                    markers: {
+                                        size: 4
+                                    },
+                                    colors: ['#2eca6a', '#2eca6a', '#ff771d'],
                                     fill: {
                                         type: "gradient",
                                         gradient: {

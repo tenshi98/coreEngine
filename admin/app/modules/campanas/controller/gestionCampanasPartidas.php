@@ -699,6 +699,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 campanas_listado_partidas.idEntidad,
                 campanas_listado_partidas.idEstadoPartida,
                 campanas_listado_partidas.idFacturacion,
+                campanas_listado_partidas.idConfirmWeb,
                 campanas_listado.idBodegas,
                 entidades_listado.Nombre AS EntidadNombre,
                 entidades_listado.ApellidoPat AS EntidadApellido,
