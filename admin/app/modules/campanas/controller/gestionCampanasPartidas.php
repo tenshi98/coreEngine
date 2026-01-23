@@ -317,7 +317,8 @@ class gestionCampanasPartidas extends ControllerBase {
         $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'entidades_listado', 2);
         $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'entidades_listado', 3);
         //Verifico si esta vacio
-        $DiasCreacion = $this->DataOperations->restarDias($this->ServerServer->fechaActual(),$_POST['nDias']);
+        $DiasMin = $this->DataOperations->restarDias($this->ServerServer->fechaActual(),$_POST['nDias']);
+        $DiasMax = $this->DataOperations->restarDias($this->ServerServer->fechaActual(),$_POST['nDiasMax']);
         //Se verifica si se necesita telefono
         if(isset($_POST['idTieneFono'])){
             switch ($_POST['idTieneFono']) {
@@ -326,7 +327,10 @@ class gestionCampanasPartidas extends ControllerBase {
             }
         }
         //Filtro de fecha
-        $whereInt1 = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha>="'.$DiasCreacion.'"' : 'facturacion_listado.Creacion_fecha>="'.$DiasCreacion.'"';
+        $whereInt1 = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha NOT BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"' : 'facturacion_listado.Creacion_fecha BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"';
+
+        //$whereInt1 = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha>="'.$DiasCreacion.'"' : 'facturacion_listado.Creacion_fecha>="'.$DiasCreacion.'"';
+
 
         /******************************/
         //Se genera la query
@@ -335,7 +339,7 @@ class gestionCampanasPartidas extends ControllerBase {
             'table'   => 'facturacion_listado',
             'join'    => 'LEFT JOIN entidades_listado  ON entidades_listado.idEntidad = facturacion_listado.idEntidad',
             'where'   => $whereInt1,
-            'group'   => '',
+            'group'   => 'facturacion_listado.idEntidad',
             'having'  => '',
             'order'   => 'facturacion_listado.idEntidad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
@@ -354,7 +358,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 'table'   => 'campanas_listado_partidas',
                 'join'    => '',
                 'where'   => 'idCampana = "'.$_POST['idCampana'].'"',
-                'group'   => '',
+                'group'   => 'idEntidad',
                 'having'  => '',
                 'order'   => 'idEntidad ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]

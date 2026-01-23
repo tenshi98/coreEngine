@@ -43,12 +43,13 @@ $RandName = 'rand_'.rand(1, 999999);
             <div class="col">
                 <?php
                 //Comun
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nick',         'Name'  => 'Nick',       'Id'  => 'SearchPartida_Nick',          'Value'  => '','Required'  => 1]);
-                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Sector',       'Name'  => 'idSector',   'Id'  => 'SearchPartida_idSector',      'Value'  => '','Required'  => 1,'arrData'  => $data['arrSector'], 'BASE' => $BASE]);
-                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',       'Name1' => 'idCiudad',   'Id1' => 'SearchPartida_idCiudad',      'Value1' => '','Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                      'Placeholder2' => 'Comuna',       'Name2' => 'idComuna',   'Id2' => 'SearchPartida_idComuna',      'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',    'Name'  => 'Direccion',  'Id'  => 'SearchPartida_Direccion',     'Value'  => '','Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
-                $data['Fnc_FormInputs']->formNumberSpinner([          'Placeholder'  => 'Numero Dias',  'Name'  => 'nDias',      'Id'  => 'SearchPartida_nDias',         'Value'  => '','Required'  => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nick',            'Name'  => 'Nick',       'Id'  => 'SearchPartida_Nick',          'Value'  => '', 'Required'  => 1]);
+                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Sector',          'Name'  => 'idSector',   'Id'  => 'SearchPartida_idSector',      'Value'  => '', 'Required'  => 1,'arrData'  => $data['arrSector'], 'BASE' => $BASE]);
+                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',          'Name1' => 'idCiudad',   'Id1' => 'SearchPartida_idCiudad',      'Value1' => '', 'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                      'Placeholder2' => 'Comuna',          'Name2' => 'idComuna',   'Id2' => 'SearchPartida_idComuna',      'Value2' => '', 'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',       'Name'  => 'Direccion',  'Id'  => 'SearchPartida_Direccion',     'Value'  => '', 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                $data['Fnc_FormInputs']->formNumberSpinner([          'Placeholder'  => 'Numero Dias Min', 'Name'  => 'nDias',      'Id'  => 'SearchPartida_nDias',         'Value'  => 5,  'Required'  => 2,'Min' => 1,  'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
+                $data['Fnc_FormInputs']->formNumberSpinner([          'Placeholder'  => 'Numero Dias Max', 'Name'  => 'nDiasMax',   'Id'  => 'SearchPartida_nDiasMax',      'Value'  => 30, 'Required'  => 2,'Min' => 30, 'Max' => 90,'Step' => 1,'Ndecimal' => 0]);
                 ?>
             </div>
         </div>
