@@ -11,6 +11,7 @@ class exportarCampanas extends ControllerBase {
     private $Codification;
     private $DataNumbers;
     private $DataDate;
+    private $DataText;
 
     /******************************************************************************/
     //Constructor
@@ -25,6 +26,7 @@ class exportarCampanas extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->DataDate       = new FunctionsDataDate();
+        $this->DataText       = new FunctionsDataText();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -268,6 +270,7 @@ class exportarCampanas extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_DataDate'        => $this->DataDate,
+                'Fnc_DataText'        => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'arrList'       => $arrList,
             ];

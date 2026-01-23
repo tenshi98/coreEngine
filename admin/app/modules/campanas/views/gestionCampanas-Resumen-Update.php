@@ -50,7 +50,7 @@ foreach ($arrProdID as $prodID) {
                 new Chart(document.querySelector('#pieChart'), {
                     type: 'pie',
                     data: {
-                        labels: [<?php foreach ($data['arrEstadisticas'] as $crud) {echo "'".$crud['EstadoPartida']."',";} ?>],
+                        labels: [<?php foreach ($data['arrEstadisticas'] as $crud) {echo "'".$data['Fnc_DataText']->tituloMenu($crud['EstadoPartida'])."',";} ?>],
                         datasets: [{
                             label: 'N° Mensajes',
                             data: [<?php foreach ($data['arrEstadisticas'] as $crud) {echo $crud['Cuenta'].",";}?>],

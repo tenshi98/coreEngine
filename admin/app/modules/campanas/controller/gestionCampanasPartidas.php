@@ -15,6 +15,7 @@ class gestionCampanasPartidas extends ControllerBase {
     private $DataDate;
     private $CommonData;
     private $Notifications;
+    private $DataText;
 
     /******************************************************************************/
     //Constructor
@@ -33,6 +34,7 @@ class gestionCampanasPartidas extends ControllerBase {
 		$this->DataDate        = new FunctionsDataDate();
 		$this->CommonData      = new FunctionsCommonData();
 		$this->Notifications   = new FunctionsServerSocial();
+        $this->DataText        = new FunctionsDataText();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -552,6 +554,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_CommonData'      => $this->CommonData,
+                'Fnc_DataText'        => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrPartidas'      => $arrPartidas,
@@ -668,6 +671,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_CommonData'      => $this->CommonData,
+                'Fnc_DataText'        => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'            => $rowData,
                 'arrPartidas'        => $arrPartidas,
@@ -758,7 +762,7 @@ class gestionCampanasPartidas extends ControllerBase {
             'where'   => 'idEstadoPartida>='.$rowData['idEstadoPartida'].' AND idEstadoPartida NOT IN (3)',
             'group'   => '',
             'having'  => '',
-            'order'   => 'idEstadoPartida ASC',
+            'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -851,6 +855,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 'Fnc_ServerServer'  => $this->ServerServer,
                 'Fnc_DataDate'      => $this->DataDate,
+                'Fnc_DataText'      => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrEstados'       => $arrEstados,
@@ -973,6 +978,7 @@ class gestionCampanasPartidas extends ControllerBase {
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 'Fnc_ServerServer'  => $this->ServerServer,
                 'Fnc_DataDate'      => $this->DataDate,
+                'Fnc_DataText'      => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrPartidasProd'  => $arrPartidasProd,

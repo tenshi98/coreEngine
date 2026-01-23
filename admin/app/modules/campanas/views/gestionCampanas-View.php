@@ -136,7 +136,7 @@
                                             <tr>
                                                 <td><?php echo $crud['EntidadSector'].'<br>'.$crud['EntidadDireccion']; ?></td>
                                                 <td><?php echo $Entidad; ?></td>
-                                                <td><?php echo $crud['EstadoPartida']; ?></td>
+                                                <td><?php echo $data['Fnc_DataText']->tituloMenu($crud['EstadoPartida']); ?></td>
                                                 <td><?php echo $P_Producto; ?></td>
                                                 <td class="text-end"><?php echo $P_Cantidad; ?></td>
                                                 <td class="text-end"><?php echo $P_Beneficios; ?></td>

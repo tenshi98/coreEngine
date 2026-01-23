@@ -32,14 +32,14 @@ $Entidad .= !empty($data['rowData']['EntidadNombre'])
     </div>
     <div class="modal-body">
         <?php
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Partida',        'Name' => 'Fecha',              'Id' => 'PartidaFin_Fecha',      'Value' => $data['rowData']['Fecha'], 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Partida',        'Name' => 'Fecha',              'Id' => 'PartidaFin_Fecha',      'Value' => $data['rowData']['Fecha'],                                                   'Required' => 2, 'Icon' => 'bi bi-calendar3']);
         $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',              'Name' => 'idEntidad',          'Id' => 'PartidaFin_idEntidad',  'Value' => $data['rowData']['idEntidad'],                                               'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
         $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Sector',               'Name' => 'SectorFake',         'Id' => 'SectorFake',            'Value' => $data['rowData']['EntidadSector'],                                           'Required' => 3]);
         $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Dirección',            'Name' => 'DireccionFake',      'Id' => 'DireccionFake',         'Value' => $data['rowData']['EntidadDireccion'],                                        'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Estado Partida',       'Name' => 'EstadoPartidaFake',  'Id' => 'EstadoPartidaFake',     'Value' => $data['rowData']['EstadoPartida'],                                           'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Estado Partida',       'Name' => 'EstadoPartidaFake',  'Id' => 'EstadoPartidaFake',     'Value' => $data['Fnc_DataText']->tituloMenu($data['rowData']['EstadoPartida']),        'Required' => 3]);
         $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Documento Mercantil',  'Name' => 'idDocumentosFake',   'Id' => 'idDocumentosFake',      'Value' => $data['rowData']['Documento'],                                               'Required' => 3]);
         $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Numero Documento',     'Name' => 'N_DocFake',          'Id' => 'N_DocFake',             'Value' => $data['rowData']['N_Doc'],                                                   'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Fecha de Venta',       'Name' => 'Creacion_fechaFake', 'Id' => 'Creacion_fechaFake',    'Value' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha']),   'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Fecha de Venta',       'Name' => 'Creacion_fechaFake', 'Id' => 'Creacion_fechaFake',    'Value' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha']),    'Required' => 3]);
         $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Observaciones',        'Name' => 'ObservacionesFake',  'Id' => 'ObservacionesFake',     'Value' => $data['rowData']['Observaciones'],                                           'Required' => 3]);
 
         ?>
@@ -75,7 +75,7 @@ $Entidad .= !empty($data['rowData']['EntidadNombre'])
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idExistencia',   'Value' => $data['rowData']['idExistencia'],    'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCampana',      'Value' => $data['rowData']['idCampana'],       'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idFacturacion',  'Value' => $data['rowData']['idFacturacion'],   'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Fecha',  'Value' => $data['rowData']['Fecha'],       'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Fecha',      'Value' => $data['rowData']['Fecha'],           'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idEntidad',  'Value' => $data['rowData']['idEntidad'],       'Required' => 2]);
         ?>
     </div>

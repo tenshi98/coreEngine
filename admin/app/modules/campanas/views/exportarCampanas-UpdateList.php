@@ -75,7 +75,7 @@
                                             <td><?php echo $crud['Producto']; ?></td>
                                             <td><?php echo $crud['Cantidad'].' '.$crud['Unimed']; ?></td>
                                             <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['Beneficios'], 2); ?></td>
-                                            <td><?php echo $crud['PartidaEstado']; ?></td>
+                                            <td><?php echo $data['Fnc_DataText']->tituloMenu($crud['PartidaEstado']); ?></td>
                                             <td><?php if(isset($crud['DocumentoNombre'])&&$crud['DocumentoNombre']!=''){echo $crud['DocumentoNombre'].' '.($crud['DocumentoN_Doc'] ?? 'nRef '.$crud['idFacturacion']);} ?></td>
                                         </tr>
                                     <?php } ?>

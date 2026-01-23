@@ -138,7 +138,7 @@ $CompanyLogo = !empty($data['UserData']['Sistema_IMGLogo'])
                                     <td>'.$crud['EntidadSector'].'<br>'.$crud['EntidadDireccion'].'</td>
                                     <td>'.$Entidad.'</td>
                                     <td>
-                                        '.$crud['EstadoPartida'].'<br/>';
+                                        '.$data['Fnc_DataText']->tituloMenu($crud['EstadoPartida']).'<br/>';
                                         if(isset($crud['idFacturacion'])&&$crud['idFacturacion']!=0){
                                             echo $crud['DocumentoNombre'].' '.($crud['DocumentoN_Doc'] ?? 'nRef '.$crud['idFacturacion']);
                                         }

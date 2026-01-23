@@ -14,6 +14,7 @@ class gestionCampanas extends ControllerBase {
     private $ServerServer;
     private $WidgetsCommon;
     private $CommonData;
+    private $DataText;
 
     /******************************************************************************/
     //Constructor
@@ -31,6 +32,7 @@ class gestionCampanas extends ControllerBase {
 		$this->ServerServer   = new FunctionsServerServer();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
 		$this->CommonData     = new FunctionsCommonData();
+        $this->DataText       = new FunctionsDataText();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -464,6 +466,7 @@ class gestionCampanas extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_CommonData'       => $this->CommonData,
+                'Fnc_DataText'         => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData,
                 'arrCostos'       => $arrCostos,
@@ -645,6 +648,7 @@ class gestionCampanas extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_CommonData'       => $this->CommonData,
+                'Fnc_DataText'         => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'           => $rowData,
                 'arrCostos'         => $arrCostos,
@@ -804,6 +808,7 @@ class gestionCampanas extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_DataText'         => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrEstados'       => $arrEstados,
@@ -921,6 +926,7 @@ class gestionCampanas extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_DataText'         => $this->DataText,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrEstadisticas'  => $arrEstadisticas,

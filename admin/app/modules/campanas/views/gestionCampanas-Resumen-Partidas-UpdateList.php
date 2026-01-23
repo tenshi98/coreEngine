@@ -108,7 +108,7 @@
                             $SubTotalValor[$dataP['idProducto']]                                  = $SubTotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
                             $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $SubTotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
                             $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $SubTotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
-                            $SubTotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
+                            $SubTotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $data['Fnc_DataText']->tituloMenu($crud['EstadoPartida']);
                             //Variables
                             $TotalNombre[$dataP['idProducto']]                                 = $dataP['Producto'];
                             $TotalUnimed[$dataP['idProducto']]                                 = $dataP['Unimed'];
@@ -116,14 +116,14 @@
                             $TotalValor[$dataP['idProducto']]                                  = $TotalValor[$dataP['idProducto']]    + $dataP['Beneficios'];
                             $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] = $TotalProdCantidad[$dataP['idProducto']][$crud['idEstadoPartida']] + $dataP['Cantidad'];
                             $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    = $TotalProdValor[$dataP['idProducto']][$crud['idEstadoPartida']]    + $dataP['Beneficios'];
-                            $TotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $crud['EstadoPartida'];
+                            $TotalProdEstado[$dataP['idProducto']][$crud['idEstadoPartida']]   = $data['Fnc_DataText']->tituloMenu($crud['EstadoPartida']);
                         }
                     }
                     ?>
                     <tr class="<?php echo $crud['EstadoPartidaColor']; ?>">
                         <td><?php echo $crud['EntidadSector'].'<br>'.$crud['EntidadDireccion']; ?></td>
                         <td><?php echo $Entidad; ?></td>
-                        <td><?php echo $crud['EstadoPartida']; ?></td>
+                        <td><?php echo $data['Fnc_DataText']->tituloMenu($crud['EstadoPartida']); ?></td>
                         <td><?php echo $P_Producto; ?></td>
                         <td class="text-end"><?php echo $P_Cantidad; ?></td>
                         <td class="text-end"><?php echo $P_Beneficios; ?></td>

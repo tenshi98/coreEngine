@@ -48,15 +48,15 @@ $RandName = 'rand_'.rand(1, 999999);
         //Selecciono dependiendo del estado
         switch ($data['rowData']['idEstadoPartida']) {
             /*************************************/
-            //Recién Creado
-            case 1:
+            case 1: //Partida Creada
                 $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Partida', 'Name' => 'Fecha',            'Id' => 'EditPartida_Fecha',              'Value' => $x1, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                 $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',        'Name' => 'idEstadoPartida',  'Id' => 'EditPartida_idEstadoPartida',    'Value' => $x4, 'Required' => 1, 'arrData' => $data['arrEstados']]);
                 break;
             /*************************************/
-            case 2: //Campaña Enviada
-            case 3: //Campaña Revisada
-            case 4: //Campaña Confirmada
+            case 2: //Partida Enviada
+            case 3: //Partida Revisada
+            case 4: //Partida Confirmada
+            case 7: //Partida Preparada
                 $data['Fnc_FormInputs']->formInput([ 'FormType' => 8, 'Placeholder' => 'Fecha Partida', 'Name' => 'Fecha',           'Id' => 'EditPartida_Fecha',            'Value' => $x1, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                 $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Cliente',       'Name' => 'ClienteFake',     'Id' => 'ClienteFake',                  'Value' => $x8, 'Required' => 3]);
                 $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Sector',        'Name' => 'SectorFake',      'Id' => 'SectorFake',                   'Value' => $x5, 'Required' => 3]);
@@ -64,7 +64,7 @@ $RandName = 'rand_'.rand(1, 999999);
                 $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',        'Name' => 'idEstadoPartida', 'Id' => 'EditPartida_idEstadoPartida',  'Value' => $x4, 'Required' => 1, 'arrData' => $data['arrEstados']]);
                 break;
             /*************************************/
-            case 5: //Campaña Rechazada
+            case 5: //Partida Rechazada
             case 6: //Partida Entregada
                 //nada
                 break;
@@ -246,6 +246,14 @@ $RandName = 'rand_'.rand(1, 999999);
             switch (idEstadoPartida) {
                 //Partida Confirmada
                 case '4':
+                    document.getElementById('div_EditPartida_idDocumentos').style.display    = 'none';
+                    document.getElementById('div_EditPartida_N_Doc').style.display           = 'none';
+                    document.getElementById('div_EditPartida_Creacion_fecha').style.display  = 'none';
+                    document.getElementById('div_EditPartida_Observaciones').style.display   = 'none';
+                    document.getElementById('productos_List').style.display                  = '';
+                    break;
+                //Partida Preparada
+                case '7':
                     document.getElementById('div_EditPartida_idDocumentos').style.display    = 'none';
                     document.getElementById('div_EditPartida_N_Doc').style.display           = 'none';
                     document.getElementById('div_EditPartida_Creacion_fecha').style.display  = 'none';
