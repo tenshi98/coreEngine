@@ -73,26 +73,32 @@ class main extends ControllerBase {
         $UserData = $f3->get('SESSION.DataInfo');
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
-        /*******************************************************************/
-        //Variables
-        $MainViewData = [
-            'Count_Campanas'        => 0,
-            'Count_DocMercantiles'  => 0,
-            'Count_Bodegas'         => 0,
-        ];
-        //Se asignan datos a buscar
-        $menuCounters = [
-            'Gestión Campañas' => [
-                'Campañas - Listado'   => 'Count_Campanas',
-            ],
-            'Gestión Documentos Mercantiles' => [
-                'Compras'  => 'Count_DocMercantiles',
-                'Ventas'   => 'Count_DocMercantiles',
-            ],
-            'Gestión Bodegas y Productos' => [
-                'Stock Productos'   => 'Count_Bodegas',
-            ],
-        ];
+        /******************************************/
+        //Variable vacia
+        $MainViewData = [];
+        $menuCounters = [];
+
+        //Arreglo con los controladores con widgets
+        $array = $this->arrayWidgetViews();
+        /******************************************/
+        //Verifico si existe
+        if($array){
+            //recorro
+            foreach ($array as $data) {
+                //Se genera la query
+                $loadWidgets = method_exists($data, 'loadWidgets');
+                //si el metodo existe
+                if($loadWidgets===true){
+                    $ControllerData = new $data;
+                    $arrModules     = $ControllerData->loadWidgets();
+                    //Permisos
+                    $MainViewData[$arrModules['Count_Name']] = $arrModules['Count_Value'];
+                    $menuCounters[$arrModules['Menu_Name']]  = $arrModules['Menu_Value'];
+
+                }
+            }
+        }
+
         //Se recorren los permisos y se validan
         foreach ($menuCounters as $section => $names) {
             if (!empty($arrMenu[$section])) {
@@ -126,6 +132,21 @@ class main extends ControllerBase {
         echo $view->render('../app/templates/user-header.php');                                 // Header
         echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-principal.php'); // Vista
         echo $view->render('../app/templates/user-footer.php');                                 // Footer
+    }
+    /******************************************************************************/
+    //Se listan los controladores
+    public function arrayWidgetViews(){
+
+        /*******************************************************/
+        //Rutas
+        $array = array(
+            "bodegasWidgets",
+            "gestionCampanasWidgets",
+            "gestionDocumentosWidgets",
+        );
+
+        //devuelvo
+        return $array;
     }
 
 
