@@ -76,6 +76,7 @@ if($UserSesion===true){
 require_once('../app/utils/cronList.php');   //Rutas de los crones
 require_once('../app/utils/userGuest.php');  //Rutas de los usuarios no loegueados
 require_once('../app/utils/loadErrors.php'); //Manejo de los errores
+require_once('../app/utils/installer.php');  //Instalador de la plataforma
 
 //Ejecuta
 $f3->run();
