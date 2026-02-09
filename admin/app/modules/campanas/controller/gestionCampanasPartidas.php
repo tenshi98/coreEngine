@@ -329,10 +329,8 @@ class gestionCampanasPartidas extends ControllerBase {
             }
         }
         //Filtro de fecha
-        $whereInt1 = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha NOT BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"' : 'facturacion_listado.Creacion_fecha BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"';
-
-        //$whereInt1 = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha>="'.$DiasCreacion.'"' : 'facturacion_listado.Creacion_fecha>="'.$DiasCreacion.'"';
-
+        $whereInt1A = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"' : 'facturacion_listado.Creacion_fecha BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"';
+        $whereInt1B = $whereInt ? $whereInt . ' AND facturacion_listado.Creacion_fecha NOT BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"' : 'facturacion_listado.Creacion_fecha BETWEEN "'.$DiasMax.'" AND "'.$DiasMin.'"';
 
         /******************************/
         //Se genera la query
@@ -340,7 +338,30 @@ class gestionCampanasPartidas extends ControllerBase {
             'data'    => 'facturacion_listado.idEntidad',
             'table'   => 'facturacion_listado',
             'join'    => 'LEFT JOIN entidades_listado  ON entidades_listado.idEntidad = facturacion_listado.idEntidad',
-            'where'   => $whereInt1,
+            'where'   => $whereInt1A,
+            'group'   => 'facturacion_listado.idEntidad',
+            'having'  => '',
+            'order'   => 'facturacion_listado.idEntidad ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        //Ejecuto la query
+        $xParams   = ['query' => $query];
+        $arrIn    = $this->Base_GetList($xParams);
+
+        /******************************/
+        //Se dejan fuera los que si han comprado dentro del tiempo
+        $whereInt1B .= '  AND facturacion_listado.idEntidad NOT IN (0';
+        //Se genera la consulta
+        if (!empty($arrIn)) {  $whereInt1B .= ',' . implode(',', array_column($arrIn, 'idEntidad'));}
+        $whereInt1B .= ')';
+
+        /******************************/
+        //Se genera la query
+        $query = [
+            'data'    => 'facturacion_listado.idEntidad',
+            'table'   => 'facturacion_listado',
+            'join'    => 'LEFT JOIN entidades_listado  ON entidades_listado.idEntidad = facturacion_listado.idEntidad',
+            'where'   => $whereInt1B,
             'group'   => 'facturacion_listado.idEntidad',
             'having'  => '',
             'order'   => 'facturacion_listado.idEntidad ASC',
@@ -377,6 +398,7 @@ class gestionCampanasPartidas extends ControllerBase {
         //Se genera la consulta
         if (!empty($arrOut)) {  $whereInt2 .= ',' . implode(',', array_column($arrOut, 'idEntidad'));}
         if (!empty($arrOut2)) { $whereInt2 .= ',' . implode(',', array_column($arrOut2, 'idEntidad'));}
+        //$resultado = array_values(array_column(array_merge($arrOut, $arrOut2), null, 'idEntidad'));
         $whereInt2 .= ')';
 
         /******************************/
@@ -418,7 +440,6 @@ class gestionCampanasPartidas extends ControllerBase {
                 $ProdSelec .= ','.$_POST['Producto_idProducto'][$j1];
             }
         }
-
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -754,12 +775,15 @@ class gestionCampanasPartidas extends ControllerBase {
         $arrPartidasProd = $this->Base_GetList($xParams);
 
         /*******************************************************************/
+        //Se verifica estado debido a que no estan correctamente ordenadas
+        $xEstado   = ($rowData['idEstadoPartida']===7) ? 5 : $rowData['idEstadoPartida'];
+        $notEstado = ($rowData['idEstadoPartida']===5 || $rowData['idEstadoPartida']===6) ? '3,7' : '3';
         //Se genera la query
         $query = [
             'data'    => 'idEstadoPartida AS ID,Nombre',
             'table'   => 'core_estados_partida',
             'join'    => '',
-            'where'   => 'idEstadoPartida>='.$rowData['idEstadoPartida'].' AND idEstadoPartida NOT IN (3)',
+            'where'   => 'idEstadoPartida>='.$xEstado.' AND idEstadoPartida NOT IN ('.$notEstado.')',
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',

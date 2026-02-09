@@ -30,7 +30,7 @@
                 $SubTotalCantidad[$i] = 0;
                 $SubTotalValor[$i]    = 0;
                 //Estados
-                for ($x=0; $x <= 6; $x++) {
+                for ($x=0; $x <= 7; $x++) {
                     //Variables para los totales
                     $TotalProdCantidad[$i][$x]    = 0;
                     $TotalProdValor[$i][$x]       = 0;
@@ -142,7 +142,7 @@
                                 echo '<div class="btn-group" role="group">';
                                     switch ($crud['idEstadoPartida']) {
                                         /*************************************/
-                                        //Recién Creado
+                                        //Partida Creada
                                         case 1:
                                             echo '
                                             <button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')"                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
@@ -157,7 +157,7 @@
                                             }
                                             break;
                                         /*************************************/
-                                        //Campaña Enviada
+                                        //Partida Enviada
                                         case 2:
                                             echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')" class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
                                             if(isset($crud['EntidadFono1'])&&$crud['EntidadFono1']!=''){
@@ -170,12 +170,13 @@
                                             }
                                             break;
                                         /*************************************/
-                                        case 3: //Campaña Revisada
+                                        case 3: //Partida Revisada
                                             echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')"                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
                                             echo '<button type="button" onclick="tabPartidasDel( \''.$encryptedId.'\', \''.$Entidad.'\')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i> Borrar</button>';
                                             break;
                                         /*************************************/
-                                        case 4: //Campaña Confirmada
+                                        case 4: //Partida Confirmada
+                                        case 7: //Partida Preparada
                                             echo '<button type="button" onclick="tabPartidasEdit(\''.$encryptedId.'\')"                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i> Editar</button>';
                                             if(isset($crud['EntidadFono1'])&&$crud['EntidadFono1']!=''){
                                                 echo '<button type="button" onclick="tabPartidasSendInfo(\''.$WSP_ExistenciaID.'\', \''.$EntidadWsp.'\', \''.$WSP_encryptedId.'\', \''.$WSP_Fono.'\')" class="btn btn-success btn-sm tooltiplink" data-title="Reenviar Enviar Notificación Manual"><i class="bi bi-cursor"></i> Reenviar Noti Manual</button>';
@@ -185,7 +186,7 @@
                                             echo '<button type="button" onclick="tabPartidasDel( \''.$encryptedId.'\', \''.$Entidad.'\')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i> Borrar</button>';
                                             break;
                                         /*************************************/
-                                        //Campaña Rechazada
+                                        //Partida Rechazada
                                         case 5:
                                             //Nada
                                             break;
@@ -208,7 +209,7 @@
                     if(isset($SubTotalNombre[$i])&&$SubTotalNombre[$i]!=''){
                         echo '<tr class="table-info"><td colspan="7"><strong>'.$SubTotalNombre[$i].'</strong></td></tr>';
                         //Estados
-                        for ($x=0; $x <= 6; $x++) {
+                        for ($x=0; $x <= 7; $x++) {
                             if(isset($SubTotalProdEstado[$i][$x])&&$SubTotalProdEstado[$i][$x]!=''){
                                 echo '
                                 <tr>
@@ -237,7 +238,7 @@
                     $SubTotalCantidad[$i] = 0;
                     $SubTotalValor[$i]    = 0;
                     //Estados
-                    for ($x=0; $x <= 6; $x++) {
+                    for ($x=0; $x <= 7; $x++) {
                         $SubTotalProdCantidad[$i][$x] = 0;
                         $SubTotalProdValor[$i][$x]    = 0;
                         $SubTotalProdEstado[$i][$x]   = '';
@@ -253,7 +254,7 @@
             if(isset($TotalNombre[$i])&&$TotalNombre[$i]!=''){
                 echo '<tr class="table-secondary"><td colspan="7"><strong>'.$TotalNombre[$i].'</strong></td></tr>';
                 //Estados
-                for ($x=0; $x <= 6; $x++) {
+                for ($x=0; $x <= 7; $x++) {
                     if(isset($TotalProdEstado[$i][$x])&&$TotalProdEstado[$i][$x]!=''){
                         echo '
                         <tr>
