@@ -57,7 +57,15 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function selectInputGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, $classMain){
+	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain){
+
+		/******************************************/
+		//Verifico si se utiliza el icono
+		$placeholderIcon = '';
+		//Verifico si el placeholder usa icono
+		if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+			$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+		}
 
 		/******************************************/
 		//generacion del input
@@ -93,6 +101,7 @@ class UIFormInputs {
 		$this->TemplateRender->templatePath($formRoute);
 		$this->TemplateRender->assign('nameID',           $nameID);
 		$this->TemplateRender->assign('placeholder',      $placeholder);
+		$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
 		$this->TemplateRender->assign('FormCol',          $FormCol);
 		$this->TemplateRender->assign('classMain',        $classMain);
 		$this->TemplateRender->assign('name',             $name);
@@ -105,7 +114,15 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function selectInputGroupGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, $classMain){
+	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain){
+
+		/******************************************/
+		//Verifico si se utiliza el icono
+		$placeholderIcon = '';
+		//Verifico si el placeholder usa icono
+		if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+			$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+		}
 
 		/********************************************************/
 		//Opero los datos
@@ -154,6 +171,7 @@ class UIFormInputs {
 		$this->TemplateRender->templatePath($formRoute);
 		$this->TemplateRender->assign('nameID',           $nameID);
 		$this->TemplateRender->assign('placeholder',      $placeholder);
+		$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
 		$this->TemplateRender->assign('FormCol',          $FormCol);
 		$this->TemplateRender->assign('classMain',        $classMain);
 		$this->TemplateRender->assign('name',             $name);
@@ -166,7 +184,15 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Funcionalidad de select depend
-	private function selectInputEmpty($FormAling, $FormCol, $placeholder,$name, $nameID, $selectProperties){
+	private function selectInputEmpty($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $selectProperties){
+
+		/******************************************/
+		//Verifico si se utiliza el icono
+		$placeholderIcon = '';
+		//Verifico si el placeholder usa icono
+		if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+			$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+		}
 
 		/******************************************/
 		//generacion del input
@@ -186,6 +212,7 @@ class UIFormInputs {
 		$this->TemplateRender->templatePath($formRoute);
 		$this->TemplateRender->assign('nameID',           $nameID);
 		$this->TemplateRender->assign('placeholder',      $placeholder);
+		$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
 		$this->TemplateRender->assign('FormCol',          $FormCol);
 		$this->TemplateRender->assign('classMain',        '');
 		$this->TemplateRender->assign('name',             $name);
@@ -460,31 +487,35 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormType'    => 1,               //Tipo de formulario (1 al 13)
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'InputClass'  => '',              //Clase extra
-		*		'Icon'        => '',              //Icono a mostrar
+		*		'FormType'        => 1,                     //Tipo de formulario (1 al 13)
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
+		*		'InputClass'      => '',                    //Clase extra
+		*		'Icon'            => '',                    //Icono a mostrar
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$formType      = $Options['FormType'] ?? 1;
-		$formAlign     = $Options['FormAling'] ?? 1;
-		$formCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$InputClass    = $Options['InputClass'] ?? '';
-		$Icono         = $Options['Icon'] ?? '';
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$formType         = $Options['FormType'] ?? 1;
+		$formAlign        = $Options['FormAling'] ?? 1;
+		$formCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$InputClass       = $Options['InputClass'] ?? '';
+		$Icono            = $Options['Icon'] ?? '';
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Define valid options arrays
 		$validOptions = [
@@ -686,12 +717,21 @@ class UIFormInputs {
 
             /******************************************/
 			//Verifico si se utiliza el icono
-			$input_1 = $input_2 = $input_3 = '';
+			$input_1 = $input_2 = $input_3 = $placeholderIcon = $dataInfo = '';
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group '.$ExtraClassGroup.'"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
 			}
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+			}
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
 
 			/******************************************/
 			//generacion del input
@@ -706,19 +746,21 @@ class UIFormInputs {
             /******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',       $nameID);
-			$this->TemplateRender->assign('name',         $name);
-			$this->TemplateRender->assign('placeholder',  $placeholder);
-			$this->TemplateRender->assign('formCol',      $formCol);
-			$this->TemplateRender->assign('InTipo',       $InTipo);
-			$this->TemplateRender->assign('InputClass',   $InputClass);
-			$this->TemplateRender->assign('value',        $value);
-			$this->TemplateRender->assign('requerido',    $requerido);
-			$this->TemplateRender->assign('jsValidation', $jsValidation);
-			$this->TemplateRender->assign('input_1',      $input_1);
-			$this->TemplateRender->assign('input_2',      $input_2);
-			$this->TemplateRender->assign('input_3',      $input_3);
-			$this->TemplateRender->assign('ExtraClass',   $ExtraClass);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('formCol',          $formCol);
+			$this->TemplateRender->assign('InTipo',           $InTipo);
+			$this->TemplateRender->assign('InputClass',       $InputClass);
+			$this->TemplateRender->assign('value',            $value);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('jsValidation',     $jsValidation);
+			$this->TemplateRender->assign('input_1',          $input_1);
+			$this->TemplateRender->assign('input_2',          $input_2);
+			$this->TemplateRender->assign('input_3',          $input_3);
+			$this->TemplateRender->assign('ExtraClass',       $ExtraClass);
+			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 
 			/******************************************/
 			//ejecucion
@@ -752,33 +794,35 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Min'         => '',              //Valor Minimo
-		*		'Max'         => '',              //Valor Maximo
-		*		'Step'        => '',              //Valores de avance o retroceso
-		*		'Ndecimal'    => '',              //numero de decimales
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Min'             => '',                    //Valor Minimo
+		*		'Max'             => '',                    //Valor Maximo
+		*		'Step'            => '',                    //Valores de avance o retroceso
+		*		'Ndecimal'        => '',                    //numero de decimales
+		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$min           = $Options['Min'];
-		$max           = $Options['Max'];
-		$step          = $Options['Step'];
-		$ndecimal      = $Options['Ndecimal'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$min              = $Options['Min'];
+		$max              = $Options['Max'];
+		$step             = $Options['Step'];
+		$ndecimal         = $Options['Ndecimal'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -839,6 +883,13 @@ class UIFormInputs {
 			//Si existe un valor entregado
 			$valor = ($value != 0) ? str_replace(',', '.', $value) : '';
 
+            /******************************************/
+			//Verifico si el placeholder usa icono
+			$placeholderIcon = '';
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+			}
+
 			/******************************************/
 			//generacion del input
 			switch ($FormAling) {
@@ -852,16 +903,17 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('name',        $name);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('valor',       $valor);
-			$this->TemplateRender->assign('requerido',   $requerido);
-			$this->TemplateRender->assign('min',         $min);
-			$this->TemplateRender->assign('max',         $max);
-			$this->TemplateRender->assign('step',        $step);
-			$this->TemplateRender->assign('ndecimal',    $ndecimal);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('valor',            $valor);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('min',              $min);
+			$this->TemplateRender->assign('max',              $max);
+			$this->TemplateRender->assign('step',             $step);
+			$this->TemplateRender->assign('ndecimal',         $ndecimal);
 
 			/******************************************/
 			//Imprimir dato
@@ -889,29 +941,31 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 3)
-		*		'Position'    => '',              //Posicion del popup (1 o 2)
-		*		'Icon'        => '',              //Icono a mostrar
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 3)
+		*		'Position'        => '',                    //Posicion del popup (1 o 2)
+		*		'Icon'            => '',                    //Icono a mostrar
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$position      = $Options['Position'] ?? '';
-		$Icono         = $Options['Icon'] ?? '';
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$position         = $Options['Position'] ?? '';
+		$Icono            = $Options['Icon'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -958,11 +1012,15 @@ class UIFormInputs {
 
             /******************************************/
 			//Verifico si se utiliza el icono
-			$input_1 = $input_2 = $input_3 = '';
+			$input_1 = $input_2 = $input_3 = $placeholderIcon = '';
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
+			}
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
 			}
 
 			/******************************************/
@@ -983,16 +1041,17 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('name',        $name);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('value',       $value);
-			$this->TemplateRender->assign('requerido',   $requerido);
-			$this->TemplateRender->assign('input_1',     $input_1);
-			$this->TemplateRender->assign('input_2',     $input_2);
-			$this->TemplateRender->assign('input_3',     $input_3);
-			$this->TemplateRender->assign('x_pos',       $x_pos);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('value',            $value);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('input_1',          $input_1);
+			$this->TemplateRender->assign('input_2',          $input_2);
+			$this->TemplateRender->assign('input_3',          $input_3);
+			$this->TemplateRender->assign('x_pos',            $x_pos);
 
 			/******************************************/
 			//Imprimir dato
@@ -1741,25 +1800,27 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 3)
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 3)
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1801,6 +1862,13 @@ class UIFormInputs {
 				case 2:$requerido = 'required="required"'; break;//Si el dato es requerido
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$placeholderIcon = '';
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+			}
 
 			/******************************************/
 			//generacion del input
@@ -1815,12 +1883,13 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('name',        $name);
-			$this->TemplateRender->assign('requerido',   $requerido);
-			$this->TemplateRender->assign('value',       $value);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('value',            $value);
 
 			/******************************************/
 			//Imprimir dato
@@ -1846,27 +1915,29 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'Tipo'        => 2,               //Tipo de input (1 al 3)
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'Tipo'            => 2,                     //Tipo de input (1 al 3)
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$tipo          = $Options['Tipo'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$tipo             = $Options['Tipo'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1906,6 +1977,13 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			$requerido = ($required === 2) ? 'required="required"' : '';
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$placeholderIcon = '';
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+			}
 
 			/******************************************/
 			//generacion del input
@@ -1920,12 +1998,13 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',       $nameID);
-			$this->TemplateRender->assign('placeholder',  $placeholder);
-			$this->TemplateRender->assign('FormCol',      $FormCol);
-			$this->TemplateRender->assign('name',         $name);
-			$this->TemplateRender->assign('requerido',    $requerido);
-			$this->TemplateRender->assign('value',        $value);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('value',            $value);
 
 			/******************************************/
 			//Imprimir dato
@@ -1951,27 +2030,29 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData'     => '',              //Datos recibidos
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2022,7 +2103,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Imprimir dato
-			echo $this->selectInputGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, '');
+			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
 
 		}else{
 			echo $alerts;
@@ -2041,21 +2122,23 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'        => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'          => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder'      => 'Nombre',        //Nombre a mostrar
-		*		'Name'             => 'Nombre',        //Nombre del input
-		*		'Id'               => 'Identificador', //Identificador del input
-		*		'Value'            => 'asd',           //Valor del input
-		*		'Required'         => 2,               //Si input es requerido (1 al 2)
-		*		'selectProperties' => '',              //Permite agregar propiedades dentro del elemento
-		*		'arrData'          => '',              //Datos recibidos
+		*		'FormAling'        => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'          => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'      => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon'  => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'             => 'Nombre',              //Nombre del input
+		*		'Id'               => 'Identificador',       //Identificador del input
+		*		'Value'            => 'asd',                 //Valor del input
+		*		'Required'         => 2,                     //Si input es requerido (1 al 2)
+		*		'selectProperties' => '',                    //Permite agregar propiedades dentro del elemento
+		*		'arrData'          => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
 		$name             = $Options['Name'];
 		$arrData          = $Options['arrData'];
 		$FormAling        = $Options['FormAling'] ?? 1;
@@ -2115,7 +2198,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, 'select2_Main');
+			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main');
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2141,27 +2224,29 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData'     => '',              //Datos recibidos
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2212,7 +2297,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Imprimir dato
-			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, '');
+			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
 
 		}else{
 			echo $alerts;
@@ -2231,28 +2316,30 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData'     => '',              //Datos recibidos
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$BASE          = $Options['BASE'];
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$BASE             = $Options['BASE'];
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2303,7 +2390,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, 'select2_Main');
+			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main');
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2329,27 +2416,29 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData'     => '',              //Datos recibidos
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2390,7 +2479,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, '');
+			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
 			//ejecuto script
 			$input .= '
 			<script>
@@ -2420,27 +2509,29 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData'     => '',              //Datos recibidos
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2481,7 +2572,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder,$name, $nameID, $value, $selectProperties, $arrData, '');
+			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
 			//ejecuto script
 			$input .= '
 			<script>
@@ -2511,43 +2602,47 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling1'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol1'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder1' => 'Nombre',        //Nombre a mostrar
-		*		'Name1'        => 'Nombre',        //Nombre del input
-		*		'Id1'          => 'Identificador', //Identificador del input
-		*		'Value1'       => 'asd',           //Valor del input
-		*		'Required1'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData1'     => '',              //Datos recibidos
-		*		'FormAling2'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol2'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder2' => 'Nombre',        //Nombre a mostrar
-		*		'Name2'        => 'Nombre',        //Nombre del input
-		*		'Id2'          => 'Identificador', //Identificador del input
-		*		'Value2'       => 'asd',           //Valor del input
-		*		'Required2'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData2'     => '',              //Datos recibidos
+		*		'FormAling1'       => 1,                    //Alineacion del formulario (1 al 5)
+		*		'FormCol1'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder1'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon1' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name1'            => 'Nombre',              //Nombre del input
+		*		'Id1'              => 'Identificador',       //Identificador del input
+		*		'Value1'           => 'asd',                 //Valor del input
+		*		'Required1'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData1'         => '',                    //Datos recibidos
+		*		'FormAling2'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol2'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder2'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon2' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name2'            => 'Nombre',              //Nombre del input
+		*		'Id2'              => 'Identificador',       //Identificador del input
+		*		'Value2'           => 'asd',                 //Valor del input
+		*		'Required2'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData2'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder1   = $Options['Placeholder1'];
-		$name1          = $Options['Name1'];
-		$arrData1       = $Options['arrData1'];
-		$FormAling1     = $Options['FormAling1'] ?? 1;
-		$FormCol1       = $Options['FormCol1'] ?? 8;
-		$identificador1 = $Options['Id1'] ?? $name1;
-		$value1         = $Options['Value1'] ?? '';
-		$required1      = $Options['Required1'] ?? 1;
-		$placeholder2   = $Options['Placeholder2'];
-		$name2          = $Options['Name2'];
-		$arrData2       = $Options['arrData2'];
-		$FormAling2     = $Options['FormAling2'] ?? 1;
-		$FormCol2       = $Options['FormCol2'] ?? 8;
-		$identificador2 = $Options['Id2'] ?? $name2;
-		$value2         = $Options['Value2'] ?? '';
-		$required2      = $Options['Required2'] ?? 1;
+		$placeholder1      = $Options['Placeholder1'];
+		$placeholderIcon1  = $Options['PlaceholderIcon1'] ?? '';
+		$name1             = $Options['Name1'];
+		$arrData1          = $Options['arrData1'];
+		$FormAling1        = $Options['FormAling1'] ?? 1;
+		$FormCol1          = $Options['FormCol1'] ?? 8;
+		$identificador1    = $Options['Id1'] ?? $name1;
+		$value1            = $Options['Value1'] ?? '';
+		$required1         = $Options['Required1'] ?? 1;
+		$placeholder2      = $Options['Placeholder2'];
+		$placeholderIcon2  = $Options['PlaceholderIcon2'] ?? '';
+		$name2             = $Options['Name2'];
+		$arrData2          = $Options['arrData2'];
+		$FormAling2        = $Options['FormAling2'] ?? 1;
+		$FormCol2          = $Options['FormCol2'] ?? 8;
+		$identificador2    = $Options['Id2'] ?? $name2;
+		$value2            = $Options['Value2'] ?? '';
+		$required2         = $Options['Required2'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2611,8 +2706,8 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1,$name1, $nameID1, $value1, $selectProperties1, $arrData1, '');
-			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2,$name2, $nameID2, $selectProperties2);
+			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '');
+			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			/******************************************/
@@ -2636,44 +2731,48 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling1'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol1'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder1' => 'Nombre',        //Nombre a mostrar
-		*		'Name1'        => 'Nombre',        //Nombre del input
-		*		'Id1'          => 'Identificador', //Identificador del input
-		*		'Value1'       => 'asd',           //Valor del input
-		*		'Required1'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData1'     => '',              //Datos recibidos
-		*		'FormAling2'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol2'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder2' => 'Nombre',        //Nombre a mostrar
-		*		'Name2'        => 'Nombre',        //Nombre del input
-		*		'Id2'          => 'Identificador', //Identificador del input
-		*		'Value2'       => 'asd',           //Valor del input
-		*		'Required2'    => 2,               //Si input es requerido (1 al 2)
-		*		'arrData2'     => '',              //Datos recibidos
+		*		'FormAling1'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol1'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder1'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon1' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name1'            => 'Nombre',              //Nombre del input
+		*		'Id1'              => 'Identificador',       //Identificador del input
+		*		'Value1'           => 'asd',                 //Valor del input
+		*		'Required1'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData1'         => '',                    //Datos recibidos
+		*		'FormAling2'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol2'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder2'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon2' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name2'            => 'Nombre',              //Nombre del input
+		*		'Id2'              => 'Identificador',       //Identificador del input
+		*		'Value2'           => 'asd',                 //Valor del input
+		*		'Required2'        => 2,                     //Si input es requerido (1 al 2)
+		*		'arrData2'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder1   = $Options['Placeholder1'];
-		$name1          = $Options['Name1'];
-		$arrData1       = $Options['arrData1'];
-		$FormAling1     = $Options['FormAling1'] ?? 1;
-		$FormCol1       = $Options['FormCol1'] ?? 8;
-		$identificador1 = $Options['Id1'] ?? $name1;
-		$value1         = $Options['Value1'] ?? '';
-		$required1      = $Options['Required1'] ?? 1;
-		$placeholder2   = $Options['Placeholder2'];
-		$name2          = $Options['Name2'];
-		$arrData2       = $Options['arrData2'];
-		$FormAling2     = $Options['FormAling2'] ?? 1;
-		$FormCol2       = $Options['FormCol2'] ?? 8;
-		$identificador2 = $Options['Id2'] ?? $name2;
-		$value2         = $Options['Value2'] ?? '';
-		$required2      = $Options['Required2'] ?? 1;
-		$BASE           = $Options['BASE'];
+		$placeholder1      = $Options['Placeholder1'];
+		$placeholderIcon1  = $Options['PlaceholderIcon1'] ?? '';
+		$name1             = $Options['Name1'];
+		$arrData1          = $Options['arrData1'];
+		$FormAling1        = $Options['FormAling1'] ?? 1;
+		$FormCol1          = $Options['FormCol1'] ?? 8;
+		$identificador1    = $Options['Id1'] ?? $name1;
+		$value1            = $Options['Value1'] ?? '';
+		$required1         = $Options['Required1'] ?? 1;
+		$placeholder2      = $Options['Placeholder2'];
+		$placeholderIcon2  = $Options['PlaceholderIcon2'] ?? '';
+		$name2             = $Options['Name2'];
+		$arrData2          = $Options['arrData2'];
+		$FormAling2        = $Options['FormAling2'] ?? 1;
+		$FormCol2          = $Options['FormCol2'] ?? 8;
+		$identificador2    = $Options['Id2'] ?? $name2;
+		$value2            = $Options['Value2'] ?? '';
+		$required2         = $Options['Required2'] ?? 1;
+		$BASE              = $Options['BASE'];
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2737,8 +2836,8 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1,$name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main');
-			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2,$name2, $nameID2, $selectProperties2);
+			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main');
+			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			//validacion si es requerido
@@ -2765,26 +2864,28 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$BASE          = $Options['BASE'];
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$BASE             = $Options['BASE'];
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2832,6 +2933,13 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			$requerido = ($required === 2) ? 'required="required"' : '';
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$placeholderIcon = '';
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+			}
 
 			//Se agregan los paises
 			$arrData = [
@@ -3059,13 +3167,14 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('name',        $name);
-			$this->TemplateRender->assign('requerido',   $requerido);
-			$this->TemplateRender->assign('FormOptions', $FormOptions);
-			$this->TemplateRender->assign('dataRequire', $dataRequire);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('FormOptions',      $FormOptions);
+			$this->TemplateRender->assign('dataRequire',      $dataRequire);
 
 			/******************************************/
 			//Imprimir dato
@@ -3091,29 +3200,31 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 2,               //Si input es requerido (1 al 2)
-		*		'ValorInicio' => '',              //Valor Inicio
-		*		'ValorFin'    => '',              //Valor Fin
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'ValorInicio'     => '',                    //Valor Inicio
+		*		'ValorFin'        => '',                    //Valor Fin
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$valor_ini     = $Options['ValorInicio'];
-		$valor_fin     = $Options['ValorFin'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$valor_ini        = $Options['ValorInicio'];
+		$valor_fin        = $Options['ValorFin'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -3165,6 +3276,13 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			$requerido = ($required === 2) ? 'required="required"' : '';
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$placeholderIcon = '';
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
+			}
 
 			/******************************************/
 			//generacion del input
@@ -3191,12 +3309,13 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',       $nameID);
-			$this->TemplateRender->assign('placeholder',  $placeholder);
-			$this->TemplateRender->assign('name',         $name);
-			$this->TemplateRender->assign('requerido',    $requerido);
-			$this->TemplateRender->assign('FormCol',      $FormCol);
-			$this->TemplateRender->assign('FormOptions',  $FormOptions);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('FormOptions',      $FormOptions);
 
 			/******************************************/
 			//Imprimir dato
@@ -3469,31 +3588,33 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormAling'   => 1,               //Alineacion del formulario (1 al 5)
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'InputClass'  => '',              //Clase extra
-		*		'Icon'        => '',              //Icono a mostrar
-		*		'arrData'     => '',              //Datos recibidos
+		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
+		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
+		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
+		*		'Name'            => 'Nombre',              //Nombre del input
+		*		'Id'              => 'Identificador',       //Identificador del input
+		*		'Value'           => 'asd',                 //Valor del input
+		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
+		*		'InputClass'      => '',                    //Clase extra
+		*		'Icon'            => '',                    //Icono a mostrar
+		*		'arrData'         => '',                    //Datos recibidos
 		*	];
 		*===================================================================================================================
 		*/
 
 		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormAling     = $Options['FormAling'] ?? 1;
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$InputClass    = $Options['InputClass'] ?? '';
-		$Icono         = $Options['Icon'] ?? '';
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$InputClass       = $Options['InputClass'] ?? '';
+		$Icono            = $Options['Icon'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -3538,11 +3659,15 @@ class UIFormInputs {
 
             /******************************************/
 			//Verifico si se utiliza el icono
-			$input_1 = $input_2 = $input_3 = '';
+			$input_1 = $input_2 = $input_3 = $placeholderIcon = '';
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
+			}
+			//Verifico si el placeholder usa icono
+			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
+				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
 			}
 
 			/******************************************/
@@ -3564,17 +3689,18 @@ class UIFormInputs {
 			/******************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('name',        $name);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('value',       $value);
-			$this->TemplateRender->assign('requerido',   $requerido);
-			$this->TemplateRender->assign('InputClass',  $InputClass);
-			$this->TemplateRender->assign('input_1',     $input_1);
-			$this->TemplateRender->assign('input_2',     $input_2);
-			$this->TemplateRender->assign('input_3',     $input_3);
-			$this->TemplateRender->assign('dataList',    $dataList);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('value',            $value);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('InputClass',       $InputClass);
+			$this->TemplateRender->assign('input_1',          $input_1);
+			$this->TemplateRender->assign('input_2',          $input_2);
+			$this->TemplateRender->assign('input_3',          $input_3);
+			$this->TemplateRender->assign('dataList',         $dataList);
 
 			/******************************************/
 			//Imprimir dato

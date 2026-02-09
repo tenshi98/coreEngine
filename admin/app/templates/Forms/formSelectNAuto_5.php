@@ -3,6 +3,6 @@
         <select class="form-select"  name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" aria-label="<?php echo $placeholder; ?>" <?php echo $requerido; ?>>
             <?php echo $FormOptions; ?>
         </select>
-        <label for="floatingName"><?php echo $placeholder; ?></label>
+        <label for="floatingName"><?php echo $placeholderIcon.$placeholder; ?></label>
     </div>
 </div>

@@ -1,5 +1,5 @@
 <div class="row mb-3" id="div_<?php echo $nameID; ?>">
-    <label class="col-sm-<?php echo $otrcol; ?> col-form-label" id="label_<?php echo $name; ?>"><?php echo $placeholder; ?></label>
+    <label class="col-sm-<?php echo $otrcol; ?> col-form-label" id="label_<?php echo $name; ?>"><?php echo $placeholderIcon.$placeholder; ?></label>
     <div class="col-sm-<?php echo $FormCol; ?> field">
         <input type="text" name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" class="form-control" value="<?php echo $valor; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $requerido; ?>  onkeydown="return soloNumeroRealRacional(event)" style="text-align: center;" >
     </div>
