@@ -47,8 +47,8 @@
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Texto']);
-                $data['Fnc_FormInputs']->formTextarea(['FormAling' => 1,'FormCol' => 12,'Placeholder' => 'formTextarea','Name' => 'formTextarea','Id' => 'IDInput_6_22','Required' => 2]);
-                $data['Fnc_FormInputs']->formCKEditor(['FormAling' => 1,'FormCol' => 12,'Placeholder' => 'formCKEditor','Name' => 'formCKEditor','Id' => 'IDInput_6_23','Required' => 2,'Tipo' => 2]);
+                $data['Fnc_FormInputs']->formTextarea(['FormAling' => 1,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'formTextarea','Name' => 'formTextarea','Id' => 'IDInput_6_22','Required' => 2]);
+                $data['Fnc_FormInputs']->formCKEditor(['FormAling' => 1,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'formCKEditor','Name' => 'formCKEditor','Id' => 'IDInput_6_23','Required' => 2,'Tipo' => 2]);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Subida Archivos']);
