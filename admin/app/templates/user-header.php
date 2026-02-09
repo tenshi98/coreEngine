@@ -96,6 +96,7 @@
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/media.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/my_colors.min.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/efects.css'; ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/extra_buttons.css'; ?>">
 
         <?php
         //Si esta configurado el menu superior

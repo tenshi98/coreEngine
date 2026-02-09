@@ -96,6 +96,7 @@
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/media.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/my_colors.min.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/efects.css?get='.time(); ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/extra_buttons.css?get='.time(); ?>">
 
         <script>
             /******************************************/
