@@ -110,12 +110,22 @@ class QueryBuilder{
         *        'having' => '',
         *        'order'  => 'data1 DESC'
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryRow($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query['data']) || $query['data']==''){   return 'Query Error: No hay datos en $data'; }
+        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
 
         /*************** Generacion Query ***************/
         //armado de la query
@@ -129,7 +139,7 @@ class QueryBuilder{
         }
         //Ejecucion
         try {
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             return (!empty($result)&&$result !== false) ? $result[0] : false;
         } catch (Exception $e) {
             return 'Query Error: ' . $ActionSQL;
@@ -143,7 +153,7 @@ class QueryBuilder{
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se consulta por el numero de coincidencias
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -157,12 +167,22 @@ class QueryBuilder{
         *        'having' => '',
         *        'order'  => 'data1 DESC'
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryNRows($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query['data']) || $query['data']==''){   return 'Query Error: No hay datos en $data'; }
+        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
 
         /*************** Generacion Query ***************/
         //armado de la query
@@ -176,7 +196,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
             return (!empty($result)&&$result !== false) ? count($result) : false;
         } catch (Exception $e) {
@@ -191,7 +211,7 @@ class QueryBuilder{
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se consulta por un conjunto de datos
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -206,12 +226,22 @@ class QueryBuilder{
         *        'order'  => 'data1 DESC',
         *        'limit'  => 60
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryArray($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query['data']) || $query['data']==''){   return 'Query Error: No hay datos en $data'; }
+        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
 
         /*************** Generacion Query ***************/
         //armado de la query
@@ -225,7 +255,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
             return $result;
         } catch (Exception $e) {
@@ -241,7 +271,7 @@ class QueryBuilder{
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se inserta nuevo registro en la base de datos
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -265,9 +295,15 @@ class QueryBuilder{
         *            ],
         *        ]
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryInsert($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
+		* @input   array  $novalidate  Variable opcional con la opcion de validacion de los datos
 		* @return  string|array
 		*===================================================================================================================
 		*/
@@ -357,7 +393,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
             return ($result > 0) ? $DBConn->lastInsertId() : false;
         } catch (Exception $e) {
@@ -372,7 +408,7 @@ class QueryBuilder{
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se actualiza registro en la base de datos
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -396,9 +432,15 @@ class QueryBuilder{
         *            ],
         *        ]
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryUpdate($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
+		* @input   array  $novalidate  Variable opcional con la opcion de validacion de los datos
 		* @return  string|array
 		*===================================================================================================================
 		*/
@@ -493,7 +535,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Siempre devuelve true
             return true;
         } catch (Exception $e) {
@@ -508,7 +550,7 @@ class QueryBuilder{
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se elimina dato en la base de datos, eliminando los archivos relacionados
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -520,16 +562,22 @@ class QueryBuilder{
         *        'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
         *        'Post'        => $_POST              -> Datos $_POST
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryDelete($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
 
         /*************** Validaciones ***************/
         //Se verifica si hay datos
-        if(!isset($query['where']) || $query['where']==''){ return false; }
+        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['where']) || $query['where']==''){ return 'Query Error: No hay datos en $where'; }
         //Validacion datos obligatorios
         $dataVal  = $this->validateRequired($query['where'], $query['Post']);
         if ($dataVal !== true) {return $dataVal;}
@@ -599,7 +647,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
             return true;
         } catch (Exception $e) {
@@ -609,23 +657,32 @@ class QueryBuilder{
     }
 
     /******************************************************************************/
-    //Se elimina dato
+    //Se ejecuta la query
     public function queryExecute($query, $DBConn, $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se ejecuta la query
 		*
 		*=================================================    Modo de uso  =================================================
 		*
-		* 	//transformar minutos
-		* 	$qbuilder->queryExecute($query, $DBConn)
+		* 	//Formato de la query
+        *    $query = 'SELECT * FROM Test';
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryExecute($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query) || $query==''){ return 'Query Error: No hay datos en $query'; }
 
         /***************   Ejecutar   ***************/
         //Verifico si se pide mostrar la consulta
@@ -650,7 +707,7 @@ class QueryBuilder{
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Se elimina archivo fisicamente, actualiza el registro en la base de datos
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -662,17 +719,22 @@ class QueryBuilder{
         *        'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
         *        'Post'        => $_POST              -> Datos $_POST
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->delFiles($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
 		* @return  string|array
 		*===================================================================================================================
 		*/
 
         /*************** Validaciones ***************/
         //Se verifica si hay datos
-        if(!isset($query['files']) || $query['files']==''){ return false; }
-        if(!isset($query['where']) || $query['where']==''){ return false; }
+        if(!isset($query['files']) || $query['files']==''){ return 'Query Error: No hay datos en $files'; }
+        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['where']) || $query['where']==''){ return 'Query Error: No hay datos en $where'; }
         //Validacion datos obligatorios
         $dataVal  = $this->validateRequired($query['where'], $query['Post']);
         if ($dataVal !== true) {return $dataVal;}
@@ -719,7 +781,7 @@ class QueryBuilder{
 
         /***************   Ejecutar   ***************/
         //Ejecuto la query
-        $DBConn->exec($ActionSQL);
+        $result = $this->queryExecute($ActionSQL, $DBConn);
 
         /******************************************/
         //Siempre devuelve true
@@ -729,12 +791,12 @@ class QueryBuilder{
 
     /******************************************************************************/
     /******************************************************************************/
-    //Se consulta por un conjunto de datos
+    //Permite la creacion de una tabla en la base de datos
     public function queryCreateTable($query, $DBConn, $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Permite la creacion de una tabla en la base de datos
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -745,12 +807,23 @@ class QueryBuilder{
         *        'primaryKey' => 'idusuario',                                           -> Clave Primaria
         *        'comentario' => 'fija',                                                -> Comentario de la tabla
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryCreateTable($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query['table']) || $query['table']==''){           return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['data']) || $query['data']==''){             return 'Query Error: No hay datos en $data'; }
+        if(!isset($query['primaryKey']) || $query['primaryKey']==''){ return 'Query Error: No hay datos en $primaryKey'; }
 
         /*************** Generacion Query ***************/
         //armado de la query
@@ -764,7 +837,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
             return $result;
         } catch (Exception $e) {
@@ -774,12 +847,12 @@ class QueryBuilder{
     }
 
     /******************************************************************************/
-    //Se consulta por un conjunto de datos
+    //Permite la eliminacion de una tabla en la base de datos
     public function queryDropTable($query, $DBConn, $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite ingresar un numero (decimales, representando las horas) y transformarlo en formato hora
+		* Permite la eliminacion de una tabla en la base de datos
 		*
 		*=================================================    Modo de uso  =================================================
 		*
@@ -787,12 +860,21 @@ class QueryBuilder{
         *    $query = [
         *        'table' => 'usuarios_listado', -> Tabla donde se ejecuta la consulta
         *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->queryDropTable($query, $DBConn);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   array         $query   Arreglo con la consulta
+		* @input   array  $query       Arreglo con la consulta
+		* @input   array  $DBConn      Arreglo con la configuracion de base de datos
+		* @input   array  $showQuery   Variable opcional con la opcion de visualizacion de la consulta
 		* @return  string|array
 		*===================================================================================================================
 		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
 
         /*************** Generacion Query ***************/
         //armado de la query
@@ -806,7 +888,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $DBConn->exec($ActionSQL);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
             return $result;
         } catch (Exception $e) {
@@ -814,6 +896,211 @@ class QueryBuilder{
         }
 
     }
+
+
+    /******************************************************************************/
+    /******************************************************************************/
+    //Crear una base de datos
+    public function createDatabase($query, $DBConn, $showQuery = false) {
+        /*
+		*=================================================     Detalles    =================================================
+		*
+		* Crear una base de datos
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	 //Formato de la query
+        *    $query = [
+        *        'dbName'    => 'Nombre_db',          -> Nombre de la base de datos
+        *        'charset'   => 'utf8mb4',            -> Charset (opcional)
+        *        'collation' => 'utf8mb4_unicode_ci', -> Collation (opcional)
+        *    ];
+        *
+		* 	//ejecucion
+		* 	$qbuilder->createDatabase($query, $DBConn);
+		*
+		*=================================================    Parametros   =================================================
+        * @input array $query['dbName']     Nombre de la base de datos
+        * @input array $query['charset']    Charset (opcional)
+        * @input array $query['collation']  Collation (opcional)
+        * @return bool True si se creó exitosamente
+        * @throws PDOException Si falla la creación
+		*===================================================================================================================
+		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($query['dbName']) || $query['dbName']==''){ return 'Query Error: No hay datos en $dbName'; }
+        //Verificacion datos por defecto
+        $charset   = $query['charset'] ?? 'utf8mb4';
+        $collation = $query['collation'] ?? 'utf8mb4_unicode_ci';
+
+        /*************** Generacion Query ***************/
+        //armado de la query
+        $ActionSQL = sprintf(
+            "CREATE DATABASE `%s` CHARACTER SET %s COLLATE %s",
+            $query['dbName'],
+            $charset,
+            $collation
+        );
+
+        /***************   Ejecutar   ***************/
+        //Verifico si se pide mostrar la consulta
+        if ($showQuery) {
+            return $ActionSQL;
+        }
+        //Ejecucion
+        try {
+            //Ejecuto la query
+            $result = $this->queryExecute($ActionSQL, $DBConn);
+            //Si se ejecuta correctamente
+            return true;
+        }  catch (PDOException $e) {
+            return $e;
+        }
+
+    }
+
+    /******************************************************************************/
+    //Ejecutar un archivo SQL
+    public function executeFile($filepath, $DBConn) {
+        /*
+		*=================================================     Detalles    =================================================
+		*
+		* Ejecutar un archivo SQL
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$qbuilder->executeFile($filepath, $DBConn);
+		*
+		*=================================================    Parametros   =================================================
+        * @input string $filepath Ruta del archivo SQL
+        * @return bool True si se ejecutó exitosamente
+        * @throws Exception Si el archivo no existe o falla la ejecución
+		*===================================================================================================================
+		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($filepath) || $filepath==''){ return 'Query Error: No hay datos en $filepath'; }
+        //Se inicializa la libreria de validacion
+        $DataValidations = new FunctionsDataValidations();
+        $result          = $DataValidations->validatePathFile($filepath);
+        //Se verifica si el archivo existe
+        if($result['success']===false){ return 'Query Error: Archivo SQL no encontrado:'.$filepath; }
+
+        /***************   Ejecutar   ***************/
+        //Ejecucion
+        try {
+            //Se obtiene el contenido del archivo
+            $sql = file_get_contents($filepath);
+
+            // Dividir el archivo en consultas individuales
+            // Eliminar comentarios SQL
+            $sql = preg_replace('/--.*$/m', '', $sql);
+            $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+
+            // Dividir por punto y coma
+            $queries = array_filter(
+                array_map('trim', explode(';', $sql)),
+                function ($query) {
+                    return !empty($query);
+                }
+            );
+
+            // Ejecutar cada consulta
+            foreach ($queries as $index => $query) {
+                if (!empty(trim($query))) {
+                    $this->queryExecute($query, $DBConn);
+                }
+            }
+
+            //Siempre devuelve true
+            return true;
+        } catch (PDOException $e) {
+            return $e;
+        }
+    }
+
+    /******************************************************************************/
+    //Verificar si el usuario tiene permisos para crear bases de datos
+    public function userHasCreatePermission($DBConn) {
+        /*
+		*=================================================     Detalles    =================================================
+		*
+		* Verificar si el usuario tiene permisos para crear bases de datos
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$qbuilder->userHasCreatePermission($DBConn);
+		*
+		*=================================================    Parametros   =================================================
+		* @return bool True si tiene permisos
+		*===================================================================================================================
+		*/
+
+        /***************   Ejecutar   ***************/
+        //Ejecucion
+        try {
+            // Intentar obtener los privilegios del usuario actual
+            $ActionSQL = "SHOW GRANTS FOR CURRENT_USER()";
+            $stmt      = $DBConn->query($ActionSQL);
+            $grants    = $stmt->fetchAll(PDO::FETCH_COLUMN);
+
+            // Buscar privilegio CREATE
+            foreach ($grants as $grant) {
+                if (stripos($grant, 'ALL PRIVILEGES') !== false || stripos($grant, 'CREATE') !== false) {
+                    return true;
+                }
+            }
+            //Devuelvo false por defecto
+            return false;
+
+        } catch (PDOException $e) {
+            return $e;
+        }
+    }
+
+    /******************************************************************************/
+    //Verificar si la base de datos existe
+    public function databaseExists($dbName, $DBConn) {
+        /*
+		*=================================================     Detalles    =================================================
+		*
+		* Verificar si la base de datos existe
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$qbuilder->queryDropTable($dbName, $DBConn);
+		*
+		*=================================================    Parametros   =================================================
+		* @input   string $dbName Nombre de la base de datos
+		* @return  bool True si existe
+		*===================================================================================================================
+		*/
+
+        /*************** Validaciones ***************/
+        //Se verifica si hay datos
+        if(!isset($dbName) || $dbName==''){  return 'Query Error: No hay datos en $dbName'; }
+
+        /***************   Ejecutar   ***************/
+        //Ejecucion
+        try {
+            //Se crea la query
+            $ActionSQL = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '".$dbName."'";
+            //Ejecuto la query
+            $result = $this->queryExecute($ActionSQL, $DBConn);
+            //Devuelco si hay resultados
+            return (!empty($result)&&$result !== false) ? count($result) : false;
+        } catch (PDOException $e) {
+            return $e;
+        }
+    }
+
+
 
     /*******************************************************************************************************************/
 	/*                                                                                                                 */

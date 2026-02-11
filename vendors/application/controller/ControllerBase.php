@@ -39,15 +39,17 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *       'table'  => 'data_table',
-        *       'join'   => '',                    -> Ver opciones de los join
-        *       'where'  => 'data1 = 1',           -> Ver modos alternativos where
-        *       'group'  => '',                    -> Ver agrupaciones
-        *       'having' => '',
-        *       'order'  => 'data1 DESC',
-        *       'limit'  => 60
+        *   $params = [
+        *       'query' => [
+        *           'data'   => 'data1,data2,data3',   -> Ver opciones select
+        *           'table'  => 'data_table',
+        *           'join'   => '',                    -> Ver opciones de los join
+        *           'where'  => 'data1 = 1',           -> Ver modos alternativos where
+        *           'group'  => '',                    -> Ver agrupaciones
+        *           'having' => '',
+        *           'order'  => 'data1 DESC',
+        *           'limit'  => 60
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -74,14 +76,16 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *       'table'  => 'data_table',
-        *       'join'   => '',                    -> Ver opciones de los join
-        *       'where'  => 'data1 = 1',           -> Ver modos alternativos where
-        *       'group'  => '',                    -> Ver agrupaciones
-        *       'having' => '',
-        *       'order'  => 'data1 DESC'
+        *   $params = [
+        *       'query' => [
+        *           'data'   => 'data1,data2,data3',   -> Ver opciones select
+        *           'table'  => 'data_table',
+        *           'join'   => '',                    -> Ver opciones de los join
+        *           'where'  => 'data1 = 1',           -> Ver modos alternativos where
+        *           'group'  => '',                    -> Ver agrupaciones
+        *           'having' => '',
+        *           'order'  => 'data1 DESC'
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -108,14 +112,16 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *       'table'  => 'data_table',
-        *       'join'   => '',                    -> Ver opciones de los join
-        *       'where'  => 'data1 = 1',           -> Ver modos alternativos where
-        *       'group'  => '',                    -> Ver agrupaciones
-        *       'having' => '',
-        *       'order'  => 'data1 DESC'
+        *   $params = [
+        *       'query' => [
+        *           'data'   => 'data1,data2,data3',   -> Ver opciones select
+        *           'table'  => 'data_table',
+        *           'join'   => '',                    -> Ver opciones de los join
+        *           'where'  => 'data1 = 1',           -> Ver modos alternativos where
+        *           'group'  => '',                    -> Ver agrupaciones
+        *           'having' => '',
+        *           'order'  => 'data1 DESC'
+        *       ],
         *   ];
 		*
 		*=================================================    Parametros   =================================================
@@ -145,24 +151,26 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	Formato de la query
-        *   $query = [
-        *       'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
-        *       'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
-        *       'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
-        *       'encode'    => 'password',                                   -> Datos a codificar
-        *       'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
-        *       'Post'      => $_POST,                                       -> Datos $_POST entregados
-        *       'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
-        *           [
-        *               'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
-        *               'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
-        *               'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
-        *               'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
-        *               'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
-        *               'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
-        *               'Base64'        => true                                                   -> Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
+        *   $params = [
+        *       'query' => [
+        *           'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
+        *           'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
+        *           'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
+        *           'encode'    => 'password',                                   -> Datos a codificar
+        *           'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
+        *           'Post'      => $_POST,                                       -> Datos $_POST entregados
+        *           'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
+        *               [
+        *                   'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
+        *                   'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
+        *                   'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
+        *                   'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
+        *                   'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
+        *                   'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
+        *                   'Base64'        => true                                                   -> Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
+        *               ],
         *           ],
-        *       ]
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -196,24 +204,26 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
-        *       'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
-        *       'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
-        *       'encode'    => 'password',                                   -> Datos a codificar
-        *       'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
-        *       'Post'      => $_POST,                                       -> Datos $_POST entregados
-        *       'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
-        *           [
-        *               'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
-        *               'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
-        *               'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
-        *               'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
-        *               'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
-        *               'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
-        *               'Base64'        => true                                                   -> true-false ->Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
+        *   $params = [
+        *       'query' => [
+        *           'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
+        *           'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
+        *           'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
+        *           'encode'    => 'password',                                   -> Datos a codificar
+        *           'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
+        *           'Post'      => $_POST,                                       -> Datos $_POST entregados
+        *           'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
+        *               [
+        *                   'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
+        *                   'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
+        *                   'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
+        *                   'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
+        *                   'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
+        *                   'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
+        *                   'Base64'        => true                                                   -> true-false ->Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
+        *               ],
         *           ],
-        *       ]
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -247,12 +257,14 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
-        *       'table'       => 'usuarios_listado', -> Tabla donde esta el dato
-        *       'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
-        *       'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
-        *       'Post'        => $_POST              -> Datos $_POST
+        *   $params = [
+        *       'query' => [
+        *           'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
+        *           'table'       => 'usuarios_listado', -> Tabla donde esta el dato
+        *           'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
+        *           'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
+        *           'Post'        => $_POST              -> Datos $_POST
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -279,12 +291,14 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
-        *       'table'       => 'usuarios_listado', -> Tabla donde esta el dato
-        *       'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
-        *       'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
-        *       'Post'        => $_POST              -> Datos $_POST
+        *   $params = [
+        *       'query' => [
+        *           'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
+        *           'table'       => 'usuarios_listado', -> Tabla donde esta el dato
+        *           'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
+        *           'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
+        *           'Post'        => $_POST              -> Datos $_POST
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -311,12 +325,14 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
-        *       'table'       => 'usuarios_listado', -> Tabla donde esta el dato
-        *       'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
-        *       'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
-        *       'Post'        => $_POST              -> Datos $_POST
+        *   $params = [
+        *       'query' => [
+        *           'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
+        *           'table'       => 'usuarios_listado', -> Tabla donde esta el dato
+        *           'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
+        *           'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
+        *           'Post'        => $_POST              -> Datos $_POST
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -342,11 +358,13 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'table'      => 'usuarios_listado',                                    -> Tabla donde se ejecuta la consulta
-        *       'data'       => '`idCorreosCat` int UNSIGNED NOT NULL AUTO_INCREMENT', -> Datos a crear
-        *       'primaryKey' => 'idusuario',                                           -> Clave Primaria
-        *       'comentario' => 'fija',                                                -> Comentario de la tabla
+        *   $params = [
+        *       'query' => [
+        *           'table'      => 'usuarios_listado',                                    -> Tabla donde se ejecuta la consulta
+        *           'data'       => '`idCorreosCat` int UNSIGNED NOT NULL AUTO_INCREMENT', -> Datos a crear
+        *           'primaryKey' => 'idusuario',                                           -> Clave Primaria
+        *           'comentario' => 'fija',                                                -> Comentario de la tabla
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -373,8 +391,10 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $query = [
-        *       'table' => 'usuarios_listado', -> Tabla donde se ejecuta la consulta
+        *   $params = [
+        *       'query' => [
+        *           'table' => 'usuarios_listado', -> Tabla donde se ejecuta la consulta
+        *       ],
         *   ];
 		*
 		*===================================================================================================================
@@ -389,6 +409,111 @@ class ControllerBase {
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
         return $this->queryBuilder->queryDropTable($query, $DBConn, $showQuery);
+    }
+
+    /************************************************************************************************************/
+    protected function Base_createDatabase(array &$params){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Crear una base de datos
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//Formato de la query
+        *   $params = [
+        *       'query' => [
+        *           'dbName'    => 'Nombre_db',          -> Nombre de la base de datos
+        *           'charset'   => 'utf8mb4',            -> Charset (opcional)
+        *           'collation' => 'utf8mb4_unicode_ci', -> Collation (opcional)
+        *       ],
+        *    ];
+		*
+		*===================================================================================================================
+		*/
+
+        /**********************     Valores     **********************/
+        // Extraer parámetros con valores por defecto
+        $query     = $params['query'] ?? '';
+        $showQuery = $params['showQuery'] ?? false;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Retorno datos  **********************/
+        //devuelvo resultados
+        return $this->queryBuilder->createDatabase($query, $DBConn, $showQuery);
+    }
+
+    /************************************************************************************************************/
+    protected function Base_executeFile(array &$params){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Ejecutar un archivo SQL
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//Formato de la query
+        *   $params = [
+        *       'filepath' => 'path/file', -> Ruta del archivo SQL
+        *   ];
+		*
+		*===================================================================================================================
+		*/
+
+        /**********************     Valores     **********************/
+        // Extraer parámetros con valores por defecto
+        $filepath  = $params['filepath'] ?? '';
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Retorno datos  **********************/
+        //devuelvo resultados
+        return $this->queryBuilder->executeFile($filepath, $DBConn);
+    }
+
+    /************************************************************************************************************/
+    protected function Base_userHasCreatePermission(array &$params){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Verificar si el usuario tiene permisos para crear bases de datos
+		*
+		*===================================================================================================================
+		*/
+
+        /**********************     Valores     **********************/
+        // Extraer parámetros con valores por defecto
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Retorno datos  **********************/
+        //devuelvo resultados
+        return $this->queryBuilder->userHasCreatePermission($DBConn);
+    }
+
+    /************************************************************************************************************/
+    protected function Base_databaseExists(array &$params){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Verificar si la base de datos existe
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//Formato de la query
+        *   $params = [
+        *       'dbName' => 'dbName', -> Nombre de la base de datos
+        *   ];
+		*
+		*===================================================================================================================
+		*/
+
+        /**********************     Valores     **********************/
+        // Extraer parámetros con valores por defecto
+        $dbName  = $params['dbName'] ?? '';
+        $DBConn  = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Retorno datos  **********************/
+        //devuelvo resultados
+        return $this->queryBuilder->databaseExists($dbName, $DBConn);
     }
 
     /************************************************************************************************************/
