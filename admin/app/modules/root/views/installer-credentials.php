@@ -1,4 +1,7 @@
-<h5 class="card-header text-center">Credenciales MySQL</h5>
+<h5 class="card-header text-center">
+    Credenciales MySQL
+    <smal>Paso 1 de 4</smal>
+</h5>
 <form id="FormCredentials" name="FormCredentials" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
     <div class="card-body">
         <div class="text-center">
@@ -7,9 +10,9 @@
         <?php
         //se dibujan los inputs
         echo '<p class="text-center text-muted">Ingresa las credenciales de un usuario de MySQL que tenga permisos para crear bases de datos.</p>';
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-menu-button-wide',           'Placeholder' => 'Host de MySQL',               'Name' => 'Host',      'Id' => 'Host',         'Value' => '', 'Required' => 2, 'DataInfo' => 'Dirección del servidor MySQL (generalmente localhost)']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-person',                     'Placeholder' => 'Usuario',                     'Name' => 'Usuario',   'Id' => 'Usuario',      'Value' => '', 'Required' => 2, 'DataInfo' => 'Usuario con permisos de creación de bases de datos']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-lock',                       'Placeholder' => 'Contraseña',                  'Name' => 'Password',  'Id' => 'IDInput_2_3',  'Value' => '', 'Required' => 2, 'DataInfo' => 'Contraseña del usuario MySQL']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-server',  'Placeholder' => 'Host de MySQL',  'Name' => 'Host',      'Id' => 'Host',         'Value' => '', 'Required' => 2, 'DataInfo' => 'Dirección del servidor MySQL (generalmente localhost)']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-user',    'Placeholder' => 'Usuario',        'Name' => 'Usuario',   'Id' => 'Usuario',      'Value' => '', 'Required' => 2, 'DataInfo' => 'Usuario con permisos de creación de bases de datos']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-key',     'Placeholder' => 'Contraseña',     'Name' => 'Password',  'Id' => 'IDInput_2_3',  'Value' => '', 'Required' => 2, 'DataInfo' => 'Contraseña del usuario MySQL']);
         ?>
     </div>
     <div class="card-footer text-end">

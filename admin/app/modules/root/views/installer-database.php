@@ -1,4 +1,7 @@
-<h5 class="card-header text-center">Configuración de Base de Datos</h5>
+<h5 class="card-header text-center">
+    Configuración de Base de Datos
+    <smal>Paso 2 de 4</smal>
+</h5>
 <form id="FormDatabase" name="FormDatabase" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
     <div class="card-body">
         <div class="text-center">
@@ -6,8 +9,8 @@
         </div>
         <?php
         echo '<p class="text-center text-muted">Ingresa el nombre de la base de datos que deseas crear para el sistema.</p>';
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-layout-text-window-reverse', 'Placeholder' => 'Nombre de la Base de Datos',  'Name' => 'DBName',    'Id' => 'DBName',       'Value' => '', 'Required' => 2, 'DataInfo' => 'Solo letras, números y guiones bajos']);
-        $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, '<strong>Nota:</strong> El nombre debe tener entre 3 y 64 caracteres y solo puede contener letras, números y guiones bajos.');
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-data', 'Placeholder' => 'Nombre de la Base de Datos',  'Name' => 'DBName',    'Id' => 'DBName',       'Value' => '', 'Required' => 2, 'DataInfo' => 'Solo letras, números y guiones bajos']);
+        $data['Fnc_FormInputs']->formPostData(3, 4, 'bi bi-star', 0, '<h4>Nota:</h4><p>El nombre debe tener entre 3 y 64 caracteres y solo puede contener letras, números y guiones bajos.</p>');
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Host',     'Value' => $data['PostData']['Host'],     'Required' => 2]);

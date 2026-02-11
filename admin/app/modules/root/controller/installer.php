@@ -60,10 +60,16 @@ class installer extends ControllerBase {
     public function credentials($f3){
 
         /******************************************/
+        //Validacion de instalacion
+        $ValidInstall = true;
+
+        /******************************************/
         //Datos enviados a la pagina
         $f3->data = [
             /*===========   Funcionalidad   ===========*/
-            'Fnc_FormInputs'      => $this->FormInputs,
+            'Fnc_FormInputs' => $this->FormInputs,
+            /*=========== Datos Consultados ===========*/
+            'ValidInstall'   => $ValidInstall,
         ];
 
         //Se instancia la vista
@@ -76,13 +82,11 @@ class installer extends ControllerBase {
     public function database($f3){
 
         $PostData = [
-            'Host' => $_POST['Host'],
-            'Usuario' => $_POST['Usuario'],
+            'Host'     => $_POST['Host'],
+            'Usuario'  => $_POST['Usuario'],
             'Password' => $_POST['Password'],
         ];
 
-    
-        
 
         /******************************************/
         //Validacion de instalacion
@@ -107,11 +111,26 @@ class installer extends ControllerBase {
     //Paso 4: Vista - Resumen
     public function summary($f3){
 
+        $PostData = [
+            'Host'     => $_POST['Host'],
+            'Usuario'  => $_POST['Usuario'],
+            'Password' => $_POST['Password'],
+            'DBName'   => $_POST['DBName'],
+        ];
+
+
+        /******************************************/
+        //Validacion de instalacion
+        $ValidInstall = true;
+
         /******************************************/
         //Datos enviados a la pagina
         $f3->data = [
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'      => $this->FormInputs,
+            /*=========== Datos Consultados ===========*/
+            'PostData'       => $PostData,
+            'ValidInstall'   => $ValidInstall,
         ];
 
         //Se instancia la vista
@@ -123,11 +142,26 @@ class installer extends ControllerBase {
     //Paso 5: Vista - Finalización
     public function finish($f3){
 
+        $PostData = [
+            'Host'     => $_POST['Host'],
+            'Usuario'  => $_POST['Usuario'],
+            'Password' => $_POST['Password'],
+            'DBName'   => $_POST['DBName'],
+        ];
+
+
+        /******************************************/
+        //Validacion de instalacion
+        $ValidInstall = true;
+
         /******************************************/
         //Datos enviados a la pagina
         $f3->data = [
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'      => $this->FormInputs,
+            /*=========== Datos Consultados ===========*/
+            'PostData'       => $PostData,
+            'ValidInstall'   => $ValidInstall,
         ];
 
         //Se instancia la vista
