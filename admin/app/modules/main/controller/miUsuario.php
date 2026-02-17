@@ -86,6 +86,7 @@ class miUsuario extends ControllerBase {
             setcookie('Sesion_tk_'.date("Y-m-d"),'',time()-1);
             // También es recomendable unset($_COOKIE['']) para borrar la cookie de la superglobal $_COOKIE
             unset($_COOKIE['Sesion_tk_'.date("Y-m-d")]);
+            unset($_COOKIE['']);
             //Se redirige al index
             $f3->reroute('/');
             //imprimo resultados
