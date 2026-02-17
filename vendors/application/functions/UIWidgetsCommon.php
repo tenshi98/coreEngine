@@ -51,10 +51,10 @@ class UIWidgetsCommon {
 
 		// Colores predefinidos
 		$arrColors = [
-			1 => ['color' => 'color-blue'],
-			2 => ['color' => 'color-green'],
-			3 => ['color' => 'color-yellow'],
-			4 => ['color' => 'color-red'],
+			1 => ['color' => 'text-color-blue'],
+			2 => ['color' => 'text-color-green'],
+			3 => ['color' => 'text-color-yellow'],
+			4 => ['color' => 'text-color-red'],
 		];
 
 		/******************************************/
@@ -624,7 +624,7 @@ class UIWidgetsCommon {
 				//Verifico si existe un titulo
 				if(isset($data['Titulo'])&&$data['Titulo']!=''){
 					//Verifico si se envian datos para el icono
-					$Icon = (isset($data['Icon']) && $data['Icon'] != '') ? $data['Icon'] : 'bi bi-chevron-double-right color-red';
+					$Icon = (isset($data['Icon']) && $data['Icon'] != '') ? $data['Icon'] : 'bi bi-chevron-double-right text-color-red';
 					//Se genera input
 					$input.= '
 					<div class="row">
