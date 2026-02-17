@@ -322,6 +322,7 @@ class FunctionsServerServer {
 		* Devuelve toda la info del servidor
 		*
 		*=================================================    Modo de uso  =================================================
+		*
 		* 	//se imprime input
 		* 	$ServerServer->indicesServer()->PHP_SELF;
 		* 	$ServerServer->indicesServer()->GATEWAY_INTERFACE;
@@ -374,6 +375,7 @@ class FunctionsServerServer {
 		* Permite eliminar una carpeta en especifico dentro del servidor
 		*
 		*=================================================    Modo de uso  =================================================
+		*
 		* 	//elimino la carpeta en caso de existir
 		* 	$structure = '/client_folder/client/tutor'; //carpeta
 		* 	$ServerServer->removeDirectoryRecursive($structure);
@@ -414,5 +416,380 @@ class FunctionsServerServer {
 			return ['success' => false, 'error' => 'Ha ocurrido un error al borrar archivos'];
 		}
 	}
+
+    /******************************************************************************/
+    public function writeEnvFile(string $path, array $variables, bool $overwrite = false): array {
+        /*
+		*=================================================     Detalles    =================================================
+		*
+		* Crea o sobrescribe un archivo .env en la ruta especificada.
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$envPath = __DIR__ . '/.env';
+        *
+        * 	$variables = [
+        * 	    'APP_NAME'    => 'Mi Aplicacion',
+        * 	    'APP_ENV'     => 'production',
+        * 	    'DB_HOST'     => 'localhost',
+        * 	    'DB_DATABASE' => 'mi_base',
+        * 	    'DB_USERNAME' => 'root',
+        * 	    'DB_PASSWORD' => '123456'
+        * 	];
+        *
+        * 	$result = writeEnvFile($envPath, $variables, true);
+        *
+        * 	if ($result['success']) {
+        * 	    echo $result['message'];
+        * 	} else {
+        * 	    echo "Error: " . $result['message'];
+        * 	}
+		*
+		*=================================================    Parametros   =================================================
+        * @input string $path       Ruta completa donde se creará el archivo (ej: /var/www/html/.env)
+        * @input array  $variables  Array asociativo con las variables ['KEY' => 'VALUE']
+        * @input bool   $overwrite  Permite sobrescribir si ya existe (default: false)
+        * @return array Retorna ['success' => bool, 'message' => string]
+		*===================================================================================================================
+		*/
+
+        try {
+            // Validar que el directorio exista
+            $directory = dirname($path);
+            if (!is_dir($directory)) {
+                return [
+                    'success' => false,
+                    'message' => "El directorio no existe: {$directory}"
+                ];
+            }
+
+            // Verificar si el archivo existe
+            if (file_exists($path) && !$overwrite) {
+                return [
+                    'success' => false,
+                    'message' => "El archivo ya existe y overwrite está deshabilitado."
+                ];
+            }
+
+            // Construir contenido del .env
+            $content = '';
+            foreach ($variables as $key => $value) {
+                // Sanitizar clave (solo letras, números y guión bajo)
+                $cleanKey = preg_replace('/[^A-Z0-9_]/i', '', $key);
+
+                // Escapar valores con espacios
+                if (preg_match('/\s/', $value)) {
+                    $value = '"' . addslashes($value) . '"';
+                }
+
+                $content .= "{$cleanKey}={$value}" . PHP_EOL;
+            }
+
+            // Escribir archivo
+            if (file_put_contents($path, $content) === false) {
+                return [
+                    'success' => false,
+                    'message' => "No se pudo escribir el archivo."
+                ];
+            }
+
+            return [
+                'success' => true,
+                'message' => "Archivo .env creado correctamente."
+            ];
+
+        } catch (Throwable $e) {
+            return [
+                'success' => false,
+                'message' => "Error: " . $e->getMessage()
+            ];
+        }
+    }
+
+    /******************************************************************************/
+    public function writeConfigClassFile(string $path, array $variables, string $constName = 'MySQL_1'): array {
+        /*
+		*=================================================     Detalles    =================================================
+		*
+		* Crea o sobrescribe un archivo .php en la ruta especificada.
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$phpPath = __DIR__ . '/config.php';
+        *
+        * 	$variables = [
+        * 	    'APP_NAME'    => 'Mi Aplicacion',
+        * 	    'APP_ENV'     => 'production',
+        * 	    'DB_HOST'     => 'localhost',
+        * 	    'DB_DATABASE' => 'mi_base',
+        * 	    'DB_USERNAME' => 'root',
+        * 	    'DB_PASSWORD' => '123456'
+        * 	];
+        *
+        * 	$result = writeConfigClassFile($phpPath, $variables, 'MySQL_1');
+        *
+        * 	if ($result['success']) {
+        * 	    echo $result['message'];
+        * 	} else {
+        * 	    echo "Error: " . $result['message'];
+        * 	}
+		*
+		*=================================================    Parametros   =================================================
+        * @input string $path       Ruta completa donde se creará el archivo (ej: /var/www/html/.env)
+        * @input array  $variables  Array asociativo con las variables ['KEY' => 'VALUE']
+        * @input string $constName  Permite el ingreso del nombre de la constante
+        * @return array Retorna ['success' => bool, 'message' => string]
+		*===================================================================================================================
+		*/
+
+		try {
+
+			// Devuelve la ruta del directorio padre de una ruta dada.
+			$directory = dirname($path);
+
+			// Validar que el directorio exista
+			if (!is_dir($directory)) {
+				return [
+					'success' => false,
+					'message' => "El directorio no existe: {$directory}"
+				];
+			}
+
+			// Verificar si el archivo existe
+			if (pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
+				return [
+					'success' => false,
+					'message' => "El archivo debe tener extensión .php"
+				];
+			}
+
+			// Sanitizar nombre constante
+			$constName = preg_replace('/[^A-Z0-9_]/', '', strtoupper($constName));
+
+			// Construir bloque de constante
+			$constBlock  = "    /*****************************************************/\n";
+			$constBlock .= "    //Variables para MySQL\n";
+			$constBlock .= "    const {$constName} = [\n";
+
+			foreach ($variables as $key => $value) {
+
+				$cleanKey = preg_replace('/[^A-Z0-9_]/i', '', strtoupper($key));
+
+				// Detectar tipo de dato
+				if (is_int($value) || is_float($value)) {
+					$exportedValue = $value; // sin comillas
+				} elseif (is_bool($value)) {
+					$exportedValue = $value ? 'true' : 'false';
+				} elseif (is_null($value)) {
+					$exportedValue = 'null';
+				} elseif (is_numeric($value) && !preg_match('/^0\d+$/', $value)) {
+					// Si viene como string numérico (ej: "3306") lo convertimos a número
+					$exportedValue = $value + 0;
+				} else {
+					// Escapar string correctamente
+					$exportedValue = "'" . addslashes($value) . "'";
+				}
+
+				$constBlock .= "        '{$cleanKey}' => {$exportedValue},\n";
+			}
+
+
+			$constBlock .= "    ];\n\n";
+
+			// ---------------------------------------------------------------------
+			// Si el archivo no existe → crear estructura completa
+			// ---------------------------------------------------------------------
+			if (!file_exists($path)) {
+
+				$content  = "<?php\n";
+				$content .= "/*******************************************************************************************************************/\n";
+				$content .= "/*                                              Se define la clase                                                 */\n";
+				$content .= "/*******************************************************************************************************************/\n";
+				$content .= "class ConfigData{\n";
+				$content .= $constBlock;
+				$content .= "}\n";
+
+				file_put_contents($path, $content);
+
+				return [
+					'success' => true,
+					'message' => "Archivo creado y constante {$constName} agregada."
+				];
+			}
+
+			// ---------------------------------------------------------------------
+			// Si existe → leer contenido
+			// ---------------------------------------------------------------------
+			$existingContent = file_get_contents($path);
+
+			// Verificar si la clase existe
+			if (!preg_match('/class\s+ConfigData/i', $existingContent)) {
+
+				$existingContent .= "\n\nclass ConfigData{\n";
+				$existingContent .= $constBlock;
+				$existingContent .= "}\n";
+
+				file_put_contents($path, $existingContent);
+
+				return [
+					'success' => true,
+					'message' => "Clase creada y constante {$constName} agregada."
+				];
+			}
+
+			// Verificar si la constante ya existe
+			if (preg_match('/const\s+' . $constName . '\s*=/i', $existingContent)) {
+				return [
+					'success' => false,
+					'message' => "La constante {$constName} ya existe."
+				];
+			}
+
+			// Insertar constante antes del cierre de la clase
+			$updatedContent = preg_replace(
+				'/}\s*$/',
+				$constBlock . "}",
+				$existingContent
+			);
+
+			if ($updatedContent === null) {
+				return [
+					'success' => false,
+					'message' => "Error al actualizar el archivo."
+				];
+			}
+
+			file_put_contents($path, $updatedContent);
+
+			return [
+				'success' => true,
+				'message' => "Constante {$constName} agregada correctamente."
+			];
+
+		} catch (Throwable $e) {
+			return [
+				'success' => false,
+				'message' => "Error: " . $e->getMessage()
+			];
+		}
+	}
+
+
+	/************************************************************************************************************/
+	public function getParentPath(string $path, int $levels = 1): string {
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Sube N niveles desde una ruta dada.
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$envPath  = __DIR__;
+		* 	$rootPath = getParentPath($envPath, 4);
+		* 	echo $rootPath;
+		*
+		*=================================================    Parametros   =================================================
+		* @input string $path    Ruta base (ej: __DIR__)
+		* @input int    $levels  Cantidad de niveles a subir
+		* @return string Ruta resultante normalizada
+		*===================================================================================================================
+		*/
+
+		/**********************  Validaciones   **********************/
+		if(!isset($path) || $path==''){ return 'No ha ingresado la ruta del directorio';}
+
+		/********************** Si todo esta ok **********************/
+		$result = rtrim($path, DIRECTORY_SEPARATOR);
+
+		for ($i = 0; $i < $levels; $i++) {
+			$result = dirname($result);
+		}
+
+		return $result;
+	}
+
+	/************************************************************************************************************/
+	public function isWritableDirectory(string $directory, int $permission = 0755): array {
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Verifica si una carpeta permite crear archivos dentro.
+		* Si no lo permite, intenta corregir los permisos.
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//ejecucion
+		* 	$path = '/var/www/html/coreEngine/admin/storage';
+		*
+		* 	$result = ensureWritableDirectory($path, 0775);
+		*
+		* 	if ($result['success']) {
+		* 		echo $result['message'];
+		* 	} else {
+		* 		echo "Error: " . $result['message'];
+		* 	}
+		*
+		*=================================================    Parametros   =================================================
+		* @input string $directory   Ruta absoluta de la carpeta
+		* @input int    $permission  Permisos a aplicar si no tiene escritura (default: 0755)
+		* @return array ['success' => bool, 'message' => string]
+		*===================================================================================================================
+		*/
+
+		/**********************  Validaciones   **********************/
+		if(!isset($directory) || $directory==''){ return ['success' => false,'message' => "No ha ingresado la ruta del directorio."];}
+
+		/********************** Si todo esta ok **********************/
+		try {
+
+			// Verificar existencia
+			if (!is_dir($directory)) {
+				return [
+					'success' => false,
+					'message' => "El directorio no existe."
+				];
+			}
+
+			// Verificar si ya es escribible
+			if (is_writable($directory)) {
+				return [
+					'success' => true,
+					'message' => "El directorio ya tiene permisos de escritura."
+				];
+			}
+
+			// Intentar cambiar permisos
+			if (!chmod($directory, $permission)) {
+				return [
+					'success' => false,
+					'message' => "No se pudieron cambiar los permisos del directorio."
+				];
+			}
+
+			// Verificar nuevamente
+			if (!is_writable($directory)) {
+				return [
+					'success' => false,
+					'message' => "Los permisos fueron cambiados, pero aún no es escribible."
+				];
+			}
+
+			return [
+				'success' => true,
+				'message' => "Permisos actualizados correctamente."
+			];
+
+		} catch (Throwable $e) {
+			return [
+				'success' => false,
+				'message' => "Error: " . $e->getMessage()
+			];
+		}
+	}
+
+
 
 }
