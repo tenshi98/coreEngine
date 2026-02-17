@@ -1,0 +1,74 @@
+<h5 class="wizardTittle text-danger">Credenciales MySQL</h5>
+<div class="steps clearfix">
+    <ul>
+        <li class="done">     <a><div class="title"><span class="number"><i class="bi bi-check-lg"></i></span><span class="title_text">Bienvenida</span></div></a></li>
+        <li class="current">  <a><div class="title"><span class="number">2</span><span class="title_text">Credenciales</span></div></a></li>
+        <li class="disabled"> <a><div class="title"><span class="number">3</span><span class="title_text">BBDD</span></div></a></li>
+        <li class="disabled"> <a><div class="title"><span class="number">4</span><span class="title_text">Sumario</span></div></a></li>
+        <li class="disabled"> <a><div class="title"><span class="number">5</span><span class="title_text">Finalización</span></div></a></li>
+    </ul>
+</div>
+
+<form id="FormCredentials" name="FormCredentials" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+    <div class="card-body">
+        <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 col-xl-8 col-xxl-8 mx-auto">
+            <div class="text-center">
+                <i class="bx bx-server text-color-blue" style="font-size: 5rem;"></i>
+            </div>
+            <p class="text-center text-muted">Ingresa las credenciales de un usuario válido de MySQL, que ya exista en el servidor y que cuente con los permisos necesarios para crear bases de datos.</p>
+            <h4 class="text-muted">
+                <i class="bi bi-list-check text-color-blue"></i> Tips importantes:
+            </h4>
+            <ul class="list-unstyled">
+                <li class="text-muted"><i class="bi bi-check text-color-green-dark"></i> El usuario debe estar previamente creado en el servidor MySQL.</li>
+                <li class="text-muted"><i class="bi bi-check text-color-green-dark"></i> Debe tener privilegios suficientes (por ejemplo, CREATE o ALL PRIVILEGES).</li>
+                <li class="text-muted"><i class="bi bi-check text-color-green-dark"></i> Verifica que el nombre de usuario y la contraseña sean correctos antes de continuar.</li>
+                <li class="text-muted"><i class="bi bi-check text-color-green-dark"></i> Puerto y Charset son opcionales, en el caso de no ingresarlos se utiliza la configuración por defecto</li>
+            </ul>
+
+            <?php
+            //se dibujan los inputs
+            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-server',    'Placeholder' => 'Host de MySQL',  'Name' => 'Host',      'Id' => 'Host',      'Value' => '', 'Required' => 2, 'DataInfo' => 'Dirección del servidor MySQL (generalmente localhost)']);
+            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-user',      'Placeholder' => 'Usuario',        'Name' => 'Usuario',   'Id' => 'Usuario',   'Value' => '', 'Required' => 2, 'DataInfo' => 'Usuario MySQL con permisos de creación de bases de datos']);
+            $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-key',       'Placeholder' => 'Contraseña',     'Name' => 'Password',  'Id' => 'Password',  'Value' => '', 'Required' => 2, 'DataInfo' => 'Contraseña del usuario MySQL']);
+            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-git-merge', 'Placeholder' => 'Puerto',         'Name' => 'Port',      'Id' => 'Port',      'Value' => '', 'Required' => 1, 'DataInfo' => '(Opcional) Puerto de conexión a utilizar, generalmente 3306']);
+            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-braille',   'Placeholder' => 'Charset',        'Name' => 'Charset',   'Id' => 'Charset',   'Value' => '', 'Required' => 1, 'DataInfo' => '(Opcional) Conjunto de caracteres a utilizar, generalmente utf8mb4']);
+            ?>
+        </div>
+    </div>
+    <div class="card-footer text-end">
+        <a href="<?php echo $BASE.'/install'?>" class="btn btn-danger"><i class="bi bi-arrow-left-circle"></i> Reiniciar</a>
+        <?php if($data['ValidInstall'] === true ){ ?>
+            <button type="submit" class="btn btn-primary"> Configurar Base de Datos <i class="bi bi-arrow-right-circle"></i></button>
+        <?php }else{ ?>
+            <a href="#" class="btn btn-primary disabled"> Configurar Base de Datos <i class="bi bi-arrow-right-circle"></i></a>
+        <?php } ?>
+    </div>
+</form>
+
+<script>
+    $("#FormCredentials").submit(function(e) {
+        //Se validan los datos de los formularios
+        var validatorResult = validator.checkAll(this);
+        //verifico el resultado
+        if(validatorResult.valid===false){
+            return !!validatorResult.valid;
+        }else{
+            e.preventDefault();
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Metodo      = 'POST';
+            let Direccion   = '<?php echo $BASE.'/install/credentials'; ?>';
+            let Informacion = $("#FormCredentials").serialize();
+            const Options     = {
+                UpdateDiv : [
+                    {Div:'#InstallerContent', fromData:'<?php echo $BASE.'/install/database'; ?>', refreshTbl:'false'}
+                ],
+                closeObject:'#PDloader',
+            };
+            //Se envian los datos al formulario
+            SendDataForms(Metodo, Direccion, Informacion, Options);
+        }
+    });
+</script>
