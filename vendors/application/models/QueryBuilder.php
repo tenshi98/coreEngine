@@ -535,7 +535,7 @@ class QueryBuilder{
         //Ejecucion
         try {
             //Ejecuto la query
-            $result = $this->queryExecute($ActionSQL, $DBConn);
+            $this->queryExecute($ActionSQL, $DBConn);
             //Siempre devuelve true
             return true;
         } catch (Exception $e) {
@@ -781,7 +781,7 @@ class QueryBuilder{
 
         /***************   Ejecutar   ***************/
         //Ejecuto la query
-        $result = $this->queryExecute($ActionSQL, $DBConn);
+        $this->queryExecute($ActionSQL, $DBConn);
 
         /******************************************/
         //Siempre devuelve true
@@ -930,33 +930,67 @@ class QueryBuilder{
 
         /*************** Validaciones ***************/
         //Se verifica si hay datos
-        if(!isset($query['dbName']) || $query['dbName']==''){ return 'Query Error: No hay datos en $dbName'; }
+        if(!isset($query['dbName']) || $query['dbName']==''){          return 'Query Error: No hay datos en $dbName'; }
+        if (!preg_match('/^[A-Za-z0-9_]{3,64}$/', $query['dbName'])) { return 'Query Error: Nombre de base de datos inválido'; }
         //Verificacion datos por defecto
-        $charset   = $query['charset'] ?? 'utf8mb4';
-        $collation = $query['collation'] ?? 'utf8mb4_unicode_ci';
-
-        /*************** Generacion Query ***************/
-        //armado de la query
-        $ActionSQL = sprintf(
-            "CREATE DATABASE `%s` CHARACTER SET %s COLLATE %s",
-            $query['dbName'],
-            $charset,
-            $collation
-        );
+        $charset      = $query['charset'] ?? 'utf8mb4';
+        $collation    = $query['collation'] ?? 'utf8mb4_unicode_ci';
+        $BD_host      = $DBConn['HOSTNAME'];
+        $BD_username  = $DBConn['USERNAME'];
+        $BD_password  = $DBConn['PASSWORD'];
+        $BD_port      = $DBConn['PORT'] ?? 3306;
+        $BD_charset   = $DBConn['CHARSET'] ?? 'utf8mb4';
 
         /***************   Ejecutar   ***************/
-        //Verifico si se pide mostrar la consulta
-        if ($showQuery) {
-            return $ActionSQL;
-        }
-        //Ejecucion
         try {
-            //Ejecuto la query
-            $result = $this->queryExecute($ActionSQL, $DBConn);
-            //Si se ejecuta correctamente
-            return true;
-        }  catch (PDOException $e) {
-            return $e;
+
+            /*************** Conexión al servidor ***************/
+            $NewDBConn = new DB\SQL(
+                'mysql:host='.$BD_host.';port='.$BD_port.';charset='.$BD_charset,
+                $BD_username,
+                $BD_password,
+                array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
+            );
+
+            /*************** Generacion Query ***************/
+            //armado de la query
+            $ActionSQL = sprintf(
+                "CREATE DATABASE `%s` CHARACTER SET %s COLLATE %s",
+                $query['dbName'],
+                $charset,
+                $collation
+            );
+
+            /***************   Ejecutar   ***************/
+            //Verifico si se pide mostrar la consulta
+            if ($showQuery) {
+                return $ActionSQL;
+            }
+            //Ejecucion
+            try {
+                //Ejecuto la query
+                $this->queryExecute($ActionSQL, $NewDBConn);
+                //Si se ejecuta correctamente
+                return true;
+            }  catch (PDOException $e) {
+                return $e;
+            }
+
+        } catch (\PDOException $e) {
+
+            $message = $e->getMessage();
+
+            // Permiso denegado
+            if (str_contains($message, '1044') || str_contains($message, '1045')) {
+                return 'Query Error: El usuario no tiene permisos para crear bases de datos';
+            }
+
+            // Base ya existe
+            if (str_contains($message, '1007')) {
+                return 'Query Error: La base de datos ya existe';
+            }
+
+            return 'Query Error: '.$message;
         }
 
     }
@@ -1023,82 +1057,9 @@ class QueryBuilder{
         }
     }
 
-    /******************************************************************************/
-    //Verificar si el usuario tiene permisos para crear bases de datos
-    public function userHasCreatePermission($DBConn) {
-        /*
-		*=================================================     Detalles    =================================================
-		*
-		* Verificar si el usuario tiene permisos para crear bases de datos
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//ejecucion
-		* 	$qbuilder->userHasCreatePermission($DBConn);
-		*
-		*=================================================    Parametros   =================================================
-		* @return bool True si tiene permisos
-		*===================================================================================================================
-		*/
 
-        /***************   Ejecutar   ***************/
-        //Ejecucion
-        try {
-            // Intentar obtener los privilegios del usuario actual
-            $ActionSQL = "SHOW GRANTS FOR CURRENT_USER()";
-            $stmt      = $DBConn->query($ActionSQL);
-            $grants    = $stmt->fetchAll(PDO::FETCH_COLUMN);
 
-            // Buscar privilegio CREATE
-            foreach ($grants as $grant) {
-                if (stripos($grant, 'ALL PRIVILEGES') !== false || stripos($grant, 'CREATE') !== false) {
-                    return true;
-                }
-            }
-            //Devuelvo false por defecto
-            return false;
 
-        } catch (PDOException $e) {
-            return $e;
-        }
-    }
-
-    /******************************************************************************/
-    //Verificar si la base de datos existe
-    public function databaseExists($dbName, $DBConn) {
-        /*
-		*=================================================     Detalles    =================================================
-		*
-		* Verificar si la base de datos existe
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//ejecucion
-		* 	$qbuilder->queryDropTable($dbName, $DBConn);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   string $dbName Nombre de la base de datos
-		* @return  bool True si existe
-		*===================================================================================================================
-		*/
-
-        /*************** Validaciones ***************/
-        //Se verifica si hay datos
-        if(!isset($dbName) || $dbName==''){  return 'Query Error: No hay datos en $dbName'; }
-
-        /***************   Ejecutar   ***************/
-        //Ejecucion
-        try {
-            //Se crea la query
-            $ActionSQL = "SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '".$dbName."'";
-            //Ejecuto la query
-            $result = $this->queryExecute($ActionSQL, $DBConn);
-            //Devuelco si hay resultados
-            return (!empty($result)&&$result !== false) ? count($result) : false;
-        } catch (PDOException $e) {
-            return $e;
-        }
-    }
 
 
 
