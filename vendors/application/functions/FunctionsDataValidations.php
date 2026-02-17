@@ -542,7 +542,7 @@ class FunctionsDataValidations {
 	}
 
     /************************************************************************************************************/
-    public function validateCredentials($host, $username, $password, $default_port = 3306, $charset = 'utf8mb4'): array {
+    public function validateCredentials($host, $username, $password, $port, $charset): array {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -554,9 +554,11 @@ class FunctionsDataValidations {
 		* 	$DataValidations->validateCredentials($host, $username, $password);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   string $host      Host de MySQL
-		* @input   string $username  Usuario
-		* @input   string $password  Contraseña
+		* @input   string $host          Host de MySQL
+		* @input   string $username      Usuario
+		* @input   string $password      Contraseña
+		* @input   string $port          Puerto de conexión
+		* @input   string $charset       Charset a utilizar
 		* @return  array ['success' => bool, 'message' => string, 'db' => MySQLDatabase|null]
 		*===================================================================================================================
 		*/
@@ -566,210 +568,244 @@ class FunctionsDataValidations {
         if(!isset($host) || $host==''){          return ['success' => false, 'message' => 'No hay datos en $host'];}
         if(!isset($username) || $username==''){  return ['success' => false, 'message' => 'No hay datos en $username'];}
         if(!isset($password) || $password==''){  return ['success' => false, 'message' => 'No hay datos en $password'];}
+        if(!isset($port) || $port==''){          return ['success' => false, 'message' => 'No hay datos en $port'];}
+        if(!isset($charset) || $charset==''){    return ['success' => false, 'message' => 'No hay datos en $charset'];}
 
 		/********************** Si todo esta ok **********************/
-        try {
-			//Se crea archivo de configuracion
-			$dbConfig = [
-				'HOSTNAME' => $host,
-				'USERNAME' => $username,
-				'PASSWORD' => $password,
-				'PORT'     => $default_port,
-                'CHARSET'  => $charset
+		try {
+
+			// --------------------------------------------------------------------------
+			// Intentar conexión al servidor (sin DB específica)
+			// --------------------------------------------------------------------------
+			// Declaro conexion
+            $DBConn = new DB\SQL(
+                'mysql:host='.$host.';port='.$port.';charset='.$charset,
+                $username,
+                $password,
+                array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
+            );
+			// Ejecuto query de prueba
+			$DBConn->exec("SELECT 1;");
+
+			// --------------------------------------------------------------------------
+			// Verificación teórica de privilegios
+			// --------------------------------------------------------------------------
+			// Consulta
+			$grants = $DBConn->exec("SHOW GRANTS FOR CURRENT_USER();");
+			// Variable
+			$hasCreateGrant = false;
+			// Recorro los permisos
+			if ($grants) {
+				foreach ($grants as $row) {
+					foreach ($row as $grant) {
+						if (stripos($grant, 'ALL PRIVILEGES') !== false || stripos($grant, 'CREATE') !== false) {
+							$hasCreateGrant = true;
+							break 2;
+						}
+					}
+				}
+			}
+
+			// --------------------------------------------------------------------------
+			// Prueba REAL de creación de base de datos
+			// --------------------------------------------------------------------------
+			// Nombre base de datos temporal
+			$testDbName = '__test_install_' . uniqid();
+			// Se ejecuta
+			try {
+				// Creacion de Base de datos
+				$DBConn->exec("CREATE DATABASE `$testDbName`");
+				// Eliminacion de Base de datos
+				$DBConn->exec("DROP DATABASE `$testDbName`");
+				// Declaracion variable
+				$realCreateWorks = true;
+			} catch (\Exception $e) {
+				// Declaracion variable
+				$realCreateWorks = false;
+			}
+
+			// --------------------------------------------------------------------------
+			// Evaluación final
+			// --------------------------------------------------------------------------
+			// Usuario válido pero sin permisos
+			if (!$hasCreateGrant && !$realCreateWorks) {
+				return [
+					'status'  => 'no_create_permission',
+					'success' => false,
+					'message' => 'Usuario válido pero sin permisos CREATE DATABASE'
+				];
+			}
+			// El usuario declara permisos CREATE pero no puede crear bases
+			if ($hasCreateGrant && !$realCreateWorks) {
+				return [
+					'status'  => 'grant_mismatch',
+					'success' => false,
+					'message' => 'El usuario declara permisos CREATE pero no puede crear bases'
+				];
+			}
+			// Permisos OK
+			return [
+				'status'  => 'success',
+				'success' => true,
+				'message' => 'Conexión y permisos verificados correctamente'
 			];
-			//Se ejecuta la conexion
-			LoadConexionDB::loadSQLConnection($dbConfig);
-			//Se devuelve respuesta
+
+		} catch (\PDOException $e) {
+
+			$message = $e->getMessage();
+
+			// Servidor no disponible
+			if (str_contains($message, '2002')) {
+				return [
+					'status'  => 'server_unreachable',
+					'success' => false,
+					'message' => 'No se puede conectar al servidor MySQL'
+				];
+			}
+
+			// Access denied
+			if (str_contains($message, '1045')) {
+
+				if (str_contains($message, '@')) {
+					return [
+						'status'  => 'host_not_allowed',
+						'success' => false,
+						'message' => 'Usuario no autorizado desde este host'
+					];
+				}
+
+				return [
+					'status'  => 'access_denied',
+					'success' => false,
+					'message' => 'Usuario o contraseña incorrectos'
+				];
+			}
+
 			return [
-                'success' => true,
-                'message' => 'Credenciales válidas'
-            ];
-        } catch (PDOException $e) {
-			//Se devuelve respuesta
+				'status'  => 'unknown_error',
+				'success' => false,
+				'message' => $message
+			];
+		}
+
+    }
+
+    /************************************************************************************************************/
+    public function validateDatabase($host, $username, $password, $port, $charset, $dbName): array {
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Validar credenciales de MySQL
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//se ejecuta operacion
+		* 	$DataValidations->validateCredentials($host, $username, $password);
+		*
+		*=================================================    Parametros   =================================================
+		* @input   string $host          Host de MySQL
+		* @input   string $username      Usuario
+		* @input   string $password      Contraseña
+		* @input   string $dbName        Nombre de la base de datos
+		* @input   string $port          Puerto de conexion
+		* @input   string $charset       Charset a utilizar
+		* @return  array ['success' => bool, 'message' => string, 'db' => MySQLDatabase|null]
+		*===================================================================================================================
+		*/
+
+        /**********************  Validaciones   **********************/
+        //Se verifica si hay datos
+        if(!isset($host) || $host==''){          return ['success' => false, 'message' => 'No hay datos en $host'];}
+        if(!isset($username) || $username==''){  return ['success' => false, 'message' => 'No hay datos en $username'];}
+        if(!isset($password) || $password==''){  return ['success' => false, 'message' => 'No hay datos en $password'];}
+        if(!isset($port) || $port==''){          return ['success' => false, 'message' => 'No hay datos en $port'];}
+        if(!isset($charset) || $charset==''){    return ['success' => false, 'message' => 'No hay datos en $charset'];}
+        if(!isset($dbName) || $dbName==''){      return ['success' => false, 'message' => 'No hay datos en $dbName'];}
+
+		/********************** Si todo esta ok **********************/
+
+		// --------------------------------------------------------------------------
+		// Validación de longitud
+		// --------------------------------------------------------------------------
+		if (strlen($dbName) < 3 || strlen($dbName) > 64) {
 			return [
-                'success' => false,
-                'message' => 'Credenciales inválidas: ' . $e->getMessage()
-            ];
-        }
+				'status'  => 'invalid_length',
+				'success' => false,
+				'message' => 'El nombre debe tener entre 3 y 64 caracteres'
+			];
+		}
+
+		// --------------------------------------------------------------------------
+		// Validación de formato
+		// --------------------------------------------------------------------------
+		if (!preg_match('/^[A-Za-z0-9_]+$/', $dbName)) {
+			return [
+				'status'  => 'invalid_format',
+				'success' => false,
+				'message' => 'El nombre solo puede contener letras, números y guiones bajos'
+			];
+		}
+
+		// --------------------------------------------------------------------------
+		// Validación de nombres reservados
+		// --------------------------------------------------------------------------
+		$reservedNames = [
+			'mysql',
+			'information_schema',
+			'performance_schema',
+			'sys'
+		];
+		// Si el nombre esta entre los reservados
+		if (in_array(strtolower($dbName), $reservedNames, true)) {
+			return [
+				'status'  => 'reserved_name',
+				'success' => false,
+				'message' => 'El nombre corresponde a una base de datos reservada del sistema'
+			];
+		}
+
+		// --------------------------------------------------------------------------
+		// Verificar existencia en el servidor
+		// --------------------------------------------------------------------------
+		try {
+
+			// Declaro conexion
+            $DBConn = new DB\SQL(
+                'mysql:host='.$host.';port='.$port.';charset='.$charset,
+                $username,
+                $password,
+                array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
+            );
+
+			$safeDbName = str_replace('`', '', $dbName);
+
+			$query  = "SHOW DATABASES LIKE '".$safeDbName."'";
+			$result = $DBConn->exec($query);
+
+			if (!empty($result)) {
+				return [
+					'status'  => 'database_exists',
+					'success' => false,
+					'message' => 'Ya existe una base de datos con ese nombre'
+				];
+			}
+
+			return [
+				'status'  => 'valid',
+				'success' => true,
+				'message' => 'Nombre válido y disponible'
+			];
+
+		} catch (\Exception $e) {
+
+			return [
+				'status'  => 'connection_error',
+				'success' => false,
+				'message' => 'Error al conectar al servidor: '.$e->getMessage()
+			];
+		}
     }
 
-    /************************************************************************************************************/
-    public function validateCreatePermission($DBConn): array {
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Verificar si el usuario tiene permisos para crear bases de datos
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validateCreatePermission($db);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   MySQLDatabase $DBConn Instancia de la base de datos conectada
-		* @return array ['success' => bool, 'message' => string]
-		*===================================================================================================================
-		*/
-
-        /**********************  Validaciones   **********************/
-        //Se verifica si hay datos
-        if(!isset($DBConn) || $DBConn==''){  return ['success' => false,'message' => 'No hay datos en $DBConn'];}
-
-		/********************** Si todo esta ok **********************/
-        try {
-			//Se instancia la libreria de consultas
-			$QueryBuilder   = new QueryBuilder();
-			//Se llama a la funcion que verifica los permisos del usuario
-			$hasPermission  = $QueryBuilder->userHasCreatePermission($DBConn);
-			//Validaciones
-            if ($hasPermission) {
-				//Se devuelve respuesta
-                return [
-                    'success' => true,
-                    'message' => 'El usuario tiene permisos para crear bases de datos'
-                ];
-            } else {
-				//Se devuelve respuesta
-                return [
-                    'success' => false,
-                    'message' => 'El usuario no tiene permisos para crear bases de datos'
-                ];
-            }
-        } catch (Exception $e) {
-			//Se devuelve respuesta
-            return [
-                'success' => false,
-                'message' => 'Error al verificar permisos: ' . $e->getMessage()
-            ];
-        }
-    }
-
-    /************************************************************************************************************/
-    public function validateDatabaseName($dbName): array {
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Validar nombre de base de datos
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validateDatabaseName('dbName');
-		*
-		*=================================================    Parametros   =================================================
-		* @input   string $dbName Nombre de la base de datos
-		* @return array ['success' => bool, 'message' => string]
-		*===================================================================================================================
-		*/
-
-        /**********************  Validaciones   **********************/
-        //Se verifica si hay datos
-        if(!isset($dbName) || $dbName==''){  return ['success' => false,'message' => 'No hay datos en $dbName'];}
-
-		/********************** Si todo esta ok **********************/
-		//Variables
-        $minLength  = 3;
-        $maxLength  = 64;
-        $pattern    = '/^[a-zA-Z0-9_]+$/';
-
-        // Verificar que no esté vacío
-        if (empty(trim($dbName))) {
-			//Se devuelve respuesta
-            return [
-                'success' => false,
-                'message' => 'El nombre de la base de datos no puede estar vacío'
-            ];
-        }
-
-        // Verificar longitud mínima
-        if (strlen($dbName) < $minLength) {
-			//Se devuelve respuesta
-            return [
-                'success' => false,
-                'message' => "El nombre debe tener al menos $minLength caracteres"
-            ];
-        }
-
-        // Verificar longitud máxima
-        if (strlen($dbName) > $maxLength) {
-			//Se devuelve respuesta
-            return [
-                'success' => false,
-                'message' => "El nombre no puede superar los $maxLength caracteres"
-            ];
-        }
-
-        // Verificar patrón (solo letras, números y guiones bajos)
-        if (!preg_match($pattern, $dbName)) {
-			//Se devuelve respuesta
-            return [
-                'success' => false,
-                'message' => 'El nombre solo puede contener letras, números y guiones bajos'
-            ];
-        }
-
-		//Se devuelve respuesta
-        return [
-            'success' => true,
-            'message' => 'Nombre válido'
-        ];
-    }
-
-    /************************************************************************************************************/
-    public function checkDatabaseExists($dbName, $DBConn): array {
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Verificar si la base de datos ya existe
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->checkDatabaseExists($db, 'dbName');
-		*
-		*=================================================    Parametros   =================================================
-		* @input   MySQLDatabase  $db      Instancia de la base de datos conectada
-		* @input   string         $dbName  Nombre de la base de datos
-		* @return array ['success' => bool, 'message' => string, 'exists' => bool]
-		*===================================================================================================================
-		*/
-
-        /**********************  Validaciones   **********************/
-        //Se verifica si hay datos
-        if(!isset($dbName) || $dbName==''){  return ['success' => false,'message' => 'No hay datos en $dbName'];}
-        if(!isset($DBConn) || $DBConn==''){  return ['success' => false,'message' => 'No hay datos en $DBConn'];}
-
-		/********************** Si todo esta ok **********************/
-        try {
-			//Se instancia la libreria de consultas
-			$QueryBuilder = new QueryBuilder();
-			//Se llama a la funcion que verifica los permisos del usuario
-			$exists       = $QueryBuilder->databaseExists($dbName, $DBConn);
-			//Validaciones
-            if ($exists) {
-				//Se devuelve respuesta
-                return [
-                    'success' => false,
-                    'message' => 'La base de datos ya existe',
-                    'exists'  => true
-                ];
-            } else {
-				//Se devuelve respuesta
-                return [
-                    'success' => true,
-                    'message' => 'La base de datos no existe, se puede crear',
-                    'exists'  => false
-                ];
-            }
-        } catch (Exception $e) {
-			//Se devuelve respuesta
-            return [
-                'success' => false,
-                'message' => 'Error al verificar la base de datos: ' . $e->getMessage(),
-                'exists'  => null
-            ];
-        }
-    }
 
     /************************************************************************************************************/
     public function validatePathFile($PathFile): array {
