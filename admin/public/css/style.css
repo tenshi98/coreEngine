@@ -23,6 +23,7 @@ textarea {resize:none !important;	}
 .popover.clockpicker-popover {z-index: 10010!important;}
 .table tr th, .table tr td {color: var(--body-color) !important;}
 .formHelp {font-size: 0.875rem;margin-top: 0.25rem;}
+.btn:disabled,.btn[disabled],.btn.disabled {cursor: not-allowed;}
 
 /*--------------------------------------------------------------
 # Bordes

@@ -958,7 +958,7 @@ body::-webkit-scrollbar-thumb {background-color: #aab7cf;}
 .title_h1{color: var(--text-color01);}
 .title_h2{color: var(--text-color08);}
 .title_h3{color: var(--text-color11);}
-.title_h4{color: var(--text-color13);}
+.title_h4{color: var(--color-red-dark);}
 .title_h5{color: var(--text-color15);}
 
 
