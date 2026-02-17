@@ -98,11 +98,11 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Widgets</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/box'; ?>">           <i class="bi bi-puzzle color-red"></i> Box</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">      <i class="bi bi-puzzle color-red"></i> Time Line</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">  <i class="bi bi-puzzle color-red"></i> Text Divider</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle color-red"></i> Componentes Web</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle color-red"></i> Calendario</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/box'; ?>">           <i class="bi bi-puzzle text-color-red"></i> Box</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Time Line</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
