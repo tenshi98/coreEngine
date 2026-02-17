@@ -40,16 +40,16 @@
 
 
 
-        echo '<h5 class="card-title">Datos Básicos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
 
-        echo '<h5 class="card-title">Datos de Contacto</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos de Contacto</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 8);
 
-        echo '<h5 class="card-title">Representante Legal</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Representante Legal</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_3, 8);
 
-        echo '<h5 class="card-title">APIS</h5>';
+        echo '<h5 class="box-title text-color-red-dark">APIS</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
 
         //funcion para devolver el uso

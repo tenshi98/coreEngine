@@ -34,7 +34,7 @@
             <div class="tab-pane fade" id="tab_id_2" role="tabpanel" aria-labelledby="view_tab_2">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                        <h5 class="card-title">Cargas</h5>
+                        <h5 class="box-title text-color-red-dark">Cargas</h5>
                         <div class="clearfix"></div>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
@@ -63,7 +63,7 @@
             <div class="tab-pane fade" id="tab_id_3" role="tabpanel" aria-labelledby="view_tab_3">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                        <h5 class="card-title">Contactos</h5>
+                        <h5 class="box-title text-color-red-dark">Contactos</h5>
                         <div class="clearfix"></div>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
@@ -94,7 +94,7 @@
             <div class="tab-pane fade" id="tab_id_4" role="tabpanel" aria-labelledby="view_tab_4">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                        <h5 class="card-title">Documentos</h5>
+                        <h5 class="box-title text-color-red-dark">Documentos</h5>
                         <div class="clearfix"></div>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
@@ -123,7 +123,7 @@
         <div class="tab-pane fade" id="tab_id_5" role="tabpanel" aria-labelledby="view_tab_5">
             <div class="row">
                 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                    <h5 class="card-title">Observaciones</h5>
+                    <h5 class="box-title text-color-red-dark">Observaciones</h5>
                     <div class="clearfix"></div>
                     <div class="table-responsive">
                         <table class="table table-sm table-hover">

@@ -41,11 +41,11 @@
             ['Icon' => '','Titulo' => 'Estado Pago',   'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['EstadoPago'].'</span>'],
         ];
 
-        echo '<h5 class="card-title">Datos Básicos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData1, 8);
-        echo '<h5 class="card-title">Productos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Productos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData2, 8);
-        echo '<h5 class="card-title">Montos y Pagos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Montos y Pagos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData3, 8);
 
         ?>

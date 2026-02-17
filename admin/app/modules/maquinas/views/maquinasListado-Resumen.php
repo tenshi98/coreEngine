@@ -69,7 +69,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Nombre']; ?>
                         </div>
@@ -103,7 +103,7 @@
 
                 <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Documentos de <?php echo $data['rowData']['Nombre']; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -117,7 +117,7 @@
                 <?php } ?>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -131,7 +131,7 @@
 
                 <?php if($data['UserData']["maquinasListadoComponentes"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-componentes">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Componentes de <?php echo $data['rowData']['Nombre']; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -147,7 +147,7 @@
                 <?php if($data['UserData']["maquinasListadoTelemetria"]==2){ ?>
 
                     <div class="tab-pane fade" id="resumen-tel-config">
-                        <h5 class="card-title">Configuración de <?php echo $data['rowData']['Nombre']; ?></h5>
+                        <h5 class="box-title text-color-red-dark">Configuración de <?php echo $data['rowData']['Nombre']; ?></h5>
                         <div class="clearfix"></div>
                         <div class="table-responsive" id="tabObsDataTable">
                             <?php require_once('maquinasListado-Resumen-Config.php'); ?>
@@ -156,7 +156,7 @@
 
                     <?php if($data['rowData']['id_Sensores']==1){ ?>
                         <div class="tab-pane fade" id="resumen-tel-sensores">
-                            <h5 class="card-title">
+                            <h5 class="box-title text-color-red-dark">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                     Sensores de <?php echo $data['rowData']['Nombre']; ?>
                                     <button type="button" class="btn btn-success"  onclick="tabSensoresNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -169,7 +169,7 @@
                         </div>
 
                         <div class="tab-pane fade" id="resumen-tel-alarmas">
-                            <h5 class="card-title">
+                            <h5 class="box-title text-color-red-dark">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                     Alarmas Personalizadas de <?php echo $data['rowData']['Nombre']; ?>
                                     <button type="button" class="btn btn-success"  onclick="tabAlarmasNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

@@ -29,7 +29,7 @@
 
                 <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-planes">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Planes de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabPlanesNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -44,7 +44,7 @@
 
                 <?php if($data['UserData']["entidadesListadoUsoUsuarios"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-usuarios">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Usuarios de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabUsuariosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -59,7 +59,7 @@
 
                 <?php if($data['UserData']["entidadesListadoUsoMaquinas"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-maquinas">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Máquinas de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabMaquinasNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

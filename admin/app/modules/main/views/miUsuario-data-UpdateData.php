@@ -23,15 +23,15 @@ $arrData_4 = [
 ];
 
 /*******************************************/
-echo '<h5 class="card-title">Datos del Perfil</h5>';
+echo '<h5 class="box-title text-color-red-dark">Datos del Perfil</h5>';
 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
 
-echo '<h5 class="card-title">Datos Personales</h5>';
+echo '<h5 class="box-title text-color-red-dark">Datos Personales</h5>';
 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 8);
 
-echo '<h5 class="card-title">Social</h5>';
+echo '<h5 class="box-title text-color-red-dark">Social</h5>';
 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_3, 8);
 
-echo '<h5 class="card-title">Opciones</h5>';
+echo '<h5 class="box-title text-color-red-dark">Opciones</h5>';
 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
 ?>

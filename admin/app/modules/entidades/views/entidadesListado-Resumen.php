@@ -126,7 +126,7 @@
                 ?>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $Entidad; ?>
                         </div>
@@ -155,7 +155,7 @@
 
                 <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-cargas">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Cargas de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabCargasNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -170,7 +170,7 @@
 
                 <?php if($data['UserData']["entidadesListadoVerContactos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-contactos">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Contactos de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabContactosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -185,7 +185,7 @@
 
                 <?php if($data['UserData']["entidadesListadoVerDocumentos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Documentos de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -199,7 +199,7 @@
                 <?php } ?>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $Entidad; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

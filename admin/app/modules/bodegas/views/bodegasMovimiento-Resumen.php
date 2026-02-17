@@ -64,7 +64,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-prod">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Productos de <?php echo $data['rowData']['TipoMovimiento'].' '.$Movimiento; ?>
                             <button type="button" class="btn btn-success"  onclick="tabProdNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMovimiento']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

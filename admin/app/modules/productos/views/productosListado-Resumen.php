@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Nombre']; ?>
                         </div>
@@ -101,7 +101,7 @@
 
                 <?php if($data['UserData']["productosListadoVerDocumentos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
-                        <h5 class="card-title">
+                        <h5 class="box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Documentos de <?php echo $data['rowData']['Nombre']; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -115,7 +115,7 @@
                 <?php } ?>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

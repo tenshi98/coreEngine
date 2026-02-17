@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Email']; ?>
                         </div>
@@ -81,7 +81,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-file">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             archivos de <?php echo $data['rowData']['Email']; ?>
                         </div>
@@ -120,7 +120,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Email']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCrud']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

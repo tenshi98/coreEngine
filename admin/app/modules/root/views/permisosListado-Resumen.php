@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-rutas">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Rutas de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newFormModal"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

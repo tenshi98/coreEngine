@@ -50,7 +50,7 @@
                 ?>
 
                 <div class="tab-pane fade" id="resumen-items">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Items de <?php echo 'Cotización N° '.$data['rowData']['idCotizacion']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabItemNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
@@ -63,7 +63,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-productos">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Productos de <?php echo 'Cotización N° '.$data['rowData']['idCotizacion']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabProdNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
@@ -76,7 +76,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-servicios">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Servicios de <?php echo 'Cotización N° '.$data['rowData']['idCotizacion']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabServNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>

@@ -20,7 +20,7 @@
             ['Icon' => '','Titulo' => 'Palabra',    'Texto' => $data['rowData']['Palabra']],
         ];
 
-        echo '<h5 class="card-title">Datos del Perfil</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos del Perfil</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
         ?>
     </div>

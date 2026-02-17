@@ -12,12 +12,12 @@
             ['Icon' => '','Titulo' => 'Descripcion',       'Texto' => $data['rowData']['Descripcion']],
         ];
 
-        //echo '<h5 class="card-title">Datos del Perfil</h5>';
+        //echo '<h5 class="box-title text-color-red-dark">Datos del Perfil</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
         ?>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-        <h5 class="card-title">Rutas</h5>
+        <h5 class="box-title text-color-red-dark">Rutas</h5>
         <div class="clearfix"></div>
         <div class="table-responsive">
             <table class="table table-sm table-hover">

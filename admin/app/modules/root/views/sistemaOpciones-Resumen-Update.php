@@ -71,29 +71,29 @@
         echo '
         <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                echo '<h5 class="card-title">Datos Básicos</h5>';
+                echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
                 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 6);
             echo '
             </div>
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                echo '<h5 class="card-title">Datos de Contacto</h5>';
+                echo '<h5 class="box-title text-color-red-dark">Datos de Contacto</h5>';
                 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 6);
             echo '
             </div>
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-12 col-xxl-12">';
-                echo '<h5 class="card-title">Representante Legal</h5>';
+                echo '<h5 class="box-title text-color-red-dark">Representante Legal</h5>';
                 $data['Fnc_WidgetsCommon']->responsiveTable($arrData_3, 8);
             echo '
             </div>
         </div>';
 
-        echo '<h5 class="card-title">APIS</h5>';
+        echo '<h5 class="box-title text-color-red-dark">APIS</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
 
-        echo '<h5 class="card-title">Redes Sociales</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
 
-        echo '<h5 class="card-title">Configuracion Sistema</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Configuracion Sistema</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_6, 2);
 
         //funcion para devolver el uso

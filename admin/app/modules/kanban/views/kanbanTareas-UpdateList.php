@@ -90,7 +90,7 @@
 </div>
 
 <div class="tab-pane fade" id="tab_kanban_2" role="tabpanel" aria-labelledby="home-tab_kanban_2">
-    <h5 class="card-title">
+    <h5 class="box-title text-color-red-dark">
         <div class="btn-group" role="group">
             <button class="btn btn-secondary tooltiplink" data-title="Filtrar Información" type="button" data-bs-toggle="collapse" data-bs-target="#formSearch" aria-expanded="false" aria-controls="formSearch"><i class="bi bi-search"></i> Filtrar</button>
             <button class="btn btn-danger tooltiplink"    data-title="Quitar Filtro"       type="button" onclick="deleteFilter()"><i class="ri-filter-off-line"></i></button>

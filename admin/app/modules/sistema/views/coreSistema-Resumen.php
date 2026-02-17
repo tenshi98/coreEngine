@@ -147,7 +147,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-edit_5">
-                    <h5 class="card-title">
+                    <h5 class="box-title text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Sistema_Nombre']; ?>
                         </div>

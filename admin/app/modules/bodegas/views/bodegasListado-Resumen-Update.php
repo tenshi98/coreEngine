@@ -17,7 +17,7 @@
             ['Icon' => '','Titulo' => 'Estado',      'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ];
 
-        echo '<h5 class="card-title">Datos Básicos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
 
         ?>

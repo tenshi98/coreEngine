@@ -15,7 +15,7 @@
             ['Icon' => '','Titulo' => 'Descripcion',    'Texto' => $data['rowData']['Descripcion']],
             ['Icon' => '','Titulo' => 'Estado',         'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ];
-        echo '<h5 class="card-title">Datos Básicos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
 
         if($data['UserData']["maquinasListadoTelemetria"]==2){
@@ -31,7 +31,7 @@
                 ['Icon' => '','Titulo' => 'Tiempo Alertas Criticas',    'Texto' => $data['rowData']['AlertaTemprCritica']],
                 ['Icon' => '','Titulo' => 'Tiempo Alertas Normales',    'Texto' => $data['rowData']['AlertaTemprNormal']],
             ];
-            echo '<h5 class="card-title">Configuración</h5>';
+            echo '<h5 class="box-title text-color-red-dark">Configuración</h5>';
             $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 8);
         }
 

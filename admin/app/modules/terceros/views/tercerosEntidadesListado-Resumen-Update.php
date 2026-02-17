@@ -35,7 +35,7 @@
                 break;
         }
 
-        echo '<h5 class="card-title">Datos Básicos</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
 
         ?>
