@@ -471,52 +471,6 @@ class ControllerBase {
     }
 
     /************************************************************************************************************/
-    protected function Base_userHasCreatePermission(array &$params){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Verificar si el usuario tiene permisos para crear bases de datos
-		*
-		*===================================================================================================================
-		*/
-
-        /**********************     Valores     **********************/
-        // Extraer parámetros con valores por defecto
-        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
-
-        /**********************  Retorno datos  **********************/
-        //devuelvo resultados
-        return $this->queryBuilder->userHasCreatePermission($DBConn);
-    }
-
-    /************************************************************************************************************/
-    protected function Base_databaseExists(array &$params){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Verificar si la base de datos existe
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//Formato de la query
-        *   $params = [
-        *       'dbName' => 'dbName', -> Nombre de la base de datos
-        *   ];
-		*
-		*===================================================================================================================
-		*/
-
-        /**********************     Valores     **********************/
-        // Extraer parámetros con valores por defecto
-        $dbName  = $params['dbName'] ?? '';
-        $DBConn  = $params['newBDConn'] ?? $this->DBConn;
-
-        /**********************  Retorno datos  **********************/
-        //devuelvo resultados
-        return $this->queryBuilder->databaseExists($dbName, $DBConn);
-    }
-
-    /************************************************************************************************************/
     protected function Base_SMTPMail($f3, $query){
 		/*
 		*=================================================     Detalles    =================================================
