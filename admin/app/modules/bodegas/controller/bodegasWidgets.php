@@ -33,11 +33,9 @@ class bodegasWidgets extends ControllerBase {
     public function loadWidgets(){
 
         //Variables
-        $Data['Count_Name']  = 'Count_Bodegas';
-        $Data['Count_Value'] = 0;
         $Data['Menu_Name']   = 'Gestión Bodegas y Productos';
         $Data['Menu_Value']  = [
-            'Stock Productos'   => 'Count_Bodegas',
+            'Stock Productos'   => '../app/modules/bodegas/views/main-bodega-stock.php',
         ];
 
         //Devuelvo
