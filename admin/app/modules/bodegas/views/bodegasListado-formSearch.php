@@ -1,4 +1,5 @@
 <div class="clearfix"></div>
+
 <div class="collapse" id="formSearch">
     <form id="FormSearchData" name="FormSearchData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
         <div class="container well">
@@ -31,6 +32,11 @@
     /*********************************************************************/
     /******************************************/
     $("#FormSearchData").submit(function(e) {
+        // Si ya se está ejecutando, salimos
+        if (ejecutandoForm.valor) return;
+        //Cambio los valores
+        ejecutandoForm.valor = true;
+        //Ejecucion normal
         e.preventDefault();
         //Cargo el loader
         $('#PDloader').show();
@@ -43,6 +49,7 @@
             colapseDiv : 'true',
             refreshTables : 'true',
             closeObject:'#PDloader',
+            changeValForm: ejecutandoForm,
         };
         //Se envian los datos al formulario
         SendDataForms(Metodo, Direccion, Informacion, Options);

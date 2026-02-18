@@ -4,7 +4,7 @@
             <th>Servicio</th>
             <th class="text-end">Cantidad</th>
             <th class="text-end">Valor</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -12,7 +12,7 @@
         //Verifico si hay datos
         if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
             //Recorro
-            foreach($data['arrServicios'] AS $crud){
+            foreach($data['arrServicios'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idExistencia']);
                 $Entidad     = addslashes($crud['ServicioNombre']); ?>

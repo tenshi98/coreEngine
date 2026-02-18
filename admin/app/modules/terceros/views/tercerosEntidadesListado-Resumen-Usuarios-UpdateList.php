@@ -5,7 +5,7 @@
             <th>Nombre</th>
             <th>Ultimo Acceso</th>
             <th>Estado</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -13,7 +13,7 @@
         //Verifico si hay datos
         if(is_array($data['arrUsuarios'])&&!empty($data['arrUsuarios'])){
             //Recorro
-            foreach($data['arrUsuarios'] AS $crud){
+            foreach($data['arrUsuarios'] as $crud){
                 //Variables
                 $idEntidad   = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idEntidad']);
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idUsuario']);

@@ -6,7 +6,7 @@
             <th>Nombre</th>
             <th>Sector</th>
             <th>Estado</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
         //Verifico si hay datos
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
             //Recorro
-            foreach($data['arrList'] AS $crud){
+            foreach($data['arrList'] as $crud){
                 //Se obtiene el nombre o la razón social
                 $Entidad  = '';
                 $Entidad .= !empty($crud['Nick'])

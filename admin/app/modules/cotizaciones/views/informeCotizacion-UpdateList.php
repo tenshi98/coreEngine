@@ -12,7 +12,7 @@
                                     <th>Fecha</th>
                                     <th>Entidad</th>
                                     <th>Valor Total</th>
-                                    <th width="10">Acciones</th>
+                                    <th style="width: 10px;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -20,7 +20,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
                                     //Recorro
-                                    foreach($data['arrList'] AS $crud){ ?>
+                                    foreach($data['arrList'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
                                             <td>

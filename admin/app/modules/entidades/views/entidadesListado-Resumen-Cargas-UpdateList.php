@@ -3,7 +3,7 @@
         <tr>
             <th>Nombre</th>
             <th>Parentesco</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -11,7 +11,7 @@
         //Verifico si hay datos
         if(is_array($data['arrCargas'])&&!empty($data['arrCargas'])){
             //Recorro
-            foreach($data['arrCargas'] AS $crud){
+            foreach($data['arrCargas'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCargas']);
                 $Entidad     = addslashes($crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']); ?>

@@ -4,7 +4,7 @@
             <th>Categoria</th>
             <th>Descripcion</th>
             <th>Carpeta Contenedora</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -12,7 +12,7 @@
         //Verifico si hay datos
         if(is_array($data['arrCategoria'])&&!empty($data['arrCategoria'])){
             //Recorro
-            foreach($data['arrCategoria'] AS $crud){
+            foreach($data['arrCategoria'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPermisosCat']);
                 $Entidad     = addslashes($crud['Nombre']); ?>

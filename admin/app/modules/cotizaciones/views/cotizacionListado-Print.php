@@ -83,7 +83,7 @@ $To .= '</p>';
                     /*******************************************************************/
                     if(is_array($data['arrItems'])&&!empty($data['arrItems'])){
                         //Recorro
-                        foreach($data['arrItems'] AS $crud){
+                        foreach($data['arrItems'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['Item'].'</td>
@@ -95,7 +95,7 @@ $To .= '</p>';
                     /*******************************************************************/
                     if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
                         //Recorro
-                        foreach($data['arrProductos'] AS $crud){
+                        foreach($data['arrProductos'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['ProductoNombre'].'</td>
@@ -107,7 +107,7 @@ $To .= '</p>';
                     /*******************************************************************/
                     if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
                         //Recorro
-                        foreach($data['arrServicios'] AS $crud){
+                        foreach($data['arrServicios'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['ServicioNombre'].'</td>

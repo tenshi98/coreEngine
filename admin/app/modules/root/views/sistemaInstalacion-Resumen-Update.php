@@ -7,7 +7,7 @@
         </tr>
     </thead>
     <tbody>
-        <?php foreach ($data['arrModules'] AS $module){
+        <?php foreach ($data['arrModules'] as $module){
             echo '
             <tr>
                 <td>
@@ -22,7 +22,7 @@
                     //Verifico si existe
                     if(isset($module['Dependencias'])&&is_array($module['Dependencias'])){
                         //Se recorren las dependencias
-                        foreach ($module['Dependencias'] AS $mod){
+                        foreach ($module['Dependencias'] as $mod){
                             //Se verifica si existe
                             if(isset($mod['Numero'])&&$mod['Numero']!=0){
                                 $depInstal = '<span class="badge bg-success">Instalado</span>';

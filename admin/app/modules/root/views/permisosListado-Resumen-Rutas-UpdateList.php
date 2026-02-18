@@ -6,7 +6,7 @@
             <th>Ruta Controller</th>
             <th>Descripcion</th>
             <th>Objetivo</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>

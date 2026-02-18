@@ -19,7 +19,7 @@
                         <?php
                         //Verifico si hay datos
                         if(is_array($data['MainViewData']['Data_ComprasListado'])){
-                            foreach($data['MainViewData']['Data_ComprasListado'] AS $datos){
+                            foreach($data['MainViewData']['Data_ComprasListado'] as $datos){
                                 //Se obtiene el nombre o la razón social
                                 $Entidad  = '';
                                 $Entidad .= !empty($datos['EntidadesNick'])
@@ -68,7 +68,7 @@
                         <?php
                         //Verifico si hay datos
                         if(is_array($data['MainViewData']['Data_VentasListado'])){
-                            foreach($data['MainViewData']['Data_VentasListado'] AS $datos){
+                            foreach($data['MainViewData']['Data_VentasListado'] as $datos){
                                 //Se obtiene el nombre o la razón social
                                 $Entidad  = '';
                                 $Entidad .= !empty($datos['EntidadesNick'])

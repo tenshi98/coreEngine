@@ -2,7 +2,7 @@
     <thead>
         <tr>
             <th>Observaciones</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -10,7 +10,7 @@
         //Verifico si hay datos
         if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
             //Recorro
-            foreach($data['arrObservaciones'] AS $crud){
+            foreach($data['arrObservaciones'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idObservaciones']); ?>
                 <tr>

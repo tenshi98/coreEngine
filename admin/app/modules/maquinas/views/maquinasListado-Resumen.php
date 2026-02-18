@@ -149,7 +149,7 @@
                     <div class="tab-pane fade" id="resumen-tel-config">
                         <h5 class="box-title text-color-red-dark">Configuración de <?php echo $data['rowData']['Nombre']; ?></h5>
                         <div class="clearfix"></div>
-                        <div class="table-responsive" id="tabObsDataTable">
+                        <div class="table-responsive" id="tabObsConfigTable">
                             <?php require_once('maquinasListado-Resumen-Config.php'); ?>
                         </div>
                     </div>
@@ -207,6 +207,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
+    /******************************************/
     $("#FormEditData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -214,6 +215,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -228,6 +234,7 @@
                 showNoti:'Datos Editados Correctamente',
                 triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -580,6 +587,11 @@
             if(validatorResult.valid===false){
                 return !!validatorResult.valid;
             }else{
+                // Si ya se está ejecutando, salimos
+                if (ejecutandoForm.valor) return;
+                //Cambio los valores
+                ejecutandoForm.valor = true;
+                //Ejecucion normal
                 e.preventDefault();
                 //Cargo el loader
                 $('#PDloader').show();
@@ -594,6 +606,7 @@
                     showNoti:'Datos Editados Correctamente',
                     triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
                     closeObject:'#PDloader',
+                    changeValForm: ejecutandoForm,
                 };
                 //Se envian los datos al formulario
                 SendDataForms(Metodo, Direccion, Informacion, Options);

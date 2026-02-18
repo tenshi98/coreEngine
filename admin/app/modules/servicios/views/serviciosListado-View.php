@@ -41,7 +41,7 @@
                                     //Verifico si hay datos
                                     if(is_array($data['arrDocumentos'])&&!empty($data['arrDocumentos'])){
                                         //Recorro
-                                        foreach($data['arrDocumentos'] AS $crud){ ?>
+                                        foreach($data['arrDocumentos'] as $crud){ ?>
                                             <tr>
                                                 <td><?php echo $crud['Nombre']; ?></td>
                                                 <td><?php echo $crud['FVencimiento']; ?></td>
@@ -70,7 +70,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
                                     //Recorro
-                                    foreach($data['arrObservaciones'] AS $crud){ ?>
+                                    foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
                                             <td><?php echo $crud['Observacion']; ?></td>

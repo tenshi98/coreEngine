@@ -117,7 +117,7 @@ switch ($data['rowData']['idTipo']) {
                     /*******************************************************************/
                     if(is_array($data['arrItems'])&&!empty($data['arrItems'])){
                         //Recorro
-                        foreach($data['arrItems'] AS $crud){
+                        foreach($data['arrItems'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['Item'].'</td>
@@ -129,7 +129,7 @@ switch ($data['rowData']['idTipo']) {
                     /*******************************************************************/
                     if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
                         //Recorro
-                        foreach($data['arrProductos'] AS $crud){
+                        foreach($data['arrProductos'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['ProductoNombre'].' ('.$crud['TipoMovimiento'].' '.$crud['Bodega'].')</td>
@@ -141,7 +141,7 @@ switch ($data['rowData']['idTipo']) {
                     /*******************************************************************/
                     if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
                         //Recorro
-                        foreach($data['arrServicios'] AS $crud){
+                        foreach($data['arrServicios'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['ServicioNombre'].'</td>
@@ -153,7 +153,7 @@ switch ($data['rowData']['idTipo']) {
                     /*******************************************************************/
                     if(is_array($data['arrGuias'])&&!empty($data['arrGuias'])){
                         //Recorro
-                        foreach($data['arrGuias'] AS $crud){
+                        foreach($data['arrGuias'] as $crud){
                             echo '
                             <tr>
                                 <td>'.$crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacionRel']).' ('.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']).')</td>

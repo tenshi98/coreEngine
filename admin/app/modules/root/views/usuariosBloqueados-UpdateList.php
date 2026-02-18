@@ -15,7 +15,7 @@
         //Verifico si hay datos
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
             //Recorro
-            foreach($data['arrList'] AS $crud){
+            foreach($data['arrList'] as $crud){
                 //Variables
                 $encryptedEmail = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['Email']);
                 $EntidadEmail   = addslashes($crud['Email']);

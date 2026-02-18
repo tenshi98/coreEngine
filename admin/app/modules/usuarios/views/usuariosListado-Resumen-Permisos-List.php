@@ -100,11 +100,13 @@
 </form>
 
 <script>
-
+    /*********************************************************************/
+    /*                      FORMULARIO DE BUSQUEDA                       */
+    /*********************************************************************/
     /******************************************/
     <?php
     echo 'const div = [];';
-    foreach ($data['arrPermisos'] AS $perm){
+    foreach ($data['arrPermisos'] as $perm){
         //si tiene permiso
         if(isset($perm['level'])&&$perm['level']!=0){
             echo 'div['.$perm['idPermisos'].'] = 1;';
@@ -127,6 +129,11 @@
     }
     /******************************************/
     $("#FormUpdatePermisos").submit(function(e) {
+        // Si ya se está ejecutando, salimos
+        if (ejecutandoForm.valor) return;
+        //Cambio los valores
+        ejecutandoForm.valor = true;
+        //Ejecucion normal
         e.preventDefault();
         //Cargo el loader
         $('#PDloader').show();
@@ -137,13 +144,13 @@
         const Options     = {
             showNoti:'Permisos Editados Correctamente',
             closeObject:'#PDloader',
+            changeValForm: ejecutandoForm,
         };
         //Se envian los datos al formulario
         SendDataForms(Metodo, Direccion, Informacion, Options);
     });
 
 </script>
-
 
 <style>
     .dlk-radio input[type="radio"],

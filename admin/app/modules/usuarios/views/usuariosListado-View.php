@@ -40,7 +40,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrPermisos'])&&!empty($data['arrPermisos'])){
                                     //Recorro
-                                    foreach($data['arrPermisos'] AS $crud){ ?>
+                                    foreach($data['arrPermisos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['Permiso']; ?></td>
                                             <td><?php echo $crud['Nivel']; ?></td>
@@ -67,7 +67,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
                                     //Recorro
-                                    foreach($data['arrObservaciones'] AS $crud){ ?>
+                                    foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
                                             <td><?php echo $crud['Observacion']; ?></td>

@@ -57,7 +57,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrItems'] AS $crud){ ?>
+                                    foreach($data['arrItems'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['Item']; ?></td>
                                             <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['Number'], 2); ?></td>
@@ -91,7 +91,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrProductos'] AS $crud){ ?>
+                                    foreach($data['arrProductos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['TipoMovimiento']; ?></td>
                                             <td><?php echo $crud['Bodega']; ?></td>
@@ -125,7 +125,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrServicios'] AS $crud){ ?>
+                                    foreach($data['arrServicios'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['ServicioNombre']; ?></td>
                                             <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ServicioCantidad'], 2); ?></td>
@@ -157,7 +157,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrGuias'] AS $crud){ ?>
+                                    foreach($data['arrGuias'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
                                             <td><?php echo $crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacionRel']); ?></td>
@@ -189,7 +189,7 @@
                                 </thead>
                                 <tbody>
                                     <?php //Recorro
-                                    foreach($data['arrPagos'] AS $crud){ ?>
+                                    foreach($data['arrPagos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaPago']); ?></td>
                                             <td><?php echo $crud['UsuarioPago']; ?></td>

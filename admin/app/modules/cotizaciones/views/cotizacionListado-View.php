@@ -55,7 +55,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrItems'] AS $crud){ ?>
+                                    foreach($data['arrItems'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['Item']; ?></td>
                                             <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['Number'], 2); ?></td>
@@ -87,7 +87,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrProductos'] AS $crud){ ?>
+                                    foreach($data['arrProductos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['ProductoNombre']; ?></td>
                                             <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ProductoCantidad'], 2).' '.$crud['UnidadMedida']; ?></td>
@@ -119,7 +119,7 @@
                                 <tbody>
                                     <?php
                                     //Recorro
-                                    foreach($data['arrServicios'] AS $crud){ ?>
+                                    foreach($data['arrServicios'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['ServicioNombre']; ?></td>
                                             <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ServicioCantidad'], 2); ?></td>

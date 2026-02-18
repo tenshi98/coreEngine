@@ -49,7 +49,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
                                     //Recorro
-                                    foreach($data['arrList'] AS $crud){
+                                    foreach($data['arrList'] as $crud){
                                         //Se obtiene el nombre o la razón social
                                         $Entidad  = !empty($crud['Nombre'])
                                                     ? $crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']

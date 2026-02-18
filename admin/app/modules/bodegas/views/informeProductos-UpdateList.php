@@ -14,7 +14,7 @@
                                     //Verifico si hay datos
                                     if(is_array($data['arrBodegas'])){
                                         //Recorro
-                                        foreach($data['arrBodegas'] AS $bod){
+                                        foreach($data['arrBodegas'] as $bod){
                                             echo '<th>'.$bod['Nombre'].'</th>';
                                         }
                                     } ?>
@@ -25,14 +25,14 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrStocks'])&&!empty($data['arrStocks'])){
                                     //Recorro
-                                    foreach($data['arrStocks'] AS $stock){ ?>
+                                    foreach($data['arrStocks'] as $stock){ ?>
                                         <tr>
                                             <td><?php echo $stock['Producto']; ?></td>
                                             <?php
                                             //Verifico si hay datos
                                             if(is_array($data['arrBodegas'])){
                                                 //Recorro
-                                                foreach($data['arrBodegas'] AS $bod){
+                                                foreach($data['arrBodegas'] as $bod){
                                                     echo '
                                                     <td>
                                                         '.$data['Fnc_DataNumbers']->Cantidades($stock['Cantidad_idBodegas_'.$bod['idBodegas']], 2).' '.$stock['UniMed'].'

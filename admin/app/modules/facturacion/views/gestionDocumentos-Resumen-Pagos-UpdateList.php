@@ -6,7 +6,7 @@
             <th>Documento Pago</th>
             <th class="text-end">Monto pago</th>
             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
-                <th width="10">Acciones</th>
+                <th style="width: 10px;">Acciones</th>
             <?php } ?>
         </tr>
     </thead>
@@ -15,7 +15,7 @@
         //Verifico si hay datos
         if(is_array($data['arrPagos'])&&!empty($data['arrPagos'])){
             //Recorro
-            foreach($data['arrPagos'] AS $crud){ ?>
+            foreach($data['arrPagos'] as $crud){ ?>
                 <tr>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaPago']); ?></td>
                     <td><?php echo $crud['UsuarioPago']; ?></td>

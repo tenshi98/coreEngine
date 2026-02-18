@@ -94,15 +94,15 @@
                                             <?php
                                             //Se verifica si se permite usar tareas especificas
                                             if($data['UserData']["KanbanTareasUsoTareas"]==2){ ?>
-                                                <?php foreach ($data['arrTareas'] AS $task){
+                                                <?php foreach ($data['arrTareas'] as $task){
                                                     //Variables
                                                     $encryptedTareas = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idTareas']);
                                                     ?>
                                                     <tr>
                                                         <td><?php echo $task['Trabajo'].'<br> - '.$task['Tarea'];?></td>
-                                                        <td width=120><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
+                                                        <td style="width: 120px;"><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
                                                         <?php if($data['rowData']['idEstadoCierre']==1){ ?>
-                                                            <td width=120>
+                                                            <td style="width: 120px;">
                                                                 <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
                                                                     <button class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información" type="button" onclick="tareas_Edit('<?php echo $encryptedTareas; ?>')"><i class="bi bi-pencil-square"></i> Editar</button>
                                                                 <?php } ?>
@@ -111,14 +111,14 @@
                                                     </tr>
                                                 <?php } ?>
                                             <?php }else{ ?>
-                                                <?php foreach ($data['arrTareas'] AS $task){
+                                                <?php foreach ($data['arrTareas'] as $task){
                                                     //Variables
                                                     $encryptedTareas = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idTareas']); ?>
                                                     <tr>
                                                         <td><?php echo $task['Tarea']?></td>
-                                                        <td width=120><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
+                                                        <td style="width: 120px;"><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
                                                         <?php if($data['rowData']['idEstadoCierre']==1){ ?>
-                                                            <td width=120>
+                                                            <td style="width: 120px;">
                                                                 <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
                                                                     <button class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información" type="button" onclick="tareas_Edit('<?php echo $encryptedTareas; ?>')"><i class="bi bi-pencil-square"></i> Editar</button>
                                                                 <?php } ?>
@@ -148,7 +148,7 @@
                                 <div class="table-responsive">
                                     <table class="table table-bordered">
                                         <tbody>
-                                            <?php foreach ($data['arrParticipantes'] AS $task){
+                                            <?php foreach ($data['arrParticipantes'] as $task){
                                                 //verifico si existe imagen
                                                 $UserIMG  = !empty($task['UsuarioImg'])
                                                             ? $BASE.'/upload/'.$task['UsuarioImg']
@@ -157,7 +157,7 @@
                                                 <tr>
                                                     <td><img src="<?php echo $UserIMG; ?>" alt="Profile" class="rounded-circle" style="width: 30px;height: 30px;border: 1px solid #ebeef4;"> <?php echo $task['UsuarioNombre']; ?></td>
                                                     <?php if($data['rowData']['idEstadoCierre']==1){ ?>
-                                                        <td width=120>
+                                                        <td style="width: 120px;">
                                                             <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
                                                                 <button class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información" type="button" onclick="participantes_Del('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idParticipantes']); ?>', '<?php echo $encryptedId; ?>')"><i class="bi bi-trash"></i> Borrar</button>
                                                             <?php } ?>
@@ -192,7 +192,7 @@
                                             //variables
                                             $vowels = array('&lt;br&gt;', '&lt;br/&gt;');
                                             //recorro
-                                            foreach ($data['arrHistorial'] AS $task){
+                                            foreach ($data['arrHistorial'] as $task){
                                                 //verifico si existe imagen
                                                 $UserIMG  = !empty($task['UsuarioImg'])
                                                             ? $BASE.'/upload/'.$task['UsuarioImg']

@@ -7,7 +7,6 @@
                 <div class="card-body">
                     <h5 class="card-title">Calendario</h5>
                     <div id="calendar"></div>
-                    
 
                 </div>
             </div>
@@ -65,6 +64,10 @@
 
 
 <script>
+    /*********************************************************************/
+    /*                      EJECUCION DE LA LOGICA                       */
+    /*********************************************************************/
+    /******************************************/
     $(document).ready(function() {
         //identificar calendario
         const calendarEl = document.getElementById('calendar');
@@ -110,6 +113,11 @@
             if(validatorResult.valid===false){
                 return !!validatorResult.valid;
             }else{
+                // Si ya se está ejecutando, salimos
+                if (ejecutandoForm.valor) return;
+                //Cambio los valores
+                ejecutandoForm.valor = true;
+                //Ejecucion normal
                 e.preventDefault();
                 //se busca si existe
                 const eventData = {
@@ -127,6 +135,7 @@
                 const Options     = {
                     closeModal:'#eventModal',
                     closeObject:'#PDloader',
+                    changeValForm: ejecutandoForm,
                 };
                 //Se envian los datos al formulario
                 SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -178,4 +187,5 @@
         }
 
     });
+
 </script>

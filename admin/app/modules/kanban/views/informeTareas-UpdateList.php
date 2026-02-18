@@ -14,7 +14,7 @@
                                     <th>Fecha</th>
                                     <th>Titulo</th>
                                     <th>Participantes</th>
-                                    <th width="10">Acciones</th>
+                                    <th style="width: 10px;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -22,7 +22,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrTareas'])&&!empty($data['arrTareas'])){
                                     //Recorro
-                                    foreach ($data['arrTareas'] AS $Tareas=>$tarea){ ?>
+                                    foreach ($data['arrTareas'] as $Tareas=>$tarea){ ?>
                                         <tr>
                                             <td><span class="badge <?php echo $tarea[0]['KanbanColor']; ?>"><?php echo $tarea[0]['KanbanEstado']; ?></span></td>
                                             <td><span class="badge <?php echo $tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span></td>

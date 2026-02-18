@@ -5,7 +5,7 @@
             <th>Email</th>
             <th>Celular</th>
             <th>Telefono</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -13,7 +13,7 @@
         //Verifico si hay datos
         if(is_array($data['arrContactos'])&&!empty($data['arrContactos'])){
             //Recorro
-            foreach($data['arrContactos'] AS $crud){
+            foreach($data['arrContactos'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idContacto']);
                 $Entidad     = addslashes($crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']); ?>

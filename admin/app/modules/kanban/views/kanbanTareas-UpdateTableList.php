@@ -6,7 +6,7 @@
             <th>Fecha</th>
             <th>Titulo</th>
             <th>Participantes</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -14,7 +14,7 @@
         //Verifico si hay datos
         if(is_array($data['arrTareas'])&&!empty($data['arrTareas'])){
             //Recorro
-            foreach ($data['arrTareas'] AS $Tareas=>$tarea){
+            foreach ($data['arrTareas'] as $Tareas=>$tarea){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas);
                 $level       = $data['UserAccess']['LevelAccess'];

@@ -5,7 +5,7 @@
             //Verifico si hay datos
             if(is_array($data['arrList'])){
                 //Recorro
-                foreach($data['arrList'] AS $crud){ ?>
+                foreach($data['arrList'] as $crud){ ?>
                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
                         <div class="kanban status" id="<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']); ?>">
                             <h5 class="title text-center">
@@ -31,7 +31,7 @@
                             //Verifico si hay datos
                             if(is_array($data['arrTareas'])){
                                 //Recorro
-                                foreach ($data['arrTareas'] AS $Tareas=>$tarea){
+                                foreach ($data['arrTareas'] as $Tareas=>$tarea){
                                     //Filtro los del mismo estado
                                     if($tarea[0]['idKanbanEstado']==$crud['idKanbanEstado']){
                                         //Verifico si la fecha de cierre es mayor que fecha actual

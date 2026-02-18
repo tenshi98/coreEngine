@@ -7,7 +7,7 @@
             <th class="text-end">Cantidad</th>
             <th class="text-end">Valor</th>
             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
-                <th width="10">Acciones</th>
+                <th style="width: 10px;">Acciones</th>
             <?php } ?>
         </tr>
     </thead>
@@ -16,7 +16,7 @@
         //Verifico si hay datos
         if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
             //Recorro
-            foreach($data['arrProductos'] AS $crud){ ?>
+            foreach($data['arrProductos'] as $crud){ ?>
                 <tr>
                     <td><?php echo $crud['TipoMovimiento']; ?></td>
                     <td><?php echo $crud['Bodega']; ?></td>

@@ -4,7 +4,7 @@
             <th>Maquina</th>
             <th>Fecha Ingreso</th>
             <th>Estado</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -12,7 +12,7 @@
         //Verifico si hay datos
         if(is_array($data['arrMaq'])&&!empty($data['arrMaq'])){
             //Recorro
-            foreach($data['arrMaq'] AS $crud){
+            foreach($data['arrMaq'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idMaq']);
                 $Entidad     = addslashes($crud['Maquina']);

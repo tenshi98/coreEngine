@@ -5,7 +5,7 @@
             <th class="text-end">Cantidad</th>
             <th class="text-end">Valor</th>
             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
-                <th width="10">Acciones</th>
+                <th style="width: 10px;">Acciones</th>
             <?php } ?>
         </tr>
     </thead>
@@ -14,7 +14,7 @@
         //Verifico si hay datos
         if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
             //Recorro
-            foreach($data['arrServicios'] AS $crud){ ?>
+            foreach($data['arrServicios'] as $crud){ ?>
                 <tr>
                     <td><?php echo $crud['ServicioNombre']; ?></td>
                     <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ServicioCantidad'], 2); ?></td>

@@ -68,45 +68,27 @@
 </main>
 
 <style>
-
-body {
-  margin: 0;
-  padding: 0;
-  background-image: url('<?php echo $BASE.'/img/login_bg.jpg'; ?>'); /* Cambia esto por la URL de tu imagen */
-  background-size: cover;        /* Escala la imagen para cubrir todo el contenedor */
-  background-repeat: no-repeat;  /* Evita que se repita */
-  background-position: center;   /* Centra la imagen */
-  min-height: 100vh;             /* Asegura que el body tenga al menos el alto de la pantalla */
-  background-color: #809fbe;
-}
-.card {
-  background: transparent;
-  backdrop-filter: blur(10px);
-  border: 1px solid #4d5669;
-}
-.card .nav-tabs-bordered {
-  border-bottom: 2px solid transparent;
-}
-.card .nav-tabs-bordered .nav-link {
-  color: #4d5669;
-}
-.card .nav-tabs-bordered .nav-link.active {
-  color: #fcfcfc;
-  background-color: transparent;
-  border-bottom: 2px solid #3e4452
-}
-.card .card-title,
-.card .text-center,
-.card .form-label {
-  color: #fcfcfc;
-}
-
+    body {margin: 0;padding: 0;background-image: url('<?php echo $BASE.'/img/login_bg.jpg'; ?>'); /* Cambia esto por la URL de tu imagen */background-size: cover; /* Escala la imagen para cubrir todo el contenedor */background-repeat: no-repeat; /* Evita que se repita */background-position: center; /* Centra la imagen */min-height: 100vh; /* Asegura que el body tenga al menos el alto de la pantalla */background-color: #809fbe;}
+    .card {background: transparent;backdrop-filter: blur(10px);border: 1px solid #4d5669;}
+    .card .nav-tabs-bordered {border-bottom: 2px solid transparent;}
+    .card .nav-tabs-bordered .nav-link {color: #4d5669;}
+    .card .nav-tabs-bordered .nav-link.active {color: #fcfcfc;background-color: transparent;border-bottom: 2px solid #3e4452;}
+    .card .card-title,
+    .card .text-center,
+    .card .form-label {color: #fcfcfc;}
 </style>
 
-
 <script>
+    /*********************************************************************/
+    /*                      EJECUCION DE LA LOGICA                       */
+    /*********************************************************************/
     /******************************************/
     $("#LoginForm").submit(function(e) {
+        // Si ya se está ejecutando, salimos
+        if (ejecutandoForm.valor) return;
+        //Cambio los valores
+        ejecutandoForm.valor = true;
+        //Ejecucion normal
         e.preventDefault();
         //Cargo el loader
         $('#PDloader').show();
@@ -117,11 +99,17 @@ body {
         const Options     = {
             Destino:'<?php echo $BASE.'/principal'; ?>',
             closeObject:'#PDloader',
+            changeValForm: ejecutandoForm,
         };
         SendDataForms(Metodo, Direccion, Informacion, Options);
     });
     /******************************************/
     $("#RecoverForm").submit(function(e) {
+        // Si ya se está ejecutando, salimos
+        if (ejecutandoForm.valor) return;
+        //Cambio los valores
+        ejecutandoForm.valor = true;
+        //Ejecucion normal
         e.preventDefault();
         //Cargo el loader
         $('#PDloader').show();
@@ -132,6 +120,7 @@ body {
         const Options     = {
             Destino:'<?php echo $BASE.'/login'; ?>',
             closeObject:'#PDloader',
+            changeValForm: ejecutandoForm,
         };
         SendDataForms(Metodo, Direccion, Informacion, Options);
     });

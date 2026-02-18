@@ -23,7 +23,7 @@
                                 $arrCompare = array();
                                 //Se parsean los datos
                                 if(is_array($data['arrModules'])&&!empty($data['arrModules'])){
-                                    foreach ($data['arrModules'] AS $key=>$modules){
+                                    foreach ($data['arrModules'] as $key=>$modules){
                                         //Recorro
                                         foreach($modules AS $crud){
                                             if(isset($crud['idMetodo'])&&$crud['idMetodo']!=''){
@@ -40,7 +40,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrRutas'])&&!empty($data['arrRutas'])){
                                     //Recorro
-                                    foreach($data['arrRutas'] AS $crud){
+                                    foreach($data['arrRutas'] as $crud){
                                         //Conteo
                                         $CountExist = 0;
                                         $CountDif   = 0; ?>

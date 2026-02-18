@@ -106,5 +106,5 @@
             $(collapse).collapse("toggle");
         }
     }
-</script>
 
+</script>

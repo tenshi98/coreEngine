@@ -5,7 +5,7 @@
             <th>Fecha Ingreso</th>
             <th>Monto Servicio</th>
             <th>Estado</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -13,7 +13,7 @@
         //Verifico si hay datos
         if(is_array($data['arrPlanes'])&&!empty($data['arrPlanes'])){
             //Recorro
-            foreach($data['arrPlanes'] AS $crud){
+            foreach($data['arrPlanes'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPlan']);
                 $Entidad     = addslashes($crud['Servicio']);

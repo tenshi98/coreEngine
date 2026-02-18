@@ -16,7 +16,7 @@
                                     <th>Estado</th>
                                     <th>Valor Total</th>
                                     <th>Monto Pagado</th>
-                                    <th width="10">Acciones</th>
+                                    <th style="width: 10px;">Acciones</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -24,7 +24,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
                                     //Recorro
-                                    foreach($data['arrList'] AS $crud){ ?>
+                                    foreach($data['arrList'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['TipoMov']; ?></td>
                                             <td><?php echo $crud['Documento'].' '.$crud['N_Doc']; ?></td>

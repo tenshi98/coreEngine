@@ -8,7 +8,7 @@
             <th>Fecha</th>
             <th>Hora</th>
             <th>Palabra</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -16,7 +16,7 @@
         //Verifico si hay datos
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
             //Recorro
-            foreach($data['arrList'] AS $crud){
+            foreach($data['arrList'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCrud']);
                 $level       = $data['UserAccess']['LevelAccess'];

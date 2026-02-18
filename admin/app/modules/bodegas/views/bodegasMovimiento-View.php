@@ -47,7 +47,7 @@
                                 //Verifico si hay datos
                                 if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
                                     //Recorro
-                                    foreach($data['arrProductos'] AS $crud){ ?>
+                                    foreach($data['arrProductos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['TipoMovimiento']; ?></td>
                                             <td><?php echo $crud['Bodega']; ?></td>

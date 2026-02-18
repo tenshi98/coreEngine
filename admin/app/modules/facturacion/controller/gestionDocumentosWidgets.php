@@ -33,12 +33,10 @@ class gestionDocumentosWidgets extends ControllerBase {
     public function loadWidgets(){
 
         //Variables
-        $Data['Count_Name']  = 'Count_DocMercantiles';
-        $Data['Count_Value'] = 0;
-        $Data['Menu_Name']  = 'Gestión Documentos Mercantiles';
-        $Data['Menu_Value'] = [
-            'Compras'  => 'Count_DocMercantiles',
-            'Ventas'   => 'Count_DocMercantiles',
+        $Data['Menu_Name']   = 'Gestión Documentos Mercantiles';
+        $Data['Menu_Value']  = [
+            'Compras'  => '../app/modules/facturacion/views/main-doc-mercantiles.php',
+            'Ventas'   => '../app/modules/facturacion/views/main-doc-mercantiles.php',
         ];
 
         //Devuelvo

@@ -323,10 +323,12 @@
 <style>
     #tableSwitch td .mb-3 {margin-bottom: 0 !important;}
 </style>
+
 <script>
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
+    /******************************************/
     $("#FormEditData_1").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -334,6 +336,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -344,6 +351,7 @@
             const Options     = {
                 Destino:'<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -357,6 +365,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -367,6 +380,7 @@
             const Options     = {
                 Destino:'<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -380,6 +394,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -390,6 +409,7 @@
             const Options     = {
                 Destino:'<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -403,6 +423,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -413,6 +438,7 @@
             const Options     = {
                 Destino:'<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -426,6 +452,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -436,6 +467,7 @@
             const Options     = {
                 Destino:'<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
@@ -449,6 +481,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -459,6 +496,7 @@
             const Options     = {
                 Destino:'<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataFormsFiles(Metodo, Direccion, Informacion, Options);
@@ -496,4 +534,5 @@
             }
         });
     }
+
 </script>

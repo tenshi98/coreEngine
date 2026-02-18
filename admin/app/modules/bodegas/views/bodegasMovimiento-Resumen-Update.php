@@ -33,8 +33,9 @@
         /*****************************************/
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
         if($data['UserData']["gestionDocumentosUsoBodega"]==2){
-            //Verificosi existe
+            //Verifico si existe
             if(isset($data['rowData']['idFacturacion'])&&$data['rowData']['idFacturacion']!=0){
+                //Verifico el tipo de movimiento
                 switch ($data['rowData']['idTipo']) {
                     case 1:$rRoute = 'gestionDocumentos/compras/listado'; break;//Compra
                     case 2:$rRoute = 'gestionDocumentos/ventas/listado'; break; //Venta

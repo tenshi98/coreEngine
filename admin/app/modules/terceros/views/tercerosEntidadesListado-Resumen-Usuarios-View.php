@@ -84,7 +84,7 @@
                                     //Verifico si hay datos
                                     if(is_array($data['MainViewData']['Data_Maquinas'])&&!empty($data['MainViewData']['Data_Maquinas'])){
                                         //Recorro
-                                        foreach($data['MainViewData']['Data_Maquinas'] AS $crud){
+                                        foreach($data['MainViewData']['Data_Maquinas'] as $crud){
                                             echo '<tr><td>'.$crud['Maquina'].'</td></tr>';
                                         }
                                     }else{
@@ -112,7 +112,7 @@
                                         //Verifico si hay datos
                                         if(is_array($data['MainViewData']['Data_Noti'])&&!empty($data['MainViewData']['Data_Noti'])){
                                             //Recorro
-                                            foreach($data['MainViewData']['Data_Noti'] AS $crud){
+                                            foreach($data['MainViewData']['Data_Noti'] as $crud){
                                                 echo '<tr><td>'.$crud['Notificacion'].'</td></tr>';
                                             }
                                         }else{

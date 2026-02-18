@@ -47,17 +47,17 @@
                             <?php
                             //Se verifica si se permite usar tareas especificas
                             if($data['UserData']["KanbanTareasUsoTareas"]==2){ ?>
-                                <?php foreach ($data['arrTareas'] AS $task){ ?>
+                                <?php foreach ($data['arrTareas'] as $task){ ?>
                                     <tr>
                                         <td><?php echo $task['Trabajo'].'<br> - '.$task['Tarea'];?></td>
-                                        <td width=120><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
+                                        <td style="width: 120px;"><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
                                     </tr>
                                 <?php } ?>
                             <?php }else{ ?>
-                                <?php foreach ($data['arrTareas'] AS $task){ ?>
+                                <?php foreach ($data['arrTareas'] as $task){ ?>
                                     <tr>
                                         <td><?php echo $task['Tarea']?></td>
-                                        <td width=120><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
+                                        <td style="width: 120px;"><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
                                     </tr>
                                 <?php } ?>
                             <?php } ?>
@@ -77,7 +77,7 @@
                 <div class="table-responsive">
                     <table class="table table-bordered">
                         <tbody>
-                            <?php foreach ($data['arrParticipantes'] AS $task){
+                            <?php foreach ($data['arrParticipantes'] as $task){
                                 //verifico si existe imagen
                                 $UserIMG =  !empty($task['UsuarioImg'])
                                             ? $BASE.'/upload/'.$task['UsuarioImg']

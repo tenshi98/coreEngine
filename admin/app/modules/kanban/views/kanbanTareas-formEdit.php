@@ -64,6 +64,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
+    /******************************************/
     $("#FormEditData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -71,6 +72,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -85,9 +91,11 @@
                 ],
                 showNoti:'Datos Editados Correctamente',
                 closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
+
 </script>

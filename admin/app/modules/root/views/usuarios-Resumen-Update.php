@@ -59,7 +59,7 @@
                     //Verifico si hay datos
                     if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
                         //Recorro
-                        foreach($data['arrObservaciones'] AS $crud){
+                        foreach($data['arrObservaciones'] as $crud){
                              echo '<tr><td>'.$crud['Observacion'].'</td></tr>';
                         }
                     }else{

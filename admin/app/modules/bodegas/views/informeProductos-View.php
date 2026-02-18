@@ -43,7 +43,7 @@
                         //Verifico si hay datos
                         if(is_array($data['arrStocks'])&&!empty($data['arrStocks'])){
                             //Recorro
-                            foreach($data['arrStocks'] AS $crud){ ?>
+                            foreach($data['arrStocks'] as $crud){ ?>
                                 <tr>
                                     <?php
                                     //permite la interaccion con la bodega, para generar documentos de ingreso o egreso

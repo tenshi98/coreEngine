@@ -78,7 +78,7 @@ class main extends ControllerBase {
         $MainViewData = [];
         $menuCounters = [];
 
-        //Arreglo con los controladores con widgets
+        //Arreglo con los controladores con widgets, considerar que desde aqui se ordenan
         $array = $this->arrayWidgetViews();
         /******************************************/
         //Verifico si existe
@@ -92,23 +92,26 @@ class main extends ControllerBase {
                     $ControllerData = new $data;
                     $arrModules     = $ControllerData->loadWidgets();
                     //Permisos
-                    $MainViewData[$arrModules['Count_Name']] = $arrModules['Count_Value'];
-                    $menuCounters[$arrModules['Menu_Name']]  = $arrModules['Menu_Value'];
-
+                    $menuCounters[$arrModules['Menu_Name']] = $arrModules['Menu_Value'];
                 }
             }
         }
 
         //Se recorren los permisos y se validan
         foreach ($menuCounters as $section => $names) {
+            //Verifico si existen datos del menu
             if (!empty($arrMenu[$section])) {
+                //Recorro el menu
                 foreach ($arrMenu[$section] as $asd) {
                     if (isset($names[$asd['Nombre']])) {
-                        $MainViewData[$names[$asd['Nombre']]]++;
+                        $MainViewData[] = $names[$asd['Nombre']]; //Se guardan las URL
                     }
                 }
             }
         }
+
+        //Se filtran para obtener datos unicos
+        $MainViewData = array_values(array_unique($MainViewData));
 
         /******************************************/
         //Datos enviados a la pagina
@@ -140,9 +143,9 @@ class main extends ControllerBase {
         /*******************************************************/
         //Rutas
         $array = array(
+            "gestionDocumentosWidgets",
             "bodegasWidgets",
             "gestionCampanasWidgets",
-            "gestionDocumentosWidgets",
         );
 
         //devuelvo

@@ -2,8 +2,8 @@
     <thead>
         <tr>
             <th>Nombre</th>
-            <th width="200">Fecha Vencimiento</th>
-            <th width="10">Acciones</th>
+            <th style="width: 200px;">Fecha Vencimiento</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -11,7 +11,7 @@
         //Verifico si hay datos
         if(is_array($data['arrDocumentos'])&&!empty($data['arrDocumentos'])){
             //Recorro
-            foreach($data['arrDocumentos'] AS $crud){
+            foreach($data['arrDocumentos'] as $crud){
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idDocumentos']);
                 $Entidad     = addslashes($crud['Nombre']); ?>

@@ -7,7 +7,7 @@
             <th>Controlador</th>
             <th>Nivel Acceso</th>
             <th>Estado</th>
-            <th width="10">Acciones</th>
+            <th style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>

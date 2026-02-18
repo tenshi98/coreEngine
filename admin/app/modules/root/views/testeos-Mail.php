@@ -28,7 +28,7 @@
 
 <script>
     /*********************************************************************/
-    /*                      FORMULARIO DE BUSQUEDA                       */
+    /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
     /******************************************/
     $("#FormSendData").submit(function(e) {
@@ -38,6 +38,11 @@
         if(validatorResult.valid===false){
             return !!validatorResult.valid;
         }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
             e.preventDefault();
             //Cargo el loader
             $('#PDloader').show();
@@ -49,10 +54,11 @@
                 ClearForm:'FormSendData',
                 closeObject:'#PDloader',
                 showNoti:'Mensaje enviado correctamente',
+                changeValForm: ejecutandoForm,
             };
             //Se envian los datos al formulario
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-</script>
 
+</script>
