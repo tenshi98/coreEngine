@@ -164,6 +164,8 @@ function SendDataOptions(Options, jqXHR) {
     if(typeof Options.closeObject !== 'undefined' && Options.closeObject != null && Options.closeObject!=''){$(Options.closeObject).hide();}
     //Se abre nueva pestaña
     if(typeof Options.openNewTab !== 'undefined' && Options.openNewTab != null && Options.openNewTab!=''){window.open(Options.openNewTab, '_blank');}
+    //Se cambia el valor de una variable
+    if(typeof Options.changeValForm !== 'undefined' && Options.changeValForm != null && Options.changeValForm!=''){Options.changeValForm.valor = false;}
 }
 /**********************************************************/
 //Se ejecutan las opciones
@@ -180,6 +182,8 @@ function SendDataErrors(Options, jqXHR, textStatus, errorThrown) {
     if(typeof Options.showObject !== 'undefined' && Options.showObject != null && Options.showObject!=''){$(Options.showObject).show();}
     //Se oculta el objeto
     if(typeof Options.closeObject !== 'undefined' && Options.closeObject != null && Options.closeObject!=''){$(Options.closeObject).hide();}
+    //Se cambia el valor de una variable
+    if(typeof Options.changeValForm !== 'undefined' && Options.changeValForm != null && Options.changeValForm!=''){Options.changeValForm.valor = false;}
     /******************************/
     // Se verifica la respuesta
     if (jqXHR.responseText) {
@@ -256,6 +260,8 @@ function UpdateContentId(Div, URL, Options=null) {
             if(typeof Options.showObject !== 'undefined' && Options.showObject != null && Options.showObject!=''){$(Options.showObject).show();}
             //Se oculta el objeto
             if(typeof Options.closeObject !== 'undefined' && Options.closeObject != null && Options.closeObject!=''){$(Options.closeObject).hide();}
+            //Se cambia el valor de una variable
+            if(typeof Options.changeValForm !== 'undefined' && Options.changeValForm != null && Options.changeValForm!=''){Options.changeValForm.valor = false;}
         }
         if(statusTxt == "error"){
             //log
