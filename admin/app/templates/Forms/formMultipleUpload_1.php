@@ -2,7 +2,7 @@
 
 <div class="form-group" id="div_<?php echo $name; ?>">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12" style="margin-bottom:10px;">
-        <label class="control-label col-xs-12 col-sm-4 col-md-4 col-lg-4"><?php echo $placeholder; ?></label>
+        <label class="control-label col-xs-12 col-sm-4 col-md-4 col-lg-4" for="<?php echo $nameID; ?>"><?php echo $placeholder; ?></label>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12">
         <input id="kv-<?php echo $name; ?>" name="<?php echo $name.$ndat; ?>" type="file" multiple>
