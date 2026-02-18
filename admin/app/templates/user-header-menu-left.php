@@ -13,7 +13,7 @@
       //Variable
       $x_var = 0;
       //Recorro
-      foreach ($_SESSION['arrMenu'] AS $Categoria=>$permisos){
+      foreach ($_SESSION['arrMenu'] as $Categoria=>$permisos){
         //var
         $x_var++;
         //Icono

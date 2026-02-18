@@ -10,7 +10,7 @@
         $arrMenu    = '<li class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-4">';
         $countMenu  = 0;
         //Recorro
-        foreach ($_SESSION['arrMenu'] AS $Categoria=>$permisos){
+        foreach ($_SESSION['arrMenu'] as $Categoria=>$permisos){
             //Variables
             $countMenu = 0;
             $arrMenu .= '<ul><li class="dropdown-tittle">'.$Categoria.'</li>';
