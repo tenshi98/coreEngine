@@ -46,12 +46,9 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreWidgets-box.php');    // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-box.php');
     }
 
     /******************************************************************************/
@@ -74,12 +71,9 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreWidgets-timeLine.php');    // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-timeLine.php');
     }
 
     /******************************************************************************/
@@ -102,12 +96,9 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreWidgets-textDividers.php');    // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-textDividers.php');
     }
 
     /******************************************************************************/
@@ -130,12 +121,9 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreWidgets-components.php');    // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-components.php');
     }
 
     /******************************************************************************/
@@ -160,12 +148,9 @@ class coreWidgets extends ControllerBase {
             'Fnc_FormInputs'    => $this->FormInputs,
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreWidgets-calendar.php');   // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-calendar.php');
     }
 
 }

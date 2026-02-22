@@ -64,11 +64,9 @@ class installer extends ControllerBase {
             'ValidInstall'   => $ValidInstall,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/guest-header.php');                                   // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/installer-welcome.php'); // Vista
-        echo $view->render('../app/templates/guest-footer.php');                                   // Footer
+        $this->showVista(1, 0, $this->returnRutaVista(__DIR__, 'app').'/installer-welcome.php');
 
     }
 
@@ -102,9 +100,9 @@ class installer extends ControllerBase {
             'ValidInstall'   => $ValidInstall,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/installer-credentials.php'); // Vista
+        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-credentials.php');
 
     }
 
@@ -138,9 +136,9 @@ class installer extends ControllerBase {
             'ValidInstall'   => $ValidInstall,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/installer-database.php');    // Vista
+        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-database.php');
 
     }
 
@@ -174,9 +172,9 @@ class installer extends ControllerBase {
             'ValidInstall'   => $ValidInstall,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/installer-summary.php'); // Vista
+        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-summary.php');
 
     }
 
@@ -198,9 +196,9 @@ class installer extends ControllerBase {
             'ValidInstall'   => $ValidInstall,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/installer-finish.php'); // Vista
+        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-finish.php');
 
     }
 

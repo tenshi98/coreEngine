@@ -82,10 +82,7 @@ class usuariosBloqueados extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../app/templates/user-header.php');                                           // Header
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-List.php');  // Vista
-            echo $view->render('../app/templates/user-footer.php');                                           // Footer
+            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-List.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -141,8 +138,7 @@ class usuariosBloqueados extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-UpdateList.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {

@@ -75,10 +75,7 @@ class sistemaInstalacion extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../app/templates/user-header.php');                                              // Header
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen.php');  // Vista
-            echo $view->render('../app/templates/user-footer.php');                                              // Footer
+            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -133,8 +130,7 @@ class sistemaInstalacion extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-Update.php');  // Vista
+            $this->showVista($UserData['TypeSession'], 1, this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-Update.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -143,6 +139,84 @@ class sistemaInstalacion extends ControllerBase {
         }
     }
 
+    /******************************************************************************/
+    //View
+    public function checkModule($f3, $params){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        /******************************************/
+        //Variable vacia
+        $arrModules = [];
+
+        //Arreglo con los controladores a instalar
+        $array = $this->arrayModInstall();
+        /******************************************/
+        //Verifico si existe
+        if($array){
+            //recorro
+            foreach ($array as $data) {
+                //Se genera la query
+                $ListDataModule = method_exists($data, 'ListDataModule');
+                //si el metodo existe
+                if($ListDataModule===true){
+                    $ControllerData = new $data;
+                    //Se traen las rutas
+                    for ($i=0; $i < 10; $i++) {
+                        $arrModules[] = $ControllerData->listRouteModule($i, 0);
+                    }
+                }
+            }
+        }
+
+        /******************************************/
+        //Se genera la query
+        $query = [
+            'data'    => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
+            'table'   => 'core_permisos_listado_rutas',
+            'join'    => '',
+            'where'   => 'idRutas!=0',
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'idRutas ASC',
+            'limit'   => 10000
+        ];
+        //Ejecuto la query
+        $xParams  = ['query' => $query];
+        $arrRutas = $this->Base_GetList($xParams);
+
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        //Si hay resultados
+        if(is_array($arrModules)){
+            /******************************************/
+            //Datos enviados a la pagina
+            $f3->data = [
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $UserData,
+                'UserAccess'    => $arrLevel[$this->controllerName],
+                /*=========== Datos Consultados ===========*/
+                'arrModules' => $arrModules,
+                'arrRutas'   => $arrRutas,
+            ];
+
+            /******************************************/
+            //Se instancia la vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
+        /*******************************************************************/
+        //si no hay resultados
+        } else {
+            //Muestra los errores
+            $this->showError($UserData['TypeSession'], 2, $f3);
+        }
+    }
+
+    /******************************************************************************/
+    /*                                  DATOS                                     */
+    /******************************************************************************/
     /******************************************************************************/
     //Resumen-Update
     public function installModule(){
@@ -206,6 +280,10 @@ class sistemaInstalacion extends ControllerBase {
             echo Response::sendData(500, "Error en el Request Method");
         }
     }
+
+    /******************************************************************************/
+    /*                             EJECUCION OTROS                                */
+    /******************************************************************************/
     /******************************************************************************/
     //Se listan los controladores
     public function arrayModInstall(){

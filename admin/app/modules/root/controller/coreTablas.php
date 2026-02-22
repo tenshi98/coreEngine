@@ -44,12 +44,9 @@ class coreTablas extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                    // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreTablas-normal.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                    // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreTablas-normal.php');
     }
 
     /******************************************************************************/
@@ -72,12 +69,9 @@ class coreTablas extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                        // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreTablas-dataTables.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                        // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreTablas-dataTables.php');
     }
 
 

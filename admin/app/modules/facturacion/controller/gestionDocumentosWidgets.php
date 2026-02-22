@@ -51,6 +51,7 @@ class gestionDocumentosWidgets extends ControllerBase {
     public function pagosPendientes($f3, $params){
         /*******************************************************************/
         //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /*******************************************************************/
@@ -181,9 +182,9 @@ class gestionDocumentosWidgets extends ControllerBase {
             'MainViewData'    => $MainViewData,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-doc-mercantiles-update.php'); // Vista
+        $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/main-doc-mercantiles-update.php');
     }
 
 }

@@ -281,12 +281,9 @@ class testeos extends ControllerBase {
             'test'            => $test->results(),
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                   // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-controladores.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                   // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-controladores.php');
 
     }
 
@@ -466,11 +463,9 @@ class testeos extends ControllerBase {
             'test'            => $test->results(),
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                   // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-funciones.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                   // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-funciones.php');
 
     }
 
@@ -535,11 +530,9 @@ class testeos extends ControllerBase {
             'TypeSend'         => $TypeSend,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                               // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                               // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
     }
 
     /******************************************************************************/
@@ -573,11 +566,9 @@ class testeos extends ControllerBase {
             'TypeSend'         => $TypeSend,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                               // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                               // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
     }
 
     /******************************************************************************/
@@ -611,11 +602,9 @@ class testeos extends ControllerBase {
             'TypeSend'         => $TypeSend,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                               // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                               // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
     }
 
     /******************************************************************************/
@@ -644,11 +633,9 @@ class testeos extends ControllerBase {
             'Fnc_FormInputs'   => $this->FormInputs,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                   // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-Whatsapp.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                   // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Whatsapp.php');
     }
 
     /******************************************************************************/
@@ -675,11 +662,9 @@ class testeos extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                             // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplateSelect.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                             // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplateSelect.php');
     }
 
     /******************************************************************************/
@@ -727,9 +712,9 @@ class testeos extends ControllerBase {
             'MailTemplate'   => $MailTemplate,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplate.php'); // Vista
+        $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplate.php');
     }
 
     /******************************************************************************/
@@ -758,11 +743,9 @@ class testeos extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                  // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/testeos-IA_Chat.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                  // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-IA_Chat.php');
     }
 
     /******************************************************************************/

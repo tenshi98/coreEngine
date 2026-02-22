@@ -87,8 +87,7 @@ class permisosListadoRutas extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-UpdateList.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -147,8 +146,7 @@ class permisosListadoRutas extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-View.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-View.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -234,8 +232,7 @@ class permisosListadoRutas extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-formEdit.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-formEdit.php');
         /*******************************************************************/
         //si no hay resultados
         } else {

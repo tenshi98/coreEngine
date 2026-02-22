@@ -50,6 +50,7 @@ class bodegasWidgets extends ControllerBase {
     public function stocksProductos($f3, $params){
         /*******************************************************************/
         //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /*******************************************************************/
@@ -139,8 +140,7 @@ class bodegasWidgets extends ControllerBase {
         ];
 
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-bodega-stock-update.php'); // Vista
+        $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/main-bodega-stock-update.php');
     }
 
 }

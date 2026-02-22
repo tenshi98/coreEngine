@@ -74,8 +74,7 @@ class usuariosObservaciones extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-UpdateList.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -126,8 +125,7 @@ class usuariosObservaciones extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-View.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-View.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -179,8 +177,7 @@ class usuariosObservaciones extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $view = new View;
-            echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-formEdit.php'); // Vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-formEdit.php');
         /*******************************************************************/
         //si no hay resultados
         } else {

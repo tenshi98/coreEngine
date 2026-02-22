@@ -40,11 +40,9 @@ class main extends ControllerBase {
 
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/guest-header.php');                            // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-login.php'); // Vista
-        echo $view->render('../app/templates/guest-footer.php');                            // Footer
+        $this->showVista(1, 0, $this->returnRutaVista(__DIR__, 'app').'/main-login.php');
     }
 
     /******************************************************************************/
@@ -130,11 +128,9 @@ class main extends ControllerBase {
             'MainViewData'    => $MainViewData,
         ];
 
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                 // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-principal.php'); // Vista
-        echo $view->render('../app/templates/user-footer.php');                                 // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
     }
     /******************************************************************************/
     //Se listan los controladores

@@ -44,12 +44,9 @@ class coreGraficos extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                            // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreGraficos-apexcharts.php');   // Vista
-        echo $view->render('../app/templates/user-footer.php');                                            // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-apexcharts.php');
     }
 
     /******************************************************************************/
@@ -72,12 +69,9 @@ class coreGraficos extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreGraficos-chartjs.php');   // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-chartjs.php');
     }
 
     /******************************************************************************/
@@ -100,12 +94,9 @@ class coreGraficos extends ControllerBase {
             'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
-
+        /******************************************/
         //Se instancia la vista
-        $view = new View;
-        echo $view->render('../app/templates/user-header.php');                                         // Header
-        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/coreGraficos-echarts.php');   // Vista
-        echo $view->render('../app/templates/user-footer.php');                                         // Footer
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-echarts.php');
     }
 
 
