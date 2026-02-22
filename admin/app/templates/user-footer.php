@@ -17,6 +17,22 @@
 
     <div id="PDloader"></div>
 
+    <div class="modal fade" id="viewModal-xl" tabindex="-1">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content" id="modalContent-xl">
+
+        </div>
+      </div>
+    </div>
+
+    <div class="modal fade" id="viewModal-lg" tabindex="-1">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content" id="modalContent-lg">
+
+        </div>
+      </div>
+    </div>
+
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
