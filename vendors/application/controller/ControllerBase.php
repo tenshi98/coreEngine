@@ -736,6 +736,11 @@ class ControllerBase {
             case 1:
                 //opcion de vista
                 switch ($TypeView) {
+                    //Vista de las visitas
+                    case 0:
+                        echo $view->render('../app/templates/guest-header.php');
+                        echo $view->render('../'.$Route);
+                        echo $view->render('../app/templates/guest-footer.php');
                     //Vista de la pagina
                     case 1:
                         echo $view->render('../app/templates/user-header.php');
