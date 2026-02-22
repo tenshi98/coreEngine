@@ -102,6 +102,8 @@
             /******************************************/
             //Estancia del validacion formularios
             var validator = new FormValidator();
+            //Se declara variable para evitar datos duplicados
+            let ejecutandoForm = { valor: false };
         </script>
 
     </head>
