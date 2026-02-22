@@ -86,7 +86,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarEmail($Data):bool{
+	public function validarEmail($Data):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -114,7 +114,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarNumero($Data):bool{
+	public function validarNumero($Data):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -146,7 +146,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function ValidarPatente($Data):bool{
+	public function ValidarPatente($Data):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -180,7 +180,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarURL($Data):bool{
+	public function validarURL($Data):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -259,7 +259,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarFecha($Data, $format = 'Y-m-d'):bool{
+	public function validarFecha($Data, $format = 'Y-m-d'):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -291,7 +291,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarEntero($Data):bool{
+	public function validarEntero($Data):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -319,7 +319,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarDispositivoMovil():bool{
+	public function validarDispositivoMovil():bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -358,7 +358,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarLargoMinimo($oracion, int $largo):bool{
+	public function validarLargoMinimo($oracion, int $largo):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -388,7 +388,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function validarLargoMaximo($oracion, int $largo):bool{
+	public function validarLargoMaximo($oracion, int $largo):bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -418,7 +418,7 @@ class FunctionsDataValidations {
 	}
 
 	/************************************************************************************************************/
-	public function checkData($validOptions, $dataToCheck, $placeholder, $type): array{
+	public function checkData($validOptions, $dataToCheck, $placeholder, $type): array {
 		/*
 		*=================================================     Detalles    =================================================
 		*

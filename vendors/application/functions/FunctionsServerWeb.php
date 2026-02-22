@@ -60,7 +60,7 @@ class FunctionsServerWeb {
 	}
 
 	/************************************************************************************************************/
-	public function getBaseUrl($atRoot=false, $atCore=false, $parse=false): string{
+	public function getBaseUrl($atRoot=false, $atCore=false, $parse=false): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*

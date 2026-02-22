@@ -110,7 +110,7 @@ class FunctionsSecurityCodification {
     }
 
     /************************************************************************************************************/
-    public function generateServerSpecificHash(): string{
+    public function generateServerSpecificHash(): string {
         /*
         *=================================================     Detalles    =================================================
         *

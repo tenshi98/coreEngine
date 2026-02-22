@@ -26,7 +26,7 @@ class FunctionsSecurityPasswords {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-    public function generarPassword($longitud,$tipo): string{
+    public function generarPassword($longitud,$tipo): string {
         /*
         *=================================================     Detalles    =================================================
         *
@@ -78,7 +78,7 @@ class FunctionsSecurityPasswords {
     }
 
     /************************************************************************************************************/
-    public function generarPasswordUnica(): string{
+    public function generarPasswordUnica(): string {
         /*
         *=================================================     Detalles    =================================================
         *
@@ -106,7 +106,7 @@ class FunctionsSecurityPasswords {
     }
 
     /************************************************************************************************************/
-    public function caracteresRandom($longitud = 16, $lecturaAmigable = true, $incluirSimbolos = false, $sinDuplicados = false): string{
+    public function caracteresRandom($longitud = 16, $lecturaAmigable = true, $incluirSimbolos = false, $sinDuplicados = false): string {
         /*
         *=================================================     Detalles    =================================================
         *
@@ -194,7 +194,7 @@ class FunctionsSecurityPasswords {
     }
 
     /************************************************************************************************************/
-    public static function hashCreate($plain): string{
+    public static function hashCreate($plain): string {
         /*
         *=================================================     Detalles    =================================================
         *
@@ -226,7 +226,7 @@ class FunctionsSecurityPasswords {
     }
 
     /************************************************************************************************************/
-    public static function hashVerify($plain, $hash): string{
+    public static function hashVerify($plain, $hash): string {
         /*
         *=================================================     Detalles    =================================================
         *
@@ -256,6 +256,5 @@ class FunctionsSecurityPasswords {
         return password_verify($plain, $hash);
 
     }
-
 
 }

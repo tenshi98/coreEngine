@@ -55,7 +55,7 @@ class FunctionsServerClient {
 	}
 
 	/************************************************************************************************************/
-	public function getClientIpAlternative($headerContainingIPAddress = null): string | bool{
+	public function getClientIpAlternative($headerContainingIPAddress = null): string | bool {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -177,7 +177,7 @@ class FunctionsServerClient {
 	}
 
 	/************************************************************************************************************/
-	public function getOperatingSystem(): string{
+	public function getOperatingSystem(): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
