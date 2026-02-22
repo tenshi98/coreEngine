@@ -1239,24 +1239,24 @@ class gestionDocumentos extends ControllerBase {
         if(isset($ndata_1)&&$ndata_1!=0){
             //recorro los items
             for($j1 = 0; $j1 < $ndata_1; $j1++){
-                $x_ValorTotal = $x_ValorTotal + $PostData['Item_ValorTotal'][$j1];
-                $x_TotalItems = $x_TotalItems + $PostData['Item_ValorTotal'][$j1];
+                $x_ValorTotal += $PostData['Item_ValorTotal'][$j1];
+                $x_TotalItems += $PostData['Item_ValorTotal'][$j1];
             }
         }
         //Productos
         if(isset($ndata_2)&&$ndata_2!=0){
             //recorro los items
             for($j1 = 0; $j1 < $ndata_2; $j1++){
-                $x_ValorTotal     = $x_ValorTotal + $PostData['Producto_ValorTotal'][$j1];
-                $x_TotalProductos = $x_TotalProductos + $PostData['Producto_ValorTotal'][$j1];
+                $x_ValorTotal     += $PostData['Producto_ValorTotal'][$j1];
+                $x_TotalProductos += $PostData['Producto_ValorTotal'][$j1];
             }
         }
         //Servicios
         if(isset($ndata_3)&&$ndata_3!=0){
             //recorro los items
             for($j1 = 0; $j1 < $ndata_3; $j1++){
-                $x_ValorTotal     = $x_ValorTotal + $PostData['Servicio_ValorTotal'][$j1];
-                $x_TotalServicios = $x_TotalServicios + $PostData['Servicio_ValorTotal'][$j1];
+                $x_ValorTotal     += $PostData['Servicio_ValorTotal'][$j1];
+                $x_TotalServicios += $PostData['Servicio_ValorTotal'][$j1];
             }
         }
         //Guias de despacho
@@ -1287,7 +1287,7 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se suman los totales de las guias
-            $x_ValorTotal = $x_ValorTotal + $rowData['Total'];
+            $x_ValorTotal += $rowData['Total'];
         }
 
         /*******************************************************/
