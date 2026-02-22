@@ -194,11 +194,12 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                  Instalacion de Modulos                   */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/plataforma/instalacion/resumen',         'sistemaInstalacion->Resumen');           //Listar modulos disponibles
-    $f3->route('GET /Core/plataforma/instalacion/resumenUpdate',   'sistemaInstalacion->resumenUpdate');     //Actualizar vista
-    $f3->route('PUT /Core/plataforma/instalacion/installModule',   'sistemaInstalacion->installModule');     //Instalacion de modulos
-    $f3->route('PUT /Core/plataforma/instalacion/uninstallModule', 'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
-    $f3->route('GET /Core/plataforma/rutas/listado',               'sistemaRutas->Resumen');                 //Listar las rutas disponibles
+    $f3->route('GET /Core/plataforma/instalacion/resumen',                 'sistemaInstalacion->Resumen');           //Listar modulos disponibles
+    $f3->route('GET /Core/plataforma/instalacion/resumenUpdate',           'sistemaInstalacion->resumenUpdate');     //Actualizar vista
+    $f3->route('GET /Core/plataforma/instalacion/checkModule/@Controller', 'sistemaInstalacion->checkModule');       //Revisar las rutas de la BD contra el instalador
+    $f3->route('PUT /Core/plataforma/instalacion/installModule',           'sistemaInstalacion->installModule');     //Instalacion de modulos
+    $f3->route('PUT /Core/plataforma/instalacion/uninstallModule',         'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
+    $f3->route('GET /Core/plataforma/rutas/listado',                       'sistemaRutas->Resumen');                 //Listar las rutas disponibles
 
 
 }

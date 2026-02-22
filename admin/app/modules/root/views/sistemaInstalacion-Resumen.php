@@ -75,5 +75,19 @@
             }
         });
     }
+    /******************************************/
+    function checkModule(Controller) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-xl';
+        let URL       = '<?php echo $BASE.'/Core/plataforma/instalacion/checkModule/'; ?>'+Controller;
+        const Options = {
+            showModal : '#viewModal-xl',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
 
 </script>
