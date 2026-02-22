@@ -28,7 +28,7 @@
                         <div class="taskimg">
                             <?php
                             //Se recorre
-                            foreach ($tarea AS $task){
+                            foreach ($tarea as $task){
                                 //se verifica si existe
                                 if(isset($task['UsuarioNombre'])&&$task['UsuarioNombre']!=''){
                                     //verifico si existe imagen

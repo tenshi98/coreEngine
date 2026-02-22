@@ -51,7 +51,7 @@
                                                 <div class="float-start img">
                                                     <?php
                                                     //se recorre
-                                                    foreach ($tarea AS $task){
+                                                    foreach ($tarea as $task){
                                                         //se verifica si existe
                                                         if(isset($task['UsuarioNombre'])&&$task['UsuarioNombre']!=''){
                                                             //verifico si existe imagen

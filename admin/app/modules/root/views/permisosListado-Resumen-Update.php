@@ -37,11 +37,11 @@
                         //filtro
                         $newData = $data['Fnc_CommonData']->agruparPorClave ($data['arrRutas'], 'Controller' );
                         //Recorro
-                        foreach ($newData AS $Controller=>$permisos){
+                        foreach ($newData as $Controller=>$permisos){
                             //imprimimos la categoría
                             echo '<tr class="table-secondary"><td colspan="5"><strong>'.$Controller.'</strong></td></tr>';
                             //se recorren los datos dentro de la categoría
-                            foreach ($permisos AS $ruta){ ?>
+                            foreach ($permisos as $ruta){ ?>
                                 <tr>
                                     <td><?php echo $ruta['Metodo']; ?></td>
                                     <td><?php echo $ruta['RutaWeb']; ?></td>

@@ -25,7 +25,7 @@
                                 if(is_array($data['arrModules'])&&!empty($data['arrModules'])){
                                     foreach ($data['arrModules'] as $key=>$modules){
                                         //Recorro
-                                        foreach($modules AS $crud){
+                                        foreach($modules as $crud){
                                             if(isset($crud['idMetodo'])&&$crud['idMetodo']!=''){
                                                 $arrCompare[$crud['RutaWeb']][$crud['RutaController']]['idMetodo']        = $crud['idMetodo'];
                                                 $arrCompare[$crud['RutaWeb']][$crud['RutaController']]['RutaWeb']         = $crud['RutaWeb'];

@@ -16,11 +16,11 @@
             //filtro
             $newData = $data['Fnc_CommonData']->agruparPorClave ($data['arrRutas'], 'Controller' );
             //Recorro
-            foreach ($newData AS $Controller=>$permisos){
+            foreach ($newData as $Controller=>$permisos){
                 //imprimimos la categoría
                 echo '<tr class="table-secondary"><td colspan="6"><strong>'.$Controller.'</strong></td></tr>';
                 //se recorren los datos dentro de la categoría
-                foreach ($permisos AS $ruta){
+                foreach ($permisos as $ruta){
                     //Variables
                     $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $ruta['idRutas']); ?>
                     <tr>

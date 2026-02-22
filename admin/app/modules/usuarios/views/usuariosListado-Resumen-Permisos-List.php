@@ -14,11 +14,11 @@
                 //filtro
                 $newData = $data['Fnc_CommonData']->agruparPorClave ($data['arrPermisos'], 'PermisosCat' );
                 //Recorro
-                foreach ($newData AS $Categoria=>$permisos){
+                foreach ($newData as $Categoria=>$permisos){
                     //imprimimos la categoría
                     echo ' <tr class="table-secondary"><td colspan="7"><strong>'.$Categoria.'</strong></td></tr>';
                     //se recorren los datos dentro de la categoría
-                    foreach ($permisos AS $perm){
+                    foreach ($permisos as $perm){
                         //Variables
                         $check[1] = '';
                         $check[2] = '';

@@ -214,12 +214,12 @@ $RandName = 'rand_'.rand(1, 999999);
     //filtro
     $newData = $data['Fnc_CommonData']->agruparPorClave ($data['arrGuias'], 'idEntidad' );
     //Recorro
-    foreach ($newData AS $EntidadID=>$datos){
+    foreach ($newData as $EntidadID=>$datos){
         //imprimimos la categoría
         $DataID   = 'let id_data_guias_'.$EntidadID.' = new Array(""';
         $DataText = 'let data_guias_'.$EntidadID.'    = new Array("Seleccione una Opción"';
         //se recorren los datos dentro de la categoría
-        foreach ($datos AS $crud){
+        foreach ($datos as $crud){
             // Construir nombre de la guía de forma más compacta
             $x_nombre = 'Guia Despacho ';
             $x_nombre .= (!empty($crud['N_Doc'])) ? $crud['N_Doc'] : 'nRef '.$crud['idFacturacion'];

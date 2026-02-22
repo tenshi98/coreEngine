@@ -15,7 +15,7 @@
             $countMenu = 0;
             $arrMenu .= '<ul><li class="dropdown-tittle">'.$Categoria.'</li>';
             //se recorren los datos dentro de la categoría
-            foreach ($permisos AS $perm){
+            foreach ($permisos as $perm){
                 //Icono
                 $Icono = $perm['PermisosIcon'] . (!empty($perm['PermisosIconColor']) ? ' ' . $perm['PermisosIconColor'] : '');
                 //Menu

@@ -30,7 +30,7 @@
           </a>
           <ul id="test-nav_'.$x_var.'" class="nav-content collapse " data-bs-parent="#sidebar-nav">';
             //se recorren los datos dentro de la categoría
-            foreach ($permisos AS $perm){
+            foreach ($permisos as $perm){
               echo '<li><a href="'.$BASE.'/'.$perm['RutaWeb'].'/listAll"><i class="bi bi-circle"></i><span> '.$perm['Nombre'].'</span></a></li>';
             }
             echo '
