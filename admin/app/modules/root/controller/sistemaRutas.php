@@ -50,7 +50,7 @@ class sistemaRutas extends ControllerBase {
                 if($ListDataModule===true){
                     $ControllerData = new $data;
                     //Se traen las rutas
-                    for ($i=0; $i < 6; $i++) {
+                    for ($i=0; $i < 10; $i++) {
                         $arrModules[] = $ControllerData->listRouteModule($i, 0);
                     }
                 }
