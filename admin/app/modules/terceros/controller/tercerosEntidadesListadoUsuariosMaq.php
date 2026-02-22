@@ -133,7 +133,7 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
 
             /*******************************************************************/
             //Recorro los permisos
-            foreach ($arrPermisos AS $permisos){
+            foreach ($arrPermisos as $permisos){
                 //Se verifica si esta marcado
                 switch ($_POST['switch_'.$permisos['idMaq']]) {
                     /*******************************************************************/

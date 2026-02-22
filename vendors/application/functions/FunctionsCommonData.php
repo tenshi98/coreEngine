@@ -21,11 +21,11 @@ class FunctionsCommonData {
 		* 	//se filtran los datos
 		* 	$CommonData->agruparPorClave ($arreglo, 'categoria' );
 		* 	//se recorre el nuevo arreglo
-		* 	foreach ($arreglo AS $categoria=>$arr1){
+		* 	foreach ($arreglo as $categoria=>$arr1){
 		* 		//imprimimos la categoría
 		* 		echo $categoria;
 		* 		//se recorren los datos dentro de la categoría
-		* 		foreach ($arr1 AS $arr2){
+		* 		foreach ($arr1 as $arr2){
 		* 			//imprimimos los datos dentro de la categoría
 		* 		}
 		* 	}

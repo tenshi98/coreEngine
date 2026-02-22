@@ -521,7 +521,7 @@ class bodegasMovimientoProductos extends ControllerBase {
 
                 /******************************/
                 //Recorro
-                foreach($arrStocks AS $crud){
+                foreach($arrStocks as $crud){
                     $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
                     $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
                 }
