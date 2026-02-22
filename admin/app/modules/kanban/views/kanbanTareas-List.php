@@ -52,16 +52,6 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
 ?>
 <?php require_once('kanbanTareas-formNew.php'); ?>
 
-<div class="modal fade" id="viewModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content" id="modalContent">
-
-        </div>
-    </div>
-</div>
-
-
-
 <script>
     /*********************************************************************/
     /*                        OPCIONES DE LA TABLA                       */
@@ -71,10 +61,10 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
@@ -85,10 +75,10 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/getID/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
@@ -137,10 +127,10 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-xl';
             let URL       = '<?php echo $BASE.'/gestionProyectos/kanban/estados/getID/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-xl',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -187,10 +177,10 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'Tareas/newData/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
@@ -201,10 +191,10 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'Tareas/getID/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
@@ -218,10 +208,10 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'Participantes/newData/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
@@ -255,7 +245,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
                 };
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#modalContent', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'; ?>'+ID2, refreshTbl:'false'},
+                        {Div:'#modalContent-xl', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'; ?>'+ID2, refreshTbl:'false'},
                         {Div:'#listTableData', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>', refreshTbl:'true'}
                     ],
                     showNoti:'Dato Borrado Correctamente',

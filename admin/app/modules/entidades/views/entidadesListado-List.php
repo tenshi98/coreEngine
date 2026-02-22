@@ -31,14 +31,6 @@
 
 <?php require_once('entidadesListado-formNew.php'); ?>
 
-<div class="modal fade" id="viewModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content" id="modalContent">
-
-        </div>
-    </div>
-</div>
-
 <script>
     /*********************************************************************/
     /*                        OPCIONES DE LA TABLA                       */
@@ -48,10 +40,10 @@
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario

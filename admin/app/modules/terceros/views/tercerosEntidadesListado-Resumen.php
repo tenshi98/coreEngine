@@ -84,22 +84,6 @@
 </div>
 <div class="clearfix"></div>
 
-<div class="modal fade" id="viewModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="modalContent">
-
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="viewModal_2" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content" id="modalContent_2">
-
-        </div>
-    </div>
-</div>
-
 <script>
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
@@ -168,10 +152,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/planes/new/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -182,10 +166,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/planes/view/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -196,10 +180,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/planes/getID/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -269,10 +253,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuarios/new/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -283,10 +267,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent_2';
+            let Div       = '#modalContent-xl';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuarios/view/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal_2',
+                showModal : '#viewModal-xl',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -297,10 +281,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuarios/getID/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -343,10 +327,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent_2';
+            let Div       = '#modalContent-xl';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuariosMaq/updateList/'; ?>'+idEntidad+'/'+idUsuario;
             const Options = {
-                showModal : '#viewModal_2',
+                showModal : '#viewModal-xl',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -357,10 +341,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent_2';
+            let Div       = '#modalContent-xl';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuariosNoti/updateList/'; ?>'+idEntidad+'/'+idUsuario;
             const Options = {
-                showModal : '#viewModal_2',
+                showModal : '#viewModal-xl',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -398,10 +382,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/maquinas/new/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -412,10 +396,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/maquinas/view/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario
@@ -426,10 +410,10 @@
             //Cargo el loader
             $('#PDloader').show();
             //Ejecuto
-            let Div       = '#modalContent';
+            let Div       = '#modalContent-lg';
             let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/maquinas/getID/'; ?>'+ID;
             const Options = {
-                showModal : '#viewModal',
+                showModal : '#viewModal-lg',
                 closeObject:'#PDloader',
             };
             //Se envian los datos al formulario

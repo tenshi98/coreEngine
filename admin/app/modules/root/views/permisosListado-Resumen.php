@@ -79,16 +79,6 @@
 
 <?php require_once('permisosListado-Resumen-Rutas-formNew.php'); ?>
 
-
-<div class="modal fade" id="viewModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="modalContent">
-
-        </div>
-    </div>
-</div>
-
-
 <script>
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
@@ -131,10 +121,10 @@
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-lg';
         let URL       = '<?php echo $BASE.'/Core/permisos/listado/rutas/view/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-lg',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
@@ -145,10 +135,10 @@
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-lg';
         let URL       = '<?php echo $BASE.'/Core/permisos/listado/rutas/getID/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-lg',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
