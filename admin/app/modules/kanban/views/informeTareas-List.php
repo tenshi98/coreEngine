@@ -27,51 +27,50 @@
     </div>
 </div>
 
-<div class="modal fade" id="viewModal" tabindex="-1">
-    <div class="modal-dialog modal-xl">
-        <div class="modal-content" id="modalContent">
-
-        </div>
-    </div>
-</div>
-
 <script>
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
     /******************************************/
     $("#FormSearchData").submit(function(e) {
-        // Si ya se está ejecutando, salimos
-        if (ejecutandoForm.valor) return;
-        //Cambio los valores
-        ejecutandoForm.valor = true;
-        //Ejecucion normal
-        e.preventDefault();
-        //Cargo el loader
-        $('#PDloader').show();
-        //Ejecuto
-        let Metodo      = 'POST';
-        let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/search'; ?>';
-        let Informacion = $("#FormSearchData").serialize();
-        const Options     = {
-            UpdateDivFrom : 'listTableData',
-            colapseDiv : 'true',
-            refreshTables : 'true',
-            closeObject:'#PDloader',
-            changeValForm: ejecutandoForm,
-        };
-        //Se envian los datos al formulario
-        SendDataForms(Metodo, Direccion, Informacion, Options);
+        //Se validan los datos de los formularios
+        var validatorResult = validator.checkAll(this);
+        //verifico el resultado
+        if(validatorResult.valid===false){
+            return !!validatorResult.valid;
+        }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
+            e.preventDefault();
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Metodo      = 'POST';
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/search'; ?>';
+            let Informacion = $("#FormSearchData").serialize();
+            const Options     = {
+                UpdateDivFrom : 'listTableData',
+                colapseDiv : 'true',
+                refreshTables : 'true',
+                closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
+            };
+            //Se envian los datos al formulario
+            SendDataForms(Metodo, Direccion, Informacion, Options);
+        }
     });
     /******************************************/
     function listTableDataView(ID) {
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
-        let Div       = '#modalContent';
+        let Div       = '#modalContent-xl';
         let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'; ?>'+ID;
         const Options = {
-            showModal : '#viewModal',
+            showModal : '#viewModal-xl',
             closeObject:'#PDloader',
         };
         //Se envian los datos al formulario
