@@ -8,6 +8,9 @@
     </thead>
     <tbody>
         <?php foreach ($data['arrModules'] as $module){
+            //Contador dependencias no instaladas
+            $CountDepends = 0;
+            //Imprimo
             echo '
             <tr>
                 <td>
@@ -28,6 +31,7 @@
                                 $depInstal = '<span class="badge bg-success">Instalado</span>';
                             }else{
                                 $depInstal = '<span class="badge bg-danger">No Instalado</span>';
+                                $CountDepends++;
                             }
                             //se escribe
                             echo '<br>'.$mod['Nombre'].' '.$depInstal;
@@ -36,24 +40,25 @@
                         //se escribe
                         echo '<br>Ninguna';
                     }
-
-                    //echo '<br>countPermisos:'.$module['countPermisos'];
-
                     echo '
                 </td>
-                <td>';
-                    if($module['countPermisos']!=0){
-                        echo '
-                        <div class="btn-group" role="group">
-                            <button type="button" onclick="uninstallModule(\''.$module['Controller'].'\')" class="btn btn-danger btn-sm tooltiplink" data-title="Desinstalar Modulo completamente"><i class="bi bi-trash"></i> Desinstalar Modulo</button>
-                        </div>';
-                    }else{
-                        echo '
-                        <div class="btn-group" role="group">
-                            <button type="button" onclick="installModule(\''.$module['Controller'].'\')" class="btn btn-primary btn-sm tooltiplink" data-title="Instalar Modulo en la plataforma"><i class="bi bi-eye"></i> Instalar Modulo</button>
-                        </div>';
-                    }
+                <td>
+                    <div class="btn-group-vertical" role="group">';
+                        if($module['countPermisos']!=0){
+                            echo '
+                            <button type="button" onclick="uninstallModule(\''.$module['Controller'].'\')" class="btn btn-danger   btn-sm tooltiplink" data-title="Desinstalar Modulo completamente"><i class="bi bi-trash"></i> Desinstalar Modulo</button>
+                            <button type="button" onclick="checkModule(\''.$module['Controller'].'\')"     class="btn btn-primary  btn-sm tooltiplink" data-title="Hacer checkeo de rutas"><i class="bi bi-eye"></i> Checkear Rutas</button>
+                            ';
+                        }else{
+                            //Si se permite la instalacion
+                            if($CountDepends===0){
+                                echo '<button type="button" onclick="installModule(\''.$module['Controller'].'\')" class="btn btn-primary btn-sm tooltiplink" data-title="Instalar Modulo en la plataforma"><i class="bi bi-eye"></i> Instalar Modulo</button>';
+                            }else{
+                                echo '<button type="button" class="btn btn-primary disabled btn-sm tooltiplink" data-title="Instalar Modulo en la plataforma"><i class="bi bi-eye"></i> Instalar Modulo</button>';
+                            }
+                        }
                     echo '
+                    </div>
                 </td>
             </tr>';
         } ?>
