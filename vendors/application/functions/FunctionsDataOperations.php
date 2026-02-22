@@ -30,8 +30,7 @@ class FunctionsDataOperations
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-	public function dividirHoras($hora, int $divisor): int
-	{
+	public function dividirHoras($hora, int $divisor): int {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -66,8 +65,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function multiplicarHoras($hora, int $multiplicador): string
-	{
+	public function multiplicarHoras($hora, int $multiplicador): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -114,8 +112,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function restarhoras($hora, $horaResta): string
-	{
+	public function restarhoras($hora, $horaResta): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -171,8 +168,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function sumarhoras($hora, $horaSuma): string
-	{
+	public function sumarhoras($hora, $horaSuma): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -222,8 +218,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function sumarDias($Fecha, int $nDias): string
-	{
+	public function sumarDias($Fecha, int $nDias): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -255,8 +250,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function restarDias($Fecha, int $nDias): string
-	{
+	public function restarDias($Fecha, int $nDias): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -288,8 +282,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function obtenerEdad($fechaNacimiento): string
-	{
+	public function obtenerEdad($fechaNacimiento): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -321,8 +314,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function obtenerNumeroAnos($fechaNacimiento): string
-	{
+	public function obtenerNumeroAnos($fechaNacimiento): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -354,8 +346,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function diasTranscurridos($fechaInicio, $fechaTermino): string | float | int
-	{
+	public function diasTranscurridos($fechaInicio, $fechaTermino): string | float | int {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -384,8 +375,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function horasTranscurridas($fechaInicio, $fechaTermino, $horaInicio, $horaTermino): string
-	{
+	public function horasTranscurridas($fechaInicio, $fechaTermino, $horaInicio, $horaTermino): string {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -435,8 +425,7 @@ class FunctionsDataOperations
 	}
 
 	/************************************************************************************************************/
-	public function diferenciaMeses($fechaInicio, $fechaTermino): string | int
-	{
+	public function diferenciaMeses($fechaInicio, $fechaTermino): string | int {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -471,4 +460,5 @@ class FunctionsDataOperations
 		/**********************  Retorno datos  **********************/
 		return $intervalMeses + $intervalAnos;
 	}
+
 }
