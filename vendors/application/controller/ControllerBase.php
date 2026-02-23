@@ -741,6 +741,7 @@ class ControllerBase {
                         echo $view->render('../app/templates/guest-header.php');
                         echo $view->render('../'.$Route);
                         echo $view->render('../app/templates/guest-footer.php');
+                        break;
                     //Vista de la pagina
                     case 1:
                         echo $view->render('../app/templates/user-header.php');
