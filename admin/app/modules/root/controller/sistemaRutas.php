@@ -56,6 +56,8 @@ class sistemaRutas extends ControllerBase {
                 }
             }
         }
+        //Se eliminan valores vacios
+        $arrModules = array_filter($arrModules);
 
         /******************************************/
         //Se genera la query

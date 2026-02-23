@@ -130,7 +130,7 @@ class sistemaInstalacion extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-Update.php');
+            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-Update.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -149,10 +149,11 @@ class sistemaInstalacion extends ControllerBase {
 
         /******************************************/
         //Variable vacia
-        $arrModules = [];
+        $arrModules    = [];
+        $arrControlers = [];
 
         //Arreglo con los controladores a instalar
-        $array = $this->arrayModInstall();
+        $array = array($params['Controller']);
         /******************************************/
         //Verifico si existe
         if($array){
@@ -170,17 +171,43 @@ class sistemaInstalacion extends ControllerBase {
                 }
             }
         }
+        //Se eliminan valores vacios
+        $arrModules = array_filter($arrModules);
+
+        //Se parsean los datos
+        if(is_array($arrModules)&&!empty($arrModules)){
+            foreach ($arrModules as $key=>$modules){
+                //Recorro
+                foreach($modules as $crud){
+                    if(isset($crud['idMetodo'])&&$crud['idMetodo']!=''){
+                        $arrControlers[] = '"'.$crud['Controller'].'"';
+                    }
+                }
+            }
+        }
+        //Se eliminan duplicados
+        $arrControlers = array_unique($arrControlers);
+        //Se filtran los controladores
+        $subWhere   = $arrControlers ? implode(',', $arrControlers) : '';
+
 
         /******************************************/
         //Se genera la query
         $query = [
-            'data'    => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
+            'data'    => '
+                core_permisos_listado_rutas.idPermisos,
+                core_permisos_listado_rutas.idMetodo,
+                core_permisos_listado_rutas.RutaWeb,
+                core_permisos_listado_rutas.RutaController,
+                core_permisos_listado_rutas.Descripcion,
+                core_permisos_listado_rutas.idLevelLimit,
+                core_permisos_listado_rutas.Controller',
             'table'   => 'core_permisos_listado_rutas',
-            'join'    => '',
-            'where'   => 'idRutas!=0',
+            'join'    => 'LEFT JOIN core_permisos_listado ON core_permisos_listado.idPermisos  = core_permisos_listado_rutas.idPermisos',
+            'where'   => 'core_permisos_listado.RutaController IN ('.$subWhere.')',
             'group'   => '',
             'having'  => '',
-            'order'   => 'idRutas ASC',
+            'order'   => 'core_permisos_listado_rutas.idRutas ASC',
             'limit'   => 10000
         ];
         //Ejecuto la query
@@ -205,7 +232,7 @@ class sistemaInstalacion extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-ViewRutas.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
