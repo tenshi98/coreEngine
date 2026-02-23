@@ -74,7 +74,7 @@
                     {Div:'#tabMaquinasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/maquinas/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

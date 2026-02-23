@@ -90,7 +90,7 @@
                     {Div:'#tabCargasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/cargas/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

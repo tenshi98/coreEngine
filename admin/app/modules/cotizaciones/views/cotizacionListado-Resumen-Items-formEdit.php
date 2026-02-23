@@ -77,7 +77,7 @@
                     {Div:'#tabItemDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/items/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

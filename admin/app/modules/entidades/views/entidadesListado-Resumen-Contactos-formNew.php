@@ -78,7 +78,7 @@
                     {Div:'#tabContactosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/contactos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 ClearForm:'FormNewContacto',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,

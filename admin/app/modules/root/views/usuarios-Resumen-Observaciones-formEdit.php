@@ -68,7 +68,7 @@
                     {Div:'#X_datatable', fromData:'<?php echo $BASE.'/Core/administracion/usuarios/observaciones/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

@@ -76,7 +76,7 @@
                     {Div:'#tabCargasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/cargas/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 ClearForm:'FormNewCarga',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,

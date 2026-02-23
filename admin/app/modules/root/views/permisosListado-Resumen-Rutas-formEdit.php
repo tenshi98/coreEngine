@@ -78,7 +78,7 @@
                     {Div:'#X_datatable', fromData:'<?php echo $BASE.'/Core/permisos/listado/rutas/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idPermisos']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

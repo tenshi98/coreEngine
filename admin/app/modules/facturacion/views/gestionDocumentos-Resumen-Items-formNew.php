@@ -69,7 +69,7 @@
                     {Div:'#tabItemDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/items/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 ClearForm:'FormNewItem',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,

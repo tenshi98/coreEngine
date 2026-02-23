@@ -66,7 +66,7 @@
                     {Div:'#tabGuiaDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/guias/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 ClearForm:'FormNewGuia',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,

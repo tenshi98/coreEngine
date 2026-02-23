@@ -68,7 +68,7 @@
                     {Div:'#tabDocumentosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idProducto']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 ClearForm:'FormNewDocumentos',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,

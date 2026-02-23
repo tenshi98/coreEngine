@@ -96,7 +96,7 @@
             let Informacion = $("#FormEditUsuariosPermisos").serialize();
             const Options     = {
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal_2',
+                closeModal:'#viewModal-xl',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

@@ -68,7 +68,7 @@
                     {Div:'#tabServDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/servicios/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 ClearForm:'FormNewServicio',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,

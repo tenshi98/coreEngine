@@ -76,7 +76,7 @@
                     {Div:'#X_datatable', fromData:'<?php echo $BASE.'/Core/permisos/categorias/updateList'; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal',
+                closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };
