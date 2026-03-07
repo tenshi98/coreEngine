@@ -24,7 +24,7 @@
     $arrData = [
         ['Icon' => '','Titulo' => 'Máquina',         'Texto' => $data['rowData']['Maquina']],
         ['Icon' => '','Titulo' => 'Fecha Ingreso',   'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
-        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ['Icon' => '','Titulo' => 'Observación',     'Texto' => $data['rowData']['Observacion']],
     ];
 

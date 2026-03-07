@@ -13,7 +13,7 @@
             ['Icon' => '','Titulo' => 'Nombre',         'Texto' => $data['rowData']['Nombre']],
             ['Icon' => '','Titulo' => 'Identificador',  'Texto' => $data['rowData']['CodIdentificador']],
             ['Icon' => '','Titulo' => 'Descripcion',    'Texto' => $data['rowData']['Descripcion']],
-            ['Icon' => '','Titulo' => 'Estado',         'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+            ['Icon' => '','Titulo' => 'Estado',         'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ];
         echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);

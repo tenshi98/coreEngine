@@ -5,10 +5,10 @@
             <h5 class="card-title">Horizontal Form</h5>
 
             <!-- Horizontal Form -->
-            <form id="form1" name="form1" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+            <form id="form1" name="form1" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                 <?php
                 /***********************************/
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Normales']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Normales', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Texto normal',      'Name' => 'Nombre',             'Id' => 'IDInput_1_1', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',             'Id' => 'IDInput_1_2', 'Required' => 3, 'DataInfo' => 'Lorem ipsum dolor sit amet,']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 2,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Email',             'Name' => 'email',              'Id' => 'IDInput_1_3', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,','Icon' => 'bx bx-mail-send']);
@@ -16,18 +16,18 @@
                 $data['Fnc_FormInputs']->formInputDatalist([        'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Input Datalist',    'Name' => 'formInputDatalist',  'Id' => 'IDInput_1_29','Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,','Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
 
                 /***********************************/
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Especificos']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Especificos', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 11,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Rut','Name' => 'rut','Id' => 'IDInput_1_5','Required' => 2,'Icon' => 'bi bi-person-circle']);
 
                 /***********************************/
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Numericos']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Numericos', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Numeros enteros positivos', 'Name' => 'Numeros1',      'Id' => 'IDInput_1_6','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 5,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Numeros reales',            'Name' => 'Numeros2',      'Id' => 'IDInput_1_7','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 6,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Numeros enteros',           'Name' => 'Numeros3',      'Id' => 'IDInput_1_8','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
                 $data['Fnc_FormInputs']->formNumberSpinner([        'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'number_spinner',            'Name' => 'number_spinner','Id' => 'IDInput_1_9','Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
 
                 /***********************************/
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Fecha y Hora']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Fecha y Hora', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 7, 'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'date',            'Name' => 'date',             'Id' => 'IDInput_1_10','Required' => 2,'Icon' => 'bi bi-calendar-date']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 8, 'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'form_input_date', 'Name' => 'form_input_date',  'Id' => 'IDInput_1_11','Required' => 2,'Icon' => 'bi bi-calendar-date']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 9, 'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'time',            'Name' => 'time',             'Id' => 'IDInput_1_12','Required' => 2,'Icon' => 'bi bi-clock']);
@@ -35,7 +35,7 @@
                 $data['Fnc_FormInputs']->formTime([                  'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'formTime',        'Name' => 'formTime',         'Id' => 'IDInput_1_14','Required' => 2,'Position' => 1,'Icon' => 'bi bi-clock']);
 
                 /***********************************/
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Funcionales']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Funcionales', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 12,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Color',            'Name' => 'Color',            'Id' => 'IDInput_1_15','Required' => 2,'InputClass'  => 'form-control-color','Icon' => 'bi bi-pencil']);
                 $data['Fnc_FormInputs']->formInput(['FormType' => 13,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'form_color_picker','Name' => 'form_color_picker','Id' => 'IDInput_1_16','Required' => 2,'Icon' => 'bi bi-pencil']);
 
@@ -44,7 +44,7 @@
                 $xvalue  = '5';
                 $xvalue2 = '';
                 //input
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Selects']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Selects', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formSelect([               'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Ciudad',                   'Name' => 'idCiudad0',                  'Id' => 'IDInput_1_17','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad']]);
                 $data['Fnc_FormInputs']->formSelectFilter([         'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'formSelectFilter',         'Name' => 'formSelectFilter',           'Id' => 'IDInput_1_18','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad'], 'BASE' => $BASE]);
                 $data['Fnc_FormInputs']->formSelectGroup([          'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'formSelectGroup',          'Name' => 'formSelectGroup',            'Id' => 'IDInput_1_19','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup']]);
@@ -52,10 +52,10 @@
                 $data['Fnc_FormInputs']->formSelectMultiple([       'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'form_multiple1',           'Name' => 'form_multiple2[]',           'Id' => 'IDInput_1_21','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrCiudad']]);
                 $data['Fnc_FormInputs']->formSelectMultipleGroup([  'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'formSelectMultipleGroup',  'Name' => 'formSelectMultipleGroup[]',  'Id' => 'IDInput_1_22','Value' => $xvalue,'Required' => 2,'arrData' => $data['arrGroup']]);
 
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 5,'Texto' => 'formSelectDepend']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 5,'Texto' => 'formSelectDepend', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formSelectDepend([  'PlaceholderIcon1' => 'bi bi-person', 'Placeholder1' => 'Ciudad','Name1' => 'idCiudad','Id1' => 'IDInput_1_23','Value1' => $xvalue2,'Required1' => 2,'arrData1' => $data['arrCiudad'],
                                                              'PlaceholderIcon2' => 'bi bi-person', 'Placeholder2' => 'Comuna','Name2' => 'idComuna','Id2' => 'IDInput_1_24','Value2' => $xvalue2,'Required2' => 2,'arrData2' => $data['arrComuna']]);
-                $data['Fnc_FormInputs']->formTittle(['Tipo' => 5,'Texto' => 'formSelectDependFilter']);
+                $data['Fnc_FormInputs']->formTittle(['Tipo' => 5,'Texto' => 'formSelectDependFilter', 'Clase' => 'box-title text-color-red-dark']);
                 $data['Fnc_FormInputs']->formSelectDependFilter(['PlaceholderIcon1' => 'bi bi-person', 'Placeholder1' => 'Ciudad','Name1' => 'idCiudad','Id1' => 'IDInput_1_25','Value1' => $xvalue2,'Required1' => 2,'arrData1' => $data['arrCiudad'],
                                                                  'PlaceholderIcon2' => 'bi bi-person', 'Placeholder2' => 'Comuna','Name2' => 'idComuna','Id2' => 'IDInput_1_26','Value2' => $xvalue2,'Required2' => 2,'arrData2' => $data['arrComuna'],
                                                                  'BASE' => $BASE]);

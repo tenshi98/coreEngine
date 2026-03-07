@@ -8,7 +8,6 @@ class installer extends ControllerBase {
     //Variables
     private $FormInputs;
     private $DataValidations;
-    private $queryBuilder_Extra;
     private $FunctionsServer;
 
     /******************************************************************************/
@@ -50,6 +49,7 @@ class installer extends ControllerBase {
             $ValidInstall = false; //No permite instalar
         }
 
+                $ValidInstall = true; //Permite instalar
         /******************************************/
         //Datos enviados a la pagina
         $f3->data = [
@@ -182,7 +182,6 @@ class installer extends ControllerBase {
     //Paso 5: Vista - Finalización
     public function finish($f3){
 
-
         /******************************************/
         //Validacion de instalacion
         $ValidInstall = true;
@@ -217,9 +216,11 @@ class installer extends ControllerBase {
             //Variables
             $Response = '';
             //Valido datos ingresados por el usuario
-            if (empty($_POST['Host'])){     $Response.= '<br> - Host es obligatorio';     }else{$Host      = trim($_POST['Host']);}
-            if (empty($_POST['Usuario'])){  $Response.= '<br> - Usuario es obligatorio';  }else{$Usuario   = trim($_POST['Usuario']);}
-            if (empty($_POST['Password'])){ $Response.= '<br> - Password es obligatorio'; }else{$Password  = $_POST['Password'];}
+            if (empty($_POST['Host'])){           $Response.= '<br> - Host es obligatorio';                   }else{$Host            = trim($_POST['Host']);}
+            if (empty($_POST['Admin_Usuario'])){  $Response.= '<br> - Usuario Administrador es obligatorio';  }else{$Admin_Usuario   = trim($_POST['Admin_Usuario']);}
+            if (empty($_POST['Admin_Password'])){ $Response.= '<br> - Password Administrador es obligatorio'; }else{$Admin_Password  = $_POST['Admin_Password'];}
+            if (empty($_POST['Prod_Usuario'])){   $Response.= '<br> - Usuario Producción es obligatorio';     }else{$Prod_Usuario    = trim($_POST['Prod_Usuario']);}
+            if (empty($_POST['Prod_Password'])){  $Response.= '<br> - Password Producción es obligatorio';    }else{$Prod_Password   = $_POST['Prod_Password'];}
             //Datos opcionales
             if (empty($_POST['Port'])){     $Port     = 3306;       }else{$Port     = trim($_POST['Port']);}
             if (empty($_POST['Charset'])){  $Charset  = 'utf8mb4';  }else{$Charset  = trim($_POST['Charset']);}
@@ -228,19 +229,23 @@ class installer extends ControllerBase {
             //Si no hay errores
             if(empty($Response)){
                 // Validar credenciales
-                $result = $this->DataValidations->validateCredentials($Host, $Usuario, $Password, $Port, $Charset);
+                $result_Admin = $this->DataValidations->validateCredentials($Host, $Admin_Usuario, $Admin_Password, $Port, $Charset, 'admin');
+                $result_Prod  = $this->DataValidations->validateCredentials($Host, $Prod_Usuario,  $Prod_Password,  $Port, $Charset, 'basic');
                 // Se valida resultado
-                if ($result['success']) {
+                if ($result_Admin['success'] && $result_Prod['success']) {
                     // Guardar credenciales en sesión (no guardamos la conexión porque PDO no es serializable)
-                    $_SESSION['db_Host']     = $Host;
-                    $_SESSION['db_Usuario']  = $Usuario;
-                    $_SESSION['db_Password'] = $Password;
-                    $_SESSION['db_Port']     = $Port;
-                    $_SESSION['db_Charset']  = $Charset;
+                    $_SESSION['db_Host']           = $Host;
+                    $_SESSION['db_Admin_Usuario']  = $Admin_Usuario;
+                    $_SESSION['db_Admin_Password'] = $Admin_Password;
+                    $_SESSION['db_Prod_Usuario']   = $Prod_Usuario;
+                    $_SESSION['db_Prod_Password']  = $Prod_Password;
+                    $_SESSION['db_Port']           = $Port;
+                    $_SESSION['db_Charset']        = $Charset;
                     //devuelve true
                     $Response = true;
                 } else {
-                    $Response.= $result['message'];
+                    $Response.= $result_Admin['message'] ? $result_Admin['message'] : null;
+                    $Response.= $result_Prod['message']  ? $result_Prod['message']  : null;
                 }
             }
 
@@ -268,27 +273,31 @@ class installer extends ControllerBase {
             //Variables
             $Response = '';
             //Valido datos ingresados por el usuario
-            if (empty($_POST['Host'])){     $Response.= '<br> - Host es obligatorio';                 }else{$Host      = trim($_POST['Host']);}
-            if (empty($_POST['Usuario'])){  $Response.= '<br> - Usuario es obligatorio';              }else{$Usuario   = trim($_POST['Usuario']);}
-            if (empty($_POST['Password'])){ $Response.= '<br> - Password es obligatorio';             }else{$Password  = $_POST['Password'];}
-            if (empty($_POST['Port'])){     $Response.= '<br> - Port es obligatorio';                 }else{$Port      = trim($_POST['Port']);}
-            if (empty($_POST['Charset'])){  $Response.= '<br> - Charset es obligatorio';              }else{$Charset   = trim($_POST['Charset']);}
-            if (empty($_POST['DBName'])){   $Response.= '<br> - Nombre Base de Datos es obligatorio'; }else{$DBName    = trim($_POST['DBName']);}
+            if (empty($_POST['Host'])){           $Response.= '<br> - Host es obligatorio';                   }else{$Host            = trim($_POST['Host']);}
+            if (empty($_POST['Admin_Usuario'])){  $Response.= '<br> - Usuario Administrador es obligatorio';  }else{$Admin_Usuario   = trim($_POST['Admin_Usuario']);}
+            if (empty($_POST['Admin_Password'])){ $Response.= '<br> - Password Administrador es obligatorio'; }else{$Admin_Password  = $_POST['Admin_Password'];}
+            if (empty($_POST['Prod_Usuario'])){   $Response.= '<br> - Usuario Producción es obligatorio';     }else{$Prod_Usuario    = trim($_POST['Prod_Usuario']);}
+            if (empty($_POST['Prod_Password'])){  $Response.= '<br> - Password Producción es obligatorio';    }else{$Prod_Password   = $_POST['Prod_Password'];}
+            if (empty($_POST['Port'])){           $Response.= '<br> - Port es obligatorio';                   }else{$Port            = trim($_POST['Port']);}
+            if (empty($_POST['Charset'])){        $Response.= '<br> - Charset es obligatorio';                }else{$Charset         = trim($_POST['Charset']);}
+            if (empty($_POST['DBName'])){         $Response.= '<br> - Nombre Base de Datos es obligatorio';   }else{$DBName          = trim($_POST['DBName']);}
 
             /******************************/
             //Si no hay errores
             if(empty($Response)){
                 // Validar credenciales
-                $result = $this->DataValidations->validateDatabase($Host, $Usuario, $Password, $Port, $Charset, $DBName);
+                $result = $this->DataValidations->validateDatabase($Host, $Admin_Usuario, $Admin_Password, $Port, $Charset, $DBName);
                 // Se valida resultado
                 if ($result['success']) {
                     // Guardar credenciales en sesión (no guardamos la conexión porque PDO no es serializable)
-                    $_SESSION['db_Host']     = $Host;
-                    $_SESSION['db_Usuario']  = $Usuario;
-                    $_SESSION['db_Password'] = $Password;
-                    $_SESSION['db_Port']     = $Port;
-                    $_SESSION['db_Charset']  = $Charset;
-                    $_SESSION['db_DBName']   = $DBName;
+                    $_SESSION['db_Host']           = $Host;
+                    $_SESSION['db_Admin_Usuario']  = $Admin_Usuario;
+                    $_SESSION['db_Admin_Password'] = $Admin_Password;
+                    $_SESSION['db_Prod_Usuario']   = $Prod_Usuario;
+                    $_SESSION['db_Prod_Password']  = $Prod_Password;
+                    $_SESSION['db_Port']           = $Port;
+                    $_SESSION['db_Charset']        = $Charset;
+                    $_SESSION['db_DBName']         = $DBName;
                     //devuelve true
                     $Response = true;
                 } else {
@@ -320,12 +329,14 @@ class installer extends ControllerBase {
             //Variables
             $Response = '';
             //Valido datos ingresados por el usuario
-            if (empty($_POST['Host'])){     $Response.= '<br> - Host es obligatorio';                 }else{$Host      = trim($_POST['Host']);}
-            if (empty($_POST['Usuario'])){  $Response.= '<br> - Usuario es obligatorio';              }else{$Usuario   = trim($_POST['Usuario']);}
-            if (empty($_POST['Password'])){ $Response.= '<br> - Password es obligatorio';             }else{$Password  = $_POST['Password'];}
-            if (empty($_POST['Port'])){     $Response.= '<br> - Port es obligatorio';                 }else{$Port      = trim($_POST['Port']);}
-            if (empty($_POST['Charset'])){  $Response.= '<br> - Charset es obligatorio';              }else{$Charset   = trim($_POST['Charset']);}
-            if (empty($_POST['DBName'])){   $Response.= '<br> - Nombre Base de Datos es obligatorio'; }else{$DBName    = trim($_POST['DBName']);}
+            if (empty($_POST['Host'])){           $Response.= '<br> - Host es obligatorio';                   }else{$Host            = trim($_POST['Host']);}
+            if (empty($_POST['Admin_Usuario'])){  $Response.= '<br> - Usuario Administrador es obligatorio';  }else{$Admin_Usuario   = trim($_POST['Admin_Usuario']);}
+            if (empty($_POST['Admin_Password'])){ $Response.= '<br> - Password Administrador es obligatorio'; }else{$Admin_Password  = $_POST['Admin_Password'];}
+            if (empty($_POST['Prod_Usuario'])){   $Response.= '<br> - Usuario Producción es obligatorio';     }else{$Prod_Usuario    = trim($_POST['Prod_Usuario']);}
+            if (empty($_POST['Prod_Password'])){  $Response.= '<br> - Password Producción es obligatorio';    }else{$Prod_Password   = $_POST['Prod_Password'];}
+            if (empty($_POST['Port'])){           $Response.= '<br> - Port es obligatorio';                   }else{$Port            = trim($_POST['Port']);}
+            if (empty($_POST['Charset'])){        $Response.= '<br> - Charset es obligatorio';                }else{$Charset         = trim($_POST['Charset']);}
+            if (empty($_POST['DBName'])){         $Response.= '<br> - Nombre Base de Datos es obligatorio';   }else{$DBName          = trim($_POST['DBName']);}
 
             /******************************/
             //Si no hay errores
@@ -338,8 +349,8 @@ class installer extends ControllerBase {
                 ];
                 $newBDConn = [
                     'HOSTNAME' => $Host,
-                    'USERNAME' => $Usuario,
-                    'PASSWORD' => $Password,
+                    'USERNAME' => $Admin_Usuario,
+                    'PASSWORD' => $Admin_Password,
                     'PORT'     => $Port,
                     'CHARSET'  => $Charset,
                 ];
@@ -361,8 +372,8 @@ class installer extends ControllerBase {
                     //Se generan los datos de conexión
                     $BD_Data = [
                         'HOSTNAME' => $Host,
-                        'USERNAME' => $Usuario,
-                        'PASSWORD' => $Password,
+                        'USERNAME' => $Admin_Usuario,
+                        'PASSWORD' => $Admin_Password,
                         'PORT'     => $Port,
                         'CHARSET'  => $Charset,
                         'DATABASE' => $DBName,
@@ -387,18 +398,29 @@ class installer extends ControllerBase {
                         //Si se permite la escritura
                         if ($isWritableDirectory['success']) {
                             //Se agrega el nombre del archivo
-                            $envPath = $folderPath . 'ConfigData.php';
+                            $envPath = $folderPath . 'ConfigDataTest.php';
                             //Se generan los datos a ingresar en el archivo
                             $variables = [
-                                'HOSTNAME' => $Host,
-                                'USERNAME' => $Usuario,
-                                'PASSWORD' => $Password,
-                                'DATABASE' => $DBName,
-                                'CHARSET'  => $Charset,
-                                'PORT'     => $Port,
+                                'MySQL_ADMIN' => [
+                                    'HOSTNAME' => $Host,
+                                    'USERNAME' => $Admin_Usuario,
+                                    'PASSWORD' => $Admin_Password,
+                                    'DATABASE' => $DBName,
+                                    'CHARSET'  => $Charset,
+                                    'PORT'     => $Port,
+                                ],
+                                'MySQL_1' => [
+                                    'HOSTNAME' => $Host,
+                                    'USERNAME' => $Prod_Usuario,
+                                    'PASSWORD' => $Prod_Password,
+                                    'DATABASE' => $DBName,
+                                    'CHARSET'  => $Charset,
+                                    'PORT'     => $Port,
+                                ],
                             ];
+
                             //Se crea el archivo
-                            $iswritePHPFile = $this->FunctionsServer->writeConfigClassFile($envPath, $variables, 'MySQL_1');
+                            $iswritePHPFile = $this->FunctionsServer->writeConfigClassFile($envPath, $variables);
                             //Si se crea correctamente
                             if ($iswritePHPFile['success']) {
                                 // Se cambian los permisos de la carpeta y el archivo

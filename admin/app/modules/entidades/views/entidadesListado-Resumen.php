@@ -20,7 +20,7 @@
 
                 <div class="tab-pane fade" id="resumen-edit">
 
-                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
@@ -56,7 +56,7 @@
                                 $x28  = $data['rowData']['idEstado'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo',              'Name'  => 'idTipo',         'Id' => 'Edit_idTipo',         'Value'  => $x0,'Required' => 2,'arrData' => $data['arrTipo']]);
                                 $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo Entidad',      'Name'  => 'idTipoEntidad',  'Id' => 'Edit_idTipoEntidad',  'Value'  => $x1,'Required' => 2,'arrData' => $data['arrTipoEntidad']]);
                                 //Persona natural
@@ -71,7 +71,7 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',               'Name'  => 'Web',            'Id' => 'Edit_Web',           'Value' => $x9, 'Required' => 1]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Giro',              'Name'  => 'Giro',           'Id' => 'Edit_Giro',          'Value' => $x10,'Required' => 1]);
                                 //Comun
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Comunes']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Comunes', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',      'Id1' => 'Edit_idCiudad',    'Value1' => $x11,'Required1' => 1,'arrData1' => $data['arrCiudad'],
                                                                                       'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',      'Id2' => 'Edit_idComuna',    'Value2' => $x12,'Required2' => 1,'arrData2' => $data['arrComuna']]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion',     'Id'  => 'Edit_Direccion',   'Value'  => $x13,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
@@ -81,7 +81,7 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Celular',    'Name'  => 'Fono1',         'Id'  => 'Edit_Fono1',       'Value'  => $x17,'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Teléfono',   'Name'  => 'Fono2',         'Id'  => 'Edit_Fono2',       'Value'  => $x18,'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Representante Legal']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Representante Legal', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',    'Name' => 'RepLegalNombre',   'Id' => 'Edit_RepLegalNombre',   'Value' => $x19,'Required' => 1]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',       'Name' => 'RepLegalRut',      'Id' => 'Edit_RepLegalRut',      'Value' => $x20,'Required' => 1,'Icon' => 'bi bi-person-circle']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',     'Name' => 'RepLegalEmail',    'Id' => 'Edit_RepLegalEmail',    'Value' => $x21,'Required' => 1,'Icon' => 'bx bx-mail-send']);
@@ -89,13 +89,13 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',   'Name' => 'RepLegalFono1',    'Id' => 'Edit_RepLegalFono1',    'Value' => $x22,'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Teléfono',  'Name' => 'RepLegalFono2',    'Id' => 'Edit_RepLegalFono2',    'Value' => $x23,'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => $x24, 'Required' => 1, 'Icon' => 'bi bi-x']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',   'Id' => 'Edit_Social_Facebook',  'Value' => $x25, 'Required' => 1, 'Icon' => 'bi bi-facebook']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram',  'Id' => 'Edit_Social_Instagram', 'Value' => $x26, 'Required' => 1, 'Icon' => 'bi bi-instagram']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => $x27, 'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelect([  'Placeholder' => 'Estado',  'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => $x28,'Required' => 2,'arrData' => $data['arrEstado']]);
                                 //permite la modificacion de la contraseña en caso de ser utilizada
                                 if($data['UserData']["entidadesListadoUsoPassword"]==2){
@@ -126,7 +126,7 @@
                 ?>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $Entidad; ?>
                         </div>
@@ -155,7 +155,7 @@
 
                 <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-cargas">
-                        <h5 class="box-title text-color-red-dark">
+                        <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Cargas de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabCargasNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -170,7 +170,7 @@
 
                 <?php if($data['UserData']["entidadesListadoVerContactos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-contactos">
-                        <h5 class="box-title text-color-red-dark">
+                        <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Contactos de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabContactosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -185,7 +185,7 @@
 
                 <?php if($data['UserData']["entidadesListadoVerDocumentos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
-                        <h5 class="box-title text-color-red-dark">
+                        <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Documentos de <?php echo $Entidad; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -199,7 +199,7 @@
                 <?php } ?>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $Entidad; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

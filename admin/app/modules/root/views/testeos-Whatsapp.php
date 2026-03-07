@@ -7,7 +7,7 @@
                         <div class="text-center">
                             <h5 class="search-title"><i class="bi bi-whatsapp"></i> Envio de mensaje por Whatsapp</h5>
                         </div>
-                        <form id="FormSendData" name="FormSendData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                        <form id="FormSendData" name="FormSendData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                             <?php
                             //Se verifican si existen los datos
                             $x1 = $data['UserData']['Config_WhatsappToken'] ?? '';

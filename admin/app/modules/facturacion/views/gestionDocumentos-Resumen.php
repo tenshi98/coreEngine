@@ -24,7 +24,7 @@
 
                 <div class="tab-pane fade" id="resumen-edit">
 
-                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
@@ -96,7 +96,7 @@
                 ?>
 
                 <div class="tab-pane fade" id="resumen-items">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Items de <?php echo $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?>
                             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
@@ -111,7 +111,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-productos">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Productos de <?php echo $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?>
                             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
@@ -126,7 +126,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-servicios">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Servicios de <?php echo $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?>
                             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
@@ -142,7 +142,7 @@
 
                 <?php if(isset($data['rowData']['idDocumentos'])&&$data['rowData']['idDocumentos']==1){ ?>
                     <div class="tab-pane fade" id="resumen-guias">
-                        <h5 class="box-title text-color-red-dark">
+                        <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Guia de Despacho de <?php echo $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?>
                                 <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
@@ -159,7 +159,7 @@
 
                 <?php if(isset($data['rowData']['idDocumentos'])&&$data['rowData']['idDocumentos']!=3){ ?>
                     <div class="tab-pane fade" id="resumen-pagos">
-                        <h5 class="box-title text-color-red-dark">
+                        <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Pagos Realizados de <?php echo $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?>
                                 <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>

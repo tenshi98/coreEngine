@@ -15,7 +15,7 @@ class coreFormularios extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/

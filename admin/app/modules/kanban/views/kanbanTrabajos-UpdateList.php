@@ -18,7 +18,7 @@
                 $Entidad     = addslashes($crud['Nombre']); ?>
                 <tr>
                     <td><?php echo $crud['Nombre']; ?></td>
-                    <td><span class="badge <?php echo $crud['EstadoColor']; ?>"><?php echo $crud['Estado']; ?></span></td>
+                    <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$crud['EstadoColor']; ?>"><?php echo $crud['Estado']; ?></span></td>
                     <td>
                         <div class="btn-group" role="group">
                             <?php

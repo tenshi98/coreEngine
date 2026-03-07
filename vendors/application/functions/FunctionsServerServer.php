@@ -508,7 +508,7 @@ class FunctionsServerServer {
     }
 
     /******************************************************************************/
-    public function writeConfigClassFile(string $path, array $variables, string $constName = 'MySQL_1'): array {
+    public function writeConfigClassFile(string $path, array $variables): array {
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -519,16 +519,26 @@ class FunctionsServerServer {
 		* 	//ejecucion
 		* 	$phpPath = __DIR__ . '/config.php';
         *
-        * 	$variables = [
-        * 	    'APP_NAME'    => 'Mi Aplicacion',
-        * 	    'APP_ENV'     => 'production',
-        * 	    'DB_HOST'     => 'localhost',
-        * 	    'DB_DATABASE' => 'mi_base',
-        * 	    'DB_USERNAME' => 'root',
-        * 	    'DB_PASSWORD' => '123456'
-        * 	];
+		* 	$variables = [
+		* 		'MySQL_ADMIN' => [
+		* 			'HOSTNAME' => 'localhost',
+		* 			'USERNAME' => 'root',
+		* 			'PASSWORD' => '123456'
+		* 			'DATABASE' => 'mi_base',
+		* 			'CHARSET'  => 'utf8mb4',
+		* 			'PORT'     => 3306,
+		* 		],
+		* 		'MySQL_1' => [
+		* 			'HOSTNAME' => 'localhost',
+		* 			'USERNAME' => 'usuario',
+		* 			'PASSWORD' => '123456'
+		* 			'DATABASE' => 'mi_base',
+		* 			'CHARSET'  => 'utf8mb4',
+		* 			'PORT'     => 3306,
+		* 		],
+		* 	];
         *
-        * 	$result = writeConfigClassFile($phpPath, $variables, 'MySQL_1');
+        * 	$result = writeConfigClassFile($phpPath, $variables);
         *
         * 	if ($result['success']) {
         * 	    echo $result['message'];
@@ -537,7 +547,7 @@ class FunctionsServerServer {
         * 	}
 		*
 		*=================================================    Parametros   =================================================
-        * @input string $path       Ruta completa donde se creará el archivo (ej: /var/www/html/.env)
+        * @input string $path       Ruta completa donde se creará el archivo (ej: /var/www/html/conf.php)
         * @input array  $variables  Array asociativo con las variables ['KEY' => 'VALUE']
         * @input string $constName  Permite el ingreso del nombre de la constante
         * @return array Retorna ['success' => bool, 'message' => string]
@@ -546,10 +556,8 @@ class FunctionsServerServer {
 
 		try {
 
-			// Devuelve la ruta del directorio padre de una ruta dada.
-			$directory = dirname($path);
-
 			// Validar que el directorio exista
+			$directory = dirname($path);
 			if (!is_dir($directory)) {
 				return [
 					'success' => false,
@@ -557,7 +565,7 @@ class FunctionsServerServer {
 				];
 			}
 
-			// Verificar si el archivo existe
+			// Verificar extensión
 			if (pathinfo($path, PATHINFO_EXTENSION) !== 'php') {
 				return [
 					'success' => false,
@@ -565,41 +573,51 @@ class FunctionsServerServer {
 				];
 			}
 
-			// Sanitizar nombre constante
-			$constName = preg_replace('/[^A-Z0-9_]/', '', strtoupper($constName));
-
-			// Construir bloque de constante
-			$constBlock  = "    /*****************************************************/\n";
-			$constBlock .= "    //Variables para MySQL\n";
-			$constBlock .= "    const {$constName} = [\n";
-
-			foreach ($variables as $key => $value) {
-
-				$cleanKey = preg_replace('/[^A-Z0-9_]/i', '', strtoupper($key));
-
-				// Detectar tipo de dato
-				if (is_int($value) || is_float($value)) {
-					$exportedValue = $value; // sin comillas
-				} elseif (is_bool($value)) {
-					$exportedValue = $value ? 'true' : 'false';
-				} elseif (is_null($value)) {
-					$exportedValue = 'null';
-				} elseif (is_numeric($value) && !preg_match('/^0\d+$/', $value)) {
-					// Si viene como string numérico (ej: "3306") lo convertimos a número
-					$exportedValue = $value + 0;
-				} else {
-					// Escapar string correctamente
-					$exportedValue = "'" . addslashes($value) . "'";
+			// Validar que $variables sea un array asociativo de arrays
+			foreach ($variables as $constName => $fields) {
+				if (!is_array($fields)) {
+					return [
+						'success' => false,
+						'message' => "El valor de '{$constName}' debe ser un array."
+					];
 				}
-
-				$constBlock .= "        '{$cleanKey}' => {$exportedValue},\n";
 			}
 
+			// ---------------------------------------------------------------------
+			// Construir todos los bloques de constantes
+			// ---------------------------------------------------------------------
+			$buildConstBlock = function(string $constName, array $fields): string {
 
-			$constBlock .= "    ];\n\n";
+				$constName  = preg_replace('/[^A-Z0-9_]/', '', strtoupper($constName));
+				$constBlock  = "    /*****************************************************/\n";
+				$constBlock .= "    //Variables para MySQL\n";
+				$constBlock .= "    const {$constName} = [\n";
+
+				foreach ($fields as $key => $value) {
+
+					$cleanKey = preg_replace('/[^A-Z0-9_]/i', '', strtoupper($key));
+
+					if (is_int($value) || is_float($value)) {
+						$exportedValue = $value;
+					} elseif (is_bool($value)) {
+						$exportedValue = $value ? 'true' : 'false';
+					} elseif (is_null($value)) {
+						$exportedValue = 'null';
+					} elseif (is_numeric($value) && !preg_match('/^0\d+$/', $value)) {
+						$exportedValue = $value + 0;
+					} else {
+						$exportedValue = "'" . addslashes($value) . "'";
+					}
+
+					$constBlock .= "        '{$cleanKey}' => {$exportedValue},\n";
+				}
+
+				$constBlock .= "    ];\n\n";
+				return $constBlock;
+			};
 
 			// ---------------------------------------------------------------------
-			// Si el archivo no existe → crear estructura completa
+			// Si el archivo NO existe → crear estructura completa
 			// ---------------------------------------------------------------------
 			if (!file_exists($path)) {
 
@@ -608,14 +626,19 @@ class FunctionsServerServer {
 				$content .= "/*                                              Se define la clase                                                 */\n";
 				$content .= "/*******************************************************************************************************************/\n";
 				$content .= "class ConfigData{\n";
-				$content .= $constBlock;
+
+				foreach ($variables as $constName => $fields) {
+					$content .= $buildConstBlock($constName, $fields);
+				}
+
 				$content .= "}\n";
 
 				file_put_contents($path, $content);
 
+				$names = implode(', ', array_keys($variables));
 				return [
 					'success' => true,
-					'message' => "Archivo creado y constante {$constName} agregada."
+					'message' => "Archivo creado con las constantes: {$names}."
 				];
 			}
 
@@ -624,33 +647,59 @@ class FunctionsServerServer {
 			// ---------------------------------------------------------------------
 			$existingContent = file_get_contents($path);
 
-			// Verificar si la clase existe
+			// Verificar si la clase existe, si no, crearla con todo el contenido
 			if (!preg_match('/class\s+ConfigData/i', $existingContent)) {
 
 				$existingContent .= "\n\nclass ConfigData{\n";
-				$existingContent .= $constBlock;
+
+				foreach ($variables as $constName => $fields) {
+					$existingContent .= $buildConstBlock($constName, $fields);
+				}
+
 				$existingContent .= "}\n";
 
 				file_put_contents($path, $existingContent);
 
+				$names = implode(', ', array_keys($variables));
 				return [
 					'success' => true,
-					'message' => "Clase creada y constante {$constName} agregada."
+					'message' => "Clase creada con las constantes: {$names}."
 				];
 			}
 
-			// Verificar si la constante ya existe
-			if (preg_match('/const\s+' . $constName . '\s*=/i', $existingContent)) {
+			// ---------------------------------------------------------------------
+			// Verificar cuáles constantes ya existen y cuáles son nuevas
+			// ---------------------------------------------------------------------
+			$existentes = [];
+			$nuevas     = [];
+
+			foreach ($variables as $constName => $fields) {
+				$sanitized = preg_replace('/[^A-Z0-9_]/', '', strtoupper($constName));
+				if (preg_match('/const\s+' . $sanitized . '\s*=/i', $existingContent)) {
+					$existentes[] = $sanitized;
+				} else {
+					$nuevas[$sanitized] = $fields;
+				}
+			}
+
+			// Si todas ya existen, retornar error
+			if (empty($nuevas)) {
+				$names = implode(', ', $existentes);
 				return [
 					'success' => false,
-					'message' => "La constante {$constName} ya existe."
+					'message' => "Las constantes ya existen: {$names}."
 				];
 			}
 
-			// Insertar constante antes del cierre de la clase
+			// Insertar solo las constantes nuevas antes del cierre de la clase
+			$newBlocks = '';
+			foreach ($nuevas as $constName => $fields) {
+				$newBlocks .= $buildConstBlock($constName, $fields);
+			}
+
 			$updatedContent = preg_replace(
 				'/}\s*$/',
-				$constBlock . "}",
+				$newBlocks . "}",
 				$existingContent
 			);
 
@@ -663,9 +712,14 @@ class FunctionsServerServer {
 
 			file_put_contents($path, $updatedContent);
 
+			// Mensaje detallado con resultado por constante
+			$msg = [];
+			if (!empty($nuevas))     { $msg[] = "Agregadas: "  . implode(', ', array_keys($nuevas)); }
+			if (!empty($existentes)) { $msg[] = "Ya existían: " . implode(', ', $existentes); }
+
 			return [
 				'success' => true,
-				'message' => "Constante {$constName} agregada correctamente."
+				'message' => implode(' | ', $msg)
 			];
 
 		} catch (Throwable $e) {

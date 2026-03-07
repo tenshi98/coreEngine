@@ -1,4 +1,4 @@
-<form id="FormUpdatePermisos" name="FormUpdatePermisos" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+<form id="FormUpdatePermisos" name="FormUpdatePermisos" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <table class="table table-sm table-hover">
         <thead>
             <tr>

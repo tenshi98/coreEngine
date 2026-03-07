@@ -240,6 +240,22 @@ class userSession extends ControllerBase {
             /******************************/
             //Se envia el correo
             try {
+
+                /******************************/
+                //Se cargan los datos de la plataforma
+                $query = [
+                    'data'   => 'Config_motorEmail',
+                    'table'  => 'core_sistemas',
+                    'join'   => '',
+                    'where'  => 'idSistema = "1"',
+                    'group'  => '',
+                    'having' => '',
+                    'order'  => ''
+                ];
+                //Verifico si hay un dato
+                $xParams     = ['query' => $query];
+                $rowOpciones = $this->Base_GetByID($xParams);
+
                 /******************************/
                 //Se agrega respuesta
                 $arrData = [
@@ -254,7 +270,7 @@ class userSession extends ControllerBase {
                     'Post'      => $arrData,
                 ];
                 /******************************/
-                $Respuesta = $this->Base_SMTPMail($f3, $query);
+                $Respuesta = $this->Base_SelectMail($f3, $query, $rowOpciones['Config_motorEmail']);
                 //si es la respuesta esperada
                 if ($Respuesta===true) {
                     //imprimo resultados

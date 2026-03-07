@@ -30,6 +30,22 @@ class main extends ControllerBase {
     //Vista - Login
     public function login($f3){
 
+        /******************************************/
+        //Se cargan los datos de la plataforma
+        $query = [
+            'data'   => 'Sistema_idTema',
+            'table'  => 'core_sistemas',
+            'join'   => '',
+            'where'  => 'idSistema = "1"',
+            'group'  => '',
+            'having' => '',
+            'order'  => ''
+        ];
+        //Verifico si hay un dato
+        $xParams     = ['query' => $query];
+        $rowOpciones = $this->Base_GetByID($xParams);
+
+        /******************************************/
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -37,6 +53,8 @@ class main extends ControllerBase {
             'PageDescription' => 'Iniciar Sesión',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*=========== Datos Consultados ===========*/
+            'rowOpciones'    => $rowOpciones,
 
         ];
 
@@ -132,6 +150,7 @@ class main extends ControllerBase {
         //Se instancia la vista
         $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
     }
+
     /******************************************************************************/
     //Se listan los controladores
     public function arrayWidgetViews(){

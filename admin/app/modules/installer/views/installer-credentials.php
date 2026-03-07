@@ -9,7 +9,7 @@
     </ul>
 </div>
 
-<form id="FormCredentials" name="FormCredentials" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+<form id="FormCredentials" name="FormCredentials" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="card-body">
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 col-xl-8 col-xxl-8 mx-auto">
             <div class="text-center">
@@ -25,15 +25,42 @@
                 <li class="text-muted"><i class="bi bi-check text-color-green-dark"></i> Verifica que el nombre de usuario y la contraseña sean correctos antes de continuar.</li>
                 <li class="text-muted"><i class="bi bi-check text-color-green-dark"></i> Puerto y Charset son opcionales, en el caso de no ingresarlos se utiliza la configuración por defecto</li>
             </ul>
+        </div>
 
-            <?php
-            //se dibujan los inputs
-            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-server',    'Placeholder' => 'Host de MySQL',  'Name' => 'Host',      'Id' => 'Host',      'Value' => '', 'Required' => 2, 'DataInfo' => 'Dirección del servidor MySQL (generalmente localhost)']);
-            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-user',      'Placeholder' => 'Usuario',        'Name' => 'Usuario',   'Id' => 'Usuario',   'Value' => '', 'Required' => 2, 'DataInfo' => 'Usuario MySQL con permisos de creación de bases de datos']);
-            $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-key',       'Placeholder' => 'Contraseña',     'Name' => 'Password',  'Id' => 'Password',  'Value' => '', 'Required' => 2, 'DataInfo' => 'Contraseña del usuario MySQL']);
-            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-git-merge', 'Placeholder' => 'Puerto',         'Name' => 'Port',      'Id' => 'Port',      'Value' => '', 'Required' => 1, 'DataInfo' => '(Opcional) Puerto de conexión a utilizar, generalmente 3306']);
-            $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-braille',   'Placeholder' => 'Charset',        'Name' => 'Charset',   'Id' => 'Charset',   'Value' => '', 'Required' => 1, 'DataInfo' => '(Opcional) Conjunto de caracteres a utilizar, generalmente utf8mb4']);
-            ?>
+        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xl-10 col-xxl-10 mx-auto">
+            <h4 class="text-muted"><i class="bi bi-list-check text-color-blue"></i> Administrador:</h4>
+            <hr>
+            <div class="row">
+                <div class="col"><?php $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-user',      'Placeholder' => 'Usuario',        'Name' => 'Admin_Usuario',   'Id' => 'Admin_Usuario',   'Value' => '', 'Required' => 2, 'DataInfo' => 'Usuario MySQL Administrador con permisos de creación de bases de datos']);?></div>
+                <div class="col"><?php $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-key',       'Placeholder' => 'Contraseña',     'Name' => 'Admin_Password',  'Id' => 'Admin_Password',  'Value' => '', 'Required' => 2, 'DataInfo' => 'Contraseña del usuario MySQL']);?></div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xl-10 col-xxl-10 mx-auto">
+            <h4 class="text-muted"><i class="bi bi-list-check text-color-blue"></i> Usuario de Producción:</h4>
+            <hr>
+            <div class="row">
+                <div class="col"><?php $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-user',      'Placeholder' => 'Usuario',        'Name' => 'Prod_Usuario',   'Id' => 'Prod_Usuario',   'Value' => '', 'Required' => 2, 'DataInfo' => 'Usuario MySQL Produccion con permisos de lectura de bases de datos']);?></div>
+                <div class="col"><?php $data['Fnc_FormInputs']->formInput(['FormType' => 3,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-key',       'Placeholder' => 'Contraseña',     'Name' => 'Prod_Password',  'Id' => 'Prod_Password',  'Value' => '', 'Required' => 2, 'DataInfo' => 'Contraseña del usuario MySQL']);?></div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-10 col-xl-10 col-xxl-10 mx-auto">
+            <h4 class="text-muted"><i class="bi bi-list-check text-color-blue"></i> Datos del Servidor:</h4>
+            <hr>
+            <div class="row">
+                <div class="col">
+                    <?php
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-server',    'Placeholder' => 'Host de MySQL',  'Name' => 'Host',      'Id' => 'Host',      'Value' => '', 'Required' => 2, 'DataInfo' => 'Dirección del servidor MySQL (generalmente localhost)']);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-braille',   'Placeholder' => 'Charset',        'Name' => 'Charset',   'Id' => 'Charset',   'Value' => '', 'Required' => 1, 'DataInfo' => '(Opcional) Conjunto de caracteres a utilizar, generalmente utf8mb4']);
+                    ?>
+                </div>
+                <div class="col">
+                    <?php
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 2,'FormCol' => 12,'PlaceholderIcon' => 'bx bx-git-merge', 'Placeholder' => 'Puerto',         'Name' => 'Port',      'Id' => 'Port',      'Value' => '', 'Required' => 1, 'DataInfo' => '(Opcional) Puerto de conexión a utilizar, generalmente 3306']);
+                    ?>
+                </div>
+            </div>
         </div>
     </div>
     <div class="card-footer text-end">

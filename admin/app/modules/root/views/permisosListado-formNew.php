@@ -6,7 +6,7 @@ $RandName = 'rand_'.rand(1, 999999);
 <div class="modal fade" id="newFormModal" tabindex="-1">
     <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <form id="FormNewData" name="FormNewData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+            <form id="FormNewData" name="FormNewData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                 <div class="modal-header">
                     <?php
                     switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -28,7 +28,7 @@ $RandName = 'rand_'.rand(1, 999999);
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <?php $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Información Base']); ?>
+                    <?php $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Información Base', 'Clase' => 'box-title text-color-red-dark']); ?>
                     <div class="d-flex">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 col-xxl-6" style="padding-right:6px;">
                             <?php

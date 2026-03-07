@@ -3,8 +3,7 @@
         <tr>
             <th>Tipo</th>
             <th>Nombre</th>
-            <th>Ruta Web</th>
-            <th>Controlador</th>
+            <th>Ruta</th>
             <th>Nivel Acceso</th>
             <th>Estado</th>
             <th style="width: 10px;">Acciones</th>
@@ -33,10 +32,9 @@
                     <tr>
                         <td><?php echo $perm['Tipo']; ?></td>
                         <td><?php echo $perm['Nombre']; ?></td>
-                        <td><?php echo $perm['RutaWeb']; ?></td>
-                        <td><?php echo $perm['RutaController']; ?></td>
+                        <td><?php echo '<strong>Ruta: </strong>'.$perm['RutaWeb'].'<br><strong>Controlador: </strong>'.$perm['RutaController']; ?></td>
                         <td><?php echo $perm['LevelLimit']; ?></td>
-                        <td><?php echo '<span class="badge '.$estadoBadge[$perm['idEstado']].'">'.$perm['Estado'].'</span>'; ?></td>
+                        <td><?php echo '<span class="badge-sp1 badge-sp1-'.$estadoBadge[$perm['idEstado']].'">'.$perm['Estado'].'</span>'; ?></td>
                         <td>
                             <div class="btn-group" role="group">
                                 <button type="button" onclick="TDviewBTN('<?php echo $encryptedId; ?>')"                            class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>

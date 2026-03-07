@@ -16,7 +16,7 @@
 
                 <div class="tab-pane fade" id="resumen-edit">
 
-                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
@@ -53,7 +53,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-rutas">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Rutas de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#newFormModal"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

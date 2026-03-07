@@ -50,7 +50,7 @@
                         ['Icon' => '','Titulo' => 'Rut',             'Texto' => $data['rowData']['Rut']],
                         ['Icon' => '','Titulo' => 'Fono',            'Texto' => $data['rowData']['Fono']],
                         ['Icon' => '','Titulo' => 'Email',           'Texto' => $data['rowData']['email']],
-                        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+                        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
                     ];
                     $arrData_2 = [
                         ['Icon' => '','Titulo' => 'Ultimo acceso', 'Texto' => $data['rowData']['Ultimo_acceso']],

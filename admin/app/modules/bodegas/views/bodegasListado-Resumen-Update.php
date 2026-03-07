@@ -14,7 +14,7 @@
             ['Icon' => '','Titulo' => 'Ciudad',      'Texto' => $data['rowData']['Ciudad']],
             ['Icon' => '','Titulo' => 'Comuna',      'Texto' => $data['rowData']['Comuna']],
             ['Icon' => '','Titulo' => 'Direccion',   'Texto' => $data['rowData']['Direccion']],
-            ['Icon' => '','Titulo' => 'Estado',      'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+            ['Icon' => '','Titulo' => 'Estado',      'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ];
 
         echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';

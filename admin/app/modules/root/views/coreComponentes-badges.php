@@ -72,12 +72,54 @@
             <div class="card" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
                 <div class="card-body">
                     <h1 class="card-title">Extras</h1>
+                    <h5 class="card-title">Default Badges</h5>
+                    <span class="badge-sp1 badge-sp1-bg-primary">Primary</span>
+                    <span class="badge-sp1 badge-sp1-bg-secondary">Secondary</span>
+                    <span class="badge-sp1 badge-sp1-bg-success">Success</span>
+                    <span class="badge-sp1 badge-sp1-bg-danger">Danger</span>
+                    <span class="badge-sp1 badge-sp1-bg-warning">Warning</span>
+                    <span class="badge-sp1 badge-sp1-bg-info">Info</span>
+                    <span class="badge-sp1 badge-sp1-bg-light">Light</span>
+                    <span class="badge-sp1 badge-sp1-bg-dark">Dark</span>
 
+                    <h5 class="card-title">Pill Badges</h5>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-primary">Primary</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-secondary">Secondary</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-success">Success</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-danger">Danger</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-warning">Warning</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-info">Info</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-light">Light</span>
+                    <span class="badge-sp1 rounded-pill badge-sp1-bg-dark">Dark</span>
+
+                    <h5 class="card-title">Icon Badges</h5>
+                    <span class="badge-sp1 badge-sp1-bg-primary"><i class="bi bi-star me-1"></i> Primary</span>
+                    <span class="badge-sp1 badge-sp1-bg-secondary"><i class="bi bi-collection me-1"></i> Secondary</span>
+                    <span class="badge-sp1 badge-sp1-bg-success"><i class="bi bi-check-circle me-1"></i> Success</span>
+                    <span class="badge-sp1 badge-sp1-bg-danger"><i class="bi bi-exclamation-octagon me-1"></i> Danger</span>
+                    <span class="badge-sp1 badge-sp1-bg-warning"><i class="bi bi-exclamation-triangle me-1"></i> Warning</span>
+                    <span class="badge-sp1 badge-sp1-bg-info"><i class="bi bi-info-circle me-1"></i> Info</span>
+                    <span class="badge-sp1 badge-sp1-bg-light"><i class="bi bi-star me-1"></i> Light</span>
+                    <span class="badge-sp1 badge-sp1-bg-dark"><i class="bi bi-folder me-1"></i> Dark</span>
+
+                    <h5 class="card-title">Heading Badges</h5>
+                    <h1>Example h1 heading <span class="badge-sp1 badge-sp1-bg-primary">Primary</span></h1>
+                    <h2>Example h2 heading <span class="badge-sp1 badge-sp1-bg-secondary">Secondary</span></h2>
+                    <h3>Example h3 heading <span class="badge-sp1 badge-sp1-bg-success">Success</span></h3>
+                    <h4>Example h4 heading <span class="badge-sp1 badge-sp1-bg-danger">Danger</span></h4>
+                    <h5>Example h5 heading <span class="badge-sp1 badge-sp1-bg-warning">Warning</span></h5>
+                    <h6>Example h6 heading <span class="badge-sp1 badge-sp1-bg-info">Info</span></h6>
+                    <h6>Example h6 heading <span class="badge-sp1 badge-sp1-bg-light">Info</span></h6>
+                    <h6>Example h6 heading <span class="badge-sp1 badge-sp1-bg-dark">Info</span></h6>
 
 
                 </div>
             </div>
 
+            <style>
+
+
+            </style>
 
 
         </div>

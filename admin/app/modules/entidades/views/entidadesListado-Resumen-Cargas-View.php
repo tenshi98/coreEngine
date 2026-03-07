@@ -31,7 +31,7 @@
         ['Icon' => '','Titulo' => 'Observaciones Estudio',  'Texto' => $data['rowData']['ObsEstudios']],
         ['Icon' => '','Titulo' => 'Fecha Vigencia',         'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVigencia'])],
         ['Icon' => '','Titulo' => 'Fecha Vencimiento',      'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVencimiento'])],
-        ['Icon' => '','Titulo' => 'Estado',                 'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        ['Icon' => '','Titulo' => 'Estado',                 'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
     ];
     $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
     ?>

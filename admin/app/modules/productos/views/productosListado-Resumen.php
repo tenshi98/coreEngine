@@ -18,7 +18,7 @@
 
                 <div class="tab-pane fade" id="resumen-edit">
 
-                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
@@ -36,7 +36,7 @@
                                 $x11 = $data['rowData']['idEstado'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo',           'Name' => 'idTipoProducto',   'Id' => 'Edit_idTipoProducto',    'Value' => $x1,'Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
                                 $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => $x2,'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => $x3,'Required' => 2]);
@@ -45,12 +45,12 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',         'Name' => 'Codigo',           'Id' => 'Edit_Codigo',            'Value' => $x6,'Required' => 1,'Icon' => 'ri-barcode-line']);
                                 $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => $x7,'Required' => 1]);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Stock Limite',   'Name' => 'StockLimite',      'Id' => 'Edit_StockLimite',       'Value' => $x8,  'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Valor Ingreso',  'Name' => 'ValorIngreso',     'Id' => 'Edit_ValorIngreso',      'Value' => $x9,  'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Valor Egreso',   'Name' => 'ValorEgreso',      'Id' => 'Edit_ValorEgreso',       'Value' => $x10, 'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelect([   'Placeholder' => 'Estado',  'Name'  => 'idEstado', 'Id'  => 'Search_idEstado', 'Value'  => $x11,'Required' => 2,'arrData' => $data['arrEstado']]);
 
 
@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Nombre']; ?>
                         </div>
@@ -101,7 +101,7 @@
 
                 <?php if($data['UserData']["productosListadoVerDocumentos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
-                        <h5 class="box-title text-color-red-dark">
+                        <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Documentos de <?php echo $data['rowData']['Nombre']; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
@@ -115,7 +115,7 @@
                 <?php } ?>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

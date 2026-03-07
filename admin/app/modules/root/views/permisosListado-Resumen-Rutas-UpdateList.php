@@ -2,8 +2,7 @@
     <thead>
         <tr>
             <th>Metodo</th>
-            <th>Ruta Web</th>
-            <th>Ruta Controller</th>
+            <th>Ruta</th>
             <th>Descripcion</th>
             <th>Objetivo</th>
             <th style="width: 10px;">Acciones</th>
@@ -25,8 +24,7 @@
                     $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $ruta['idRutas']); ?>
                     <tr>
                         <td><?php echo $ruta['Metodo']; ?></td>
-                        <td><?php echo $ruta['RutaWeb']; ?></td>
-                        <td><?php echo $ruta['RutaController']; ?></td>
+                        <td><?php echo '<strong>Ruta: </strong>'.$ruta['RutaWeb'].'<br><strong>Controlador: </strong>'.$ruta['RutaController']; ?></td>
                         <td><?php echo $ruta['Descripcion']; ?></td>
                         <td><?php echo $ruta['LevelLimit']; ?></td>
                         <td>

@@ -1,7 +1,7 @@
 <div class="modal fade" id="newFormModal" >
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <form id="FormNewData" name="FormNewData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+            <form id="FormNewData" name="FormNewData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                 <div class="modal-header">
                     <?php
                     switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -25,7 +25,7 @@
                 <div class="modal-body">
                     <?php
                     //se dibujan los inputs
-                    $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales']);
+                    $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales', 'Clase' => 'box-title text-color-red-dark']);
                     $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Cada usuario nuevo creado lleva por defecto la contraseña 1234');
                     $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',               'Name'  => 'email',         'Value'  => '',  'Required'  => 2,  'Icon' => 'bx bx-mail-send']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',        'Value'  => '',  'Required'  => 2]);

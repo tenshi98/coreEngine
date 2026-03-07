@@ -12,7 +12,7 @@ class sistemaInstalacion extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -130,18 +130,18 @@ class sistemaInstalacion extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-Update.php');
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-Update.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError($UserData['TypeSession'], 2, $f3);
         }
     }
 
     /******************************************************************************/
     //View
-    public function checkModule($f3, $params){
+    public function checkModuleData($f3, $params){
         /*******************************************************************/
         //Se llaman los datos
         $UserData = $f3->get('SESSION.DataInfo');
@@ -194,20 +194,13 @@ class sistemaInstalacion extends ControllerBase {
         /******************************************/
         //Se genera la query
         $query = [
-            'data'    => '
-                core_permisos_listado_rutas.idPermisos,
-                core_permisos_listado_rutas.idMetodo,
-                core_permisos_listado_rutas.RutaWeb,
-                core_permisos_listado_rutas.RutaController,
-                core_permisos_listado_rutas.Descripcion,
-                core_permisos_listado_rutas.idLevelLimit,
-                core_permisos_listado_rutas.Controller',
+            'data'    => 'idPermisos, idMetodo, RutaWeb, RutaController, Descripcion, idLevelLimit, Controller',
             'table'   => 'core_permisos_listado_rutas',
-            'join'    => 'LEFT JOIN core_permisos_listado ON core_permisos_listado.idPermisos  = core_permisos_listado_rutas.idPermisos',
-            'where'   => 'core_permisos_listado.RutaController IN ('.$subWhere.')',
+            'join'    => '',
+            'where'   => 'Controller IN ('.$subWhere.')',
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_permisos_listado_rutas.idRutas ASC',
+            'order'   => 'idRutas ASC',
             'limit'   => 10000
         ];
         //Ejecuto la query
@@ -232,7 +225,102 @@ class sistemaInstalacion extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-ViewRutas.php');
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-checkModuleData.php');
+        /*******************************************************************/
+        //si no hay resultados
+        } else {
+            //Muestra los errores
+            $this->showError($UserData['TypeSession'], 2, $f3);
+        }
+    }
+
+    /******************************************************************************/
+    //View
+    public function checkModuleBBDD($f3, $params){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        /******************************************/
+        //Variable vacia
+        $arrModules    = [];
+        $arrControlers = [];
+
+        //Arreglo con los controladores a instalar
+        $array = array($params['Controller']);
+        /******************************************/
+        //Verifico si existe
+        if($array){
+            //recorro
+            foreach ($array as $data) {
+                //Se genera la query
+                $ListDataModule = method_exists($data, 'ListDataModule');
+                //si el metodo existe
+                if($ListDataModule===true){
+                    $ControllerData = new $data;
+                    //Se traen las rutas
+                    for ($i=0; $i < 10; $i++) {
+                        $arrModules[] = $ControllerData->listRouteModule($i, 0);
+                    }
+                }
+            }
+        }
+        //Se eliminan valores vacios
+        $arrModules = array_filter($arrModules);
+
+        //Se parsean los datos
+        if(is_array($arrModules)&&!empty($arrModules)){
+            foreach ($arrModules as $key=>$modules){
+                //Recorro
+                foreach($modules as $crud){
+                    if(isset($crud['idMetodo'])&&$crud['idMetodo']!=''){
+                        $arrControlers[] = '"'.$crud['Controller'].'"';
+                    }
+                }
+            }
+        }
+        //Se eliminan duplicados
+        $arrControlers = array_unique($arrControlers);
+        //Se filtran los controladores
+        $subWhere   = $arrControlers ? implode(',', $arrControlers) : '';
+
+
+        /******************************************/
+        //Se genera la query
+        $query = [
+            'data'    => 'idPermisos, idMetodo, RutaWeb, RutaController, Descripcion, idLevelLimit, Controller',
+            'table'   => 'core_permisos_listado_rutas',
+            'join'    => '',
+            'where'   => 'Controller IN ('.$subWhere.')',
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'idRutas ASC',
+            'limit'   => 10000
+        ];
+        //Ejecuto la query
+        $xParams  = ['query' => $query];
+        $arrRutas = $this->Base_GetList($xParams);
+
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        //Si hay resultados
+        if(is_array($arrModules)){
+            /******************************************/
+            //Datos enviados a la pagina
+            $f3->data = [
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $UserData,
+                'UserAccess'    => $arrLevel[$this->controllerName],
+                /*=========== Datos Consultados ===========*/
+                'arrModules' => $arrModules,
+                'arrRutas'   => $arrRutas,
+            ];
+
+            /******************************************/
+            //Se instancia la vista
+            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaInstalacion-Resumen-checkModuleBBDD.php');
         /*******************************************************************/
         //si no hay resultados
         } else {

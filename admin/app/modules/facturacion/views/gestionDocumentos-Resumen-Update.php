@@ -38,7 +38,7 @@
             ['Icon' => '','Titulo' => 'IVA',           'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['IVA'], 2)],
             ['Icon' => '','Titulo' => 'Valor Total',   'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorTotal'], 2)],
             ['Icon' => '','Titulo' => 'Monto Pagado',  'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['MontoPagado'], 2)],
-            ['Icon' => '','Titulo' => 'Estado Pago',   'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['EstadoPago'].'</span>'],
+            ['Icon' => '','Titulo' => 'Estado Pago',   'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['EstadoPago'].'</span>'],
         ];
 
         echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';

@@ -5,4 +5,5 @@
         </select>
         <label for="floatingName"><?php echo $placeholderIcon.$placeholder; ?></label>
     </div>
+    <?php echo $dataInfo; ?>
 </div>

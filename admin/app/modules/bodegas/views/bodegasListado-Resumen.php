@@ -17,7 +17,7 @@
 
                 <div class="tab-pane fade" id="resumen-edit">
 
-                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
@@ -29,13 +29,13 @@
                                 $x5  = $data['rowData']['idEstado'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',     'Name'  => 'Nombre',    'Id'  => 'Edit_Nombre',     'Value'  => $x1,'Required'  => 2]);
                                 $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',  'Id1' => 'Edit_idCiudad',   'Value1' => $x2,'Required1' => 1,'arrData1' => $data['arrCiudad'],
                                                                                       'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',  'Id2' => 'Edit_idComuna',   'Value2' => $x3,'Required2' => 1,'arrData2' => $data['arrComuna']]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion', 'Id'  => 'Edit_Direccion',  'Value'  => $x4,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelect([  'Placeholder' => 'Estado', 'Name' => 'idEstado',  'Id' => 'Edit_idEstado',  'Value'  => $x5,'Required' => 2,'arrData' => $data['arrEstado']]);
 
                                 //datos ocultos
@@ -51,7 +51,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Nombre']; ?>
                         </div>
@@ -79,7 +79,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idBodegas']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

@@ -24,8 +24,8 @@
                                     //Recorro
                                     foreach ($data['arrTareas'] as $Tareas=>$tarea){ ?>
                                         <tr>
-                                            <td><span class="badge <?php echo $tarea[0]['KanbanColor']; ?>"><?php echo $tarea[0]['KanbanEstado']; ?></span></td>
-                                            <td><span class="badge <?php echo $tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span></td>
+                                            <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$tarea[0]['KanbanColor']; ?>"><?php echo $tarea[0]['KanbanEstado']; ?></span></td>
+                                            <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span></td>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($tarea[0]['Fecha']); ?></td>
                                             <td><?php echo $tarea[0]['Titulo']; ?></td>
                                             <td>

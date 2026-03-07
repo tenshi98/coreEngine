@@ -1,4 +1,4 @@
-<form id="FormEditConfiguracion" name="FormEditConfiguracion" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+<form id="FormEditConfiguracion" name="FormEditConfiguracion" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="d-flex justify-content-center pt-4">
         <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
             <?php
@@ -16,11 +16,11 @@
             $x11 = $data['rowData']['AlertaTemprNormal'] ?? '';
 
             //se dibujan los inputs
-            $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos de la tarjeta SIM']);
+            $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos de la tarjeta SIM', 'Clase' => 'box-title text-color-red-dark']);
             $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'SIM - Numero Telefónico',  'Name' => 'Sim_Num_Tel',  'Id' => 'EditConfig_Sim_Num_Tel',   'Value' => $x1,'Required' => 1,'Icon' => 'bi bi-sd-card']);
             $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'SIM - Compañia',           'Name' => 'Sim_Compania', 'Id' => 'EditConfig_Sim_Compania',  'Value' => $x2,'Required' => 1,'Icon' => 'bi bi-share']);
 
-            $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración']);
+            $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración', 'Clase' => 'box-title text-color-red-dark']);
             $data['Fnc_FormInputs']->formTime([ 'Placeholder' => 'Tiempo Fuera Linea Máximo', 'Name' => 'TiempoFueraLinea',  'Id' => 'EditConfig_TiempoFueraLinea', 'Value' => $x3,'Required' => 1,'Position' => 1,'Icon' => 'bi bi-clock']);
 
             $data['Fnc_FormInputs']->formPostData(3, 4, 'exclamation-circle', 0, '<strong>Tab:</strong> Esta opción indica en que pestaña de la pantalla principal sera mostrado el equipo');

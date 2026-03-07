@@ -1,5 +1,5 @@
 /*--------------------------------------------------------------
-# bg colors
+# colores definidos
 --------------------------------------------------------------*/
 :root {
 
@@ -393,10 +393,14 @@
     --rgba-grey-slight:rgba(158,158,158,.1);
     --rgba-grey-light:rgba(158,158,158,.3);
     --rgba-grey-strong:rgba(158,158,158,.7);
+    --rgba-transparent:rgba(255,255,255,0);
+    --rgba-white:rgba(255,255,255,1);
 
 }
 
-
+/*--------------------------------------------------------------
+# colores para fuentes
+--------------------------------------------------------------*/
 .text-color-red{color:var(--color-red)!important}
 .text-color-red-light{color:var(--color-red-light)!important}
 .text-color-red-dark{color:var(--color-red-dark)!important}
@@ -437,6 +441,9 @@
 .text-color-blue-grey-text{color:var(--color-blue-grey-text)!important}
 .text-color-grey-text{color:var(--color-grey-text)!important}
 
+/*--------------------------------------------------------------
+# colores para fondos (divs-botones-etc)
+--------------------------------------------------------------*/
 .bg-standart-purple{background-color:var(--color-standart-purple)!important}
 .bg-standart-green{background-color:var(--color-standart-green)!important}
 .bg-standart-yellow{background-color:var(--color-standart-yellow)!important}
@@ -727,6 +734,9 @@
 .bkg-grey-darken-3{background-color:var(--bkg-grey-darken-3)!important}
 .bkg-grey-darken-4{background-color:var(--bkg-grey-darken-4)!important}
 
+/*--------------------------------------------------------------
+# colores con transparencias
+--------------------------------------------------------------*/
 .rgba-mdb-color-slight,.rgba-mdb-color-slight:after{background-color:var(--rgba-mdb-color-slight)}
 .rgba-mdb-color-light,.rgba-mdb-color-light:after{background-color:var(--rgba-mdb-color-light)}
 .rgba-mdb-color-strong,.rgba-mdb-color-strong:after{background-color:var(--rgba-mdb-color-strong)}
@@ -798,7 +808,9 @@
 
 
 
-
+/*--------------------------------------------------------------
+# ORDENAR
+--------------------------------------------------------------*/
 .circle_dark-blue{background-color:#34495e}
 .circle_green{background-color:#16a085}
 .circle_orange{background-color:#f39c12}

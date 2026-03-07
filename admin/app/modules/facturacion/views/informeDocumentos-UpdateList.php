@@ -37,7 +37,7 @@
                                                 echo $Entidad;
                                                 ?>
                                             </td>
-                                            <td><?php echo '<span class="badge '.$crud['EstadoColor'].'">'.$crud['EstadoPago'].'</span>'; ?></td>
+                                            <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['EstadoPago'].'</span>'; ?></td>
                                             <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 2); ?></td>
                                             <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['MontoPagado'], 2); ?></td>
                                             <td>

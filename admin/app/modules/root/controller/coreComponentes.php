@@ -13,7 +13,7 @@ class coreComponentes extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -345,6 +345,31 @@ class coreComponentes extends ControllerBase {
 
     /******************************************************************************/
     //pantalla principal
+    public function popovers($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Componentes - Popovers',
+            'PageDescription' => 'Componentes - Popovers',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreComponentes-popovers.php');
+    }
+
+    /******************************************************************************/
+    //pantalla principal
     public function progress($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -366,6 +391,31 @@ class coreComponentes extends ControllerBase {
         /******************************************/
         //Se instancia la vista
         $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreComponentes-progress.php');
+    }
+
+    /******************************************************************************/
+    //pantalla principal
+    public function ribbons($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Componentes - Ribbons',
+            'PageDescription' => 'Componentes - Ribbons',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreComponentes-ribbons.php');
     }
 
     /******************************************************************************/

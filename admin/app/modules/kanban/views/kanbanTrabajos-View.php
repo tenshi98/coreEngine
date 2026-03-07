@@ -22,7 +22,7 @@
     <?php
     $arrData = [
         ['Icon' => '','Titulo' => 'Nombre', 'Texto' => $data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'Estado', 'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        ['Icon' => '','Titulo' => 'Estado', 'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
     ];
     $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
     ?>

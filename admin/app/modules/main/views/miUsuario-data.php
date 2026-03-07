@@ -30,7 +30,7 @@
 
                         <div class="tab-pane fade profile-edit pt-3" id="profile-edit">
 
-                            <form id="FormData" name="FormData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                            <form id="FormData" name="FormData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                 <?php
                                 //Se verifican si existen los datos
@@ -47,7 +47,7 @@
                                 $x11 = $data['rowData']['Social_Linkedin'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',      'Value'  => $x1,'Required'  => 2]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',         'Value'  => $x2,'Required'  => 2,'Icon' => 'bi bi-person-circle']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento', 'Value'  => $x3,'Required'  => 1,'Icon' => 'bi bi-calendar3']);
@@ -56,7 +56,7 @@
                                                                                       'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',    'Value2' => $x6,'Required2' => 1,'arrData2' => $data['arrComuna']]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',   'Value'  => $x7,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => $x8, 'Required' => 1, 'Icon' => 'bi bi-x']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => $x9, 'Required' => 1, 'Icon' => 'bi bi-facebook']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => $x10,'Required' => 1, 'Icon' => 'bi bi-instagram']);
@@ -97,7 +97,7 @@
 
                         <div class="tab-pane fade profile-edit pt-3" id="settings">
 
-                            <form id="FormOpciones" name="FormOpciones" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                            <form id="FormOpciones" name="FormOpciones" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                 <?php
                                 //Se verifican si existen los datos
@@ -121,7 +121,7 @@
 
                         <div class="tab-pane fade profile-edit pt-3" id="profile-change-password">
 
-                            <form id="FormPassword" name="FormPassword" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                            <form id="FormPassword" name="FormPassword" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                 <?php
                                 //se dibujan los inputs

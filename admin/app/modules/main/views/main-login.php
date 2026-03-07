@@ -17,7 +17,7 @@
                                             <h5 class="card-title text-center pb-0 fs-4">Iniciar Sesión</h5>
                                             <p class="text-center small">Ingrese su Email y contraseña para acceder</p>
                                         </div>
-                                        <form id="LoginForm" name="LoginForm" autocomplete="off" method="POST" class="row g-3" action="" role="form" novalidate enctype="multipart/form-data">
+                                        <form id="LoginForm" name="LoginForm" autocomplete="off" method="POST" class="row g-3" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                             <div class="col-12">
                                                 <label class="form-label">Email</label>
@@ -40,7 +40,7 @@
                                             <h5 class="card-title text-center pb-0 fs-4">¿Olvidaste tu contraseña?</h5>
                                             <p class="text-center small">Ingresa tu Email para recuperar tu contraseña.Revisa la bandeja de entrada o spam de tu correo.</p>
                                         </div>
-                                        <form id="RecoverForm" name="RecoverForm" autocomplete="off" method="POST" class="row g-3" action="" role="form" novalidate enctype="multipart/form-data">
+                                        <form id="RecoverForm" name="RecoverForm" autocomplete="off" method="POST" class="row g-3" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                             <div class="col-12">
                                                 <label class="form-label">Email</label>

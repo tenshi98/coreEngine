@@ -18,7 +18,7 @@
 
                 <div class="tab-pane fade" id="resumen-edit">
 
-                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
@@ -39,7 +39,7 @@
                                 $x14 = $data['rowData']['Social_Linkedin'] ?? '';
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',               'Name'  => 'email',        'Id'  => 'Edit_email',       'Value'  => $x1,  'Required'  => 2, 'Icon' => 'bx bx-mail-send']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',       'Id'  => 'Edit_Nombre',      'Value'  => $x2,  'Required'  => 2]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',          'Id'  => 'Edit_Rut',         'Value'  => $x3,  'Required'  => 1, 'Icon' => 'bi bi-person-circle']);
@@ -49,16 +49,16 @@
                                                                                       'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',     'Id2' => 'Edit_idComuna',    'Value2' => $x7,  'Required2' => 1, 'arrData2' => $data['arrComuna']]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',    'Id'  => 'Edit_Direccion',   'Value'  => $x8,  'Required'  => 1, 'Icon' => 'bi bi-geo-alt-fill']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'Edit_idTipoUsuario',  'Value' => $x9, 'Required' => 2,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => $x11, 'Required' => 1, 'Icon' => 'bi bi-x']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',   'Id' => 'Edit_Social_Facebook',  'Value' => $x12, 'Required' => 1, 'Icon' => 'bi bi-facebook']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram',  'Id' => 'Edit_Social_Instagram', 'Value' => $x13, 'Required' => 1, 'Icon' => 'bi bi-instagram']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => $x14, 'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
-                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración']);
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => $x10,  'Required' => 2,'arrData' => $data['arrEstado']]);
                                 $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'Edit_password',  'Value'  => '',    'Required' => 1,'Icon' => 'bi bi-key']);
@@ -76,7 +76,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Nombre']; ?>
                         </div>
@@ -104,7 +104,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-permisos">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Permisos de <?php echo $data['rowData']['Nombre']; ?>
                         </div>
@@ -116,7 +116,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-obs">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>

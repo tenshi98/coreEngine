@@ -28,9 +28,9 @@
                         foreach ($module['Dependencias'] as $mod){
                             //Se verifica si existe
                             if(isset($mod['Numero'])&&$mod['Numero']!=0){
-                                $depInstal = '<span class="badge bg-success">Instalado</span>';
+                                $depInstal = '<span class="badge-sp1 badge-sp1-bg-success">Instalado</span>';
                             }else{
-                                $depInstal = '<span class="badge bg-danger">No Instalado</span>';
+                                $depInstal = '<span class="badge-sp1 badge-sp1-bg-danger">No Instalado</span>';
                                 $CountDepends++;
                             }
                             //se escribe
@@ -46,8 +46,9 @@
                     <div class="btn-group-vertical" role="group">';
                         if($module['countPermisos']!=0){
                             echo '
-                            <button type="button" onclick="uninstallModule(\''.$module['Controller'].'\')" class="btn btn-danger   btn-sm tooltiplink" data-title="Desinstalar Modulo completamente"><i class="bi bi-trash"></i> Desinstalar Modulo</button>
-                            <button type="button" onclick="checkModule(\''.$module['Controller'].'\')"     class="btn btn-primary  btn-sm tooltiplink" data-title="Hacer checkeo de rutas"><i class="bi bi-eye"></i> Checkear Rutas</button>
+                            <button type="button" onclick="uninstallModule(\''.$module['Controller'].'\')" class="btn btn-danger     btn-sm tooltiplink" data-title="Desinstalar Modulo completamente"><i class="bi bi-trash"></i> Desinstalar Modulo</button>
+                            <button type="button" onclick="checkModuleData(\''.$module['Controller'].'\')" class="btn btn-primary    btn-sm tooltiplink" data-title="Hacer checkeo instalador vs base datos"><i class="bi bi-eye"></i> Checkear Instalador vs BBDD</button>
+                            <button type="button" onclick="checkModuleBBDD(\''.$module['Controller'].'\')" class="btn btn-secondary  btn-sm tooltiplink" data-title="Hacer checkeo base datos vs instalador"><i class="bi bi-eye"></i> Checkear BBDD vs Instalador</button>
                             ';
                         }else{
                             //Si se permite la instalacion

@@ -10,16 +10,20 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-7">
         <?php
-        $arrData_1 = [
-            ['Icon' => '','Titulo' => 'Nombre',              'Texto' => $data['rowData']['Sistema_Nombre']],
-            ['Icon' => '','Titulo' => 'Email',               'Texto' => $data['rowData']['Sistema_Email']],
-            ['Icon' => '','Titulo' => 'Rut',                 'Texto' => $data['rowData']['Sistema_Rut']],
-            ['Icon' => '','Titulo' => 'Ciudad',              'Texto' => $data['rowData']['Ciudad']],
-            ['Icon' => '','Titulo' => 'Comuna',              'Texto' => $data['rowData']['Comuna']],
-            ['Icon' => '','Titulo' => 'Direccion',           'Texto' => $data['rowData']['Sistema_Direccion']],
-            ['Icon' => '','Titulo' => 'Tema',                'Texto' => $data['rowData']['Tema']],
-            ['Icon' => '','Titulo' => 'Fono Noti Whatsapp',  'Texto' => $data['rowData']['Sistema_NotiWhatsapp']],
-        ];
+        /**************************************/
+        $arrData_1   = [];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Nombre',     'Texto' => $data['rowData']['Sistema_Nombre']];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Email',      'Texto' => $data['rowData']['Sistema_Email']];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Rut',        'Texto' => $data['rowData']['Sistema_Rut']];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Ciudad',     'Texto' => $data['rowData']['Ciudad']];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Comuna',     'Texto' => $data['rowData']['Comuna']];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Direccion',  'Texto' => $data['rowData']['Sistema_Direccion']];
+        $arrData_1[] = ['Icon' => '','Titulo' => 'Tema',       'Texto' => $data['rowData']['Tema']];
+        //Se condiciona el uso de Whatsapp
+        if($data['UserData']["sistemaUsoWhatsapp"]==2){
+            $arrData_1[] = ['Icon' => '','Titulo' => 'Fono Noti Whatsapp',  'Texto' => $data['rowData']['Sistema_NotiWhatsapp']];
+        }
+        /**************************************/
         $arrData_2 = [
             ['Icon' => '','Titulo' => 'Contacto Nombre', 'Texto' => $data['rowData']['Contacto_Nombre']],
             ['Icon' => '','Titulo' => 'Contacto Fono1',  'Texto' => $data['rowData']['Contacto_Fono1']],
@@ -28,26 +32,38 @@
             ['Icon' => '','Titulo' => 'Contacto Email',  'Texto' => $data['rowData']['Contacto_Email']],
             ['Icon' => '','Titulo' => 'Contacto Web',    'Texto' => $data['rowData']['Contacto_Web']],
         ];
+        /**************************************/
         $arrData_3 = [
             ['Icon' => '','Titulo' => 'Representante Nombre',  'Texto' => $data['rowData']['RepresentanteNombre']],
             ['Icon' => '','Titulo' => 'Representante Rut',     'Texto' => $data['rowData']['RepresentanteRut']],
             ['Icon' => '','Titulo' => 'Representante Fono',    'Texto' => $data['rowData']['RepresentanteFono']],
             ['Icon' => '','Titulo' => 'Representante Email',   'Texto' => $data['rowData']['RepresentanteEmail']],
         ];
-        $arrData_4 = [
-            ['Icon' => '','Titulo' => 'Config API GoogleMaps',        'Texto' => $data['rowData']['Config_API_GoogleMaps']],
-            ['Icon' => '','Titulo' => 'Config Whatsapp Token',        'Texto' => $data['rowData']['Config_WhatsappToken']],
-            ['Icon' => '','Titulo' => 'Config Whatsapp Instance Id',  'Texto' => $data['rowData']['Config_WhatsappInstanceId']],
-        ];
+        /**************************************/
+        $arrData_4   = [];
+        //Se condiciona el motor de mapas
+        switch ($data['UserData']["Config_motorMap"]) {
+            case 1:$arrData_4[] = ['Icon' => '', 'Titulo' => 'Config API GoogleMaps', 'Texto' => $data['rowData']['Config_API_GoogleMaps']];break;
+        }
+        //Se condiciona el uso de Whatsapp
+        if($data['UserData']["sistemaUsoWhatsapp"]==2){
+            $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Token',        'Texto' => $data['rowData']['Config_WhatsappToken']];
+            $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Instance Id',  'Texto' => $data['rowData']['Config_WhatsappInstanceId']];
+        }
+        /**************************************/
         $arrData_5 = [
             ['Icon' => '','Titulo' => 'URL Twitter',    'Texto' => (!empty($data['rowData']['Social_X']) ? '<a href="'.$data['rowData']['Social_X'].'" class="twitter"><i class="bi bi-twitter"></i> Twitter</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Facebook',   'Texto' => (!empty($data['rowData']['Social_Facebook']) ? '<a href="'.$data['rowData']['Social_Facebook'].'"  class="facebook"><i class="bi bi-facebook"></i> Facebook</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Instagram',  'Texto' => (!empty($data['rowData']['Social_Instagram']) ? '<a href="'.$data['rowData']['Social_Instagram'].'" class="instagram"><i class="bi bi-instagram"></i> Instagram</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Linkedin',   'Texto' => (!empty($data['rowData']['Social_Linkedin']) ? '<a href="'.$data['rowData']['Social_Linkedin'].'"  class="linkedin"><i class="bi bi-linkedin"></i> Linkedin</a>' : '')],
         ];
+        /**************************************/
         $arrData_6 = [
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Modal - Subtítulos',                                     'Texto' => activo($data['rowData']['sistemaModalSubtitle'])],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Modal - Botón Cerrar',                                   'Texto' => activo($data['rowData']['sistemaModalCloseBTN'])],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Uso Whatsapp',                                           'Texto' => activo($data['rowData']['sistemaUsoWhatsapp'])],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Motor Email',                                            'Texto' => $data['rowData']['ConfigEmail']],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Motor Mapas',                                            'Texto' => $data['rowData']['ConfigMap']],
             ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Uso listados de tareas en las Tareas Pendientes',  'Texto' => activo($data['rowData']['KanbanTareasUsoTareas'])],
             ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Admin Tableros Independiente de las Tareas',       'Texto' => activo($data['rowData']['KanbanTareasAdminTabIndepend'])],
             ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Cargas',                                   'Texto' => activo($data['rowData']['entidadesListadoVerCargas'])],
@@ -67,7 +83,8 @@
             ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Envío de Notificaciones',                     'Texto' => activo($data['rowData']['maquinasListadoNotificaciones'])],
         ];
 
-
+        /**************************************/
+        /**************************************/
         echo '
         <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';

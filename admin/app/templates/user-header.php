@@ -90,12 +90,11 @@
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/fullcalendar/es.js'; ?>"></script>
 
         <!-- Archivos de la Plataforma -->
-        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color.css'; ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color_'.$data['UserData']['Sistema_idTema'].'.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/style.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/theme.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/media.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/my_colors.min.css'; ?>">
-        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/efects.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/extra_buttons.css'; ?>">
 
         <?php

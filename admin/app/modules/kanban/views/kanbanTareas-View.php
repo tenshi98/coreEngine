@@ -45,9 +45,9 @@
                             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">
                                 <address>
                                     <p>
-                                        <span class="badge <?php echo $data['rowData']['PrioridadColor']; ?>"><?php echo 'Prioridad: '.$data['rowData']['PrioridadNombre']; ?></span>
-                                        <span class="badge <?php echo $data['rowData']['KanbanColor']; ?>"><?php echo 'Tablero: '.$data['rowData']['KanbanEstado']; ?></span>
-                                        <span class="badge <?php echo $data['rowData']['EstadoCierreColor']; ?>"><?php echo 'Estado Cierre: '.$data['rowData']['EstadoCierreNombre']; ?></span>
+                                        <span class="<?php echo 'badge-sp1 badge-sp1-'.$data['rowData']['PrioridadColor']; ?>"><?php echo 'Prioridad: '.$data['rowData']['PrioridadNombre']; ?></span>
+                                        <span class="<?php echo 'badge-sp1 badge-sp1-'.$data['rowData']['KanbanColor']; ?>"><?php echo 'Tablero: '.$data['rowData']['KanbanEstado']; ?></span>
+                                        <span class="<?php echo 'badge-sp1 badge-sp1-'.$data['rowData']['EstadoCierreColor']; ?>"><?php echo 'Estado Cierre: '.$data['rowData']['EstadoCierreNombre']; ?></span>
                                     </p>
                                 </address>
                             </div>
@@ -100,7 +100,7 @@
                                                     ?>
                                                     <tr>
                                                         <td><?php echo $task['Trabajo'].'<br> - '.$task['Tarea'];?></td>
-                                                        <td style="width: 120px;"><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
+                                                        <td style="width: 120px;"><span class="<?php echo 'badge-sp1 badge-sp1-'.$task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
                                                         <?php if($data['rowData']['idEstadoCierre']==1){ ?>
                                                             <td style="width: 120px;">
                                                                 <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
@@ -116,7 +116,7 @@
                                                     $encryptedTareas = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idTareas']); ?>
                                                     <tr>
                                                         <td><?php echo $task['Tarea']?></td>
-                                                        <td style="width: 120px;"><span class="badge <?php echo $task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
+                                                        <td style="width: 120px;"><span class="<?php echo 'badge-sp1 badge-sp1-'.$task['EstadoColor']?>"><?php echo '<i class="'.$task['EstadoIcon'].'"></i> '.$task['EstadoNombre']?></span></td>
                                                         <?php if($data['rowData']['idEstadoCierre']==1){ ?>
                                                             <td style="width: 120px;">
                                                                 <?php if($data['UserAccess']['LevelAccess']>=2){ ?>

@@ -7,7 +7,7 @@
                         <div class="text-center">
                             <h5 class="search-title"><i class="bi bi-search"></i> Filtrar Datos</h5>
                         </div>
-                        <form id="FormSearchData" name="FormSearchData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                        <form id="FormSearchData" name="FormSearchData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                             <?php
                             //se dibujan los inputs
                             $data['Fnc_FormInputs']->formSelectFilter([ 'Placeholder' => 'Bodega',   'Name' => 'idBodegas',  'Id' => 'Search_idBodegas',   'Value' => '','Required' => 1,'arrData' => $data['arrBodegas'],   'BASE' => $BASE]);

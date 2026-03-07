@@ -29,7 +29,7 @@
             ['Icon' => '','Titulo' => 'Linkedin',    'Texto' => $data['rowData']['Social_Linkedin']],
         ];
         $arrData_4 = [
-            ['Icon' => '','Titulo' => 'Estado',         'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+            ['Icon' => '','Titulo' => 'Estado',         'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
             ['Icon' => '','Titulo' => 'Posición Menu',  'Texto' => $data['rowData']['MenuPosicion']],
         ];
 

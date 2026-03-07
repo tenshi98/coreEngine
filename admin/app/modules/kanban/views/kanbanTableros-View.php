@@ -23,7 +23,7 @@
     $arrData = [
         ['Icon' => '','Titulo' => 'Nombre Tablero',                'Texto' => $data['rowData']['Nombre']],
         ['Icon' => '','Titulo' => 'Color Icono',                   'Texto' => $data['rowData']['idPrioridad']],
-        ['Icon' => '','Titulo' => 'Prioridad',                     'Texto' => '<span class="badge '.$data['rowData']['Color'].'">'.$data['rowData']['Color'].'</span>'],
+        ['Icon' => '','Titulo' => 'Prioridad',                     'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['Color'].'">'.$data['rowData']['Color'].'</span>'],
         ['Icon' => '','Titulo' => '¿Permite Cierre de la Tarea?',  'Texto' => $data['rowData']['Cierre']],
     ];
     $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);

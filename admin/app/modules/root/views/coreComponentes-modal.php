@@ -32,6 +32,19 @@
                 </div>
             </div>
 
+            <div class="card" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
+                <div class="card-body">
+                    <h5 class="card-title">Colored Header Modals</h5>
+                    <p>A rendered modal with header having contexual background color.</p>
+                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#colorModal_1">Basic Modal primary</button>
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#colorModal_2">Basic Modal success</button>
+                    <button type="button" class="btn btn-info"    data-bs-toggle="modal" data-bs-target="#colorModal_3">Basic Modal info</button>
+                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#colorModal_4">Basic Modal warning</button>
+                    <button type="button" class="btn btn-danger"  data-bs-toggle="modal" data-bs-target="#colorModal_5">Basic Modal danger</button>
+                    <button type="button" class="btn btn-dark"    data-bs-toggle="modal" data-bs-target="#colorModal_6">Basic Modal dark</button>
+                </div>
+            </div>
+
         </div>
 
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-4">
@@ -285,4 +298,122 @@
     </div>
 </div>
 
+<div class="modal fade" id="colorModal_1" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
+<div class="modal fade" id="colorModal_2" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_3" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_4" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_5" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_6" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-dark-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

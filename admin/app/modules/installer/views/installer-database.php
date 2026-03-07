@@ -9,7 +9,7 @@
     </ul>
 </div>
 
-<form id="FormDatabase" name="FormDatabase" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+<form id="FormDatabase" name="FormDatabase" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="card-body">
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 col-xl-8 col-xxl-8 mx-auto">
             <div class="text-center">
@@ -22,11 +22,13 @@
             $data['Fnc_FormInputs']->formPostData(3, 4, 'bi bi-star', 0, '<h4>Nota:</h4><p>El nombre debe tener entre 3 y 64 caracteres y solo puede contener letras, números y guiones bajos.</p>');
 
             //datos ocultos
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Host',     'Value' => $_SESSION['db_Host'],     'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Usuario',  'Value' => $_SESSION['db_Usuario'],  'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Password', 'Value' => $_SESSION['db_Password'], 'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Port',     'Value' => $_SESSION['db_Port'],     'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Charset',  'Value' => $_SESSION['db_Charset'],  'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Host',           'Value' => $_SESSION['db_Host'],           'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Admin_Usuario',  'Value' => $_SESSION['db_Admin_Usuario'],  'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Admin_Password', 'Value' => $_SESSION['db_Admin_Password'], 'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Prod_Usuario',   'Value' => $_SESSION['db_Prod_Usuario'],   'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Prod_Password',  'Value' => $_SESSION['db_Prod_Password'],  'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Port',           'Value' => $_SESSION['db_Port'],           'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Charset',        'Value' => $_SESSION['db_Charset'],        'Required' => 2]);
 
             ?>
         </div>

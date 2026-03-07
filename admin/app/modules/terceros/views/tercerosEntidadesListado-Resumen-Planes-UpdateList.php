@@ -22,7 +22,7 @@
                     <td><?php echo $crud['Servicio']; ?></td>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Fecha']); ?></td>
                     <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['Monto'], 0); ?></td>
-                    <td><?php echo '<span class="badge '.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
+                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
                     <td>
                         <div class="btn-group" role="group">
                             <?php

@@ -76,12 +76,26 @@
         });
     }
     /******************************************/
-    function checkModule(Controller) {
+    function checkModuleData(Controller) {
         //Cargo el loader
         $('#PDloader').show();
         //Ejecuto
         let Div       = '#modalContent-xl';
-        let URL       = '<?php echo $BASE.'/Core/plataforma/instalacion/checkModule/'; ?>'+Controller;
+        let URL       = '<?php echo $BASE.'/Core/plataforma/instalacion/checkModuleData/'; ?>'+Controller;
+        const Options = {
+            showModal : '#viewModal-xl',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /******************************************/
+    function checkModuleBBDD(Controller) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-xl';
+        let URL       = '<?php echo $BASE.'/Core/plataforma/instalacion/checkModuleBBDD/'; ?>'+Controller;
         const Options = {
             showModal : '#viewModal-xl',
             closeObject:'#PDloader',

@@ -90,12 +90,11 @@
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/fullcalendar/es.js'; ?>"></script>
 
         <!-- Archivos de la Plataforma -->
-        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color.css?get='.time(); ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color_'.$data['rowOpciones']['Sistema_idTema'].'.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/style.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/theme.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/media.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/my_colors.min.css?get='.time(); ?>">
-        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/efects.css?get='.time(); ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/extra_buttons.css?get='.time(); ?>">
 
         <script>

@@ -3,7 +3,7 @@
         <?php
         $arrData = [
             ['Icon' => '','Titulo' => 'Categoria Permiso', 'Texto' => $data['rowData']['PermisosCat']],
-            ['Icon' => '','Titulo' => 'Estado',            'Texto' => '<span class="badge '.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+            ['Icon' => '','Titulo' => 'Estado',            'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
             ['Icon' => '','Titulo' => 'Tipo',              'Texto' => $data['rowData']['Tipo']],
             ['Icon' => '','Titulo' => 'Nombre',            'Texto' => $data['rowData']['Nombre']],
             ['Icon' => '','Titulo' => 'Nivel Acceso',      'Texto' => $data['rowData']['LevelLimit']],
@@ -24,8 +24,7 @@
                 <thead>
                     <tr>
                         <th>Metodo</th>
-                        <th>Ruta Web</th>
-                        <th>Ruta Controller</th>
+                        <th>Ruta</th>
                         <th>Descripcion</th>
                         <th>Objetivo</th>
                     </tr>
@@ -44,8 +43,7 @@
                             foreach ($permisos as $ruta){ ?>
                                 <tr>
                                     <td><?php echo $ruta['Metodo']; ?></td>
-                                    <td><?php echo $ruta['RutaWeb']; ?></td>
-                                    <td><?php echo $ruta['RutaController']; ?></td>
+                                    <td><?php echo '<strong>Ruta: </strong>'.$ruta['RutaWeb'].'<br><strong>Controlador: </strong>'.$ruta['RutaController']; ?></td>
                                     <td><?php echo $ruta['Descripcion']; ?></td>
                                     <td><?php echo $ruta['LevelLimit']; ?></td>
                                 </tr>

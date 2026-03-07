@@ -9,7 +9,7 @@
                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
                         <div class="kanban status" id="<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']); ?>">
                             <h5 class="title text-center">
-                                <span class="badge <?php echo $crud['Color']; ?>"><?php echo $crud['Nombre']; ?></span>
+                                <span class="<?php echo 'badge-sp1 badge-sp1-'.$crud['Color']; ?>"><?php echo $crud['Nombre']; ?></span>
                                 <?php
                                 //Se verifica si se permite Administrar Tableros Independiente de las Tareas
                                 if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
@@ -43,7 +43,7 @@
                                         ?>
                                         <div class="task <?php echo $col_borde; ?> todo" draggable="true" id="<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas); ?>">
                                             <h4 class="align-middle">
-                                                <span class="badge <?php echo $tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span>
+                                                <span class="<?php echo 'badge-sp1 badge-sp1-'.$tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span>
                                                 <span class="float-end date"><i class="bi bi-calendar3"></i> <?php echo $data['Fnc_DataDate']->fechaEstandar($tarea[0]['Fecha']); ?></span>
                                             </h4>
                                             <p><?php echo $tarea[0]['Titulo']; ?></p>
@@ -90,7 +90,7 @@
 </div>
 
 <div class="tab-pane fade" id="tab_kanban_2" role="tabpanel" aria-labelledby="home-tab_kanban_2">
-    <h5 class="box-title text-color-red-dark">
+    <h5 class="text-color-red-dark">
         <div class="btn-group" role="group">
             <button class="btn btn-secondary tooltiplink" data-title="Filtrar Información" type="button" data-bs-toggle="collapse" data-bs-target="#formSearch" aria-expanded="false" aria-controls="formSearch"><i class="bi bi-search"></i> Filtrar</button>
             <button class="btn btn-danger tooltiplink"    data-title="Quitar Filtro"       type="button" onclick="deleteFilter()"><i class="ri-filter-off-line"></i></button>

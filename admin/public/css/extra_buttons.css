@@ -1,4 +1,4 @@
-
+/*===========================================================================*/
 /* bkg-red-lighten */
 .btn-bkg-red-lighten {color: var(--color-white);background-color: var(--bkg-red-lighten-4);border-color: var(--bkg-red-lighten-5);}
 .btn-bkg-red-lighten:hover {color: var(--color-white);background-color: var(--bkg-red-lighten-3);border-color: var(--bkg-red-lighten-5);}
@@ -54,6 +54,7 @@
 }
 .pulseBtn-red-lighten {-webkit-animation-name: pulseBtn-red-lighten;-moz-animation-name: pulseBtn-red-lighten;-o-animation-name: pulseBtn-red-lighten;animation-name: pulseBtn-red-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-red-darken */
 .btn-bkg-red-darken {color: var(--color-white);background-color: var(--bkg-red-darken-3);border-color: var(--bkg-red-darken-4);}
 .btn-bkg-red-darken:hover {color: var(--color-white);background-color: var(--bkg-red-darken-2);border-color: var(--bkg-red-darken-4);}
@@ -109,6 +110,7 @@
 }
 .pulseBtn-red-darken {-webkit-animation-name: pulseBtn-red-darken;-moz-animation-name: pulseBtn-red-darken;-o-animation-name: pulseBtn-red-darken;animation-name: pulseBtn-red-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-red-accent */
 .btn-bkg-red-accent {color: var(--color-white);background-color: var(--bkg-red-accent-3);border-color: var(--bkg-red-accent-4);}
 .btn-bkg-red-accent:hover {color: var(--color-white);background-color: var(--bkg-red-accent-2);border-color: var(--bkg-red-accent-4);}
@@ -164,6 +166,7 @@
 }
 .pulseBtn-red-accent {-webkit-animation-name: pulseBtn-red-accent;-moz-animation-name: pulseBtn-red-accent;-o-animation-name: pulseBtn-red-accent;animation-name: pulseBtn-red-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-pink-lighten */
 .btn-bkg-pink-lighten {color: var(--color-white);background-color: var(--bkg-pink-lighten-4);border-color: var(--bkg-pink-lighten-5);}
 .btn-bkg-pink-lighten:hover {color: var(--color-white);background-color: var(--bkg-pink-lighten-3);border-color: var(--bkg-pink-lighten-5);}
@@ -219,6 +222,7 @@
 }
 .pulseBtn-pink-lighten {-webkit-animation-name: pulseBtn-pink-lighten;-moz-animation-name: pulseBtn-pink-lighten;-o-animation-name: pulseBtn-pink-lighten;animation-name: pulseBtn-pink-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-pink-darken */
 .btn-bkg-pink-darken {color: var(--color-white);background-color: var(--bkg-pink-darken-3);border-color: var(--bkg-pink-darken-4);}
 .btn-bkg-pink-darken:hover {color: var(--color-white);background-color: var(--bkg-pink-darken-2);border-color: var(--bkg-pink-darken-4);}
@@ -274,6 +278,7 @@
 }
 .pulseBtn-pink-darken {-webkit-animation-name: pulseBtn-pink-darken;-moz-animation-name: pulseBtn-pink-darken;-o-animation-name: pulseBtn-pink-darken;animation-name: pulseBtn-pink-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-pink-accent */
 .btn-bkg-pink-accent {color: var(--color-white);background-color: var(--bkg-pink-accent-3);border-color: var(--bkg-pink-accent-4);}
 .btn-bkg-pink-accent:hover {color: var(--color-white);background-color: var(--bkg-pink-accent-2);border-color: var(--bkg-pink-accent-4);}
@@ -329,6 +334,7 @@
 }
 .pulseBtn-pink-accent {-webkit-animation-name: pulseBtn-pink-accent;-moz-animation-name: pulseBtn-pink-accent;-o-animation-name: pulseBtn-pink-accent;animation-name: pulseBtn-pink-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-purple-lighten */
 .btn-bkg-purple-lighten {color: var(--color-white);background-color: var(--bkg-purple-lighten-4);border-color: var(--bkg-purple-lighten-5);}
 .btn-bkg-purple-lighten:hover {color: var(--color-white);background-color: var(--bkg-purple-lighten-3);border-color: var(--bkg-purple-lighten-5);}
@@ -384,6 +390,7 @@
 }
 .pulseBtn-purple-lighten {-webkit-animation-name: pulseBtn-purple-lighten;-moz-animation-name: pulseBtn-purple-lighten;-o-animation-name: pulseBtn-purple-lighten;animation-name: pulseBtn-purple-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-purple-darken */
 .btn-bkg-purple-darken {color: var(--color-white);background-color: var(--bkg-purple-darken-3);border-color: var(--bkg-purple-darken-4);}
 .btn-bkg-purple-darken:hover {color: var(--color-white);background-color: var(--bkg-purple-darken-2);border-color: var(--bkg-purple-darken-4);}
@@ -439,6 +446,7 @@
 }
 .pulseBtn-purple-darken {-webkit-animation-name: pulseBtn-purple-darken;-moz-animation-name: pulseBtn-purple-darken;-o-animation-name: pulseBtn-purple-darken;animation-name: pulseBtn-purple-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-purple-accent */
 .btn-bkg-purple-accent {color: var(--color-white);background-color: var(--bkg-purple-accent-3);border-color: var(--bkg-purple-accent-4);}
 .btn-bkg-purple-accent:hover {color: var(--color-white);background-color: var(--bkg-purple-accent-2);border-color: var(--bkg-purple-accent-4);}
@@ -494,6 +502,7 @@
 }
 .pulseBtn-purple-accent {-webkit-animation-name: pulseBtn-purple-accent;-moz-animation-name: pulseBtn-purple-accent;-o-animation-name: pulseBtn-purple-accent;animation-name: pulseBtn-purple-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-deep-purple-lighten */
 .btn-bkg-deep-purple-lighten {color: var(--color-white);background-color: var(--bkg-deep-purple-lighten-4);border-color: var(--bkg-deep-purple-lighten-5);}
 .btn-bkg-deep-purple-lighten:hover {color: var(--color-white);background-color: var(--bkg-deep-purple-lighten-3);border-color: var(--bkg-deep-purple-lighten-5);}
@@ -549,6 +558,7 @@
 }
 .pulseBtn-deep-purple-lighten {-webkit-animation-name: pulseBtn-deep-purple-lighten;-moz-animation-name: pulseBtn-deep-purple-lighten;-o-animation-name: pulseBtn-deep-purple-lighten;animation-name: pulseBtn-deep-purple-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-deep-purple-darken */
 .btn-bkg-deep-purple-darken {color: var(--color-white);background-color: var(--bkg-deep-purple-darken-3);border-color: var(--bkg-deep-purple-darken-4);}
 .btn-bkg-deep-purple-darken:hover {color: var(--color-white);background-color: var(--bkg-deep-purple-darken-2);border-color: var(--bkg-deep-purple-darken-4);}
@@ -604,6 +614,7 @@
 }
 .pulseBtn-deep-purple-darken {-webkit-animation-name: pulseBtn-deep-purple-darken;-moz-animation-name: pulseBtn-deep-purple-darken;-o-animation-name: pulseBtn-deep-purple-darken;animation-name: pulseBtn-deep-purple-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-deep-purple-accent */
 .btn-bkg-deep-purple-accent {color: var(--color-white);background-color: var(--bkg-deep-purple-accent-3);border-color: var(--bkg-deep-purple-accent-4);}
 .btn-bkg-deep-purple-accent:hover {color: var(--color-white);background-color: var(--bkg-deep-purple-accent-2);border-color: var(--bkg-deep-purple-accent-4);}
@@ -659,6 +670,7 @@
 }
 .pulseBtn-deep-purple-accent {-webkit-animation-name: pulseBtn-deep-purple-accent;-moz-animation-name: pulseBtn-deep-purple-accent;-o-animation-name: pulseBtn-deep-purple-accent;animation-name: pulseBtn-deep-purple-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-indigo-lighten */
 .btn-bkg-indigo-lighten {color: var(--color-white);background-color: var(--bkg-indigo-lighten-4);border-color: var(--bkg-indigo-lighten-5);}
 .btn-bkg-indigo-lighten:hover {color: var(--color-white);background-color: var(--bkg-indigo-lighten-3);border-color: var(--bkg-indigo-lighten-5);}
@@ -714,6 +726,7 @@
 }
 .pulseBtn-indigo-lighten {-webkit-animation-name: pulseBtn-indigo-lighten;-moz-animation-name: pulseBtn-indigo-lighten;-o-animation-name: pulseBtn-indigo-lighten;animation-name: pulseBtn-indigo-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-indigo-darken */
 .btn-bkg-indigo-darken {color: var(--color-white);background-color: var(--bkg-indigo-darken-3);border-color: var(--bkg-indigo-darken-4);}
 .btn-bkg-indigo-darken:hover {color: var(--color-white);background-color: var(--bkg-indigo-darken-2);border-color: var(--bkg-indigo-darken-4);}
@@ -769,6 +782,7 @@
 }
 .pulseBtn-indigo-darken {-webkit-animation-name: pulseBtn-indigo-darken;-moz-animation-name: pulseBtn-indigo-darken;-o-animation-name: pulseBtn-indigo-darken;animation-name: pulseBtn-indigo-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-indigo-accent */
 .btn-bkg-indigo-accent {color: var(--color-white);background-color: var(--bkg-indigo-accent-3);border-color: var(--bkg-indigo-accent-4);}
 .btn-bkg-indigo-accent:hover {color: var(--color-white);background-color: var(--bkg-indigo-accent-2);border-color: var(--bkg-indigo-accent-4);}
@@ -824,6 +838,7 @@
 }
 .pulseBtn-indigo-accent {-webkit-animation-name: pulseBtn-indigo-accent;-moz-animation-name: pulseBtn-indigo-accent;-o-animation-name: pulseBtn-indigo-accent;animation-name: pulseBtn-indigo-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-blue-lighten */
 .btn-bkg-blue-lighten {color: var(--color-white);background-color: var(--bkg-blue-lighten-4);border-color: var(--bkg-blue-lighten-5);}
 .btn-bkg-blue-lighten:hover {color: var(--color-white);background-color: var(--bkg-blue-lighten-3);border-color: var(--bkg-blue-lighten-5);}
@@ -879,6 +894,7 @@
 }
 .pulseBtn-blue-lighten {-webkit-animation-name: pulseBtn-blue-lighten;-moz-animation-name: pulseBtn-blue-lighten;-o-animation-name: pulseBtn-blue-lighten;animation-name: pulseBtn-blue-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-blue-darken */
 .btn-bkg-blue-darken {color: var(--color-white);background-color: var(--bkg-blue-darken-3);border-color: var(--bkg-blue-darken-4);}
 .btn-bkg-blue-darken:hover {color: var(--color-white);background-color: var(--bkg-blue-darken-2);border-color: var(--bkg-blue-darken-4);}
@@ -934,6 +950,7 @@
 }
 .pulseBtn-blue-darken {-webkit-animation-name: pulseBtn-blue-darken;-moz-animation-name: pulseBtn-blue-darken;-o-animation-name: pulseBtn-blue-darken;animation-name: pulseBtn-blue-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-blue-accent */
 .btn-bkg-blue-accent {color: var(--color-white);background-color: var(--bkg-blue-accent-3);border-color: var(--bkg-blue-accent-4);}
 .btn-bkg-blue-accent:hover {color: var(--color-white);background-color: var(--bkg-blue-accent-2);border-color: var(--bkg-blue-accent-4);}
@@ -989,6 +1006,7 @@
 }
 .pulseBtn-blue-accent {-webkit-animation-name: pulseBtn-blue-accent;-moz-animation-name: pulseBtn-blue-accent;-o-animation-name: pulseBtn-blue-accent;animation-name: pulseBtn-blue-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-light-blue-lighten */
 .btn-bkg-light-blue-lighten {color: var(--color-white);background-color: var(--bkg-light-blue-lighten-4);border-color: var(--bkg-light-blue-lighten-5);}
 .btn-bkg-light-blue-lighten:hover {color: var(--color-white);background-color: var(--bkg-light-blue-lighten-3);border-color: var(--bkg-light-blue-lighten-5);}
@@ -1044,6 +1062,7 @@
 }
 .pulseBtn-light-blue-lighten {-webkit-animation-name: pulseBtn-light-blue-lighten;-moz-animation-name: pulseBtn-light-blue-lighten;-o-animation-name: pulseBtn-light-blue-lighten;animation-name: pulseBtn-light-blue-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-light-blue-darken */
 .btn-bkg-light-blue-darken {color: var(--color-white);background-color: var(--bkg-light-blue-darken-3);border-color: var(--bkg-light-blue-darken-4);}
 .btn-bkg-light-blue-darken:hover {color: var(--color-white);background-color: var(--bkg-light-blue-darken-2);border-color: var(--bkg-light-blue-darken-4);}
@@ -1099,6 +1118,7 @@
 }
 .pulseBtn-light-blue-darken {-webkit-animation-name: pulseBtn-light-blue-darken;-moz-animation-name: pulseBtn-light-blue-darken;-o-animation-name: pulseBtn-light-blue-darken;animation-name: pulseBtn-light-blue-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-light-blue-accent */
 .btn-bkg-light-blue-accent {color: var(--color-white);background-color: var(--bkg-light-blue-accent-3);border-color: var(--bkg-light-blue-accent-4);}
 .btn-bkg-light-blue-accent:hover {color: var(--color-white);background-color: var(--bkg-light-blue-accent-2);border-color: var(--bkg-light-blue-accent-4);}
@@ -1154,6 +1174,7 @@
 }
 .pulseBtn-light-blue-accent {-webkit-animation-name: pulseBtn-light-blue-accent;-moz-animation-name: pulseBtn-light-blue-accent;-o-animation-name: pulseBtn-light-blue-accent;animation-name: pulseBtn-light-blue-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-cyan-lighten */
 .btn-bkg-cyan-lighten {color: var(--color-white);background-color: var(--bkg-cyan-lighten-4);border-color: var(--bkg-cyan-lighten-5);}
 .btn-bkg-cyan-lighten:hover {color: var(--color-white);background-color: var(--bkg-cyan-lighten-3);border-color: var(--bkg-cyan-lighten-5);}
@@ -1209,6 +1230,7 @@
 }
 .pulseBtn-cyan-lighten {-webkit-animation-name: pulseBtn-cyan-lighten;-moz-animation-name: pulseBtn-cyan-lighten;-o-animation-name: pulseBtn-cyan-lighten;animation-name: pulseBtn-cyan-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-cyan-darken */
 .btn-bkg-cyan-darken {color: var(--color-white);background-color: var(--bkg-cyan-darken-3);border-color: var(--bkg-cyan-darken-4);}
 .btn-bkg-cyan-darken:hover {color: var(--color-white);background-color: var(--bkg-cyan-darken-2);border-color: var(--bkg-cyan-darken-4);}
@@ -1264,6 +1286,7 @@
 }
 .pulseBtn-cyan-darken {-webkit-animation-name: pulseBtn-cyan-darken;-moz-animation-name: pulseBtn-cyan-darken;-o-animation-name: pulseBtn-cyan-darken;animation-name: pulseBtn-cyan-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-cyan-accent */
 .btn-bkg-cyan-accent {color: var(--color-white);background-color: var(--bkg-cyan-accent-3);border-color: var(--bkg-cyan-accent-4);}
 .btn-bkg-cyan-accent:hover {color: var(--color-white);background-color: var(--bkg-cyan-accent-2);border-color: var(--bkg-cyan-accent-4);}
@@ -1319,6 +1342,7 @@
 }
 .pulseBtn-cyan-accent {-webkit-animation-name: pulseBtn-cyan-accent;-moz-animation-name: pulseBtn-cyan-accent;-o-animation-name: pulseBtn-cyan-accent;animation-name: pulseBtn-cyan-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-teal-lighten */
 .btn-bkg-teal-lighten {color: var(--color-white);background-color: var(--bkg-teal-lighten-4);border-color: var(--bkg-teal-lighten-5);}
 .btn-bkg-teal-lighten:hover {color: var(--color-white);background-color: var(--bkg-teal-lighten-3);border-color: var(--bkg-teal-lighten-5);}
@@ -1374,6 +1398,7 @@
 }
 .pulseBtn-teal-lighten {-webkit-animation-name: pulseBtn-teal-lighten;-moz-animation-name: pulseBtn-teal-lighten;-o-animation-name: pulseBtn-teal-lighten;animation-name: pulseBtn-teal-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-teal-darken */
 .btn-bkg-teal-darken {color: var(--color-white);background-color: var(--bkg-teal-darken-3);border-color: var(--bkg-teal-darken-4);}
 .btn-bkg-teal-darken:hover {color: var(--color-white);background-color: var(--bkg-teal-darken-2);border-color: var(--bkg-teal-darken-4);}
@@ -1429,6 +1454,7 @@
 }
 .pulseBtn-teal-darken {-webkit-animation-name: pulseBtn-teal-darken;-moz-animation-name: pulseBtn-teal-darken;-o-animation-name: pulseBtn-teal-darken;animation-name: pulseBtn-teal-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-teal-accent */
 .btn-bkg-teal-accent {color: var(--color-white);background-color: var(--bkg-teal-accent-3);border-color: var(--bkg-teal-accent-4);}
 .btn-bkg-teal-accent:hover {color: var(--color-white);background-color: var(--bkg-teal-accent-2);border-color: var(--bkg-teal-accent-4);}
@@ -1484,6 +1510,7 @@
 }
 .pulseBtn-teal-accent {-webkit-animation-name: pulseBtn-teal-accent;-moz-animation-name: pulseBtn-teal-accent;-o-animation-name: pulseBtn-teal-accent;animation-name: pulseBtn-teal-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-green-lighten */
 .btn-bkg-green-lighten {color: var(--color-white);background-color: var(--bkg-green-lighten-4);border-color: var(--bkg-green-lighten-5);}
 .btn-bkg-green-lighten:hover {color: var(--color-white);background-color: var(--bkg-green-lighten-3);border-color: var(--bkg-green-lighten-5);}
@@ -1539,6 +1566,7 @@
 }
 .pulseBtn-green-lighten {-webkit-animation-name: pulseBtn-green-lighten;-moz-animation-name: pulseBtn-green-lighten;-o-animation-name: pulseBtn-green-lighten;animation-name: pulseBtn-green-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-green-darken */
 .btn-bkg-green-darken {color: var(--color-white);background-color: var(--bkg-green-darken-3);border-color: var(--bkg-green-darken-4);}
 .btn-bkg-green-darken:hover {color: var(--color-white);background-color: var(--bkg-green-darken-2);border-color: var(--bkg-green-darken-4);}
@@ -1594,6 +1622,7 @@
 }
 .pulseBtn-green-darken {-webkit-animation-name: pulseBtn-green-darken;-moz-animation-name: pulseBtn-green-darken;-o-animation-name: pulseBtn-green-darken;animation-name: pulseBtn-green-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-green-accent */
 .btn-bkg-green-accent {color: var(--color-white);background-color: var(--bkg-green-accent-3);border-color: var(--bkg-green-accent-4);}
 .btn-bkg-green-accent:hover {color: var(--color-white);background-color: var(--bkg-green-accent-2);border-color: var(--bkg-green-accent-4);}
@@ -1649,6 +1678,7 @@
 }
 .pulseBtn-green-accent {-webkit-animation-name: pulseBtn-green-accent;-moz-animation-name: pulseBtn-green-accent;-o-animation-name: pulseBtn-green-accent;animation-name: pulseBtn-green-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-light-green-lighten */
 .btn-bkg-light-green-lighten {color: var(--color-white);background-color: var(--bkg-light-green-lighten-4);border-color: var(--bkg-light-green-lighten-5);}
 .btn-bkg-light-green-lighten:hover {color: var(--color-white);background-color: var(--bkg-light-green-lighten-3);border-color: var(--bkg-light-green-lighten-5);}
@@ -1704,6 +1734,7 @@
 }
 .pulseBtn-light-green-lighten {-webkit-animation-name: pulseBtn-light-green-lighten;-moz-animation-name: pulseBtn-light-green-lighten;-o-animation-name: pulseBtn-light-green-lighten;animation-name: pulseBtn-light-green-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-light-green-darken */
 .btn-bkg-light-green-darken {color: var(--color-white);background-color: var(--bkg-light-green-darken-3);border-color: var(--bkg-light-green-darken-4);}
 .btn-bkg-light-green-darken:hover {color: var(--color-white);background-color: var(--bkg-light-green-darken-2);border-color: var(--bkg-light-green-darken-4);}
@@ -1759,6 +1790,7 @@
 }
 .pulseBtn-light-green-darken {-webkit-animation-name: pulseBtn-light-green-darken;-moz-animation-name: pulseBtn-light-green-darken;-o-animation-name: pulseBtn-light-green-darken;animation-name: pulseBtn-light-green-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-light-green-accent */
 .btn-bkg-light-green-accent {color: var(--color-white);background-color: var(--bkg-light-green-accent-3);border-color: var(--bkg-light-green-accent-4);}
 .btn-bkg-light-green-accent:hover {color: var(--color-white);background-color: var(--bkg-light-green-accent-2);border-color: var(--bkg-light-green-accent-4);}
@@ -1814,6 +1846,7 @@
 }
 .pulseBtn-light-green-accent {-webkit-animation-name: pulseBtn-light-green-accent;-moz-animation-name: pulseBtn-light-green-accent;-o-animation-name: pulseBtn-light-green-accent;animation-name: pulseBtn-light-green-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-lime-lighten */
 .btn-bkg-lime-lighten {color: var(--color-white);background-color: var(--bkg-lime-lighten-4);border-color: var(--bkg-lime-lighten-5);}
 .btn-bkg-lime-lighten:hover {color: var(--color-white);background-color: var(--bkg-lime-lighten-3);border-color: var(--bkg-lime-lighten-5);}
@@ -1869,6 +1902,7 @@
 }
 .pulseBtn-lime-lighten {-webkit-animation-name: pulseBtn-lime-lighten;-moz-animation-name: pulseBtn-lime-lighten;-o-animation-name: pulseBtn-lime-lighten;animation-name: pulseBtn-lime-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-lime-darken */
 .btn-bkg-lime-darken {color: var(--color-white);background-color: var(--bkg-lime-darken-3);border-color: var(--bkg-lime-darken-4);}
 .btn-bkg-lime-darken:hover {color: var(--color-white);background-color: var(--bkg-lime-darken-2);border-color: var(--bkg-lime-darken-4);}
@@ -1924,6 +1958,7 @@
 }
 .pulseBtn-lime-darken {-webkit-animation-name: pulseBtn-lime-darken;-moz-animation-name: pulseBtn-lime-darken;-o-animation-name: pulseBtn-lime-darken;animation-name: pulseBtn-lime-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-lime-accent */
 .btn-bkg-lime-accent {color: var(--color-white);background-color: var(--bkg-lime-accent-3);border-color: var(--bkg-lime-accent-4);}
 .btn-bkg-lime-accent:hover {color: var(--color-white);background-color: var(--bkg-lime-accent-2);border-color: var(--bkg-lime-accent-4);}
@@ -1979,6 +2014,7 @@
 }
 .pulseBtn-lime-accent {-webkit-animation-name: pulseBtn-lime-accent;-moz-animation-name: pulseBtn-lime-accent;-o-animation-name: pulseBtn-lime-accent;animation-name: pulseBtn-lime-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-yellow-lighten */
 .btn-bkg-yellow-lighten {color: var(--color-white);background-color: var(--bkg-yellow-lighten-4);border-color: var(--bkg-yellow-lighten-5);}
 .btn-bkg-yellow-lighten:hover {color: var(--color-white);background-color: var(--bkg-yellow-lighten-3);border-color: var(--bkg-yellow-lighten-5);}
@@ -2034,6 +2070,7 @@
 }
 .pulseBtn-yellow-lighten {-webkit-animation-name: pulseBtn-yellow-lighten;-moz-animation-name: pulseBtn-yellow-lighten;-o-animation-name: pulseBtn-yellow-lighten;animation-name: pulseBtn-yellow-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-yellow-darken */
 .btn-bkg-yellow-darken {color: var(--color-white);background-color: var(--bkg-yellow-darken-3);border-color: var(--bkg-yellow-darken-4);}
 .btn-bkg-yellow-darken:hover {color: var(--color-white);background-color: var(--bkg-yellow-darken-2);border-color: var(--bkg-yellow-darken-4);}
@@ -2089,6 +2126,7 @@
 }
 .pulseBtn-yellow-darken {-webkit-animation-name: pulseBtn-yellow-darken;-moz-animation-name: pulseBtn-yellow-darken;-o-animation-name: pulseBtn-yellow-darken;animation-name: pulseBtn-yellow-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-yellow-accent */
 .btn-bkg-yellow-accent {color: var(--color-white);background-color: var(--bkg-yellow-accent-3);border-color: var(--bkg-yellow-accent-4);}
 .btn-bkg-yellow-accent:hover {color: var(--color-white);background-color: var(--bkg-yellow-accent-2);border-color: var(--bkg-yellow-accent-4);}
@@ -2144,6 +2182,7 @@
 }
 .pulseBtn-yellow-accent {-webkit-animation-name: pulseBtn-yellow-accent;-moz-animation-name: pulseBtn-yellow-accent;-o-animation-name: pulseBtn-yellow-accent;animation-name: pulseBtn-yellow-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-amber-lighten */
 .btn-bkg-amber-lighten {color: var(--color-white);background-color: var(--bkg-amber-lighten-4);border-color: var(--bkg-amber-lighten-5);}
 .btn-bkg-amber-lighten:hover {color: var(--color-white);background-color: var(--bkg-amber-lighten-3);border-color: var(--bkg-amber-lighten-5);}
@@ -2199,6 +2238,7 @@
 }
 .pulseBtn-amber-lighten {-webkit-animation-name: pulseBtn-amber-lighten;-moz-animation-name: pulseBtn-amber-lighten;-o-animation-name: pulseBtn-amber-lighten;animation-name: pulseBtn-amber-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-amber-darken */
 .btn-bkg-amber-darken {color: var(--color-white);background-color: var(--bkg-amber-darken-3);border-color: var(--bkg-amber-darken-4);}
 .btn-bkg-amber-darken:hover {color: var(--color-white);background-color: var(--bkg-amber-darken-2);border-color: var(--bkg-amber-darken-4);}
@@ -2254,6 +2294,7 @@
 }
 .pulseBtn-amber-darken {-webkit-animation-name: pulseBtn-amber-darken;-moz-animation-name: pulseBtn-amber-darken;-o-animation-name: pulseBtn-amber-darken;animation-name: pulseBtn-amber-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-amber-accent */
 .btn-bkg-amber-accent {color: var(--color-white);background-color: var(--bkg-amber-accent-3);border-color: var(--bkg-amber-accent-4);}
 .btn-bkg-amber-accent:hover {color: var(--color-white);background-color: var(--bkg-amber-accent-2);border-color: var(--bkg-amber-accent-4);}
@@ -2309,6 +2350,7 @@
 }
 .pulseBtn-amber-accent {-webkit-animation-name: pulseBtn-amber-accent;-moz-animation-name: pulseBtn-amber-accent;-o-animation-name: pulseBtn-amber-accent;animation-name: pulseBtn-amber-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-orange-lighten */
 .btn-bkg-orange-lighten {color: var(--color-white);background-color: var(--bkg-orange-lighten-4);border-color: var(--bkg-orange-lighten-5);}
 .btn-bkg-orange-lighten:hover {color: var(--color-white);background-color: var(--bkg-orange-lighten-3);border-color: var(--bkg-orange-lighten-5);}
@@ -2364,6 +2406,7 @@
 }
 .pulseBtn-orange-lighten {-webkit-animation-name: pulseBtn-orange-lighten;-moz-animation-name: pulseBtn-orange-lighten;-o-animation-name: pulseBtn-orange-lighten;animation-name: pulseBtn-orange-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-orange-darken */
 .btn-bkg-orange-darken {color: var(--color-white);background-color: var(--bkg-orange-darken-3);border-color: var(--bkg-orange-darken-4);}
 .btn-bkg-orange-darken:hover {color: var(--color-white);background-color: var(--bkg-orange-darken-2);border-color: var(--bkg-orange-darken-4);}
@@ -2419,6 +2462,7 @@
 }
 .pulseBtn-orange-darken {-webkit-animation-name: pulseBtn-orange-darken;-moz-animation-name: pulseBtn-orange-darken;-o-animation-name: pulseBtn-orange-darken;animation-name: pulseBtn-orange-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-orange-accent */
 .btn-bkg-orange-accent {color: var(--color-white);background-color: var(--bkg-orange-accent-3);border-color: var(--bkg-orange-accent-4);}
 .btn-bkg-orange-accent:hover {color: var(--color-white);background-color: var(--bkg-orange-accent-2);border-color: var(--bkg-orange-accent-4);}
@@ -2474,6 +2518,7 @@
 }
 .pulseBtn-orange-accent {-webkit-animation-name: pulseBtn-orange-accent;-moz-animation-name: pulseBtn-orange-accent;-o-animation-name: pulseBtn-orange-accent;animation-name: pulseBtn-orange-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-deep-orange-lighten */
 .btn-bkg-deep-orange-lighten {color: var(--color-white);background-color: var(--bkg-deep-orange-lighten-4);border-color: var(--bkg-deep-orange-lighten-5);}
 .btn-bkg-deep-orange-lighten:hover {color: var(--color-white);background-color: var(--bkg-deep-orange-lighten-3);border-color: var(--bkg-deep-orange-lighten-5);}
@@ -2529,6 +2574,7 @@
 }
 .pulseBtn-deep-orange-lighten {-webkit-animation-name: pulseBtn-deep-orange-lighten;-moz-animation-name: pulseBtn-deep-orange-lighten;-o-animation-name: pulseBtn-deep-orange-lighten;animation-name: pulseBtn-deep-orange-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-deep-orange-darken */
 .btn-bkg-deep-orange-darken {color: var(--color-white);background-color: var(--bkg-deep-orange-darken-3);border-color: var(--bkg-deep-orange-darken-4);}
 .btn-bkg-deep-orange-darken:hover {color: var(--color-white);background-color: var(--bkg-deep-orange-darken-2);border-color: var(--bkg-deep-orange-darken-4);}
@@ -2584,6 +2630,7 @@
 }
 .pulseBtn-deep-orange-darken {-webkit-animation-name: pulseBtn-deep-orange-darken;-moz-animation-name: pulseBtn-deep-orange-darken;-o-animation-name: pulseBtn-deep-orange-darken;animation-name: pulseBtn-deep-orange-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-deep-orange-accent */
 .btn-bkg-deep-orange-accent {color: var(--color-white);background-color: var(--bkg-deep-orange-accent-3);border-color: var(--bkg-deep-orange-accent-4);}
 .btn-bkg-deep-orange-accent:hover {color: var(--color-white);background-color: var(--bkg-deep-orange-accent-2);border-color: var(--bkg-deep-orange-accent-4);}
@@ -2639,6 +2686,7 @@
 }
 .pulseBtn-deep-orange-accent {-webkit-animation-name: pulseBtn-deep-orange-accent;-moz-animation-name: pulseBtn-deep-orange-accent;-o-animation-name: pulseBtn-deep-orange-accent;animation-name: pulseBtn-deep-orange-accent;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-brown-lighten */
 .btn-bkg-brown-lighten {color: var(--color-white);background-color: var(--bkg-brown-lighten-4);border-color: var(--bkg-brown-lighten-5);}
 .btn-bkg-brown-lighten:hover {color: var(--color-white);background-color: var(--bkg-brown-lighten-3);border-color: var(--bkg-brown-lighten-5);}
@@ -2694,6 +2742,7 @@
 }
 .pulseBtn-brown-lighten {-webkit-animation-name: pulseBtn-brown-lighten;-moz-animation-name: pulseBtn-brown-lighten;-o-animation-name: pulseBtn-brown-lighten;animation-name: pulseBtn-brown-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-brown-darken */
 .btn-bkg-brown-darken {color: var(--color-white);background-color: var(--bkg-brown-darken-3);border-color: var(--bkg-brown-darken-4);}
 .btn-bkg-brown-darken:hover {color: var(--color-white);background-color: var(--bkg-brown-darken-2);border-color: var(--bkg-brown-darken-4);}
@@ -2749,7 +2798,7 @@
 }
 .pulseBtn-brown-darken {-webkit-animation-name: pulseBtn-brown-darken;-moz-animation-name: pulseBtn-brown-darken;-o-animation-name: pulseBtn-brown-darken;animation-name: pulseBtn-brown-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
-
+/*===========================================================================*/
 /* bkg-blue-grey-lighten */
 .btn-bkg-blue-grey-lighten {color: var(--color-white);background-color: var(--bkg-blue-grey-lighten-4);border-color: var(--bkg-blue-grey-lighten-5);}
 .btn-bkg-blue-grey-lighten:hover {color: var(--color-white);background-color: var(--bkg-blue-grey-lighten-3);border-color: var(--bkg-blue-grey-lighten-5);}
@@ -2805,6 +2854,7 @@
 }
 .pulseBtn-blue-grey-lighten {-webkit-animation-name: pulseBtn-blue-grey-lighten;-moz-animation-name: pulseBtn-blue-grey-lighten;-o-animation-name: pulseBtn-blue-grey-lighten;animation-name: pulseBtn-blue-grey-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-blue-grey-darken */
 .btn-bkg-blue-grey-darken {color: var(--color-white);background-color: var(--bkg-blue-grey-darken-3);border-color: var(--bkg-blue-grey-darken-4);}
 .btn-bkg-blue-grey-darken:hover {color: var(--color-white);background-color: var(--bkg-blue-grey-darken-2);border-color: var(--bkg-blue-grey-darken-4);}
@@ -2860,7 +2910,7 @@
 }
 .pulseBtn-blue-grey-darken {-webkit-animation-name: pulseBtn-blue-grey-darken;-moz-animation-name: pulseBtn-blue-grey-darken;-o-animation-name: pulseBtn-blue-grey-darken;animation-name: pulseBtn-blue-grey-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
-
+/*===========================================================================*/
 /* bkg-grey-lighten */
 .btn-bkg-grey-lighten {color: var(--color-white);background-color: var(--bkg-grey-lighten-4);border-color: var(--bkg-grey-lighten-5);}
 .btn-bkg-grey-lighten:hover {color: var(--color-white);background-color: var(--bkg-grey-lighten-3);border-color: var(--bkg-grey-lighten-5);}
@@ -2916,6 +2966,7 @@
 }
 .pulseBtn-grey-lighten {-webkit-animation-name: pulseBtn-grey-lighten;-moz-animation-name: pulseBtn-grey-lighten;-o-animation-name: pulseBtn-grey-lighten;animation-name: pulseBtn-grey-lighten;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
+/*===========================================================================*/
 /* bkg-grey-darken */
 .btn-bkg-grey-darken {color: var(--color-white);background-color: var(--bkg-grey-darken-3);border-color: var(--bkg-grey-darken-4);}
 .btn-bkg-grey-darken:hover {color: var(--color-white);background-color: var(--bkg-grey-darken-2);border-color: var(--bkg-grey-darken-4);}
@@ -2972,6 +3023,7 @@
 .pulseBtn-grey-darken {-webkit-animation-name: pulseBtn-grey-darken;-moz-animation-name: pulseBtn-grey-darken;-o-animation-name: pulseBtn-grey-darken;animation-name: pulseBtn-grey-darken;-webkit-animation-iteration-count: infinite;-moz-animation-iteration-count: infinite;-o-animation-iteration-count: infinite;animation-iteration-count: infinite;-webkit-animation-direction: alternate;-moz-animation-direction: alternate;-o-animation-direction: alternate;animation-direction: alternate;-webkit-animation-timing-function: ease-in-out;-moz-animation-timing-function: ease-in-out;-o-animation-timing-function: ease-in-out;animation-timing-function: ease-in-out;}
 
 
+/*===========================================================================*/
 .pulseBtn-time-1s {
     -webkit-animation-duration: 1s;
     -moz-animation-duration: 1s;

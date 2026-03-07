@@ -1,4 +1,4 @@
-<form id="FormEditUsuarios" name="FormEditUsuarios" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+<form id="FormEditUsuarios" name="FormEditUsuarios" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
         <?php
         switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -30,16 +30,16 @@
         $x6  = $data['rowData']['idEstado'] ?? '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales']);
+        $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales', 'Clase' => 'box-title text-color-red-dark']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',   'Name'  => 'email',   'Id'  => 'EditUsuarios_email',   'Value'  => $x1,  'Required'  => 2, 'Icon' => 'bx bx-mail-send']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',  'Name'  => 'Nombre',  'Id'  => 'EditUsuarios_Nombre',  'Value'  => $x2,  'Required'  => 2]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',     'Name'  => 'Rut',     'Id'  => 'EditUsuarios_Rut',     'Value'  => $x3,  'Required'  => 1, 'Icon' => 'bi bi-person-circle']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono',    'Name'  => 'Fono',    'Id'  => 'EditUsuarios_Fono',    'Value'  => $x4,  'Required'  => 1, 'Icon' => 'bi bi-telephone-fill']);
 
-        $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración']);
+        $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración', 'Clase' => 'box-title text-color-red-dark']);
         $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'EditUsuarios_idTipoUsuario',  'Value' => $x5, 'Required' => 2,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
-        $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración']);
+        $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
         $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'EditUsuarios_idEstado',  'Value'  => $x6,  'Required' => 2,'arrData' => $data['arrEstado']]);
         $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
         $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'EditUsuarios_password',  'Value'  => '',    'Required' => 1,'Icon' => 'bi bi-key']);

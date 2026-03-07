@@ -22,7 +22,7 @@
                     <td><?php echo $crud['email']; ?></td>
                     <td><?php echo $crud['Nombre']; ?></td>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Ultimo_acceso']); ?></td>
-                    <td><?php echo '<span class="badge '.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
+                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
                     <td>
                         <div class="btn-group" role="group">
                             <button type="button" onclick="tabUsuariosView('<?php echo $encryptedId; ?>')"                                    class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>

@@ -471,6 +471,18 @@ class ControllerBase {
     }
 
     /************************************************************************************************************/
+    protected function Base_SelectMail($f3, $query, $type){
+        //Selecciono el tipo de envio
+        switch ($type) {
+            case 1: $Response = $this->Base_SMTPMail($f3, $query); break;
+            case 2: $Response = $this->Base_GMail($f3, $query); break;
+            case 3: $Response = $this->Base_SendingBlue($f3, $query); break;
+        }
+        //devuelvo resultados
+        return $Response;
+    }
+
+    /************************************************************************************************************/
     protected function Base_SMTPMail($f3, $query){
 		/*
 		*=================================================     Detalles    =================================================

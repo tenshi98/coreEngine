@@ -7,7 +7,7 @@
                         <div class="text-center">
                             <h5 class="search-title"><i class="bi bi-search"></i> Filtrar Datos</h5>
                         </div>
-                        <form id="FormSearchData" name="FormSearchData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                        <form id="FormSearchData" name="FormSearchData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                             <?php
                             //se dibujan los inputs
                             $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',   'Name' => 'Email',    'Id' => 'Search_Email',    'Value' => '','Required' => 1,'Icon' => 'bx bx-mail-send']);

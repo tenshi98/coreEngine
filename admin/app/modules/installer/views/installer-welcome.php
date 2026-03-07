@@ -32,7 +32,7 @@
 
                                     <?php
                                     if($data['ValidInstall'] === false ){
-                                        $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-triangle', 0, '<h4>Alerta:</h4><p>El sistema ya está instalado. Si deseas reinstalar, elimina el archivo de configuración primero y la base de datos.</p>');
+                                        $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-triangle', 0, '<h4>Alerta:</h4><p>El sistema ya está instalado. Si deseas reinstalar, elimina el archivo de configuración y la base de datos primero.</p>');
                                     } ?>
 
                                     <div class="box has-text-left mt-5" style="background-clip: border-box;border: 1px solid rgba(0,0,0,0.175);border-radius: 0.375rem;padding:25px;">
@@ -40,7 +40,7 @@
                                             <i class="bi bi-list-check text-color-blue"></i> El proceso incluye:
                                         </h4>
                                         <ul class="list-unstyled">
-                                            <li><i class="bi bi-check text-color-green-dark"></i> Validación de credenciales MySQL</li>
+                                            <li><i class="bi bi-check text-color-green-dark"></i> Validación de credenciales MySQL (Administrador y Usuario de Produccion)</li>
                                             <li><i class="bi bi-check text-color-green-dark"></i> Verificación de permisos</li>
                                             <li><i class="bi bi-check text-color-green-dark"></i> Creación de base de datos</li>
                                             <li><i class="bi bi-check text-color-green-dark"></i> Ejecución de scripts SQL</li>

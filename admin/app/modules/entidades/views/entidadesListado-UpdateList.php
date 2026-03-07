@@ -33,7 +33,7 @@
                     <td><?php echo $crud['TipoEntidad']; ?></td>
                     <td><?php echo $Entidad; ?></td>
                     <td><?php echo $crud['Sector']; ?></td>
-                    <td><?php echo '<span class="badge '.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
+                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
                     <td>
                         <div class="btn-group" role="group">
                             <?php

@@ -5,6 +5,16 @@
 class ConfigData{
     /*****************************************************/
     //Variables para MySQL
+    const MySQL_ADMIN = [
+        'HOSTNAME' => 'database',
+        'USERNAME' => 'root',
+        'PASSWORD' => 'docker',
+        'DATABASE' => 'core_engine',
+        'CHARSET'  => 'utf8mb4',
+        'PORT'     => 3306,
+    ];
+    /*****************************************************/
+    //Variables para MySQL
     const MySQL_1 = [
         'HOSTNAME' => 'database',
         'USERNAME' => 'root',

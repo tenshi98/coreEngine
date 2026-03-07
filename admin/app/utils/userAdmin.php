@@ -20,7 +20,9 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     $f3->route('GET /Core/Componentes/listgroup',    'coreComponentes->listgroup');    //Listgroup
     $f3->route('GET /Core/Componentes/modal',        'coreComponentes->modal');        //Modal
     $f3->route('GET /Core/Componentes/pagination',   'coreComponentes->pagination');   //Pagination
+    $f3->route('GET /Core/Componentes/popovers',     'coreComponentes->popovers');     //Popovers
     $f3->route('GET /Core/Componentes/progress',     'coreComponentes->progress');     //Progress
+    $f3->route('GET /Core/Componentes/ribbons',      'coreComponentes->ribbons');      //Ribbons
     $f3->route('GET /Core/Componentes/spinners',     'coreComponentes->spinners');     //Spinners
     $f3->route('GET /Core/Componentes/tabs',         'coreComponentes->tabs');         //Tabs
     $f3->route('GET /Core/Componentes/tooltips',     'coreComponentes->tooltips');     //Tooltips
@@ -29,9 +31,11 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Widgets
     $f3->route('GET /Core/Widgets/box',           'coreWidgets->box');            //box
     $f3->route('GET /Core/Widgets/timeLine',      'coreWidgets->timeLine');       //timeLine
-    $f3->route('GET /Core/Widgets/textDividers',  'coreWidgets->textDividers');   //timeLine
+    $f3->route('GET /Core/Widgets/dividers',      'coreWidgets->dividers');       //dividers
+    $f3->route('GET /Core/Widgets/textDividers',  'coreWidgets->textDividers');   //textDividers
     $f3->route('GET /Core/Widgets/components',    'coreWidgets->components');     //Componentes
     $f3->route('GET /Core/Widgets/calendar',      'coreWidgets->calendar');       //Calendario
+    $f3->route('GET /Core/Widgets/treeview',      'coreWidgets->treeview');       //Treeview
     //Tablas
     $f3->route('GET /Core/Tablas/normal',     'coreTablas->normal');        //Tablas Normales
     $f3->route('GET /Core/Tablas/dataTables', 'coreTablas->dataTables');    //Tablas dataTables
@@ -194,12 +198,13 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                  Instalacion de Modulos                   */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/plataforma/instalacion/resumen',                 'sistemaInstalacion->Resumen');           //Listar modulos disponibles
-    $f3->route('GET /Core/plataforma/instalacion/resumenUpdate',           'sistemaInstalacion->resumenUpdate');     //Actualizar vista
-    $f3->route('GET /Core/plataforma/instalacion/checkModule/@Controller', 'sistemaInstalacion->checkModule');       //Revisar las rutas de la BD contra el instalador
-    $f3->route('PUT /Core/plataforma/instalacion/installModule',           'sistemaInstalacion->installModule');     //Instalacion de modulos
-    $f3->route('PUT /Core/plataforma/instalacion/uninstallModule',         'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
-    $f3->route('GET /Core/plataforma/rutas/listado',                       'sistemaRutas->Resumen');                 //Listar las rutas disponibles
+    $f3->route('GET /Core/plataforma/instalacion/resumen',                     'sistemaInstalacion->Resumen');           //Listar modulos disponibles
+    $f3->route('GET /Core/plataforma/instalacion/resumenUpdate',               'sistemaInstalacion->resumenUpdate');     //Actualizar vista
+    $f3->route('GET /Core/plataforma/instalacion/checkModuleData/@Controller', 'sistemaInstalacion->checkModuleData');   //Revisar las rutas deL instalador contra la BD
+    $f3->route('GET /Core/plataforma/instalacion/checkModuleBBDD/@Controller', 'sistemaInstalacion->checkModuleBBDD');   //Revisar las rutas de la BD contra el instalador
+    $f3->route('PUT /Core/plataforma/instalacion/installModule',               'sistemaInstalacion->installModule');     //Instalacion de modulos
+    $f3->route('PUT /Core/plataforma/instalacion/uninstallModule',             'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
+    $f3->route('GET /Core/plataforma/rutas/listado',                           'sistemaRutas->Resumen');                 //Listar las rutas disponibles
 
 
 }

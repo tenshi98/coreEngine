@@ -1,19 +1,33 @@
     </main>
 
     <!-- ======= Footer ======= -->
-    <footer id="footer" class="footer">
-      <div class="copyright">
-        <?php
-        $CompanyName  = !empty($data['UserData']['Sistema_Nombre'])
-                        ? $data['UserData']['Sistema_Nombre']
-                        : 'Nombre Compañia';
-        ?>
-        &copy; <strong><span><?php echo $CompanyName; ?></span></strong>. Todos los derechos reservados
+    <div id="footer" class="footer">
+      <div class="container">
+        <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+          <div class="copyright col-md-4 d-flex align-items-center">
+            <a href="<?php echo $BASE.'/principal'; ?>" class="mb-3 me-2 mb-md-0 text-muted text-decoration-none lh-1">
+              <i class="ri-copyright-line"></i>
+            </a>
+            <span class="company text-muted">
+              <?php $CompanyName  = !empty($data['UserData']['Sistema_Nombre']) ? $data['UserData']['Sistema_Nombre'] : 'Nombre Compañia'; ?>
+              <strong><span><?php echo $CompanyName; ?></span></strong>. Todos los derechos reservados
+            </span>
+            <div class="credits">
+              <?php echo ConfigAPP::SOFTWARE['CompanyCredits']; ?>
+            </div>
+          </div>
+
+          <ul class="social-links nav col-md-4 justify-content-end list-unstyled d-flex">
+            <?php if($data['UserData']['Social_X']!=''){ ?>          <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_X']; ?>"         class="twitter text-muted"><i class="bi bi-twitter"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_Facebook']!=''){ ?>   <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_Facebook']; ?>"  class="facebook text-muted"><i class="bi bi-facebook"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_Instagram']!=''){ ?>  <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_Instagram']; ?>" class="instagram text-muted"><i class="bi bi-instagram"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_Linkedin']!=''){ ?>   <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_Linkedin']; ?>"  class="linkedin text-muted"><i class="bi bi-linkedin"></i></a></li><?php } ?>
+          </ul>
+        </footer>
       </div>
-      <div class="credits">
-        <?php echo ConfigAPP::SOFTWARE['CompanyCredits']; ?>
-      </div>
-    </footer><!-- End Footer -->
+    </div>
+
+
 
     <div id="PDloader"></div>
 

@@ -36,10 +36,17 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Pruebas Notificaciones</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_SMTPMail'; ?>">       <i class="bx bx-mail-send color-green-dark"></i> Envío Correo SMTP</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_GMail'; ?>">          <i class="bi bi-google color-green-dark"></i> Envío Correo GMail</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_SendingBlue'; ?>">    <i class="ri-mail-open-line color-green-dark"></i> Envío Correo SendingBlue</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_Whatsapp'; ?>">       <i class="bi bi-whatsapp color-green-dark"></i> Envío Mensaje Whatsapp</a></li>
+            <?php
+            //Se condiciona el motor de Email
+            switch ($data['UserData']["Config_motorEmail"]) {
+                case 1:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_SMTPMail">     <i class="bx bx-mail-send color-green-dark"></i> Envío Correo SMTP</a></li>';break;
+                case 2:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_GMail">        <i class="bi bi-google color-green-dark"></i> Envío Correo GMail</a></li>';break;
+                case 3:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_SendingBlue">  <i class="ri-mail-open-line color-green-dark"></i> Envío Correo SendingBlue</a></li>';break;
+            }
+            //Se condiciona el uso de Whatsapp
+            if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_Whatsapp">       <i class="bi bi-whatsapp color-green-dark"></i> Envío Mensaje Whatsapp</a></li>';
+            } ?>
             <li><hr class="dropdown-divider"></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_mailTemplateSelect'; ?>">  <i class="bx bx-mail-send color-green-dark"></i> Prueba Plantilla Email</a></li>
             <li><hr class="dropdown-divider"></li>
@@ -63,22 +70,24 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Componentes</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/acordeon'; ?>">     <i class="bi bi-puzzle color-blue"></i> Acordeon</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/alertas'; ?>">      <i class="bi bi-puzzle color-blue"></i> Alertas</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/badges'; ?>">       <i class="bi bi-puzzle color-blue"></i> Badges</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/breadcrumbs'; ?>">  <i class="bi bi-puzzle color-blue"></i> Breadcrumbs</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/buttons'; ?>">      <i class="bi bi-puzzle color-blue"></i> Botones</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/cards'; ?>">        <i class="bi bi-puzzle color-blue"></i> Cards</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/carousel'; ?>">     <i class="bi bi-puzzle color-blue"></i> Carousel</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/colors'; ?>">       <i class="bi bi-puzzle color-blue"></i> Colores</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/icons'; ?>">        <i class="bi bi-puzzle color-blue"></i> Iconos</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/listgroup'; ?>">    <i class="bi bi-puzzle color-blue"></i> Listgroup</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/modal'; ?>">        <i class="bi bi-puzzle color-blue"></i> Modal</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/pagination'; ?>">   <i class="bi bi-puzzle color-blue"></i> Paginacion</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/progress'; ?>">     <i class="bi bi-puzzle color-blue"></i> Barra Progreso</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/spinners'; ?>">     <i class="bi bi-puzzle color-blue"></i> Spinners</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/tabs'; ?>">         <i class="bi bi-puzzle color-blue"></i> Tabs</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/tooltips'; ?>">     <i class="bi bi-puzzle color-blue"></i> Tooltips</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/acordeon'; ?>">     <i class="bi bi-puzzle text-color-blue"></i> Acordeon</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/alertas'; ?>">      <i class="bi bi-puzzle text-color-blue"></i> Alertas</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/badges'; ?>">       <i class="bi bi-puzzle text-color-blue"></i> Badges</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/breadcrumbs'; ?>">  <i class="bi bi-puzzle text-color-blue"></i> Breadcrumbs</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/buttons'; ?>">      <i class="bi bi-puzzle text-color-blue"></i> Botones</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/cards'; ?>">        <i class="bi bi-puzzle text-color-blue"></i> Cards</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/carousel'; ?>">     <i class="bi bi-puzzle text-color-blue"></i> Carousel</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/colors'; ?>">       <i class="bi bi-puzzle text-color-blue"></i> Colores</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/icons'; ?>">        <i class="bi bi-puzzle text-color-blue"></i> Iconos</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/listgroup'; ?>">    <i class="bi bi-puzzle text-color-blue"></i> Listgroup</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/modal'; ?>">        <i class="bi bi-puzzle text-color-blue"></i> Modal</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/popovers'; ?>">     <i class="bi bi-puzzle text-color-blue"></i> Popovers</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/pagination'; ?>">   <i class="bi bi-puzzle text-color-blue"></i> Paginacion</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/progress'; ?>">     <i class="bi bi-puzzle text-color-blue"></i> Barra Progreso</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/ribbons'; ?>">      <i class="bi bi-puzzle text-color-blue"></i> Ribbons</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/spinners'; ?>">     <i class="bi bi-puzzle text-color-blue"></i> Spinners</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/tabs'; ?>">         <i class="bi bi-puzzle text-color-blue"></i> Tabs</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Componentes/tooltips'; ?>">     <i class="bi bi-puzzle text-color-blue"></i> Tooltips</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -103,6 +112,7 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>

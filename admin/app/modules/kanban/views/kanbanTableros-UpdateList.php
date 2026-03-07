@@ -21,8 +21,8 @@
                 <tr>
                     <td><?php echo $crud['Nombre']; ?></td>
                     <td><?php echo $crud['idPrioridad']; ?></td>
-                    <td><span class="badge <?php echo $crud['Color']; ?>"><?php echo $crud['Color']; ?></span></td>
-                    <td><span class="badge <?php echo $crud['CierreColor']; ?>"><?php echo $crud['Cierre']; ?></span></td>
+                    <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$crud['Color']; ?>"><?php echo $crud['Color']; ?></span></td>
+                    <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$crud['CierreColor']; ?>"><?php echo $crud['Cierre']; ?></span></td>
                     <td>
                         <div class="btn-group" role="group">
                             <?php

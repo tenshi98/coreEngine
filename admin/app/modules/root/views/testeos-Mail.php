@@ -7,7 +7,7 @@
                         <div class="text-center">
                             <h5 class="search-title"><i class="bi bi-mailbox"></i> Envio de correos</h5>
                         </div>
-                        <form id="FormSendData" name="FormSendData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                        <form id="FormSendData" name="FormSendData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                             <?php
                             //se dibujan los inputs
                             $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',   'Name' => 'Hacia',   'Id' => 'Send_Hacia',   'Value' => '','Required' => 2,'Icon' => 'bx bx-mail-send']);

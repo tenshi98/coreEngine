@@ -2,6 +2,7 @@
     <select class="form-select select2_Main"  name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" aria-label="<?php echo $placeholder; ?>" <?php echo $requerido; ?>>; ?>
         <?php echo $FormOptions; ?>
     </select>
+    <?php echo $dataInfo; ?>
 </div>
 
 <?php echo $dataRequire; ?>

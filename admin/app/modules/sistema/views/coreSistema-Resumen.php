@@ -19,28 +19,29 @@
 
                 <div class="tab-pane fade" id="resumen-edit_1">
 
-                    <form id="FormEditData_1" name="FormEditData_1" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData_1" name="FormEditData_1" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['Sistema_Nombre'] ?? '';
-                                $x2  = $data['rowData']['Sistema_Email'] ?? '';
-                                $x3  = $data['rowData']['Sistema_Rut'] ?? '';
-                                $x4  = $data['rowData']['Sistema_idCiudad'] ?? '';
-                                $x5  = $data['rowData']['Sistema_idComuna'] ?? '';
-                                $x6  = $data['rowData']['Sistema_Direccion'] ?? '';
-                                $x7  = $data['rowData']['Sistema_NotiWhatsapp'] ?? '';
-
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',    'Name'  => 'Sistema_Nombre',    'Value'  => $x1,'Required'  => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',     'Name'  => 'Sistema_Email',     'Value'  => $x2,'Required'  => 1,'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',       'Name'  => 'Sistema_Rut',       'Value'  => $x3,'Required'  => 1,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',    'Name1' => 'Sistema_idCiudad',  'Value1' => $x4,'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                      'Placeholder2' => 'Comuna',    'Name2' => 'Sistema_idComuna',  'Value2' => $x5,'Required2' => 1,'arrData2' => $data['arrComuna']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección', 'Name'  => 'Sistema_Direccion', 'Value'  => $x6,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
-                                $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => $x7, 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',    'Name'  => 'Sistema_Nombre',    'Value'  => $data['rowData']['Sistema_Nombre'] ?? '',    'Required'  => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',     'Name'  => 'Sistema_Email',     'Value'  => $data['rowData']['Sistema_Email'] ?? '',     'Required'  => 1,'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',       'Name'  => 'Sistema_Rut',       'Value'  => $data['rowData']['Sistema_Rut'] ?? '',       'Required'  => 1,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',    'Name1' => 'Sistema_idCiudad',  'Value1' => $data['rowData']['Sistema_idCiudad'] ?? '',  'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',    'Name2' => 'Sistema_idComuna',  'Value2' => $data['rowData']['Sistema_idComuna'] ?? '',  'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección', 'Name'  => 'Sistema_Direccion', 'Value'  => $data['rowData']['Sistema_Direccion'] ?? '', 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+
+                                //Se condiciona el uso de Whatsapp
+                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                    $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => $data['rowData']['Sistema_NotiWhatsapp'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                }
+
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4, 'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => $data['rowData']['Social_X'] ?? '',         'Required' => 1, 'Icon' => 'bi bi-x']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => $data['rowData']['Social_Facebook'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-facebook']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => $data['rowData']['Social_Instagram'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-instagram']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => $data['rowData']['Social_Linkedin'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
@@ -56,25 +57,17 @@
 
                 <div class="tab-pane fade" id="resumen-edit_2">
 
-                    <form id="FormEditData_2" name="FormEditData_2" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData_2" name="FormEditData_2" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['Contacto_Nombre'] ?? '';
-                                $x2  = $data['rowData']['Contacto_Fono1'] ?? '';
-                                $x3  = $data['rowData']['Contacto_Fono2'] ?? '';
-                                $x4  = $data['rowData']['Contacto_Fax'] ?? '';
-                                $x5  = $data['rowData']['Contacto_Email'] ?? '';
-                                $x6  = $data['rowData']['Contacto_Web'] ?? '';
-
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Contacto_Nombre',   'Value' => $x1, 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'Contacto_Fono1',    'Value' => $x2, 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 2', 'Name' => 'Contacto_Fono2',    'Value' => $x3, 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fax',    'Name' => 'Contacto_Fax',      'Value' => $x4, 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'Contacto_Email',    'Value' => $x5, 'Required' => 1, 'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',    'Name' => 'Contacto_Web',      'Value' => $x6, 'Required' => 1, 'Icon' => 'ri-edge-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Contacto_Nombre',   'Value' => $data['rowData']['Contacto_Nombre'] ?? '', 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'Contacto_Fono1',    'Value' => $data['rowData']['Contacto_Fono1'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 2', 'Name' => 'Contacto_Fono2',    'Value' => $data['rowData']['Contacto_Fono2'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fax',    'Name' => 'Contacto_Fax',      'Value' => $data['rowData']['Contacto_Fax'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'Contacto_Email',    'Value' => $data['rowData']['Contacto_Email'] ?? '',  'Required' => 1, 'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',    'Name' => 'Contacto_Web',      'Value' => $data['rowData']['Contacto_Web'] ?? '',    'Required' => 1, 'Icon' => 'ri-edge-fill']);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
@@ -90,21 +83,15 @@
 
                 <div class="tab-pane fade" id="resumen-edit_3">
 
-                    <form id="FormEditData_3" name="FormEditData_3" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData_3" name="FormEditData_3" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['RepresentanteNombre'] ?? '';
-                                $x2  = $data['rowData']['RepresentanteRut'] ?? '';
-                                $x3  = $data['rowData']['RepresentanteFono'] ?? '';
-                                $x4  = $data['rowData']['RepresentanteEmail'] ?? '';
-
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'RepresentanteNombre',  'Value' => $x1, 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',    'Name' => 'RepresentanteRut',     'Value' => $x2, 'Required' => 1, 'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'RepresentanteFono',    'Value' => $x3, 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'RepresentanteEmail',   'Value' => $x4, 'Required' => 1, 'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'RepresentanteNombre',  'Value' => $data['rowData']['RepresentanteNombre'] ?? '', 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',    'Name' => 'RepresentanteRut',     'Value' => $data['rowData']['RepresentanteRut'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'RepresentanteFono',    'Value' => $data['rowData']['RepresentanteFono'] ?? '',   'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'RepresentanteEmail',   'Value' => $data['rowData']['RepresentanteEmail'] ?? '',  'Required' => 1, 'Icon' => 'bx bx-mail-send']);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
@@ -120,19 +107,20 @@
 
                 <div class="tab-pane fade" id="resumen-edit_4">
 
-                    <form id="FormEditData_4" name="FormEditData_4" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+                    <form id="FormEditData_4" name="FormEditData_4" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                //$x1  = $data['rowData']['Config_API_GoogleMaps'] ?? '';
-                                $x2  = $data['rowData']['Config_WhatsappToken'] ?? '';
-                                $x3  = $data['rowData']['Config_WhatsappInstanceId'] ?? '';
-
                                 //se dibujan los inputs
-                                //$data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API GoogleMaps',           'Name' => 'Config_API_GoogleMaps',      'Value' => $x1, 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => $x2, 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => $x3, 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                //Se condiciona el motor de mapas
+                                switch ($data['UserData']["Config_motorMap"]) {
+                                    case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => $data['rowData']['Config_API_GoogleMaps'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
+                                }
+                                //Se condiciona el uso de Whatsapp
+                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => $data['rowData']['Config_WhatsappToken'] ?? '',      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => $data['rowData']['Config_WhatsappInstanceId'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                }
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
@@ -147,7 +135,7 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-edit_5">
-                    <h5 class="box-title text-color-red-dark">
+                    <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Imagen de <?php echo $data['rowData']['Sistema_Nombre']; ?>
                         </div>

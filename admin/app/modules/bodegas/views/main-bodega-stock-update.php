@@ -1,6 +1,6 @@
 <?php
 //Verifico si hay datos
-if(is_array($data['MainViewData']['Data_arrBodegas'])){
+if(!empty($data['MainViewData']['Data_arrBodegas'])&&is_array($data['MainViewData']['Data_arrBodegas'])){
     //Recorro
     foreach($data['MainViewData']['Data_arrBodegas'] as $bod){ ?>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">

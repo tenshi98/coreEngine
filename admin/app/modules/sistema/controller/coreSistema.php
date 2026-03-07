@@ -54,6 +54,7 @@ class coreSistema extends ControllerBase {
                 core_sistemas.Sistema_idComuna,
                 core_sistemas.Sistema_Direccion,
                 core_sistemas.Sistema_IMGLogo,
+                core_sistemas.Sistema_idTema,
                 core_sistemas.Sistema_NotiWhatsapp,
                 core_sistemas.Contacto_Nombre,
                 core_sistemas.Contacto_Fono1,
@@ -65,15 +66,22 @@ class coreSistema extends ControllerBase {
                 core_sistemas.RepresentanteRut,
                 core_sistemas.RepresentanteFono,
                 core_sistemas.RepresentanteEmail,
+                core_sistemas.Config_API_GoogleMaps,
                 core_sistemas.Config_WhatsappToken,
                 core_sistemas.Config_WhatsappInstanceId,
+                core_sistemas.Social_X,
+                core_sistemas.Social_Facebook,
+                core_sistemas.Social_Instagram,
+                core_sistemas.Social_Linkedin,
 
                 core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna',
+                core_ubicacion_comunas.Nombre AS Comuna,
+                core_temas.Nombre AS Tema',
             'table'   => 'core_sistemas',
             'join'    => '
                 LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad  = core_sistemas.Sistema_idCiudad
-                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna = core_sistemas.Sistema_idComuna',
+                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna = core_sistemas.Sistema_idComuna
+                LEFT JOIN core_temas             ON core_temas.idTema               = core_sistemas.Sistema_idTema',
             'where'   => 'core_sistemas.idSistema = "1"',
             'group'   => '',
             'having'  => '',
@@ -174,6 +182,7 @@ class coreSistema extends ControllerBase {
                 core_sistemas.Sistema_idComuna,
                 core_sistemas.Sistema_Direccion,
                 core_sistemas.Sistema_IMGLogo,
+                core_sistemas.Sistema_idTema,
                 core_sistemas.Sistema_NotiWhatsapp,
                 core_sistemas.Contacto_Nombre,
                 core_sistemas.Contacto_Fono1,
@@ -185,15 +194,22 @@ class coreSistema extends ControllerBase {
                 core_sistemas.RepresentanteRut,
                 core_sistemas.RepresentanteFono,
                 core_sistemas.RepresentanteEmail,
+                core_sistemas.Config_API_GoogleMaps,
                 core_sistemas.Config_WhatsappToken,
                 core_sistemas.Config_WhatsappInstanceId,
+                core_sistemas.Social_X,
+                core_sistemas.Social_Facebook,
+                core_sistemas.Social_Instagram,
+                core_sistemas.Social_Linkedin,
 
                 core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna',
+                core_ubicacion_comunas.Nombre AS Comuna,
+                core_temas.Nombre AS Tema',
             'table'   => 'core_sistemas',
             'join'    => '
                 LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad  = core_sistemas.Sistema_idCiudad
-                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna = core_sistemas.Sistema_idComuna',
+                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna = core_sistemas.Sistema_idComuna
+                LEFT JOIN core_temas             ON core_temas.idTema               = core_sistemas.Sistema_idTema',
             'where'   => 'core_sistemas.idSistema = "1"',
             'group'   => '',
             'having'  => '',
@@ -249,7 +265,7 @@ class coreSistema extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,idOpcionesGen_10,idOpcionesGen_11,idOpcionesGen_12,idOpcionesGen_13,idOpcionesGen_14,idOpcionesGen_15,idOpcionesGen_16,idOpcionesGen_17,idOpcionesGen_18,idOpcionesGen_19,idOpcionesGen_20',
+                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,idOpcionesGen_23,idOpcionesGen_24,idOpcionesGen_25,idOpcionesGen_26,idOpcionesGen_27,idOpcionesGen_28,idOpcionesGen_29,idOpcionesGen_30,idOpcionesGen_31,idOpcionesGen_32,idOpcionesGen_33,idOpcionesGen_34,idOpcionesGen_35,idOpcionesGen_36,idOpcionesGen_37,idOpcionesGen_38,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
                 'required'  => 'Sistema_Nombre',
                 'unique'    => '',
                 'encode'    => '',

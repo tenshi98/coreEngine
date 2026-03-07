@@ -13,7 +13,34 @@
                 <div class="tab-pane fade show active" id="fuentes">
                     <div class="row">
 
-                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
+                            <div class="box">
+                                <header>
+                                    <h5>Base</h5>
+                                </header>
+                                <div class="body">
+                                    <h3 class="text-base-color01">text-base-color01</h3>
+                                    <h3 class="text-base-color02">text-base-color02</h3>
+                                    <h3 class="text-base-color03">text-base-color03</h3>
+                                    <h3 class="text-base-color04">text-base-color04</h3>
+                                    <h3 class="text-base-color05">text-base-color05</h3>
+                                    <h3 class="text-base-color06">text-base-color06</h3>
+                                    <h3 class="text-base-color07">text-base-color07</h3>
+                                    <h3 class="text-base-color08">text-base-color08</h3>
+                                    <h3 class="text-base-color09">text-base-color09</h3>
+                                    <h3 class="text-base-color10">text-base-color10</h3>
+                                    <h3 class="text-base-color11">text-base-color11</h3>
+                                    <h3 class="text-base-color12">text-base-color12</h3>
+                                    <h3 class="text-base-color13">text-base-color13</h3>
+                                    <h3 class="text-base-color14">text-base-color14</h3>
+                                    <h3 class="text-base-color15">text-base-color15</h3>
+                                    <h3 class="text-base-color16">text-base-color16</h3>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                             <div class="box">
                                 <header>
                                     <h5>Bootstrap</h5>
@@ -29,7 +56,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                             <div class="box">
                                 <header>
                                     <h5>Propias 1</h5>
@@ -58,7 +85,7 @@
                             </div>
                         </div>
 
-                        <div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">
+                        <div class="col-xs-12 col-sm-6 col-md-3 col-lg-3">
                             <div class="box">
                                 <header>
                                     <h5>Propias 2</h5>
@@ -96,14 +123,45 @@
 
                         <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
                             <ul class="list-unstyled">
-                                <li class="btn-default">btn-default</li>
-                                <li class="btn-primary">btn-primary</li>
-                                <li class="btn-success">btn-success</li>
-                                <li class="btn-info">btn-info</li>
-                                <li class="btn-warning">btn-warning</li>
-                                <li class="btn-danger">btn-danger</li>
+                                <li class="bg-primary">bg-primary</li>
+                                <li class="bg-secondary">bg-secondary</li>
+                                <li class="bg-success">bg-success</li>
+                                <li class="bg-danger">bg-danger</li>
+                                <li class="bg-warning">bg-warning</li>
+                                <li class="bg-info">bg-info</li>
+                                <li class="bg-light">bg-light</li>
+                                <li class="bg-dark">bg-dark</li>
                             </ul>
                         </div>
+
+                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                            <ul class="list-unstyled">
+                                <li class="bg-primary-light">bg-primary-light</li>
+                                <li class="bg-secondary-light">bg-secondary-light</li>
+                                <li class="bg-success-light">bg-success-light</li>
+                                <li class="bg-danger-light">bg-danger-light</li>
+                                <li class="bg-warning-light">bg-warning-light</li>
+                                <li class="bg-info-light">bg-info-light</li>
+                                <li class="bg-light-light">bg-light-light</li>
+                                <li class="bg-dark-light">bg-dark-light</li>
+                            </ul>
+                        </div>
+
+                        <div class="col-xs-12 col-sm-3 col-md-3 col-lg-3">
+                            <ul class="list-unstyled">
+                                <li class="bg-primary-gradient">bg-primary-gradient</li>
+                                <li class="bg-secondary-gradient">bg-secondary-gradient</li>
+                                <li class="bg-success-gradient">bg-success-gradient</li>
+                                <li class="bg-danger-gradient">bg-danger-gradient</li>
+                                <li class="bg-warning-gradient">bg-warning-gradient</li>
+                                <li class="bg-info-gradient">bg-info-gradient</li>
+                                <li class="bg-light-gradient">bg-light-gradient</li>
+                                <li class="bg-dark-gradient">bg-dark-gradient</li>
+                            </ul>
+                        </div>
+
+
+
 
                     </div>
                 </div>

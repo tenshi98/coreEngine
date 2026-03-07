@@ -231,7 +231,7 @@ class kanbanTareasTareas extends ControllerBase {
                         'idKanban'         => $_POST['idKanban'],               //idKanban
                         'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
                         'idEstadoTrabajo'  => 1,                                //Estado abierto
-                        'idTrabajo'        => ($_POST['idTrabajo'][$j1] ?? ''), //idTrabajo si existe
+                        'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
                     ];
                     /******************************/
                     //Se genera la query

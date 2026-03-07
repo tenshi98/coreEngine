@@ -9,7 +9,7 @@
     </ul>
 </div>
 
-<form id="FormSummary" name="FormSummary" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data">
+<form id="FormSummary" name="FormSummary" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="card-body">
         <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8 col-xl-8 col-xxl-8 mx-auto">
             <div class="text-center">
@@ -19,22 +19,22 @@
             <?php
             echo '<div class="row">';
                 echo '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-server"></i> Host de MySQL</h4>  <p>'.$_SESSION['db_Host'].'</p>');
+                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-user"></i> Usuario Administrador</h4><p>'.$_SESSION['db_Admin_Usuario'].'</p>');
                 echo '</div>';
                 echo '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-user"></i> Usuario</h4>          <p>'.$_SESSION['db_Usuario'].'</p>');
+                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-user"></i> Usuario Producción</h4><p>'.$_SESSION['db_Prod_Usuario'].'</p>');
                 echo '</div>';
                 echo '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-git-merge"></i> Puerto</h4>           <p>'.$_SESSION['db_Port'].'</p>');
+                    $dataBox  = '<h4><i class="bx bx-server"></i> Datos del Servidor</h4><p>';
+                    $dataBox .= 'Host de MySQL: '.$_SESSION['db_Host'].'<br>';
+                    $dataBox .= 'Puerto: '.$_SESSION['db_Port'].'<br>';
+                    $dataBox .= 'Conjunto de Caracteres: '.$_SESSION['db_Charset'].'<br>';
+                    $dataBox .= 'Base de Datos: '.$_SESSION['db_DBName'].'<br>';
+                    $dataBox .= '</p>';
+                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, $dataBox);
                 echo '</div>';
                 echo '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-braille"></i> Conjunto de Caracteres</h4>   <p>'.$_SESSION['db_Charset'].'</p>');
-                echo '</div>';
-                echo '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-data"></i> Base de Datos</h4>    <p>'.$_SESSION['db_DBName'].'</p>');
-                echo '</div>';
-                echo '<div class="col-xs-12 col-sm-6 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-extension"></i> Archivo SQL</h4> <p>install.sql</p>');
+                    $data['Fnc_FormInputs']->formPostData(1, 5, 'exclamation-circle', 0, '<h4><i class="bx bx-extension"></i> Archivo SQL</h4><p>install.sql</p>');
                 echo '</div>';
             echo '</div>';
 
@@ -47,12 +47,14 @@
             $data['Fnc_FormInputs']->formPostData(3, 4, 'bi bi-star', 0, $DataInf);
 
             //datos ocultos
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Host',     'Value' => $_SESSION['db_Host'],     'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Usuario',  'Value' => $_SESSION['db_Usuario'],  'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Password', 'Value' => $_SESSION['db_Password'], 'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Port',     'Value' => $_SESSION['db_Port'],     'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Charset',  'Value' => $_SESSION['db_Charset'],  'Required' => 2]);
-            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'DBName',   'Value' => $_SESSION['db_DBName'],   'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Host',           'Value' => $_SESSION['db_Host'],           'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Admin_Usuario',  'Value' => $_SESSION['db_Admin_Usuario'],  'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Admin_Password', 'Value' => $_SESSION['db_Admin_Password'], 'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Prod_Usuario',   'Value' => $_SESSION['db_Prod_Usuario'],   'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Prod_Password',  'Value' => $_SESSION['db_Prod_Password'],  'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Port',           'Value' => $_SESSION['db_Port'],           'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Charset',        'Value' => $_SESSION['db_Charset'],        'Required' => 2]);
+            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'DBName',         'Value' => $_SESSION['db_DBName'],         'Required' => 2]);
 
             ?>
 

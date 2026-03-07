@@ -57,7 +57,7 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain){
+	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo){
 
 		/******************************************/
 		//Verifico si se utiliza el icono
@@ -107,6 +107,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('name',             $name);
 		$this->TemplateRender->assign('selectProperties', $selectProperties);
 		$this->TemplateRender->assign('SelectOptions',    $SelectOptions);
+		$this->TemplateRender->assign('dataInfo',         $dataInfo);
 
 		/******************************************/
 		//devuelvo
@@ -114,7 +115,7 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain){
+	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo){
 
 		/******************************************/
 		//Verifico si se utiliza el icono
@@ -177,6 +178,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('name',             $name);
 		$this->TemplateRender->assign('selectProperties', $selectProperties);
 		$this->TemplateRender->assign('SelectOptions',    $SelectOptions);
+		$this->TemplateRender->assign('dataInfo',         $dataInfo);
 
 		/******************************************/
 		//devuelvo
@@ -338,8 +340,9 @@ class UIFormInputs {
 		*/
 
 		/**********************  Definiciones   **********************/
-		$type = $Options['Tipo'];
-		$Text = $Options['Texto'];
+		$type  = $Options['Tipo'];
+		$Text  = $Options['Texto'];
+		$Class = $Options['Clase'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -371,7 +374,8 @@ class UIFormInputs {
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formTittle_1.php');
 			$this->TemplateRender->assign('tipo',  $tipo);
-			$this->TemplateRender->assign('Text',  $Text);
+			$this->TemplateRender->assign('texto',  $Text);
+			$this->TemplateRender->assign('clase',  $Class);
 
 			/******************************************/
 			//Imprimir dato
@@ -713,7 +717,6 @@ class UIFormInputs {
 				$ExtraClassGroup = $defaults['ExtraClassGroup'];
 				$ExtraCode       = $defaults['ExtraCode'];
 			}
-
 
             /******************************************/
 			//Verifico si se utiliza el icono
@@ -1077,13 +1080,14 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'Color'       => '',              //Color a mostrar
+		*		'FormCol'     => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder' => 'Nombre',              //Nombre a mostrar
+		*		'Name'        => 'Nombre',              //Nombre del input
+		*		'Id'          => 'Identificador',       //Identificador del input
+		*		'Value'       => 'asd',                 //Valor del input
+		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
+		*		'Color'       => '',                    //Color a mostrar
+		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -1096,6 +1100,7 @@ class UIFormInputs {
 		$value         = $Options['Value'] ?? '';
 		$required      = $Options['Required'] ?? 1;
 		$color         = $Options['Color'] ?? 1;
+		$DataInfo      = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1135,6 +1140,10 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
+			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                     break;//Si el dato no es requerido
@@ -1159,6 +1168,12 @@ class UIFormInputs {
 			$tipo    = $options[$color-1];
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			//Se genera input
 			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'checkbox', $valor, $check, $requerido);
 
@@ -1170,6 +1185,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('placeholder', $placeholder);
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
+			$this->TemplateRender->assign('dataInfo',    $dataInfo);
 
 			/******************************************/
 			//Imprimir dato
@@ -1317,13 +1333,14 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'Color'       => '',              //Color a mostrar
+		*		'FormCol'     => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder' => 'Nombre',              //Nombre a mostrar
+		*		'Name'        => 'Nombre',              //Nombre del input
+		*		'Id'          => 'Identificador',       //Identificador del input
+		*		'Value'       => 'asd',                 //Valor del input
+		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
+		*		'Color'       => '',                    //Color a mostrar
+		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -1336,6 +1353,7 @@ class UIFormInputs {
 		$value         = $Options['Value'] ?? '';
 		$required      = $Options['Required'] ?? 1;
 		$color         = $Options['Color'] ?? 1;
+		$DataInfo      = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1375,6 +1393,10 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
+			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';          break;//Si el dato no es requerido
@@ -1399,6 +1421,12 @@ class UIFormInputs {
 			$tipo    = $options[$color-1];
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			//Se genera input
 			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'radio', $valor, $check, $requerido);
 
@@ -1410,6 +1438,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('placeholder', $placeholder);
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
+			$this->TemplateRender->assign('dataInfo',    $dataInfo);
 
 			/******************************************/
 			//Imprimir dato
@@ -1557,13 +1586,14 @@ class UIFormInputs {
 		*
 		*=================================================    Parametros   =================================================
 		*	$Options = [
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'Color'       => '',              //Color a mostrar
+		*		'FormCol'     => 8,                     //Columnas del formulario (0 al 12)
+		*		'Placeholder' => 'Nombre',              //Nombre a mostrar
+		*		'Name'        => 'Nombre',              //Nombre del input
+		*		'Id'          => 'Identificador',       //Identificador del input
+		*		'Value'       => 'asd',                 //Valor del input
+		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
+		*		'Color'       => '',                    //Color a mostrar
+		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -1576,6 +1606,7 @@ class UIFormInputs {
 		$value         = $Options['Value'] ?? '';
 		$required      = $Options['Required'] ?? 1;
 		$color         = $Options['Color'] ?? 1;
+		$DataInfo      = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1615,6 +1646,10 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
+			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                     break;//Si el dato no es requerido
@@ -1632,6 +1667,12 @@ class UIFormInputs {
 			//Si el tab correspondiente esta seleccionado
 			$check = (isset($value) && $value == 2) ? 'checked' : '';
 			$valor = '2';
+
+			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
 
 			/******************************************/
 			//Selecciono el tipo de mensaje
@@ -1653,6 +1694,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('extracol',    $extracol);
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
+			$this->TemplateRender->assign('dataInfo',    $dataInfo);
 
 			/******************************************/
 			//Imprimir dato
@@ -2039,6 +2081,7 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2053,6 +2096,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2091,6 +2135,10 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
@@ -2098,12 +2146,18 @@ class UIFormInputs {
 				: $identificador;
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			//Valido si es requerido
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
 
 			/******************************************/
 			//Imprimir dato
-			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
+			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
 
 		}else{
 			echo $alerts;
@@ -2132,6 +2186,7 @@ class UIFormInputs {
 		*		'Required'         => 2,                     //Si input es requerido (1 al 2)
 		*		'selectProperties' => '',                    //Permite agregar propiedades dentro del elemento
 		*		'arrData'          => '',                    //Datos recibidos
+		*		'DataInfo'        => 'Lorem ipsum dolor',    //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2148,6 +2203,7 @@ class UIFormInputs {
 		$required         = $Options['Required'] ?? 1;
 		$selectProperties = $Options['selectProperties'] ?? '';
 		$BASE             = $Options['BASE'];
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2186,6 +2242,10 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
@@ -2193,12 +2253,18 @@ class UIFormInputs {
 				: $identificador;
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			//Valido si es requerido
 			$selectProperties .= ($required === 2) ? 'required="required"' : '';
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main');
+			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2233,6 +2299,7 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2247,6 +2314,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2285,6 +2353,10 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
@@ -2292,12 +2364,18 @@ class UIFormInputs {
 				: $identificador;
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			//Valido si es requerido
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
 
 			/******************************************/
 			//Imprimir dato
-			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
+			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
 
 		}else{
 			echo $alerts;
@@ -2325,6 +2403,7 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2340,6 +2419,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$BASE             = $Options['BASE'];
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2378,6 +2458,10 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
@@ -2385,12 +2469,18 @@ class UIFormInputs {
 				: $identificador;
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			//Valido si es requerido
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main');
+			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2425,6 +2515,7 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2439,6 +2530,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2467,6 +2559,10 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
@@ -2474,12 +2570,18 @@ class UIFormInputs {
 				: $identificador;
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			// Configura propiedades para select multiple de forma compacta
 			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : '');
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
+			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
 			//ejecuto script
 			$input .= '
 			<script>
@@ -2518,6 +2620,7 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2532,6 +2635,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2560,6 +2664,10 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
@@ -2567,12 +2675,18 @@ class UIFormInputs {
 				: $identificador;
 
 			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
+
+			/******************************************/
 			// Configura propiedades para select multiple de forma compacta
 			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : '');
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '');
+			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
 			//ejecuto script
 			$input .= '
 			<script>
@@ -2706,7 +2820,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '');
+			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '', '');
 			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
@@ -2836,7 +2950,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main');
+			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main', '');
 			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
@@ -2872,6 +2986,7 @@ class UIFormInputs {
 		*		'Id'              => 'Identificador',       //Identificador del input
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -2886,6 +3001,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$BASE             = $Options['BASE'];
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2924,11 +3040,21 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
 				? str_replace('[]', '', $identificador) . '_' . uniqid()
 				: $identificador;
+
+			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
 
 			/******************************************/
 			//Valido si es requerido
@@ -3175,6 +3301,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('requerido',        $requerido);
 			$this->TemplateRender->assign('FormOptions',      $FormOptions);
 			$this->TemplateRender->assign('dataRequire',      $dataRequire);
+			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 
 			/******************************************/
 			//Imprimir dato
@@ -3210,6 +3337,7 @@ class UIFormInputs {
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'ValorInicio'     => '',                    //Valor Inicio
 		*		'ValorFin'        => '',                    //Valor Fin
+		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*	];
 		*===================================================================================================================
 		*/
@@ -3225,6 +3353,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$DataInfo         = $Options['DataInfo'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -3267,11 +3396,21 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
+            /******************************************/
+			//Verifico si se utiliza el icono
+			$dataInfo = '';
+
 			/******************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false)
 				? str_replace('[]', '', $identificador) . '_' . uniqid()
 				: $identificador;
+
+			/******************************************/
+			//Verifico si el DataInfo tiene datos
+			if (!empty($DataInfo)&&$DataInfo!='') {
+				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
+			}
 
 			/******************************************/
 			//Valido si es requerido
@@ -3316,6 +3455,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('requerido',        $requerido);
 			$this->TemplateRender->assign('FormCol',          $FormCol);
 			$this->TemplateRender->assign('FormOptions',      $FormOptions);
+			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 
 			/******************************************/
 			//Imprimir dato

@@ -542,7 +542,7 @@ class FunctionsDataValidations {
 	}
 
     /************************************************************************************************************/
-    public function validateCredentials($host, $username, $password, $port, $charset): array {
+    public function validateCredentials($host, $username, $password, $port, $charset, $type): array {
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -563,99 +563,151 @@ class FunctionsDataValidations {
 		*===================================================================================================================
 		*/
 
-        /**********************  Validaciones   **********************/
-        //Se verifica si hay datos
-        if(!isset($host) || $host==''){          return ['success' => false, 'message' => 'No hay datos en $host'];}
-        if(!isset($username) || $username==''){  return ['success' => false, 'message' => 'No hay datos en $username'];}
-        if(!isset($password) || $password==''){  return ['success' => false, 'message' => 'No hay datos en $password'];}
-        if(!isset($port) || $port==''){          return ['success' => false, 'message' => 'No hay datos en $port'];}
-        if(!isset($charset) || $charset==''){    return ['success' => false, 'message' => 'No hay datos en $charset'];}
+        // ================================================================
+		// Validaciones de parámetros vacíos
+		// ================================================================
+		$params = compact('host', 'username', 'password', 'port', 'charset', 'type');
+		foreach ($params as $name => $value) {
+			if ($value === '' || $value === null) {
+				return [
+					'status'  => 'missing_param',
+					'success' => false,
+					'message' => "No hay datos en \$$name"
+				];
+			}
+		}
 
-		/********************** Si todo esta ok **********************/
+		// Validar puerto numérico
+		if (!is_numeric($port) || (int)$port <= 0 || (int)$port > 65535) {
+			return [
+				'status'  => 'invalid_port',
+				'success' => false,
+				'message' => 'El puerto debe ser un número entre 1 y 65535'
+			];
+		}
+
+		// Validar tipo antes de conectar (whitelist)
+		if (!in_array($type, ['admin', 'basic'], true)) {
+			return [
+				'status'  => 'invalid_type',
+				'success' => false,
+				'message' => 'Tipo de usuario no válido. Use "admin" o "basic"'
+			];
+		}
+
 		try {
 
 			// --------------------------------------------------------------------------
 			// Intentar conexión al servidor (sin DB específica)
 			// --------------------------------------------------------------------------
 			// Declaro conexion
-            $DBConn = new DB\SQL(
-                'mysql:host='.$host.';port='.$port.';charset='.$charset,
-                $username,
-                $password,
-                array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
-            );
-			// Ejecuto query de prueba
+			$DBConn = new DB\SQL(
+				'mysql:host=' . $host . ';port=' . (int)$port . ';charset=' . $charset,
+				$username,
+				$password,
+				[\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;']
+			);
+			// Ejecuto query de prueba sin el usuario
 			$DBConn->exec("SELECT 1;");
 
-			// --------------------------------------------------------------------------
-			// Verificación teórica de privilegios
-			// --------------------------------------------------------------------------
-			// Consulta
-			$grants = $DBConn->exec("SHOW GRANTS FOR CURRENT_USER();");
-			// Variable
-			$hasCreateGrant = false;
-			// Recorro los permisos
-			if ($grants) {
-				foreach ($grants as $row) {
-					foreach ($row as $grant) {
-						if (stripos($grant, 'ALL PRIVILEGES') !== false || stripos($grant, 'CREATE') !== false) {
-							$hasCreateGrant = true;
-							break 2;
-						}
-					}
+			// ================================================================
+			// TIPO ADMIN
+			// ================================================================
+			if ($type === 'admin') {
+
+				// Nombre seguro: solo caracteres hexadecimales
+				$testDbName = '__test_install_' . preg_replace('/[^a-f0-9]/', '', uniqid('', true));
+				// Se ejecuta
+				try {
+					// Creacion de Base de datos
+					$DBConn->exec("CREATE DATABASE `$testDbName`");
+					// Eliminacion de Base de datos
+					$DBConn->exec("DROP DATABASE `$testDbName`");
+					// Declaracion variable
+					$realCreateWorks = true;
+				} catch (\Exception $e) {
+					// Intentar limpiar si CREATE tuvo éxito pero DROP falló
+					try { $DBConn->exec("DROP DATABASE IF EXISTS `$testDbName`"); } catch (\Exception $ignored) {}
+					// Declaracion variable
+					$realCreateWorks = false;
 				}
-			}
 
-			// --------------------------------------------------------------------------
-			// Prueba REAL de creación de base de datos
-			// --------------------------------------------------------------------------
-			// Nombre base de datos temporal
-			$testDbName = '__test_install_' . uniqid();
-			// Se ejecuta
-			try {
-				// Creacion de Base de datos
-				$DBConn->exec("CREATE DATABASE `$testDbName`");
-				// Eliminacion de Base de datos
-				$DBConn->exec("DROP DATABASE `$testDbName`");
-				// Declaracion variable
-				$realCreateWorks = true;
-			} catch (\Exception $e) {
-				// Declaracion variable
-				$realCreateWorks = false;
-			}
+				// Usuario válido pero sin permisos
+				if (!$realCreateWorks) {
+					return [
+						'status'  => 'no_create_permission',
+						'success' => false,
+						'message' => 'Usuario válido pero sin permisos CREATE DATABASE'
+					];
+				}
 
-			// --------------------------------------------------------------------------
-			// Evaluación final
-			// --------------------------------------------------------------------------
-			// Usuario válido pero sin permisos
-			if (!$hasCreateGrant && !$realCreateWorks) {
+				// Permisos OK
 				return [
-					'status'  => 'no_create_permission',
-					'success' => false,
-					'message' => 'Usuario válido pero sin permisos CREATE DATABASE'
+					'status'  => 'success',
+					'success' => true,
+					'message' => 'Usuario ADMIN validado correctamente'
 				];
 			}
-			// El usuario declara permisos CREATE pero no puede crear bases
-			if ($hasCreateGrant && !$realCreateWorks) {
+
+			// ================================================================
+			// TIPO BASIC
+			// ================================================================
+			if ($type === 'basic') {
+
+				// Cambiar contexto a 'mysql' para permitir escritura en tabla temporal
+				$DBConn->exec("USE `mysql`");
+
+				// Nombre seguro: solo caracteres hexadecimales
+				$testTable = '__test_perm_' . preg_replace('/[^a-f0-9]/', '', uniqid('', true));
+
+				try {
+					$DBConn->exec("CREATE TEMPORARY TABLE `$testTable` (id INT)"); // Crear tabla temporal
+					$DBConn->exec("INSERT INTO `$testTable` (id) VALUES (1)");     // Insertar
+					$DBConn->exec("SELECT * FROM `$testTable`");                   // Leer
+					$DBConn->exec("DELETE FROM `$testTable` WHERE id = 1");        // Eliminar
+					$DBConn->exec("DROP TEMPORARY TABLE IF EXISTS `$testTable`");  // Eliminar tabla temporal
+					// Declaracion variable
+					$basicPermissionsOK = true;
+				} catch (\Exception $e) {
+					// Limpiar tabla temporal si quedó creada
+					try { $DBConn->exec("DROP TEMPORARY TABLE IF EXISTS `$testTable`"); } catch (\Exception $ignored) {}
+					// Declaracion variable
+					$basicPermissionsOK = false;
+				}
+
+				//Usuario válido pero sin permisos
+				if (!$basicPermissionsOK) {
+					return [
+						'status'  => 'no_basic_permissions',
+						'success' => false,
+						'message' => 'Usuario válido pero sin permisos SELECT/INSERT/DELETE sdf'.$asd
+					];
+				}
+
+				// Permisos OK
 				return [
-					'status'  => 'grant_mismatch',
-					'success' => false,
-					'message' => 'El usuario declara permisos CREATE pero no puede crear bases'
+					'status'  => 'success',
+					'success' => true,
+					'message' => 'Usuario BASIC validado correctamente'
 				];
 			}
-			// Permisos OK
+
+			// ================================================================
+			// RESPUESTA POR DEFECTO
+			// ================================================================
 			return [
-				'status'  => 'success',
-				'success' => true,
-				'message' => 'Conexión y permisos verificados correctamente'
+				'status'  => 'unknown_error',
+				'success' => false,
+				'message' => 'Error desconocido'
 			];
 
 		} catch (\PDOException $e) {
 
 			$message = $e->getMessage();
+			$code    = (string) $e->getCode();
 
-			// Servidor no disponible
-			if (str_contains($message, '2002')) {
+			// Host no alcanzable (errores de red / socket)
+			if (str_contains($message, '2002') || str_contains($message, '2003')) {
 				return [
 					'status'  => 'server_unreachable',
 					'success' => false,
@@ -663,17 +715,8 @@ class FunctionsDataValidations {
 				];
 			}
 
-			// Access denied
+			// Usuario o contraseña incorrectos
 			if (str_contains($message, '1045')) {
-
-				if (str_contains($message, '@')) {
-					return [
-						'status'  => 'host_not_allowed',
-						'success' => false,
-						'message' => 'Usuario no autorizado desde este host'
-					];
-				}
-
 				return [
 					'status'  => 'access_denied',
 					'success' => false,
@@ -681,10 +724,28 @@ class FunctionsDataValidations {
 				];
 			}
 
+			// Acceso denegado a base de datos específica
+			if (str_contains($message, '1044')) {
+				return [
+					'status'  => 'db_access_denied',
+					'success' => false,
+					'message' => 'Acceso denegado a la base de datos especificada'
+				];
+			}
+
 			return [
 				'status'  => 'unknown_error',
 				'success' => false,
 				'message' => $message
+			];
+
+		} catch (\Exception $e) {
+
+			// Captura excepciones no-PDO lanzadas por DB\SQL u otras capas
+			return [
+				'status'  => 'unknown_error',
+				'success' => false,
+				'message' => $e->getMessage()
 			];
 		}
 

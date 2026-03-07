@@ -2,4 +2,5 @@
     <select class="form-select select2_<?php echo $nameID; ?> <?php echo $classMain; ?>"  name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" aria-label="<?php echo $placeholder; ?>" <?php echo $selectProperties; ?>>
         <?php echo $SelectOptions; ?>
     </select>
+    <?php echo $dataInfo; ?>
 </div>

@@ -13,7 +13,7 @@ class coreWidgets extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -103,6 +103,31 @@ class coreWidgets extends ControllerBase {
 
     /******************************************************************************/
     //pantalla principal
+    public function dividers($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Divider',
+            'PageDescription' => 'Widgets - Divider',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-dividers.php');
+    }
+
+    /******************************************************************************/
+    //pantalla principal
     public function components($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -116,6 +141,8 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Componentes Web',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
             /*===========  Datos del usuario ===========*/
             'UserData'      => $UserData,
             'UserAccess'    => $arrLevel[$this->controllerName],
@@ -151,6 +178,33 @@ class coreWidgets extends ControllerBase {
         /******************************************/
         //Se instancia la vista
         $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-calendar.php');
+    }
+
+    /******************************************************************************/
+    //pantalla principal
+    public function treeview($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Treeview',
+            'PageDescription' => 'Widgets - Treeview',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_FormInputs'    => $this->FormInputs,
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-treeview.php');
     }
 
 }
