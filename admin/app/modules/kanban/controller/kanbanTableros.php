@@ -463,6 +463,9 @@ class kanbanTableros extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -470,8 +473,8 @@ class kanbanTableros extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idColor,idPrioridad,idCierre',
+            'ValidarEntero'             => 'idColor,idPrioridad,idCierre',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
@@ -485,6 +488,15 @@ class kanbanTableros extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

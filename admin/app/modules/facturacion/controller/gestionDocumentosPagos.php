@@ -330,10 +330,6 @@ class gestionDocumentosPagos extends ControllerBase {
                 echo Response::sendData(500, 'Ha ingresado un monto superior al valor total del documento');
             }else{
                 /******************************/
-                //Se genera el chequeo
-                $DataCheck = $this->dataCheck($_POST);
-
-                /******************************/
                 //Se genera la query
                 $query = [
                     'data'      => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
@@ -344,8 +340,10 @@ class gestionDocumentosPagos extends ControllerBase {
                     'where'     => 'idPago',
                     'Post'      => $_POST
                 ];
+                //Se genera el chequeo
+                $dataCheck_1 = $this->dataCheck_1($_POST);
                 //Ejecuto la query
-                $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+                $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
                 $Response = $this->Base_update($xParams);
 
                 /******************************/
@@ -428,36 +426,8 @@ class gestionDocumentosPagos extends ControllerBase {
     }
 
     /******************************************************************************/
-    //Se validan los datos
-    private function dataCheck($POST){
-        //Variables
-        $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'Post'                      => $POST,
-        ];
-        //Devuelvo
-        return $DataChecking;
-    }
-
-    /******************************************************************************/
     /*                             EJECUCION OTROS                                */
+    /******************************************************************************/
     /******************************************************************************/
     //Se actualizan los montos
     public function updateFact($FacturacionID){
@@ -504,22 +474,12 @@ class gestionDocumentosPagos extends ControllerBase {
             'where'     => 'idFacturacion',
             'Post'      => $arrTareas
         ];
+        //Se genera el chequeo
+        $dataCheck_2 = $this->dataCheck_2($arrTareas);
         //Ejecuto la query
-        $xParams = ['DataCheck' => '', 'query' => $query];
+        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
         $this->Base_update($xParams);
 
-    }
-
-    /******************************************************************************/
-    //Se validan los datos
-    private function tsrxName(int $idTipo): string{
-        // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
-        $tsrxMap = [
-            1 => 'gestionDocumentosCompras',
-            2 => 'gestionDocumentosVentas'
-        ];
-        // Por defecto usar ventas si no viene un tipo válido
-        return $tsrxMap[$idTipo] ?? $tsrxMap[2];
     }
 
     /******************************************************************************/
@@ -549,10 +509,6 @@ class gestionDocumentosPagos extends ControllerBase {
             return ['status' => 500, 'Response' => 'Ha ingresado un monto superior al valor total del documento'];
         }else{
             /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($Data);
-
-            /******************************/
             //Se genera la query
             $query = [
                 'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
@@ -562,8 +518,10 @@ class gestionDocumentosPagos extends ControllerBase {
                 'table'     => 'facturacion_listado_pagos',
                 'Post'      => $Data
             ];
+            //Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($Data);
             //Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_insert($xParams);
 
             /******************************/
@@ -582,6 +540,96 @@ class gestionDocumentosPagos extends ControllerBase {
             }
 
         }
+    }
+
+    /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
+    //Se validan los datos
+    private function dataCheck_1($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado',
+            'ValidarEntero'             => 'idPago,idFacturacion,idUsuario,idDocumentoPago',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => 'FechaPago',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idFacturacion,idEstadoPago,MontoPagado',
+            'ValidarEntero'             => 'idFacturacion,idEstadoPago',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    /******************************************************************************/
+    //Se validan los datos
+    private function tsrxName(int $idTipo): string{
+        // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
+        $tsrxMap = [
+            1 => 'gestionDocumentosCompras',
+            2 => 'gestionDocumentosVentas'
+        ];
+        // Por defecto usar ventas si no viene un tipo válido
+        return $tsrxMap[$idTipo] ?? $tsrxMap[2];
     }
 
 }

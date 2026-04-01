@@ -354,6 +354,9 @@ class permisosListadoRutas extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -361,21 +364,30 @@ class permisosListadoRutas extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idPermisos,idMetodo,idLevelLimit',
+            'ValidarEntero'             => 'idPermisos,idMetodo,idLevelLimit',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
             'ValidarHora'               => '',
             'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Descripcion',
+            'ValidarLargoMinimo'        => 'RutaWeb,RutaController,Descripcion,Controller',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Descripcion',
+            'ValidarLargoMaximo'        => 'RutaWeb,RutaController,Descripcion,Controller',
             'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Descripcion',
+            'ValidarPalabrasCensuradas' => 'RutaWeb,RutaController,Descripcion,Controller',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

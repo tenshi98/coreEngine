@@ -89,6 +89,26 @@
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/fullcalendar/fullcalendar.min.js'; ?>"></script>
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/fullcalendar/es.js'; ?>"></script>
 
+        <!-- Popover-ex -->
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/popover-ex/popover-ex.css'; ?>">
+        <script type="text/javascript" src="<?php echo $BASE.'/vendor/popover-ex/popover-ex.js'; ?>"></script>
+
+        <!-- JS Leaflet -->
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/leaflet/leaflet.css'; ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/leaflet/zoom-info/leaflet.zoom.info.css'; ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/leaflet/control-opacity/L.Control.Opacity.css'; ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/leaflet/multi-markers/leaflet-iconex.css'; ?>">
+        <script src="<?php echo $BASE.'/vendor/leaflet/leaflet.js'; ?>"></script>
+        <script src="<?php echo $BASE.'/vendor/leaflet/zoom-info/leaflet.zoom.info.js'; ?>"></script>
+        <script src="<?php echo $BASE.'/vendor/leaflet/control-opacity/L.Control.Opacity.js'; ?>"></script>
+        <script src="<?php echo $BASE.'/vendor/leaflet/multi-markers/leaflet-iconex.min.js'; ?>"></script>
+        <script src="<?php echo $BASE.'/vendor/leaflet/multi-markers/leaflet-multi-markers.min.js'; ?>"></script>
+        <script src="<?php echo $BASE.'/vendor/leaflet/heat/leaflet-heat.js'; ?>"></script>
+
+        <!-- Meteo -->
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/meteo/meteo.css'; ?>">
+        <script type="text/javascript" src="<?php echo $BASE.'/vendor/meteo/meteo.js'; ?>"></script>
+
         <!-- Archivos de la Plataforma -->
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color_'.$data['UserData']['Sistema_idTema'].'.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/style.css'; ?>">

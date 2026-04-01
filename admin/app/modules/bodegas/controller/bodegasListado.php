@@ -666,6 +666,9 @@ class bodegasListado extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -673,8 +676,8 @@ class bodegasListado extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idEstado,idCiudad,idComuna',
+            'ValidarEntero'             => 'idEstado,idCiudad,idComuna',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
@@ -688,6 +691,15 @@ class bodegasListado extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

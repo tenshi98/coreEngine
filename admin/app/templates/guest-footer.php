@@ -4,11 +4,17 @@
 
         <!-- Vendor JS Files -->
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/bootstrap/js/bootstrap.bundle.min.js'; ?>"></script>
+
+        <!-- Graficos -->
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/apexcharts/apexcharts.min.js'; ?>"></script>
-        <script type="text/javascript" src="<?php echo $BASE.'/vendor/chart.js/chart.umd.js'; ?>"></script>
-        <script type="text/javascript" src="<?php echo $BASE.'/vendor/echarts/echarts.min.js'; ?>"></script>
+
+        <!-- Tablas -->
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/simple-datatables/simple-datatables.js'; ?>"></script>
+
+        <!-- Notificaciones -->
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/sweetalert2/sweetalert2.min.js'; ?>"></script>
+
+        <!-- tinymce -->
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/tinymce/tinymce.min.js'; ?>"></script>
 
         <!-- Bootstrap Colorpicker -->

@@ -141,6 +141,52 @@ class FunctionsLocation {
             return false;
         }
     }
+
+    /************************************************************************************************************/
+    public function geocodeAddress($street) {
+
+        // Limpiar la direccion
+        $buscar     = ['Nº', 'nº', ' n ', "'", 'Av.', 'av.'];
+        $reemplazar = ['',   '',   '',   '',  'Avenida', 'Avenida'];
+        $Ubicacion  = str_replace($buscar, $reemplazar, $street);
+
+        // Construir dirección completa
+        $address = trim("$Ubicacion");
+
+        // URL de Nominatim
+        $url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" . urlencode($address);
+
+        // Contexto HTTP (Nominatim recomienda definir user-agent)
+        $opts = [
+            "http" => [
+                "header" => "User-Agent: MyPHPGeocoder/1.0\r\n"
+            ]
+        ];
+
+        $context = stream_context_create($opts);
+
+        // Llamada a la API
+        $response = file_get_contents($url, false, $context);
+
+        if ($response === false) {
+            return false;
+        }
+
+        $data = json_decode($response, true);
+
+        if (!empty($data)) {
+            return [
+                'lat' => $data[0]['lat'],
+                'lon' => $data[0]['lon'],
+                'display_name' => $data[0]['display_name']
+            ];
+        }
+
+        return false;
+    }
+
+
+
 }
 
 /************************************************************************************************************/
@@ -215,7 +261,7 @@ class subpointLocation {
                 }
             }
         }
-        // If the number of edges we passed through is odd, then it's in the polygon. 
+        // If the number of edges we passed through is odd, then it's in the polygon.
         if ($intersections % 2 != 0) {
             return "inside";
         } else {

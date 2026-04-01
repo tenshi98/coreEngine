@@ -144,6 +144,32 @@
 
                             <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
                                 <div class="card">
+                                    <div class="card-header">Pantalla Principal</div>
+                                    <div class="card-body">
+                                        <?php
+                                        /********************************/
+                                        $Title = 'Mostrar Widget Meteorologico';
+                                        $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
+                                        $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Meteo',  'Value' => $data['rowData']['Config_Principal_Meteo'] ?? '',  'Required' => 1,'Color' => 3]);
+                                        /********************************/
+                                        $Title = 'Mostrar Widget Radio';
+                                        $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
+                                        $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Radio',  'Value' => $data['rowData']['Config_Principal_Radio'] ?? '',  'Required' => 1,'Color' => 3]);
+                                        /********************************/
+                                        $Title = 'Mostrar Widget Feed';
+                                        $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
+                                        $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Feed',  'Value' => $data['rowData']['Config_Principal_Feed'] ?? '',  'Required' => 1,'Color' => 3]);
+                                        /********************************/
+                                        $Title = 'URL Feed';
+                                        $Info  = 'La URL con el feed de noticias, si no existe se ocupa la opcion por defecto';
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'FormAling' => 2, 'FormCol' => 12, 'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_FeedURL',  'Value' => $data['rowData']['Config_Principal_FeedURL'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-globe']);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+                                <div class="card">
                                     <div class="card-header">Sistema</div>
                                     <div class="card-body">
                                         <?php
@@ -584,5 +610,18 @@
             }
         });
     }
+    /******************************************/
+    //Oculto
+    document.getElementById('div_Config_Principal_FeedURL').style.display     = 'none';
+    //cargo
+    const checkbox = document.getElementById("Config_Principal_Feed");
+    //Ejecutar logica
+    checkbox.addEventListener("change", function () {
+        if (this.checked) {
+            document.getElementById('div_Config_Principal_FeedURL').style.display     = '';
+        } else {
+            document.getElementById('div_Config_Principal_FeedURL').style.display     = 'none';
+        }
+    });
 
 </script>

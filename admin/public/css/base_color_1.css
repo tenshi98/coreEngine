@@ -242,14 +242,14 @@
     --btn-info-active-border: #5a8f9e;
 
     /* light */
-    --btn-light-color: #ffffff;
+    --btn-light-color: #4C566A;
     --btn-light-bg: #e5e9f0;
     --btn-light-bg-light: rgb(229, 233, 240, 0.3);
     --btn-light-border: #7b7c7e;
-    --btn-light-hover-color: #ffffff;
+    --btn-light-hover-color: #4C566A;
     --btn-light-hover-bg: #d8dee9;
     --btn-light-hover-border: #7b7c7e;
-    --btn-light-active-color: #ffffff;
+    --btn-light-active-color: #4C566A;
     --btn-light-active-bg: #d8dee9;
     --btn-light-active-border: #7b7c7e;
 

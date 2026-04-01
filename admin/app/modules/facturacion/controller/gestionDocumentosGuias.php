@@ -208,10 +208,6 @@ class gestionDocumentosGuias extends ControllerBase {
     public function Insert(){
 
         /******************************/
-        //Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /******************************/
         //Se genera la query
         $query = [
             'data'      => 'idFacturacion,idFacturacionRel',
@@ -221,8 +217,10 @@ class gestionDocumentosGuias extends ControllerBase {
             'table'     => 'facturacion_listado_guias',
             'Post'      => $_POST
         ];
+        //Se genera el chequeo
+        $dataCheck_1 = $this->dataCheck_1($_POST);
         //Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
         /******************************/
@@ -301,15 +299,18 @@ class gestionDocumentosGuias extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
-    private function dataCheck($POST){
+    private function dataCheck_1($POST){
         //Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idFacturacion,idFacturacionRel',
+            'ValidarEntero'             => 'idFacturacion,idFacturacionRel',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
@@ -323,15 +324,58 @@ class gestionDocumentosGuias extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo
         return $DataChecking;
     }
 
-    /******************************************************************************/
-    /*                             EJECUCION OTROS                                */
-    /******************************************************************************/
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idFacturacion,idEstadoPago,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,TotalGuias',
+            'ValidarEntero'             => 'idFacturacion,idEstadoPago',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
     /******************************************************************************/
     //Se actualizan los montos
     private function updateFact($PostData, $EstadoPagoID){
@@ -380,8 +424,10 @@ class gestionDocumentosGuias extends ControllerBase {
             'where'     => 'idFacturacion',
             'Post'      => $arrTareas
         ];
+        //Se genera el chequeo
+        $dataCheck_2 = $this->dataCheck_2($arrTareas);
         //Ejecuto la query
-        $xParams = ['DataCheck' => '', 'query' => $query];
+        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
         $this->Base_update($xParams);
 
         /******************************/
@@ -401,8 +447,10 @@ class gestionDocumentosGuias extends ControllerBase {
             'where'     => 'idFacturacion',
             'Post'      => $arrTareas
         ];
+        //Se genera el chequeo
+        $dataCheck_2 = $this->dataCheck_2($arrTareas);
         //Ejecuto la query
-        $xParams = ['DataCheck' => '', 'query' => $query];
+        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
         $this->Base_update($xParams);
 
     }

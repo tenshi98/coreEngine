@@ -178,7 +178,7 @@ class ControllerBase {
 
         /**********************     Valores     **********************/
         // Extraer parámetros con valores por defecto
-        $DataCheck  = $params['DataCheck'] ?? '';
+        $DataCheck  = (isset($params['DataCheck'])&&$params['DataCheck']!='') ? $params['DataCheck'] : [];
         $query      = $params['query'] ?? '';
         $showQuery  = $params['showQuery'] ?? false;
         $novalidate = $params['novalidate'] ?? false;
@@ -231,7 +231,7 @@ class ControllerBase {
 
         /**********************     Valores     **********************/
         // Extraer parámetros con valores por defecto
-        $DataCheck  = $params['DataCheck'] ?? '';
+        $DataCheck  = (isset($params['DataCheck'])&&$params['DataCheck']!='') ? $params['DataCheck'] : [];
         $query      = $params['query'] ?? '';
         $showQuery  = $params['showQuery'] ?? false;
         $novalidate = $params['novalidate'] ?? false;

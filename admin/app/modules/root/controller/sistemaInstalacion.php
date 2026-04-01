@@ -417,7 +417,8 @@ class sistemaInstalacion extends ControllerBase {
             "gestionCampanasInstaller",
             "tercerosEntidadesInstaller",
             "cotizacionInstaller",
-            "maquinasInstaller"
+            "maquinasInstaller",
+            "fileExplorerInstaller"
         );
 
         //devuelvo

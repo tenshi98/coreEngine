@@ -102,16 +102,27 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
                 <li><a href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
                 <li><a href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
                 <li><a href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/codeVisor'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Visor de Codigo</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/meteo'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget meteorologico</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/feed'; ?>">          <i class="bi bi-puzzle text-color-red"></i> Feed de noticias</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/radio'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget radio</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/fileExplorer'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Widget fileExplorer</a></li>
                 <li class="divider"></li>
             </ul>
+        </li>
+        <li class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
             <ul>
                 <li class="dropdown-tittle">Tablas</li>
                 <li><a href="<?php echo $BASE.'/Core/Tablas/normal'; ?>">       <i class="bi bi-table text-color-blue-dark"></i> Normales</a></li>
                 <li><a href="<?php echo $BASE.'/Core/Tablas/dataTables'; ?>">   <i class="bi bi-table text-color-blue-dark"></i> dataTables</a></li>
                 <li class="divider"></li>
             </ul>
-        </li>
-        <li class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
+            <ul>
+                <li class="dropdown-tittle">Mapas</li>
+                <li><a href="<?php echo $BASE.'/Core/Mapas/googleMaps'; ?>">    <i class="bi bi-map text-color-grey-dark"></i> Google Maps</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Mapas/leafletMaps'; ?>">   <i class="bi bi-map text-color-grey-dark"></i> Leaflet Maps</a></li>
+                <li class="divider"></li>
+            </ul>
             <ul>
                 <li class="dropdown-tittle">Gráficos</li>
                 <li><a href="<?php echo $BASE.'/Core/Graficos/apexcharts'; ?>">     <i class="bi bi-bar-chart-line text-color-amber-text"></i> Apexcharts</a></li>

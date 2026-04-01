@@ -92,22 +92,22 @@ class FunctionsDataOperations
 		}
 
 		/********************** Si todo esta ok **********************/
-		// 1. Convertir la hora al total de segundos.
+		// Convertir la hora al total de segundos.
 		// strtotime("1970-01-01 $hora UTC") sigue siendo la forma más sencilla y robusta
 		// para convertir 'HH:MM:SS' a segundos desde cero.
 		$total_segundos = strtotime("1970-01-01 $hora UTC");
 
-		// 2. Multiplicar y asegurar que el resultado sea un entero (la parte que realmente importa).
+		// Multiplicar y asegurar que el resultado sea un entero (la parte que realmente importa).
 		$segundos_multiplicados = (int) round($total_segundos * $multiplicador);
 
-		// 3. Calcular la parte de segundos, minutos y horas usando matemática simple.
+		// Calcular la parte de segundos, minutos y horas usando matemática simple.
 		$segundos        = $segundos_multiplicados % 60;
 		$minutos_totales = floor($segundos_multiplicados / 60);
 		$minutos         = $minutos_totales % 60;
 		$horas           = floor($minutos_totales / 60);
 
 		/**********************  Retorno datos  **********************/
-		// 4. Formatear y devolver el resultado.
+		// Formatear y devolver el resultado.
 		return sprintf("%02d:%02d:%02d", $horas, $minutos, $segundos);
 	}
 

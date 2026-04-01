@@ -1084,10 +1084,6 @@ class gestionDocumentos extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
-            /******************************/
             //Verifico si existe
             if(isset($_POST['Creacion_fecha'])&&$_POST['Creacion_fecha']!=''){
                 $_POST['Creacion_Semana']  = $this->DataDate->fecha2NSemana($_POST['Creacion_fecha']);
@@ -1106,8 +1102,10 @@ class gestionDocumentos extends ControllerBase {
                 'where'     => 'idFacturacion',
                 'Post'      => $_POST,
             ];
+            //Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($_POST);
             //Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
             /******************************/
@@ -1183,34 +1181,6 @@ class gestionDocumentos extends ControllerBase {
         }
     }
 
-    /******************************************************************************/
-    //Se validan los datos
-    private function dataCheck($POST){
-        //Variables
-        $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'fecha_auto,Creacion_fecha',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Observaciones',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Observaciones',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'Post'                      => $POST,
-        ];
-        //Devuelvo
-        return $DataChecking;
-    }
 
     /******************************************************************************/
     /*                             EJECUCION OTROS                                */
@@ -1223,10 +1193,6 @@ class gestionDocumentos extends ControllerBase {
         $ndata_2 = isset($PostData['Producto_idProducto']) ? count($PostData['Producto_idProducto']) : 0;
         $ndata_3 = isset($PostData['Servicio_idServicio']) ? count($PostData['Servicio_idServicio']) : 0;
         $ndata_4 = isset($PostData['idFacturacionRel']) ? count($PostData['idFacturacionRel']) : 0;
-
-        /******************************/
-        //Se genera el chequeo
-        $DataCheck = $this->dataCheck($PostData);
 
         /******************************/
         //Variables
@@ -1316,8 +1282,10 @@ class gestionDocumentos extends ControllerBase {
             'Post'      => $PostData
         ];
 
+        //Se genera el chequeo
+        $dataCheck_1 = $this->dataCheck_1($PostData);
         //Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
         /******************************/
@@ -1346,8 +1314,10 @@ class gestionDocumentos extends ControllerBase {
                         'table'     => 'facturacion_listado_items',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_2 = $this->dataCheck_2($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
                     $this->Base_insert($xParams);
                 }
             }
@@ -1389,8 +1359,10 @@ class gestionDocumentos extends ControllerBase {
                         'table'     => 'facturacion_listado_productos',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_2 = $this->dataCheck_2($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
                     $this->Base_insert($xParams);
                 }
                 /**********************************************************************/
@@ -1444,8 +1416,10 @@ class gestionDocumentos extends ControllerBase {
                         'table'     => 'facturacion_listado_servicios',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_2 = $this->dataCheck_2($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
                     $this->Base_insert($xParams);
                 }
             }
@@ -1471,8 +1445,10 @@ class gestionDocumentos extends ControllerBase {
                         'table'     => 'facturacion_listado_guias',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_3 = $this->dataCheck_3($arrTareas);
                     //Ejecuto la query
-                    $xParams       = ['DataCheck' => '', 'query' => $query];
+                    $xParams       = ['DataCheck' => $dataCheck_3, 'query' => $query];
                     $ResponseGuias = $this->Base_insert($xParams);
                     /******************************/
                     //Verifico si hay respuesta para actualizar datos
@@ -1498,8 +1474,10 @@ class gestionDocumentos extends ControllerBase {
                                 'where'     => 'idFacturacion',
                                 'Post'      => $arrTareas
                             ];
+                            //Se genera el chequeo
+                            $dataCheck_4 = $this->dataCheck_4($arrTareas);
                             //Ejecuto la query
-                            $xParams = ['DataCheck' => '', 'query' => $query];
+                            $xParams = ['DataCheck' => $dataCheck_4, 'query' => $query];
                             $this->Base_update($xParams);
 
                         }
@@ -1601,9 +1579,200 @@ class gestionDocumentos extends ControllerBase {
             'where'     => 'idFacturacion',
             'Post'      => $arrTareas
         ];
+        //Se genera el chequeo
+        $dataCheck_5 = $this->dataCheck_5($arrTareas);
         //Ejecuto la query
-        $xParams = ['DataCheck' => '', 'query' => $query];
+        $xParams = ['DataCheck' => $dataCheck_5, 'query' => $query];
         $this->Base_update($xParams);
+    }
+
+    /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
+    //Se validan los datos
+    private function dataCheck_1($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idUsuario,idTipo,idEntidad,idBodegasIngreso,idBodegasEgreso,idDocumentos,N_Doc,Creacion_Semana,Creacion_mes,Creacion_ano,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,idEstadoPago,MontoPagado',
+            'ValidarEntero'             => 'idUsuario,idTipo,idEntidad,idBodegasIngreso,idBodegasEgreso,idDocumentos,idEstadoPago',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => 'fecha_auto,Creacion_fecha',
+            'ValidarHora'               => 'Creacion_hora',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => 'Observaciones',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => 'Observaciones',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => 'fecha_auto',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idFacturacion,idEstadoIngreso,idBodegas,idProducto,idServicio,Number,ValorTotal',
+            'ValidarEntero'             => 'idFacturacion,idEstadoIngreso,idBodegas,idProducto,idServicio',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => 'Item',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => 'Item',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => 'Item',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_3($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idFacturacion,idFacturacionRel',
+            'ValidarEntero'             => 'idFacturacion,idFacturacionRel',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_4($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idFacturacion,idEstadoPago',
+            'ValidarEntero'             => 'idFacturacion,idEstadoPago',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_5($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idFacturacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,TotalGuias',
+            'ValidarEntero'             => 'idFacturacion',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
     }
 
     /******************************************************************************/

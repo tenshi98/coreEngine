@@ -844,10 +844,6 @@ class kanbanTareas extends ControllerBase {
             echo Response::sendData(500, 'No hay Participantes en la tarea');
         }else{
             /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
-            /******************************/
             //Se genera la query
             $query = [
                 'data'      => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
@@ -857,9 +853,11 @@ class kanbanTareas extends ControllerBase {
                 'table'     => 'kanban_tareas',
                 'Post'      => $_POST
             ];
+            //Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($_POST);
             //Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-        $Response = $this->Base_insert($xParams);
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
+            $Response = $this->Base_insert($xParams);
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
@@ -886,8 +884,10 @@ class kanbanTareas extends ControllerBase {
                             'table'     => 'kanban_tareas_tareas',
                             'Post'      => $arrTareas
                         ];
+                        //Se genera el chequeo
+                        $dataCheck_2 = $this->dataCheck_2($arrTareas);
                         //Ejecuto la query
-                        $xParams = ['DataCheck' => '', 'query' => $query];
+                        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
                         $this->Base_insert($xParams);
                     }
                 }
@@ -911,8 +911,10 @@ class kanbanTareas extends ControllerBase {
                             'table'     => 'kanban_tareas_participantes',
                             'Post'      => $arrParticipantes
                         ];
+                        //Se genera el chequeo
+                        $dataCheck_2 = $this->dataCheck_2($arrParticipantes);
                         //Ejecuto la query
-                        $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
                         $this->Base_insert($xParams);
                     }
                 }
@@ -936,8 +938,10 @@ class kanbanTareas extends ControllerBase {
                     'table'     => 'kanban_tareas_historial',
                     'Post'      => $arrTareas
                 ];
+                //Se genera el chequeo
+                $dataCheck_3 = $this->dataCheck_3($arrTareas);
                 //Ejecuto la query
-                $xParams = ['DataCheck' => '', 'query' => $query];
+                $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query];
                 $this->Base_insert($xParams);
 
                 /******************************/
@@ -959,10 +963,6 @@ class kanbanTareas extends ControllerBase {
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
-            /******************************/
             //Se genera la query
             $query = [
                 'data'      => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
@@ -973,8 +973,10 @@ class kanbanTareas extends ControllerBase {
                 'where'     => 'idKanban',
                 'Post'      => $_POST
             ];
+            //Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($_POST);
             //Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
             /******************************/
@@ -1063,8 +1065,10 @@ class kanbanTareas extends ControllerBase {
                         'table'     => 'kanban_tareas_historial',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_3 = $this->dataCheck_3($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                    $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
                     $this->Base_insert($xParams);
 
                 }
@@ -1129,8 +1133,10 @@ class kanbanTareas extends ControllerBase {
                     'where'     => 'idKanban',
                     'Post'      => $arrTareas
                 ];
+                //Se genera el chequeo
+                $dataCheck_1 = $this->dataCheck_1($arrTareas);
                 //Ejecuto la query
-                $xParams  = ['DataCheck' => '', 'query' => $query];
+                $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
                 $Response = $this->Base_update($xParams);
 
                 /******************************/
@@ -1155,8 +1161,10 @@ class kanbanTareas extends ControllerBase {
                         'table'     => 'kanban_tareas_historial',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_3 = $this->dataCheck_3($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                    $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
                     $this->Base_insert($xParams);
                     /******************************/
                     // Devuelvo $Response con código 200 (OK)
@@ -1232,18 +1240,21 @@ class kanbanTareas extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
-    private function dataCheck($POST){
+    private function dataCheck_1($POST){
         //Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idKanban,idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario',
+            'ValidarEntero'             => 'idKanban,idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
-            'ValidarFecha'              => 'Fecha',
+            'ValidarFecha'              => 'Fecha,FechaCreacion',
             'ValidarHora'               => '',
             'ValidarURL'                => '',
             'ValidarLargoMinimo'        => 'Titulo,Descripcion',
@@ -1254,6 +1265,89 @@ class kanbanTareas extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idKanban,idEstadoTrabajo,idTrabajo,idUsuario',
+            'ValidarEntero'             => 'idKanban,idEstadoTrabajo,idTrabajo,idUsuario',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => 'Tarea',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => 'Tarea',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => 'Tarea',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_3($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idKanban,idUsuario',
+            'ValidarEntero'             => 'idKanban,idUsuario',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => 'Fecha',
+            'ValidarHora'               => 'Hora',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => 'Descripcion',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => 'Descripcion',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

@@ -1,6 +1,0 @@
-.rss-feed {overflow-y: auto;transition: opacity .25s ease;scroll-behavior: smooth;}
-.rss-title {font-size: 0.8rem;color: var(--text-color04);transition: .2s;}
-.rss-title:hover {color: var(--color-blue-light);text-decoration: underline;}
-.rss-description { font-size: .9rem; color: var(--text-color04); }
-.rss-date { font-size: .75rem; color: var(--btn-danger-bg); }
-.rss-loading {position: absolute;top: 50%;left: 50%;transform: translate(-50%, -50%);display: none;}

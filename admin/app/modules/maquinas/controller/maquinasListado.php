@@ -710,6 +710,9 @@ class maquinasListado extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -717,21 +720,30 @@ class maquinasListado extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idEstado,Sim_Num_Tel,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana',
+            'ValidarEntero'             => 'idEstado,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
-            'ValidarHora'               => '',
+            'ValidarHora'               => 'TiempoFueraLinea,AlertaTemprCritica,AlertaTemprNormal',
             'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Descripcion,CodIdentificador',
+            'ValidarLargoMinimo'        => 'Nombre,CodIdentificador,Descripcion,Sim_Compania',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,CodIdentificador',
+            'ValidarLargoMaximo'        => 'Nombre,CodIdentificador,Sim_Compania',
             'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Nombre,Descripcion,CodIdentificador',
+            'ValidarPalabrasCensuradas' => 'Nombre,CodIdentificador,Descripcion,Sim_Compania',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

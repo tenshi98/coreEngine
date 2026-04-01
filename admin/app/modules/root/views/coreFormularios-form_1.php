@@ -7,13 +7,39 @@
             <!-- Horizontal Form -->
             <form id="form1" name="form1" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                 <?php
+                //Este es el popup
+                $dataPops_1 = [
+                    'style'     => 'primary',
+                    'position'  => 'top',
+                    'content'   => 'Este aparece arriba',
+                    'icon'      => 'bi bi-info-circle',
+                ];
+                $dataPops_2 = [
+                    'style'     => 'secondary',
+                    'position'  => 'bottom',
+                    'content'   => 'Este aparece debajo',
+                    'icon'      => 'bi bi-info-circle',
+                ];
+                $dataPops_3 = [
+                    'style'     => 'success',
+                    'position'  => 'left',
+                    'content'   => 'Este aparece izquierda',
+                    'icon'      => 'bi bi-info-circle',
+                ];
+                $dataPops_4 = [
+                    'style'     => 'danger',
+                    'position'  => 'right',
+                    'content'   => 'Este aparece derecha',
+                    'icon'      => 'bi bi-info-circle',
+                ];
+
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Normales', 'Clase' => 'box-title text-color-red-dark']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Texto normal',      'Name' => 'Nombre',             'Id' => 'IDInput_1_1', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',             'Id' => 'IDInput_1_2', 'Required' => 3, 'DataInfo' => 'Lorem ipsum dolor sit amet,']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 2,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Email',             'Name' => 'email',              'Id' => 'IDInput_1_3', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,','Icon' => 'bx bx-mail-send']);
-                $data['Fnc_FormInputs']->formInput(['FormType' => 3,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Contraseñas',       'Name' => 'password',           'Id' => 'IDInput_1_4', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,','Icon' => 'bi bi-key']);
-                $data['Fnc_FormInputs']->formInputDatalist([        'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Input Datalist',    'Name' => 'formInputDatalist',  'Id' => 'IDInput_1_29','Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,','Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Texto normal',      'Name' => 'Nombre',             'Id' => 'IDInput_1_1', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,', 'dataPops' => $dataPops_1]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 1,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Input desactivado', 'Name' => 'Nombre',             'Id' => 'IDInput_1_2', 'Required' => 3, 'DataInfo' => 'Lorem ipsum dolor sit amet,', 'dataPops' => $dataPops_2]);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 2,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Email',             'Name' => 'email',              'Id' => 'IDInput_1_3', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,', 'dataPops' => $dataPops_3, 'Icon' => 'bx bx-mail-send']);
+                $data['Fnc_FormInputs']->formInput(['FormType' => 3,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Contraseñas',       'Name' => 'password',           'Id' => 'IDInput_1_4', 'Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,', 'dataPops' => $dataPops_4, 'Icon' => 'bi bi-key']);
+                $data['Fnc_FormInputs']->formInputDatalist([        'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'Input Datalist',    'Name' => 'formInputDatalist',  'Id' => 'IDInput_1_29','Required' => 2, 'DataInfo' => 'Lorem ipsum dolor sit amet,', 'dataPops' => $dataPops_1, 'Icon' => 'bi bi-server','arrData' => $data['arrCiudad']]);
 
                 /***********************************/
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Especificos', 'Clase' => 'box-title text-color-red-dark']);

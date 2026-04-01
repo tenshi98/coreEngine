@@ -1,0 +1,58 @@
+.weatherWidget_v1 .weather-widget{margin:auto;}
+.weatherWidget_v1 .weather-widget .weather-main-icon{width:100%;}
+.weatherWidget_v1 .weather-widget .weather-temp{font-size:42px;font-weight:600;}
+.weatherWidget_v1 .weather-widget .weather-minmax{font-size:14px;color:#777;}
+.weatherWidget_v1 .weather-widget .weather-extra{margin-top:10px;font-size:14px;color:#555;}
+.weatherWidget_v1 .weather-widget .weather-day{padding:10px;}
+.weatherWidget_v1 .weather-widget .weather-day img{width:40px;}
+
+
+.weatherWidget_v4 .weather-card {margin: 60px auto;background: #fff;overflow: hidden;}
+.weatherWidget_v4 .weather-card .top {position: relative;width: 100%;overflow: hidden;background-size: cover;background-position: center center;text-align: center;}
+.weatherWidget_v4 .weather-card .top .wrapper {padding: 30px;position: relative;z-index: 1;}
+.weatherWidget_v4 .weather-card .top .wrapper .mynav {height: 20px;}
+.weatherWidget_v4 .weather-card .top .wrapper .mynav .lnr {color: #fff;font-size: 20px;}
+.weatherWidget_v4 .weather-card .top .wrapper .mynav .lnr-chevron-left {display: inline-block;float: left;}
+.weatherWidget_v4 .weather-card .top .wrapper .mynav .lnr-cog {display: inline-block;float: right;}
+.weatherWidget_v4 .weather-card .top .wrapper .heading {margin-top: 20px;font-size: 35px;font-weight: 400;color: #fff;}
+.weatherWidget_v4 .weather-card .top .wrapper .location {margin-top: 20px;font-size: 21px;font-weight: 400;color: #fff;}
+.weatherWidget_v4 .weather-card .top .wrapper .temp-value {margin-top: 20px;}
+.weatherWidget_v4 .weather-card .top .wrapper .temp-value {display: inline-block;font-size: 85px;font-weight: 600;color: #fff;}
+.weatherWidget_v4 .weather-card .top:after {content: "";height: 100%;width: 100%;display: block;position: absolute;top: 0;left: 0;background: rgba(0, 0, 0, 0.5);}
+.weatherWidget_v4 .weather-card .bottom {padding: 0 30px;background: #fff;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast {overflow: hidden;margin: 0;font-size: 0;padding: 0;padding-top: 20px;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast a {text-decoration: none;color: #000;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast .go-up {text-align: center;display: block;font-size: 25px;margin-bottom: 10px;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast li {display: block;font-size: 25px;font-weight: 400;line-height: 1em;margin-bottom: 30px;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast li .date {display: inline-block;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast li .condition {display: inline-block;vertical-align: middle;float: right;font-size: 25px;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast li .condition .temp {display: inline-block;vertical-align: top;font-family: 'Montserrat', sans-serif;font-size: 20px;font-weight: 400;padding-top: 2px;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast li .condition .temp .deg {display: inline-block;font-size: 10px;font-weight: 600;margin-left: 3px;vertical-align: top;}
+.weatherWidget_v4 .weather-card .bottom .wrapper .forecast li .condition .temp .temp-type {font-size: 20px;}
+
+
+.weatherWidget_v5 #card {background: #fff;position: relative;-webkit-transition: all 0.5s ease;-moz-transition: all 0.5s ease;-ms-transition: all 0.5s ease;-o-transition: all 0.5s ease;transition: all 0.5s ease;}
+.weatherWidget_v5 .city-selected {position: relative;overflow: hidden;background: #3D6AA2;}
+.weatherWidget_v5 article {position: relative;z-index: 2;color: #fff;padding: 20px;display: -ms-flexbox;display: -webkit-flex;display: flex;-webkit-flex-direction: row;-ms-flex-direction: row;flex-direction: row;-webkit-flex-wrap: wrap;-ms-flex-wrap: wrap;flex-wrap: wrap;-webkit-justify-content: space-between;-ms-flex-pack: justify;justify-content: space-between;-webkit-align-content: flex-start;-ms-flex-line-pack: start;align-content: flex-start;-webkit-align-items: flex-start;-ms-flex-align: start;align-items: flex-start;}
+.weatherWidget_v5 .info .city,.night {font-size: 24px;font-weight: 200;position: relative;-webkit-order: 0;-ms-flex-order: 0;order: 0;-webkit-flex: 0 1 auto;-ms-flex: 0 1 auto;flex: 0 1 auto;-webkit-align-self: auto;-ms-flex-item-align: auto;align-self: auto;}
+.weatherWidget_v5 .city span {color: #fff;font-size: 13px;font-weight: bold;text-transform: lowercase;text-align: left;}
+.weatherWidget_v5 .night {font-size: 15px;text-transform: uppercase;}
+.weatherWidget_v5 .icon {width: 184px;height: 184px;-webkit-order: 0;-ms-flex-order: 0;order: 0;-webkit-flex: 0 0 auto;-ms-flex: 0 0 auto;flex: 0 0 auto;-webkit-align-self: center;-ms-flex-item-align: center;align-self: center;overflow: visible;}
+.weatherWidget_v5 .temp {font-size: 73px;display: block;position: relative;font-weight: bold;}
+.weatherWidget_v5 svg {color: #fff;fill: currentColor;}
+.weatherWidget_v5 .wind svg {width: 18px;height: 18px;margin-top: 20px;margin-right: 10px;vertical-align: bottom;}
+.weatherWidget_v5 .wind span {font-size: 13px;text-transform: uppercase;}
+.weatherWidget_v5 .city-selected:hover figure {opacity: 0.4;}
+.weatherWidget_v5 figure {width: 100%;height: 100%;position: absolute;left: 0;top: 0;background-position: center;background-size: cover;opacity: 0.1;z-index: 1;-webkit-transition: all 0.5s ease;-moz-transition: all 0.5s ease;-ms-transition: all 0.5s ease;-o-transition: all 0.5s ease;transition: all 0.5s ease;}
+.weatherWidget_v5 .days .row [class*="col-"] {-webkit-transition: all 0.5s ease;-moz-transition: all 0.5s ease;-ms-transition: all 0.5s ease;-o-transition: all 0.5s ease;transition: all 0.5s ease;}
+.weatherWidget_v5 .days .row [class*="col-"]:hover{background: #eaeaea;}
+.weatherWidget_v5 .day {padding: 10px 0px;text-align: center;}
+.weatherWidget_v5 .day h1 {font-size: 14px;text-transform: uppercase;margin-top: 10px;}
+.weatherWidget_v5 .day svg {color: #000;width: 32px;height: 32px;}
+
+
+
+
+/* animación entrada */
+.weatherContent{opacity:0;transform:translateY(15px);transition:all .6s ease;}
+.weatherContent.show{opacity:1;transform:translateY(0);}

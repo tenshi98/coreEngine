@@ -266,7 +266,7 @@ class maquinasListadoDocumentos extends ControllerBase {
                     'Identificador' => 'NombreArchivo',
                     'SubCarpeta'    => '',
                     'NombreArchivo' => '',
-                    'SufijoArchivo' => 'ProductosDoc_',
+                    'SufijoArchivo' => 'MaquinasDoc_',
                     'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music',
                     'ValidarPeso'   => 10,
                     'Base64'        => false
@@ -365,6 +365,9 @@ class maquinasListadoDocumentos extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -372,8 +375,8 @@ class maquinasListadoDocumentos extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idMaquina',
+            'ValidarEntero'             => 'idMaquina',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => 'FVencimiento',
@@ -387,6 +390,15 @@ class maquinasListadoDocumentos extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

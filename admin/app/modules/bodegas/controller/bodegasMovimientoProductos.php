@@ -312,10 +312,6 @@ class bodegasMovimientoProductos extends ControllerBase {
     public function Insert(){
 
         /******************************/
-        //Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /******************************/
         //Se genera la query
         $query = [
             'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
@@ -325,8 +321,10 @@ class bodegasMovimientoProductos extends ControllerBase {
             'table'     => 'bodegas_movimientos_productos',
             'Post'      => $_POST
         ];
+        //Se genera el chequeo
+        $DataCheck_1 = $this->dataCheck_1($_POST);
         //Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        $xParams  = ['DataCheck' => $DataCheck_1, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
         /******************************/
@@ -384,8 +382,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'where'     => 'idStocks',
                             'Post'      => $arrTareas
                         ];
+                        //Se genera el chequeo
+                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
                         //Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                         $this->Base_update($xParams);
 
                     }else{
@@ -405,8 +405,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'table'     => 'bodegas_productos_stocks',
                             'Post'      => $arrTareas
                         ];
+                        //Se genera el chequeo
+                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
                         //Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                         $this->Base_insert($xParams);
 
                     }
@@ -436,8 +438,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'where'     => 'idStocks',
                             'Post'      => $arrTareas
                         ];
+                        //Se genera el chequeo
+                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
                         //Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                         $this->Base_update($xParams);
                     }else{
                         /******************************/
@@ -456,8 +460,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                             'table'     => 'bodegas_productos_stocks',
                             'Post'      => $arrTareas
                         ];
+                        //Se genera el chequeo
+                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
                         //Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                         $this->Base_insert($xParams);
                     }
                     break;
@@ -481,10 +487,6 @@ class bodegasMovimientoProductos extends ControllerBase {
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
-            /******************************/
             //Se genera la query
             $query = [
                 'data'      => 'idExistencia,idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
@@ -495,8 +497,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'where'     => 'idExistencia',
                 'Post'      => $_POST
             ];
+            //Se genera el chequeo
+            $DataCheck_1 = $this->DataCheck_1($_POST);
             //Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+            $xParams  = ['DataCheck' => $DataCheck_1, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
             /******************************/
@@ -554,8 +558,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'where'     => 'idStocks',
                                 'Post'      => $arrTareas
                             ];
+                            //Se genera el chequeo
+                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
                             //Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                             $this->Base_update($xParams);
 
                         }else{
@@ -575,8 +581,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'table'     => 'bodegas_productos_stocks',
                                 'Post'      => $arrTareas
                             ];
+                            //Se genera el chequeo
+                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
                             //Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                             $this->Base_insert($xParams);
 
                         }
@@ -606,8 +614,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'where'     => 'idStocks',
                                 'Post'      => $arrTareas
                             ];
+                            //Se genera el chequeo
+                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
                             //Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                             $this->Base_update($xParams);
                         }else{
                             /******************************/
@@ -626,8 +636,10 @@ class bodegasMovimientoProductos extends ControllerBase {
                                 'table'     => 'bodegas_productos_stocks',
                                 'Post'      => $arrTareas
                             ];
+                            //Se genera el chequeo
+                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
                             //Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
                             $this->Base_insert($xParams);
                         }
                         break;
@@ -683,15 +695,18 @@ class bodegasMovimientoProductos extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
-    private function dataCheck($POST){
+    private function dataCheck_1($POST){
         //Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+            'ValidarEntero'             => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
@@ -705,6 +720,52 @@ class bodegasMovimientoProductos extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+    /******************************************************************************/
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idStocks,idProducto',
+            'ValidarEntero'             => 'idStocks,idProducto',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

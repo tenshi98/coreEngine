@@ -2,6 +2,6 @@
     <?php echo $extracol; ?>
     <div class="col-sm-<?php echo $FormCol; ?> field">
         <?php echo $formInput; ?>
-        <?php echo $dataInfo; ?>
     </div>
+    <?php echo $dataInfo; ?>
 </div>

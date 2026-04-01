@@ -382,6 +382,9 @@ class crudNormal extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -389,21 +392,30 @@ class crudNormal extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'Numero',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idUsuario,Numero',
+            'ValidarEntero'             => 'idUsuario',
             'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => '',
+            'ValidarPatente'            => 'Patente',
             'ValidarFecha'              => 'Fecha',
             'ValidarHora'               => 'Hora',
             'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Palabra',
+            'ValidarLargoMinimo'        => 'Email,Palabra',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Palabra',
+            'ValidarLargoMaximo'        => 'Email,Palabra',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Palabra',
             'ValidarEspaciosVacios'     => 'Email',
             'ValidarMayusculas'         => 'Email',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'Email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

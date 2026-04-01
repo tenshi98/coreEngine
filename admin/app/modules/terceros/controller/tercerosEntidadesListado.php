@@ -611,6 +611,9 @@ class tercerosEntidadesListado extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -624,15 +627,24 @@ class tercerosEntidadesListado extends ControllerBase {
             'ValidarPatente'            => '',
             'ValidarFecha'              => 'FNacimiento',
             'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
+            'ValidarURL'                => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
+            'ValidarLargoMinimo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
+            'ValidarLargoMaximo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
-            'ValidarEspaciosVacios'     => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarMayusculas'         => '',
+            'ValidarEspaciosVacios'     => 'Email,RepLegalEmail,Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
+            'ValidarMayusculas'         => 'Email,RepLegalEmail',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'Email,RepLegalEmail',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

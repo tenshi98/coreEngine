@@ -1,4 +1,9 @@
-<p>Chart.JS Examples. You can check the <a href="https://www.chartjs.org/docs/latest/samples/" target="_blank">official website</a> for more examples.</p>
+<h5 class="box-title text-color-red-dark">
+    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+        Chart.JS
+        <a href="https://www.chartjs.org/docs/latest/samples/" target="_blank" class="btn btn-success btn-sm"><i class="bi bi-pencil-square"></i> Pagina Oficial</a>
+    </div>
+</h5>
 
 <section class="section">
 
@@ -414,3 +419,6 @@
     </div>
 
 </section>
+
+<script type="text/javascript" src="<?php echo $BASE.'/vendor/chart.js/chart.umd.js'; ?>"></script>
+

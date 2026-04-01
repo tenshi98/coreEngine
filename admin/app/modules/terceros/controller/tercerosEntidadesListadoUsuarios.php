@@ -513,6 +513,9 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -520,11 +523,11 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'email',
-            'ValidarNumero'             => 'Fono',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idEntidad,idTipoUsuario,idEstado,Fono',
+            'ValidarEntero'             => 'idEntidad,idTipoUsuario,idEstado',
             'ValidarRut'                => 'Rut',
             'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
+            'ValidarFecha'              => 'Ultimo_acceso',
             'ValidarHora'               => '',
             'ValidarURL'                => '',
             'ValidarLargoMinimo'        => 'email,Nombre',
@@ -535,6 +538,15 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             'ValidarEspaciosVacios'     => 'email',
             'ValidarMayusculas'         => 'email',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => 'IP_Client',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

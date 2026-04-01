@@ -31,10 +31,6 @@ class usuariosListadoPermisos extends ControllerBase {
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
             /*******************************************************************/
             //Se traen los permisos
             $query = [
@@ -121,8 +117,10 @@ class usuariosListadoPermisos extends ControllerBase {
                                     'table'     => 'usuarios_listado_permisos',
                                     'Post'      => $Post
                                 ];
+                                //Se genera el chequeo
+                                $dataCheck = $this->dataCheck($Post);
                                 //Ejecuto la query
-                                $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                                $xParams = ['DataCheck' => $dataCheck, 'query' => $query];
                                 $this->Base_insert($xParams);
                                 break;
 
@@ -140,8 +138,10 @@ class usuariosListadoPermisos extends ControllerBase {
                                     'where'     => 'idUsuario,idPermisos',
                                     'Post'      => $Post,
                                 ];
+                                //Se genera el chequeo
+                                $dataCheck = $this->dataCheck($Post);
                                 //Ejecuto la query
-                                $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                                $xParams = ['DataCheck' => $dataCheck, 'query' => $query];
                                 $this->Base_update($xParams);
                                 break;
                         }
@@ -160,6 +160,9 @@ class usuariosListadoPermisos extends ControllerBase {
 
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -167,8 +170,8 @@ class usuariosListadoPermisos extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idUsuario,idPermisos,idLevelLimit',
+            'ValidarEntero'             => 'idUsuario,idPermisos,idLevelLimit',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
@@ -182,6 +185,15 @@ class usuariosListadoPermisos extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

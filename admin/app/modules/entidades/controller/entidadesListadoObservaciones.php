@@ -295,7 +295,7 @@ class entidadesListadoObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idEntidad,Observacion',
+                'data'      => 'idEntidad,Observacion,FechaCreacion',
                 'required'  => 'idEntidad,Observacion',
                 'unique'    => '',
                 'encode'    => '',
@@ -358,6 +358,9 @@ class entidadesListadoObservaciones extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -365,8 +368,8 @@ class entidadesListadoObservaciones extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idEntidad',
+            'ValidarEntero'             => 'idEntidad',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => 'FechaCreacion',
@@ -380,6 +383,15 @@ class entidadesListadoObservaciones extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

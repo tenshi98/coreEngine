@@ -10,6 +10,8 @@ class RSSReader {
             showDescription: true,
             showPubDate: true,
             maxHeight: "400px",
+            maxItems: 100,
+            feed_Type: 1,
             ...options
         };
 
@@ -27,36 +29,47 @@ class RSSReader {
     }
 
     buildLayout() {
-        this.container.innerHTML = `
-        <div class="card shadow-sm position-relative">
-			<div class="card-header">${this.settings.cardTitle}</div>
-            <div class="card-body">
+        //
+        switch (this.settings.feed_Type) {
+            case 1:
+                this.container.innerHTML = `
+                <div class="card shadow-sm position-relative RSSReader">
+                    <div class="card-header">${this.settings.cardTitle}</div>
+                    <div class="card-body">
+                        <input type="text" class="form-control mb-3 rss-search" placeholder="Buscar...">
+                        <div class="rss-feed list-group mb-3" style="max-height:${this.settings.maxHeight};"></div>
+                        <nav>
+                            <ul class="pagination justify-content-center mb-0">
+                                <li class="page-item"><a class="page-link rss-prev" href="#">Anterior</a></li>
+                                <li class="page-item disabled"><span class="page-link rss-page-info"></span></li>
+                                <li class="page-item"><a class="page-link rss-next" href="#">Siguiente</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="rss-loading"><div class="spinner-border text-primary"></div></div>
+                </div>
+                `;
+                break;
 
-                <input type="text" class="form-control mb-3 rss-search" placeholder="Buscar...">
+            case 2:
+                this.container.innerHTML = `
+                <div class="card shadow-sm RSSMiniReader">
+                    <div class="card-header py-2 fw-semibold">${this.settings.cardTitle}</div>
+                    <div class="card-body p-2 news-feed rss-feed" id="newsFeed" style="max-height:${this.settings.maxHeight};"></div>
+                    <div class="card-footer py-1">
+                        <nav>
+                            <ul class="pagination pagination-sm justify-content-center mb-0">
+                                <li class="page-item"><a class="page-link rss-prev" href="#">‹</a></li>
+                                <li class="page-item disabled"><span class="page-link rss-page-info small"></span></li>
+                                <li class="page-item"><a class="page-link rss-next" href="#">›</a></li>
+                            </ul>
+                        </nav>
+                    </div>
+                    <div class="rss-loading"><div class="spinner-border text-primary"></div></div>
+                </div>`;
 
-                <div class="rss-feed list-group mb-3" style="max-height:${this.settings.maxHeight};"></div>
-
-                <nav>
-                    <ul class="pagination justify-content-center mb-0">
-                        <li class="page-item">
-                            <a class="page-link rss-prev" href="#">Anterior</a>
-                        </li>
-                        <li class="page-item disabled">
-                            <span class="page-link rss-page-info"></span>
-                        </li>
-                        <li class="page-item">
-                            <a class="page-link rss-next" href="#">Siguiente</a>
-                        </li>
-                    </ul>
-                </nav>
-
-            </div>
-
-            <div class="rss-loading">
-                <div class="spinner-border text-primary"></div>
-            </div>
-        </div>
-        `;
+                break;
+        }
 
         this.feedContainer = this.container.querySelector(".rss-feed");
         this.spinner       = this.container.querySelector(".rss-loading");
@@ -71,21 +84,24 @@ class RSSReader {
 
         try {
 
-            const response = await fetch(
-                `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(this.settings.feedUrl)}`
-            );
+            const url      = `https://api.feednami.com/api/v1/feeds/load?url=${encodeURIComponent(this.settings.feedUrl)}&count=${this.settings.maxItems}`;
+            const response = await fetch(url);
+            const data     = await response.json();
 
-            const data = await response.json();
+            this.allItems = (data.feed.entries || []).map(item => {
+                let description = (item.content || item.description || "");
+                let imgMatch    = description.match(/<img[^>]+src="([^">]+)"/);
+                return {
+                    title: item.title || "",
+                    link: item.link || "",
+                    description: description.replace(/<[^>]*>/g, ""),
+                    pubDate: item.publishedDate || "",
+                    image: item.thumbnail || imgMatch?.[1] || null
+                };
 
-            this.allItems = data.items.map(item => ({
-                title: item.title,
-                link: item.link,
-                description: item.description.replace(/<[^>]*>/g, ""),
-                pubDate: item.pubDate,
-                image: item.thumbnail || null
-            }));
+            });
 
-            this.filteredItems = this.allItems;
+            this.filteredItems = [...this.allItems];
             this.renderPage(1);
 
         } catch (error) {
@@ -110,57 +126,117 @@ class RSSReader {
 
             this.feedContainer.innerHTML = "";
 
-            items.forEach(item => {
+            switch (this.settings.feed_Type) {
+                case 1:
+                    items.forEach(item => {
+                        const a     = document.createElement("a");
+                        a.href      = item.link;
+                        a.target    = "_blank";
+                        a.className = "list-group-item list-group-item-action";
+                        if (item.image) {
+                            const img     = document.createElement("img");
+                            img.src       = item.image;
+                            img.loading   = "lazy";
+                            img.className = "rss-img";
+                            a.appendChild(img);
+                        }
+                        a.innerHTML += `<div class="rss-title mb-1">${item.title}</div>`;
+                        if (this.settings.showPubDate) {     a.innerHTML += `<div class="rss-date mb-1">${item.pubDate}</div>`;}
+                        if (this.settings.showDescription) { a.innerHTML += `<div class="rss-description">${item.description}</div>`;}
 
-                const a = document.createElement("a");
-                a.href = item.link;
-                a.target = "_blank";
-                a.className = "list-group-item list-group-item-action";
+                        this.feedContainer.appendChild(a);
+                    });
+                    break;
+                case 2:
+                    items.forEach(item => {
+                        const b     = document.createElement("a");
+                        b.href      = item.link;
+                        b.target    = "_blank";
+                        b.className = "text-decoration-none text-reset";
 
-                if (item.image) {
-                    const img = document.createElement("img");
-                    img.src = item.image;
-                    img.loading = "lazy";
-                    img.className = "rss-img";
-                    a.appendChild(img);
-                }
+                        // card
+                        const card     = document.createElement("div");
+                        card.className = "card mb-2 news-card";
 
-                a.innerHTML += `
-                    <div class="rss-title mb-1">${item.title}</div>
-                `;
+                        // body
+                        const body     = document.createElement("div");
+                        body.className = "card-body p-2";
 
-                if (this.settings.showPubDate) {
-                    a.innerHTML += `<div class="rss-date mb-1">${item.pubDate}</div>`;
-                }
+                        // row
+                        const row     = document.createElement("div");
+                        row.className = "row g-2";
 
-                if (this.settings.showDescription) {
-                    a.innerHTML += `<div class="rss-description">${item.description}</div>`;
-                }
+                        // columna imagen
+                        if (item.image) {
+                            const colImg     = document.createElement("div");
+                            colImg.className = "col-auto";
 
-                this.feedContainer.appendChild(a);
-            });
+                            const img     = document.createElement("img");
+                            img.src       = item.image;
+                            img.loading   = "lazy";
+                            img.className = "news-img";
+
+                            colImg.appendChild(img);
+                            row.appendChild(colImg);
+                        }
+
+                        // columna contenido
+                        const col     = document.createElement("div");
+                        col.className = "col";
+
+                        // titulo
+                        const title       = document.createElement("div");
+                        title.className   = "news-title";
+                        title.textContent = item.title;
+                        col.appendChild(title);
+
+                        // fecha
+                        if (this.settings.showPubDate) {
+                            const date       = document.createElement("div");
+                            date.className   = "news-date";
+                            date.textContent = item.pubDate;
+                            col.appendChild(date);
+                        }
+
+                        // descripcion
+                        if (this.settings.showDescription) {
+                            const desc       = document.createElement("div");
+                            desc.className   = "news-desc";
+                            desc.textContent = item.description;
+                            col.appendChild(desc);
+                        }
+
+                        row.appendChild(col);
+                        body.appendChild(row);
+                        card.appendChild(body);
+                        b.appendChild(card);
+
+                        this.feedContainer.appendChild(b);
+
+                    });
+                    
+                    break;
+
+            }
+
 
             this.updatePagination();
-            this.feedContainer.scrollTop = 0;
+            this.feedContainer.scrollTop     = 0;
             this.feedContainer.style.opacity = 1;
 
         }, 200);
     }
 
     updatePagination() {
-
         const totalPages = Math.ceil(
             this.filteredItems.length / this.settings.itemsPerPage
         );
-
-        this.container.querySelector(".rss-page-info").textContent =
-            `Página ${this.currentPage} de ${totalPages || 1}`;
-
-        this.container.querySelector(".rss-prev").parentElement
-            .classList.toggle("disabled", this.currentPage === 1);
-
-        this.container.querySelector(".rss-next").parentElement
-            .classList.toggle("disabled", this.currentPage >= totalPages);
+        switch (this.settings.feed_Type) {
+            case 1: this.container.querySelector(".rss-page-info").textContent = `Página ${this.currentPage} de ${totalPages || 1}`; break;
+            case 2: this.container.querySelector(".rss-page-info").textContent = `${this.currentPage} / ${totalPages || 1}`; break;
+        }
+        this.container.querySelector(".rss-prev").parentElement.classList.toggle("disabled", this.currentPage === 1);
+        this.container.querySelector(".rss-next").parentElement.classList.toggle("disabled", this.currentPage >= totalPages);
     }
 
     bindEvents() {

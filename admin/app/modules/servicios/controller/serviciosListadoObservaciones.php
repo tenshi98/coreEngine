@@ -358,6 +358,9 @@ class serviciosListadoObservaciones extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -365,8 +368,8 @@ class serviciosListadoObservaciones extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idServicio',
+            'ValidarEntero'             => 'idServicio',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => 'FechaCreacion',
@@ -374,12 +377,21 @@ class serviciosListadoObservaciones extends ControllerBase {
             'ValidarURL'                => '',
             'ValidarLargoMinimo'        => 'Observacion',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Observacion',
+            'ValidarLargoMaximo'        => '',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Observacion',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

@@ -232,23 +232,22 @@ class FunctionsDataValidations {
 		/********************** Si todo esta ok **********************/
 		// Expresión Regular (RegEx) para el formato HHH:MM:SS
 		// Explicación:
-		// ^                   # Inicio de la cadena
-		// (?:[0-9]{1,3})      # Grupo 1 (Horas): Coincide con 1 a 3 dígitos (0 a 999)
-		// :                   # Separador de dos puntos (:)
-		// (?:[0-5][0-9])      # Grupo 2 (Minutos): Coincide con 00 a 59
-		// :                   # Separador de dos puntos (:)
-		// (?:[0-5][0-9])      # Grupo 3 (Segundos): Coincide con 00 a 59
-		// $                   # Fin de la cadena
+		// ^                    # Inicio
+		// (?:[0-9]{1,3})       # Horas: 1 a 3 dígitos (0-999)
+		// :                    # Separador
+		// (?:[0-5][0-9])       # Minutos: 00 a 59
+		// (?::[0-5][0-9])?     # Segundos OPCIONALES: Un ":" seguido de 00-59 (el ? al final lo hace opcional)
+		// $                    # Fin
 
-		$patron = '/^(?:[0-9]{1,3}):(?:[0-5][0-9]):(?:[0-5][0-9])$/';
+		$patron = '/^(?:[0-9]{1,3}):(?:[0-5][0-9])(?::[0-5][0-9])?$/';
 
 		/**********************  Retorno datos  **********************/
 		// Verifica si la cadena coincide con el patrón
 		if (preg_match($patron, $Data)) {
-			// Validación adicional: Asegura que las horas no excedan 999
 			$partes = explode(':', $Data);
 			$horas = (int)$partes[0];
 
+			// Mantenemos tu validación de tope máximo
 			return $horas <= 999;
 		}
 
@@ -680,7 +679,7 @@ class FunctionsDataValidations {
 					return [
 						'status'  => 'no_basic_permissions',
 						'success' => false,
-						'message' => 'Usuario válido pero sin permisos SELECT/INSERT/DELETE sdf'.$asd
+						'message' => 'Usuario válido pero sin permisos SELECT/INSERT/DELETE'
 					];
 				}
 

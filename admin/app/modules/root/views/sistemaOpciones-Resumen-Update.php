@@ -6,7 +6,37 @@
                     ? $BASE.'/upload/'.$data['rowData']['Sistema_IMGLogo']
                     : $BASE.'/img/picture-img.jpg';
         ?>
-        <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
+        <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100 mb-2">
+
+        <?php if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'){ ?>
+            <div class="square-rounded-2 square-border-3 w-100">
+                <?php
+                //variable para los marcadores
+                $arrMarkers = [
+                    [
+                        $data['rowData']['Latitud'],
+                        $data['rowData']['Longitud'],
+                        'A',
+                        '#81a1c1',
+                        "<i class='bi bi-cursor-fill text-primary'></i>",
+                        '<b>Direccion</b><br>'.$data['rowData']['Sistema_Direccion']
+                    ],
+                ];
+                //se imprime input
+                $Options = [
+                    'Latitud'      => $data['rowData']['Latitud'],   //Latitud de la ubicacion
+                    'Longitud'     => $data['rowData']['Longitud'],  //Longitud de la ubicacion
+                    'ID_Map'       => 'map_1',                       //ID del div donde se dibuja el html
+                    'Zoom'         => 14,                            //Zoom del mapa
+                    'attribution'  => '&copy; Ubicacion',            //Pie de pagina del mapa
+                    'arrMarkers'   => $arrMarkers,                   //array con los marcadores
+                    'defaultLayer' => 'Esri_WorldTopoMap',           //Layer a mostrar en la carga
+                    'ConfMode'     => 3,                             //Modo del mapa
+                ];
+                echo $data['Fnc_WidgetsMaps']->leaFletMap_from_gps($Options);
+                ?>
+            </div>
+        <?php } ?>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-7">
         <?php
@@ -64,6 +94,10 @@
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Uso Whatsapp',                                           'Texto' => activo($data['rowData']['sistemaUsoWhatsapp'])],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Motor Email',                                            'Texto' => $data['rowData']['ConfigEmail']],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Motor Mapas',                                            'Texto' => $data['rowData']['ConfigMap']],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Meteorologico',                           'Texto' => activo($data['rowData']['Config_Principal_Meteo'])],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Radio',                                   'Texto' => activo($data['rowData']['Config_Principal_Radio'])],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Feed',                                    'Texto' => activo($data['rowData']['Config_Principal_Feed'])],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> URL Feed Noticias',                                      'Texto' => $data['rowData']['Config_Principal_FeedURL']],
             ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Uso listados de tareas en las Tareas Pendientes',  'Texto' => activo($data['rowData']['KanbanTareasUsoTareas'])],
             ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Admin Tableros Independiente de las Tareas',       'Texto' => activo($data['rowData']['KanbanTareasAdminTabIndepend'])],
             ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Cargas',                                   'Texto' => activo($data['rowData']['entidadesListadoVerCargas'])],
@@ -111,7 +145,7 @@
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
 
         echo '<h5 class="box-title text-color-red-dark">Configuracion Sistema</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_6, 2);
+        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_6, 4);
 
         //funcion para devolver el uso
         function activo($valor){

@@ -492,6 +492,9 @@ class entidadesListadoContactos extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -499,21 +502,30 @@ class entidadesListadoContactos extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'Fono1,Fono2',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idEntidad,idCiudad,idComuna,idTipoContacto,idEstado,Fono1,Fono2',
+            'ValidarEntero'             => 'idEntidad,idCiudad,idComuna,idTipoContacto,idEstado',
             'ValidarRut'                => 'Rut',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
             'ValidarHora'               => '',
             'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
+            'ValidarLargoMinimo'        => 'Email,Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
+            'ValidarLargoMaximo'        => 'Email,Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
             'ValidarEspaciosVacios'     => 'Email',
             'ValidarMayusculas'         => 'Email',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'Email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

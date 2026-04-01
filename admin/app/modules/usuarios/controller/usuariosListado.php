@@ -468,6 +468,7 @@ class usuariosListado extends ControllerBase {
                 core_permisos_listado.idPermisos,
                 core_permisos_listado.idPermisos AS ID,
                 core_permisos_listado.Nombre,
+                core_permisos_listado.Descripcion,
                 core_permisos_listado.idLevelLimit,
                 core_permisos_categorias.Nombre AS PermisosCat,
                 (SELECT idLevelLimit FROM usuarios_listado_permisos WHERE idPermisos = ID AND idUsuario = '.$this->Codification->encryptDecrypt('decrypt', $params['id']).' LIMIT 1) AS level',
@@ -786,6 +787,9 @@ class usuariosListado extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -793,11 +797,11 @@ class usuariosListado extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'email',
-            'ValidarNumero'             => 'Fono',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idTipoUsuario,idEstado,Fono,idCiudad,idComuna,idMenuPosicion',
+            'ValidarEntero'             => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion',
             'ValidarRut'                => 'Rut',
             'ValidarPatente'            => '',
-            'ValidarFecha'              => 'fNacimiento',
+            'ValidarFecha'              => 'fNacimiento,Ultimo_acceso',
             'ValidarHora'               => '',
             'ValidarURL'                => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarLargoMinimo'        => 'email,Nombre,Direccion',
@@ -805,9 +809,18 @@ class usuariosListado extends ControllerBase {
             'ValidarLargoMaximo'        => 'email,Nombre,Direccion',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Nombre,Direccion',
-            'ValidarEspaciosVacios'     => 'email',
+            'ValidarEspaciosVacios'     => 'email,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'email',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => 'fNacimiento',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => 'IP_Client',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

@@ -27,7 +27,6 @@ class coreWidgets extends ControllerBase {
     /*                                  VISTAS                                    */
     /******************************************************************************/
     /******************************************************************************/
-    //pantalla principal
     public function box($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -52,7 +51,6 @@ class coreWidgets extends ControllerBase {
     }
 
     /******************************************************************************/
-    //pantalla principal
     public function timeLine($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -77,7 +75,6 @@ class coreWidgets extends ControllerBase {
     }
 
     /******************************************************************************/
-    //pantalla principal
     public function textDividers($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -102,7 +99,6 @@ class coreWidgets extends ControllerBase {
     }
 
     /******************************************************************************/
-    //pantalla principal
     public function dividers($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -127,7 +123,6 @@ class coreWidgets extends ControllerBase {
     }
 
     /******************************************************************************/
-    //pantalla principal
     public function components($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -154,7 +149,6 @@ class coreWidgets extends ControllerBase {
     }
 
     /******************************************************************************/
-    //pantalla principal
     public function calendar($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -181,7 +175,6 @@ class coreWidgets extends ControllerBase {
     }
 
     /******************************************************************************/
-    //pantalla principal
     public function treeview($f3){
         /*******************************************************************/
         //Se llaman los datos
@@ -205,6 +198,136 @@ class coreWidgets extends ControllerBase {
         /******************************************/
         //Se instancia la vista
         $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-treeview.php');
+    }
+
+    /******************************************************************************/
+    public function codeVisor($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Visor de Codigo',
+            'PageDescription' => 'Widgets - Visor de Codigo',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-codeVisor.php');
+    }
+
+    /******************************************************************************/
+    public function meteo($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Widget Meteorologico',
+            'PageDescription' => 'Widgets - Widget Meteorologico',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-meteo.php');
+    }
+
+    /******************************************************************************/
+    public function feed($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Feed de noticias',
+            'PageDescription' => 'Widgets - Feed de noticias',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-feed.php');
+    }
+
+    /******************************************************************************/
+    public function radio($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Radio Player',
+            'PageDescription' => 'Widgets - Radio Player',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-radio.php');
+    }
+
+    /******************************************************************************/
+    public function fileExplorer($f3){
+        /*******************************************************************/
+        //Se llaman los datos
+        $UserData = $f3->get('SESSION.DataInfo');
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        //Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Widgets - Explorador Archivos',
+            'PageDescription' => 'Widgets - Explorador Archivos',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========   Funcionalidad   ===========*/
+            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $UserData,
+            'UserAccess'    => $arrLevel[$this->controllerName],
+        ];
+
+        /******************************************/
+        //Se instancia la vista
+        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-fileExplorer.php');
     }
 
 }

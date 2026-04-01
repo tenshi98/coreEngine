@@ -36,7 +36,7 @@
                         }
                         ?>
                         <tr>
-                            <td><?php echo $perm['Nombre']; ?></td>
+                            <td><?php echo $perm['Nombre']; ?> <i class="bi bi-info-circle text-success" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-original-title="<?php echo $perm['Descripcion']; ?>"></i></td>
                             <td>
                                 <div class="col-sm-8 field">
                                     <div class="form-check checkbox-success form-switch required=" required>

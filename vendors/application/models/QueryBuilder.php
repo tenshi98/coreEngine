@@ -92,7 +92,7 @@ class QueryBuilder{
 	/*******************************************************************************************************************/
 	/******************************************************************************/
     //Se consulta por solo un dato
-    public function queryRow($query, $DBConn, $showQuery = false){
+    public function queryRow(array $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -142,14 +142,14 @@ class QueryBuilder{
             $result = $this->queryExecute($ActionSQL, $DBConn);
             return (!empty($result)&&$result !== false) ? $result[0] : false;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
 
     /******************************************************************************/
     //Se consulta por el numero de coincidencias
-    public function queryNRows($query, $DBConn, $showQuery = false){
+    public function queryNRows(array $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -185,8 +185,9 @@ class QueryBuilder{
         if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
 
         /*************** Generacion Query ***************/
-        //armado de la query
-        $ActionSQL = $this->createQuery($query);
+        //Se construye el COUNT(*) primero para que $showQuery muestre la query real ejecutada
+        $BaseSQL   = $this->createQuery($query);
+        $ActionSQL = 'SELECT COUNT(*) AS _total FROM (' . $BaseSQL . ') AS _t';
 
         /***************   Ejecutar   ***************/
         //Verifico si se pide mostrar la consulta
@@ -195,19 +196,18 @@ class QueryBuilder{
         }
         //Ejecucion
         try {
-            //Ejecuto la query
             $result = $this->queryExecute($ActionSQL, $DBConn);
             //Si se ejecuta correctamente
-            return (!empty($result)&&$result !== false) ? count($result) : false;
+            return (!empty($result)&&$result !== false) ? (int)$result[0]['_total'] : 0;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
 
     /******************************************************************************/
     //Se consulta por un conjunto de datos
-    public function queryArray($query, $DBConn, $showQuery = false){
+    public function queryArray(array $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -259,7 +259,7 @@ class QueryBuilder{
             //Si se ejecuta correctamente
             return $result;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
@@ -267,7 +267,7 @@ class QueryBuilder{
     /******************************************************************************/
     /******************************************************************************/
     //Se inserta nuevo registro
-    public function queryInsert($query, $DBConn, $showQuery = false, $novalidate = false){
+    public function queryInsert(array $query, $DBConn, bool $showQuery = false, bool $novalidate = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -322,48 +322,18 @@ class QueryBuilder{
 
         /***************    Datos    ***************/
         //Variables
-	    $arrData       = $this->CommonData->parseDataCommas($query['data']); //Separacion por comas
-        $DatosNombres  = '';
-        $DatosArchivos = '';
+        $arrData = $this->CommonData->parseDataCommas($query['data']); //Separacion por comas
 
         /***************   Archivos   ***************/
-        //Subida de archivos
-        $CountFileExist = 0;
-        if (!empty($query['files'])){
-            //Cuento los archivos esperados y si existen
-            $CountFileExist = array_reduce(
-                $query['files'],
-                function($count, $archivo) use ($query) {
-                    return $count + (!empty($query['Post'][$archivo['Identificador']]) ? 1 : 0);
-                },
-                0
-            );
-            //Si existen archivos fisicos o si se enviaron por base64
-            if (!empty($_FILES) || $CountFileExist!=0){
-                //Valido los archivos
-                $dataFiles = $this->FileManager->validateFiles($_FILES, $query['files']);
-                //Si todos los datos requeridos estan ok
-                if ($dataFiles !== true) {return $dataFiles;}
-                //Si no hay errores se suben los archivos
-                $newFileName = $this->FileManager->uploadFile($_FILES, $query['files']);
-                //Se guardan los nombres
-                $DatosNombres  = $newFileName['Nombres'];
-                $DatosArchivos = $newFileName['Archivos'];
-            }
-        }
+        //Subida de archivos - procesado por metodo auxiliar processFiles
+        $fileProc      = $this->processFiles($query, 'insert');
+        if ($fileProc['success'] === false) {return $fileProc['error'];}
+        $DatosNombres  = $fileProc['nombres'];
+        $DatosArchivos = $fileProc['archivos'];
 
         /***************  Codificacion  ***************/
-        //Codificacion Datos
-        if (!empty($query['encode'])){
-            //Separo los datos
-            $arrEncode = $this->CommonData->parseDataCommas($query['encode']); //Separacion por comas
-            //recorro validando
-            foreach ($arrEncode as $data) {
-                if(isset($query['Post'][$data]) && $query['Post'][$data]!=''){
-                    $query['Post'][$data] = $this->Codification->encryptDecrypt('encrypt',$query['Post'][$data],ConfigToken::ENCODE_KEYS["KEY_1"]);
-                }
-            }
-        }
+        //Codificacion Datos - procesado por metodo auxiliar encodeFormData
+        $Post = $this->encodeFormData($query);
 
         /***************   Guardar   ***************/
         //Variable vacia
@@ -372,9 +342,9 @@ class QueryBuilder{
         //Se recorren los datos separados
         foreach ($arrData as $data) {
             // Se verifican los datos del post
-            if (!empty($query['Post'][$data])) {
+            if (!empty($Post[$data])) {
                 $matrixColumn[] = $data;
-                $matrixValue[]  = '"'.($novalidate ? $query['Post'][$data] : $this->clearData($query['Post'][$data])).'"';
+                $matrixValue[]  = "'".(($novalidate ? $Post[$data] : $this->clearData($Post[$data])))."'";
             }
         }
         //Se crea cadena en base al arreglo, con su propia separacion
@@ -397,14 +367,14 @@ class QueryBuilder{
             //Si se ejecuta correctamente
             return ($result > 0) ? $DBConn->lastInsertId() : false;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
 
     /******************************************************************************/
     //Se actualiza registro
-    public function queryUpdate($query, $DBConn, $showQuery = false, $novalidate = false){
+    public function queryUpdate(array $query, $DBConn, bool $showQuery = false, bool $novalidate = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -448,9 +418,12 @@ class QueryBuilder{
         /*************** Validaciones ***************/
         //Validacion datos obligatorios
         if(isset($query['required'])&&$query['required']!=''){
-            $dataVal  = $this->validateRequired($query['required'].','.$query['where'], $query['Post']);
+            $dataVal  = $this->validateRequired($query['required'], $query['Post']);
             if ($dataVal !== true) {return $dataVal;}
         }
+        //Validacion campo where (siempre obligatorio en un UPDATE)
+        $dataWhere = $this->validateRequired($query['where'], $query['Post']);
+        if ($dataWhere !== true) {return $dataWhere;}
         //Validacion datos unicos
         if(isset($query['unique'])&&$query['unique']!=''){
             $dataUniq = $this->validateUnique($query['unique'], $query['table'], $query['Post'], $query['where'], $DBConn);
@@ -459,47 +432,18 @@ class QueryBuilder{
 
         /***************    Datos    ***************/
         //Variables
-        $arrData   = $this->CommonData->parseDataCommas($query['data']);  //Separacion por comas
-        $arrWhere  = $this->CommonData->parseDataCommas($query['where']); //Separacion por comas
-        $FilesData = '';
+        $arrData  = $this->CommonData->parseDataCommas($query['data']);  //Separacion por comas
+        $arrWhere = $this->CommonData->parseDataCommas($query['where']); //Separacion por comas
 
         /***************   Archivos   ***************/
-        //Subida de archivos
-        $CountFileExist = 0;
-        if (!empty($query['files'])){
-            //Cuento los archivos esperados y si existen
-            $CountFileExist = array_reduce(
-                $query['files'],
-                function($count, $archivo) use ($query) {
-                    return $count + (!empty($query['Post'][$archivo['Identificador']]) ? 1 : 0);
-                },
-                0
-            );
-            //Si existen archivos fisicos o si se enviaron por base64
-            if (!empty($_FILES) || $CountFileExist!=0){
-                //Valido los archivos
-                $dataFiles = $this->FileManager->validateFiles($_FILES, $query['files'], $query['Post']);
-                //Si todos los datos requeridos estan ok
-                if ($dataFiles !== true) {return $dataFiles;}
-                //Si no hay errores se suben los archivos
-                $newFileName = $this->FileManager->uploadFile($_FILES, $query['files'], $query['Post']);
-                //Se guardan los nombres
-                $FilesData  = $newFileName['Update'];
-            }
-        }
+        //Subida de archivos - procesado por metodo auxiliar processFiles
+        $fileProc  = $this->processFiles($query, 'update');
+        if ($fileProc['success'] === false) {return $fileProc['error'];}
+        $FilesData = $fileProc['update'];
 
         /***************  Codificacion  ***************/
-        //Codificacion Datos
-        if (!empty($query['encode'])){
-            //Separo los datos
-            $arrEncode = $this->CommonData->parseDataCommas($query['encode']); //Separacion por comas
-            //recorro validando
-            foreach ($arrEncode as $data) {
-                if(isset($query['Post'][$data]) && $query['Post'][$data]!=''){
-                    $query['Post'][$data] = $this->Codification->encryptDecrypt('encrypt',$query['Post'][$data],ConfigToken::ENCODE_KEYS["KEY_1"]);
-                }
-            }
-        }
+        //Codificacion Datos - procesado por metodo auxiliar encodeFormData
+        $Post = $this->encodeFormData($query);
 
         /*************** Generacion Datos ***************/
         //Variable vacia
@@ -508,15 +452,15 @@ class QueryBuilder{
         //Se recorren los datos a actualizar
         foreach ($arrData as $data) {
             // Se verifican los datos del post
-            if (!empty($query['Post'][$data])) {
-                $matrixData[] = "`".$data."`='".($novalidate ? $query['Post'][$data] : $this->clearData($query['Post'][$data]))."'";
+            if (!empty($Post[$data])) {
+                $matrixData[] = "`".$data."`='".($novalidate ? $Post[$data] : $this->clearData($Post[$data]))."'";
             }
         }
         //Se recorren los datos del where
         foreach ($arrWhere as $where) {
             // Se verifican los datos del post
-            if (!empty($query['Post'][$where])) {
-                $matrixWhere[] = $where." = '".($novalidate ? $query['Post'][$where] : $this->clearData($query['Post'][$where]))."'";
+            if (!empty($Post[$where])) {
+                $matrixWhere[] = $where." = '".($novalidate ? $Post[$where] : $this->clearData($Post[$where]))."'";
             }
         }
         //Se crea cadena en base al arreglo, con su propia separacion
@@ -539,14 +483,14 @@ class QueryBuilder{
             //Siempre devuelve true
             return true;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
 
     /******************************************************************************/
     //Se elimina dato
-    public function queryDelete($query, $DBConn, $showQuery = false){
+    public function queryDelete(array $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -618,7 +562,7 @@ class QueryBuilder{
 
             /******************************************/
             //Se eliminan los archivos en caso de existir
-            $delFile  = $this->FileManager->deleteFilesMasive($query['files'], $query['SubCarpeta'], $result);
+            $delFile  = $this->FileManager->deleteFilesMassive($query['files'], $query['SubCarpeta'], $result);
             if ($delFile !== true) {return $delFile;}
         }
 
@@ -651,14 +595,14 @@ class QueryBuilder{
             //Si se ejecuta correctamente
             return true;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
 
     /******************************************************************************/
     //Se ejecuta la query
-    public function queryExecute($query, $DBConn, $showQuery = false){
+    public function queryExecute(string $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -691,19 +635,21 @@ class QueryBuilder{
         }
         //Ejecucion
         try {
-            //Ejecuto la query
-            $result = $DBConn->exec($query);
+            //FIX: exec() no retorna resultados para SELECT, se usa prepare()+fetchAll()
+            $isSelect = (bool) preg_match('/^\s*(SELECT|SHOW|DESCRIBE|EXPLAIN)\s/i', $query);
+            $stmt = $DBConn->prepare($query);
+            $stmt->execute();
             //Si se ejecuta correctamente
-            return $result;
+            return $isSelect ? $stmt->fetchAll(PDO::FETCH_ASSOC) : $stmt->rowCount();
         } catch (Exception $e) {
-            return 'Query Error: ' . $query;
+            return $this->logError($query, $e);
         }
 
     }
 
     /******************************************************************************/
     //Se elimina archivo
-    public function delFiles($query, $DBConn){
+    public function delFiles(array $query, $DBConn){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -781,7 +727,11 @@ class QueryBuilder{
 
         /***************   Ejecutar   ***************/
         //Ejecuto la query
-        $this->queryExecute($ActionSQL, $DBConn);
+        try {
+            $this->queryExecute($ActionSQL, $DBConn);
+        } catch (Exception $e) {
+            return $this->logError($ActionSQL, $e);
+        }
 
         /******************************************/
         //Siempre devuelve true
@@ -792,7 +742,7 @@ class QueryBuilder{
     /******************************************************************************/
     /******************************************************************************/
     //Permite la creacion de una tabla en la base de datos
-    public function queryCreateTable($query, $DBConn, $showQuery = false){
+    public function queryCreateTable(array $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -841,14 +791,14 @@ class QueryBuilder{
             //Si se ejecuta correctamente
             return $result;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
 
     /******************************************************************************/
     //Permite la eliminacion de una tabla en la base de datos
-    public function queryDropTable($query, $DBConn, $showQuery = false){
+    public function queryDropTable(array $query, $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -892,7 +842,7 @@ class QueryBuilder{
             //Si se ejecuta correctamente
             return $result;
         } catch (Exception $e) {
-            return 'Query Error: ' . $ActionSQL;
+            return $this->logError($ActionSQL, $e);
         }
 
     }
@@ -901,7 +851,7 @@ class QueryBuilder{
     /******************************************************************************/
     /******************************************************************************/
     //Crear una base de datos
-    public function createDatabase($query, $DBConn, $showQuery = false) {
+    public function createDatabase(array $query, array $DBConn, bool $showQuery = false){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -973,7 +923,7 @@ class QueryBuilder{
                 //Si se ejecuta correctamente
                 return true;
             }  catch (PDOException $e) {
-                return $e;
+                return $this->logError($ActionSQL, $e);
             }
 
         } catch (\PDOException $e) {
@@ -997,7 +947,7 @@ class QueryBuilder{
 
     /******************************************************************************/
     //Ejecutar un archivo SQL
-    public function executeFile($filepath, $DBConn) {
+    public function executeFile(string $filepath, $DBConn){
         /*
 		*=================================================     Detalles    =================================================
 		*
@@ -1044,7 +994,7 @@ class QueryBuilder{
             );
 
             // Ejecutar cada consulta
-            foreach ($queries as $index => $query) {
+            foreach ($queries as $query) {
                 if (!empty(trim($query))) {
                     $this->queryExecute($query, $DBConn);
                 }
@@ -1053,30 +1003,25 @@ class QueryBuilder{
             //Siempre devuelve true
             return true;
         } catch (PDOException $e) {
-            return $e;
+            return $this->logError($filepath, $e);
         }
     }
 
 
-
-
-
-
-
     /*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                              Metodos Internos                                                   */
+	/*                                                  Metodos Auxiliares                                             */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
     /******************************************************************************/
-    private function validateRequired($SIS_data, $SIS_Post){
+    private function validateRequired(string $SIS_data, array $SIS_Post): bool|array{
         //Variables
         $arrData = $this->CommonData->parseDataCommas($SIS_data); //Separacion por comas
         $errors  = [];
         //Recorro
         foreach ($arrData as $field) {
             //verifico si existe el dato y verifico si esta vacio
-            if(isset($SIS_Post[$field])&&empty($SIS_Post[$field])){
+            if(isset($SIS_Post[$field]) && empty($SIS_Post[$field])){
                 $errors[] = ["message" => "$field es obligatorio"];
             }
         }
@@ -1085,7 +1030,7 @@ class QueryBuilder{
 
     }
     /******************************************************************************/
-    private function validateUnique($SIS_Data, $SIS_Table, $SIS_Post, $SIS_Where, $DBConn){
+    private function validateUnique(string $SIS_Data, string $SIS_Table, array $SIS_Post, string $SIS_Where, $DBConn): bool|array{
 
         /******************************************/
         //Variables
@@ -1144,7 +1089,7 @@ class QueryBuilder{
                 $x_data  = $parts_data ? implode(',', $parts_data) : '';
                 $x_where = $parts_where ? implode(' AND ', $parts_where) : '';
                 //Se genera la query solo si hay datos
-                if(isset($x_data)&&$x_data!=''){
+                if($x_data!=''){
                     //Guardo los datos
                     $DataInternal  = $x_data;
                     $whereInternal = ($whereInternal!='') ? $whereInternal.' AND '.$x_where : $x_where;
@@ -1180,24 +1125,92 @@ class QueryBuilder{
 
     }
     /******************************************************************************/
-    private function clearData($Data){
-        $Data = trim($Data);             //Elimina espacios al inicio y al termino
-        $Data = stripslashes($Data);     //Elimina barras invertidas
-        $Data = htmlspecialchars($Data); //Transforma caracteres especiales en entidades HTML
+    private function clearData(string $Data): string{
+        $Data = trim($Data);         //Elimina espacios al inicio y al termino
+        $Data = stripslashes($Data); //Elimina barras invertidas
+        //FIX: htmlspecialchars() es para contexto HTML, no SQL. addslashes() escapa correctamente para SQL
+        $Data = addslashes($Data);   //Escapa comillas simples, dobles y barras para uso en SQL
         return $Data;
     }
     /******************************************************************************/
-    private function createQuery($query){
+    private function createQuery(array $query): string{
         //armado de la query
         $ActionSQL = 'SELECT '.$query['data'];
         $ActionSQL.= ' FROM `'.$query['table'].'`';
         //Recorro las opciones
-        foreach (['join' => '', 'where' => ' WHERE ', 'group' => ' GROUP BY ', 'having' => ' HAVING ', 'order' => ' ORDER BY ', 'limit' => ' LIMIT '] as $key => $clause) {
+        foreach (['join' => ' ', 'where' => ' WHERE ', 'group' => ' GROUP BY ', 'having' => ' HAVING ', 'order' => ' ORDER BY ', 'limit' => ' LIMIT '] as $key => $clause) {
             if (!empty($query[$key])) {
                 $ActionSQL .= $clause . $query[$key];
             }
         }
         return $ActionSQL;
+    }
+    /******************************************************************************/
+    //Loguea de forma segura los errores sin exponer SQL al cliente
+    private function logError($sql, $exception) {
+        //Guarda el detalle en logs del servidor (no se expone al cliente)
+        error_log('QueryBuilder Error: [' . $exception->getMessage() . '] SQL: ' . $sql);
+        //Retorna un mensaje generico al cliente
+        return 'Query Error: Se produjo un error al procesar la solicitud.';
+    }
+    /******************************************************************************/
+    //Procesamiento de archivos - evita codigo duplicado entre queryInsert y queryUpdate
+    private function processFiles($query, $action = 'insert') {
+        //Variable vacia
+        $result = ['success' => true, 'nombres' => '', 'archivos' => '', 'update' => ''];
+        //Si no hay archivos se retorna vacio
+        if (empty($query['files'])) {return $result;}
+        //Cuento los archivos esperados y si existen
+        $CountFileExist = array_reduce(
+            $query['files'],
+            function($count, $archivo) use ($query) {
+                return $count + (!empty($query['Post'][$archivo['Identificador']]) ? 1 : 0);
+            },
+            0
+        );
+        //Si existen archivos fisicos o si se enviaron por base64
+        if (!empty($_FILES) || $CountFileExist != 0) {
+            $isUpdate = ($action === 'update');
+            //Valido los archivos
+            $dataFiles = $isUpdate
+                ? $this->FileManager->validateFiles($_FILES, $query['files'], $query['Post'])
+                : $this->FileManager->validateFiles($_FILES, $query['files']);
+            //Si todos los datos requeridos estan ok
+            if ($dataFiles['success'] !== true) {
+                $result['success'] = $dataFiles['success'];
+                $result['error']   = $dataFiles['message'];
+                return $result;
+            }
+            //Si no hay errores se suben los archivos
+            $newFileName = $isUpdate
+                ? $this->FileManager->uploadFile($_FILES, $query['files'], $query['Post'])
+                : $this->FileManager->uploadFile($_FILES, $query['files']);
+            //Se guardan los nombres
+            if ($action === 'insert') {
+                $result['nombres']  = $newFileName['Nombres'];
+                $result['archivos'] = $newFileName['Archivos'];
+            } else {
+                $result['update'] = $newFileName['Update'];
+            }
+        }
+        return $result;
+    }
+    /******************************************************************************/
+    //Codificacion de datos del formulario - evita codigo duplicado entre queryInsert y queryUpdate
+    private function encodeFormData($query) {
+        //Se verifica si hay datos a codificar
+        if (!empty($query['encode'])){
+            //Separo los datos
+            $arrEncode = $this->CommonData->parseDataCommas($query['encode']); //Separacion por comas
+            //recorro validando
+            foreach ($arrEncode as $data) {
+                if(isset($query['Post'][$data]) && $query['Post'][$data] != ''){
+                    $query['Post'][$data] = $this->Codification->encryptDecrypt('encrypt', $query['Post'][$data], ConfigToken::ENCODE_KEYS["KEY_1"]);
+                }
+            }
+        }
+        //Retorna el arreglo POST (modificado o no)
+        return $query['Post'];
     }
 
 }

@@ -1,0 +1,29 @@
+.popover_ex{
+    position:absolute;
+    max-width:260px;
+    background:#fff;
+    border:1px solid rgba(0,0,0,.2);
+    border-radius:.5rem;
+    box-shadow:0 .5rem 1rem rgba(0,0,0,.15);
+    opacity:0;
+    transform:scale(.95);
+    transition:all .15s ease;
+    pointer-events:none;
+    z-index:9999;
+}
+.popover_ex.show{
+    opacity:1;
+    transform:scale(1);
+    pointer-events:auto;
+}
+
+#popover_ex_div {height: 0px;}
+
+
+.popover_ex-header{padding:.5rem .75rem;font-weight:600;background:#f7f7f7;border-bottom:1px solid rgba(0,0,0,.1);border-radius:.5rem .5rem 0 0;}
+.popover_ex-body{padding:.75rem;}
+.popover_ex-arrow{position:absolute;width:12px;height:12px;border-left:1px solid rgba(0,0,0,.2);border-top:1px solid rgba(0,0,0,.2);}
+.arrow_top .popover_ex-arrow{transform:rotate(225deg);background: #ffffff;}
+.arrow_bottom .popover_ex-arrow{transform:rotate(45deg);background: #f7f7f7;}
+.arrow_left .popover_ex-arrow{transform:rotate(135deg);background: #ffffff;}
+.arrow_right .popover_ex-arrow{transform:rotate(315deg);background: #ffffff;}

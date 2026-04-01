@@ -1,3 +1,5 @@
+      <div id="popover_ex_div"></div>
+
     </main>
 
     <!-- ======= Footer ======= -->
@@ -27,8 +29,6 @@
       </div>
     </div>
 
-
-
     <div id="PDloader"></div>
 
     <div class="modal fade" id="viewModal-xl" tabindex="-1">
@@ -51,11 +51,17 @@
 
     <!-- Vendor JS Files -->
     <script type="text/javascript" src="<?php echo $BASE.'/vendor/bootstrap/js/bootstrap.bundle.min.js'; ?>"></script>
+
+    <!-- Graficos -->
     <script type="text/javascript" src="<?php echo $BASE.'/vendor/apexcharts/apexcharts.min.js'; ?>"></script>
-    <script type="text/javascript" src="<?php echo $BASE.'/vendor/chart.js/chart.umd.js'; ?>"></script>
-    <script type="text/javascript" src="<?php echo $BASE.'/vendor/echarts/echarts.min.js'; ?>"></script>
+
+    <!-- Tablas -->
     <script type="text/javascript" src="<?php echo $BASE.'/vendor/simple-datatables/simple-datatables.js'; ?>"></script>
+
+    <!-- Notificaciones -->
     <script type="text/javascript" src="<?php echo $BASE.'/vendor/sweetalert2/sweetalert2.min.js'; ?>"></script>
+
+    <!-- tinymce -->
     <script type="text/javascript" src="<?php echo $BASE.'/vendor/tinymce/tinymce.min.js'; ?>"></script>
 
     <!-- Bootstrap Colorpicker -->
@@ -73,7 +79,11 @@
     <script>
       //ajustar tamaño de todos los textarea
 			autosize(document.querySelectorAll('textarea'));
+      //Se activa el plugin de los popover
+      document.querySelectorAll("[data-popover]").forEach(el=> new Popover(el))
+      document.addEventListener("click",()=>{Popover.closeAll()})
     </script>
+
 
   </body>
 

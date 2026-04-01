@@ -3,9 +3,9 @@
     <?php
     /**************************************/
     //Cuadro de bienvenida
-    require_once('main-principal-bienvenida.php');
-    require_once('main-principal-meteo.php');
-
+    require_once('main-principal-bienvenida.php'); //Cuadro Perfil
+    if($data['UserData']["Config_Principal_Meteo"]==2){ require_once('main-principal-meteo.php');}      //Widget meteorologico
+    if($data['UserData']["Config_Principal_Feed"]==2){ require_once('main-principal-feeds.php');}    //Widget con noticias
 
     /**************************************/
     //Se cargan los widgets

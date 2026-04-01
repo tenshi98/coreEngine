@@ -140,8 +140,9 @@ class main extends ControllerBase {
             /*===========  Datos del usuario ===========*/
             'UserData'        => $UserData,
             /*===========   Funcionalidad   ===========*/
-            'Fnc_ServerServer'  => $this->ServerServer,
-            'Fnc_DataDate'      => $this->DataDate,
+            'Fnc_ServerServer'    => $this->ServerServer,
+            'Fnc_DataDate'        => $this->DataDate,
+            'Fnc_WidgetsCommon'   => new UIWidgetsCommon(),
             /*=========== Datos Consultados ===========*/
             'MainViewData'    => $MainViewData,
         ];

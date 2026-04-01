@@ -197,8 +197,10 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
                                     'table'     => 'terceros_entidades_listado_usuarios_noti',
                                     'Post'      => $Post
                                 ];
+                                //Se genera el chequeo
+                                $dataCheck_1 = $this->dataCheck_1($Post);
                                 //Ejecuto la query
-                                $xParams = ['DataCheck' => '', 'query' => $query];
+                                $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
                                 $this->Base_insert($xParams);
                                 break;
 
@@ -214,6 +216,47 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
             echo Response::sendData(500, "Error en el Request Method");
         }
+    }
+
+    /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
+    //Se validan los datos
+    private function dataCheck_1($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idUsuario,idTipoNoti',
+            'ValidarEntero'             => 'idUsuario,idTipoNoti',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
     }
 
 

@@ -738,6 +738,9 @@ class usuarios extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -745,21 +748,30 @@ class usuarios extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'email',
-            'ValidarNumero'             => 'Fono',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion,Fono',
+            'ValidarEntero'             => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion',
             'ValidarRut'                => 'Rut',
             'ValidarPatente'            => '',
-            'ValidarFecha'              => 'fNacimiento',
+            'ValidarFecha'              => 'fNacimiento,Ultimo_acceso',
             'ValidarHora'               => '',
             'ValidarURL'                => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarLargoMinimo'        => 'email,Nombre,Direccion',
+            'ValidarLargoMinimo'        => 'email,password,email,Nombre,Direccion',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'email,Nombre,Direccion',
+            'ValidarLargoMaximo'        => 'email,password,email,Nombre,Direccion',
             'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Nombre,Direccion',
-            'ValidarEspaciosVacios'     => 'email',
+            'ValidarPalabrasCensuradas' => 'password,Nombre,Direccion',
+            'ValidarEspaciosVacios'     => 'email,password,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'email',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => 'fNacimiento,Ultimo_acceso',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => 'IP_Client',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

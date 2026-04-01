@@ -128,7 +128,6 @@ class kanbanTareasParticipantes extends ControllerBase {
     /******************************************************************************/
     //Crear
     public function Insert(){
-
         /*******************************************************************/
         //variables
         $ndata_2 = isset($_POST['idParticipante']) ? count($_POST['idParticipante']) : 0;
@@ -156,8 +155,10 @@ class kanbanTareasParticipantes extends ControllerBase {
                         'table'     => 'kanban_tareas_participantes',
                         'Post'      => $arrParticipantes
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_1 = $this->dataCheck_1($arrParticipantes);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
                     $this->Base_insert($xParams);
                 }
             }
@@ -180,8 +181,10 @@ class kanbanTareasParticipantes extends ControllerBase {
                 'table'     => 'kanban_tareas_historial',
                 'Post'      => $arrTareas
             ];
+            //Se genera el chequeo
+            $dataCheck_2 = $this->dataCheck_2($arrTareas);
             //Ejecuto la query
-            $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+            $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
             $this->Base_insert($xParams);
 
             /******************************/
@@ -234,10 +237,10 @@ class kanbanTareasParticipantes extends ControllerBase {
                 //Se agrega historial
                 $arrTareas = [
                     'idKanban'    => $this->Codification->encryptDecrypt('decrypt', $dataDelete['idKanbanDel']),  //idKanban
-                    'idUsuario'   => $dataDelete['idUsuarioDel'],                                            //Usuario creador
-                    'Descripcion' => 'Encargado '.$rowData['Nombre'].' Borrado',                             //Descripcion
-                    'Fecha'       => $dataDelete['Fecha_Actual'],                                            //Fecha actual
-                    'Hora'        => $dataDelete['Hora_Actual'],                                             //Hora actual
+                    'idUsuario'   => $dataDelete['idUsuarioDel'],                                                 //Usuario creador
+                    'Descripcion' => 'Encargado '.$rowData['Nombre'].' Borrado',                                  //Descripcion
+                    'Fecha'       => $dataDelete['Fecha_Actual'],                                                 //Fecha actual
+                    'Hora'        => $dataDelete['Hora_Actual'],                                                  //Hora actual
                 ];
                 /******************************/
                 //Se genera la query
@@ -249,8 +252,10 @@ class kanbanTareasParticipantes extends ControllerBase {
                     'table'     => 'kanban_tareas_historial',
                     'Post'      => $arrTareas
                 ];
+                //Se genera el chequeo
+                $dataCheck_2 = $this->dataCheck_2($arrTareas);
                 //Ejecuto la query
-                $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
                 $this->Base_insert($xParams);
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
@@ -264,6 +269,84 @@ class kanbanTareasParticipantes extends ControllerBase {
         }else {
             echo Response::sendData(500, "Error en el Request Method");
         }
+    }
+
+    /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
+    //Se validan los datos
+    private function dataCheck_1($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idKanban,idUsuario',
+            'ValidarEntero'             => 'idKanban,idUsuario',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => '',
+            'ValidarHora'               => '',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => '',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => '',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idKanban,idUsuario',
+            'ValidarEntero'             => 'idKanban,idUsuario',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => 'Fecha',
+            'ValidarHora'               => 'Hora',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => 'Descripcion',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => 'Descripcion',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
     }
 
 }

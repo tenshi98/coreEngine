@@ -69,10 +69,18 @@ class coreSistema extends ControllerBase {
                 core_sistemas.Config_API_GoogleMaps,
                 core_sistemas.Config_WhatsappToken,
                 core_sistemas.Config_WhatsappInstanceId,
+                core_sistemas.Latitud,
+                core_sistemas.Longitud,
                 core_sistemas.Social_X,
                 core_sistemas.Social_Facebook,
                 core_sistemas.Social_Instagram,
                 core_sistemas.Social_Linkedin,
+                core_sistemas.Latitud,
+                core_sistemas.Longitud,
+                core_sistemas.Config_Principal_Meteo,
+                core_sistemas.Config_Principal_Radio,
+                core_sistemas.Config_Principal_Feed,
+                core_sistemas.Config_Principal_FeedURL,
 
                 core_ubicacion_ciudad.Nombre AS Ciudad,
                 core_ubicacion_comunas.Nombre AS Comuna,
@@ -145,6 +153,7 @@ class coreSistema extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_Codification'     => $this->Codification,
+                'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrCiudad'        => $arrCiudad,
@@ -197,10 +206,18 @@ class coreSistema extends ControllerBase {
                 core_sistemas.Config_API_GoogleMaps,
                 core_sistemas.Config_WhatsappToken,
                 core_sistemas.Config_WhatsappInstanceId,
+                core_sistemas.Latitud,
+                core_sistemas.Longitud,
                 core_sistemas.Social_X,
                 core_sistemas.Social_Facebook,
                 core_sistemas.Social_Instagram,
                 core_sistemas.Social_Linkedin,
+                core_sistemas.Latitud,
+                core_sistemas.Longitud,
+                core_sistemas.Config_Principal_Meteo,
+                core_sistemas.Config_Principal_Radio,
+                core_sistemas.Config_Principal_Feed,
+                core_sistemas.Config_Principal_FeedURL,
 
                 core_ubicacion_ciudad.Nombre AS Ciudad,
                 core_ubicacion_comunas.Nombre AS Comuna,
@@ -234,6 +251,7 @@ class coreSistema extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
             ];
@@ -263,9 +281,68 @@ class coreSistema extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
+            //Si hay datos
+            if(isset($_POST['Sistema_Direccion'])&&$_POST['Sistema_Direccion']!=''){
+                //Se instancia
+                $fncLocation = new FunctionsLocation;
+                //Se obtiene la direccion
+                $Ubicacion = $_POST['Sistema_Direccion'];
+                //Si existe comuna
+                if(isset($_POST['Sistema_idComuna'])&&$_POST['Sistema_idComuna']!=''){
+                    //Se genera la query
+                    $query = [
+                        'data'    => 'Nombre',
+                        'table'   => 'core_ubicacion_comunas',
+                        'join'    => '',
+                        'where'   => 'idComuna = "'.$_POST['Sistema_idComuna'].'"',
+                        'group'   => '',
+                        'having'  => '',
+                        'order'   => ''
+                    ];
+                    //Ejecuto la query
+                    $xParams = ['query' => $query];
+                    $rowData = $this->Base_GetByID($xParams);
+                    //Si hay resultados
+                    if ($rowData!==false) {
+                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    }
+                }
+                //Si existe ciudad
+                if(isset($_POST['Sistema_idCiudad'])&&$_POST['Sistema_idCiudad']!=''){
+                    //Se genera la query
+                    $query = [
+                        'data'    => 'Nombre',
+                        'table'   => 'core_ubicacion_ciudad',
+                        'join'    => '',
+                        'where'   => 'idCiudad = "'.$_POST['Sistema_idCiudad'].'"',
+                        'group'   => '',
+                        'having'  => '',
+                        'order'   => ''
+                    ];
+                    //Ejecuto la query
+                    $xParams = ['query' => $query];
+                    $rowData = $this->Base_GetByID($xParams);
+                    //Si hay resultados
+                    if ($rowData!==false) {
+                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    }
+                }
+                //Pais
+                $Ubicacion .= ', Chile';
+                //Se hace la busqueda de lat y long por su direccion
+                $result = $fncLocation->geocodeAddress($Ubicacion);
+                //Si hay resultados se guarda
+                if ($result) {
+                    //Se guarda el ultimo dato
+                    $_POST['Latitud']  = $result['lat'];
+                    $_POST['Longitud'] = $result['lon'];
+                }
+            }
+
+            /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,idOpcionesGen_23,idOpcionesGen_24,idOpcionesGen_25,idOpcionesGen_26,idOpcionesGen_27,idOpcionesGen_28,idOpcionesGen_29,idOpcionesGen_30,idOpcionesGen_31,idOpcionesGen_32,idOpcionesGen_33,idOpcionesGen_34,idOpcionesGen_35,idOpcionesGen_36,idOpcionesGen_37,idOpcionesGen_38,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
+                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,idOpcionesGen_29,idOpcionesGen_30,idOpcionesGen_31,idOpcionesGen_32,idOpcionesGen_33,idOpcionesGen_34,idOpcionesGen_35,idOpcionesGen_36,idOpcionesGen_37,idOpcionesGen_38,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
                 'required'  => 'Sistema_Nombre',
                 'unique'    => '',
                 'encode'    => '',
@@ -338,6 +415,9 @@ class coreSistema extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -352,14 +432,23 @@ class coreSistema extends ControllerBase {
             'ValidarFecha'              => '',
             'ValidarHora'               => '',
             'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
+            'ValidarLargoMinimo'        => 'Sistema_Email,Contacto_Email,RepresentanteEmail,Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
+            'ValidarLargoMaximo'        => 'Sistema_Email,Contacto_Email,RepresentanteEmail,Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
+            'ValidarEspaciosVacios'     => 'Sistema_Email,Contacto_Email,RepresentanteEmail',
+            'ValidarMayusculas'         => 'Sistema_Email,Contacto_Email,RepresentanteEmail',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'Sistema_Email,Contacto_Email,RepresentanteEmail',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

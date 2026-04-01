@@ -57,15 +57,15 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo){
+	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
 		/******************************************/
-		//Verifico si se utiliza el icono
-		$placeholderIcon = '';
+		//Variables vacias
+		$Options = '';
+
+		/******************************************/
 		//Verifico si el placeholder usa icono
-		if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-			$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-		}
+		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 
 		/******************************************/
 		//generacion del input
@@ -80,8 +80,6 @@ class UIFormInputs {
 		/*******************************************/
 		// Inicializa la variable que marcará la opción vacía como seleccionada por defecto
 		$selectedx = 'selected="selected"';
-		// Inicializa la cadena que contendrá todas las opciones del <select>
-		$Options = '';
 		// Recorre el arreglo de datos para construir cada opción del <select>
 		foreach ($arrData as $select) {
 			// Verifica si el valor actual coincide con el ID del elemento
@@ -108,6 +106,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('selectProperties', $selectProperties);
 		$this->TemplateRender->assign('SelectOptions',    $SelectOptions);
 		$this->TemplateRender->assign('dataInfo',         $dataInfo);
+		$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 		/******************************************/
 		//devuelvo
@@ -115,15 +114,15 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo){
+	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
 		/******************************************/
-		//Verifico si se utiliza el icono
-		$placeholderIcon = '';
+		//Variables vacias
+		$Options = '';
+
+		/******************************************/
 		//Verifico si el placeholder usa icono
-		if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-			$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-		}
+		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 
 		/********************************************************/
 		//Opero los datos
@@ -142,8 +141,6 @@ class UIFormInputs {
 		/*******************************************/
 		// Variable que indica si la opción vacía ("Seleccione una Opción") debe estar seleccionada por defecto
 		$selectedx = 'selected="selected"';
-		// Variable que acumulará todas las opciones y grupos de opciones del <select>
-		$Options = '';
 		// Recorre el arreglo $newArray, donde cada clave representa una categoría
 		foreach ($newArray as $categoria => $selected) {
 			// Crea un grupo de opciones <optgroup> con la etiqueta de la categoría
@@ -179,6 +176,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('selectProperties', $selectProperties);
 		$this->TemplateRender->assign('SelectOptions',    $SelectOptions);
 		$this->TemplateRender->assign('dataInfo',         $dataInfo);
+		$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 		/******************************************/
 		//devuelvo
@@ -186,15 +184,11 @@ class UIFormInputs {
 	}
 	/****************************************************************************************/
 	//Funcionalidad de select depend
-	private function selectInputEmpty($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $selectProperties){
+	private function selectInputEmpty($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $selectProperties, $dataPopover){
 
 		/******************************************/
-		//Verifico si se utiliza el icono
-		$placeholderIcon = '';
 		//Verifico si el placeholder usa icono
-		if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-			$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-		}
+		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 
 		/******************************************/
 		//generacion del input
@@ -220,6 +214,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('name',             $name);
 		$this->TemplateRender->assign('selectProperties', $selectProperties);
 		$this->TemplateRender->assign('SelectOptions',    $SelectOptions);
+		$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 		/******************************************/
 		//devuelvo
@@ -503,6 +498,7 @@ class UIFormInputs {
 		*		'InputClass'      => '',                    //Clase extra
 		*		'Icon'            => '',                    //Icono a mostrar
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -520,6 +516,7 @@ class UIFormInputs {
 		$InputClass       = $Options['InputClass'] ?? '';
 		$Icono            = $Options['Icon'] ?? '';
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Define valid options arrays
 		$validOptions = [
@@ -565,16 +562,23 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Variables
-			$ExtraClass      = '';
-            $ExtraClassGroup = '';
-            $ExtraCode       = '';
+			//Variables vacias
+			$ExtraClass = $ExtraClassGroup = $ExtraCode  = $input_1 = $input_2 = $input_3 = '';
 
             /******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
+			//Verifico si se utiliza el icono
+			if (!empty($Icono)&&$Icono!='') {
+				$input_1 = '<div class="input-group '.$ExtraClassGroup.'"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
+                $input_2 = 'aria-describedby="basic-addon1"';
+                $input_3 = '</div>';
+			}
+
+			/******************************************/
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Valido si es requerido
@@ -719,24 +723,6 @@ class UIFormInputs {
 			}
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$input_1 = $input_2 = $input_3 = $placeholderIcon = $dataInfo = '';
-			if (!empty($Icono)&&$Icono!='') {
-				$input_1 = '<div class="input-group '.$ExtraClassGroup.'"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
-                $input_2 = 'aria-describedby="basic-addon1"';
-                $input_3 = '</div>';
-			}
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-
-			/******************************************/
 			//generacion del input
 			switch ($formAlign) {
 				case 1: $formRoute = '../app/templates/Forms/formInput_1.php'; $this->TemplateRender->assign('otrcol', (12 - $formCol)); break;//Horizontal Form
@@ -764,6 +750,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('input_3',          $input_3);
 			$this->TemplateRender->assign('ExtraClass',       $ExtraClass);
 			$this->TemplateRender->assign('dataInfo',         $dataInfo);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//ejecucion
@@ -809,6 +796,7 @@ class UIFormInputs {
 		*		'Step'            => '',                    //Valores de avance o retroceso
 		*		'Ndecimal'        => '',                    //numero de decimales
 		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -826,6 +814,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -868,12 +857,6 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			 /******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
@@ -883,15 +866,11 @@ class UIFormInputs {
 			}
 
 			/******************************************/
-			//Si existe un valor entregado
-			$valor = ($value != 0) ? str_replace(',', '.', $value) : '';
-
-            /******************************************/
-			//Verifico si el placeholder usa icono
-			$placeholderIcon = '';
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$valor           = ($value != 0) ? str_replace(',', '.', $value) : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
@@ -917,6 +896,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('max',              $max);
 			$this->TemplateRender->assign('step',             $step);
 			$this->TemplateRender->assign('ndecimal',         $ndecimal);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -954,6 +934,7 @@ class UIFormInputs {
 		*		'Required'        => 2,                     //Si input es requerido (1 al 3)
 		*		'Position'        => '',                    //Posicion del popup (1 o 2)
 		*		'Icon'            => '',                    //Icono a mostrar
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -969,6 +950,7 @@ class UIFormInputs {
 		$required         = $Options['Required'] ?? 1;
 		$position         = $Options['Position'] ?? '';
 		$Icono            = $Options['Icon'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1000,10 +982,8 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
+			//Variables vacias
+			$input_1 = $input_2 = $input_3 = '';
 
 			/******************************************/
 			//Valido si es requerido
@@ -1015,16 +995,17 @@ class UIFormInputs {
 
             /******************************************/
 			//Verifico si se utiliza el icono
-			$input_1 = $input_2 = $input_3 = $placeholderIcon = '';
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
 			}
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
+
+			/******************************************/
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Posicion de la burbuja
@@ -1055,6 +1036,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('input_2',          $input_2);
 			$this->TemplateRender->assign('input_3',          $input_3);
 			$this->TemplateRender->assign('x_pos',            $x_pos);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -1088,6 +1070,7 @@ class UIFormInputs {
 		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
 		*		'Color'       => '',                    //Color a mostrar
 		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'    => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -1101,6 +1084,7 @@ class UIFormInputs {
 		$required      = $Options['Required'] ?? 1;
 		$color         = $Options['Color'] ?? 1;
 		$DataInfo      = $Options['DataInfo'] ?? '';
+		$dataPops      = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1140,22 +1124,12 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                     break;//Si el dato no es requerido
 				case 2:$requerido = 'required="required"';  break;//Si el dato es requerido
 				case 3:$requerido = 'disabled';             break;//Si el dato esta desactivado
 			}
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
 
 			/******************************************/
 			//Si el tab correspondiente esta seleccionado
@@ -1168,10 +1142,10 @@ class UIFormInputs {
 			$tipo    = $options[$color-1];
 
 			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
+			//Verifico
+			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Se genera input
@@ -1186,6 +1160,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
+			$this->TemplateRender->assign('dataPopover', $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -1263,9 +1238,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
+			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 
 			/******************************************/
 			//Valido si es requerido
@@ -1341,6 +1314,7 @@ class UIFormInputs {
 		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
 		*		'Color'       => '',                    //Color a mostrar
 		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'    => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -1354,6 +1328,7 @@ class UIFormInputs {
 		$required      = $Options['Required'] ?? 1;
 		$color         = $Options['Color'] ?? 1;
 		$DataInfo      = $Options['DataInfo'] ?? '';
+		$dataPops      = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1393,22 +1368,12 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';          break;//Si el dato no es requerido
 				case 2:$requerido = '';          break;//Si el dato es requerido
 				case 3:$requerido = 'disabled';  break;//Si el dato esta desactivado
 			}
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
 
 			/******************************************/
 			//Si el tab correspondiente esta seleccionado
@@ -1421,10 +1386,10 @@ class UIFormInputs {
 			$tipo    = $options[$color-1];
 
 			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
+			//Verifico
+			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Se genera input
@@ -1439,6 +1404,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
+			$this->TemplateRender->assign('dataPopover', $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -1516,9 +1482,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
+			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 
 			/******************************************/
 			//Valido si es requerido
@@ -1594,6 +1558,7 @@ class UIFormInputs {
 		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
 		*		'Color'       => '',                    //Color a mostrar
 		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'    => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -1607,6 +1572,7 @@ class UIFormInputs {
 		$required      = $Options['Required'] ?? 1;
 		$color         = $Options['Color'] ?? 1;
 		$DataInfo      = $Options['DataInfo'] ?? '';
+		$dataPops      = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1646,10 +1612,6 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                     break;//Si el dato no es requerido
@@ -1658,21 +1620,15 @@ class UIFormInputs {
 			}
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
 			//Si el tab correspondiente esta seleccionado
 			$check = (isset($value) && $value == 2) ? 'checked' : '';
 			$valor = '2';
 
 			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
+			//Verifico
+			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Selecciono el tipo de mensaje
@@ -1695,6 +1651,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
+			$this->TemplateRender->assign('dataPopover', $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -1772,9 +1729,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
+			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 
 			/******************************************/
 			//Valido si es requerido
@@ -1850,6 +1805,7 @@ class UIFormInputs {
 		*		'Id'              => 'Identificador',       //Identificador del input
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 3)
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -1863,6 +1819,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -1892,25 +1849,18 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                    break;//Si el dato no es requerido
 				case 2:$requerido = 'required="required"'; break;//Si el dato es requerido
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
+
             /******************************************/
-			//Verifico si se utiliza el icono
-			$placeholderIcon = '';
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
@@ -1932,6 +1882,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('name',             $name);
 			$this->TemplateRender->assign('requerido',        $requerido);
 			$this->TemplateRender->assign('value',            $value);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -1966,6 +1917,7 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'Tipo'            => 2,                     //Tipo de input (1 al 3)
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -1980,6 +1932,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$tipo             = $Options['Tipo'] ?? 1;
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2011,21 +1964,11 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Valido si es requerido
-			$requerido = ($required === 2) ? 'required="required"' : '';
-            /******************************************/
-			//Verifico si se utiliza el icono
-			$placeholderIcon = '';
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$requerido       = ($required === 2) ? 'required="required"' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
@@ -2047,6 +1990,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('name',             $name);
 			$this->TemplateRender->assign('requerido',        $requerido);
 			$this->TemplateRender->assign('value',            $value);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -2082,6 +2026,7 @@ class UIFormInputs {
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2097,6 +2042,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2136,28 +2082,15 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			//Valido si es requerido
+			//Verifico
+			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Imprimir dato
-			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
+			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 
 		}else{
 			echo $alerts;
@@ -2186,7 +2119,9 @@ class UIFormInputs {
 		*		'Required'         => 2,                     //Si input es requerido (1 al 2)
 		*		'selectProperties' => '',                    //Permite agregar propiedades dentro del elemento
 		*		'arrData'          => '',                    //Datos recibidos
-		*		'DataInfo'        => 'Lorem ipsum dolor',    //Informacion a mostrar debajo de un input
+		*		'BASE'             => 'http://google.cl',    //Ruta base del sistema
+		*		'DataInfo'         => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'         => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2204,6 +2139,7 @@ class UIFormInputs {
 		$selectProperties = $Options['selectProperties'] ?? '';
 		$BASE             = $Options['BASE'];
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2243,28 +2179,15 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			//Valido si es requerido
+			//Verifico
+			$nameID            = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties .= ($required === 2) ? 'required="required"' : '';
+			$dataInfo          = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover       = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo);
+			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2300,6 +2223,7 @@ class UIFormInputs {
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2315,6 +2239,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2354,28 +2279,15 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			//Valido si es requerido
+			//Verifico
+			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//Imprimir dato
-			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
+			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 
 		}else{
 			echo $alerts;
@@ -2403,7 +2315,9 @@ class UIFormInputs {
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'BASE'            => 'http://google.cl',    //Ruta base del sistema
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2420,6 +2334,7 @@ class UIFormInputs {
 		$required         = $Options['Required'] ?? 1;
 		$BASE             = $Options['BASE'];
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2459,28 +2374,15 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			//Valido si es requerido
+			//Verifico
+			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo);
+			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2516,6 +2418,7 @@ class UIFormInputs {
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2531,6 +2434,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2560,28 +2464,15 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			// Configura propiedades para select multiple de forma compacta
-			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : '');
+			//Verifico
+			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : ''); // Configura propiedades para select multiple de forma compacta
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
+			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 			//ejecuto script
 			$input .= '
 			<script>
@@ -2621,6 +2512,7 @@ class UIFormInputs {
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData'         => '',                    //Datos recibidos
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2636,6 +2528,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2665,28 +2558,15 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			// Configura propiedades para select multiple de forma compacta
-			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : '');
+			//Verifico
+			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : ''); // Configura propiedades para select multiple de forma compacta
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo);
+			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 			//ejecuto script
 			$input .= '
 			<script>
@@ -2725,6 +2605,7 @@ class UIFormInputs {
 		*		'Value1'           => 'asd',                 //Valor del input
 		*		'Required1'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData1'         => '',                    //Datos recibidos
+		*		'dataPops1'        => array,                 //Popup con info
 		*		'FormAling2'       => 1,                     //Alineacion del formulario (1 al 5)
 		*		'FormCol2'         => 8,                     //Columnas del formulario (0 al 12)
 		*		'Placeholder2'     => 'Nombre',              //Nombre a mostrar
@@ -2734,6 +2615,7 @@ class UIFormInputs {
 		*		'Value2'           => 'asd',                 //Valor del input
 		*		'Required2'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData2'         => '',                    //Datos recibidos
+		*		'dataPops2'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -2748,6 +2630,7 @@ class UIFormInputs {
 		$identificador1    = $Options['Id1'] ?? $name1;
 		$value1            = $Options['Value1'] ?? '';
 		$required1         = $Options['Required1'] ?? 1;
+		$dataPops1         = $Options['dataPops'] ?? '';
 		$placeholder2      = $Options['Placeholder2'];
 		$placeholderIcon2  = $Options['PlaceholderIcon2'] ?? '';
 		$name2             = $Options['Name2'];
@@ -2757,6 +2640,7 @@ class UIFormInputs {
 		$identificador2    = $Options['Id2'] ?? $name2;
 		$value2            = $Options['Value2'] ?? '';
 		$required2         = $Options['Required2'] ?? 1;
+		$dataPops2         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -2804,24 +2688,18 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID1 = (strpos($identificador1, '[]') !== false)
-				? str_replace('[]', '', $identificador1) . '_' . uniqid()
-				: $identificador1;
-			//Verifico si nombre viene de un array
-			$nameID2 = (strpos($identificador2, '[]') !== false)
-				? str_replace('[]', '', $identificador2) . '_' . uniqid()
-				: $identificador2;
-
-			/******************************************/
-			//Valido si es requerido
+			//Verifico
+			$nameID1           = (strpos($identificador1, '[]') !== false) ? str_replace('[]', '', $identificador1) . '_' . uniqid() : $identificador1;
+			$nameID2           = (strpos($identificador2, '[]') !== false) ? str_replace('[]', '', $identificador2) . '_' . uniqid() : $identificador2;
 			$selectProperties1 = ($required1 === 2) ? 'required="required"' : '';
 			$selectProperties2 = ($required2 === 2) ? 'required="required"' : '';
+			$dataPopover1      = (!empty($dataPops1)&&$dataPops1!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops1['style'].'" data-popover data-extraclass="popover-'.$dataPops1['style'].'" data-title="'.$dataPops1['title'].'" data-content="'.$dataPops1['content'].'" data-placement="'.$dataPops1['position'].'"><i class="'.$dataPops1['icon'].'"></i></button>' : '';
+			$dataPopover2      = (!empty($dataPops2)&&$dataPops2!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops2['style'].'" data-popover data-extraclass="popover-'.$dataPops2['style'].'" data-title="'.$dataPops2['title'].'" data-content="'.$dataPops2['content'].'" data-placement="'.$dataPops2['position'].'"><i class="'.$dataPops2['icon'].'"></i></button>' : '';
 
 			/******************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '', '');
-			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2);
+			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '', '', $dataPopover1);
+			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			/******************************************/
@@ -2854,6 +2732,7 @@ class UIFormInputs {
 		*		'Value1'           => 'asd',                 //Valor del input
 		*		'Required1'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData1'         => '',                    //Datos recibidos
+		*		'dataPops1'        => array,                 //Popup con info
 		*		'FormAling2'       => 1,                     //Alineacion del formulario (1 al 5)
 		*		'FormCol2'         => 8,                     //Columnas del formulario (0 al 12)
 		*		'Placeholder2'     => 'Nombre',              //Nombre a mostrar
@@ -2863,6 +2742,8 @@ class UIFormInputs {
 		*		'Value2'           => 'asd',                 //Valor del input
 		*		'Required2'        => 2,                     //Si input es requerido (1 al 2)
 		*		'arrData2'         => '',                    //Datos recibidos
+		*		'dataPops2'        => array,                 //Popup con info
+		*		'BASE'             => 'http://google.cl',    //Ruta base del sistema
 		*	];
 		*===================================================================================================================
 		*/
@@ -2877,6 +2758,7 @@ class UIFormInputs {
 		$identificador1    = $Options['Id1'] ?? $name1;
 		$value1            = $Options['Value1'] ?? '';
 		$required1         = $Options['Required1'] ?? 1;
+		$dataPops1         = $Options['dataPops1'] ?? '';
 		$placeholder2      = $Options['Placeholder2'];
 		$placeholderIcon2  = $Options['PlaceholderIcon2'] ?? '';
 		$name2             = $Options['Name2'];
@@ -2886,6 +2768,7 @@ class UIFormInputs {
 		$identificador2    = $Options['Id2'] ?? $name2;
 		$value2            = $Options['Value2'] ?? '';
 		$required2         = $Options['Required2'] ?? 1;
+		$dataPops2         = $Options['dataPops2'] ?? '';
 		$BASE              = $Options['BASE'];
 
 		//Definir opciones válidas
@@ -2934,24 +2817,18 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID1 = (strpos($identificador1, '[]') !== false)
-				? str_replace('[]', '', $identificador1) . '_' . uniqid()
-				: $identificador1;
-			//Verifico si nombre viene de un array
-			$nameID2 = (strpos($identificador2, '[]') !== false)
-				? str_replace('[]', '', $identificador2) . '_' . uniqid()
-				: $identificador2;
-
-			/******************************************/
-			//Valido si es requerido
+			//Verifico
+			$nameID1           = (strpos($identificador1, '[]') !== false) ? str_replace('[]', '', $identificador1) . '_' . uniqid() : $identificador1;
+			$nameID2           = (strpos($identificador2, '[]') !== false) ? str_replace('[]', '', $identificador2) . '_' . uniqid() : $identificador2;
 			$selectProperties1 = ($required1 === 2) ? 'required="required"' : '';
 			$selectProperties2 = ($required2 === 2) ? 'required="required"' : '';
+			$dataPopover1      = (!empty($dataPops1)&&$dataPops1!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops1['style'].'" data-popover data-extraclass="popover-'.$dataPops1['style'].'" data-title="'.$dataPops1['title'].'" data-content="'.$dataPops1['content'].'" data-placement="'.$dataPops1['position'].'"><i class="'.$dataPops1['icon'].'"></i></button>' : '';
+			$dataPopover2      = (!empty($dataPops2)&&$dataPops2!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops2['style'].'" data-popover data-extraclass="popover-'.$dataPops2['style'].'" data-title="'.$dataPops2['title'].'" data-content="'.$dataPops2['content'].'" data-placement="'.$dataPops2['position'].'"><i class="'.$dataPops2['icon'].'"></i></button>' : '';
 
 			/******************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main', '');
-			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2);
+			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main', '', $dataPopover1);
+			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			//validacion si es requerido
@@ -2986,7 +2863,9 @@ class UIFormInputs {
 		*		'Id'              => 'Identificador',       //Identificador del input
 		*		'Value'           => 'asd',                 //Valor del input
 		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
+		*		'BASE'            => 'http://google.cl',    //Ruta base del sistema
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -3002,6 +2881,7 @@ class UIFormInputs {
 		$required         = $Options['Required'] ?? 1;
 		$BASE             = $Options['BASE'];
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -3041,32 +2921,14 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$requerido       = ($required === 2) ? 'required="required"' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			//Valido si es requerido
-			$requerido = ($required === 2) ? 'required="required"' : '';
-            /******************************************/
-			//Verifico si se utiliza el icono
-			$placeholderIcon = '';
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
-
 			//Se agregan los paises
 			$arrData = [
 				["value" => 1, "Nombre" => '🇦🇫 Afghanistan'],
@@ -3302,6 +3164,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormOptions',      $FormOptions);
 			$this->TemplateRender->assign('dataRequire',      $dataRequire);
 			$this->TemplateRender->assign('dataInfo',         $dataInfo);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -3338,6 +3201,7 @@ class UIFormInputs {
 		*		'ValorInicio'     => '',                    //Valor Inicio
 		*		'ValorFin'        => '',                    //Valor Fin
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -3354,6 +3218,7 @@ class UIFormInputs {
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
 		$DataInfo         = $Options['DataInfo'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -3397,31 +3262,12 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Verifico si se utiliza el icono
-			$dataInfo = '';
-
-			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
-
-			/******************************************/
-			//Verifico si el DataInfo tiene datos
-			if (!empty($DataInfo)&&$DataInfo!='') {
-				$dataInfo = '<p class="formHelp text-muted">'.$DataInfo.'</p>';
-			}
-
-			/******************************************/
-			//Valido si es requerido
-			$requerido = ($required === 2) ? 'required="required"' : '';
-            /******************************************/
-			//Verifico si se utiliza el icono
-			$placeholderIcon = '';
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$requerido       = ($required === 2) ? 'required="required"' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
 			/******************************************/
 			//generacion del input
@@ -3456,6 +3302,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',          $FormCol);
 			$this->TemplateRender->assign('FormOptions',      $FormOptions);
 			$this->TemplateRender->assign('dataInfo',         $dataInfo);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -3739,6 +3586,7 @@ class UIFormInputs {
 		*		'InputClass'      => '',                    //Clase extra
 		*		'Icon'            => '',                    //Icono a mostrar
 		*		'arrData'         => '',                    //Datos recibidos
+		*		'dataPops'        => array,                 //Popup con info
 		*	];
 		*===================================================================================================================
 		*/
@@ -3755,6 +3603,7 @@ class UIFormInputs {
 		$required         = $Options['Required'] ?? 1;
 		$InputClass       = $Options['InputClass'] ?? '';
 		$Icono            = $Options['Icon'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
 		$validOptions = [
@@ -3784,10 +3633,8 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false)
-				? str_replace('[]', '', $identificador) . '_' . uniqid()
-				: $identificador;
+			//Variables vacias
+			$input_1 = $input_2 = $input_3 = '';
 
 			/******************************************/
 			//Valido si es requerido
@@ -3799,19 +3646,18 @@ class UIFormInputs {
 
             /******************************************/
 			//Verifico si se utiliza el icono
-			$input_1 = $input_2 = $input_3 = $placeholderIcon = '';
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
 			}
-			//Verifico si el placeholder usa icono
-			if (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') {
-				$placeholderIcon = "<i class='".$PlaceholderIcon."'></i> ";
-			}
 
 			/******************************************/
-			//generacion del input
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+
 			/******************************************/
 			//generacion del input
 			switch ($FormAling) {
@@ -3841,6 +3687,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('input_2',          $input_2);
 			$this->TemplateRender->assign('input_3',          $input_3);
 			$this->TemplateRender->assign('dataList',         $dataList);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/******************************************/
 			//Imprimir dato
@@ -3881,7 +3728,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 			/******************************************/
-			//inicial
+			//Variables vacias
 			$dataDetails = '';
 			//Recorro
 			foreach ( $arrData as $select ) {$dataDetails .= '<details><summary>'.$select['ID'].'</summary><p>'.$this->DataText->tituloMenu($select['Nombre']).'</p></details>';}

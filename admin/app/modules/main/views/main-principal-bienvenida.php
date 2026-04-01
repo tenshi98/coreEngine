@@ -3,7 +3,7 @@ $UserIMG = !empty($data['UserData']['UserIMG'])
     ? $BASE.'/upload/'.$data['UserData']['UserIMG']
     : $BASE.'/img/profile-img.jpg';
 ?>
-<div class="col-xs-12 col-sm-6 col-md-6 col-lg-5 col-xl-5 col-xxl-5">
+<div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
     <div class="card">
         <div class="row g-0">
             <div class="col-md-4 p-3 text-center">
@@ -19,22 +19,6 @@ $UserIMG = !empty($data['UserData']['UserIMG'])
                     <p class="card-text text-muted">
                         <i class="fas fa-briefcase"></i> <?php echo $data['UserData']['UserPosition']; ?>
                     </p>
-                    <div class="border-top pt-2">
-                        <div class="row text-center">
-                            <div class="col">
-                                <h6>Projects</h6>
-                                <strong>25</strong>
-                            </div>
-                            <div class="col border-start">
-                                <h6>Following</h6>
-                                <strong>142</strong>
-                            </div>
-                            <div class="col border-start">
-                                <h6>Followers</h6>
-                                <strong>289</strong>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -44,4 +28,6 @@ $UserIMG = !empty($data['UserData']['UserIMG'])
             </div>
         </div>
     </div>
+
+    <?php if($data['UserData']["Config_Principal_Radio"]==2){ $data['Fnc_WidgetsCommon']->widget_radio_player($BASE, 2);} ?>
 </div>

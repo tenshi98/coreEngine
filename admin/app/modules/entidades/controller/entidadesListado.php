@@ -449,6 +449,8 @@ class entidadesListado extends ControllerBase {
                 entidades_listado.Social_Linkedin,
                 entidades_listado.Ultimo_acceso,
                 entidades_listado.idTipoEntidad,
+                entidades_listado.Latitud,
+                entidades_listado.Longitud,
 
                 core_estados.Nombre AS Estado,
                 core_estados.Color AS EstadoColor,
@@ -577,6 +579,7 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
                 'arrCargas'        => $arrCargas,
@@ -640,6 +643,8 @@ class entidadesListado extends ControllerBase {
                 entidades_listado.idTipoEntidad,
                 entidades_listado.idCiudad,
                 entidades_listado.idComuna,
+                entidades_listado.Latitud,
+                entidades_listado.Longitud,
 
                 core_estados.Nombre AS Estado,
                 core_estados.Color AS EstadoColor,
@@ -801,6 +806,7 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData,
                 'arrEstado'       => $arrEstado,
@@ -860,6 +866,8 @@ class entidadesListado extends ControllerBase {
                 entidades_listado.Social_Linkedin,
                 entidades_listado.Ultimo_acceso,
                 entidades_listado.idTipoEntidad,
+                entidades_listado.Latitud,
+                entidades_listado.Longitud,
 
                 core_estados.Nombre AS Estado,
                 core_estados.Color AS EstadoColor,
@@ -902,6 +910,7 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData,
             ];
@@ -929,9 +938,68 @@ class entidadesListado extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
+        //Si hay datos
+        if(isset($_POST['Direccion'])&&$_POST['Direccion']!=''){
+            //Se instancia
+            $fncLocation = new FunctionsLocation;
+            //Se obtiene la direccion
+            $Ubicacion = $_POST['Direccion'];
+            //Si existe comuna
+            if(isset($_POST['idComuna'])&&$_POST['idComuna']!=''){
+                //Se genera la query
+                $query = [
+                    'data'    => 'Nombre',
+                    'table'   => 'core_ubicacion_comunas',
+                    'join'    => '',
+                    'where'   => 'idComuna = "'.$_POST['idComuna'].'"',
+                    'group'   => '',
+                    'having'  => '',
+                    'order'   => ''
+                ];
+                //Ejecuto la query
+                $xParams = ['query' => $query];
+                $rowData = $this->Base_GetByID($xParams);
+                //Si hay resultados
+                if ($rowData!==false) {
+                    $Ubicacion .= ', '.$rowData['Nombre'];
+                }
+            }
+            //Si existe ciudad
+            if(isset($_POST['idCiudad'])&&$_POST['idCiudad']!=''){
+                //Se genera la query
+                $query = [
+                    'data'    => 'Nombre',
+                    'table'   => 'core_ubicacion_ciudad',
+                    'join'    => '',
+                    'where'   => 'idCiudad = "'.$_POST['idCiudad'].'"',
+                    'group'   => '',
+                    'having'  => '',
+                    'order'   => ''
+                ];
+                //Ejecuto la query
+                $xParams = ['query' => $query];
+                $rowData = $this->Base_GetByID($xParams);
+                //Si hay resultados
+                if ($rowData!==false) {
+                    $Ubicacion .= ', '.$rowData['Nombre'];
+                }
+            }
+            //Pais
+            $Ubicacion .= ', Chile';
+            //Se hace la busqueda de lat y long por su direccion
+            $result = $fncLocation->geocodeAddress($Ubicacion);
+            //Si hay resultados se guarda
+            if ($result) {
+                //Se guarda el ultimo dato
+                $_POST['Latitud']  = $result['lat'];
+                $_POST['Longitud'] = $result['lon'];
+            }
+        }
+
+        /******************************/
         //Se genera la query
         $query = [
-            'data'      => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso',
+            'data'      => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,Latitud,Longitud',
             'required'  => 'idEstado,idTipo,idTipoEntidad,password',
             'unique'    => 'Rut,Email',
             'encode'    => 'password',
@@ -966,9 +1034,68 @@ class entidadesListado extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
+            //Si hay datos
+            if(isset($_POST['Direccion'])&&$_POST['Direccion']!=''){
+                //Se instancia
+                $fncLocation = new FunctionsLocation;
+                //Se obtiene la direccion
+                $Ubicacion = $_POST['Direccion'];
+                //Si existe comuna
+                if(isset($_POST['idComuna'])&&$_POST['idComuna']!=''){
+                    //Se genera la query
+                    $query = [
+                        'data'    => 'Nombre',
+                        'table'   => 'core_ubicacion_comunas',
+                        'join'    => '',
+                        'where'   => 'idComuna = "'.$_POST['idComuna'].'"',
+                        'group'   => '',
+                        'having'  => '',
+                        'order'   => ''
+                    ];
+                    //Ejecuto la query
+                    $xParams = ['query' => $query];
+                    $rowData = $this->Base_GetByID($xParams);
+                    //Si hay resultados
+                    if ($rowData!==false) {
+                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    }
+                }
+                //Si existe ciudad
+                if(isset($_POST['idCiudad'])&&$_POST['idCiudad']!=''){
+                    //Se genera la query
+                    $query = [
+                        'data'    => 'Nombre',
+                        'table'   => 'core_ubicacion_ciudad',
+                        'join'    => '',
+                        'where'   => 'idCiudad = "'.$_POST['idCiudad'].'"',
+                        'group'   => '',
+                        'having'  => '',
+                        'order'   => ''
+                    ];
+                    //Ejecuto la query
+                    $xParams = ['query' => $query];
+                    $rowData = $this->Base_GetByID($xParams);
+                    //Si hay resultados
+                    if ($rowData!==false) {
+                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    }
+                }
+                //Pais
+                $Ubicacion .= ', Chile';
+                //Se hace la busqueda de lat y long por su direccion
+                $result = $fncLocation->geocodeAddress($Ubicacion);
+                //Si hay resultados se guarda
+                if ($result) {
+                    //Se guarda el ultimo dato
+                    $_POST['Latitud']  = $result['lat'];
+                    $_POST['Longitud'] = $result['lon'];
+                }
+            }
+
+            /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso',
+                'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,Latitud,Longitud',
                 'required'  => 'idEstado,idTipo,idTipoEntidad',
                 'unique'    => 'Rut,Email',
                 'encode'    => 'password',
@@ -1099,6 +1226,9 @@ class entidadesListado extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -1106,21 +1236,30 @@ class entidadesListado extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'Email,RepLegalEmail',
-            'ValidarNumero'             => 'Fono1,Fono2,RepLegalFono1,RepLegalFono2',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna,Fono1,Fono2,RepLegalFono1,RepLegalFono2',
+            'ValidarEntero'             => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna',
             'ValidarRut'                => 'Rut,RepLegalRut',
             'ValidarPatente'            => '',
             'ValidarFecha'              => 'FNacimiento',
             'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
+            'ValidarURL'                => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
+            'ValidarLargoMinimo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre,password',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
+            'ValidarLargoMaximo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre,password',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
-            'ValidarEspaciosVacios'     => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,Email,RepLegalEmail',
+            'ValidarEspaciosVacios'     => 'Email,RepLegalEmail,Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,password',
             'ValidarMayusculas'         => 'Email,RepLegalEmail',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'Email,RepLegalEmail',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => 'FNacimiento',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => 'IP_Client',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

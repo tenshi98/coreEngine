@@ -8,7 +8,7 @@
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit_1"><i class="bi bi-pencil-square"></i> Editar Datos Basicos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit_2"><i class="bi bi-bookmark-check"></i> Editar Contacto</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit_3"><i class="bi bi-person-square"></i> Editar Representante</button></li>
-                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit_4"><i class="bi bi-puzzle"></i> Editar APIS</button></li>
+                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit_4"><i class="bi bi-puzzle"></i> Editar APIS y Config</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit_5"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
             </ul>
             <div class="tab-content pt-2">
@@ -117,11 +117,26 @@
                                     case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => $data['rowData']['Config_API_GoogleMaps'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
                                 }
                                 //Se condiciona el uso de Whatsapp
-                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                //if($data['UserData']["sistemaUsoWhatsapp"]==2){
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => $data['rowData']['Config_WhatsappToken'] ?? '',      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => $data['rowData']['Config_WhatsappInstanceId'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                }
-
+                                //}
+                                /********************************/
+                                $Title = 'Mostrar Widget Meteorologico';
+                                $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Meteo',  'Value' => $data['rowData']['Config_Principal_Meteo'] ?? '',  'Required' => 1,'Color' => 3]);
+                                /********************************/
+                                $Title = 'Mostrar Widget Radio';
+                                $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Radio',  'Value' => $data['rowData']['Config_Principal_Radio'] ?? '',  'Required' => 1,'Color' => 3]);
+                                /********************************/
+                                $Title = 'Mostrar Widget Feed';
+                                $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Feed',  'Value' => $data['rowData']['Config_Principal_Feed'] ?? '',  'Required' => 1,'Color' => 3]);
+                                /********************************/
+                                $Title = 'URL Feed';
+                                $Info  = 'La URL con el feed de noticias, si no existe se ocupa la opcion por defecto';
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'FormCol' => 12,  'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_FeedURL',  'Value' => $data['rowData']['Config_Principal_FeedURL'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-globe']);
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
                                 ?>
@@ -336,5 +351,19 @@
             }
         });
     }
+    /******************************************/
+    //Oculto
+    document.getElementById('div_Config_Principal_FeedURL').style.display     = 'none';
+    //cargo
+    const checkbox = document.getElementById("Config_Principal_Feed");
+    //Ejecutar logica
+    checkbox.addEventListener("change", function () {
+        if (this.checked) {
+            document.getElementById('div_Config_Principal_FeedURL').style.display     = '';
+        } else {
+            document.getElementById('div_Config_Principal_FeedURL').style.display     = 'none';
+        }
+    });
+
 
 </script>

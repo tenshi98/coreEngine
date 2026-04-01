@@ -36,12 +36,15 @@
                 <div class="card-body">
                     <h5 class="card-title">Colored Header Modals</h5>
                     <p>A rendered modal with header having contexual background color.</p>
-                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#colorModal_1">Basic Modal primary</button>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#colorModal_2">Basic Modal success</button>
-                    <button type="button" class="btn btn-info"    data-bs-toggle="modal" data-bs-target="#colorModal_3">Basic Modal info</button>
-                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#colorModal_4">Basic Modal warning</button>
-                    <button type="button" class="btn btn-danger"  data-bs-toggle="modal" data-bs-target="#colorModal_5">Basic Modal danger</button>
-                    <button type="button" class="btn btn-dark"    data-bs-toggle="modal" data-bs-target="#colorModal_6">Basic Modal dark</button>
+                    <button type="button" class="btn btn-primary"   data-bs-toggle="modal" data-bs-target="#colorModal_primary">Basic Modal primary</button>
+                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#colorModal_secondary">Basic Modal secondary</button>
+                    <button type="button" class="btn btn-success"   data-bs-toggle="modal" data-bs-target="#colorModal_success">Basic Modal success</button>
+                    <button type="button" class="btn btn-danger"    data-bs-toggle="modal" data-bs-target="#colorModal_danger">Basic Modal danger</button>
+                    <button type="button" class="btn btn-warning"   data-bs-toggle="modal" data-bs-target="#colorModal_warning">Basic Modal warning</button>
+                    <button type="button" class="btn btn-info"      data-bs-toggle="modal" data-bs-target="#colorModal_info">Basic Modal info</button>
+                    <button type="button" class="btn btn-light"     data-bs-toggle="modal" data-bs-target="#colorModal_light">Basic Modal light</button>
+                    <button type="button" class="btn btn-dark"      data-bs-toggle="modal" data-bs-target="#colorModal_dark">Basic Modal dark</button>
+                    <button type="button" class="btn btn-link"      data-bs-toggle="modal" data-bs-target="#colorModal_link">Basic Modal link</button>
                 </div>
             </div>
 
@@ -298,7 +301,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="colorModal_1" tabindex="-1">
+<div class="modal fade" id="colorModal_primary" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-primary-gradient">
@@ -318,7 +321,27 @@
     </div>
 </div>
 
-<div class="modal fade" id="colorModal_2" tabindex="-1">
+<div class="modal fade" id="colorModal_secondary" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_success" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-success-gradient">
@@ -338,47 +361,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="colorModal_3" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-info-gradient">
-                <h5 class="modal-title">Basic Modal</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
-            </div>
-            <div class="modal-footer">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="colorModal_4" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header bg-warning-gradient">
-                <h5 class="modal-title">Basic Modal</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
-            </div>
-            <div class="modal-footer">
-                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
-                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="colorModal_5" tabindex="-1">
+<div class="modal fade" id="colorModal_danger" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-danger-gradient">
@@ -398,7 +381,67 @@
     </div>
 </div>
 
-<div class="modal fade" id="colorModal_6" tabindex="-1">
+<div class="modal fade" id="colorModal_warning" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-warning-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_info" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-info-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_light" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-light-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="colorModal_dark" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header bg-dark-gradient">
@@ -417,3 +460,25 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" id="colorModal_link" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-link-gradient">
+                <h5 class="modal-title">Basic Modal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+            Non omnis incidunt qui sed occaecati magni asperiores est mollitia. Soluta at et reprehenderit. Placeat autem numquam et fuga numquam. Tempora in facere consequatur sit dolor ipsum. Consequatur nemo amet incidunt est facilis. Dolorem neque recusandae quo sit molestias sint dignissimos.
+            </div>
+            <div class="modal-footer">
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                    <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

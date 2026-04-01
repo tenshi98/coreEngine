@@ -101,7 +101,7 @@ class UIWidgetsCommon {
 		*
 		*=================================================    Modo de uso  =================================================
 		*
-		* 	//se imprime input
+		* 	//se imprime elemento
 		*   $Options = [
 		*		'type'     => 1,        //Tipo de acordeon
 		*		'showOpen' => 8,        //elemento abierto, el id 0 mantiene todos cerrados
@@ -190,7 +190,7 @@ class UIWidgetsCommon {
 		*
 		*=================================================    Modo de uso  =================================================
 		*
-		* 	//se imprime input
+		* 	//se imprime elemento
 		* 	$Common->alertPostData(1,0,3,0, 'dato' );
 		* 	$Common->alertPostData(2,1,2,0, '<strong>Dato:</strong>explicacion' );
 		* 	$Common->alertPostData(3,2,1,0, '<strong>Dato 1:</strong>explicacion 1 <br/><strong>Dato 2:</strong>explicacion 2' );
@@ -282,7 +282,8 @@ class UIWidgetsCommon {
 		* Permite generar un widget tipo tabs que se rellena en base a la info entregada
 		*
 		*=================================================    Modo de uso  =================================================
-		* 	//se imprime input
+		*
+		*   //se imprime elemento
 		*   $Options = [
 		*	   'type'      => 1,        //Tipo de tab
 		*	   'justif'    => 1,        //Tipo de justificacion
@@ -380,10 +381,10 @@ class UIWidgetsCommon {
 		/*
 		*=================================================     Detalles    =================================================
 		*
-		* Permite generar un widget tipo tabs que se rellena en base a la info entregada
+		* Permite generar una vista previa de los documentos
 		*
 		*=================================================    Modo de uso  =================================================
-		* 	//se imprime input
+		* 	//se imprime elemento
 		* 	$Common->previewDocs(BaseURL, $Route, $File);
 		*
 		*=================================================    Parametros   =================================================
@@ -395,9 +396,9 @@ class UIWidgetsCommon {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($BaseURL) || $BaseURL==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Dirección base del archivo.');}
-		if(!isset($Route) || $Route==''){      echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta a la carpeta contenedora.');}
-		if(!isset($File) || $File==''){        echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Nombre del archivo.');}
+		if(!isset($BaseURL) || $BaseURL==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Dirección base del archivo.');    exit;}
+		if(!isset($Route) || $Route==''){      echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta a la carpeta contenedora.'); exit;}
+		if(!isset($File) || $File==''){        echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Nombre del archivo.');            exit;}
 
 		/********************** Si todo esta ok **********************/
 		/****************************************/
@@ -568,7 +569,7 @@ class UIWidgetsCommon {
 		* Permite generar un elemento que se asemeja a una tabla, pero es responsive
 		*
 		*=================================================    Modo de uso  =================================================
-		* 	//se imprime input
+		* 	//se imprime elemento
 		*	$arrData = [
 		*		['Icon' => '','Titulo' => 'idCrud',     'Texto' => 'Texto Texto'],
 		*		['Icon' => '','Titulo' => 'idUsuario',  'Texto' => 'Texto Texto'],
@@ -584,6 +585,7 @@ class UIWidgetsCommon {
 		*
 		*=================================================    Parametros   =================================================
 		* @input   array   $Options    array con los datos
+		* @input   int     $FormCol    Ancho de la columna
 		* @return  string
 		*===================================================================================================================
 		*/
@@ -664,7 +666,7 @@ class UIWidgetsCommon {
 		*
 		*=================================================    Modo de uso  =================================================
 		*
-		* 	//se imprime input
+		* 	//se imprime elemento
 		*	$Common->preview_pdf('Pdf_viewer', 'upload/archivo.pdf', 'www.google.com');
 		*
 		*=================================================    Parametros   =================================================
@@ -676,9 +678,9 @@ class UIWidgetsCommon {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($idDiv) || $idDiv==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el identificador.');}
-		if(!isset($Route) || $Route==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de acceso del archivo.');}
-		if(!isset($BASE) || $BASE==''){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de la raiz del sitio.');}
+		if(!isset($idDiv) || $idDiv==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el identificador.');              exit;}
+		if(!isset($Route) || $Route==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de acceso del archivo.'); exit;}
+		if(!isset($BASE) || $BASE==''){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de la raiz del sitio.');  exit;}
 
 		/********************** Si todo esta ok **********************/
 		$input = '
@@ -710,6 +712,7 @@ class UIWidgetsCommon {
 		*=================================================    Parametros   =================================================
 		* @input   String   $type     Tipo de elemento
 		* @input   String   $code     Codigo a mostrar
+		* @input   String   $BASE     Ruta de la raiz del sitio
 		* @return  string
 		*===================================================================================================================
 		*/
@@ -718,9 +721,9 @@ class UIWidgetsCommon {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 		//Validaciones
-		if(!isset($type) || $type==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Tipo de elemento.');}
-		if(!isset($code) || $code==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Codigo a mostrar.');}
-		if(!in_array($type, $tipos)){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada en el codeblock no esta dentro de las opciones.');}
+		if(!isset($type) || $type==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Tipo de elemento.');                                             exit;}
+		if(!isset($code) || $code==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Codigo a mostrar.');                                             exit;}
+		if(!in_array($type, $tipos)){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada en el codeblock no esta dentro de las opciones.'); exit;}
 
 		/********************** Si todo esta ok **********************/
 		//Si todo esta ok
@@ -759,7 +762,7 @@ class UIWidgetsCommon {
 	}
 
 	/************************************************************************************************************/
-	public function widget_feed($Type, $Titulo, $Identificador, $URL, $MaxCount, $height, $ShowDesc, $ShowPubDate, $BASE){
+	public function widget_feed($Options){
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -767,17 +770,23 @@ class UIWidgetsCommon {
 		*
 		*=================================================    Modo de uso  =================================================
 		*
-		* 	$Common->widget_feed('www.data.cl/feed', 10, 200, true, true, 'www.google.com');
+		* 	//se imprime elemento
+		*   $Options = [
+		*		'Titulo'        => 'Titulo', //Titulo del Feed
+		*		'URL'           => 'URL',    //URL con la direccion del feed
+		*		'BASE'          => 'URL',    //Ruta de la raiz del sitio
+		*		'Identificador' => 'ID_xxx', //Identificador del div
+		*		'MaxCount'      => '40',     //Numero maximo de datos a solicitar (depende del feed)
+		*		'height'        => 200,      //Numero maximo de altura en px
+		*		'ShowDesc'      => true,     //Mostrar de forma ascendente
+		*		'ShowPubDate'   => false,    //Mostrar la fecha de publicacion
+		*		'Type'          => 1,        //Tipo de feed
+		*		'maxItems'      => 10,       //Numero de elementos para paginar
+		*	];
+		* 	$Common->widget_feed($Options);
 		*
 		*=================================================    Parametros   =================================================
-		* @input   string   $Titulo         Titulo del Feed
-		* @input   string   $Identificador  Identificador del div
-		* @input   string   $URL            URL con la direccion del feed
-		* @input   int      $MaxCount       Numero maximo de datos a solicitar
-		* @input   int      $height         Numero maximo de altura en px
-		* @input   bool     $ShowDesc       Mostrar de forma ascendente
-		* @input   bool     $ShowPubDate    Mostrar la fecha de publicacion
-		* @input   string   $BASE           Ruta de la raiz del sitio
+		* @input   array   $Options    array con los datos
 		* @return  string
 		*===================================================================================================================
 		*/
@@ -786,45 +795,48 @@ class UIWidgetsCommon {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2);
 		//Validaciones
-		if(!isset($Type) || $Type==''){                         echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Tipo de Feed.');}
-		if(!isset($Identificador) || $Identificador==''){       echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Identificador del div.');}
-		if(!isset($URL) || $URL==''){                           echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la URL con la direccion del feed.');}
-		if(!isset($MaxCount) || $MaxCount==''){                 echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Numero maximo de datos a solicitar.');}
-		if(!isset($ShowDesc) || $ShowDesc==''){                 echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado si se muestra la descripcion.');}
-		if(!isset($ShowPubDate) || $ShowPubDate==''){           echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado si se muestra la fecha de publicacion.');}
-		if(!isset($height) || $height==''){                     echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Numero maximo de altura en px.');}
-		if(!isset($BASE) || $BASE==''){                         echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de la raiz del sitio.');}
-		if(!$this->DataValidations->validarNumero($MaxCount)){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'El dato $MaxCount ingresado no es un numero.');}
-		if(!$this->DataValidations->validarNumero($height)){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'El dato $height ingresado no es un numero.');}
-		if(!in_array($Type, $tipos)){                           echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada no esta dentro de las opciones.');}
+		if(!isset($Options['URL']) || $Options['URL']==''){                                             echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la URL con la direccion del feed.');                exit;}
+		if(isset($Options['MaxCount'])&&!$this->DataValidations->validarNumero($Options['MaxCount'])){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'El dato $MaxCount ingresado no es un numero.');                     exit;}
+		if(isset($Options['height'])&&!$this->DataValidations->validarNumero($Options['height'])){      echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'El dato $height ingresado no es un numero.');                       exit;}
+		if(isset($Options['Type'])&&!in_array($Options['Type'], $tipos)){                               echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada no esta dentro de las opciones.'); exit;}
 
-		/********************** Si todo esta ok **********************/
+		/**********************  Definiciones   **********************/
+		$feed_Titulo       = $Options['Titulo'] ?? '';
+		$feed_URL          = $Options['URL'] ?? '';
+		$feed_BASE         = $Options['BASE'] ?? '';
+		$feed_ID           = $Options['Identificador'] ?? 'div_feed_'.uniqid();
+		$feed_MaxCount     = $Options['MaxCount'] ?? 5;
+		$feed_height       = $Options['height'] ?? 400;
+		$feed_ShowDesc     = $Options['ShowDesc']  ?? 'true';
+		$feed_ShowPubDate  = $Options['ShowPubDate'] ?? 'true';
+		$feed_Type         = $Options['Type'] ?? 1;
+		$feed_maxItems     = $Options['maxItems'] ?? 40;
+
+        /********************** Si todo esta ok **********************/
 		/****************************************/
 		//$Type:
 		//		1 - Normal
 		//		2 - Mini
 		/****************************************/
-		$widget  = '<link type="text/css" rel="stylesheet" href="'.$BASE.'/vendor/rss_reader/rssReader_'.$Type.'.css" />';
-		$widget .= '<script type="text/javascript"          src="'.$BASE.'/vendor/rss_reader/rssReader.js"></script>';
+		$widget  = '<link type="text/css" rel="stylesheet" href="'.$feed_BASE.'/vendor/rss_reader/rssReader.css?get='.time().'"/>';
+		$widget .= '<script type="text/javascript"          src="'.$feed_BASE.'/vendor/rss_reader/rssReader.js?get='.time().'"></script>';
 		$widget .= '
-		<div id="rssReader_'.$Identificador.'"></div>
+		<div id="rssReader_'.$feed_ID.'"></div>
 		<script type="text/javascript">
 			// Inicialización
 			$(document).ready(function() {
-				new RSSReader("#rssReader_'.$Identificador.'", {
-					cardTitle: "'.$Titulo.'",        /* Titulo del feed */
-					feedUrl: "'.$URL.'",             /* URL de los datos */
-					itemsPerPage: '.$MaxCount.',     /* cantidad de post a mostrar */
-					showDescription: '.$ShowDesc.',  /* Mostrar descripcion (true-false) */
-					showPubDate: '.$ShowPubDate.',   /* Mostrar fecha de publicacion (true-false) */
-					maxHeight: "'.$height.'px"       /* Altura del div */
+				new RSSReader("#rssReader_'.$feed_ID.'", {
+					cardTitle: "'.$feed_Titulo.'",        /* Titulo del feed */
+					feedUrl: "'.$feed_URL.'",             /* URL de los datos */
+					itemsPerPage: '.$feed_MaxCount.',     /* cantidad de post a mostrar */
+					showDescription: '.$feed_ShowDesc.',  /* Mostrar descripcion (true-false) */
+					showPubDate: '.$feed_ShowPubDate.',   /* Mostrar fecha de publicacion (true-false) */
+					maxHeight: "'.$feed_height.'px",      /* Altura del div */
+    				maxItems:'.$feed_maxItems.',          /* Numero maximo de noticias */
+    				feed_Type:'.$feed_Type.',             /* Tipo de Feed */
 				});
 			});
 		</script>';
-		//Si es la version mini
-		if($Type==2){
-			$widget .= '<style>#rssReader_'.$Identificador.' .rss-img {display: none;}</style>';
-		}
 
 		/**********************/
 		//Imprimir dato
@@ -832,7 +844,7 @@ class UIWidgetsCommon {
 	}
 
 	/************************************************************************************************************/
-	public function widget_radio_player($BASE){
+	public function widget_mejs_radio_player($BASE){
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -840,7 +852,7 @@ class UIWidgetsCommon {
 		*
 		*=================================================    Modo de uso  =================================================
 		*
-		* 	$Common->widget_radio_player('www.google.com');
+		* 	$Common->widget_mejs_radio_player('www.google.com');
 		*
 		*=================================================    Parametros   =================================================
 		* @input   string   $BASE   Ruta de la raiz del sitio
@@ -1057,6 +1069,1195 @@ class UIWidgetsCommon {
 		echo $input;
 
 	}
+
+	/************************************************************************************************************/
+	public function widget_radio_player($BASE, $Type){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Permite generar un reproductor de radio
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	$Common->widget_radio_player('www.google.com');
+		*
+		*=================================================    Parametros   =================================================
+		* @input   string   $BASE   Ruta de la raiz del sitio
+		* @input   string   $Type   Tipo de radio a mostrar
+		* @return  string
+		*===================================================================================================================
+		*/
+
+		/**********************  Validaciones   **********************/
+		//se definen las opciones disponibles
+		$tipos = array(1, 2);
+		//Validaciones
+		//if(!isset($BASE) || $BASE==''){              echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de la raiz del sitio.');                    exit;}
+		if(!isset($Type) || $Type==''){              echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el tipo de configuracion.');                        exit;}
+		if(isset($Type)&&!in_array($Type, $tipos)){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada no esta dentro de las opciones.'); exit;}
+
+		/********************** Si todo esta ok **********************/
+		$widget  = '
+		<link type="text/css" rel="stylesheet" href="'.$BASE.'/vendor/radio_player/radio_player.css?get='.time().'"/>
+		<div class="rp-wrap">
+			<div class="card radio-card" style="border-radius:var(--rp-border-radius-lg) !important;background:var(--rp-color-background-primary)">
+				<div class="card-body pb-2">
+					<div class="d-flex align-items-center gap-3 mb-3">
+						<div class="cover-box">
+							<img id="mainCoverImg" alt="cover">
+							<span id="mainCoverEmoji" style="font-size:28px">📻</span>
+						</div>
+						<div class="flex-grow-1 overflow-hidden">
+							<div class="d-flex align-items-center gap-2 mb-1">
+								<span class="live-dot" id="liveDot"></span>
+								<span style="font-size:11px;color:var(--rp-color-text-secondary)" id="statusTxt">Sin reproducir</span>
+							</div>
+							<div style="font-size:16px;font-weight:500;color:var(--rp-color-text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="mainName">Selecciona una emisora</div>
+							<div style="font-size:12px;color:var(--rp-color-text-secondary)" id="mainGenre">—</div>
+						</div>
+						<span class="badge-band" id="mainBand">—</span>
+					</div>
+					<div class="d-flex align-items-center gap-2 mb-2">
+						<button class="btn-ctrl" onclick="toggleTheme()" id="themeBtn" title="Cambiar tema">🌙</button>
+						<button class="btn-ctrl" onclick="playPrev()" title="Anterior">&#9198;</button>
+						<button class="btn-play-main" id="btnPlay" onclick="togglePlay()">&#9654;</button>
+						<button class="btn-ctrl" onclick="playNext()" title="Siguiente">&#9197;</button>
+						<button class="btn-ctrl" id="btnMute" onclick="toggleMute()">&#128266;</button>
+						<input type="range" class="flex-grow-1" min="0" max="100" value="80" step="1" id="volSlider" oninput="setVol(this.value)" style="height:4px">
+						<span style="font-size:11px;color:var(--rp-color-text-secondary);min-width:30px;text-align:right" id="volPct">80%</span>
+					</div>';
+					//Si es minireproductor
+					if($Type==2){
+						$widget  .= '
+						<select class="station-select" id="stationSelect" onchange="loadStation(this.value)">
+							<option value="">— Elige una emisora —</option>
+						</select>';
+					}
+					$widget  .= '
+				</div>
+				<div class="stream-bar">
+					<div class="stream-stat">Estado: <strong id="streamState">—</strong></div>
+					<div class="stream-divider"></div>
+					<div class="stream-stat">Bitrate: <strong id="streamBitrate">—</strong></div>
+					<div class="stream-divider"></div>
+					<div class="stream-stat">Tipo: <strong id="streamType">—</strong></div>
+				</div>';
+				//Si no es minireproductor
+				if($Type==1){
+					$widget  .= '
+					<div style="border-top:0.5px solid var(--rp-color-border-tertiary);padding:8px 12px">
+						<input type="text" class="form-control form-control-sm" id="srch" placeholder="Buscar emisora..." oninput="renderList()" style="background:var(--rp-color-background-secondary);color:var(--rp-color-text-primary);border:0.5px solid var(--rp-color-border-tertiary);font-size:13px">
+					</div>
+					<div class="cat-pills" id="catPills"></div>
+					<div class="list-scroll" id="stList"></div>';
+				}
+				$widget  .= '
+			</div>
+		</div>
+		<script>
+			//Ubicacion de las caratulas
+			let rp_covers = "'.$BASE.'/vendor/mejs-player/emisoras/";
+			let rp_Type   = '.$Type.';
+		</script>
+		<script type="text/javascript" src="'.$BASE.'/vendor/radio_player/radio_player.js?get='.time().'"></script>';
+
+		/**********************/
+		//Imprimir dato
+		echo $widget;
+
+	}
+
+	/************************************************************************************************************/
+	public function widget_meteo($Options){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Permite generar elementos para mostrar la prevision meteorologica
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//se imprime elemento
+		*   $Options = [
+		*		'BASE'        => 'URL',    //Ruta de la raiz del sitio
+		*		'Type'        => 1,        //Tipo de widget
+		*		'latitude'    => -33.45,   //Latitud
+		*		'longitude'   => -70.66,   //Longitud
+		*	];
+		* 	$Common->widget_meteo($Options);
+		*
+		*=================================================    Parametros   =================================================
+		* @input   array   $Options    array con los datos
+		* @return  string
+		*===================================================================================================================
+		*/
+
+		/**********************  Validaciones   **********************/
+		//se definen las opciones disponibles
+		$tipos = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11);
+		//Validaciones
+		if(isset($Options['Type'])&&!in_array($Options['Type'], $tipos)){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada no esta dentro de las opciones.'); exit;}
+
+		/**********************  Definiciones   **********************/
+		$Type       = $Options['Type'] ?? 1;
+		$latitude   = $Options['latitude'] ?? -33.45;
+		$longitude  = $Options['longitude'] ?? -70.66;
+
+		/********************** Si todo esta ok **********************/
+		switch ($Type) {
+			/****************************************/
+			case 1:
+				$widget  = '
+				<div class="weatherWidget_v1 loadMeteo_'.$Type.'">
+					<div class="card weather-widget shadow-sm">
+						<div class="card-body">
+							<div class="d-flex justify-content-between mb-3">
+								<h5 class="mb-0 weatherTitle">Clima</h5>
+							</div>
+							<!-- LOADER -->
+							<div class="text-center py-4 weatherLoader">
+								<div class="spinner-border text-primary"></div>
+								<div class="small text-muted mt-2">Obteniendo clima...</div>
+							</div>
+							<!-- CONTENIDO -->
+							<div class="weatherContent">
+								<div class="row align-items-center mb-4">
+									<div class="col-md-6 text-center">
+										<img class="weather-main-icon weatherIcon">
+									</div>
+									<div class="col-md-6">
+										<div class="weather-temp weatherTemp"></div>
+										<!-- MIN MAX -->
+										<div class="weather-minmax">
+											<span class="weatherMin"></span> / <span class="weatherMax"></span>
+										</div>
+										<div class="weather-extra">
+											<div>💧 Lluvia: <span class="weatherRain"></span>%</div>
+											<div>💨 Viento: <span class="weatherWind"></span> km/h</div>
+											<div>💦 Humedad: <span class="weatherHumidity"></span>%</div>
+										</div>
+									</div>
+								</div>
+								<div class="row text-center mt-3 weatherWeek"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 2:
+				$widget  = '
+				<div class="weatherWidget_v1 loadMeteo_'.$Type.'">
+					<div class="card weather-widget shadow-sm">
+						<div class="card-body">
+							<div class="d-flex justify-content-between mb-3">
+								<h5 class="mb-0 weatherTitle">Clima</h5>
+							</div>
+							<!-- LOADER -->
+							<div class="text-center py-4 weatherLoader">
+								<div class="spinner-border text-primary"></div>
+								<div class="small text-muted mt-2">Obteniendo clima...</div>
+							</div>
+							<!-- CONTENIDO -->
+							<div class="weatherContent">
+								<div class="row align-items-center mb-4">
+									<div class="col-md-6 text-center">
+										<img class="weather-main-icon weatherIcon">
+									</div>
+									<div class="col-md-6">
+										<div class="weather-temp weatherTemp"></div>
+										<!-- MIN MAX -->
+										<div class="weather-minmax">
+											<span class="weatherMin"></span> / <span class="weatherMax"></span>
+										</div>
+										<div class="weather-extra">
+											<div>💧 Lluvia: <span class="weatherRain"></span>%</div>
+											<div>💨 Viento: <span class="weatherWind"></span> km/h</div>
+											<div>💦 Humedad: <span class="weatherHumidity"></span>%</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 3:
+				$widget  = '
+				<div class="weatherWidget_v1 loadMeteo_'.$Type.'">
+					<div class="card weather-widget shadow-sm">
+						<div class="card-body">
+							<div class="d-flex justify-content-between mb-3">
+								<h5 class="mb-0 weatherTitle">Clima</h5>
+							</div>
+							<!-- LOADER -->
+							<div class="text-center py-4 weatherLoader">
+								<div class="spinner-border text-primary"></div>
+								<div class="small text-muted mt-2">Obteniendo clima...</div>
+							</div>
+							<!-- CONTENIDO -->
+							<div class="weatherContent">
+								<div class="row text-center mt-3 weatherWeek"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 4:
+				$widget  = '
+				<div class="weatherWidget_v2 loadMeteo_'.$Type.'">
+					<div class="card text-body" style=" border-radius: 35px;">
+						<div class="card-body p-4">
+							<!-- LOADER -->
+							<div class="text-center py-4 weatherLoader">
+								<div class="spinner-border text-primary"></div>
+								<div class="small text-muted mt-2">Obteniendo clima...</div>
+							</div>
+							<!-- CONTENIDO -->
+							<div class="weatherContent">
+								<div class="d-flex"><h6 class="flex-grow-1 weatherTitle">Clima</h6></div>
+								<div class="d-flex flex-column text-center mt-5 mb-4">
+									<h6 class="display-4 mb-0 font-weight-bold weatherTemp"></h6>
+									<span class="small" style="color: #868B94"><span class="weatherMin"></span> / <span class="weatherMax"></span></span>
+								</div>
+								<div class="d-flex align-items-center">
+									<div class="flex-grow-1" style="font-size: 1rem;">
+										<div>💧 Lluvia: <span class="ms-1 weatherRain"></span>%</div>
+										<div>💨 Viento: <span class="ms-1 weatherWind"></span> km/h</div>
+										<div>💦 Humedad: <span class="ms-1 weatherHumidity"></span>%</div>
+									</div>
+									<div><img width="100px" class="weatherIcon"></div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 5:
+				$widget  = '
+				<div class="weatherWidget_v3 loadMeteo_'.$Type.'">
+					<div class="card" style="border-radius: 35px;border: none;">
+						<div class="bg-image" style="border-radius: 35px;">
+							<img src="'.$Options['BASE'].'/img/meteo/draw1.jpg" class="card-img" alt="weather" style="border-radius: 35px;" />
+						</div>
+						<div class="card-img-overlay text-dark p-5" style="border-radius: 35px;">
+							<!-- LOADER -->
+							<div class="text-center py-4 weatherLoader">
+								<div class="spinner-border text-primary"></div>
+								<div class="small text-muted mt-2">Obteniendo clima...</div>
+							</div>
+							<!-- CONTENIDO -->
+							<div class="weatherContent">
+
+								<h4 class="mb-0 weatherTitle">Clima</h4>
+								<p class="display-2 my-3 weatherTemp"></p>
+								<p class="mb-2"><span class="weatherMin"></span> / <span class="weatherMax"></span></p>
+								<div class="flex-grow-1" style="font-size: 1rem;">
+									<div>
+									💧 <span class="ms-1 weatherRain"></span>% /
+									💨 <span class="ms-1 weatherWind"></span> km/h /
+									💦 <span class="ms-1 weatherHumidity"></span>%
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 6:
+				$widget  = '
+				<div class="weatherWidget_v4 loadMeteo_'.$Type.'">
+					<!-- LOADER -->
+					<div class="text-center py-4 weatherLoader">
+						<div class="spinner-border text-primary"></div>
+						<div class="small text-muted mt-2">Obteniendo clima...</div>
+					</div>
+					<!-- CONTENIDO -->
+					<div class="weatherContent">
+						<div class="weather-card">
+							<div class="top" style="background: url(\''.$Options['BASE'].'/img/meteo/draw1.jpg\') no-repeat;">
+								<div class="wrapper">
+									<h1 class="heading weatherTitle">Clima</h1>
+									<h3 class="location"><span class="weatherMin"></span> / <span class="weatherMax"></span></h3>
+									<p class="temp-value weatherTemp"></p>
+								</div>
+							</div>
+							<div class="bottom">
+								<div class="wrapper">
+									<ul class="forecast weatherWeek"></ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 7:
+				$widget  = '
+				<div class="weatherWidget_v4 loadMeteo_'.$Type.'">
+					<!-- LOADER -->
+					<div class="text-center py-4 weatherLoader">
+						<div class="spinner-border text-primary"></div>
+						<div class="small text-muted mt-2">Obteniendo clima...</div>
+					</div>
+					<!-- CONTENIDO -->
+					<div class="weatherContent">
+						<div class="weather-card">
+							<div class="top" style="background: url(\''.$Options['BASE'].'/img/meteo/draw1.jpg\') no-repeat;">
+								<div class="wrapper">
+									<h1 class="heading weatherTitle">Clima</h1>
+									<h3 class="location"><span class="weatherMin"></span> / <span class="weatherMax"></span></h3>
+									<p class="temp-value weatherTemp"></p>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 8:
+				$widget  = '
+				<div class="weatherWidget_v4 loadMeteo_'.$Type.'">
+					<!-- LOADER -->
+					<div class="text-center py-4 weatherLoader">
+						<div class="spinner-border text-primary"></div>
+						<div class="small text-muted mt-2">Obteniendo clima...</div>
+					</div>
+					<!-- CONTENIDO -->
+					<div class="weatherContent">
+						<div class="weather-card">
+							<div class="bottom">
+								<div class="wrapper">
+									<ul class="forecast weatherWeek"></ul>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 9:
+				$widget  = '
+				<div class="weatherWidget_v5 loadMeteo_'.$Type.'">
+					<div id="card" class="weater">
+						<!-- LOADER -->
+						<div class="text-center py-4 weatherLoader">
+							<div class="spinner-border text-primary"></div>
+							<div class="small text-muted mt-2">Obteniendo clima...</div>
+						</div>
+						<!-- CONTENIDO -->
+						<div class="weatherContent">
+							<div class="city-selected">
+								<article>
+									<div class="info">
+										<div class="city weatherTitle">Clima</div>
+										<div class="night"><span class="weatherMin"></span> / <span class="weatherMax"></span></div>
+										<div class="temp weatherTemp"></div>
+										<div class="wind">
+											<div>💧 Lluvia: <span class="ms-1 weatherRain"></span>%</div>
+											<div>💨 Viento: <span class="ms-1 weatherWind"></span> km/h</div>
+											<div>💦 Humedad: <span class="ms-1 weatherHumidity"></span>%</div>
+										</div>
+									</div>
+									<div class="icon">
+										<img class="weather-main-icon weatherIcon">
+									</div>
+								</article>
+							</div>
+							<div class="days">
+								<div class="row row-no-gutter weatherWeek"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 10:
+				$widget  = '
+				<div class="weatherWidget_v5 loadMeteo_'.$Type.'">
+					<div id="card" class="weater">
+						<!-- LOADER -->
+						<div class="text-center py-4 weatherLoader">
+							<div class="spinner-border text-primary"></div>
+							<div class="small text-muted mt-2">Obteniendo clima...</div>
+						</div>
+						<!-- CONTENIDO -->
+						<div class="weatherContent">
+							<div class="city-selected">
+								<article>
+									<div class="info">
+										<div class="city weatherTitle">Clima</div>
+										<div class="night"><span class="weatherMin"></span> / <span class="weatherMax"></span></div>
+										<div class="temp weatherTemp"></div>
+										<div class="wind">
+											<div>💧 Lluvia: <span class="ms-1 weatherRain"></span>%</div>
+											<div>💨 Viento: <span class="ms-1 weatherWind"></span> km/h</div>
+											<div>💦 Humedad: <span class="ms-1 weatherHumidity"></span>%</div>
+										</div>
+									</div>
+									<div class="icon">
+										<img class="weather-main-icon weatherIcon">
+									</div>
+								</article>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+			/****************************************/
+			case 11:
+				$widget  = '
+				<div class="weatherWidget_v5 loadMeteo_'.$Type.'">
+					<div id="card" class="weater">
+						<!-- LOADER -->
+						<div class="text-center py-4 weatherLoader">
+							<div class="spinner-border text-primary"></div>
+							<div class="small text-muted mt-2">Obteniendo clima...</div>
+						</div>
+						<!-- CONTENIDO -->
+						<div class="weatherContent">
+							<div class="city-selected">
+								<article>
+									<div class="info">
+										<div class="city weatherTitle">Clima</div>
+									</div>
+								</article>
+							</div>
+							<div class="days">
+								<div class="row row-no-gutter weatherWeek"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+				<script>
+					document.querySelectorAll(".loadMeteo_'.$Type.'").forEach(el=>{
+						new WeatherWidget(el, "'.$Options['BASE'].'", '.$Options['Type'].', '.$latitude.', '.$longitude.');
+					});
+				</script>';
+				break;
+
+		}
+
+		/**********************/
+		//Imprimir dato
+		echo $widget;
+	}
+
+	/************************************************************************************************************/
+	public function widget_fileExplorer($Options){
+		/*
+		*=================================================     Detalles    =================================================
+		*
+		* Permite generar un explorador de archivos
+		*
+		*=================================================    Modo de uso  =================================================
+		*
+		* 	//se imprime elemento
+		*   $Options = [
+		*		'BASE'         => 'URL',                //Ruta de la raiz del sitio
+		*		'Route'        => 'carpeta/subcarpeta', //Ruta de la carpeta a mostrar
+		*		'ValidarTipo'  => 'word,excel',         //Archivos permitidos a mostrar
+		*	];
+		* 	$Common->widget_fileExplorer($Options);
+		*
+		*=================================================    Parametros   =================================================
+		* @input   array   $Options    array con los datos
+		* @return  array
+		*===================================================================================================================
+		*/
+
+		/**********************  Definiciones   **********************/
+		$fnc_Codification   = new FunctionsSecurityCodification();
+		$BASE               = $Options['BASE'];
+		$rootPaht           = (isset($Options['rootPaht'])&&$Options['rootPaht']!='') ? $Options['rootPaht'] : 'upload';
+		$SubRoute           = (isset($Options['Route'])&&$Options['Route']!='') ? $Options['Route'] : '';
+        $Route              = $fnc_Codification->encryptDecrypt('encrypt', $SubRoute);
+		$ValidarTipo        = (isset($Options['ValidarTipo'])&&$Options['ValidarTipo']!='') ? $Options['ValidarTipo'] : 'all';
+
+		/********************** Si todo esta ok **********************/
+		$widget  = '
+			<div class="file-explorer">
+
+				<!-- Toolbar -->
+				<div class="toolbar p-2 d-flex justify-content-between align-items-center">
+					<div class="btn-group">
+						<button class="btn btn-sm btn-outline-secondary" onclick="setView(\'grid\')"><i class="bi bi-grid"></i></button>
+						<button class="btn btn-sm btn-outline-secondary" onclick="setView(\'list\')"><i class="bi bi-card-list"></i></button>
+					</div>
+					<div class="btn-group">
+						<button class="btn btn-sm btn-primary"           onclick="document.getElementById(\'fileInput\').click()"><i class="bi bi-upload"></i> Subir Archivo</button>
+    					<button class="btn btn-sm btn-outline-primary"   onclick="createNewFolder()"><i class="bi bi-folder-plus"></i> Crear Carpeta</button>
+					</div>
+
+					<input type="file" id="fileInput" style="display:none" onchange="uploadFile(this)">
+
+					<div class="input-group input-group-sm" style="max-width: 250px;">
+						<span class="input-group-text"><i class="bi bi-search"></i></span>
+						<input type="text" id="searchInput" class="form-control" placeholder="Buscar...">
+					</div>
+				</div>
+
+				<!-- Breadcrumb -->
+				<div class="p-2 border-bottom">
+					<nav><ol class="breadcrumb" id="breadcrumb"></ol></nav>
+				</div>
+
+				<!-- Lista de archivos -->
+				<div class="table-responsive file-content">
+					<div id="gridView" class="file-grid"></div>
+					<table id="listView" class="table table-hover bg-white d-none">
+						<thead>
+							<tr>
+								<th>Nombre</th>
+								<th>Tamaño</th>
+								<th>Fecha</th>
+							</tr>
+						</thead>
+						<tbody id="fileList"></tbody>
+					</table>
+				</div>
+
+			</div>
+
+			<!-- MODAL PREVIEW -->
+			<div class="modal fade" id="previewModal">
+				<div class="modal-dialog modal-xl">
+					<div class="modal-content">
+						<div class="modal-header">
+							<h5 class="modal-title" id="previewTitle"></h5>
+							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+						</div>
+						<div class="modal-body" id="previewBody"></div>
+						<div class="modal-footer">
+							<div class="d-grid gap-2 d-md-flex justify-content-md-end w-100" id="previewActions"></div>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<style>
+				.file-explorer {overflow: hidden;background: #fff;border: 1px solid var(--card-border-color);border-radius: 5px;}
+				.file-explorer .toolbar {background: #f1f3f5;border-bottom: 1px solid #dee2e6;}
+				.file-explorer .breadcrumb {margin-bottom: 0;}
+				.file-explorer .file-content{min-height:400px;}
+
+				.file-explorer .file-grid {display: grid;grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));gap: 15px;}
+				.file-explorer .file-card {background: white;border-radius: 10px;padding: 15px;text-align: center;transition: 0.2s;}
+				.file-explorer .file-card:hover {background: #e9f2ff;cursor: pointer;}
+				.file-explorer .file-icon {font-size: 40px;}
+				.file-explorer .file-name {font-size: 13px;word-break: break-word;}
+				.file-explorer .view-toggle button {margin-left: 5px;}
+
+				.file-explorer .table thead {background-color: #f8f9fa;}
+				.file-explorer .table tbody tr td {cursor: pointer;}
+			</style>
+
+			<script>
+
+				let currentPath = "";
+				let currentView = "grid";
+				let allFiles    = [];
+
+				/**
+				 * ===============================
+				 * CONFIGURACIÓN DE SEGURIDAD
+				 * ===============================
+				 */
+				const EXCLUDED_NAMES = [
+					".htaccess", ".htpasswd", ".env", ".env.local", ".env.production", ".env.dev",
+					".gitignore", ".gitattributes", "config.php", "configuration.php", "settings.php",
+					"web.config", "composer.json", "composer.lock", "package.json", "package-lock.json",
+					"yarn.lock", "Dockerfile", "docker-compose.yml", "phpunit.xml", "README.md",
+					"LICENSE", "error_log", "access.log"
+				];
+
+				const EXCLUDED_EXTENSIONS = [
+					"php", "php3", "php4", "php5", "phtml", "phar",
+					"ini", "env", "conf", "config", "yaml", "yml", "toml",
+					"log",
+					"sh", "bash", "zsh", "bat", "cmd", "ps1",
+					"exe", "bin", "run",
+					"sql", "bak", "old", "backup", "dump",
+					"cgi", "pl", "py", "rb", "jsp", "asp", "aspx"
+				];
+
+				const EXCLUDED_FOLDERS = [
+					".git", ".svn", ".hg",
+					"node_modules", "vendor",
+					".idea", ".vscode",
+					"bin", "etc", "var", "proc", "sys", "dev", "tmp",
+					"logs", "log", "cache", "storage",
+					"backup", "backups",
+					".docker", ".github",
+					"tests", "test"
+				];
+
+				function sanitizePath(path) {
+					return path.replace(/\.\./g, "");
+				}
+
+				/**
+				 * ===============================
+				 * FILTRO DE SEGURIDAD
+				 * ===============================
+				 */
+				function isAllowed(file) {
+					const name = file.name.toLowerCase();
+
+					// Excluir por nombre exacto
+					if (EXCLUDED_NAMES.includes(name)) return false;
+
+					// Excluir carpetas completas
+					if (file.type === "folder" && EXCLUDED_FOLDERS.includes(name)) return false;
+
+					// Excluir por extensión
+					const extMatch = name.match(/\.([^.]+)$/);
+					if (extMatch) {
+						const ext = extMatch[1];
+						if (EXCLUDED_EXTENSIONS.includes(ext)) return false;
+					}
+
+					return true;
+				}
+
+				async function loadFiles(path = "") {
+					path = sanitizePath(path);
+
+					let finalPath = "";
+
+					if (!path) {
+						finalPath = "asdqwe";
+					} else {
+						let cleanedPath = path.replace(/^\//, "");
+						cleanedPath = cleanedPath.replace(/\//g, "ntn");
+						finalPath = cleanedPath;
+					}
+
+					const res   = await fetch(`'.$BASE.'/core/fileExplorer/updateList/'.$Route.'/'.$ValidarTipo.'/${finalPath}`);
+					let files   = await res.json();
+					currentPath = path;
+
+					/**
+					 * ===============================
+					 * APLICAR FILTRO DE SEGURIDAD
+					 * ===============================
+					 */
+					files = files.filter(isAllowed);
+
+					/**
+					 * ===============================
+					 * ORDEN: carpetas primero + archivos
+					 * ===============================
+					 */
+					const folders = files
+						.filter(f => f.type === "folder")
+						.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: \'base\' }));
+
+					const others = files
+						.filter(f => f.type !== "folder")
+						.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: \'base\' }));
+
+					const sortedFiles = [...folders, ...others];
+
+					/* Buscador */
+					allFiles = sortedFiles;
+					document.getElementById("searchInput").value = "";
+					/* Render */
+					render(sortedFiles);
+					renderBreadcrumb();
+				}
+
+				function render(files) {
+					renderGrid(files);
+					renderList(files);
+				}
+
+				function renderGrid(files) {
+					const grid     = document.getElementById("gridView");
+					grid.innerHTML = "";
+
+					files.forEach(file => {
+						const div = document.createElement("div");
+						div.className = "file-card";
+
+						div.ondblclick = () => openItem(file);
+
+						div.innerHTML = `
+							<div class="file-icon">${getIcon(file)}</div>
+							<div class="file-name">${file.name}</div>
+						`;
+
+						grid.appendChild(div);
+					});
+				}
+
+				function renderList(files) {
+					const list     = document.getElementById("fileList");
+					list.innerHTML = "";
+
+					files.forEach(file => {
+						const row      = document.createElement("tr");
+						row.ondblclick = () => openItem(file);
+
+						row.innerHTML = `
+							<td>${getIcon(file)} ${file.name}</td>
+							<td>${file.size ? formatSize(file.size) : "-"}</td>
+							<td>${file.date}</td>
+						`;
+
+						list.appendChild(row);
+					});
+				}
+
+				function getIcon(file) {
+					if (file.type === "folder") return "<i class=\'bi bi-folder-fill text-warning\'></i>";
+
+					const name = file.name.toLowerCase();
+
+					// Obtener extensión
+					const extMatch = name.match(/\.([^.]+)$/);
+					const ext = extMatch ? extMatch[1] : "";
+
+					/**
+					 * ===============================
+					 * MAPEO DE ICONOS
+					 * ===============================
+					 */
+					const iconMap = {
+						// Imágenes
+						jpg: "bi-file-image text-info",
+						jpeg: "bi-file-image text-info",
+						png: "bi-file-image text-info",
+						gif: "bi-file-image text-info",
+						webp: "bi-file-image text-info",
+						svg: "bi-file-image text-info",
+						bmp: "bi-file-image text-info",
+
+						// PDF
+						pdf: "bi-file-pdf text-danger",
+
+						// Word
+						doc: "bi-file-word text-primary",
+						docx: "bi-file-word text-primary",
+						rtf: "bi-file-word text-primary",
+
+						// Excel
+						xls: "bi-file-excel text-success",
+						xlsx: "bi-file-excel text-success",
+						csv: "bi-file-excel text-success",
+
+						// PowerPoint
+						ppt: "bi-file-ppt text-warning",
+						pptx: "bi-file-ppt text-warning",
+
+						// Código
+						js: "bi-filetype-js text-warning",
+						html: "bi-filetype-html text-danger",
+						css: "bi-filetype-css text-primary",
+						json: "bi-filetype-json text-info",
+						xml: "bi-filetype-xml text-secondary",
+						py: "bi-filetype-py text-warning",
+						java: "bi-filetype-java text-danger",
+						c: "bi-filetype-c text-primary",
+						cpp: "bi-filetype-cpp text-primary",
+						cs: "bi-filetype-cs text-success",
+						php: "bi-filetype-php text-indigo",
+
+						// Texto
+						txt: "bi-file-text text-secondary",
+						md: "bi-file-text text-secondary",
+
+						// Comprimidos
+						zip: "bi-file-zip text-warning",
+						rar: "bi-file-zip text-warning",
+						/*7z: "bi-file-zip text-warning",*/
+						tar: "bi-file-zip text-warning",
+						gz: "bi-file-zip text-warning",
+
+						// Video
+						mp4: "bi-file-play text-danger",
+						avi: "bi-file-play text-danger",
+						mkv: "bi-file-play text-danger",
+						mov: "bi-file-play text-danger",
+
+						// Audio
+						mp3: "bi-file-music text-success",
+						wav: "bi-file-music text-success",
+						ogg: "bi-file-music text-success",
+
+						// Otros
+						exe: "bi-file-earmark-binary text-dark",
+						apk: "bi-file-earmark-binary text-success"
+					};
+
+					const iconClass = iconMap[ext] || "bi-file-earmark text-muted";
+
+					return `<i class="bi ${iconClass}"></i>`;
+				}
+
+				function openItem(file) {
+					if (file.type === "folder") {
+						loadFiles(currentPath + "/" + file.name);
+					} else {
+						preview(file);
+					}
+				}
+
+				function renderBreadcrumb() {
+					const breadcrumb     = document.getElementById("breadcrumb");
+					breadcrumb.innerHTML = "";
+
+					const parts = currentPath.split("/").filter(Boolean);
+					let path    = "";
+
+					breadcrumb.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="loadFiles(\'\')"><i class="bi bi-house-door"></i> Inicio</a></li>`;
+
+					parts.forEach(p => {
+						path                 += "/" + p;
+						breadcrumb.innerHTML += `<li class="breadcrumb-item"><a href="#" onclick="loadFiles(\'${path}\')">${p}</a></li>`;
+					});
+				}
+
+				function setView(view) {
+					currentView = view;
+
+					document.getElementById("gridView").classList.toggle("d-none", view !== "grid");
+					document.getElementById("listView").classList.toggle("d-none", view !== "list");
+				}
+
+				function formatSize(bytes) {
+					return (bytes / 1024).toFixed(1) + " KB";
+				}
+
+				function filterFiles(query) {
+					const q = query.toLowerCase().trim();
+
+					if (!q) {
+						render(allFiles);
+						return;
+					}
+
+					const filtered = allFiles.filter(file =>
+						file.name.toLowerCase().includes(q)
+					);
+
+					render(filtered);
+				}
+
+				document.getElementById("searchInput").addEventListener("input", function () {
+					filterFiles(this.value);
+				});
+
+				/**
+				 * Crea una nueva carpeta en la ruta actual
+				 */
+				async function createNewFolder() {
+					// Lanzamos el diálogo de SweetAlert2
+					const { value: folderName } = await Swal.fire({
+						title: "Nueva Carpeta",
+						input: "text",
+						inputLabel: "Introduce el nombre de la carpeta:",
+						inputPlaceholder: "Ej: Vacaciones 2026",
+						showCancelButton: true,
+						confirmButtonText: "<i class=\'bi bi-check-circle\'></i> Crear",
+						cancelButtonText: "<i class=\'bi bi-x-circle\'></i> Cancelar",
+						confirmButtonColor: "#81A1C1",
+						cancelButtonColor: "#EA5757",
+            			reverseButtons: true,
+						inputValidator: (value) => {
+							if (!value || value.trim() === "") {
+								return "¡Necesitas escribir un nombre!";
+							}
+						}
+					});
+
+					// Si el usuario canceló o cerró el diálogo, folderName será undefined
+					if (!folderName) return;
+
+					// Preparamos los datos
+					const formData = new FormData();
+					formData.append("base", "'.$BASE.'"); // Asegúrate de que esto imprima bien el valor
+					formData.append("SubRoute", "'.$SubRoute.'");
+					formData.append("path", currentPath);
+					formData.append("name", folderName.trim());
+
+					try {
+						const res = await fetch(`'.$BASE.'/core/fileExplorer/createFolder`, {
+							method: "POST",
+							body: formData
+						});
+						const result = await res.json();
+						if (result.success) {
+							// Notificación de éxito
+							Swal.fire({position: "top-end",timer: 5000,showConfirmButton: false,timerProgressBar: true,icon: "success",text: "La carpeta se ha creado correctamente."});
+							loadFiles(currentPath);
+						} else {
+							// Notificación de error del servidor
+							Swal.fire({position: "top-end",timer: 5000,showConfirmButton: false,timerProgressBar: true,icon: "error",text: result.message || "No se pudo crear la carpeta."});
+						}
+					} catch (error) {
+						console.error("Error al crear carpeta:", error);
+						Swal.fire({position: "top-end",timer: 5000,showConfirmButton: false,timerProgressBar: true,icon: "error",text: "Hubo un problema al comunicarse con el servidor."});
+					}
+				}
+
+				/**
+				 * Sube un archivo a la ruta actual
+				 */
+				async function uploadFile(input) {
+					if (input.files.length === 0) return;
+
+					const file = input.files[0];
+					const formData = new FormData();
+					formData.append("base", "'.$BASE.'"); // Asegúrate de que esto imprima bien el valor
+					formData.append("SubRoute", "'.$SubRoute.'");
+					formData.append("file", file);
+					formData.append("path", currentPath);
+
+					try {
+						// Mostramos un feedback visual simple
+						const btn = document.querySelector(\'button[onclick*="fileInput"]\');
+						const originalText = btn.innerHTML;
+						btn.innerHTML = `<span class="spinner-border spinner-border-sm"></span> Subiendo...`;
+						btn.disabled = true;
+
+						const res = await fetch(`'.$BASE.'/core/fileExplorer/uploadFile`, {
+							method: "POST",
+							body: formData
+						});
+
+						const result = await res.json();
+						btn.innerHTML = originalText;
+						btn.disabled = false;
+
+						if (result.success) {
+							loadFiles(currentPath);
+							input.value = ""; // Reset input
+						} else {
+							alert("Error: " + result.message);
+						}
+					} catch (error) {
+						alert("Error de conexión al subir archivo.");
+					}
+				}
+
+				/**
+				 * ===============================
+				 * PREVIEW REAL
+				 * ===============================
+				 */
+				function preview(file) {
+					const modal    = new bootstrap.Modal(document.getElementById("previewModal"));
+					const body     = document.getElementById("previewBody");
+					const actions  = document.getElementById("previewActions"); // NUEVO contenedor de acciones
+					const filePath = `'.$BASE.'/'.$rootPaht.'/'.$SubRoute.'${currentPath}/${file.name}`;
+					const name     = file.name.toLowerCase();
+
+					document.getElementById("previewTitle").innerText = file.name;
+
+					// Loader inicial
+					body.innerHTML = `
+						<div class="text-center p-5">
+							<div class="spinner-border text-primary"></div>
+							<div class="mt-3 text-muted">Cargando preview...</div>
+						</div>
+					`;
+
+					// BOTÓN DESCARGA GLOBAL
+					actions.innerHTML = `
+						<a href="${filePath}" class="btn btn-success" download>
+							<i class="bi bi-download"></i> Descargar
+						</a>
+					`;
+
+					/* ===============================
+					* IMÁGENES
+					* =============================== */
+					if (name.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/)) {
+						body.innerHTML = `
+							<div class="text-center">
+								<img src="${filePath}" class="img-fluid rounded shadow">
+							</div>
+						`;
+					}
+
+					/* ===============================
+					* PDF
+					* =============================== */
+					else if (name.endsWith(".pdf")) {
+						body.innerHTML = `
+							<iframe src="${filePath}" width="100%" height="600px" style="border:none;"></iframe>
+						`;
+					}
+
+					/* ===============================
+					* VIDEO
+					* =============================== */
+					else if (name.match(/\.(mp4|webm|ogg|mov|mkv)$/)) {
+						body.innerHTML = `
+							<video controls class="w-100 rounded shadow">
+								<source src="${filePath}">
+								Tu navegador no soporta video.
+							</video>
+						`;
+					}
+
+					/* ===============================
+					* AUDIO
+					* =============================== */
+					else if (name.match(/\.(mp3|wav|ogg|aac|flac)$/)) {
+						body.innerHTML = `
+							<div class="p-4">
+								<audio controls class="w-100">
+									<source src="${filePath}">
+									Tu navegador no soporta audio.
+								</audio>
+							</div>
+						`;
+					}
+
+					/* ===============================
+					* TEXTO / CÓDIGO
+					* =============================== */
+					else if (name.match(/\.(txt|json|js|css|html|md|xml|csv|log|env|ini)$/)) {
+						fetch(filePath)
+							.then(res => res.text())
+							.then(text => {
+								body.innerHTML = `
+									<pre style="
+										text-align:left;
+										max-height:600px;
+										overflow:auto;
+										background:#0f172a;
+										color:#e2e8f0;
+										padding:15px;
+										border-radius:10px;
+										font-size:13px;
+									">${escapeHtml(text)}</pre>
+								`;
+							})
+							.catch(() => {
+								body.innerHTML = `<p class="text-danger">Error al cargar archivo</p>`;
+							});
+					}
+
+					/* ===============================
+					* HTML (SANDBOX SEGURO)
+					* =============================== */
+					else if (name.endsWith(".html")) {
+						body.innerHTML = `
+							<iframe src="${filePath}" width="100%" height="600px" sandbox></iframe>
+						`;
+					}
+
+					/* ===============================
+					* DOCUMENTOS OFFICE
+					* =============================== */
+					else if (name.match(/\.(doc|docx|xls|xlsx|ppt|pptx)$/)) {
+						body.innerHTML = `
+							<iframe 
+								src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(location.origin + filePath)}"
+								width="100%" 
+								height="600px"
+								style="border:none;">
+							</iframe>
+						`;
+					}
+
+					/* ===============================
+					* ARCHIVOS COMPRIMIDOS
+					* =============================== */
+					else if (name.match(/\.(zip|rar|7z|tar|gz)$/)) {
+						body.innerHTML = `
+							<div class="p-5 text-center">
+								<i class="bi bi-file-zip fs-1 text-warning"></i>
+								<p class="mt-3">Archivo comprimido</p>
+								<small class="text-muted">No se puede previsualizar, pero puedes descargarlo</small>
+							</div>
+						`;
+					}
+
+					/* ===============================
+					* FALLBACK UNIVERSAL
+					* =============================== */
+					else {
+						body.innerHTML = `
+							<div class="p-5 text-center">
+								<i class="bi bi-file-earmark fs-1 text-muted"></i>
+								<p class="mt-3">Vista previa no disponible</p>
+								<small class="text-muted">Tipo de archivo no soportado</small>
+							</div>
+						`;
+					}
+
+					modal.show();
+				}
+
+				loadFiles();
+
+			</script>
+
+		';
+
+		/**********************/
+		//Imprimir dato
+		echo $widget;
+	}
+
+
 
 
 }

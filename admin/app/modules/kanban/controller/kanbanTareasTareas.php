@@ -243,8 +243,10 @@ class kanbanTareasTareas extends ControllerBase {
                         'table'     => 'kanban_tareas_tareas',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_1 = $this->dataCheck_1($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query];
+                    $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
                     $this->Base_insert($xParams);
                 }
             }
@@ -268,8 +270,10 @@ class kanbanTareasTareas extends ControllerBase {
                 'table'     => 'kanban_tareas_historial',
                 'Post'      => $arrTareas
             ];
+            //Se genera el chequeo
+            $dataCheck_2 = $this->dataCheck_2($arrTareas);
             //Ejecuto la query
-            $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+            $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
             $this->Base_insert($xParams);
 
             /******************************/
@@ -286,10 +290,6 @@ class kanbanTareasTareas extends ControllerBase {
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
-
-            /******************************/
             //Se genera la query
             $query = [
                 'data'      => 'Tarea,idEstadoTrabajo,idTrabajo',
@@ -300,8 +300,10 @@ class kanbanTareasTareas extends ControllerBase {
                 'where'     => 'idTareas',
                 'Post'      => $_POST
             ];
+            //Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($_POST);
             //Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
             /******************************/
@@ -388,8 +390,10 @@ class kanbanTareasTareas extends ControllerBase {
                         'table'     => 'kanban_tareas_historial',
                         'Post'      => $arrTareas
                     ];
+                    //Se genera el chequeo
+                    $dataCheck_2 = $this->dataCheck_2($arrTareas);
                     //Ejecuto la query
-                    $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
+                    $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
                     $this->Base_insert($xParams);
                 }
 
@@ -408,15 +412,18 @@ class kanbanTareasTareas extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
-    private function dataCheck($POST){
+    private function dataCheck_1($POST){
         //Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idKanban,idEstadoTrabajo,idTrabajo',
+            'ValidarEntero'             => 'idKanban,idEstadoTrabajo,idTrabajo',
             'ValidarRut'                => '',
             'ValidarPatente'            => '',
             'ValidarFecha'              => '',
@@ -430,6 +437,52 @@ class kanbanTareasTareas extends ControllerBase {
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        //Devuelvo
+        return $DataChecking;
+    }
+
+    //Se validan los datos
+    private function dataCheck_2($POST){
+        //Variables
+        $DataChecking = [
+            'emptyData'                 => '',
+            'encode'                    => '',
+            'ValidarEmail'              => '',
+            'ValidarNumero'             => 'idKanban,idUsuario',
+            'ValidarEntero'             => 'idKanban,idUsuario',
+            'ValidarRut'                => '',
+            'ValidarPatente'            => '',
+            'ValidarFecha'              => 'Fecha',
+            'ValidarHora'               => 'Hora',
+            'ValidarURL'                => '',
+            'ValidarLargoMinimo'        => 'Descripcion',
+            'ValidarLargoMinimoN'       => 3,
+            'ValidarLargoMaximo'        => '',
+            'ValidarLargoMaximoN'       => 255,
+            'ValidarPalabrasCensuradas' => 'Descripcion',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

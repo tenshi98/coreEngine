@@ -36,9 +36,17 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     $f3->route('GET /Core/Widgets/components',    'coreWidgets->components');     //Componentes
     $f3->route('GET /Core/Widgets/calendar',      'coreWidgets->calendar');       //Calendario
     $f3->route('GET /Core/Widgets/treeview',      'coreWidgets->treeview');       //Treeview
+    $f3->route('GET /Core/Widgets/codeVisor',     'coreWidgets->codeVisor');      //codeVisor
+    $f3->route('GET /Core/Widgets/meteo',         'coreWidgets->meteo');          //Widget meteorologico
+    $f3->route('GET /Core/Widgets/feed',          'coreWidgets->feed');           //Feed de noticias
+    $f3->route('GET /Core/Widgets/radio',         'coreWidgets->radio');          //Widget radio
+    $f3->route('GET /Core/Widgets/fileExplorer',  'coreWidgets->fileExplorer');   //Widget fileExplorer
     //Tablas
     $f3->route('GET /Core/Tablas/normal',     'coreTablas->normal');        //Tablas Normales
     $f3->route('GET /Core/Tablas/dataTables', 'coreTablas->dataTables');    //Tablas dataTables
+    //Mapas
+    $f3->route('GET /Core/Mapas/googleMaps',     'coreMaps->googleMaps');     //Google Maps
+    $f3->route('GET /Core/Mapas/leafletMaps',    'coreMaps->leafletMaps');    //Leaflet Maps
     //Gráficos
     $f3->route('GET /Core/Graficos/apexcharts',  'coreGraficos->apexcharts');    //Apexcharts
     $f3->route('GET /Core/Graficos/chartjs',     'coreGraficos->chartjs');       //Chartjs

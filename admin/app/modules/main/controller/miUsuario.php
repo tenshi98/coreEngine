@@ -470,6 +470,9 @@ class miUsuario extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -484,14 +487,23 @@ class miUsuario extends ControllerBase {
             'ValidarFecha'              => 'fNacimiento',
             'ValidarHora'               => '',
             'ValidarURL'                => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarLargoMinimo'        => 'Nombre,Direccion',
+            'ValidarLargoMinimo'        => 'mainPassword,oldPassword,password,rePassword,email,Nombre,Direccion',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,Direccion',
+            'ValidarLargoMaximo'        => 'mainPassword,oldPassword,password,rePassword,email,Nombre,Direccion',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Nombre,Direccion',
-            'ValidarEspaciosVacios'     => 'email,password,rePassword',
+            'ValidarEspaciosVacios'     => 'email,mainPassword,oldPassword,password,rePassword,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'email',
             'ValidarCoincidencias'      => 'mainPassword-oldPassword,password-rePassword',
+            'ValidarDominioEmail'       => 'email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => 'fNacimiento',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

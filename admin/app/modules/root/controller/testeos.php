@@ -88,6 +88,15 @@ class testeos extends ControllerBase {
             'ValidarEspaciosVacios'     => 'Palabra',
             'ValidarMayusculas'         => 'Palabra',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $Post_1,
         ];
 
@@ -110,6 +119,15 @@ class testeos extends ControllerBase {
             'ValidarEspaciosVacios'     => 'Palabra',
             'ValidarMayusculas'         => 'Palabra',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $Post_1,
         ];
 

@@ -64,9 +64,10 @@ $UserSesion   = (!$f3->get('SESSION.TokenUser') || !$f3->get('SESSION.TokenExpir
 //Solo si esta activa la sesion
 if($UserSesion===true){
 
-    require_once('../app/utils/userAdmin.php'); //Rutas de los administradores
-    require_once('../app/utils/userData.php');  //Rutas de los usuarios normales
-    require_once('../app/utils/apiList.php');   //Rutas de los administradores
+    require_once('../app/utils/userAdmin.php');              //Rutas de los administradores
+    require_once('../app/utils/userData.php');               //Rutas de los usuarios normales
+    require_once('../app/utils/apiList.php');                //Rutas de los administradores
+    require_once('../app/utils/sistemaFuncionalidad.php');   //Funcionalidad del sistema
 
 }
 /**********************************************************************************************************************************/

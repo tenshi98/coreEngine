@@ -6,15 +6,15 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Administración</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/permisos/categorias/listAll'; ?>">   <i class="bi bi-card-list color-blue"></i> Permisos - Categorias</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/permisos/listado/listAll'; ?>">      <i class="bi bi-card-list color-blue"></i> Permisos - Listado</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/permisos/categorias/listAll'; ?>">   <i class="bi bi-card-list text-color-blue"></i> Permisos - Categorias</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/permisos/listado/listAll'; ?>">      <i class="bi bi-card-list text-color-blue"></i> Permisos - Listado</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/administracion/usuarios/listAll'; ?>">           <i class="bi bi-card-list color-blue"></i> Administrar Administradores</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/administracion/bloqueo-usuarios/listAll'; ?>">   <i class="bi bi-card-list color-blue"></i> Usuarios Bloqueados</a></li>
-            <<li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>">  <i class="bi bi-card-list color-blue"></i> Configuracion Sistema</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/instalacion/resumen'; ?>">    <i class="bi bi-card-list color-blue"></i> Instalacion de Modulos</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/rutas/listado'; ?>">          <i class="bi bi-card-list color-blue"></i> Comparación Rutas</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/administracion/usuarios/listAll'; ?>">           <i class="bi bi-card-list text-color-blue"></i> Administrar Administradores</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/administracion/bloqueo-usuarios/listAll'; ?>">   <i class="bi bi-card-list text-color-blue"></i> Usuarios Bloqueados</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>">  <i class="bi bi-card-list text-color-blue"></i> Configuracion Sistema</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/instalacion/resumen'; ?>">    <i class="bi bi-card-list text-color-blue"></i> Instalacion de Modulos</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/rutas/listado'; ?>">          <i class="bi bi-card-list text-color-blue"></i> Comparación Rutas</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -24,9 +24,9 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Pruebas</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/controladores'; ?>">           <i class="bi bi-gear color-gray"></i> Pruebas controlador</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/funciones'; ?>">               <i class="bi bi-gear color-gray"></i> Pruebas funciones</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/inteligenciaArtificial'; ?>">  <i class="bi bi-chat-square color-gray"></i> Pruebas IA</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/controladores'; ?>">           <i class="bi bi-gear        text-color-gray"></i> Pruebas controlador</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/funciones'; ?>">               <i class="bi bi-gear        text-color-gray"></i> Pruebas funciones</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/inteligenciaArtificial'; ?>">  <i class="bi bi-chat-square text-color-gray"></i> Pruebas IA</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -39,16 +39,16 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             <?php
             //Se condiciona el motor de Email
             switch ($data['UserData']["Config_motorEmail"]) {
-                case 1:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_SMTPMail">     <i class="bx bx-mail-send color-green-dark"></i> Envío Correo SMTP</a></li>';break;
-                case 2:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_GMail">        <i class="bi bi-google color-green-dark"></i> Envío Correo GMail</a></li>';break;
-                case 3:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_SendingBlue">  <i class="ri-mail-open-line color-green-dark"></i> Envío Correo SendingBlue</a></li>';break;
+                case 1:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_SMTPMail">     <i class="bx bx-mail-send   text-color-green-dark"></i> Envío Correo SMTP</a></li>';break;
+                case 2:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_GMail">        <i class="bi bi-google      text-color-green-dark"></i> Envío Correo GMail</a></li>';break;
+                case 3:echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_SendingBlue">  <i class="ri-mail-open-line text-color-green-dark"></i> Envío Correo SendingBlue</a></li>';break;
             }
             //Se condiciona el uso de Whatsapp
             if($data['UserData']["sistemaUsoWhatsapp"]==2){
-                echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_Whatsapp">       <i class="bi bi-whatsapp color-green-dark"></i> Envío Mensaje Whatsapp</a></li>';
+                echo '<li><a class="notification-item" href="'.$BASE.'/Core/testeos/send_Whatsapp">       <i class="bi bi-whatsapp text-color-green-dark"></i> Envío Mensaje Whatsapp</a></li>';
             } ?>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_mailTemplateSelect'; ?>">  <i class="bx bx-mail-send color-green-dark"></i> Prueba Plantilla Email</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/send_mailTemplateSelect'; ?>">  <i class="bx bx-mail-send text-color-green-dark"></i> Prueba Plantilla Email</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -58,9 +58,9 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Crud</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/pruebas/crudNormal/listAll'; ?>">    <i class="bi bi-gear color-yellow-light"></i> Crud Normal</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/pruebas/crudResumen/listAll'; ?>">   <i class="bi bi-gear color-yellow-light"></i> Crud Resumen</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/pruebas/crudInforme/listAll'; ?>">   <i class="bi bi-gear color-yellow-light"></i> Informes</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/pruebas/crudNormal/listAll'; ?>">    <i class="bi bi-gear text-color-yellow-light"></i> Crud Normal</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/pruebas/crudResumen/listAll'; ?>">   <i class="bi bi-gear text-color-yellow-light"></i> Crud Resumen</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/pruebas/crudInforme/listAll'; ?>">   <i class="bi bi-gear text-color-yellow-light"></i> Informes</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -97,7 +97,7 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Formularios</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Formularios/formularios'; ?>">  <i class="bi bi-card-list color-green-dark"></i> Form Inputs</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Formularios/formularios'; ?>">  <i class="bi bi-card-list text-color-green-dark"></i> Form Inputs</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -109,10 +109,16 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             <li><hr class="dropdown-divider"></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/box'; ?>">           <i class="bi bi-puzzle text-color-red"></i> Box</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Time Line</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/dividers'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Divider</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/codeVisor'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Visor de Codigo</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/meteo'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget meteorologico</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/feed'; ?>">          <i class="bi bi-puzzle text-color-red"></i> Feed de noticias</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/radio'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget radio</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/fileExplorer'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Widget fileExplorer</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -122,8 +128,19 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Tablas</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Tablas/normal'; ?>">       <i class="bi bi-table color-blue-dark"></i> Normales</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Tablas/dataTables'; ?>">   <i class="bi bi-table color-blue-dark"></i> dataTables</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Tablas/normal'; ?>">       <i class="bi bi-table text-color-blue-dark"></i> Normales</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Tablas/dataTables'; ?>">   <i class="bi bi-table text-color-blue-dark"></i> dataTables</a></li>
+            <li><hr class="dropdown-divider"></li>
+        </ul>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-card-list"></i></a>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <li class="dropdown-header">Mapas</li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Mapas/googleMaps'; ?>">    <i class="bi bi-map text-color-grey-dark"></i> Google Maps</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Mapas/leafletMaps'; ?>">   <i class="bi bi-map text-color-grey-dark"></i> Leaflet Maps</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -133,9 +150,9 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Gráficos</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/apexcharts'; ?>">     <i class="bi bi-bar-chart-line color-amber-text"></i> Apexcharts</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/chartjs'; ?>">        <i class="bi bi-bar-chart-line color-amber-text"></i> Chartjs</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/echarts'; ?>">        <i class="bi bi-bar-chart-line color-amber-text"></i> Echarts</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/apexcharts'; ?>">     <i class="bi bi-bar-chart-line text-color-amber-text"></i> Apexcharts</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/chartjs'; ?>">        <i class="bi bi-bar-chart-line text-color-amber-text"></i> Chartjs</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/echarts'; ?>">        <i class="bi bi-bar-chart-line text-color-amber-text"></i> Echarts</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>

@@ -411,7 +411,7 @@ class crudResumen extends ControllerBase {
                         'Identificador' => 'Direccion_img',
                         'SubCarpeta'    => '',
                         'NombreArchivo' => '',
-                        'SufijoArchivo' => 'ResumenIMG_',
+                        'SufijoArchivo' => 'crudResumenIMG_',
                         'ValidarTipo'   => 'image',
                         'ValidarPeso'   => 10,
                         'Base64'        => true
@@ -420,7 +420,7 @@ class crudResumen extends ControllerBase {
                         'Identificador' => 'File',
                         'SubCarpeta'    => '',
                         'NombreArchivo' => '',
-                        'SufijoArchivo' => 'ResumenFile_',
+                        'SufijoArchivo' => 'crudResumenFile_',
                         'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music',
                         'ValidarPeso'   => 10,
                         'Base64'        => false
@@ -535,6 +535,9 @@ class crudResumen extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                             Métodos privados                               */
+    /******************************************************************************/
+    /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
         //Variables
@@ -542,21 +545,30 @@ class crudResumen extends ControllerBase {
             'emptyData'                 => '',
             'encode'                    => '',
             'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'Numero',
-            'ValidarEntero'             => '',
+            'ValidarNumero'             => 'idUsuario,Numero',
+            'ValidarEntero'             => 'idUsuario',
             'ValidarRut'                => 'Rut',
             'ValidarPatente'            => '',
             'ValidarFecha'              => 'Fecha',
             'ValidarHora'               => 'Hora',
             'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Palabra',
+            'ValidarLargoMinimo'        => 'Email,Palabra',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Palabra',
+            'ValidarLargoMaximo'        => 'Email,Palabra',
             'ValidarLargoMaximoN'       => 255,
             'ValidarPalabrasCensuradas' => 'Palabra',
             'ValidarEspaciosVacios'     => 'Email',
             'ValidarMayusculas'         => 'Email',
             'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => 'Email',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
         //Devuelvo

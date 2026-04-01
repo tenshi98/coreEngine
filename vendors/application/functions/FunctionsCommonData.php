@@ -185,6 +185,14 @@ class FunctionsCommonData {
 
     }
 
+	/******************************************************************************/
+    public function safePath($path, $root) {
+		$real = realpath($path);
+		if ($real === false || strpos($real, $root) !== 0) {
+			return $root;
+		}
+		return $real;
+	}
 
 }
 

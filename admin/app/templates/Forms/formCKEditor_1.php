@@ -1,5 +1,5 @@
 <div class="row mb-3" id="div_<?php echo $nameID; ?>">
-    <label class="col-sm-<?php echo $otrcol; ?> col-form-label" for="<?php echo $name; ?>"><?php echo $placeholderIcon.$placeholder; ?></label>
+    <label class="col-sm-<?php echo $otrcol; ?> col-form-label" for="<?php echo $name; ?>"><?php echo $placeholderIcon.$placeholder.$dataPopover; ?></label>
     <div class="col-sm-<?php echo $FormCol; ?> field">
         <textarea name="<?php echo $name; ?>" id="<?php echo $nameID; ?>"  class="tinymce-editor" style="height: 100px" <?php echo $requerido; ?>><?php echo $value; ?></textarea>
     </div>

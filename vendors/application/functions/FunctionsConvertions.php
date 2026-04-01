@@ -438,11 +438,11 @@ class FunctionsConvertions {
 		if (!$this->DataValidations->validarNumero($numero)){return 'El dato ingresado no es un numero';}
 
 		/********************** Si todo esta ok **********************/
-		// 1. Manejar el signo
+		// Manejar el signo
 		$es_negativo = $numero < 0;
 		$numero_abs = abs($numero); // Trabajar con el valor absoluto
 
-		// 2. Definir las tablas de palabras
+		// Definir las tablas de palabras
 		$unidades = [
 			0 => 'cero', 1 => 'uno', 2 => 'dos', 3 => 'tres', 4 => 'cuatro',
 			5 => 'cinco', 6 => 'seis', 7 => 'siete', 8 => 'ocho', 9 => 'nueve'
@@ -456,7 +456,7 @@ class FunctionsConvertions {
 			1000000000 => 'mil millones', 1000000 => 'millón', 1000 => 'mil'
 		];
 
-		// 3. Función auxiliar para manejar números de 0 a 999 (el núcleo recursivo)
+		// Función auxiliar para manejar números de 0 a 999 (el núcleo recursivo)
 		$convertirCientos = function ($n) use (&$convertirCientos, $unidades, $dieces) {
 			if ($n < 10) {
 				return $unidades[$n];
@@ -505,7 +505,7 @@ class FunctionsConvertions {
 			return ''; // Retorno por defecto
 		};
 
-		// 4. Lógica principal para números grandes (millares, millones, etc.)
+		// Lógica principal para números grandes (millares, millones, etc.)
 		if ($numero_abs === 0) {
 			return $unidades[0];
 		}
@@ -536,10 +536,10 @@ class FunctionsConvertions {
 			$palabras[] = $convertirCientos($numero_abs);
 		}
 
-		// 5. Construir el resultado final
+		// Construir el resultado final
 		$resultado = trim(implode(' ', $palabras));
 
-		// 6. Añadir el signo si era negativo
+		// Añadir el signo si era negativo
 		if ($es_negativo) {
 			$resultado = 'menos ' . $resultado;
 		}

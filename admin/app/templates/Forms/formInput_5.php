@@ -3,5 +3,5 @@
         <input type="<?php echo $InTipo; ?>" name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" class="form-control <?php echo $InputClass; ?>" value="<?php echo $value; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $requerido; ?> <?php echo $jsValidation; ?> >
         <label for="<?php echo $nameID; ?>"><?php echo $placeholder; ?></label>
     </div>
+    <?php echo $dataInfo; ?>
 </div>
-<?php echo $dataInfo; ?>

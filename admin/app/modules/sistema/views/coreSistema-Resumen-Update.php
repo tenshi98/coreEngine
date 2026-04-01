@@ -6,7 +6,37 @@
                     ? $BASE.'/upload/'.$data['rowData']['Sistema_IMGLogo']
                     : $BASE.'/img/picture-img.jpg';
         ?>
-        <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
+        <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100 mb-2">
+
+        <?php if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'){ ?>
+            <div class="square-rounded-2 square-border-3 w-100">
+                <?php
+                //variable para los marcadores
+                $arrMarkers = [
+                    [
+                        $data['rowData']['Latitud'],
+                        $data['rowData']['Longitud'],
+                        'A',
+                        '#81a1c1',
+                        "<i class='bi bi-cursor-fill text-primary'></i>",
+                        '<b>Direccion</b><br>'.$data['rowData']['Sistema_Direccion']
+                    ],
+                ];
+                //se imprime input
+                $Options = [
+                    'Latitud'      => $data['rowData']['Latitud'],   //Latitud de la ubicacion
+                    'Longitud'     => $data['rowData']['Longitud'],  //Longitud de la ubicacion
+                    'ID_Map'       => 'map_1',                       //ID del div donde se dibuja el html
+                    'Zoom'         => 14,                            //Zoom del mapa
+                    'attribution'  => '&copy; Ubicacion',            //Pie de pagina del mapa
+                    'arrMarkers'   => $arrMarkers,                   //array con los marcadores
+                    'defaultLayer' => 'Esri_WorldTopoMap',           //Layer a mostrar en la carga
+                    'ConfMode'     => 3,                             //Modo del mapa
+                ];
+                echo $data['Fnc_WidgetsMaps']->leaFletMap_from_gps($Options);
+                ?>
+            </div>
+        <?php } ?>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-7">
         <?php
@@ -50,6 +80,14 @@
             $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Token',        'Texto' => $data['rowData']['Config_WhatsappToken']];
             $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Instance Id',  'Texto' => $data['rowData']['Config_WhatsappInstanceId']];
         }
+        $arrData_4[] = ['Icon' => '','Titulo' => 'Mostrar Widget Meteorologico',   'Texto' => activo($data['rowData']['Config_Principal_Meteo'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => 'Mostrar Widget Radio',           'Texto' => activo($data['rowData']['Config_Principal_Radio'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => 'Mostrar Widget Feed',            'Texto' => activo($data['rowData']['Config_Principal_Feed'])];
+        //Solo si se muestra
+        if($data['rowData']['Config_Principal_Feed']==2){
+             $arrData_4[] = ['Icon' => '','Titulo' => 'URL Feed Noticias',         'Texto' => $data['rowData']['Config_Principal_FeedURL']];
+        }
+
         /**************************************/
         $arrData_5 = [
             ['Icon' => '','Titulo' => 'URL Twitter',    'Texto' => (!empty($data['rowData']['Social_X']) ? '<a href="'.$data['rowData']['Social_X'].'" class="twitter"><i class="bi bi-twitter"></i> Twitter</a>' : '')],
@@ -69,8 +107,8 @@
         echo '<h5 class="box-title text-color-red-dark">Representante Legal</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_3, 8);
 
-        echo '<h5 class="box-title text-color-red-dark">APIS</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
+        echo '<h5 class="box-title text-color-red-dark">APIS Y Configuraciones</h5>';
+        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 7);
 
         echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
