@@ -60,7 +60,11 @@ class main extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista(1, 0, $this->returnRutaVista(__DIR__, 'app').'/main-login.php');
+        $view     = new View;
+        echo $view->render('../app/templates/guest-header.php');
+        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-login.php');
+        echo $view->render('../app/templates/guest-footer.php');
+
     }
 
     /******************************************************************************/
@@ -86,7 +90,6 @@ class main extends ControllerBase {
     public function principal($f3){
         /*******************************************************************/
         //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /******************************************/
@@ -138,7 +141,7 @@ class main extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'        => $UserData,
+            'UserData'        => $this->getUserData($f3),
             /*===========   Funcionalidad   ===========*/
             'Fnc_ServerServer'    => $this->ServerServer,
             'Fnc_DataDate'        => $this->DataDate,
@@ -149,7 +152,7 @@ class main extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
     }
 
     /******************************************************************************/

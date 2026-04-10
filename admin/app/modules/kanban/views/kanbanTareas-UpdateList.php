@@ -56,7 +56,7 @@
                                                         if(isset($task['UsuarioNombre'])&&$task['UsuarioNombre']!=''){
                                                             //verifico si existe imagen
                                                             $UserIMG  = !empty($task['UsuarioImg'])
-                                                                        ? $BASE.'/upload/'.$task['UsuarioImg']
+                                                                        ? $data['UserData']['MainPathUrl'].$task['UsuarioImg']
                                                                         : $BASE.'/img/profile-img.jpg';
 
                                                             //imprimo

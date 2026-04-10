@@ -70,11 +70,6 @@ class gestionDocumentos extends ControllerBase {
     /******************************************************************************/
     //Listar Todo
     public function listAll($f3, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
@@ -240,8 +235,8 @@ class gestionDocumentos extends ControllerBase {
                 'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
                 'TableTitle'      => $TipoMov,
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
@@ -264,23 +259,18 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError(1, $f3);
         }
     }
 
     /******************************************************************************/
     //List
     public function UpdateList($f3, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
@@ -344,8 +334,8 @@ class gestionDocumentos extends ControllerBase {
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => $TipoMov,
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
@@ -357,23 +347,18 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //View
     public function View($f3, $params, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         switch ($idTipo) {
@@ -542,8 +527,8 @@ class gestionDocumentos extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
@@ -560,23 +545,18 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //Print
     public function Print($f3, $params, $idTipo, $Imprimir){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         switch ($idTipo) {
@@ -772,8 +752,8 @@ class gestionDocumentos extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
@@ -791,23 +771,18 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 4, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Print.php');
+            $this->showVista(4, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Print.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //Resumen
     public function Resumen($f3, $params, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
@@ -907,8 +882,8 @@ class gestionDocumentos extends ControllerBase {
                 'PageAuthor'       => ConfigAPP::SOFTWARE['SoftwareName'],
                 'PageKeywords'     => ConfigAPP::SOFTWARE['SoftwareName'],
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
@@ -923,23 +898,18 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen.php');
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError(1, $f3);
         }
     }
 
     /******************************************************************************/
     //Resumen-Update
     public function ResumenUpdate($f3, $params, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
@@ -997,8 +967,8 @@ class gestionDocumentos extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
@@ -1009,12 +979,12 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Update.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Update.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
@@ -1025,9 +995,9 @@ class gestionDocumentos extends ControllerBase {
     //Crear
     public function Insert($f3){
 
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /*******************************************************************/
         //variables
@@ -1059,7 +1029,7 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se llama al movimiento de materiales
-            $Response = $this->createDoc($_POST, $UserData);
+            $Response = $this->createDoc($_POST, $arrUserData);
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
@@ -1185,7 +1155,7 @@ class gestionDocumentos extends ControllerBase {
     /******************************************************************************/
     /*                             EJECUCION OTROS                                */
     /******************************************************************************/
-    public function createDoc($PostData, $UserData){
+    public function createDoc($PostData, $arrUserData){
 
         /*******************************************************************/
         //variables
@@ -1368,7 +1338,7 @@ class gestionDocumentos extends ControllerBase {
                 /**********************************************************************/
                 //Movimiento de bodegas
                 //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-                if($UserData["gestionDocumentosUsoBodega"]==2){
+                if($arrUserData["gestionDocumentosUsoBodega"]==2){
                     //Variable
                     $PostMovProd = array();
                     //Se generan los datos

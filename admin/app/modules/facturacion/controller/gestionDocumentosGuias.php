@@ -46,11 +46,6 @@ class gestionDocumentosGuias extends ControllerBase {
     /******************************************************************************/
     //Crear nuevo
     public function New($f3, $params, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
@@ -95,8 +90,8 @@ class gestionDocumentosGuias extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_Codification'     => $this->Codification,
@@ -108,22 +103,17 @@ class gestionDocumentosGuias extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Guias-formNew.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Guias-formNew.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
     /******************************************************************************/
     //List
     public function UpdateList($f3, $params, $idTipo){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
@@ -177,8 +167,8 @@ class gestionDocumentosGuias extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
@@ -191,12 +181,12 @@ class gestionDocumentosGuias extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Guias-UpdateList.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Guias-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 

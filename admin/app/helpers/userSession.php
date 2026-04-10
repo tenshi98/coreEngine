@@ -576,6 +576,9 @@ class userSession extends ControllerBase {
         /***************************************************/
         /*         Se generan los datos del usuario        */
         /***************************************************/
+        //Se instancia la libreria
+        $FileManager  = new FileManager();
+
         //Armo los datos del usuario
         $rowUsuario = [
             'UserID'             => $rowData['idUsuario'],
@@ -588,6 +591,7 @@ class userSession extends ControllerBase {
             'UbicacionWheater'   => $rowData['UbicacionWheater'],
             'TypeSession'        => $TypeSession,
             'UserIP'             => $this->Client->getClientIp(),
+            'MainPathUrl'        => $FileManager->getMainPathUrl(),
         ];
         /******************************/
         //Se cargan los datos de la plataforma

@@ -77,7 +77,7 @@
 
     <?php
     $UserIMG = !empty($data['UserData']['UserIMG'])
-        ? $BASE.'/upload/'.$data['UserData']['UserIMG']
+        ? $data['UserData']['MainPathUrl'].$data['UserData']['UserIMG']
         : $BASE.'/img/profile-img.jpg';
     ?>
 

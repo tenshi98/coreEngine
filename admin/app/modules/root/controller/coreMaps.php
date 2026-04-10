@@ -29,11 +29,6 @@ class coreMaps extends ControllerBase {
     /******************************************************************************/
     //pantalla principal
     public function googleMaps($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -44,23 +39,18 @@ class coreMaps extends ControllerBase {
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsMaps'  => $this->WidgetsMaps,
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreMaps-googleMaps.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreMaps-googleMaps.php');
     }
 
     /******************************************************************************/
     //pantalla principal
     public function leafletMaps($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -71,13 +61,13 @@ class coreMaps extends ControllerBase {
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsMaps'  => $this->WidgetsMaps,
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreMaps-leafletMaps.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreMaps-leafletMaps.php');
     }
 
 

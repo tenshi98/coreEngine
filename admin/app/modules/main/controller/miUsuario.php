@@ -105,11 +105,6 @@ class miUsuario extends ControllerBase {
     /******************************************************************************/
     //Ver Datos
     public function view($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************/
         //Se genera la query
         $query = [
@@ -217,8 +212,8 @@ class miUsuario extends ControllerBase {
                 'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
                 'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_DataDate'        => $this->DataDate,
@@ -233,13 +228,13 @@ class miUsuario extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data.php');
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data.php');
 
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError(1, $f3);
         }
 
     }
@@ -247,11 +242,6 @@ class miUsuario extends ControllerBase {
     /******************************************************************************/
     //Ver Datos
     public function FRG_UpdateData($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************/
         //Se genera la query
         $query = [
@@ -299,8 +289,8 @@ class miUsuario extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
@@ -311,23 +301,18 @@ class miUsuario extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data-UpdateData.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data-UpdateData.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //Ver Datos
     public function FRG_UpdateCard($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************/
         //Se genera la query
         $query = [
@@ -359,20 +344,20 @@ class miUsuario extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'rowData' => $rowData,
             ];
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data-UpdateCard.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data-UpdateCard.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 

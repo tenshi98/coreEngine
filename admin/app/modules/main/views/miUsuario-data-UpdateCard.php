@@ -1,6 +1,6 @@
 <?php
 if(isset($data['rowData']['Direccion_img'])&&$data['rowData']['Direccion_img']!=''){
-    $UserIMG = $BASE.'/upload/'.$data['rowData']['Direccion_img'];
+    $UserIMG = $data['UserData']['MainPathUrl'].$data['rowData']['Direccion_img'];
 }else{
     $UserIMG = $BASE.'/img/profile-img.jpg';
 }

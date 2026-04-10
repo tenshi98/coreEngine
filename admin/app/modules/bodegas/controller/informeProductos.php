@@ -38,11 +38,6 @@ class informeProductos extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
-        /*******************************************************************/
         //Se genera la query
         $query = [
             'data'    => 'idBodegas AS ID,Nombre',
@@ -84,8 +79,8 @@ class informeProductos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Stock Productos',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'   => $this->FormInputs,
             'Fnc_Codification' => $this->Codification,
@@ -96,17 +91,12 @@ class informeProductos extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
     }
 
     /******************************************************************************/
     //List
     public function UpdateList($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /*******************************************************************/
         //Variables
         $WhereData_int_1     = 'idBodegas';  //Datos búsqueda exacta
@@ -189,8 +179,8 @@ class informeProductos extends ControllerBase {
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Stock Actual',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
@@ -201,22 +191,21 @@ class informeProductos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //View
     public function View($f3, $params){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /******************************************/
         //Se genera la query
@@ -267,7 +256,7 @@ class informeProductos extends ControllerBase {
         $DataWhere.= ' AND bodegas_movimientos_productos.idBodegas = '.$this->Codification->encryptDecrypt('decrypt', $params['idBodegas']);
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($UserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"]==2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -302,8 +291,8 @@ class informeProductos extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
@@ -316,23 +305,18 @@ class informeProductos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //View
     public function Print($f3, $params){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se genera la query
         $query = [
@@ -416,8 +400,8 @@ class informeProductos extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
@@ -430,12 +414,12 @@ class informeProductos extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 3, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Print.php');
+            $this->showVista(3, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Print.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 

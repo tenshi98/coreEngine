@@ -28,11 +28,6 @@ class coreWidgets extends ControllerBase {
     /******************************************************************************/
     /******************************************************************************/
     public function box($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -41,22 +36,17 @@ class coreWidgets extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-box.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-box.php');
     }
 
     /******************************************************************************/
     public function timeLine($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -65,22 +55,17 @@ class coreWidgets extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-timeLine.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-timeLine.php');
     }
 
     /******************************************************************************/
     public function textDividers($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -89,22 +74,17 @@ class coreWidgets extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-textDividers.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-textDividers.php');
     }
 
     /******************************************************************************/
     public function dividers($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -113,22 +93,17 @@ class coreWidgets extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-dividers.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-dividers.php');
     }
 
     /******************************************************************************/
     public function components($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -136,25 +111,20 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Componentes Web',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-components.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-components.php');
     }
 
     /******************************************************************************/
     public function calendar($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -163,24 +133,19 @@ class coreWidgets extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'    => $this->FormInputs,
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-calendar.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-calendar.php');
     }
 
     /******************************************************************************/
     public function treeview($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -189,24 +154,19 @@ class coreWidgets extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'    => $this->FormInputs,
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-treeview.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-treeview.php');
     }
 
     /******************************************************************************/
     public function codeVisor($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -214,25 +174,20 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Visor de Codigo',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-codeVisor.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-codeVisor.php');
     }
 
     /******************************************************************************/
     public function meteo($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -240,25 +195,20 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Widget Meteorologico',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-meteo.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-meteo.php');
     }
 
     /******************************************************************************/
     public function feed($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -266,25 +216,20 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Feed de noticias',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-feed.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-feed.php');
     }
 
     /******************************************************************************/
     public function radio($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -292,25 +237,20 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Radio Player',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-radio.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-radio.php');
     }
 
     /******************************************************************************/
     public function fileExplorer($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -318,16 +258,16 @@ class coreWidgets extends ControllerBase {
             'PageDescription' => 'Widgets - Explorador Archivos',
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-fileExplorer.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreWidgets-fileExplorer.php');
     }
 
 }

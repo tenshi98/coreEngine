@@ -145,7 +145,7 @@
                     <?php
                     /********************************/
                     $CompanyLogo  = !empty($data['UserData']['Sistema_IMGLogo'])
-                                    ? $BASE.'/upload/'.$data['UserData']['Sistema_IMGLogo']
+                                    ? $data['UserData']['MainPathUrl'].$data['UserData']['Sistema_IMGLogo']
                                     : $BASE.'/img/logo.png';
 
                     /********************************/

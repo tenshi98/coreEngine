@@ -27,11 +27,6 @@ class coreGraficos extends ControllerBase {
     /******************************************************************************/
     //pantalla principal
     public function apexcharts($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -40,23 +35,18 @@ class coreGraficos extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-apexcharts.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-apexcharts.php');
     }
 
     /******************************************************************************/
     //pantalla principal
     public function chartjs($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -65,23 +55,18 @@ class coreGraficos extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-chartjs.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-chartjs.php');
     }
 
     /******************************************************************************/
     //pantalla principal
     public function echarts($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -90,13 +75,13 @@ class coreGraficos extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-echarts.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreGraficos-echarts.php');
     }
 
 

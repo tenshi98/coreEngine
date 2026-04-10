@@ -27,11 +27,6 @@ class sistemaRutas extends ControllerBase {
     /******************************************************************************/
     //Resumen
     public function Resumen($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Variable vacia
         $arrModules = [];
@@ -90,8 +85,8 @@ class sistemaRutas extends ControllerBase {
                 'PageKeywords'     => ConfigAPP::SOFTWARE['SoftwareName'],
                 'TableTitle'      => 'Comparación Rutas',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'arrModules' => $arrModules,
                 'arrRutas'   => $arrRutas,
@@ -99,12 +94,12 @@ class sistemaRutas extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/sistemaRutas-Resumen.php');
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/sistemaRutas-Resumen.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError(1, $f3);
         }
     }
 

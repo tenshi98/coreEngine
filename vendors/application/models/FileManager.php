@@ -1,29 +1,46 @@
 <?php
+/**
+ * Carga el sistema de almacenamiento multi-driver.
+ * Se incluye aquí para garantizar disponibilidad sin importar
+ * el orden de carga del framework.
+ */
+require_once __DIR__ . '/../storage/StorageDriverInterface.php';
+require_once __DIR__ . '/../storage/LocalStorageDriver.php';
+require_once __DIR__ . '/../storage/S3StorageDriver.php';
+require_once __DIR__ . '/../storage/GCSStorageDriver.php';
+require_once __DIR__ . '/../storage/SFTPStorageDriver.php';
+require_once __DIR__ . '/../storage/StorageDriverFactory.php';
+
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
+/**
+ * Class FileManager
+ *
+ * Gestiona la subida, validación y eliminación de archivos en el servidor.
+ *
+ * Mejoras aplicadas:
+ *  - Validación de MIME type real con finfo (evita spoofing del header HTTP)
+ *  - Sanitización de nombres de archivo (previene path traversal)
+ *  - Bloqueo de extensiones peligrosas (.php, .sh, .exe, etc.)
+ *  - Uso controlado del operador @ solo donde el error es manejado explícitamente
+ *  - Uso de match() en lugar de switch/case con break redundantes
+ *  - Tipado estricto en parámetros y retornos
+ *  - Extracción de lógica duplicada a métodos privados (DRY)
+ *  - Validaciones de entradas vacías
+ *  - Permisos de directorio corregidos (0755 en lugar de 0777)
+ *  - Manejo de errores con excepciones
+ *
+ * Drivers disponibles:
+ *   'local' → Sistema de archivos local (Apache)    [por defecto]
+ *   's3'    → Amazon S3 (o compatibles: MinIO, R2)
+ *   'gcs'   → Google Cloud Storage
+ *   'sftp'  → Servidor remoto vía SFTP
+ */
 class FileManager {
-    /**
-     * Class FileManager
-     *
-     * Gestiona la subida, validación y eliminación de archivos en el servidor.
-     *
-     * Mejoras aplicadas:
-     *  - Validación de MIME type real con finfo (evita spoofing del header HTTP)
-     *  - Sanitización de nombres de archivo (previene path traversal)
-     *  - Bloqueo de extensiones peligrosas (.php, .sh, .exe, etc.)
-     *  - Uso controlado del operador @ solo donde el error es manejado explícitamente
-     *  - Uso de match() en lugar de switch/case con break redundantes
-     *  - Tipado estricto en parámetros y retornos
-     *  - Extracción de lógica duplicada a métodos privados (DRY)
-     *  - Validaciones de entradas vacías
-     *  - Permisos de directorio corregidos (0755 en lugar de 0777)
-     *  - Manejo de errores con excepciones
-     */
+
     /*******************************************************************************************************************/
-	/*                                                                                                                 */
     /*                                           Constantes de clase                                                   */
-	/*                                                                                                                 */
     /*******************************************************************************************************************/
 
     /******************************************************************************************/
@@ -221,116 +238,133 @@ class FileManager {
 
     ];
 
-
     /*******************************************************************************************************************/
-	/*                                                                                                                 */
     /*                                                Instancias                                                       */
-	/*                                                                                                                 */
     /*******************************************************************************************************************/
 
-    private FunctionsCommonData $CommonData;
-    private ?\finfo $finfo = null;
-    private static array $pathCache = [];
+    private FunctionsCommonData      $CommonData;
+    private StorageDriverInterface   $storage;    // ← driver activo (local | s3 | gcs | sftp)
+    private ?\finfo                  $finfo = null;
+    private static array             $pathCache = [];
 
     public function __construct() {
         $this->CommonData = new FunctionsCommonData();
+        // Instancia el driver correcto según ConfigAPP::APP['uploadServer']
+        $this->storage = StorageDriverFactory::make();
     }
 
     /*******************************************************************************************************************/
-	/*                                                                                                                 */
     /*                                                  Métodos públicos                                               */
-	/*                                                                                                                 */
     /*******************************************************************************************************************/
 
     /******************************************************************************************/
+    /**
+     * Valida la integridad, seguridad y requisitos técnicos de los archivos antes de su procesamiento.
+     * * Este método realiza una auditoría exhaustiva de cada archivo enviado al servidor:
+     * verifica errores de subida nativos de PHP, bloquea extensiones peligrosas,
+     * valida el tipo MIME real (inspeccionando el contenido y no solo la extensión),
+     * controla el peso máximo permitido y comprueba la existencia de duplicados
+     * mediante el driver de almacenamiento activo (Local, S3, etc.).
+     *
+     * @param array $SIS_FILES Arreglo equivalente a $_FILES con los datos binarios.
+     * @param array $arrArchivos Configuración detallada de cada archivo esperado.
+     * @param array $PostData Datos adicionales del contexto de la petición.
+     * @return array ['success' => true] si pasa todas las pruebas, o un arreglo con el detalle de los errores.
+     */
     public function validateFiles(array $SIS_FILES, array $arrArchivos, array $PostData = []): array {
-        /**
-         * Valida los archivos antes de subirlos al servidor.
-         *
-         * @param array      $SIS_FILES   Equivalente a $_FILES
-         * @param array      $arrArchivos Configuración de archivos a validar
-         * @param array      $PostData    Datos POST adicionales
-         * @return array                  Array con 'success' y 'message', o array de errores indexados
-         */
 
-        // Si no hay archivos
-        if (empty($arrArchivos)) { return ['success' => true,  'data' => true];}
+        // Si no se definieron reglas de archivos, se asume validación exitosa por defecto
+        if (empty($arrArchivos)) {
+            return ['success' => true, 'data' => true];
+        }
 
-        // Variables
+        // Acumulador de incidentes encontrados durante la validación
         $errors = [];
 
-        // Se recorren archivos
+        // Procesamiento secuencial de cada archivo configurado
         foreach ($arrArchivos as $archivo) {
-            // Solo se valida si el identificador existe en PostData y NO es Base64
+            /**
+             * Filtro de entrada:
+             * Solo se valida si el identificador está presente en PostData y NO es una carga vía Base64,
+             * ya que el procesamiento de Base64 sigue un flujo de decodificación distinto.
+             */
             if (!isset($PostData[$archivo['Identificador']]) || $archivo['Base64'] !== false) {
                 continue;
             }
 
-            // Variable
             $id = $archivo['Identificador'];
 
-            // Verificar existencia del archivo en el request
+            /*************** Verificaciones de Existencia y Sistema ***************/
+
+            // 1. Comprueba que el archivo físico exista en el buffer de subida
             if (empty($SIS_FILES[$id])) {
                 $errors[] = ['success' => false, 'message' => $id . ' es obligatorio'];
                 continue;
             }
 
-            // Verificar errores PHP de subida
+            // 2. Valida códigos de error nativos de PHP (UPLOAD_ERR_INI_SIZE, UPLOAD_ERR_PARTIAL, etc.)
             if ($SIS_FILES[$id]['error'] > 0) {
                 $errors[] = ['success' => false, 'message' => $this->uploadPHPError($SIS_FILES[$id]['error'])];
                 continue;
             }
 
-            // Verificar extensión peligrosa
+            /*************** Verificaciones de Seguridad ***************/
+
+            // 3. Bloquea archivos con extensiones ejecutables o peligrosas (.php, .exe, .sh, etc.)
             if ($this->hasForbiddenExtension($SIS_FILES[$id]['name'])) {
                 $errors[] = ['success' => false, 'message' => 'Extensión de archivo no permitida por seguridad'];
                 continue;
             }
 
-            // Verificar tipo MIME real (desde el archivo temporal, no del header)
+            // 4. Validación de Tipo MIME Real:
+            // No confía en la extensión; inspecciona los bytes del archivo temporal (tmp_name)
             $allowedMimes = $this->buildAllowedMimes($archivo['ValidarTipo']);
             $realMime     = $this->getRealMimeType($SIS_FILES[$id]['tmp_name']);
-            // Verificacion
+
             if (!in_array($realMime, $allowedMimes, true)) {
                 $errors[] = ['success' => false, 'message' => 'Tipo de archivo no permitido'];
                 continue;
             }
 
-            // Verificar peso máximo (en megas)
+            /*************** Verificaciones de Restricción ***************/
+
+            // 5. Control de Peso: Convierte megabytes configurados a bytes para la comparación
             if ($SIS_FILES[$id]['size'] >= ($archivo['ValidarPeso'] * 1048576)) {
                 $errors[] = ['success' => false, 'message' => 'Archivo excede el tamaño permitido'];
                 continue;
             }
 
-            // Verificar si el archivo ya existe en el servidor
+            // 6. Verificación de Duplicados en Almacenamiento:
+            // Utiliza la abstracción de 'storage' para consultar si el nombre ya existe en el destino
             $nombreArchivo = $this->buildFileName($archivo, $SIS_FILES[$id]['name']);
-            $rutaArchivo   = $this->buildFilePath($archivo) . $nombreArchivo;
-            // Verificacion
-            if (file_exists($rutaArchivo)) {
+            $rutaRelativa  = $this->buildRelativePath($archivo) . $nombreArchivo;
+
+            if ($this->storage->exists($rutaRelativa)) {
                 $errors[] = ['success' => false, 'message' => 'El archivo ' . $SIS_FILES[$id]['name'] . ' ya existe en el servidor'];
             }
         }
 
-        // Retorno de datos
-        return empty($errors) ? ['success' => true,  'message' => true] : $errors;
+        // Retorno final: si el arreglo de errores está vacío, la validación es exitosa
+        return empty($errors)
+            ? ['success' => true,  'message' => true]
+            : $errors;
     }
 
     /******************************************************************************************/
+    /**
+     * Gestiona la subida física de archivos al servidor o almacenamiento en la nube.
+     *
+     * @param array $SIS_FILES   Arreglo global $_FILES con los binarios.
+     * @param array $arrArchivos Configuración de destino y reglas para cada archivo.
+     * @param array $PostData    Datos adicionales (necesario para procesar Base64).
+     * @return array {
+     *      Nombres  : string  Fragmento SQL para columnas (ej: ", foto, cv").
+     *      Archivos : string  Fragmento SQL para valores (ej: ", 'foto.jpg', 'doc.pdf'").
+     *      Update   : string  Fragmento SQL para SET (ej: ", foto='foto.jpg', cv='doc.pdf'").
+     *      success  : bool    Estado del proceso.
+     * }
+     */
     public function uploadFile(array $SIS_FILES, array $arrArchivos, array $PostData = []): array {
-        /**
-         * Sube los archivos al servidor.
-         *
-         * @param array $SIS_FILES   Equivalente a $_FILES
-         * @param array $arrArchivos Configuración de archivos a subir
-         * @param array $PostData    Datos POST adicionales (para Base64)
-         * @return array {
-         *   Nombres  : string  Columnas concatenadas (ej: ",imagen,doc")
-         *   Archivos : string  Valores concatenados  (ej: ",'file.png'")
-         *   Update   : string  Expresiones SQL UPDATE (ej: ",col = 'file.png'")
-         *   success  : bool
-         *   message  : string
-         * }
-         */
 
         // Variables
         $Data = [
@@ -341,11 +375,15 @@ class FileManager {
             'message'  => '',
         ];
 
-        // Se recorren archivos
+        // Itera sobre la configuración para decidir el método de subida
+        // - handleBase64Upload: Maneja la subida de un archivo codificado en Base64
+        // - handleNormalUpload: Maneja la subida de un archivo normal (multipart/form-data).
         foreach ($arrArchivos as $archivo) {
             if ($archivo['Base64'] === true) {
+                // Procesa strings Base64 (común en firmas o canvas)
                 $this->handleBase64Upload($archivo, $PostData, $Data);
             } else {
+                // Procesa subidas tradicionales (multipart/form-data)
                 $this->handleNormalUpload($archivo, $SIS_FILES, $Data);
             }
         }
@@ -355,81 +393,80 @@ class FileManager {
     }
 
     /******************************************************************************************/
+    /**
+     * Elimina un archivo específico del almacenamiento.
+     *
+     * @param string $SIS_File    Nombre del archivo físico.
+     * @param string $SIS_Carpeta Subdirectorio donde reside.
+     * @return bool True si se eliminó con éxito.
+     */
     public function deleteFile(string $SIS_File, string $SIS_Carpeta): bool {
-        /**
-         * Elimina un archivo del servidor.
-         *
-         * @param string $SIS_File    Nombre del archivo
-         * @param string $SIS_Carpeta Subcarpeta donde se encuentra
-         * @return bool
-         */
 
         // Si no hay archivos
         if (empty($SIS_File)) { return false;}
 
-        // Se obtiene la ruta
-        $rutaArchivo = $this->buildFilePath(['SubCarpeta' => $SIS_Carpeta]) . $SIS_File;
+        // Normaliza la ruta para evitar slashes duplicados o al inicio
+        $rutaRelativa = ltrim($SIS_Carpeta . '/' . $SIS_File, '/');
 
-        // Se verifica si existe y se borra los datos
-        if (file_exists($rutaArchivo)) {
-            return unlink($rutaArchivo);
-        }
+        // Delega al driver de almacenamiento (Local, S3, etc.)
+        return $this->storage->delete($rutaRelativa);
 
-        // El archivo no existía en el servidor, se considera operación exitosa
-        // (evita errores en el queryBuilder cuando el archivo ya fue eliminado previamente)
-        return true;
     }
 
     /******************************************************************************************/
+    /**
+     * Elimina múltiples archivos de forma masiva basándose en un mapa de resultados.
+     *
+     * @param string $SIS_Files   Lista de IDs separados por coma (ej: "img_perfil,doc_identidad").
+     * @param string $SIS_Carpeta Carpeta común de los archivos.
+     * @param array  $Result      Mapa que asocia el ID con el nombre real del archivo.
+     * @return bool
+     */
     public function deleteFilesMassive(string $SIS_Files, string $SIS_Carpeta, array $Result): bool {
-        /**
-         * Elimina múltiples archivos del servidor.
-         *
-         * @param string $SIS_Files   Lista de identificadores separados por coma
-         * @param string $SIS_Carpeta Subcarpeta donde se encuentran
-         * @param array  $Result      Mapa identificador => nombre de archivo
-         * @return bool
-         */
 
         // Si no hay archivos
-        if (empty($SIS_Files) || empty($Result)) {return false;}
+        if (empty($SIS_Files) || empty($Result)) {
+            return false;
+        }
 
         // Se obtienen datos y rutas
-        $arrFiles    = $this->CommonData->parseDataCommas($SIS_Files);
-        $rutaArchivo = $this->buildFilePath(['SubCarpeta' => $SIS_Carpeta]);
+        $arrFiles = $this->CommonData->parseDataCommas($SIS_Files);
 
         // Se recorren los archivos y se eliminan
         foreach ($arrFiles as $file) {
+            // Sanitización estricta del ID para evitar inyecciones en la ruta
             $file = preg_replace('/[^a-zA-Z0-9_]/', '', $file);
-            if (!empty($Result[$file]) && file_exists($rutaArchivo . $Result[$file])) {
-                unlink($rutaArchivo . $Result[$file]);
+            if (!empty($Result[$file])) {
+                $rutaRelativa = ltrim($SIS_Carpeta . '/' . $Result[$file], '/');
+                $this->storage->delete($rutaRelativa);
             }
         }
 
         // Retorno de datos
         return true;
+
     }
 
     /******************************************************************************************/
+    /**
+     * Explorador de archivos seguro.
+     *
+     * Orquesta las responsabilidades delegadas a métodos privados:
+     * 1. Resuelve y valida la ruta segura
+     * 2. Construye los MIME permitidos
+     * 3. Lista y filtra el contenido del directorio
+     *
+     * @param array $Data Parámetros de entrada:
+     *  - route : ruta encriptada base
+     *  - path  : subruta desde el frontend (ofuscada)
+     *  - tipos : tipos de archivos permitidos (ej: "image,pdf") o "all"
+     *
+     * @return array Lista de archivos y carpetas con metadata (nombre, tamaño, fecha, icono)
+     */
     public function fileExplorer(array $Data = []): array {
-        /**
-         * Explorador de archivos seguro.
-         *
-         * Orquesta las responsabilidades delegadas a métodos privados:
-         * 1. Resuelve y valida la ruta segura
-         * 2. Construye los MIME permitidos
-         * 3. Lista y filtra el contenido del directorio
-         *
-         * @param array $Data Parámetros de entrada:
-         *  - route : ruta encriptada base
-         *  - path  : subruta desde el frontend (ofuscada)
-         *  - tipos : tipos de archivos permitidos (ej: "image,pdf") o "all"
-         *
-         * @return array Lista de archivos y carpetas con metadata
-         */
 
-        // Resuelve y valida la ruta del explorador (anti path traversal)
-        $fullPath = $this->resolveExplorerPath($Data);
+        // Resuelve la ruta real evitando "Path Traversal" (../)
+        $relativePath = $this->resolveExplorerRelativePath($Data);
 
         // Construye la lista de MIME permitidos según los tipos configurados
         $allowedMimes = $this->buildAllowedMimes(
@@ -438,140 +475,225 @@ class FileManager {
                 : 'word,excel,powerpoint,pdf,image,txt,zip,video,music'
         );
 
-        // Lista, filtra y retorna el contenido del directorio
-        return $this->buildFileList($fullPath, $allowedMimes);
+        // Obtiene el listado crudo desde el driver
+        $rawEntries = $this->storage->listDirectory($relativePath);
+
+        // Filtra archivos ocultos, prohibidos y construye la respuesta para el frontend
+        return $this->filterAndBuildFileList($rawEntries, $relativePath, $allowedMimes);
     }
 
     /******************************************************************************************/
+    /**
+     * CREACIÓN SEGURA DE CARPETAS (HARDENING)
+     *
+     * Este método crea una carpeta dentro de una ruta base controlada,
+     * aplicando múltiples validaciones de seguridad y consistencia:
+     *
+     * Medidas implementadas:
+     * - Validación de existencia de parámetros (path y name)
+     * - Sanitización de path y nombre
+     * - Normalización de rutas (evita doble / o separadores inválidos)
+     * - Prevención de Path Traversal
+     * - Validación de permisos de escritura
+     * - Manejo de errores detallado en mkdir
+     * - Fallback en caso de fallo
+     *
+     * @param array $PostData Parámetros de entrada:
+     *  - base : ruta base (obligatoria, controlada por backend)
+     *  - path : subruta dentro de la base
+     *  - name : nombre de la nueva carpeta
+     *
+     * @return array Resultado:
+     *  - success : bool
+     *  - message : string (solo en error)
+     */
     public function createFolder(array $PostData = []): array {
-        /**
-         * CREACIÓN SEGURA DE CARPETAS (HARDENING)
-         *
-         * Este método crea una carpeta dentro de una ruta base controlada,
-         * aplicando múltiples validaciones de seguridad y consistencia:
-         *
-         * Medidas implementadas:
-         * - Validación de existencia de parámetros (path y name)
-         * - Sanitización de path y nombre
-         * - Normalización de rutas (evita doble / o separadores inválidos)
-         * - Prevención de Path Traversal
-         * - Validación de permisos de escritura
-         * - Manejo de errores detallado en mkdir
-         * - Fallback en caso de fallo
-         *
-         * @param array $PostData Parámetros de entrada:
-         *  - base : ruta base (obligatoria, controlada por backend)
-         *  - path : subruta dentro de la base
-         *  - name : nombre de la nueva carpeta
-         *
-         * @return array Resultado:
-         *  - success : bool
-         *  - message : string (solo en error)
-         */
 
-        /*******************************************************************/
-        // VALIDACIÓN DE PARÁMETROS DE ENTRADA
-        /*******************************************************************/
+        // Validacion de parametros de entrada
         if (empty($PostData['name'])) {
-            return ["success" => false, "message" => "Nombre no definido"];
+            return ['success' => false, 'message' => 'Nombre no definido'];
         }
 
-        /*******************************************************************/
-        // CONSTRUCCIÓN SEGURA DE RUTA (SIN DOBLE SLASH)
-        /*******************************************************************/
-        $ROOT_PATH     = ConfigAPP::APP['uploadFolder'];
-        $ROOT_PATH    .= isset($PostData['SubRoute']) ? '/'.trim($this->sanitizePath($PostData['SubRoute']), '/') : '';
-        $relativePath  = isset($PostData['path']) ? '/'.trim($this->sanitizePath($PostData['path']), '/') : '';
-        $relativePath .= isset($PostData['name']) ? '/'.trim($this->sanitizeFolderName($PostData['name']), '/') : '';
+        // Construcción segura de la ruta jerárquica
+        $subRoute     = isset($PostData['SubRoute']) ? trim($this->sanitizePath($PostData['SubRoute']), '/') : '';
+        $relativePath = $subRoute !== '' ? $subRoute . '/' : '';
+        $relativePath .= isset($PostData['path'])
+            ? trim($this->sanitizePath($PostData['path']), '/') . '/'
+            : '';
 
-        /*******************************************************************/
-        // VALIDACIÓN DE SEGURIDAD (ANTI PATH TRAVERSAL)
-        /*******************************************************************/
+        // Sanitiza el nombre de la carpeta para evitar caracteres ilegales en sistemas de archivos
+        $relativePath .= $this->sanitizeFolderName($PostData['name']);
+
         // Normaliza posibles dobles slashes (extra seguridad)
-        $fullPath = preg_replace('#/+#', '/', $ROOT_PATH.$relativePath);
+        $relativePath = preg_replace('#/+#', '/', $relativePath);
 
-        /*******************************************************************/
-        // VALIDACIÓN DE EXISTENCIA
-        /*******************************************************************/
-        if (is_dir($fullPath)) {
-            return [
-                "success" => false,
-                "message" => "La carpeta ya existe"
-            ];
-        }
-
-        /*******************************************************************/
-        // VALIDACIÓN DE PERMISOS CARPETA UPLOAD
-        /*******************************************************************/
-        $result = $this->ensurePermissions755($ROOT_PATH);
-        if (!$result['success']) {
-            return [
-                "success" => false,
-                "message" => $result['message'] . " (actual: {$result['current']})"
-            ];
-        }
-        if (!$this->canWrite($ROOT_PATH)) {
-            return [
-                "success" => false,
-                "message" => "No hay permisos de escritura en ".$ROOT_PATH
-            ];
-        }
-
-        /*******************************************************************/
-        // CREACIÓN DE CARPETA (MANEJO DE ERRORES DETALLADO)
-        /*******************************************************************/
-        return $this->ensureDirectoryExists($fullPath);
+        // Creacion de la carpeta (Manejo de errores detallado)
+        return $this->storage->createDirectory($relativePath);
 
     }
 
+    /******************************************************************************************/
+    /**
+     * Elimina una carpeta y todo su contenido usando el driver activo.
+     *
+     * Medidas de seguridad aplicadas:
+     * - Validación de parámetros de entrada (path y name obligatorios)
+     * - Sanitización de la ruta para prevenir Path Traversal
+     * - Bloqueo de eliminación de la carpeta raíz de uploads
+     * - Validación de que la ruta resultante no quede vacía
+     *
+     * @param array $PostData Parámetros de entrada:
+     *  - SubRoute : subruta base opcional (controlada por backend)
+     *  - path     : subruta dentro de la base
+     *  - name     : nombre de la carpeta a eliminar
+     *
+     * @return array Resultado:
+     *  - success : bool
+     *  - message : string
+     */
+    public function deleteFolder(array $PostData = []): array {
+
+        // Validacion de parametros de entrada
+        if (empty($PostData['name'])) {
+            return ['success' => false, 'message' => 'Nombre de carpeta no definido'];
+        }
+
+        // Ensamblado de la ruta absoluta relativa al driver
+        $subRoute     = isset($PostData['SubRoute']) ? trim($this->sanitizePath($PostData['SubRoute']), '/') : '';
+        $relativePath = $subRoute !== '' ? $subRoute . '/' : '';
+        $relativePath .= isset($PostData['path'])
+            ? trim($this->sanitizePath($PostData['path']), '/') . '/'
+            : '';
+
+        // Sanitiza el nombre de la carpeta para evitar caracteres ilegales en sistemas de archivos
+        $relativePath .= $this->sanitizeFolderName($PostData['name']);
+
+        // Elimina dobles slashes y espacios residuales
+        $relativePath = trim(preg_replace('#/+#', '/', $relativePath), '/');
+
+        /*******************************************************************/
+        // SEGURIDAD CRÍTICA: impedir eliminación de la raíz
+        // Una ruta vacía o de un solo nivel sin subruta controlada
+        // apuntaría a la carpeta base completa del driver → bloqueado
+        /*******************************************************************/
+        if ($relativePath === '') {
+            return ['success' => false, 'message' => 'No se permite eliminar la carpeta raíz'];
+        }
+
+        // Eliminacion de la carpeta (Manejo de errores detallado)
+        return $this->storage->deleteDirectory($relativePath);
+    }
 
     /*******************************************************************************************************************/
-	/*                                                                                                                 */
-    /*                                              Métodos Publicos                                                   */
-	/*                                                                                                                 */
+    /*                                              Métodos Públicos utilitarios                                       */
     /*******************************************************************************************************************/
 
     /******************************************************************************************/
-    // Evitar Directory Traversal (../)
+    /**
+     * Sanitiza una ruta eliminando secuencias peligrosas y caracteres no permitidos.
+     * * Este método es la defensa principal contra ataques de "Path Traversal" (../).
+     * Primero decodifica la URL para capturar intentos de evasión mediante encoding,
+     * luego elimina cualquier intento de subir de nivel en el directorio (..) y
+     * finalmente aplica una lista blanca de caracteres permitidos (letras, números,
+     * slash, guiones y guiones bajos).
+     *
+     * @param string $path Ruta de entrada potencialmente insegura.
+     * @return string Ruta limpia y segura para el sistema de archivos.
+     */
     public function sanitizePath(string $path): string {
+        // 1. Decodifica la URL para neutralizar bypasses como %2E%2E%2F (../)
         $decoded = rawurldecode($path);
-        $clean   = preg_replace('/\.{2,}/', '', $decoded); // elimina ".."
+
+        // 2. Elimina secuencias de dos o más puntos consecutivos para evitar navegar hacia atrás
+        $clean   = preg_replace('/\.{2,}/', '', $decoded);
+
+        // 3. Filtra y deja solo caracteres alfanuméricos, slashes, guiones y guiones bajos
         return preg_replace('/[^a-zA-Z0-9\/\-_]/', '', $clean);
     }
 
     /******************************************************************************************/
-    // Eliminar caracteres especiales para nombres de carpetas
+    /**
+     * Sanitiza el nombre de una carpeta eliminando cualquier carácter especial o de ruta.
+     * * A diferencia de sanitizePath, este método es mucho más restrictivo ya que
+     * no permite el carácter "/" (slash). Su objetivo es garantizar que el nombre
+     * de un directorio sea una cadena simple y segura, sin posibilidad de inyectar
+     * subdirectorios o comandos.
+     *
+     * @param string $name Nombre de carpeta propuesto por el usuario.
+     * @return string Nombre de carpeta sanitizado (alfanumérico, guion y guion bajo).
+     */
     public function sanitizeFolderName(string $name): string {
+        // Elimina absolutamente todo lo que no sea una letra, número, guion o guion bajo
         return preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
     }
 
+    /******************************************************************************************/
+    /**
+     * Genera la URL de acceso a un recurso almacenado.
+     * * Este método resuelve la ubicación pública de un archivo. Soporta tanto URLs
+     * permanentes como URLs firmadas (temporales), las cuales son fundamentales
+     * para la seguridad al compartir archivos privados almacenados en servicios
+     * como Amazon S3 o Google Cloud Storage.
+     *
+     * @param string $filePath Ruta relativa del archivo dentro del storage.
+     * @param int $expiresIn Tiempo de vida en segundos (0 para URL permanente).
+     * @return string URL completa lista para ser usada en etiquetas <img>, <a>, etc.
+     */
+    public function getFileUrl(string $filePath, int $expiresIn = 0): string {
+        // Delega la generación de la URL al driver activo (Local, S3, GCS, etc.)
+        return $this->storage->getUrl($filePath, $expiresIn);
+    }
+
+    /******************************************************************************************/
+    /**
+     * Retorna la URL raíz pública configurada para el servidor de almacenamiento.
+     * * Es una herramienta de abstracción esencial: permite que el frontend conozca
+     * la base de las rutas sin necesidad de saber si los archivos están en el
+     * servidor local o en un CDN externo. Garantiza la consistencia al incluir
+     * siempre el slash final.
+     *
+     * @return string URL base del almacenamiento (ej: "https://cdn.example.com/uploads/").
+     */
+    public function getMainPathUrl(): string {
+        // Recupera la ruta base directamente desde la configuración del driver activo.
+        return $this->storage->getMainPathUrl();
+    }
+
+    /******************************************************************************************/
+
+    /**
+     * Provee acceso directo a la instancia del driver de almacenamiento actual.
+     * * Sigue el patrón de diseño "Bridge" o "Adapter", permitiendo acceder a
+     * funcionalidades específicas del driver que no estén mapeadas en los métodos
+     * generales de la clase, facilitando la extensibilidad del sistema.
+     *
+     * @return StorageDriverInterface Instancia del driver (LocalDriver, S3Driver, etc.).
+     */
+    public function getStorageDriver(): StorageDriverInterface {
+        return $this->storage;
+    }
 
     /*******************************************************************************************************************/
-	/*                                                                                                                 */
     /*                                              Métodos privados                                                   */
-	/*                                                                                                                 */
     /*******************************************************************************************************************/
 
     /******************************************************************************************/
-    // Maneja la subida de un archivo codificado en Base64.
+    /**
+     * Maneja la subida de archivos en formato Base64.
+     *
+     * @param array $archivo   Configuración del archivo (identificador, nombre, ruta, etc.)
+     * @param array $PostData  Datos recibidos (por ejemplo $_POST)
+     * @param array &$Data     Referencia al array donde se almacenan los resultados
+     */
     private function handleBase64Upload(array $archivo, array $PostData, array &$Data): void {
-        /**
-         * Maneja la subida de archivos en formato Base64.
-         *
-         * @param array $archivo   Configuración del archivo (identificador, nombre, ruta, etc.)
-         * @param array $PostData  Datos recibidos (por ejemplo $_POST)
-         * @param array &$Data     Referencia al array donde se almacenan los resultados
-         */
 
         // Obtiene el identificador único del archivo (clave en el POST)
         $id = $archivo['Identificador'];
 
         // Si no existe el dato en el POST, no se procesa
         if (empty($PostData[$id])) {
-            // Mensaje
             $Data['success'] = false;
             $Data['message'] = 'No hay archivo';
-            // Se detiene proceso
             return;
         }
 
@@ -579,10 +701,8 @@ class FileManager {
         // Factor 1.37 agrega margen adicional sobre el 1.33 teórico
         $maxBase64Bytes = ($archivo['ValidarPeso'] ?? 10) * 1048576 * 1.37;
         if (strlen($PostData[$id]) > $maxBase64Bytes) {
-            // Mensaje
             $Data['success'] = false;
             $Data['message'] = 'Archivo excede el tamaño permitido';
-            // Se detiene proceso
             return;
         }
 
@@ -594,23 +714,19 @@ class FileManager {
         // Si la decodificación falla, se detiene el proceso
         $dIMG = base64_decode($rawBase64, true);
         if ($dIMG === false) {
-            // Mensaje
             $Data['success'] = false;
             $Data['message'] = 'El contenido Base64 no es válido';
-            // Se detiene proceso
             return;
         }
 
         // Verificar MIME del binario decodificado antes de guardar
-        $realMime = $this->getFinfo()->buffer($dIMG); // ← buffer() inspecciona el contenido en memoria
+        $realMime = $this->getFinfo()->buffer($dIMG);
 
         // Verificar si esta dentro de los Mime permitidos
         $allowed  = $this->buildAllowedMimes($archivo['ValidarTipo'] ?? 'image');
         if (!in_array($realMime, $allowed, true)) {
-            // Mensaje
             $Data['success'] = false;
             $Data['message'] = 'Tipo de archivo no permitido';
-            // Se detiene proceso
             return;
         }
 
@@ -633,23 +749,22 @@ class FileManager {
         $nombreArchivo = $this->sanitizeFileName($nombreArchivo);
 
         // Construye la ruta completa donde se guardará el archivo
-        $rutaArchivo = $this->buildFilePath($archivo);
+        $rutaRelativa  = $this->buildRelativePath($archivo);
 
         // Delegar guardado al método compartido
-        $this->saveFileToDisk($rutaArchivo, $nombreArchivo, $dIMG, true, $Data, $id);
+        $this->saveFileViaDriver($rutaRelativa, $nombreArchivo, $dIMG, true, $Data, $id);
 
     }
 
     /******************************************************************************************/
-    // Maneja la subida de un archivo normal (multipart/form-data).
+    /**
+     * Maneja la subida de un archivo normal (multipart/form-data).
+     *
+     * @param array $archivo    Configuración del archivo (identificador, reglas, etc.)
+     * @param array $SIS_FILES  Array de archivos subidos (equivalente a $_FILES)
+     * @param array &$Data      Referencia al array donde se almacenan los resultados
+     */
     private function handleNormalUpload(array $archivo, array $SIS_FILES, array &$Data): void {
-        /**
-         * Maneja la subida de un archivo normal (multipart/form-data).
-         *
-         * @param array $archivo    Configuración del archivo (identificador, reglas, etc.)
-         * @param array $SIS_FILES  Array de archivos subidos (equivalente a $_FILES)
-         * @param array &$Data      Referencia al array donde se almacenan los resultados
-         */
 
         // Obtiene el identificador único del archivo (clave en $_FILES)
         $id = $archivo['Identificador'];
@@ -657,10 +772,8 @@ class FileManager {
         // Verifica si el archivo fue enviado correctamente
         // Si no existe el nombre del archivo, se detiene el proceso
         if (empty($SIS_FILES[$id]['name'])) {
-            // Mensaje
             $Data['success'] = false;
             $Data['message'] = 'No hay archivo';
-            // Se detiene proceso
             return;
         }
 
@@ -672,53 +785,55 @@ class FileManager {
         );
 
         // Construye la ruta donde se almacenará el archivo
-        $rutaArchivo = $this->buildFilePath($archivo);
+        $rutaRelativa = $this->buildRelativePath($archivo);
 
         // Delegar guardado al método compartido (tmp_name como contenido)
-        $this->saveFileToDisk($rutaArchivo, $nombreArchivo, $SIS_FILES[$id]['tmp_name'], false, $Data, $id);
-
+        $this->saveFileViaDriver(
+            $rutaRelativa,
+            $nombreArchivo,
+            $SIS_FILES[$id]['tmp_name'],
+            false,
+            $Data,
+            $id
+        );
     }
 
     /******************************************************************************************/
-    // Guarda un archivo en disco, verificando existencia y directorio previamente.
-    private function saveFileToDisk(string $rutaArchivo,string $nombreArchivo,string $contenido,bool   $isBase64,array  &$Data,string $id): void {
-        /**
-         * Guarda un archivo en disco, verificando existencia y directorio previamente.
-         * Centraliza la lógica común entre handleBase64Upload y handleNormalUpload.
-         *
-         * @param string   $rutaArchivo   Ruta del directorio destino (con slash final)
-         * @param string   $nombreArchivo Nombre final del archivo
-         * @param string   $contenido     Contenido binario (Base64 decodificado) o ruta tmp_name
-         * @param bool     $isBase64      true = file_put_contents, false = move_uploaded_file
-         * @param array    &$Data         Referencia al array de resultados
-         * @param string   $id            Identificador del archivo (clave en $Data)
-         */
+    /**
+     * Guarda un archivo en disco, verificando existencia y directorio previamente.
+     * Centraliza la lógica común entre handleBase64Upload y handleNormalUpload.
+     *
+     * @param string   $rutaArchivo   Ruta del directorio destino (con slash final)
+     * @param string   $nombreArchivo Nombre final del archivo
+     * @param string   $contenido     Contenido binario (Base64 decodificado) o ruta tmp_name
+     * @param bool     $isBase64      true = file_put_contents, false = move_uploaded_file
+     * @param array    &$Data         Referencia al array de resultados
+     * @param string   $id            Identificador del archivo (clave en $Data)
+     */
+    private function saveFileViaDriver(string $rutaRelativa, string $nombreArchivo, string $contenido, bool   $isBase64, array  &$Data, string $id): void {
 
         // Evita sobrescribir archivos existentes en el servidor
-        if (file_exists($rutaArchivo . $nombreArchivo)) {
-            // Mensaje
+        $fullRelative = ltrim($rutaRelativa . $nombreArchivo, '/');
+
+        // Evita sobrescribir archivos existentes en el servidor
+        if ($this->storage->exists($fullRelative)) {
             $Data['success'] = false;
             $Data['message'] = 'El archivo que intenta subir ya existe';
-            // Se detiene proceso
             return;
         }
 
         // Asegurar que el directorio exista (lo crea si es necesario)
-        $response = $this->ensureDirectoryExists($rutaArchivo);
-        if ($response['success'] === false) {
-            // Mensaje
+        // Crea el "directorio" si el driver lo requiere (local y SFTP lo necesitan; S3/GCS no)
+        $dirResult = $this->storage->createDirectory(ltrim($rutaRelativa, '/'));
+        // No bloqueamos si el dir ya existía (success=false + "ya existe" es OK)
+        if ($dirResult['success'] === false && !str_contains($dirResult['message'], 'ya existe')) {
             $Data['success'] = false;
             $Data['message'] = 'El directorio donde intenta subir el archivo no existe';
-            // Se detiene proceso
             return;
         }
 
-        // Guardar el archivo según su origen:
-        // - Base64: escribe el binario ya decodificado en memoria (file_put_contents)
-        // - Normal: mueve el archivo desde la ubicación temporal del servidor (move_uploaded_file)
-        $saved = $isBase64
-            ? file_put_contents($rutaArchivo . $nombreArchivo, $contenido) !== false
-            : move_uploaded_file($contenido, $rutaArchivo . $nombreArchivo);
+        // Sube el archivo vía driver
+        $saved = $this->storage->upload($contenido, $fullRelative, $isBase64);
 
         // Registrar resultado en $Data si se guardó correctamente
         if ($saved) {
@@ -727,21 +842,20 @@ class FileManager {
     }
 
     /******************************************************************************************/
-    // Construye el nombre final del archivo según la configuración.
+    /**
+     * Construye el nombre final del archivo según la configuración definida.
+     *
+     * Reglas:
+     * - Si existe 'NombreArchivo', se usa como nombre base y se respeta la extensión original.
+     * - Si existe 'SufijoArchivo', se antepone al nombre original.
+     * - Si no hay configuración, se mantiene el nombre original.
+     *
+     * @param array  $archivo      Configuración del archivo (NombreArchivo, SufijoArchivo, etc.)
+     * @param string $originalName Nombre original del archivo subido (incluye extensión)
+     *
+     * @return string Nombre final del archivo
+     */
     private function buildFileName(array $archivo, string $originalName): string {
-        /**
-         * Construye el nombre final del archivo según la configuración definida.
-         *
-         * Reglas:
-         * - Si existe 'NombreArchivo', se usa como nombre base y se respeta la extensión original.
-         * - Si existe 'SufijoArchivo', se antepone al nombre original.
-         * - Si no hay configuración, se mantiene el nombre original.
-         *
-         * @param array  $archivo      Configuración del archivo (NombreArchivo, SufijoArchivo, etc.)
-         * @param string $originalName Nombre original del archivo subido (incluye extensión)
-         *
-         * @return string Nombre final del archivo
-         */
 
         // Caso 1: Se define un nombre fijo para el archivo
         // - Se mantiene la extensión original del archivo subido
@@ -761,72 +875,64 @@ class FileManager {
         // Caso 3: No hay configuración adicional
         // - Se devuelve el nombre original tal cual
         return $originalName;
+
     }
 
     /******************************************************************************************/
-    // Construye la ruta de destino según la configuración.
-    private function buildFilePath(array $archivo): string {
-        /**
-         * Construye la ruta de destino donde se almacenará el archivo.
-         *
-         * Reglas:
-         * - Parte desde la carpeta base definida en la configuración global.
-         * - Si se especifica una subcarpeta, se agrega a la ruta final.
-         * - Se eliminan intentos básicos de path traversal (../) por seguridad.
-         *
-         * @param array $archivo Configuración del archivo (incluye posible subcarpeta)
-         *
-         * @return string Ruta final donde se guardará el archivo
-         */
+    /**
+     * Construye la ruta RELATIVA del archivo (sin la carpeta base del driver).
+     *
+     * Reglas:
+     * - Parte desde la carpeta base definida en la configuración global.
+     * - Si se especifica una subcarpeta, se agrega a la ruta final.
+     * - Se eliminan intentos básicos de path traversal (../) por seguridad.
+     *
+     * En v1 buildFilePath() retornaba la ruta absoluta incluyendo uploadFolder.
+     * Ahora retorna solo la subcarpeta relativa, que el driver añade a su propio
+     * "base" (carpeta local, bucket S3, directorio SFTP, etc.).
+     *
+     * Se mantiene la caché para evitar reprocesos dentro de la misma petición.
+     *
+     * @param array $archivo Configuración del archivo (incluye posible subcarpeta)
+     *
+     * @return string Ruta final donde se guardará el archivo
+     */
+    private function buildRelativePath(array $archivo): string {
 
         // Obtiene el valor de la subcarpeta desde el arreglo `$archivo`, si no existe, se asigna una cadena vacía por defecto.
         $sub = $archivo['SubCarpeta'] ?? '';
 
         // Verifica si la ruta ya fue previamente resuelta y almacenada en caché.
         if (!isset(self::$pathCache[$sub])) {
-
             // Obtiene la carpeta base de uploads desde la configuración de la aplicación
-            $path = ConfigAPP::APP['uploadFolder'];
-
+            $path = '';
             // Si se define una subcarpeta en la configuración del archivo
             if (!empty($archivo['SubCarpeta'])) {
-
-                // Resuelve la ruta absoluta real, eliminando ".." y enlaces simbólicos.
-                // Si la subcarpeta intenta escapar del uploadFolder, realpath() retornará
-                // la ruta real del sistema — validar contra ROOT si se requiere confinamiento estricto.
-                $ROOT        = realpath(ConfigAPP::APP['uploadFolder']);
-                $safeSubPath = realpath($ROOT . '/' . $archivo['SubCarpeta']);
-
-                // Agrega la subcarpeta a la ruta base
-                $path = $safeSubPath . '/';
+                // Sanitiza la subcarpeta para evitar path traversal
+                $path = $this->sanitizePath($archivo['SubCarpeta']) . '/';
             }
-
-            // Se almacena en el caché.
             self::$pathCache[$sub] = $path;
         }
 
-        // Retorna la ruta desde caché (evitando reprocesos).
         return self::$pathCache[$sub];
-
     }
 
     /******************************************************************************************/
-    // Sanitiza el nombre de archivo para prevenir path traversal e inyecciones.
+    /**
+     * Sanitiza el nombre de archivo para prevenir vulnerabilidades como:
+     * - Path Traversal (ej: ../../archivo.php)
+     * - Inyección de caracteres peligrosos
+     * - Uso de nombres no válidos en el sistema de archivos
+     *
+     * Reglas:
+     * - Se eliminan rutas y se conserva solo el nombre del archivo.
+     * - Se reemplazan caracteres no permitidos por "_".
+     *
+     * @param string $filename Nombre original del archivo
+     *
+     * @return string Nombre de archivo seguro
+     */
     private function sanitizeFileName(string $filename): string {
-        /**
-         * Sanitiza el nombre de archivo para prevenir vulnerabilidades como:
-         * - Path Traversal (ej: ../../archivo.php)
-         * - Inyección de caracteres peligrosos
-         * - Uso de nombres no válidos en el sistema de archivos
-         *
-         * Reglas:
-         * - Se eliminan rutas y se conserva solo el nombre del archivo.
-         * - Se reemplazan caracteres no permitidos por "_".
-         *
-         * @param string $filename Nombre original del archivo
-         *
-         * @return string Nombre de archivo seguro
-         */
 
         // Elimina cualquier componente de ruta (previene path traversal)
         // Ejemplo: "../../etc/passwd" → "passwd"
@@ -840,21 +946,21 @@ class FileManager {
 
         // Retorna el nombre sanitizado
         return $filename;
+
     }
 
     /******************************************************************************************/
-    // Verifica si la extensión del archivo está en la lista de extensiones prohibidas.
+    /**
+     * Verifica si la extensión del archivo está dentro de una lista de extensiones prohibidas.
+     *
+     * Esto ayuda a prevenir la subida de archivos potencialmente peligrosos
+     * como scripts ejecutables (ej: .php, .exe, .sh, etc.).
+     *
+     * @param string $filename Nombre del archivo (puede incluir ruta, pero solo se evalúa la extensión)
+     *
+     * @return bool TRUE si la extensión está prohibida, FALSE en caso contrario
+     */
     private function hasForbiddenExtension(string $filename): bool {
-        /**
-         * Verifica si la extensión del archivo está dentro de una lista de extensiones prohibidas.
-         *
-         * Esto ayuda a prevenir la subida de archivos potencialmente peligrosos
-         * como scripts ejecutables (ej: .php, .exe, .sh, etc.).
-         *
-         * @param string $filename Nombre del archivo (puede incluir ruta, pero solo se evalúa la extensión)
-         *
-         * @return bool TRUE si la extensión está prohibida, FALSE en caso contrario
-         */
 
         // Obtiene la extensión del archivo y la normaliza a minúsculas
         // Ejemplo: "imagen.PNG" → "png"
@@ -863,22 +969,22 @@ class FileManager {
         // Verifica si la extensión está en la lista de extensiones prohibidas
         // strict = true evita comparaciones débiles (ej: "0" == 0)
         return in_array($ext, self::BLOCKED_EXTENSIONS, true);
+
     }
 
     /******************************************************************************************/
-    // Obtiene el tipo MIME real del archivo usando finfo (no el reportado por el cliente).
+    /**
+     * Obtiene el tipo MIME real de un archivo utilizando la extensión Fileinfo de PHP.
+     *
+     * A diferencia del MIME enviado por el cliente (ej: $_FILES['type']),
+     * este método inspecciona el contenido real del archivo, evitando
+     * falsificaciones (ej: subir un .php disfrazado como .jpg).
+     *
+     * @param string $tmpPath Ruta temporal del archivo (ej: $_FILES['tmp_name'])
+     *
+     * @return string Tipo MIME detectado (ej: "image/png") o cadena vacía si falla
+     */
     private function getRealMimeType(string $tmpPath): string {
-        /**
-         * Obtiene el tipo MIME real de un archivo utilizando la extensión Fileinfo de PHP.
-         *
-         * A diferencia del MIME enviado por el cliente (ej: $_FILES['type']),
-         * este método inspecciona el contenido real del archivo, evitando
-         * falsificaciones (ej: subir un .php disfrazado como .jpg).
-         *
-         * @param string $tmpPath Ruta temporal del archivo (ej: $_FILES['tmp_name'])
-         *
-         * @return string Tipo MIME detectado (ej: "image/png") o cadena vacía si falla
-         */
 
         // Obtiene el MIME real del archivo desde su contenido
         // Si falla, retorna false, por lo que usamos operador ternario para asegurar string
@@ -886,43 +992,41 @@ class FileManager {
 
         // Retorna el MIME detectado o string vacío si no se pudo determinar
         return $mime ?: '';
+
     }
 
     /******************************************************************************************/
-    // Construye el array de tipos MIME permitidos a partir de una cadena de categorías separadas por comas.
+    /**
+     * Construye un array de tipos MIME permitidos a partir de una cadena
+     * de categorías separadas por comas.
+     *
+     * Ejemplo:
+     * Entrada: "image,document"
+     * Salida: ["image/png", "image/jpeg", "application/pdf", ...]
+     *
+     * Reglas:
+     * - Convierte la cadena en un array de categorías.
+     * - Busca cada categoría en una constante de tipos MIME definidos.
+     * - Combina todos los MIME encontrados en un solo array.
+     *
+     * @param string $tipos Cadena de categorías separadas por comas
+     *
+     * @return array Lista de tipos MIME permitidos
+     */
     private function buildAllowedMimes(string $tipos): array {
-        /**
-         * Construye un array de tipos MIME permitidos a partir de una cadena
-         * de categorías separadas por comas.
-         *
-         * Ejemplo:
-         * Entrada: "image,document"
-         * Salida: ["image/png", "image/jpeg", "application/pdf", ...]
-         *
-         * Reglas:
-         * - Convierte la cadena en un array de categorías.
-         * - Busca cada categoría en una constante de tipos MIME definidos.
-         * - Combina todos los MIME encontrados en un solo array.
-         *
-         * @param string $tipos Cadena de categorías separadas por comas
-         *
-         * @return array Lista de tipos MIME permitidos
-         */
 
         // Convierte la cadena en un array
         // Ejemplo: "image,document" → ["image", "document"]
-        $arrTipos = $this->CommonData->parseDataCommas($tipos);
+        $arrTipos     = $this->CommonData->parseDataCommas($tipos);
 
         // Inicializa el array de MIME permitidos
         $allowedMimes = [];
 
         // Recorre cada categoría solicitada
         foreach ($arrTipos as $tipo) {
-
             // Verifica si la categoría existe en la constante MIME_TYPES
             // Esto evita errores por categorías no definidas
             if (isset(self::MIME_TYPES[$tipo])) {
-
                 // Mezcla (merge) los MIME de esa categoría al array final
                 // Ejemplo: "image" → ["image/png", "image/jpeg", ...]
                 $allowedMimes = array_unique(array_merge($allowedMimes, self::MIME_TYPES[$tipo]));
@@ -931,84 +1035,33 @@ class FileManager {
 
         // Retorna el listado final de tipos MIME permitidos
         return $allowedMimes;
+
     }
 
     /******************************************************************************************/
-    // Crea el directorio si no existe, con permisos seguros (0755).
-    private function ensureDirectoryExists(string $path): array {
-        /**
-         * Crea el directorio si no existe, utilizando permisos seguros.
-         *
-         * Reglas:
-         * - Verifica si el directorio ya existe antes de intentar crearlo.
-         * - Si no existe, lo crea de forma recursiva.
-         * - Si la creación falla, lanza una excepción para evitar errores silenciosos.
-         *
-         * @param string $path Ruta del directorio a verificar/crear
-         */
-
-        // Verifica si la ruta ya existe y es un directorio válido
-        if (!is_dir($path)) {
-
-            // Intenta crear el directorio:
-            // - 0755: permisos seguros (lectura/ejecución para todos, escritura solo propietario)
-            // - true: permite crear directorios anidados (recursivo)
-            try {
-                $created = mkdir($path, 0755, true);
-
-                if ($created) {
-                    return [
-                        "success" => true,
-                        "message" => "Carpeta creada correctamente"
-                    ];
-                }
-
-                // Fallback: mkdir devolvió false sin excepción
-                return [
-                    "success" => false,
-                    "message" => "No se pudo crear el directorio (mkdir retornó false)"
-                ];
-
-            } catch (\Throwable $e) {
-
-                // Manejo de errores reales del sistema (permisos, rutas, etc.)
-                return [
-                    "success" => false,
-                    "message" => "Error al crear carpeta: " . $e->getMessage()
-                ];
-
-            }
-        // Si el directorio ya existe
-        }else{
-            return ['success' => true, 'message' => 'El directorio ya existe'];
-        }
-    }
-
-    /******************************************************************************************/
-    // Agrega los datos del archivo subido al array de resultados.
+    /**
+     * Agrega la información del archivo procesado al array de resultados.
+     *
+     * Este método construye strings concatenados que luego pueden ser usados
+     * para operaciones como inserciones o actualizaciones en base de datos.
+     *
+     * Estructura esperada en $Data:
+     * - Nombres: lista de identificadores (columnas)
+     * - Archivos: lista de valores (nombres de archivos)
+     * - Update: expresiones tipo "col = 'valor'" para UPDATE SQL.
+     *           IMPORTANTE: usar solo con query builders que apliquen prepared statements.
+     *
+     * @param array  &$Data          Array de resultados (por referencia)
+     * @param string $id             Identificador del archivo (ej: nombre de columna)
+     * @param string $NombreArchivo  Nombre final del archivo almacenado
+     *
+     * @return void
+     */
     private function appendToData(array &$Data, string $id, string $NombreArchivo): void {
-        /**
-         * Agrega la información del archivo procesado al array de resultados.
-         *
-         * Este método construye strings concatenados que luego pueden ser usados
-         * para operaciones como inserciones o actualizaciones en base de datos.
-         *
-         * Estructura esperada en $Data:
-         * - Nombres: lista de identificadores (columnas)
-         * - Archivos: lista de valores (nombres de archivos)
-         * - Update: expresiones tipo "col = 'valor'" para UPDATE SQL.
-         *           IMPORTANTE: usar solo con query builders que apliquen prepared statements.
-         *
-         * @param array  &$Data          Array de resultados (por referencia)
-         * @param string $id             Identificador del archivo (ej: nombre de columna)
-         * @param string $NombreArchivo  Nombre final del archivo almacenado
-         *
-         * @return void
-         */
 
         // Agrega el identificador del campo
         // Ejemplo: ",imagen,documento"
-        $Data['Nombres'] .= ',' . $id;
+        $Data['Nombres']  .= ',' . $id;
 
         // Agrega el nombre del archivo como valor (entre comillas)
         // Ejemplo: ",'file1.png','file2.pdf'"
@@ -1016,27 +1069,26 @@ class FileManager {
 
         // Construye una expresión para UPDATE SQL
         // Ejemplo: ",imagen = 'file1.png',documento = 'file2.pdf'"
-        $Data['Update'] .= ',' . $id . " = '" . $NombreArchivo . "'";
+        $Data['Update']   .= ',' . $id . " = '" . $NombreArchivo . "'";
 
         // Construye una respuesta en caso de ser necesario
-        $Data['success'] = true;
-        $Data['message'] = 'Archivo subido correctamente';
+        $Data['success']   = true;
+        $Data['message']   = 'Archivo subido correctamente';
 
     }
 
     /******************************************************************************************/
-    // Retorna el mensaje de error correspondiente al código de error de subida de PHP.
+    /**
+     * Retorna el mensaje de error correspondiente a un código de subida de archivos en PHP.
+     *
+     * Estos códigos provienen de la constante interna de PHP `$_FILES['error']`
+     * y permiten identificar qué falló durante el proceso de carga.
+     *
+     * @param int $error Código de error de subida (UPLOAD_ERR_*)
+     *
+     * @return string Mensaje descriptivo del error
+     */
     private function uploadPHPError(int $error): string {
-        /**
-         * Retorna el mensaje de error correspondiente a un código de subida de archivos en PHP.
-         *
-         * Estos códigos provienen de la constante interna de PHP `$_FILES['error']`
-         * y permiten identificar qué falló durante el proceso de carga.
-         *
-         * @param int $error Código de error de subida (UPLOAD_ERR_*)
-         *
-         * @return string Mensaje descriptivo del error
-         */
 
         // Utiliza la expresión match (PHP 8+) para mapear códigos a mensajes
         return match ($error) {
@@ -1067,356 +1119,168 @@ class FileManager {
 
             // Caso por defecto: código no reconocido
             default => "Error desconocido al subir el archivo (código: $error)",
+
         };
     }
 
     /******************************************************************************************/
-    // Determina si un archivo o carpeta debe ser incluido en el listado del explorador, aplicando múltiples reglas de seguridad
-    private function isAllowed(string $file, string $fullPath, array $allowedMimes): bool {
-        /**
-         * FUNCIÓN DE FILTRO DE ARCHIVOS Y CARPETAS
-         *
-         * Determina si un archivo o carpeta debe ser incluido en el listado del explorador,
-         * aplicando múltiples reglas de seguridad:
-         *
-         * - Exclusión de archivos ocultos
-         * - Exclusión por nombre
-         * - Exclusión por extensión
-         * - Exclusión de carpetas completas
-         * - Validación de tipo MIME real (solo para archivos)
-         *
-         * @param string   $file            Nombre del archivo o carpeta
-         * @param string   $fullPath        Ruta completa del directorio actual
-         * @param array    $allowedMimes    Lista blanca de tipos MIME permitidos
-         *
-         * @return bool TRUE si el archivo es válido, FALSE si debe ser excluido
-         */
+    /**
+     * Filtra y construye la lista de archivos aplicando políticas de seguridad multicapa.
+     * * Este método actúa como el "vigilante" del explorador de archivos. Procesa las entradas
+     * crudas de cualquier driver (Local, S3, etc.) y decide qué mostrar al usuario basándose
+     * en una lista negra de nombres, carpetas y extensiones prohibidas. Además, si el
+     * servidor es local, realiza una inspección profunda del tipo MIME real para
+     * evitar que archivos maliciosos camuflados aparezcan en la interfaz.
+     *
+     * @param array  $rawEntries   Listado bruto de archivos y carpetas del driver.
+     * @param string $dirPath      Ruta del directorio que se está explorando.
+     * @param array  $allowedMimes Lista blanca de tipos MIME permitidos para filtrar la vista.
+     * @return array Listado filtrado y seguro de objetos (archivos/carpetas).
+     */
+    private function filterAndBuildFileList(array $rawEntries, string $dirPath, array $allowedMimes): array {
 
-        // Normaliza el nombre del archivo a minúsculas para comparaciones seguras
-        $name = strtolower($file);
+        // Verificacion del entorno
+        $isLocal  = (ConfigAPP::APP['uploadServer'] ?? 'local') === 'local';
+        $filtered = [];
 
-        // Construye la ruta completa del archivo/carpeta
-        $filePath = $fullPath . "/" . $file;
+        // Se recorre el Listado bruto de archivos
+        foreach ($rawEntries as $entry) {
+            $name  = $entry['name'];
+            $lower = strtolower($name);
 
-        // EXCLUSIÓN DE ARCHIVOS OCULTOS: Archivos que comienzan con "." (ej: .env, .gitignore)
-        if (str_starts_with($name, '.')) {
-            return false;
-        }
+            /*************** 1. Filtros de Nombre y Sistema ***************/
 
-        // EXCLUSIÓN POR NOMBRE EXACTO: Evita archivos sensibles definidos explícitamente
-        if (in_array($name, self::EXCLUDED_NAMES, true)) {
-            return false;
-        }
+            // Excluir archivos ocultos (que empiezan con punto como .htaccess o .git)
+            if (str_starts_with($lower, '.')) { continue; }
 
-        // EXCLUSIÓN DE CARPETAS COMPLETAS: Bloquea acceso a directorios completos (ej: .git, node_modules)
-        if (is_dir($filePath) && in_array($name, self::EXCLUDED_FOLDERS, true)) {
-            return false;
-        }
+            // Excluir nombres sensibles definidos en la constante de clase EXCLUDED_NAMES
+            if (in_array($lower, self::EXCLUDED_NAMES, true)) { continue; }
 
-        // EXCLUSIÓN POR EXTENSIÓN: Extrae la extensión y valida contra lista negra
-        $ext = pathinfo($name, PATHINFO_EXTENSION);
-        if ($ext !== '' && in_array($ext, self::BLOCKED_EXTENSIONS, true)) {
-            return false;
-        }
+            // Excluir carpetas del sistema o privadas (EXCLUDED_FOLDERS)
+            if ($entry['type'] === 'folder' && in_array($lower, self::EXCLUDED_FOLDERS, true)) { continue; }
 
-        // Bloquear archivos sin extensión
-        if (!is_dir($filePath) && $ext === '') {
-            return false;
-        }
+            /*************** 2. Filtros de Extensión ***************/
+            // Obtener extensiones
+            $ext = pathinfo($lower, PATHINFO_EXTENSION);
 
-        // VALIDACIÓN MIME REAL (SOLO ARCHIVOS): Verifica el contenido real del archivo, no solo su extensión.
-        if (is_file($filePath)) {
-            // Obtiene el tipo MIME real usando finfo
-            $mime = $this->getFinfo()->file($filePath);
-            // Si el MIME no está en la lista blanca → bloquear
-            if (!in_array($mime, $allowedMimes, true)) {
-                return false;
+            // Bloquear extensiones peligrosas (ej: .php, .exe, .sh)
+            if ($ext !== '' && in_array($ext, self::BLOCKED_EXTENSIONS, true)) { continue; }
+
+            // Seguridad: Bloquear archivos que no tienen extensión (suelen ser binarios o scripts de sistema)
+            if ($entry['type'] === 'file' && $ext === '') { continue; }
+
+            /*************** 3. Validación de Contenido (Deep Scan) ***************/
+
+            /**
+             * Validación MIME real:
+             * Solo es posible en almacenamiento LOCAL. En la nube (S3/GCS), no podemos leer
+             * el contenido de todos los archivos eficientemente para obtener el MIME real,
+             * por lo que confiamos en los filtros anteriores.
+             */
+            if ($isLocal && $entry['type'] === 'file') {
+                $uploadFolder = rtrim(ConfigAPP::APP['uploadFolder'], '/');
+                $fullPath     = $uploadFolder . '/' . ltrim($dirPath . '/' . $name, '/');
+
+                if (file_exists($fullPath)) {
+                    // Inspección de "Magic Bytes" mediante finfo
+                    $mime = $this->getFinfo()->file($fullPath);
+
+                    // Si el tipo de archivo real no está en la lista blanca de la petición, se oculta
+                    if (!in_array($mime, $allowedMimes, true)) { continue; }
+                }
             }
+
+            // Si superó todas las pruebas, se añade al listado final
+            $filtered[] = $entry;
         }
 
-        // Si pasa todas las validaciones, el archivo es permitido
-        return true;
+        return $filtered;
     }
 
     /******************************************************************************************/
-    // Verifica que una ruta tenga permisos 0755
-    private function ensurePermissions755(string $path): array {
-        /**
-         * Verifica que una ruta tenga permisos 0755 y, si no los tiene,
-         * intenta corregirlos automáticamente.
-         *
-         * Consideraciones:
-         * - Funciona principalmente en Linux/Unix
-         * - En Docker puede fallar si el contenedor no tiene permisos suficientes
-         * - Usa chmod, por lo que requiere permisos sobre el sistema de archivos
-         *
-         * @param string $path Ruta a validar
-         *
-         * @return array Resultado:
-         *  - success : bool
-         *  - message : string
-         *  - current : string (permisos actuales)
-         *  - expected: string (permisos esperados)
-         */
-        // Verifica que exista la ruta
-        if (!file_exists($path)) {
-            return [
-                "success" => false,
-                "message" => "La ruta no existe",
-                "current" => $path,
-                "expected" => "0755"
-            ];
-        }
+    /**
+     * Resuelve y valida la ruta relativa para el explorador de archivos, previniendo ataques de navegación.
+     * * Este método actúa como un traductor de seguridad: desencripta la ruta base del servidor,
+     * procesa la subruta ofuscada enviada desde el frontend (reemplazando tokens de seguridad)
+     * y combina ambas piezas en una ruta limpia. Aplica filtros estrictos para asegurar
+     * que la ruta resultante sea siempre relativa al directorio permitido y no contenga
+     * secuencias de escape (..).
+     *
+     * @param array $Data Contiene 'route' (base encriptada) y 'path' (subruta ofuscada).
+     * @return string Ruta relativa final, normalizada y segura para el driver de almacenamiento.
+     */
+    private function resolveExplorerRelativePath(array $Data): string {
 
-        // Obtiene permisos actuales en formato octal (ej: 0755)
-        $perms = fileperms($path);
-        $currentPerms = substr(sprintf('%o', $perms), -4);
-
-        // Si ya tiene 0755, no hace nada
-        if ($currentPerms === '0755') {
-            return [
-                "success" => true,
-                "message" => "Permisos correctos",
-                "current" => $currentPerms,
-                "expected" => "0755"
-            ];
-        }
-
-        // Intenta cambiar permisos
-        $changed = @chmod($path, 0755);
-
-        // Verifica nuevamente
-        $permsAfter = fileperms($path);
-        $newPerms   = substr(sprintf('%o', $permsAfter), -4);
-
-        if ($changed && $newPerms === '0755') {
-            return [
-                "success" => true,
-                "message" => "Permisos corregidos correctamente",
-                "current" => $newPerms,
-                "expected" => "0755"
-            ];
-        }
-
-        // Fallo al cambiar permisos (muy común en Docker)
-        return [
-            "success" => false,
-            "message" => "No se pudieron cambiar los permisos (posible restricción de Docker o permisos del sistema)",
-            "current" => $currentPerms,
-            "expected" => "0755"
-        ];
-    }
-
-    /******************************************************************************************/
-    // Verifica si una ruta tiene permisos reales de escritura.
-    private function canWrite(string $path): bool {
-        /**
-         * Verifica si una ruta tiene permisos reales de escritura.
-         *
-         * A diferencia de funciones como is_writable(), este método realiza
-         * una prueba real creando y eliminando un archivo temporal.
-         *
-         * Ventajas:
-         * - Evita falsos negativos comunes en Docker
-         * - Detecta problemas reales de permisos (UID/GID, volúmenes, FS)
-         * - Funciona incluso cuando is_writable() falla incorrectamente
-         *
-         * Consideraciones:
-         * - Crea un archivo temporal oculto (prefijo ".perm_test_")
-         * - Requiere permisos de escritura en la ruta
-         * - Puede fallar si el sistema bloquea creación de archivos
-         *
-         * @param string $path Ruta donde se desea verificar escritura
-         *
-         * @return bool TRUE si se puede escribir, FALSE en caso contrario
-         */
-
-        // Construye un archivo temporal único dentro de la ruta
-        // - rtrim evita doble slash al final
-        // - uniqid garantiza nombre único
-        $testFile = rtrim($path, '/') . '/.perm_test_' . uniqid();
-
-        // Intenta escribir un archivo de prueba
-        // - @ evita warnings visibles si falla (manejo controlado)
-        if (@file_put_contents($testFile, 'test') !== false) {
-
-            // Si se pudo crear, elimina el archivo temporal
-            @unlink($testFile);
-
-            // Retorna TRUE: escritura confirmada
-            return true;
-        }
-
-        // Si no se pudo escribir, no hay permisos reales
-        return false;
-    }
-
-    /******************************************************************************************/
-    // Retorna la instancia única de finfo (patrón lazy singleton dentro de la clase).
-    private function getFinfo(): \finfo {
-        return $this->finfo ??= new \finfo(FILEINFO_MIME_TYPE);
-    }
-
-    /******************************************************************************************/
-    // Resuelve, desencripta y valida la ruta completa del explorador (anti path traversal).
-    private function resolveExplorerPath(array $Data): string {
-        /**
-         * Construye la ruta absoluta y segura para el explorador de archivos.
-         *
-         * Pasos:
-         * 1. Desencripta la ruta base recibida del frontend
-         * 2. Reconstruye la subruta eliminando tokens de ofuscación
-         * 3. Valida que la ruta final no salga del ROOT_PATH (anti path traversal)
-         *
-         * @param array $Data Parámetros de entrada (route, path)
-         *
-         * @return string Ruta absoluta validada
-         *
-         * @throws \RuntimeException Si la ruta no es válida o intenta escapar del ROOT
-         */
-
-        // Instancia de clase para desencriptar la ruta
         $fnc_Codification = new FunctionsSecurityCodification();
 
-        // Construye y normaliza la ruta raíz segura:
-        // - Se desencripta la ruta recibida del frontend
-        // - realpath() resuelve ".." y enlaces simbólicos
-        $ROOT_PATH = realpath(
-            ConfigAPP::APP['uploadFolder'] . '/' .
-            $fnc_Codification->encryptDecrypt('decrypt', $Data['route'])
-        );
+        /*************** 1. Desencriptación de Base ***************/
+        // Recupera la ruta base que el backend definió como punto de partida.
+        $decryptedBase = $fnc_Codification->encryptDecrypt('decrypt', $Data['route']);
+        $safeBase      = $this->sanitizePath($decryptedBase);
 
-        // Si realpath() falla, la ruta no existe o es inválida
-        if ($ROOT_PATH === false) {
-            throw new \RuntimeException('Ruta base no válida o inaccesible');
-        }
-
-        // Reconstruye la subruta enviada desde el frontend:
-        // - Elimina tokens de ofuscación ("asdqwe" y "ntn")
-        // - "ntn" era el separador de ruta → se convierte de vuelta a "/"
+        /*************** 2. Procesamiento de Subruta ***************/
+        /**
+         * Desofuscación del Frontend:
+         * El frontend envía rutas usando 'asdqwe' (vacío) y 'ntn' (/) para evitar
+         * que firewalls de aplicación (WAF) bloqueen la petición al detectar
+         * caracteres de ruta en la URL.
+         */
         $relativePath = isset($Data['path'])
             ? str_replace(['asdqwe', 'ntn'], ['', '/'], $Data['path'])
             : '';
-        $relativePath = $this->sanitizePath($relativePath); // limpia "..", "%2e", etc.
+        $relativePath = $this->sanitizePath($relativePath);
 
-        // Construye y valida la ruta final contra el ROOT_PATH (via safePath)
-        // safePath garantiza que no se pueda escapar del directorio raíz
-        $fullPath = $this->CommonData->safePath(
-            $ROOT_PATH . '/' . $relativePath,
-            $ROOT_PATH
-        );
+        /*************** 3. Combinación y Normalización ***************/
+        // Une la base con la subruta y elimina slashes duplicados o accidentales en los extremos.
+        $combined = trim($safeBase . '/' . $relativePath, '/');
+        $combined = preg_replace('#/+#', '/', $combined);
 
-        // Validación adicional: la ruta resuelta debe existir y ser un directorio
-        if (!is_dir($fullPath)) {
-            throw new \RuntimeException('El directorio solicitado no existe o no es accesible');
-        }
-
-        return $fullPath;
-    }
-
-    /******************************************************************************************/
-    // Lista y filtra el contenido de un directorio, retornando solo archivos permitidos con su metadata.
-    private function buildFileList(string $fullPath, array $allowedMimes): array {
+        /*************** 4. Seguro de Vida (Hardening) ***************/
         /**
-         * Recorre un directorio y retorna los archivos y carpetas permitidos.
-         *
-         * - Delega el filtro de seguridad a isAllowed()
-         * - Delega la construcción de cada entrada a buildFileEntry()
-         *
-         * @param string $fullPath    Ruta absoluta validada del directorio a listar
-         * @param array  $allowedMimes Lista blanca de tipos MIME permitidos
-         *
-         * @return array Lista de archivos/carpetas con metadata
+         * Si por alguna razón la ruta combinada contiene intentos de retroceso (..),
+         * el sistema aborta la navegación profunda y devuelve al usuario a la base segura.
          */
-
-        // Array de resultados
-        $files = [];
-
-        // Validar retorno
-        $entries = scandir($fullPath);
-        if ($entries === false) {
-            return []; // o lanzar excepción
+        if (str_contains($combined, '..')) {
+            return $safeBase;
         }
 
-        // Recorre todos los elementos del directorio
-        foreach ($entries as $file) {
-
-            // Ignora referencias de directorio actual y padre
-            if ($file === '.' || $file === '..') {
-                continue;
-            }
-
-            // Aplica todas las validaciones de seguridad y filtrado
-            // Las constantes se usan directamente desde la clase (no se pasan como parámetro)
-            if (!$this->isAllowed($file, $fullPath, $allowedMimes)) {
-                continue;
-            }
-
-            // Construye la entrada con metadata del archivo/carpeta
-            $files[] = $this->buildFileEntry($file, $fullPath);
-        }
-
-        //retorno los archivos
-        return $files;
+        return $combined;
     }
 
     /******************************************************************************************/
-    // Construye el array de metadata de un archivo o carpeta individual.
-    private function buildFileEntry(string $file, string $fullPath): array {
-        /**
-         * Construye la estructura de datos de un archivo o carpeta.
-         *
-         * Centraliza la lógica de metadata en un único lugar,
-         * facilitando agregar nuevos campos en el futuro sin tocar buildFileList().
-         *
-         * @param string $file      Nombre del archivo o carpeta
-         * @param string $fullPath  Ruta absoluta del directorio que lo contiene
-         *
-         * @return array Metadata del archivo:
-         *  - name : Nombre del archivo o carpeta
-         *  - type : "folder" | "file"
-         *  - size : Tamaño en bytes (null para carpetas)
-         *  - date : Fecha de última modificación (Y-m-d H:i:s)
-         */
-
-        $filePath = $fullPath . '/' . $file;
-        $stat     = stat($filePath);          // una sola llamada al sistema
-        $isDir    = ($stat['mode'] & 0040000) !== 0;
-
-        return [
-            'name' => $file,
-            'type' => $isDir ? 'folder' : 'file',
-            'size' => $isDir ? null : $stat['size'],
-            'date' => date('Y-m-d H:i:s', $stat['mtime']),
-        ];
-    }
-
-    /******************************************************************************************/
-    // Resuelve la extensión de archivo a partir de un tipo MIME real.
+    /**
+     * Resuelve la extensión de archivo correspondiente a partir de un tipo MIME detectado.
+     * * Este método actúa como un diccionario de traducción inversa: toma el tipo MIME real
+     * (identificado mediante la inspección de bytes del archivo) y lo convierte en
+     * una extensión de archivo estándar (ej: 'image/jpeg' -> 'jpg').
+     * * Es una pieza fundamental para la normalización de archivos, asegurando que
+     * el nombre final en el disco sea coherente con el contenido real del archivo,
+     * independientemente de la extensión original enviada por el usuario.
+     *
+     * @param string $mime Tipo MIME real detectado por el sistema (ej: 'application/pdf').
+     * @return string|null Extensión sin punto (ej: 'pdf') o null si el tipo no está mapeado en la configuración.
+     */
     private function resolveExtensionFromMime(string $mime): ?string {
-        /**
-         * Resuelve la extensión de archivo a partir de un tipo MIME real.
-         * Si el MIME no está mapeado, retorna null para que el llamador decida.
-         *
-         * @param string $mime Tipo MIME real detectado por finfo
-         * @return string|null Extensión sin punto (ej: 'jpg') o null si no está mapeado
-         */
+
+        // Busca en la constante estática de la clase (MIME_TO_EXTENSION) la llave del MIME
+        // Si no existe, utiliza el operador de fusión de nulos (??) para retornar null.
         return self::MIME_TO_EXTENSION[$mime] ?? null;
+
     }
 
     /******************************************************************************************/
-    // Limpia el prefijo data URI de un string Base64 sin importar el tipo.
+    /**
+     * Limpia el prefijo data URI de un string Base64 sin importar el tipo.
+     * Ejemplos de prefijos eliminados:
+     *  - data:image/png;base64,
+     *  - data:image/jpeg;base64,
+     *  - data:application/pdf;base64,
+     *
+     * @param string $raw String Base64 crudo recibido del frontend
+     * @return string     String Base64 limpio listo para decodificar
+     */
     private function cleanBase64Payload(string $raw): string {
-        /**
-         * Limpia el prefijo data URI de un string Base64 sin importar el tipo.
-         * Ejemplos de prefijos eliminados:
-         *  - data:image/png;base64,
-         *  - data:image/jpeg;base64,
-         *  - data:application/pdf;base64,
-         *
-         * @param string $raw String Base64 crudo recibido del frontend
-         * @return string     String Base64 limpio listo para decodificar
-         */
+
         // Elimina cualquier prefijo "data:...;base64," si existe
         if (str_contains($raw, ';base64,')) {
             $raw = substr($raw, strpos($raw, ';base64,') + 8);
@@ -1425,6 +1289,21 @@ class FileManager {
         return str_replace(' ', '+', $raw);
     }
 
+    /******************************************************************************************/
+    /**
+     * Obtiene una instancia persistente de la clase finfo para la detección de tipos MIME.
+     * * Este método implementa el patrón de diseño "Lazy Loading" (carga perezosa) mediante
+     * el operador de asignación de coalescencia nula (??=). La instancia de finfo se
+     * crea únicamente la primera vez que se solicita y se almacena en una propiedad
+     * de la clase para ser reutilizada en futuras validaciones durante el mismo ciclo
+     * de vida de la petición.
+     *
+     * @return \finfo Instancia de finfo configurada con la constante FILEINFO_MIME_TYPE.
+     */
+    private function getFinfo(): \finfo {
 
+        // Si $this->finfo ya tiene un objeto, lo retorna.
+        // De lo contrario, crea el 'new \finfo', lo asigna a la propiedad y luego lo retorna.
+        return $this->finfo ??= new \finfo(FILEINFO_MIME_TYPE);
+    }
 }
-

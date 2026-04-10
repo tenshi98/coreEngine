@@ -26,411 +26,468 @@ class FunctionsDataText {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-	public function cortar($texto, $cuantos): string {
+	/**
+     * Trunca un texto a una longitud específica y añade puntos suspensivos si excede el límite.
+     * * Utiliza la extensión mbstring si está disponible para garantizar la compatibilidad
+     * con caracteres multi-byte (UTF-8).
+     *
+     * @param string $texto El contenido de texto original.
+     * @param int $cuantos Cantidad máxima de caracteres a conservar antes del recorte.
+     * @return string Texto procesado con o sin puntos suspensivos según la longitud.
+     */
+    public function cortar($texto, $cuantos): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite cortar un texto determinado despues de cierta cantidad de caracteres determinados por el usuario, poniendo
-		* tres puntos suspensivos indicando que el texto esta cortado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->cortar('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 'Lorem ipsu...'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto     Texto a cortar
-		* @input   int      $cuantos   Cantidad de caracteres a mostrar antes de cortar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if (!$this->DataValidations->validarNumero($cuantos) || !$this->DataValidations->validarEntero($cuantos)) {
-            return 'Verificar que el dato ingresado sea un numero';
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if (!isset($texto) || $texto==''){     return 'Sin datos ingresados';}
+        if (!isset($cuantos) || $cuantos==''){ return 'Sin datos ingresados';}
+        // Verifica mediante la clase de validación externa que el límite sea un entero válido
+        if (!$this->DataValidations->validarNumero($cuantos) || !$this->DataValidations->validarEntero($cuantos)) {
+            return 'El dato ingresado no es un numero ('.$cuantos.')';
         }
 
-		/********************** Si todo esta ok **********************/
-		/**********************  Retorno datos  **********************/
-		// Asegurarse de que la extensión mbstring esté habilitada
-		if (extension_loaded('mbstring')) {
-			return (mb_strlen($texto) <= $cuantos) ? $texto : mb_substr($texto, 0, $cuantos, 'UTF-8').'...';
-		} else {
-			// Fallback o manejo de error si mbstring no está disponible
-			return (strlen($texto) <= $cuantos) ? $texto : substr($texto, 0, $cuantos).'...';
-		}
+        /********************** Proceso de Recorte **********************/
+        // Operación compatible con caracteres especiales y acentos
+        if (extension_loaded('mbstring')) {
+            return (mb_strlen($texto) <= $cuantos) ? $texto : mb_substr($texto, 0, $cuantos, 'UTF-8').'...';
+        } else {
+            // Método alternativo en caso de ausencia de la extensión mbstring
+            return (strlen($texto) <= $cuantos) ? $texto : substr($texto, 0, $cuantos).'...';
+        }
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function eliminarVerificadorRut($Rut): string {
+	/**
+     * Extrae la parte numérica de un RUT chileno, removiendo el dígito verificador y separadores.
+     * * Requiere que el RUT sea válido bajo los estándares chilenos (XXXXXXXX-X).
+     *
+     * @param string $Rut Cadena que representa el RUT (puede incluir puntos y guion).
+     * @return string Parte numérica del RUT sin puntos ni el carácter posterior al guion.
+     */
+    public function eliminarVerificadorRut($Rut): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Elimina el digito verificador del rut entregado, dejando solo los numeros. Hay que tener en cuenta que solo
-		* funciona en Rut chilenos
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->eliminarVerificadorRut('10294658-9'); //Devuelve 10294658
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $Rut    Rut a cortar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if (!isset($Rut) || $Rut==''){                   return 'No hay datos ingresados';}
-		if (!$this->DataValidations->validarRut($Rut)){  return 'El dato ingresado no es un Rut';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if (!isset($Rut) || $Rut==''){                   return 'Sin datos ingresados';}
+        // Validación lógica del formato RUT antes de proceder
+        if (!$this->DataValidations->validarRut($Rut)){  return 'El dato ingresado no es un Rut';}
 
-		/********************** Si todo esta ok **********************/
-		// str_replace elimina todas las ocurrencias del punto (.) en la cadena $Rut.
-		$Rut_limpio = str_replace('.', '', $Rut);
-		// Encuentra la última ocurrencia de '-' y toma la subcadena antes de ella
-		$lastDashPos = strrpos($Rut_limpio, '-');
+        /********************** Limpieza de Formato **********************/
+        // Remueve puntos para normalizar la cadena a números y guion
+        $Rut_limpio = str_replace('.', '', $Rut);
 
-		/**********************  Retorno datos  **********************/
-		return ($lastDashPos !== false) ? substr($Rut_limpio, 0, $lastDashPos) : $Rut_limpio;
+        // Localiza la posición del guion verificador
+        $lastDashPos = strrpos($Rut_limpio, '-');
 
-	}
+        /********************** Retorno de Datos **********************/
+        // Si existe guion, retorna todo lo que esté a su izquierda; de lo contrario, el RUT limpio
+        return ($lastDashPos !== false) ? substr($Rut_limpio, 0, $lastDashPos) : $Rut_limpio;
+
+    }
 
 	/************************************************************************************************************/
-	public function limpiarString($texto): string {
+	/**
+	 * Limpia un string de forma robusta y segura.
+	 *
+	 * ✔ Soporta UTF-8 (acentos, ñ, etc.)
+	 * ✔ Elimina saltos de línea reales y literales (\n, \r)
+	 * ✔ Elimina etiquetas HTML/PHP
+	 * ✔ Elimina caracteres invisibles/control
+	 * ✔ Normaliza espacios múltiples
+	 * ✔ Mantiene solo letras, números y espacios (opcionalmente puntuación)
+	 *
+	 * @param string $texto
+	 * @param bool $keepPunctuation Permite mantener puntuación básica (. , - _)
+	 *
+	 * @return string
+	 */
+    public function limpiarString($texto, $keepPunctuation = false): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite limpiar palabras u oraciones de caracteres raros o no admitidos
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->limpiarString('Lorem ipsum\n dolor sit amet\n, consectetur\r'); //Devuelve 'Lorem ipsum dolor sit amet consectetur'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Texto a limpiar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){  return 'No ha ingresado ningún dato';}
+        /********************** Validaciones **********************/
+		if (trim($texto) === '') {
+			return 'Sin datos ingresados';
+		}
 
-		/********************** Si todo esta ok **********************/
-		/**********************  Retorno datos  **********************/
-		return trim(strip_tags(preg_replace('/[\r\n]+|[^A-Za-z0-9.]/', ' ', $texto)));
+		/********************** Normalización base **********************/
+		// Elimina secuencias literales "\n" y "\r"
+		$texto = str_replace(['\\n', '\\r'], ' ', $texto);
 
-	}
+		// Reemplaza saltos reales por espacio
+		$texto = str_replace(["\n", "\r", "\t"], ' ', $texto);
+
+		/********************** Limpieza HTML **********************/
+		$texto = strip_tags($texto);
+
+		/********************** Elimina caracteres invisibles **********************/
+		// Control chars Unicode + ASCII
+		$texto = preg_replace('/[\x00-\x1F\x7F]/u', '', $texto);
+
+		/********************** Limpieza principal **********************/
+		if ($keepPunctuation) {
+			// Mantiene letras, números, espacios y puntuación básica
+			$texto = preg_replace('/[^\p{L}\p{N}\s\.\,\-\_]/u', ' ', $texto);
+		} else {
+			// Solo letras, números y espacios (UTF-8)
+			$texto = preg_replace('/[^\p{L}\p{N}\s]/u', ' ', $texto);
+		}
+
+		/********************** Normaliza espacios **********************/
+		// Reemplaza múltiples espacios por uno solo
+		$texto = preg_replace('/\s+/', ' ', $texto);
+
+		/********************** Retorno **********************/
+		return trim($texto);
+
+    }
 
 	/************************************************************************************************************/
-	public function reemplazarEspaciosxGuion($texto): string {
+	/**
+     * Sustituye todos los espacios en blanco por guiones bajos en una cadena.
+     * * Comúnmente utilizado para generar nombres de archivos o slugs a partir de títulos.
+     *
+     * @param string $texto Oración o palabra con espacios.
+     * @return string Texto con guiones bajos en lugar de espacios.
+     */
+    public function reemplazarEspaciosxGuion($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Formatea todos los espacios dentro de una oracion a guiones bajos
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->reemplazarEspaciosxGuion('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem_ipsum_dolor_sit_amet,_consectetur'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $dato   Oracion a transformar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){  return 'No ha ingresado ningún dato';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		/**********************  Retorno datos  **********************/
-		return str_replace(' ', '_', $texto);
+        /********************** Retorno de Datos **********************/
+		// Reemplazo de datos
+        return str_replace(' ', '_', $texto);
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function sanitizarTexto($texto): string {
+	/**
+     * Convierte caracteres especiales en sus entidades HTML correspondientes para evitar XSS.
+     * * Transforma símbolos como <, >, &, ", ' en códigos seguros para el navegador.
+     *
+     * @param string $texto Texto con caracteres especiales o código HTML.
+     * @return string Texto sanitizado con entidades HTML en formato UTF-8.
+     */
+    public function sanitizarTexto($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Formatea todos los caracteres especiales por los estandares html
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->sanitizarTexto('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem ipsum dolor sit amet, consectetur'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Oracion a transformar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){  return 'No ha ingresado ningún dato';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		/**********************  Retorno datos  **********************/
-		// Convierte caracteres especiales a entidades HTML
+        /********************** Proceso de Seguridad **********************/
+        // ENT_QUOTES asegura que tanto comillas simples como dobles sean convertidas
         return htmlentities($texto, ENT_QUOTES, 'UTF-8');
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function desanitizarTexto($texto): string {
+	/**
+     * Revierte la sanitización, convirtiendo entidades HTML de vuelta a caracteres especiales.
+     * * Proceso inverso a sanitizarTexto, útil para editar contenido previamente guardado.
+     *
+     * @param string $texto Texto con entidades HTML (ej: &quot;).
+     * @return string Texto con los caracteres originales recuperados.
+     */
+    public function desanitizarTexto($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Formatea los caracteres estandares html por los especiales
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->desanitizarTexto('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem ipsum dolor sit amet, consectetur'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Oracion a transformar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){  return 'No ha ingresado ningún dato';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		/**********************  Retorno datos  **********************/
-		// Convierte entidades HTML a caracteres especiales
+        /********************** Proceso de Reversión **********************/
+        // Traduce entidades como &amp; de nuevo a &
         return html_entity_decode($texto, ENT_QUOTES, 'UTF-8');
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function limpiezaTexto($texto): string {
+	/**
+     * Realiza una limpieza profunda del texto, eliminando etiquetas HTML, saltos de línea
+     * y codificando comillas para evitar conflictos en el almacenamiento o visualización.
+     *
+     * @param string $texto Texto original a estandarizar.
+     * @return string Texto sin etiquetas, sin saltos de línea y con comillas codificadas (%27 y %22).
+     */
+    public function limpiezaTexto($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Reemplaza las comillas simples y dobles
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se verifica
 		* 	$DataText->limpiezaTexto("bla"bla'bla"); //Devuelve 'bla%27bla%27bla'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Texto a estandarizar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){  return 'No ha ingresado ningún dato';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		// Limpieza general del texto
-		$texto = preg_replace("/[\r\n]+/", '', strip_tags($texto));
+        /********************** Proceso de Limpieza **********************/
+        // Elimina etiquetas HTML y remueve saltos de línea (\r, \n)
+        $texto = preg_replace("/[\r\n]+/", '', strip_tags($texto));
 
-		// Reemplaza comillas simples y dobles por sus equivalentes codificados
-		$texto = str_replace(["'", '"'], ['%27', '%22'], $texto);
+        // Sustituye comillas simples (') por %27 y comillas dobles (") por %22
+        $texto = str_replace(["'", '"'], ['%27', '%22'], $texto);
 
-		// Normaliza acentos y reemplaza la ñ
-		$texto = $this->sanitizarTexto($texto);
+        // Aplica sanitización adicional (acentos y ñ) mediante método interno
+        $texto = $this->sanitizarTexto($texto);
 
-		/**********************  Retorno datos  **********************/
-		return $texto;
+        /********************** Retorno datos **********************/
+		// Retorna texto limpiado
+        return $texto;
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function limpiarOracion($texto): string {
+	/**
+     * Normaliza una oración reemplazando caracteres especiales, acentuados o diacríticos
+     * por sus equivalentes más cercanos en formato ASCII/Latín estándar.
+     *
+     * @param string $texto Oración con caracteres especiales o acentos.
+     * @return string Oración convertida a minúsculas y sin caracteres especiales (ej: À -> a).
+     */
+    public function limpiarOracion($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se encarga de reemplazar todos los caracteres especiales a los similares en la lengua castellana
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se verifica
 		* 	$DataText->limpiarOracion('ÀÁÂÃÄÅÆ'); //devuelve aaaaaaa
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Oracion a revisar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
-		if (extension_loaded('intl')) {
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
+
+        /********************** Proceso de Transliteración **********************/
+        // Intenta utilizar la extensión 'intl' para una transliteración precisa y moderna
+        if (extension_loaded('intl')) {
                 $texto = transliterator_transliterate('Any-Latin; Latin-ASCII; Lower()', $texto);
-		} else {
-			// Fallback a la lógica actual o manejo de error
-			$originales   = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿª';
-			$modificadas  = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybya';
-			$cadena       = mb_convert_encoding($texto, 'ISO-8859-1', 'UTF-8');
-			$cadena       = strtr($cadena, mb_convert_encoding($originales, 'ISO-8859-1', 'UTF-8'), $modificadas);
-			$texto        = mb_convert_encoding($cadena, 'UTF-8', 'ISO-8859-1');
-			$texto        = strtolower($texto);
-		}
+        } else {
+            // Lógica de respaldo (Fallback) basada en mapeo manual de caracteres
+            $originales   = 'ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõöøùúûýýþÿª';
+            $modificadas  = 'aaaaaaaceeeeiiiidnoooooouuuuybsaaaaaaaceeeeiiiidnoooooouuuyybya';
 
-		/**********************  Retorno datos  **********************/
-		return $texto;
+            // Conversión temporal a ISO-8859-1 para facilitar el reemplazo de caracteres de un solo byte
+            $cadena       = mb_convert_encoding($texto, 'ISO-8859-1', 'UTF-8');
+            $cadena       = strtr($cadena, mb_convert_encoding($originales, 'ISO-8859-1', 'UTF-8'), $modificadas);
 
-	}
+            // Retorno al formato universal UTF-8 y conversión a minúsculas
+            $texto        = mb_convert_encoding($cadena, 'UTF-8', 'ISO-8859-1');
+            $texto        = strtolower($texto);
+        }
+
+        /********************** Retorno datos **********************/
+		// Retorna texto limpiado
+        return $texto;
+
+    }
 
 	/************************************************************************************************************/
-	public function contarPalabrasCensuradas($texto): string | int {
+	/**
+     * Identifica y cuenta la cantidad de palabras prohibidas o censuradas presentes en un texto.
+     *
+     * @param string $texto Texto a analizar en busca de lenguaje ofensivo.
+     * @return string|int Cantidad de palabras encontradas o mensaje de error si el input es nulo.
+     */
+    public function contarPalabrasCensuradas($texto): string | int {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Cuenta si hay palabras malas u ofensivas que esten prohibidas por el sistema
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->contarPalabrasCensuradas('Lorem ipsum dolor sit amet, fuck d'); //Devuelve 1
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Oracion a revisar
-		* @return  int
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){   return 'No hay datos ingresados';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){   return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		//se limpia la oracion
-		$texto      = $this->limpiarOracion($texto);
-		//bd con las palabras
-		$censuradas   = $this->getListaPalabrasCensuradas();
+        /********************** Análisis de Contenido **********************/
+        // Normaliza el texto para asegurar que la comparación no ignore acentos
+        $texto      = $this->limpiarOracion($texto);
 
-		/**********************  Retorno datos  **********************/
-		//Numero de palabras prohibidas
-		return count(array_filter($censuradas, fn($w) => stripos(" $texto ", " $w ") !== false));
+        // Recupera la lista negra de palabras mediante método del sistema
+        $censuradas = $this->getListaPalabrasCensuradas();
 
-	}
+        /********************** Retorno datos **********************/
+        /**
+         * Filtra la lista de palabras censuradas verificando si cada una existe dentro
+         * del texto (usando espacios alrededor para evitar falsos positivos en sub-palabras).
+         */
+        return count(array_filter($censuradas, fn($w) => stripos(" $texto ", " $w ") !== false));
+
+    }
 
 	/************************************************************************************************************/
-	public function filtrarPalabrasCensuradas($texto): string {
+	/**
+     * Busca palabras prohibidas en un texto y las oculta reemplazándolas por asteriscos.
+     *
+     * @param string $texto Texto original a filtrar.
+     * @return string Texto resultante con las palabras censuradas sustituidas por '****'.
+     */
+    public function filtrarPalabrasCensuradas($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Filtra si hay palabras malas u ofensivas que esten prohibidas por el sistema, reemplazandolas por un ****
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->filtrarPalabrasCensuradas('Lorem ipsum dolor sit amet, fuck d'); //Devuelve 'lorem ipsum dolor sit amet, **** d'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Oracion a revisar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){   return 'No hay datos ingresados';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){   return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		//se limpia la oracion
-		$texto       = $this->limpiarOracion($texto);
-		//bd con las palabras
-		$censuradas   = $this->getListaPalabrasCensuradas();
+        /********************** Proceso de Filtrado **********************/
+        // Normalización del texto para coincidencia exacta
+        $texto       = $this->limpiarOracion($texto);
 
-		/**********************  Retorno datos  **********************/
-		//Frase limpia de palabras prohibidas
-		return str_ireplace($censuradas, '****', $texto);
+        // Obtención de la lista de términos prohibidos
+        $censuradas   = $this->getListaPalabrasCensuradas();
 
-	}
+        /********************** Retorno datos **********************/
+        // Reemplazo insensible a mayúsculas/minúsculas de todos los términos detectados
+        return str_ireplace($censuradas, '****', $texto);
+
+    }
 
     /************************************************************************************************************/
-    public function tituloMenu($texto ): string {
+	/**
+     * Limpia nombres de archivos o elementos de menú eliminando prefijos numéricos
+     * de ordenamiento (ej: "01 - ", "2.- ").
+     *
+     * @param string $texto Cadena que contiene una numeración inicial seguida de un título.
+     * @return string Título limpio sin la numeración de orden.
+     */
+    public function tituloMenu($texto): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite eliminar la numeracion inicial en los textos
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se ejecuta operacion
 		* 	$DataText->tituloMenu( '01 - titulo' ); //Devuelve 'titulo'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $texto   Nombre a filtrar
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($texto) || $texto==''){   return 'No hay datos ingresados';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($texto) || $texto==''){   return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		//variable vacia
-		$xdata = [];
-		// Números del 0 al 100, con formato "n - " y "n.- "
-		for ($i = 0; $i <= 100; $i++) {
-			// Formato con dos dígitos, por ejemplo 01, 02, ..., 09
-			$num_padded = str_pad($i, 2, '0', STR_PAD_LEFT);
-			// Agregamos variantes sin y con ceros a la izquierda
-			$xdata[] = $num_padded . " - ";
-			$xdata[] = $num_padded . ".- ";
-			$xdata[] = $i . " - ";
-			$xdata[] = $i . ".- ";
-		}
+        /********************** Generación de Patrones **********************/
+        $xdata = [];
+        // Genera dinámicamente una lista de prefijos numéricos del 0 al 100
+        for ($i = 0; $i <= 100; $i++) {
+            $num_padded = str_pad($i, 2, '0', STR_PAD_LEFT);
+            // Formatos: "01 - ", "01.- ", "1 - ", "1.- "
+            $xdata[] = $num_padded . " - ";
+            $xdata[] = $num_padded . ".- ";
+            $xdata[] = $i . " - ";
+            $xdata[] = $i . ".- ";
+        }
 
-		/**********************  Retorno datos  **********************/
-		//Si todo esta ok
-		return str_replace($xdata, "", $texto);
+        /********************** Retorno datos **********************/
+        // Remueve cualquier coincidencia de la lista de prefijos generada
+        return str_replace($xdata, "", $texto);
 
     }
 
 	/************************************************************************************************************/
-	public function buscarPalabraYExtraer($cadena, string $palabra): array | string {
+	/**
+     * Localiza una palabra o subcadena específica y extrae todo el contenido que aparece tras ella.
+     *
+     * @param string $cadena Texto completo donde se realizará la búsqueda.
+     * @param string $palabra Término de referencia a ubicar.
+     * @return array|string|false Array con 'posicion' y texto 'extraido', o false si no se encuentra.
+     */
+    public function buscarPalabraYExtraer($cadena, $palabra): array | string | false {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite buscar dentro de una oracion y extraer el texto que sigue a esta, devuelve un array con la posicion y el
-		* texto que le sigue
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se verifica
 		* 	$DataText->buscarPalabraYExtraer('01 - titulo', '01 - '); //Devuelve 'titulo'
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $cadena    Cadena completa a revisar
-		* @input   string   $palabra   Palabra a ubicar
-		* @return  array
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($cadena) || $cadena==''){     return 'No hay datos ingresados';}
-		if(!isset($palabra) || $palabra==''){   return 'No hay datos ingresados';}
+        /********************** Validaciones **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if(!isset($cadena) || $cadena==''){     return 'Sin datos ingresados';}
+        if(!isset($palabra) || $palabra==''){   return 'Sin datos ingresados';}
 
-		/********************** Si todo esta ok **********************/
-		// Buscar la posición de la palabra en la cadena
-		$pos = strpos($cadena, $palabra);
+        /********************** Localización y Extracción **********************/
+        // Encuentra el índice numérico de la primera aparición de la palabra
+        $pos = strpos($cadena, $palabra);
 
-		/**********************  Retorno datos  **********************/
-		if ($pos === false) {
-			// La palabra no se encontró
-			return false;
-		} else {
-			// Calcular la posición donde empieza lo que sigue a la palabra
-			$posSiguiente = $pos + strlen($palabra);
+        /********************** Retorno datos **********************/
+        if ($pos === false) {
+            return false;
+        } else {
+            // Calcula el inicio del texto posterior sumando el largo de la palabra clave
+            $posSiguiente = $pos + strlen($palabra);
 
-			// Extraer lo que sigue a la palabra
-			$extraido = substr($cadena, $posSiguiente);
+            // Obtiene la subcadena restante desde la posición calculada
+            $extraido = substr($cadena, $posSiguiente);
 
 			// Devolver un array con la posición y el texto extraído
-			return [
-				'posicion' => $pos,
-				'extraido' => $extraido
-			];
-		}
-	}
+            return [
+                'posicion' => $pos,
+                'extraido' => $extraido
+            ];
+        }
+    }
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */

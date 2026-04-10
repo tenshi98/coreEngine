@@ -27,11 +27,6 @@ class coreTablas extends ControllerBase {
     /******************************************************************************/
     //pantalla principal
     public function normal($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -40,23 +35,18 @@ class coreTablas extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreTablas-normal.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreTablas-normal.php');
     }
 
     /******************************************************************************/
     //pantalla principal
     public function dataTables($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -65,13 +55,13 @@ class coreTablas extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreTablas-dataTables.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreTablas-dataTables.php');
     }
 
 

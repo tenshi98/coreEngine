@@ -33,11 +33,6 @@ class kanbanTareasParticipantes extends ControllerBase {
     /******************************************************************************/
     //NewData
     public function NewData($f3, $params){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se genera la query
         $query = [
@@ -100,8 +95,8 @@ class kanbanTareasParticipantes extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'    => $this->FormInputs,
                 'Fnc_Codification'  => $this->Codification,
@@ -113,12 +108,12 @@ class kanbanTareasParticipantes extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'Participantes-formNew.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'Participantes-formNew.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 

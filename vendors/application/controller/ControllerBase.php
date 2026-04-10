@@ -14,6 +14,7 @@ class ControllerBase {
     private $queryBuilder;
     private $checkData;
 	private $CommonData;
+	private $UserData;
 
 	/************************************************************************************************************/
 	//Instancias
@@ -29,6 +30,91 @@ class ControllerBase {
 	/*                                                  Metodos                                                        */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
+
+    /************************************************************************************************************/
+    protected function getUserData($f3 = null): array {
+        /**
+         * Obtiene los datos del usuario almacenados en sesión.
+         *
+         * Este método implementa un patrón de carga perezosa (lazy loading),
+         * inicializando la propiedad `$this->UserData` únicamente si aún no ha sido definida
+         * y si se proporciona una instancia válida de `$f3` (framework Fat-Free).
+         *
+         * Los datos se obtienen desde la clave de sesión `SESSION.DataInfo`.
+         * En caso de no existir información en sesión, se asigna un arreglo vacío.
+         *
+         * @param \Base|null $f3 Instancia del framework Fat-Free (opcional).
+         *
+         * @return array Retorna un arreglo con los datos del usuario. Si no existen datos,
+         *               devuelve un arreglo vacío.
+         *
+         * @example
+         * $userData = $this->getUserData($f3);
+         * echo $userData['username'] ?? 'Invitado';
+         */
+
+        // Si ya está cargado en memoria, retornarlo
+        if (is_array($this->UserData)) {
+            return $this->UserData;
+        }
+
+        // Si no hay instancia de F3, fallback seguro
+        if (!$f3) {
+            return $this->UserData = [];
+        }
+
+        // Obtener desde sesión con validación estricta
+        $data = $f3->get('SESSION.DataInfo');
+
+        return $this->UserData = is_array($data) ? $data : [];
+
+    }
+
+    /************************************************************************************************************/
+    protected function getArrLevel($f3 = null, $controllerName = null): array {
+        /**
+         * Obtiene la configuración de niveles/permisos asociada a un controlador específico.
+         *
+         * Este método accede a la variable de sesión `SESSION.arrLevel`, la cual
+         * contiene un arreglo indexado por nombre de controlador con sus respectivos niveles
+         * o permisos.
+         *
+         * @param \Base|null $f3 Instancia del framework Fat-Free.
+         * @param string|null $controllerName Nombre del controlador del cual se desean obtener los niveles.
+         *
+         * @return array Retorna un arreglo con los niveles/permisos del controlador indicado.
+         *               Si no existe la clave o los datos en sesión, retorna un arreglo vacío.
+         *
+         * @note
+         * - No implementa cache interno como `getUserData`, por lo que accede directamente a sesión en cada llamada.
+         * - Se recomienda validar que `$controllerName` no sea null para evitar accesos innecesarios.
+         *
+         * @example
+         * $levels = $this->getArrLevel($f3, 'UserController');
+         * if (in_array('admin', $levels)) {
+         *     // lógica para administrador
+         * }
+         */
+
+        // Validación temprana (fail-fast)
+        if (!$f3 || !$controllerName) {
+            return [];
+        }
+
+        $arrLevel = $f3->get('SESSION.arrLevel');
+
+        // Validar estructura
+        if (!is_array($arrLevel)) {
+            return [];
+        }
+
+        $levels = $arrLevel[$controllerName] ?? [];
+
+        return is_array($levels) ? $levels : [];
+
+    }
+
+
 	/************************************************************************************************************/
     protected function Base_GetList(array &$params){
 		/*
@@ -540,7 +626,8 @@ class ControllerBase {
             'Social_Facebook'   => $UserData['Social_Facebook'],
             'Social_Instagram'  => $UserData['Social_Instagram'],
             'Social_Linkedin'   => $UserData['Social_Linkedin'],
-            'baseUrl'           => $f3->get('BASE')
+            'baseUrl'           => $f3->get('BASE'),
+            'MainPathUrl'       => $UserData['MainPathUrl'],
         ];
 
         //Ejecuto la query
@@ -727,7 +814,7 @@ class ControllerBase {
     }
 
     /************************************************************************************************************/
-    protected function showVista($TypeSession, $TypeView, $Route){
+    protected function showVista($TypeView, $Route){
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -738,11 +825,13 @@ class ControllerBase {
 
         /**********************    Instancia    **********************/
         //Se instancia la vista
-        $view = new View;
+        $view     = new View;
+        //Se verifica que exista UserData y que sea un array, en caso contrario devuelve un vacio
+        $UserData = is_array($this->UserData ?? null) ? $this->UserData : [];
 
         /**********************  Retorno datos  **********************/
-        //opcion de vista
-        switch ($TypeSession) {
+        //opcion de vista, en caso de no existir toma por defecto el valor 1
+        switch ($UserData['TypeSession'] ?? 1) {
             /**********************************/
             //Vista de la APP
             case 1:
@@ -794,7 +883,7 @@ class ControllerBase {
     }
 
     /************************************************************************************************************/
-    protected function showError($TypeSession, $TypeView, $f3){
+    protected function showError($TypeView, $f3){
 		/*
 		*=================================================     Detalles    =================================================
 		*
@@ -815,11 +904,12 @@ class ControllerBase {
 
         /**********************    Instancia    **********************/
         //Se instancia la vista
-        $view = new View;
+        $view     = new View;
+        $UserData = $this->UserData;
 
         /**********************  Retorno datos  **********************/
         //opcion de vista
-        switch ($TypeSession) {
+        switch ($UserData['TypeSession']) {
             /**********************************/
             //Vista de la APP
             case 1:

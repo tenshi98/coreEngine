@@ -28,7 +28,7 @@
     ];
     $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
 
-    $data['Fnc_WidgetsCommon']->previewDocs($BASE, '/upload', $data['rowData']['NombreArchivo']);
+    $data['Fnc_WidgetsCommon']->previewDocs($data['UserData']['MainPathUrl'], '', $data['rowData']['NombreArchivo']);
     ?>
 
 </div>

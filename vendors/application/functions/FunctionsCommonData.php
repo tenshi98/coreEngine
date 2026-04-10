@@ -10,12 +10,19 @@ class FunctionsCommonData {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-	public function agruparPorClave (array $array, string $clave_orden): array {
+	/**
+	 * Agrupa un arreglo bidimensional en un formato multinivel basado en una clave específica.
+	 *
+	 * Transforma un array plano de elementos en un array asociativo donde las llaves
+	 * son los valores de la columna de ordenamiento. La clave utilizada para agrupar
+	 * es removida de los elementos internos.
+	 *
+	 * @param array $array Arreglo de entrada que se desea reordenar.
+	 * @param string $clave_orden Nombre de la columna que actuará como índice de agrupación.
+	 * @return array Arreglo procesado y agrupado por niveles.
+	 */
+	public function agruparPorClave(array $array, string $clave_orden): array {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Al ingresar un Array, se reordena un array normal transformandolo en un array multinivel
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se filtran los datos
@@ -30,58 +37,62 @@ class FunctionsCommonData {
 		* 		}
 		* 	}
 		*
-		*=================================================    Parametros   =================================================
-		* @input   array    $array        Arreglo a reordenar
-		* @input   string   $clave_orden  Columna desde donde se reordenara el arreglo
-		* @return  array
 		*===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
-		//Devolvemos el nuevo array
+		// Utiliza array_reduce para iterar el arreglo y construir la estructura agrupada
 		return array_reduce($array, function ($carry, $item) use ($clave_orden) {
-                $clave = $item[$clave_orden];
-                unset($item[$clave_orden]);
-                $carry[$clave][] = $item;
-                return $carry;
-            }, []);
-
+				// Extrae el valor que servirá como nueva clave de grupo
+				$clave = $item[$clave_orden];
+				// Elimina la clave de orden del elemento original para evitar redundancia
+				unset($item[$clave_orden]);
+				// Agrega el elemento al grupo correspondiente dentro del acumulador
+				$carry[$clave][] = $item;
+				return $carry;
+			}, []);
 
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Recupera la extensión de un archivo a partir de su nombre o ruta completa.
+	 *
+	 * Extrae la cadena de caracteres posterior al último punto en la ruta proporcionada
+	 * utilizando las funciones nativas del sistema de archivos.
+	 *
+	 * @param string $nombreArchivo Nombre o ruta completa del archivo en el servidor.
+	 * @return string Extensión del archivo resultante.
+	 */
 	public function obtenerExtensionArchivo(string $nombreArchivo): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite obtener la extension del archivo solicitado, hay que tener en cuenta el otorgar la ruta completa de
-		* acceso al archivo en el servidor
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//obtener extension
 		* 	$CommonData->obtenerExtensionArchivo('nombre del archivo'); //devuelve la extension
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string   $nombreArchivo     Nombre del archivo a revisar, incluyendo la ruta de acceso a este
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Retorna la extensión analizando la cadena de ruta mediante pathinfo
 		return pathinfo($nombreArchivo, PATHINFO_EXTENSION);
 
 	}
 
 	/************************************************************************************************************/
-    public function objectToArrayRecursive (object $obj): array{
+	/**
+	 * Convierte un objeto o una estructura jerárquica de objetos en un arreglo asociativo.
+	 *
+	 * Procesa de forma recursiva cada propiedad del objeto. Si una propiedad es a su vez
+	 * un objeto, la función se llama a sí misma para garantizar que toda la estructura
+	 * final sea un array.
+	 *
+	 * @param object $obj El objeto inicial que se desea convertir.
+	 * @return array Arreglo asociativo con los datos del objeto original.
+	 */
+	public function objectToArrayRecursive(object $obj): array {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* El objetivo es convertir un objeto (o un árbol de objetos) en un array asociativo, de forma recursiva.
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se recorre el nuevo arreglo
@@ -94,105 +105,132 @@ class FunctionsCommonData {
 		*	];
 		*   $CommonData->objectToArrayRecursive ($persona);
 		*
-		*=================================================    Parametros   =================================================
-		* @input   object     $obj   Objeto a convertir
-		* @return  array
 		*===================================================================================================================
 		*/
 
 		/********************** Si todo esta ok **********************/
-		// Convertir el objeto recibido en un array asociativo
+		// Realiza el casting inicial del objeto a un arreglo asociativo
 		$reaged = (array)$obj;
 
 		/**********************  Retorno datos  **********************/
-		// Devolver el array completamente convertido
+		// Aplica una función sobre cada campo para detectar objetos anidados
 		return array_map(function ($field) {
+			// Si el campo es un objeto, inicia la recursión; de lo contrario, retorna el valor
 			return is_object($field) ? $this->objectToArrayRecursive($field) : $field;
 		}, $reaged);
 
-    }
+	}
 
 	/******************************************************************************/
-    public function parseDataCommas($Data): array{
+	/**
+	 * Segmenta una cadena de caracteres delimitada por comas en un arreglo de elementos.
+	 *
+	 * Utiliza una expresión regular para dividir la cadena, eliminando espacios en blanco
+	 * alrededor de las comas y omitiendo fragmentos que resulten vacíos.
+	 *
+	 * @param string $Data Cadena de texto con elementos separados por comas.
+	 * @return array Arreglo que contiene los elementos individuales extraídos.
+	 */
+	public function parseDataCommas($Data): array {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se le entrega una cadena separada por comas y devuelve un array con los elementos ya separados
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se recorre el nuevo arreglo
 		* 	$CommonData->parseDataCommas('uno,dos,tres');
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string     $Data   Cadena con los datos
-		* @return  array
 		*===================================================================================================================
 		*/
 
 		/**********************  Retorno datos  **********************/
+		// Divide la cadena basándose en comas, permitiendo espacios opcionales (\s*)
 		return preg_split('/\s*,\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
-
-    }
+	}
 
     /******************************************************************************/
-    public function parseDataSeparator($Data): array{
+	/**
+	 * Segmenta una cadena de caracteres delimitada por guiones medios en un arreglo.
+	 *
+	 * Utiliza una expresión regular para dividir la cadena utilizando el carácter '-'
+	 * como delimitador, eliminando espacios en blanco adyacentes y descartando
+	 * resultados vacíos.
+	 *
+	 * @param string $Data Cadena de texto que contiene los elementos separados por guiones.
+	 * @return array Arreglo con los elementos individuales extraídos.
+	 */
+	public function parseDataSeparator($Data): array {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se le entrega una cadena separada por guiones medio y devuelve un array con los elementos ya separados
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se recorre el nuevo arreglo
 		* 	$CommonData->parseDataSeparator('uno-dos-tres');
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string     $Data   Cadena con los datos
-		* @return  array
 		*===================================================================================================================
 		*/
 
 		/**********************  Retorno datos  **********************/
+		// Divide la cadena basándose en guiones, permitiendo espacios opcionales (\s*)
 		return preg_split('/\s*-\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
-
-    }
+	}
 
 	/******************************************************************************/
-    public function parseDataSymbol($Data): array{
+	/**
+	 * Divide una cadena de texto utilizando operadores de comparación como delimitadores.
+	 *
+	 * Emplea una expresión regular para identificar símbolos lógicos (!=, <=, >=, =, <, >)
+	 * y separar la cadena en sus componentes, ignorando espacios en blanco alrededor
+	 * de dichos símbolos.
+	 *
+	 * @param string $Data Cadena con datos y operadores de comparación.
+	 * @return array Arreglo con los fragmentos de texto resultantes de la división.
+	 */
+	public function parseDataSymbol($Data): array {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se le entrega una cadena separada por !=|<=|>=|=|<|> y devuelve un array con los elementos ya separados
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se recorre el nuevo arreglo
 		* 	$CommonData->parseDataSymbol('uno=dos!=tres');
 		*
-		*=================================================    Parametros   =================================================
-		* @input   string     $Data   Cadena con los datos
-		* @return  array
 		*===================================================================================================================
 		*/
 
 		/********************** Si todo esta ok **********************/
-		//Valida !=|<=|>=|=|<|> en orden
+		// Ejecuta la división mediante un grupo de no captura para los operadores lógicos
 		$Data = preg_split('/\s*(?:!=|<=|>=|=|<|>)\s*/', $Data, -1, PREG_SPLIT_NO_EMPTY);
 
 		/**********************  Retorno datos  **********************/
+		// Retorno del arreglo procesado
 		return $Data;
-
-    }
+	}
 
 	/******************************************************************************/
-    public function safePath($path, $root) {
+	/**
+	 * Valida y normaliza una ruta de archivo para prevenir ataques de salto de directorio.
+	 *
+	 * Resuelve la ruta absoluta del archivo y verifica que el resultado comience
+	 * estrictamente con el prefijo de la ruta raíz permitida. Si la ruta es inválida
+	 * o se encuentra fuera del rango permitido, retorna la ruta raíz.
+	 *
+	 * @param string $path Ruta del archivo o directorio a validar.
+	 * @param string $root Ruta base permitida que actúa como límite de seguridad.
+	 * @return string La ruta absoluta validada o la ruta raíz en caso de acceso denegado.
+	 */
+	public function safePath($path, $root) {
+
+		/********************** Si todo esta ok **********************/
+		// Obtiene la ruta absoluta real eliminando enlaces simbólicos y relativos
 		$real = realpath($path);
+
+		// Valida si la ruta existe y si se mantiene dentro del directorio raíz
 		if ($real === false || strpos($real, $root) !== 0) {
+			// Retorno de seguridad si se detecta una ruta fuera de los límites
 			return $root;
 		}
+
+		/**********************  Retorno datos  **********************/
+		// Retorno de la ruta real confirmada
 		return $real;
 	}
+
 
 }
 

@@ -1,7 +1,7 @@
 <li class="nav-item dropdown pe-3">
     <?php
     $UserIMG = !empty($data['UserData']['UserIMG'])
-        ? $BASE.'/upload/'.$data['UserData']['UserIMG']
+        ? $data['UserData']['MainPathUrl'].$data['UserData']['UserIMG']
         : $BASE.'/img/profile-img.jpg';
     ?>
     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">

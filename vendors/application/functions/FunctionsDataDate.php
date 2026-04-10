@@ -29,605 +29,689 @@ class FunctionsDataDate {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-	public function fechaCompleta($Fecha): string{
+	/**
+     * Formatea una fecha al estilo: "Mes Día del Año".
+     * * @param string|date $Fecha Fecha a formatear.
+     * @return string Fecha formateada (ej: "Enero 01 del 2024") o mensaje de error de validación.
+     */
+    public function fechaCompleta($Fecha): string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaCompleta('2024-01-01'); //Devuelve enero 01 del 2024
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+        /********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
-		$mes_c   = new DateTime($Fecha);
-		$dia     = $mes_c->format('d');
-		$ano     = $mes_c->format('Y');
-		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
+        /********************** Si todo esta ok **********************/
+        // Instancia un objeto DateTime para la manipulación de los componentes de la fecha
+		$mes_c = new DateTime($Fecha);
+		// Extrae el día del mes con ceros iniciales (01 a 31)
+		$dia = $mes_c->format('d');
+		// Obtiene el año en formato de cuatro dígitos
+        $ano = $mes_c->format('Y');
+        // Obtiene el nombre del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
+        $mes = self::optionsMesLargo[$mes_c->format('m') - 1];
 
-		/**********************  Retorno datos  **********************/
-		return $mes.' '.$dia.' del '.$ano;
+        /********************** Retorno datos  **********************/
+        return $mes.' '.$dia.' del '.$ano;
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function fechaCompletaAlt($Fecha): string{
+	/**
+     * Formatea una fecha al estilo alternativo: "Día de Mes de Año".
+     * * @param string|date $Fecha Fecha a formatear.
+     * @return string Fecha formateada (ej: "01 de enero de 2024") o error.
+     */
+    public function fechaCompletaAlt($Fecha): string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaCompletaAlt('2024-01-01'); //Devuelve 01 de enero de 2024
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha    Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+        /********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
-		$mes_c   = new DateTime($Fecha);
-		$dia     = $mes_c->format('d');
-		$ano     = $mes_c->format('Y');
-		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
+        /********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
+		$mes_c = new DateTime($Fecha);
+		// Extrae el día del mes con ceros iniciales (01 a 31)
+		$dia = $mes_c->format('d');
+		// Obtiene el año en formato de cuatro dígitos
+        $ano = $mes_c->format('Y');
+		// Obtiene el nombre del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
+		$mes = self::optionsMesLargo[$mes_c->format('m') - 1];
 
-		/**********************  Retorno datos  **********************/
-		return $dia.' de '.$mes.' de '.$ano;
+        /********************** Retorno datos  **********************/
+        return $dia.' de '.$mes.' de '.$ano;
 
-	}
+    }
 
 	/************************************************************************************************************/
-	public function diaMes($Fecha): string{
+	/**
+	 * Formatea una fecha para obtener el día y el nombre del mes en formato largo.
+	 *
+	 * @param string $Fecha Fecha en formato válido para procesamiento.
+	 * @return string Retorna el día y mes (ej: "01 Enero") o el mensaje de error de validación.
+	 */
+	public function diaMes($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->diaMes('2024-01-01'); //Devuelve 01 Enero
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha    Fecha a Formatear
-		* @return   string
 		*===================================================================================================================
 		*/
 
 		/**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
-		$mes_c   = new DateTime($Fecha);
-		$dia     = $mes_c->format('d');
-		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
+		$mes_c = new DateTime($Fecha);
+		// Extrae el día del mes con ceros iniciales (01 a 31)
+		$dia = $mes_c->format('d');
+		// Obtiene el nombre del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
+		$mes = self::optionsMesLargo[$mes_c->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
-		return $dia.' '.$mes;
-
+		// Concatena el día y el nombre del mes para el resultado final
+		return $dia . ' ' . $mes;
 	}
 
 	/************************************************************************************************************/
-	public function fechaEstandar($Fecha): DateTime | string{
+	/**
+	 * Convierte una fecha al formato estándar extendido (día-mes-año de cuatro dígitos).
+	 *
+	 * @param string $Fecha Fecha a formatear.
+	 * @return DateTime|string Retorna la fecha en formato 'd-m-Y' o el mensaje de error de validación.
+	 */
+	public function fechaEstandar($Fecha): DateTime|string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaEstandar('2024-01-01'); //Devuelve 01-01-2024
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha    Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Crea un objeto de fecha y aplica el formato de salida con año completo
 		return date_format(date_create($Fecha), 'd-m-Y');
-
 	}
 
 	/************************************************************************************************************/
-	public function fechaEstandarCorta($Fecha): DateTime | string{
+	/**
+	 * Convierte una fecha al formato estándar corto (día-mes-año de dos dígitos).
+	 *
+	 * @param string $Fecha Fecha a formatear.
+	 * @return DateTime|string Retorna la fecha en formato 'd-m-y' o el mensaje de error de validación.
+	 */
+	public function fechaEstandarCorta($Fecha): DateTime|string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaEstandarCorta('2024-01-01'); //Devuelve 01-01-24
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Genera la representación de la fecha con el año abreviado a dos dígitos
 		return date_format(date_create($Fecha), 'd-m-y');
-
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Normaliza una fecha al formato estándar de base de datos (AAAA-MM-DD).
+	 * * @param string $Fecha La fecha de entrada a normalizar.
+	 * @return DateTime|string La fecha en formato 'Y-m-d' o el resultado de la validación si falla.
+	 */
 	public function fechaNormalizada($Fecha): DateTime | string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaNormalizada('2024-01-01'); //Devuelve 2024-01-01
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Sustituye barras inclinadas por guiones para asegurar la compatibilidad con date_create
+		// Retorna la fecha formateada como Año-Mes-Día
 		return date_format(date_create(str_replace('/', '-', $Fecha)), 'Y-m-d');
 
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Formatea una fecha para su uso en nomenclatura de archivos (AAAAMMDD).
+	 * * @param string $Fecha La fecha de entrada a formatear.
+	 * @return DateTime|string La cadena de texto con la fecha compacta o el error de validación.
+	 */
 	public function fechaArchivos($Fecha): DateTime | string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaArchivos('2024-01-01'); //Devuelve 20240101
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Reemplaza separadores y genera una cadena numérica sin guiones ni espacios
 		return date_format(date_create(str_replace('/', '-', $Fecha)), 'Ymd');
 
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Genera una representación textual de la fecha indicando el mes y el año.
+	 * * @param string $Fecha La fecha de entrada a procesar.
+	 * @return string Nombre del mes seguido del año (ej: "Enero del 2024").
+	 */
 	public function fechaMesAno($Fecha): string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se formatea la fecha ingresada a una con un formato personalizado
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaMesAno('2024-01-01'); //Devuelve Enero del 2024
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha   Fecha a Formatear
-		* @return   string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
-		$mes_c   = new DateTime($Fecha);
-		$ano     = $mes_c->format('Y');
-		$mes     = self::optionsMesLargo[$mes_c->format('m') - 1];
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
+		$mes_c = new DateTime($Fecha);
+		// Obtiene el año en formato de cuatro dígitos
+		$ano = $mes_c->format('Y');
+		// Obtiene el nombre del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
+		$mes = self::optionsMesLargo[$mes_c->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
+		// Retorna la cadena construida con el formato descriptivo solicitado
 		return $mes.' del '.$ano;
 
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NdiaMes($Fecha): string{
+	/**
+	 * Obtiene el número del día del mes sin ceros iniciales.
+	 *
+	 * @param string $Fecha Fecha a procesar.
+	 * @return string Número del día (1 a 31) o error de validación.
+	 */
+	public function fecha2NdiaMes($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite obtener el numero del dia en el mes a partir de la fecha ingresada, del 1 al 31
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se obtiene el numero del dia
 		* 	$DataDate->fecha2NdiaMes('2024-01-02'); //Devuelve 2
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$subdato = new DateTime($Fecha);
 
 		/**********************  Retorno datos  **********************/
+		// Retorna el día del mes sin ceros iniciales mediante el formato 'j'
 		return $subdato->format("j");
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NdiaMesCon0($Fecha): string{
+	/**
+	 * Obtiene el número del día del mes con dos dígitos (ceros iniciales).
+	 *
+	 * @param string $Fecha Fecha a procesar.
+	 * @return string Número del día (01 a 31) o error de validación.
+	 */
+	public function fecha2NdiaMesCon0($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite obtener el numero del dia en el mes a partir de la fecha ingresada, 2 dígitos con ceros iniciales (1 al 31)
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2NdiaMesCon0('2024-01-01'); //Devuelve 01
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$subdato = new DateTime($Fecha);
 
 		/**********************  Retorno datos  **********************/
+		// Retorna el día del mes con ceros iniciales mediante el formato 'd'
 		return $subdato->format('d');
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NDiaSemana($Fecha): string{
+	/**
+	 * Obtiene la representación numérica del día de la semana (ISO-8601).
+	 *
+	 * @param string $Fecha Fecha a procesar.
+	 * @return string Número del día de la semana (1 para Lunes, 7 para Domingo).
+	 */
+	public function fecha2NDiaSemana($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Muestra el numero del dia dentro de la semana, siendo 1 (para lunes) hasta 7 (para domingo)
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2NDiaSemana('2024-01-01'); //Devuelve 1
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$subdato = new DateTime($Fecha);
 
 		/**********************  Retorno datos  **********************/
+		// Retorna el número del día de la semana según el estándar ISO-8601
 		return $subdato->format('N');
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NombreDia($Fecha): string{
+	/**
+	 * Obtiene el nombre completo del día de la semana en español.
+	 *
+	 * @param string $Fecha Fecha a procesar.
+	 * @return string Nombre del día (ej: "Martes") o error de validación.
+	 */
+	public function fecha2NombreDia($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Devuelve el nombre del dia en base a la fecha ingresada (lunes a domingo)
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se transforma los datos
 		* 	$DataDate->fecha2NombreDia('2024-01-02'); //Devuelve Martes
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha   Fecha a Formatear
-		* @return   string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Utiliza el método fecha2NDiaSemana para obtener el índice (1-7)
+		// Se resta 1 para ajustar al índice base cero del arreglo optionsDiaSemana
+		// Obtiene el nombre del dia desde el array optionsDiaSemana usando el índice numérico del dia (0-6)
 		return self::optionsDiaSemana[$this->fecha2NDiaSemana($Fecha) - 1];
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NSemana($Fecha): string{
+	/**
+	 * Obtiene el número de la semana del año basándose en la fecha proporcionada.
+	 *
+	 * @param string $Fecha Fecha de entrada para el cálculo.
+	 * @return string Número de la semana (ISO-8601) con ceros iniciales o error de validación.
+	 */
+	public function fecha2NSemana($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se obtiene el numero de la semana en base a la fecha entregada
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2NSemana('2024-01-01'); //Devuelve 01
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$subdato = new DateTime($Fecha);
 
 		/**********************  Retorno datos  **********************/
+		// Retorna el número de la semana del año (01 a 52/53)
 		return $subdato->format("W");
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NMes($Fecha): string{
+	/**
+	 * Obtiene la representación numérica del mes a partir de una fecha.
+	 *
+	 * @param string $Fecha Fecha de entrada.
+	 * @return string Número del mes sin ceros iniciales (1 a 12) o error de validación.
+	 */
+	public function fecha2NMes($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se obtiene el numero del mes en base a la fecha entregada (1 a 12)
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2NMes('2024-01-01'); //Devuelve 1
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha  Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$subdato = new DateTime($Fecha);
 
 		/**********************  Retorno datos  **********************/
+		// Retorna el mes en formato numérico sin ceros a la izquierda
 		return $subdato->format("n");
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NombreMes($Fecha): string{
+	/**
+	 * Recupera el nombre completo del mes en español basándose en la fecha.
+	 *
+	 * @param string $Fecha Fecha de entrada.
+	 * @return string Nombre largo del mes (ej: "Enero") o error de validación.
+	 */
+	public function fecha2NombreMes($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se obtiene el nombre del mes en base a una fecha ingresada
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2NombreMes('2024-01-01'); //Devuelve Enero
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha   Fecha a Formatear
-		* @return   string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Utiliza el método fecha2NMes para obtener el índice numérico (1-12)
+		// Se resta 1 para mapear correctamente al índice del arreglo constante optionsMesLargo
+		// Obtiene el nombre del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
 		return self::optionsMesLargo[$this->fecha2NMes($Fecha) - 1];
-
 	}
 
 	/************************************************************************************************************/
-	public function fecha2NombreMesCorto($Fecha): string{
+	/**
+	 * Obtiene la abreviatura de tres letras del mes basándose en la fecha.
+	 *
+	 * @param string $Fecha Fecha de entrada.
+	 * @return string Nombre corto del mes (ej: "Ene") o error de validación.
+	 */
+	public function fecha2NombreMesCorto($Fecha): string {
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se obtiene el nombre abreviado (3 primeras letras) del mes en base a una fecha ingresada
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2NombreMesCorto('2024-01-01'); //Devuelve Ene
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha   Fecha a Formatear
-		* @return   string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Obtiene el número del mes y accede al arreglo constante optionsMesCorto
+		// El ajuste de índice (-1) es necesario para la correspondencia con arreglos base cero
+		// Obtiene el nombre corto del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
 		return self::optionsMesCorto[$this->fecha2NMes($Fecha) - 1];
-
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Extrae el año de una fecha proporcionada.
+	 *
+	 * @param string $Fecha Cadena de texto que representa la fecha.
+	 * @return string Año en formato de cuatro dígitos (YYYY) o mensaje de error de validación.
+	 */
 	public function fecha2Ano($Fecha): string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Obtiene el Año en base a la fecha ingresada
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fecha2Ano('2024-01-01'); //Devuelve 2024
 		*
-		*=================================================    Parametros   =================================================
-		* @input   date     $Fecha   Fecha a Formatear
-		* @return  string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
 		/********************** Si todo esta ok **********************/
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$subdato = new DateTime($Fecha);
 
 		/**********************  Retorno datos  **********************/
+		// Retorna el año utilizando el formato 'Y' (ej: 2024)
 		return $subdato->format('Y');
 
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Formatea una fecha al estilo estadounidense con el nombre del mes en inglés.
+	 *
+	 * @param string $Fecha Cadena de texto que representa la fecha.
+	 * @return DateTime|string Fecha formateada (ej: "January 01 2024") o error de validación.
+	 */
 	public function fechaGringa($Fecha): DateTime | string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se obtiene la descripcion de la fecha en ingles, una representación textual completa de un mes, como January o
-		* March, el numero del dia y el año
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaGringa('2024-01-01'); //Devuelve January 01 2024
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha   Fecha a Formatear
-		* @return   string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Genera un recurso de fecha y aplica el formato 'F d Y'
+		// 'F' devuelve la representación textual completa del mes en inglés
 		return date_format(date_create($Fecha), 'F d Y');
 
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Calcula y retorna la fecha correspondiente al último día del mes de la fecha dada.
+	 *
+	 * @param string $Fecha Cadena de texto que representa la fecha.
+	 * @return string Fecha completa del último día del mes (YYYY-MM-DD) o error de validación.
+	 */
 	public function fechaUltimoDiaMes($Fecha): string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Se obtiene el ultimo dia del mes de la fecha entregada
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se formatea fecha
 		* 	$DataDate->fechaUltimoDiaMes('2024-01-01'); //Devuelve '2024-01-31'
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date     $Fecha   Fecha a usar
-		* @return   string
 		*===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
+		/********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateDate($Fecha);
-		if ($dataVal !== true) { return $dataVal;}
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) {
+			return $dataVal;
+		}
 
-		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/
+		// Utiliza el parámetro de formato 't' que devuelve el número de días del mes dado
+		// Se combina con Y-m para reconstruir la fecha completa del último día
 		return date("Y-m-t", strtotime($Fecha));
 
 	}
 
 	/************************************************************************************************************/
+	/**
+	 * Genera una cadena de texto descriptiva que incluye mes, día, año y hora.
+	 *
+	 * @param string $Fecha Cadena de texto con fecha y hora (Y-m-d H:i:s).
+	 * @return string Fecha formateada en español (ej: "Diciembre 12 del 2023 13:17:59") o mensaje de error.
+	 */
 	public function fullDate($Fecha): string{
 		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Devuelve la fecha formateada: Diciembre 12 del 2023 13:17:59
-		*
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//se convierten los datos
 		* 	$DataDate->fullDate('2023-12-12 13:17:59');
 		*
-		*=================================================    Parametros   =================================================
-		* @input    date       $Fecha   Fecha a transformar
-		* @return   string
 		*===================================================================================================================
 		*/
 
+		$Fecha = trim($Fecha);
 		/**********************  Validaciones   **********************/
-		if($Fecha=='' || $Fecha=='0000-00-00'){                           return 'Sin Fecha';}
+		// Comprobación de valor vacío o nulo
+		if($Fecha=='' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000'){   return 'Sin fecha ingresada';}
+		// Validación de formato estricto incluyendo horas, minutos y segundos
 		if(!$this->DataValidations->validarFecha($Fecha, 'Y-m-d H:i:s')){ return 'El dato ingresado no es una fecha ('.$Fecha.')';}
 
 		/********************** Si todo esta ok **********************/
-		// Establecer la zona horaria predeterminada a usar.
+		// Configuración de la zona horaria para asegurar la consistencia del objeto DateTime
 		date_default_timezone_set('America/Santiago');
-		//Se formatea
+
+		// Instancia un objeto DateTime para la manipulación de los componentes de la fecha
 		$NewFecha = new DateTime($Fecha);
-		$dia     = $NewFecha->format('d');
-		$ano     = $NewFecha->format('Y');
-		$hora    = $NewFecha->format('H:i:s');
-		$mes     = self::optionsMesLargo[$NewFecha->format('m') - 1];
+		// Extrae el día del mes con ceros iniciales (01 a 31)
+		$dia = $NewFecha->format('d');
+		// Obtiene el año en formato de cuatro dígitos
+		$ano = $NewFecha->format('Y');
+		// Obtiene la hora en formato hh:mm:ss (01:00:00)
+		$hora = $NewFecha->format('H:i:s');
+		// Obtiene el nombre del mes desde el array optionsMesLargo usando el índice numérico del mes (0-11)
+		$mes = self::optionsMesLargo[$NewFecha->format('m') - 1];
 
 		/**********************  Retorno datos  **********************/
+		// Construye y retorna la cadena final con el formato descriptivo
 		return $mes.' '.$dia.' del '.$ano.' '.$hora;
 
 	}
-
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
@@ -638,7 +722,7 @@ class FunctionsDataDate {
 	private function _validateDate($Fecha){
 
 		/**********************  Validaciones   **********************/
-		if($Fecha=='' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000'){   return 'Sin Fecha';}
+		if($Fecha=='' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000'){   return 'Sin fecha ingresada';}
 		if(!$this->DataValidations->validarFecha($Fecha)){                return 'El dato ingresado no es una fecha ('.$Fecha.')';}
 
 		/********************** Si todo esta ok **********************/

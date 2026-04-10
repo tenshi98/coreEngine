@@ -4,8 +4,17 @@
 /*******************************************************************************************************************/
 class Response {
     /******************************************************************************/
-    //Se genera la respuesta
-    public static function sendData($code,$message = "",$Extra = ""){
+    /**
+     * Genera y envía una respuesta estructurada en formato JSON al cliente.
+     * * Esta función configura el código de estado HTTP de la respuesta y construye un
+     * objeto JSON que contiene un mensaje descriptivo y, opcionalmente, datos adicionales.
+     *
+     * @param int $code Código de estado HTTP (ej. 200, 400, 404, 500).
+     * @param string $message Mensaje descriptivo sobre el resultado de la operación.
+     * @param mixed $Extra Información adicional o datos de respuesta opcionales.
+     * @return string Cadena en formato JSON con la estructura de la respuesta.
+     */
+    public static function sendData($code, $message = "", $Extra = "") {
         /*
         Codigos de respuestas
 
@@ -36,25 +45,22 @@ class Response {
         505 — Versión HTTP no compatible.
 
         */
-        // Establece el código de respuesta HTTP.
-        // Esto indica al cliente el estado de la solicitud (por ejemplo, 200 OK, 400 Bad Request, 500 Internal Server Error).
+        // Configura el encabezado de estado HTTP en la cabecera de la respuesta actual
         http_response_code($code);
 
-        // Inicializa un arreglo asociativo para construir el cuerpo de la respuesta.
+        // Declara el contenedor de datos para la respuesta final
         $MSG = [];
 
-        // Agrega el mensaje principal al arreglo.
-        // Este mensaje puede describir el resultado de la operación o el error ocurrido.
+        // Asigna el mensaje informativo proporcionado a la estructura de respuesta
         $MSG['message'] = $message;
 
-        // Verifica si existe información adicional para incluir en la respuesta.
-        // Si la variable $Extra no está vacía, se agrega al arreglo bajo la clave 'Extra'.
+        // Evalúa si el parámetro de datos adicionales contiene información válida y no vacía
         if (!empty($Extra) && $Extra != '') {
+            // Adjunta los datos adicionales al cuerpo de la respuesta bajo la clave 'Extra'
             $MSG['Extra'] = $Extra;
         }
 
-        // Codifica el arreglo como una cadena JSON y la devuelve como respuesta.
-        // Esto permite que el cliente reciba los datos en un formato estructurado y fácilmente interpretable.
+        // Transforma el arreglo asociativo en una representación de texto JSON
         return json_encode($MSG);
 
     }

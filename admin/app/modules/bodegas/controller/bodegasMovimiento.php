@@ -64,11 +64,6 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     //Listar Todo
     public function listAll($f3, $idTipoIngreso){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         switch ($idTipoIngreso) {
@@ -165,8 +160,8 @@ class bodegasMovimiento extends ControllerBase {
                 'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
                 'TableTitle'      => $TipoMov.' Bodegas',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
@@ -184,23 +179,18 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError(1, $f3);
         }
     }
 
     /******************************************************************************/
     //List
     public function UpdateList($f3, $idTipoIngreso){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se verifica movimiento
         switch ($idTipoIngreso) {
@@ -266,8 +256,8 @@ class bodegasMovimiento extends ControllerBase {
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => $TipoMov.' Bodegas',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
@@ -278,22 +268,21 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //View
     public function View($f3, $params, $idTipoIngreso){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /******************************************/
         //Se verifica movimiento
@@ -322,7 +311,7 @@ class bodegasMovimiento extends ControllerBase {
         LEFT JOIN usuarios_listado            ON usuarios_listado.idUsuario            = bodegas_movimientos.idUsuario';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($UserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"]==2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -382,8 +371,8 @@ class bodegasMovimiento extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
@@ -396,22 +385,21 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
     /******************************************************************************/
     //Resumen
     public function Resumen($f3, $params, $idTipoIngreso){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /******************************************/
         //Se verifica movimiento
@@ -443,7 +431,7 @@ class bodegasMovimiento extends ControllerBase {
         LEFT JOIN usuarios_listado            ON usuarios_listado.idUsuario            = bodegas_movimientos.idUsuario';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($UserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"]==2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -483,8 +471,8 @@ class bodegasMovimiento extends ControllerBase {
                 'PageAuthor'       => ConfigAPP::SOFTWARE['SoftwareName'],
                 'PageKeywords'     => ConfigAPP::SOFTWARE['SoftwareName'],
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
@@ -497,22 +485,21 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen.php');
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 1, $f3);
+            $this->showError(1, $f3);
         }
     }
 
     /******************************************************************************/
     //Resumen-Update
     public function ResumenUpdate($f3, $params, $idTipoIngreso){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /******************************************/
         //Se verifica movimiento
@@ -541,7 +528,7 @@ class bodegasMovimiento extends ControllerBase {
         LEFT JOIN usuarios_listado            ON usuarios_listado.idUsuario            = bodegas_movimientos.idUsuario';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($UserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"]==2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -575,8 +562,8 @@ class bodegasMovimiento extends ControllerBase {
             //Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$tsrxName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
@@ -586,12 +573,12 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Update.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Update.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 

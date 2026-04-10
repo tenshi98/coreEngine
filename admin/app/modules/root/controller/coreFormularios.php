@@ -33,11 +33,6 @@ class coreFormularios extends ControllerBase {
     /******************************************************************************/
     //pantalla principal
     public function Formularios($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************/
         //Se genera la query
         $query = [
@@ -96,8 +91,8 @@ class coreFormularios extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'  => $this->FormInputs,
             /*=========== Datos Consultados ===========*/
@@ -108,7 +103,7 @@ class coreFormularios extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/coreFormularios-form.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/coreFormularios-form.php');
     }
 
 }

@@ -26,64 +26,75 @@ class FunctionsLocation {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-    public function calcularDistancia( $latitude1, $longitude1, $latitude2, $longitude2 ): float {
+    /**
+     * Calcula la distancia entre dos puntos geográficos utilizando la fórmula de Haversine.
+     * * Esta función determina la distancia en línea recta sobre la superficie de una esfera
+     * (la Tierra) entre dos pares de coordenadas (latitud/longitud). El resultado se
+     * entrega inicialmente en kilómetros según el radio medio terrestre definido.
+     *
+     * @param float|string $latitude1  Latitud del punto de origen.
+     * @param float|string $longitude1 Longitud del punto de origen.
+     * @param float|string $latitude2  Latitud del punto de destino.
+     * @param float|string $longitude2 Longitud del punto de destino.
+     * @return float|string Distancia calculada en kilómetros.
+     */
+    public function calcularDistancia($latitude1, $longitude1, $latitude2, $longitude2): string | float {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Esta funcion permte obtener la distancia (en metros) entre dos puntos georeferenciados
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//se ejecuta codigo
         * 	$Location->calcularDistancia(-40.807289, -72.634907, -42.176560, -73.425923);
         *
-        *=================================================    Parametros   =================================================
-        * @input   decimal  $latitude1     Latitud posicion 1
-        * @input   decimal  $longitude1    Longitud posicion 1
-        * @input   decimal  $latitude2     Latitud posicion 2
-        * @input   decimal  $longitude2    Longitud posicion 2
-        * @return  int
         *===================================================================================================================
 		*/
 
-        /**********************  Validaciones   **********************/
-        if (!$this->DataValidations->validarNumero($latitude1) || !$this->DataValidations->validarNumero($longitude1) ||
-            !$this->DataValidations->validarNumero($latitude2) || !$this->DataValidations->validarNumero($longitude2)) {
-            return 'Los datos ingresados no son numeros';
-        }
-        if ((!isset($latitude1) || $latitude1=='') || (!isset($longitude1) || $longitude1=='') ||
-            (!isset($latitude2) || $latitude2=='') || (!isset($longitude2) || $longitude2=='')) {
-            return 'No se han ingresado todos los datos';
-        }
+        /********************** Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_1 = $this->_validateValue($latitude1);
+		$dataVal_2 = $this->_validateValue($latitude2);
+		$dataVal_3 = $this->_validateValue($longitude1);
+		$dataVal_4 = $this->_validateValue($longitude2);
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal_1 !== true) { return $dataVal_1; }
+		if ($dataVal_2 !== true) { return $dataVal_2; }
+		if ($dataVal_3 !== true) { return $dataVal_3; }
+		if ($dataVal_4 !== true) { return $dataVal_4; }
 
         /********************** Si todo esta ok **********************/
+        // Asegurar tipo de dato flotante para precisión matemática
         $latitude1  = floatval($latitude1);
         $longitude1 = floatval($longitude1);
         $latitude2  = floatval($latitude2);
         $longitude2 = floatval($longitude2);
 
-        //radio de la tierra
+        // Radio medio de la Tierra en kilómetros
         $earth_radius = 6371;
 
-        $dLat = deg2rad( $latitude2 - $latitude1 );
-        $dLon = deg2rad( $longitude2 - $longitude1 );
+        // Conversión de diferencias de coordenadas de grados a radianes
+        $dLat = deg2rad($latitude2 - $latitude1);
+        $dLon = deg2rad($longitude2 - $longitude1);
 
+        // Aplicación de la fórmula de Haversine
         $a = sin($dLat/2) * sin($dLat/2) + cos(deg2rad($latitude1)) * cos(deg2rad($latitude2)) * sin($dLon/2) * sin($dLon/2);
         $c = 2 * asin(sqrt($a));
         $d = $earth_radius * $c;
 
-        /**********************  Retorno datos  **********************/
-        return $d;
-
+        /********************** Retorno datos  **********************/
+        return (float)$d;
     }
 
     /************************************************************************************************************/
-    public function getGeocodeData($address, $ApiKey) {
+    /**
+     * Obtiene coordenadas y dirección formateada desde la API de Geocoding de Google Maps.
+     * * Convierte una dirección de texto plano en datos geográficos (Latitud y Longitud)
+     * utilizando los servicios de Google. Requiere una API Key válida y activa.
+     *
+     * @param string $address Dirección completa a consultar (ej: "Av. Siempreviva 742, Springfield").
+     * @param string $ApiKey  Llave de API autorizada por Google Cloud Console.
+     * @return array|bool Arreglo con [lat, lng, formatted_address] o false si falla.
+     */
+    public function getGeocodeData($address, $ApiKey): array|bool|string {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Esta función devuelve la información ofrecida por Google (lat, long y direccion) y la asigna a una variable.
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//se ejecuta codigo
@@ -96,77 +107,81 @@ class FunctionsLocation {
         * 		echo "Detalles incorrectos!";
         * 	}
         *
-        *=================================================    Parametros   =================================================
-        * @input   string   $address    La dirección a consultar
-        * @input   string   $ApiKey     La Api Key de Google Maps
-        * @return  object
         *===================================================================================================================
 		*/
-        /**********************  Validaciones   **********************/
+
+        /********************** Validaciones   **********************/
         if(!isset($address) || $address==''){ return 'No ha ingresado una direccion';}
         if(!isset($ApiKey) || $ApiKey==''){   return 'No ha ingresado una ApiKey';}
 
         /********************** Si todo esta ok **********************/
-        //Variables
-        $address             = urlencode($address);                                                                    //Obtengo la dirección
-        $googleMapUrl        = "https://maps.googleapis.com/maps/api/geocode/json?address=".$address."&key=".$ApiKey;  //consulto a google
-        $geocodeResponseData = file_get_contents($googleMapUrl);                                                       //obtengo la respuesta
-        $responseData        = json_decode($geocodeResponseData, true);                                                //decodifico la respuesta
+        // Preparación de la dirección para URL (reemplazo de espacios y caracteres especiales)
+        $addressEnc          = urlencode($address);
+        $googleMapUrl        = "https://maps.googleapis.com/maps/api/geocode/json?address=".$addressEnc."&key=".$ApiKey;
 
-        /**********************  Retorno datos  **********************/
-        //si hay un resultado
-        if($responseData['status']=='OK') {
-            //datos obtenidos
-            $latitude         = isset($responseData['results'][0]['geometry']['location']['lat']) ? $responseData['results'][0]['geometry']['location']['lat'] : "";
-            $longitude        = isset($responseData['results'][0]['geometry']['location']['lng']) ? $responseData['results'][0]['geometry']['location']['lng'] : "";
-            $formattedAddress = isset($responseData['results'][0]['formatted_address']) ? $responseData['results'][0]['formatted_address'] : "";
-            //si existen todos los datos
+        // Consumo del servicio vía HTTP GET
+        $geocodeResponseData = file_get_contents($googleMapUrl);
+        $responseData        = json_decode($geocodeResponseData, true);
+
+        /********************** Retorno datos  **********************/
+        // Verificación del estado de respuesta de Google
+        if($responseData['status'] == 'OK') {
+
+            $latitude         = $responseData['results'][0]['geometry']['location']['lat'] ?? null;
+            $longitude        = $responseData['results'][0]['geometry']['location']['lng'] ?? null;
+            $formattedAddress = $responseData['results'][0]['formatted_address'] ?? null;
+
+            // Retorno de datos si la geometría y la dirección existen
             if($latitude && $longitude && $formattedAddress) {
-                //creo arreglo
-                $geocodeData = array();
-                //lleno los datos
-                array_push(
-                    $geocodeData,
+                return [
                     $latitude,
                     $longitude,
                     $formattedAddress
-                );
-                //devuelvo arreglo
-                return $geocodeData;
-            } else {
-                return false;
+                ];
             }
+            return false;
         } else {
-            echo "ERROR: {$responseData['status']}";
+            // Log de error en caso de que el status sea diferente a OK (ej: OVER_QUERY_LIMIT, REQUEST_DENIED)
+            error_log("Google Geocode ERROR: {$responseData['status']}");
             return false;
         }
     }
 
     /************************************************************************************************************/
+    /**
+     * Realiza geocodificación de una dirección utilizando el servicio gratuito Nominatim (OpenStreetMap).
+     * * Incluye una fase de limpieza de texto para normalizar abreviaciones comunes en
+     * direcciones de habla hispana (Nº, Av.) y cumple con las políticas de uso de
+     * Nominatim mediante la definición de un User-Agent.
+     *
+     * @param string $street Dirección o calle a geocodificar.
+     * @return array|bool Diccionario con 'lat', 'lon' y 'display_name', o false si no hay resultados.
+     */
     public function geocodeAddress($street) {
 
-        // Limpiar la direccion
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo o cadena vacía
+        if ($street=='') { return 'Sin datos ingresados'; }
+
+        /********************** Si todo esta ok **********************/
+        // Normalización y limpieza de la cadena de dirección
         $buscar     = ['Nº', 'nº', ' n ', "'", 'Av.', 'av.'];
         $reemplazar = ['',   '',   '',   '',  'Avenida', 'Avenida'];
-        $Ubicacion  = str_replace($buscar, $reemplazar, $street);
+        $ubicacion  = trim(str_replace($buscar, $reemplazar, $street));
 
-        // Construir dirección completa
-        $address = trim("$Ubicacion");
+        // Construcción de la URL de consulta para Nominatim (formato JSON, límite 1 resultado)
+        $url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" . urlencode($ubicacion);
 
-        // URL de Nominatim
-        $url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" . urlencode($address);
-
-        // Contexto HTTP (Nominatim recomienda definir user-agent)
+        // Configuración de cabeceras obligatorias para evitar bloqueos del servicio
         $opts = [
             "http" => [
                 "header" => "User-Agent: MyPHPGeocoder/1.0\r\n"
             ]
         ];
-
         $context = stream_context_create($opts);
 
-        // Llamada a la API
-        $response = file_get_contents($url, false, $context);
+        // Ejecución de la consulta a la API de OpenStreetMap
+        $response = @file_get_contents($url, false, $context);
 
         if ($response === false) {
             return false;
@@ -174,16 +189,40 @@ class FunctionsLocation {
 
         $data = json_decode($response, true);
 
-        if (!empty($data)) {
+        /********************** Retorno datos  **********************/
+        // Si el arreglo de resultados no está vacío, retorna el primer elemento
+        if (!empty($data) && isset($data[0])) {
             return [
-                'lat' => $data[0]['lat'],
-                'lon' => $data[0]['lon'],
+                'lat'          => $data[0]['lat'],
+                'lon'          => $data[0]['lon'],
                 'display_name' => $data[0]['display_name']
             ];
         }
 
         return false;
     }
+
+
+	/*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Internos                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+    /************************************************************************************************************/
+	private function _validateValue($Data){
+
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
+        if ($Data=='' || $Data==0) { return 'Sin datos ingresados'; }
+        // Validación de tipos de datos mediante el componente externo DataValidations
+        if (!$this->DataValidations->validarNumero($Data)) {
+            return 'El dato ingresado no es un numero ('.$Data.')';
+        }
+
+		/**********************  Retorno datos  **********************/
+		return true;
+
+	}
 
 
 

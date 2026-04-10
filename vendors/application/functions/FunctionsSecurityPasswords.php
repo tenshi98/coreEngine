@@ -26,13 +26,17 @@ class FunctionsSecurityPasswords {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
-    public function generarPassword($longitud,$tipo): string {
+    /**
+     * Genera una contraseña aleatoria de longitud específica y tipo (numérico o alfanumérico).
+     * * Utiliza un pool de caracteres basado en el tipo seleccionado, mezcla el contenido
+     * y extrae una subcadena del largo solicitado.
+     *
+     * @param int $longitud Largo de la contraseña generada.
+     * @param string $tipo Tipo de caracteres: 'numerico' o 'alfanumerico'.
+     * @return string La contraseña generada o un mensaje de error en caso de validación fallida.
+     */
+    public function generarPassword($longitud, $tipo): string {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Permite generar un pasword aleatorio de dos tipos, numerico o alfanumerico, seleccionando el largo del password
-        * aleatorio
-        *
         *=================================================    Modo de uso  =================================================
         * 	//Numerico:
         * 	$SecurityPasswords->generarPassword(10,'numerico'); //Devuelve valores numeros aleatoreos
@@ -40,221 +44,221 @@ class FunctionsSecurityPasswords {
         * 	//Alfanumerico:
         * 	$SecurityPasswords->generarPassword(10,'alfanumerico'); //Devuelve valores alfanumerico aleatoreos
         *
-        *=================================================    Parametros   =================================================
-        * @input     int        $longitud   Largo de la password generada
-        * @input     string     $tipo       Tipo de password a generar
-        * @return    string
-		*===================================================================================================================
+        *===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-        //verifico si los datos estan bien entregados
-		if(!isset($longitud) || $longitud==''){                                                                 return 'No ha ingresado longitud';}
-		if(!isset($tipo) || $tipo==''){                                                                         return 'No ha ingresado tipo';}
-        if (!$this->DataValidations->validarNumero($longitud) || ($tipo!="alfanumerico" && $tipo!="numerico")){ return 'Datos requeridos mal ingresados';}
+        /********************** Validaciones   **********************/
+        if(!isset($longitud) || $longitud == ''){ return 'No ha ingresado longitud'; }
+        if(!isset($tipo) || $tipo == ''){ return 'No ha ingresado tipo'; }
+
+        // Validación de tipo numérico para la longitud y pertenencia de tipo a los permitidos
+        if (!$this->DataValidations->validarNumero($longitud) || ($tipo != "alfanumerico" && $tipo != "numerico")){
+            return 'Datos requeridos mal ingresados';
+        }
 
         /********************** Si todo esta ok **********************/
-        // Definir los alfabetos disponibles
+        // Definir los alfabetos disponibles para la generación
         $alfabetos = [
             'alfanumerico' => 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789',
             'numerico'     => '0123456789',
         ];
 
-        // Seleccionar el alfabeto según el tipo, por defecto alfanumérico
+        // Seleccionar el alfabeto según el tipo solicitado
         $alphabet = $alfabetos[$tipo] ?? $alfabetos['alfanumerico'];
 
-        // Si la longitud requerida es mayor que la longitud del alfabeto,
-        // repetir el alfabeto para garantizar suficiente longitud
-        $repeticiones = ceil($longitud / strlen($alphabet));
+        // Asegurar que el pool de caracteres sea suficiente para la longitud pedida
+        $repeticiones = (int) ceil($longitud / strlen($alphabet));
         $pool         = str_repeat($alphabet, $repeticiones);
 
         // Mezclar aleatoriamente los caracteres del pool
         $shuffled = str_shuffle($pool);
 
-        /**********************  Retorno datos  **********************/
-        // Obtener la contraseña con la longitud deseada
-        return substr($shuffled, 0, $longitud);
+        /********************** Retorno datos  **********************/
+        // Retorna la subcadena truncada a la longitud deseada
+        return substr($shuffled, 0, (int)$longitud);
 
     }
 
     /************************************************************************************************************/
+    /**
+     * Genera una contraseña única basada en la estampa de tiempo (Timestamp) del servidor.
+     * * Concatena la fecha (YYYYMMDD) y la hora (HHMMSS) actual de Chile.
+     * Útil para identificadores rápidos que requieren orden cronológico.
+     *
+     * @return string Cadena numérica representativa del momento exacto (ej: 20260404132055).
+     */
     public function generarPasswordUnica(): string {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Se genera una password unica en base a la fecha y a la hora del servidor, de esta forma no hay probabilidades de
-        * que esta se repita, tener en cuenta su uso en caso de ser utilizada reiteradamente (2 veces en el mismo segundo)
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//generar una password
         * 	$SecurityPasswords->generarPasswordUnica(); //Devuelve 20241007152055 (para la fecha 2024/10/07 15:20:55)
         *
-        *=================================================    Parametros   =================================================
-        * @return    string
-		*===================================================================================================================
+        *===================================================================================================================
 		*/
 
         /********************** Si todo esta ok **********************/
-        // Establecer la zona horaria predeterminada a usar.
+        // Establecer la zona horaria predeterminada a Chile para asegurar consistencia
         date_default_timezone_set('America/Santiago');
 
-        /**********************  Retorno datos  **********************/
-        //devuelvo valor
-        return date("Ymd").date("His");
+        /********************** Retorno datos  **********************/
+        // Devuelve la concatenación de fecha y hora actual
+        return date("Ymd") . date("His");
 
     }
 
     /************************************************************************************************************/
+    /**
+     * Genera una cadena de caracteres aleatorios con opciones avanzadas de personalización.
+     * * Permite omitir caracteres visualmente ambiguos (como 'O' y '0'), incluir símbolos
+     * y garantizar que no existan caracteres duplicados en la cadena resultante.
+     *
+     * @param int $longitud Largo de la palabra generada.
+     * @param bool $lecturaAmigable Si es true, remueve caracteres similares (O/0, l/1, etc.).
+     * @param bool $incluirSimbolos Si es true, añade caracteres especiales (solo si lecturaAmigable es false).
+     * @param bool $sinDuplicados Si es true, asegura que cada carácter aparezca solo una vez.
+     * @return string Cadena aleatoria generada.
+     * @throws LengthException Si se solicita una longitud mayor a los caracteres únicos disponibles sin duplicados.
+     */
     public function caracteresRandom($longitud = 16, $lecturaAmigable = true, $incluirSimbolos = false, $sinDuplicados = false): string {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Permite generar palabras con caracteres random, con varias opciones disponibles
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//Caracteres Random
         * 	$SecurityPasswords->caracteresRandom(16, true, false, false); //Devuelve valores aleatoreos
         *
-        *=================================================    Parametros   =================================================
-        * @input   int        $longitud          Define el largo de la palabra generada
-        * @input   boolean    $lecturaAmigable   Remueve los caracteres similares a otro, tales como O y 0, l y 1, etc(true - false)
-        * @input   boolean    $incluirSimbolos   Permite incluir simbolos en la palabra generada, no debe estar activada si lectura
-        *                                       amigable esta activa(true - false)
-        * @input   boolean    $sinDuplicados     Da la opción de que la palabra generada no contenga caracteres repetidos(true - false)
-        * @return  String
-		*===================================================================================================================
+        *===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
+        /********************** Si todo esta ok **********************/
+        // Definición de sets de caracteres
         $caracteres_legibles = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefhjkmnprstuvwxyz23456789';
         $caracteres_todos    = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890';
         $simbolos            = '!@#$%^&*()~_-=+{}[]|:;<>,.?/"\'\\`';
 
-        // Seleccionar conjunto base de caracteres
+        // Selección del conjunto base según la preferencia de legibilidad
         $pool = $lecturaAmigable ? $caracteres_legibles : $caracteres_todos;
 
+        // Adición de símbolos si se solicita y no se requiere lectura amigable
         if (!$lecturaAmigable && $incluirSimbolos) {
             $pool .= $simbolos;
         }
 
-        // Si se permiten duplicados, generar simplemente con str_shuffle y str_repeat
+        // Lógica de generación con duplicados permitidos (estándar)
         if (!$sinDuplicados) {
             $repeticiones = (int) ceil($longitud / strlen($pool));
             return substr(str_shuffle(str_repeat($pool, $repeticiones)), 0, $longitud);
         }
 
+        // Lógica de generación sin duplicados
+        $caracteres_unicos_pool = str_split($pool);
+        $total_unicos           = count(array_unique($caracteres_unicos_pool));
         // Verificar que la longitud no supere la cantidad de caracteres únicos disponibles
-        $caracteres_unicos = count(array_unique(str_split($pool)));
-        if ($longitud > $caracteres_unicos) {
-            throw new LengthException("La longitud solicitada ($longitud) excede el número de caracteres únicos disponibles ($caracteres_unicos) cuando sinDuplicados está habilitado.");
+        if ($longitud > $total_unicos) {
+            throw new LengthException("La longitud solicitada ($longitud) excede los caracteres únicos disponibles ($total_unicos).");
         }
 
-        // Convertir pool a array y mezclar aleatoriamente (usando shuffle seguro)
         $caracteres = str_split($pool);
 
-        // Shuffle seguro (usando algoritmo Fisher-Yates y random_int)
+        // Algoritmo de mezcla Fisher-Yates utilizando un generador criptográficamente seguro
         for ($i = count($caracteres) - 1; $i > 0; $i--) {
             $j = random_int(0, $i);
             [$caracteres[$i], $caracteres[$j]] = [$caracteres[$j], $caracteres[$i]];
         }
 
-        /**********************  Retorno datos  **********************/
-        // Tomar los primeros $longitud caracteres sin duplicados
+        /********************** Retorno datos  **********************/
+        // Extrae la porción solicitada del array mezclado y lo convierte a string
         return implode('', array_slice($caracteres, 0, $longitud));
 
     }
 
     /************************************************************************************************************/
+    /**
+     * Genera un token aleatorio codificado en formato hexadecimal.
+     * * Utiliza la librería OpenSSL para generar bytes pseudo-aleatorios seguros,
+     * lo cual es ideal para tokens de sesión o llaves de seguridad.
+     *
+     * @param int $longitud Longitud total de la cadena hexadecimal resultante.
+     * @return string Token en formato hexadecimal.
+     */
     public function tokenBin2Hex($longitud): string {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Codificacion propia por cada servidor, esto impide el copiado de información entre servidores
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//se genera codigo
         * 	$SecurityPasswords->tokenBin2Hex(25); //Devuelve valores aleatoreos
         *
-        *=================================================    Parametros   =================================================
-        * @input  int      $longitud  largo del codigo generado
-        * @return  String
         *===================================================================================================================
 		*/
 
-		/**********************  Validaciones   **********************/
-		if(!isset($longitud) || $longitud==''){ return 'No ha ingresado longitud';}
+        /********************** Validaciones   **********************/
+        if(!isset($longitud) || $longitud == ''){ return 'No ha ingresado longitud'; }
 
-		/********************** Si todo esta ok **********************/
-        /**********************  Retorno datos  **********************/
-        return bin2hex(openssl_random_pseudo_bytes(($longitud - ($longitud % 2)) / 2));
+        /********************** Si todo esta ok **********************/
+        // Calcula la cantidad de bytes necesarios (cada byte produce 2 caracteres hexadecimales)
+        $bytesNeeded = (int)(($longitud - ($longitud % 2)) / 2);
+
+        /********************** Retorno datos  **********************/
+        // Genera bytes aleatorios y los convierte a representación hexadecimal
+        return bin2hex(openssl_random_pseudo_bytes($bytesNeeded));
 
     }
 
     /************************************************************************************************************/
+    /**
+     * Crea un hash de alta seguridad para contraseñas utilizando el algoritmo BCRYPT.
+     * * Implementa un factor de costo (work factor) de 12, optimizado para el hardware actual,
+     * lo que dificulta ataques de fuerza bruta.
+     *
+     * @param string $plain La contraseña o cadena en texto plano a procesar.
+     * @return string El hash generado listo para ser almacenado en la base de datos.
+     */
     public static function hashCreate($plain): string {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Crea un hash seguro de una cadena de texto (contraseña) utilizando el algoritmo BCRYPT.
-        * El algoritmo BCRYPT es una excelente opción para el hashing de contraseñas debido a
-        * su diseño y a la capacidad de aumentar el factor de "costo" (computacional) con el tiempo.
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//se genera codigo
         * 	$SecurityPasswords->password_hash(25);
         *
-        *=================================================    Parametros   =================================================
-        * @input   string       $plain   La cadena de texto (ej. la contraseña en texto plano) a hashear.
-        * @return  string|false          El hash de la cadena de texto si la operación fue exitosa, o FALSE en caso de error.
         *===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
-        // Define las opciones para el hashing.
-        // 'cost' es el factor de trabajo. Un costo de 12 se considera seguro para la mayoría de las aplicaciones a partir de 2024.
-        // Ajustar este valor requiere recalcular el equilibrio entre seguridad y rendimiento.
-        $options = ['cost' => 12,];
+        /********************** Si todo esta ok **********************/
+        // 'cost' 12 define el número de iteraciones del algoritmo (2^12).
+        $options = ['cost' => 12];
 
-        /**********************  Retorno datos  **********************/
-        // Crea y retorna el hash utilizando el algoritmo BCRYPT.
+        /********************** Retorno datos  **********************/
+        // password_hash maneja automáticamente la generación de la sal (salt)
         return password_hash($plain, PASSWORD_BCRYPT, $options);
 
     }
 
     /************************************************************************************************************/
-    public static function hashVerify($plain, $hash): string {
+    /**
+     * Verifica si una cadena en texto plano coincide con un hash previamente generado.
+     * * Es resistente a ataques de tiempo (timing attacks) y detecta automáticamente
+     * el algoritmo y el costo utilizados en el hash proporcionado.
+     *
+     * @param string $plain La cadena ingresada (ej: desde un formulario de login).
+     * @param string $hash El hash almacenado contra el cual se desea comparar.
+     * @return bool True si la contraseña es válida, False en caso contrario.
+     */
+    public static function hashVerify($plain, $hash): bool {
         /*
-        *=================================================     Detalles    =================================================
-        *
-        * Verifica si una cadena de texto sin hashear (texto plano) coincide con un hash dado.
-        *
-        * Utiliza el algoritmo que se especificó al crear el hash (ej. BCRYPT) para verificar
-        * si el texto plano, al ser hasheado, produce el mismo resultado.
-        * Esta función maneja automáticamente los diferentes algoritmos y el factor de 'costo'
-        * almacenados dentro del propio hash.
-        *
         *=================================================    Modo de uso  =================================================
         *
         * 	//se genera codigo
         * 	$SecurityPasswords->hashVerify(25, 'asdqwe');
         *
-        *=================================================    Parametros   =================================================
-        * @input   string  $plain  La cadena de texto (ej. contraseña ingresada por el usuario) en texto plano.
-        * @input   string  $hash   El hash conocido para comparar (ej. el hash almacenado en la base de datos).
-        * @return  bool            TRUE si el texto plano coincide con el hash, o FALSE si no coincide.
         *===================================================================================================================
 		*/
 
-		/********************** Si todo esta ok **********************/
-        /**********************  Retorno datos  **********************/
-        // Compara la cadena en texto plano con el hash.
-        // Esta función es segura en cuanto al tiempo, protegiendo contra ataques de temporización.
+        /********************** Si todo esta ok **********************/
+        /********************** Retorno datos  **********************/
+        // Compara el texto plano con el hash de forma segura
         return password_verify($plain, $hash);
 
     }
+
 
 }

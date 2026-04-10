@@ -66,7 +66,7 @@ class installer extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista(1, 0, $this->returnRutaVista(__DIR__, 'app').'/installer-welcome.php');
+        $this->showVista(0, $this->returnRutaVista(__DIR__, 'app').'/installer-welcome.php');
 
     }
 
@@ -102,7 +102,7 @@ class installer extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-credentials.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/installer-credentials.php');
 
     }
 
@@ -138,7 +138,7 @@ class installer extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-database.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/installer-database.php');
 
     }
 
@@ -174,7 +174,7 @@ class installer extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-summary.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/installer-summary.php');
 
     }
 
@@ -197,7 +197,7 @@ class installer extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista(1, 2, $this->returnRutaVista(__DIR__, 'app').'/installer-finish.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/installer-finish.php');
 
     }
 

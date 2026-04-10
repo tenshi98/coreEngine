@@ -79,7 +79,7 @@
                                 <div class="d-flex justify-content-center pt-3">
                                     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-6 col-xxl-5">
                                         <div class="d-flex justify-content-center">
-                                            <img src="<?php echo $BASE.'/upload/'.$data['rowData']['Direccion_img']; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
+                                            <img src="<?php echo $data['UserData']['MainPathUrl'].$data['rowData']['Direccion_img']; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
                                         </div>
                                         <div class="d-flex justify-content-center pt-2">
                                             <button  onclick="delIMG('<?php echo $data['rowData']['Direccion_img']; ?>')" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Borrar Imagen</button>

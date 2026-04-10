@@ -3,7 +3,7 @@
         <?php
         //Imagen
         $UserIMG  = !empty($data['rowData']['Direccion_img'])
-                    ? $BASE.'/upload/'.$data['rowData']['Direccion_img']
+                    ? $data['UserData']['MainPathUrl'].$data['rowData']['Direccion_img']
                     : $BASE.'/img/picture-img.jpg';
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100 mb-2">

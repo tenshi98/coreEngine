@@ -29,11 +29,7 @@ class sistemaFuncionalidad extends ControllerBase {
     public function FileExplorer_updateView($f3, $params){
 
         /*******************************************************************/
-        //Se llaman los datos
-        $UserData  = $f3->get('SESSION.DataInfo');
-        $arrLevel  = $f3->get('SESSION.arrLevel');
-
-        //Se obtienen los archivos a mostrar
+        //Se instancia la libreria
         $FileManager  = new FileManager();
         $files        = $FileManager->fileExplorer($params);
 
@@ -49,20 +45,20 @@ class sistemaFuncionalidad extends ControllerBase {
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Explorador Archivos',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'files'         => $files,
             ];
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileExplorer.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileExplorer.php');
         /*******************************************************************/
         //si no hay resultados
         } else {
             //Muestra los errores
-            $this->showError($UserData['TypeSession'], 2, $f3);
+            $this->showError(2, $f3);
         }
     }
 
@@ -71,11 +67,7 @@ class sistemaFuncionalidad extends ControllerBase {
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /*******************************************************************/
-            //Se llaman los datos
-            $UserData  = $f3->get('SESSION.DataInfo');
-            $arrLevel  = $f3->get('SESSION.arrLevel');
-
-            //Se obtienen los archivos a mostrar
+            //Se instancia la libreria
             $FileManager  = new FileManager();
             $response     = $FileManager->createFolder($_POST);
 
@@ -87,15 +79,15 @@ class sistemaFuncionalidad extends ControllerBase {
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Explorador Archivos',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'response'      => $response,
             ];
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
 
         }
     }
@@ -105,16 +97,11 @@ class sistemaFuncionalidad extends ControllerBase {
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             /*******************************************************************/
-            //Se llaman los datos
-            $UserData  = $f3->get('SESSION.DataInfo');
-            $arrLevel  = $f3->get('SESSION.arrLevel');
-
-            /*******************************************************************/
             if (!isset($_FILES['file'])) {
                 $response['success'] = false;
                 $response['message'] = "No hay archivo";
             }else{
-                //Se obtienen los archivos a mostrar
+                //Se instancia la libreria
                 $FileManager  = new FileManager();
 
                 //Se generan las rutas
@@ -159,30 +146,96 @@ class sistemaFuncionalidad extends ControllerBase {
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Explorador Archivos',
                 /*===========  Datos del usuario ===========*/
-                'UserData'      => $UserData,
-                'UserAccess'    => $arrLevel[$this->controllerName],
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'response'      => $response,
             ];
 
             /******************************************/
             //Se instancia la vista
-            $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
 
         }
     }
 
     /******************************************************************************/
     public function FileExplorer_delFolder($f3) {
-        
+        //Verificacion metodo POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            /*******************************************************************/
+            //Se instancia la libreria
+            $FileManager  = new FileManager();
+            $response     = $FileManager->deleteFolder($_POST);
+
+            /*******************************************************************/
+            /*                         Imprimir Datos                          */
+            /*******************************************************************/
+            //Datos enviados a la pagina
+            $f3->data = [
+                /*=========== Datos de la Pagina ===========*/
+                'TableTitle'      => 'Explorador Archivos',
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*=========== Datos Consultados ===========*/
+                'response'      => $response,
+            ];
+
+            /******************************************/
+            //Se instancia la vista
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+
+        }
     }
 
     /******************************************************************************/
     public function FileExplorer_delFile($f3) {
-        
+        //Verificacion metodo POST
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            /*******************************************************************/
+            //Se instancia la libreria
+            $FileManager  = new FileManager();
+
+            //Se generan las rutas
+            $subFolder  = isset($_POST['SubRoute']) ? trim($FileManager->sanitizePath($_POST['SubRoute']), '/') : '';
+            $subFolder .= isset($_POST['path']) ? '/'.trim($FileManager->sanitizePath($_POST['path']), '/') : '';
+
+            //Se eliminan los archivos en caso de existir
+            $delFile  = $FileManager->deleteFile($_POST['name'], $subFolder);
+
+            //Si todos los datos requeridos estan ok
+            if ($delFile !== true) {
+                $response['success'] = false;
+                $response['message'] = 'El archivo no se ha eliminado en el servidor';
+            //Si no hay errores se suben los archivos
+            }else{
+                $response['success'] = true;
+                $response['message'] = true;
+            }
+
+            /*******************************************************************/
+            /*                         Imprimir Datos                          */
+            /*******************************************************************/
+            //Datos enviados a la pagina
+            $f3->data = [
+                /*=========== Datos de la Pagina ===========*/
+                'TableTitle'      => 'Explorador Archivos',
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*=========== Datos Consultados ===========*/
+                'response'      => $response,
+            ];
+
+            /******************************************/
+            //Se instancia la vista
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+
+        }
     }
 
-    
+
 
 
 

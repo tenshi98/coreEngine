@@ -50,7 +50,6 @@ class bodegasWidgets extends ControllerBase {
     public function stocksProductos($f3, $params){
         /*******************************************************************/
         //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /*******************************************************************/
@@ -131,6 +130,8 @@ class bodegasWidgets extends ControllerBase {
         /******************************************/
         //Datos enviados a la pagina
         $f3->data = [
+            /*===========  Datos del usuario ===========*/
+            'UserData'      => $this->getUserData($f3),
             /*===========   Funcionalidad   ===========*/
             'Fnc_CommonData'      => $this->CommonData,
             'Fnc_DataDate'        => $this->DataDate,
@@ -140,7 +141,7 @@ class bodegasWidgets extends ControllerBase {
         ];
 
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/main-bodega-stock-update.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/main-bodega-stock-update.php');
     }
 
 }

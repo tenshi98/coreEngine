@@ -39,11 +39,6 @@ class testeos extends ControllerBase {
     /******************************************************************************/
     //controladores
     public function controladores($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Llamo a las otras clases
         $test   = new Test;
@@ -293,120 +288,309 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Pruebas Unitarias del Controlador Base',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*=========== Datos Consultados ===========*/
             'test'            => $test->results(),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-controladores.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-controladores.php');
 
     }
 
     /******************************************************************************/
     //controladores
     public function funciones($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Se abre la libreria de testeos
         $test  = new Test;
         $FNC_DataOperations       = new FunctionsDataOperations;
 
         /**********  FunctionsConvertions  **********/
-        $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                [''],                                                   'string',  '(1.5 -> Devuelve Sin Dato ingresado)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                ['a'],                                                  'string',  '(a -> Devuelve El dato ingresado no es un numero)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2horas',                [1.5],                                                  'string',  '(1.5 -> Devuelve 01:30:00)');
-        
-        $this->runTest($test, 'FunctionsConvertions',             'minutos2horas',               [65],                                                   'string',  '(65 -> Devuelve 01:05:00)');
-        $this->runTest($test, 'FunctionsConvertions',             'minutos2horas',               ['a'],                                                  'string',  '(65 -> Devuelve 01:05:00)');
-        $this->runTest($test, 'FunctionsConvertions',             'segundos2horas',              [3600],                                                 'string',  '(3600 -> Devuelve 01:00:00)');
-        $this->runTest($test, 'FunctionsConvertions',             'segundos2horas',              ['a'],                                                  'string',  '(3600 -> Devuelve 01:00:00)');
-        $this->runTest($test, 'FunctionsConvertions',             'horas2minutos',               ['01:05:00'],                                           'int',     '(01:05:00 -> Devuelve 65)');
-        $this->runTest($test, 'FunctionsConvertions',             'horas2minutos',               [''],                                                   'int',     '(01:05:00 -> Devuelve 65)');
-        $this->runTest($test, 'FunctionsConvertions',             'horas2segundos',              ['00:30:00'],                                           'int',     '(00:30:00 -> Devuelve 1800)');
-        $this->runTest($test, 'FunctionsConvertions',             'horas2segundos',              [''],                                           'int',     '(00:30:00 -> Devuelve 1800)');
-        $this->runTest($test, 'FunctionsConvertions',             'horas2decimales',             ['01:30:00'],                                           'float',   '(01:30:00 -> Devuelve 1.5)');
-        $this->runTest($test, 'FunctionsConvertions',             'horas2decimales',             [''],                                           'float',   '(01:30:00 -> Devuelve 1.5)');
-        $this->runTest($test, 'FunctionsConvertions',             'DevolverMes',                 ['Ene'],                                                'string',  '(Ene -> Devuelve Enero)');
-        $this->runTest($test, 'FunctionsConvertions',             'DevolverMes',                 ['a'],                                                'string',  '(Ene -> Devuelve Enero)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2mes',                  [1],                                                    'string',  '(1 -> Devuelve Enero)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2mes',                  ['a'],                                                    'string',  '(1 -> Devuelve Enero)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2mesCorto',             [1],                                                    'string',  '(1 -> Devuelve Ene)');
-        $this->runTest($test, 'FunctionsConvertions',             'numero2mesCorto',             ['a'],                                                    'string',  '(1 -> Devuelve Ene)');
-        $this->runTest($test, 'FunctionsConvertions',             'numeroNombreDia',             [3],                                                    'string',  '(3 -> Devuelve Miercoles)');
-        $this->runTest($test, 'FunctionsConvertions',             'numeroNombreDia',             ['a'],                                                    'string',  '(3 -> Devuelve Miercoles)');
-        $this->runTest($test, 'FunctionsConvertions',             'porcentaje',                  [0.65],                                                 'string',  '(0.65 -> Devuelve 65 %)');
-        $this->runTest($test, 'FunctionsConvertions',             'porcentaje',                  ['a'],                                                 'string',  '(0.65 -> Devuelve 65 %)');
-        $this->runTest($test, 'FunctionsConvertions',             'numeroApalabras',             [250000000],                                                'string',  '(250000000 -> Devuelve doscientos cincuenta millones)');
-        $this->runTest($test, 'FunctionsConvertions',             'numeroApalabras',             ['a'],                                                'string',  '(250000000 -> Devuelve doscientos cincuenta millones)');
+        //--------------------- numero2horas ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     [1.5],          'string',  '(1.5 -> Devuelve 01:30:00)');
+        //--------------------- minutos2horas ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    [65],           'string',  '(65  -> Devuelve 01:05:00)');
+        //--------------------- segundos2horas ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   [''],           'string',  '(""   -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   ['a'],          'string',  '("a"  -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   [3600],         'string',  '(3600 -> Devuelve 01:00:00)');
+        //--------------------- horas2minutos ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'horas2minutos',    [''],           'string',  '(""       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'horas2minutos',    ['a'],          'string',  '("a"      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsConvertions',   'horas2minutos',    ['01:05:00'],   'int',     '(01:05:00 -> Devuelve 65)');
+        //--------------------- horas2segundos ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'horas2segundos',   [''],           'string',  '(""       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'horas2segundos',   ['a'],          'string',  '("a"      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsConvertions',   'horas2segundos',   ['00:30:00'],   'int',     '(00:30:00 -> Devuelve 1800)');
+        //--------------------- horas2decimales ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'horas2decimales',  [''],           'string',  '(""       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'horas2decimales',  ['a'],          'string',  '("a"      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsConvertions',   'horas2decimales',  ['01:30:00'],   'float',   '(01:30:00 -> Devuelve 1.5)');
+        //--------------------- DevolverMes ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'DevolverMes',      [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'DevolverMes',      ['a'],          'string',  '("a" -> Devuelve Dato fuera de parámetros esperados)');
+        $this->runTest($test, 'FunctionsConvertions',   'DevolverMes',      ['Ene'],        'string',  '(Ene -> Devuelve Enero)');
+        //--------------------- numero2mes ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       [1],            'string',  '(1   -> Devuelve Enero)');
+        //--------------------- numero2mesCorto ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  [1],            'string',  '(1   -> Devuelve Ene)');
+        //--------------------- numeroNombreDia ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  [3],            'string',  '(3   -> Devuelve Miercoles)');
+        //--------------------- porcentaje ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       [''],           'string',  '(""   -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       ['a'],          'string',  '("a"  -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       [0.65],         'string',  '(0.65 -> Devuelve 65 %)');
+        //--------------------- numeroApalabras ---------------------
+        $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  [''],           'string',  '(""        -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  ['a'],          'string',  '("a"       -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  [250000000],    'string',  '(250000000 -> Devuelve doscientos cincuenta millones)');
 
         /**********  FunctionsDataDate  **********/
-        $this->runTest($test, 'FunctionsDataDate',                'fechaCompleta',               ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve Enero 01 del 2024)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaCompletaAlt',            ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 01 de Enero de 2024)');
-        $this->runTest($test, 'FunctionsDataDate',                'diaMes',                      ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 01 Enero)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaEstandar',               ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 01-01-2024)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaEstandarCorta',          ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 01-01-24)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaNormalizada',            ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 2024-01-01)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaArchivos',               ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 20240101)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaMesAno',                 ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve Enero del 2024)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NdiaMes',               ['2024-01-02'],                                         'string',  '(2024-01-02 -> Devuelve 2)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NdiaMesCon0',           ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 01)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NDiaSemana',            ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 1)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NombreDia',             ['2024-01-02'],                                         'string',  '(2024-01-02 -> Devuelve Martes)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NSemana',               ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 01)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NMes',                  ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 1)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NombreMes',             ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve Enero)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2NombreMesCorto',        ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve Ene)');
-        $this->runTest($test, 'FunctionsDataDate',                'fecha2Ano',                   ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 2024)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaGringa',                 ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve January 01 2024)');
-        $this->runTest($test, 'FunctionsDataDate',                'fechaUltimoDiaMes',           ['2024-01-01'],                                         'string',  '(2024-01-01 -> Devuelve 2024-01-31)');
-        $this->runTest($test, 'FunctionsDataDate',                'fullDate',                    ['2023-12-12 13:17:59'],                                'string',  '(2023-12-12 13:17:59 -> Devuelve Diciembre 12 del 2023 13:17:59)');
+        //--------------------- fechaCompleta ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaCompleta',         [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaCompleta',         ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaCompleta',         ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve Enero 01 del 2024)');
+        //--------------------- fechaCompletaAlt ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaCompletaAlt',      [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaCompletaAlt',      ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaCompletaAlt',      ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 01 de Enero de 2024)');
+        //--------------------- diaMes ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'diaMes',                [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'diaMes',                ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'diaMes',                ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 01 Enero)');
+        //--------------------- fechaEstandar ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaEstandar',         [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaEstandar',         ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaEstandar',         ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 01-01-2024)');
+        //--------------------- fechaEstandarCorta ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaEstandarCorta',    [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaEstandarCorta',    ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaEstandarCorta',    ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 01-01-24)');
+        //--------------------- fechaNormalizada ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaNormalizada',      [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaNormalizada',      ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaNormalizada',      ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 2024-01-01)');
+        //--------------------- fechaArchivos ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaArchivos',         [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaArchivos',         ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaArchivos',         ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 20240101)');
+        //--------------------- fechaMesAno ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaMesAno',           [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaMesAno',           ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaMesAno',           ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve Enero del 2024)');
+        //--------------------- fecha2NdiaMes ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NdiaMes',         [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NdiaMes',         ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NdiaMes',         ['2024-01-02'],             'string',  '("2024-01-02" -> Devuelve 2)');
+        //--------------------- fecha2NdiaMesCon0 ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NdiaMesCon0',     [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NdiaMesCon0',     ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NdiaMesCon0',     ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 01)');
+        //--------------------- fecha2NDiaSemana ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NDiaSemana',      [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NDiaSemana',      ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NDiaSemana',      ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 1)');
+        //--------------------- fecha2NombreDia ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreDia',       [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreDia',       ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreDia',       ['2024-01-02'],             'string',  '("2024-01-02" -> Devuelve Martes)');
+        //--------------------- fecha2NSemana ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NSemana',         [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NSemana',         ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NSemana',         ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 01)');
+        //--------------------- fecha2NMes ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NMes',            [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NMes',            ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NMes',            ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 1)');
+        //--------------------- fecha2NombreMes ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreMes',       [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreMes',       ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreMes',       ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve Enero)');
+        //--------------------- fecha2NombreMesCorto ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreMesCorto',  [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreMesCorto',  ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2NombreMesCorto',  ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve Ene)');
+        //--------------------- fecha2Ano ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2Ano',             [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2Ano',             ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fecha2Ano',             ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 2024)');
+        //--------------------- fechaGringa ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaGringa',           [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaGringa',           ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaGringa',           ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve January 01 2024)');
+        //--------------------- fechaUltimoDiaMes ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fechaUltimoDiaMes',     [''],                       'string',  '(""           -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaUltimoDiaMes',     ['a'],                      'string',  '("a"          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fechaUltimoDiaMes',     ['2024-01-01'],             'string',  '("2024-01-01" -> Devuelve 2024-01-31)');
+        //--------------------- fullDate ---------------------
+        $this->runTest($test, 'FunctionsDataDate',   'fullDate',              [''],                       'string',  '(""                    -> Devuelve Sin fecha ingresada)');
+        $this->runTest($test, 'FunctionsDataDate',   'fullDate',              ['a'],                      'string',  '("a"                   -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataDate',   'fullDate',              ['2023-12-12 13:17:58'],    'string',  '("2023-12-12 13:17:58" -> Devuelve Diciembre 12 del 2023 13:17:58)');
 
         /**********  FunctionsDataNumbers  **********/
-        $this->runTest($test, 'FunctionsDataNumbers',             'Cantidades',                  [1250.85, 6],                                           'string',  '(1250.85 -> Devuelve 1.250,850000)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'nDoc',                        [25, 7],                                                'string',  '(25 -> Devuelve 0000025)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'Valores',                     [1500.85565,2],                                         'string',  '(1500.85565 -> Devuelve $ 1.500,86)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'valoresEnteros',              [1500.85],                                              'float',   '(1500.85 -> Devuelve 1501)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'valoresComparables',          [1500.85],                                              'float',   '(1500.85 -> Devuelve 1501)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'valoresTruncados',            [1500.85],                                              'float',   '(1500.85 -> Devuelve 1500)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'cantidadesDecimalesJustos',   [1500.85000],                                           'float',   '(1500.85000 -> Devuelve 1500.85)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'cantidadesExcel',             [1500.85],                                              'string',  '(1500.85 -> Devuelve 1500,85)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'cantidadesGoogle',            [1500.85],                                              'string',  '(1500.85 -> Devuelve 1500.85)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'formatPhone',                 ['+56911265984'],                                       'string',  '(+56911265984 -> Devuelve (+56) 9 1126 5984)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'normalizarPhone',             ['+56911265984'],                                       'string',  '(+56911265984 -> Devuelve +56911265984)');
-        $this->runTest($test, 'FunctionsDataNumbers',             'numberInit0',                 [1],                                                    'string',  '(1 -> Devuelve 01)');
+        //--------------------- Cantidades ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  ['', 1],           'string',  '(""      -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, ''],     'string',  '(""      -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  ['a', 1],          'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, 'a'],    'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, 6],      'string',  '(1250.85 -> Devuelve 1.250,850000)');
+        //--------------------- nDoc ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        ['', 7],           'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, ''],          'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        ['a',1],           'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, 'a'],         'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, 7],           'string',  '(25  -> Devuelve 0000025)');
+        //--------------------- Valores ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     ['', 1],           'string',  '(""         -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, ''],  'string',  '(""         -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     ['a', 1],          'string',  '("a"        -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, 'a'], 'string',  '("a"        -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, 2],   'string',  '(1500.85565 -> Devuelve $ 1.500,86)');
+        //--------------------- valoresEnteros ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresEnteros',              [''],              'string',  '(""      -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresEnteros',              ['a'],             'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresEnteros',              [1500.85],         'float',   '(1500.85 -> Devuelve 1501)');
+        //--------------------- valoresComparables ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresComparables',          [''],              'string',  '(""      -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresComparables',          ['a'],             'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresComparables',          [1500.85],         'float',   '(1500.85 -> Devuelve 1501)');
+        //--------------------- valoresTruncados ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresTruncados',            [''],              'string',  '(""      -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresTruncados',            ['a'],             'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'valoresTruncados',            [1500.85],         'float',   '(1500.85 -> Devuelve 1500)');
+        //--------------------- cantidadesDecimalesJustos ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesDecimalesJustos',   [''],              'string',  '(""         -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesDecimalesJustos',   ['a'],             'string',  '("a"        -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesDecimalesJustos',   [1500.85000],      'float',   '(1500.85000 -> Devuelve 1500.85)');
+        //--------------------- cantidadesExcel ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesExcel',             [''],              'string',  '(""      -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesExcel',             ['a'],             'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesExcel',             [1500.85],         'string',  '(1500.85 -> Devuelve 1500,85)');
+        //--------------------- cantidadesGoogle ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesGoogle',            [''],              'string',  '(""      -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesGoogle',            ['a'],             'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'cantidadesGoogle',            [1500.85],         'string',  '(1500.85 -> Devuelve 1500.85)');
+        //--------------------- formatPhone ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'formatPhone',                 [''],              'string',  '(""           -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'formatPhone',                 ['a'],             'string',  '("a"          -> Devuelve Numero demasiado corto, tiene 1 numeros y debe tener al menos 9)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'formatPhone',                 ['+56911265984'],  'string',  '(+56911265984 -> Devuelve (+56) 9 1126 5984)');
+        //--------------------- normalizarPhone ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'normalizarPhone',             [''],              'string',  '(""           -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'normalizarPhone',             ['a'],             'string',  '("a"          -> Devuelve Numero demasiado corto, tiene 1 numeros y debe tener al menos 9)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'normalizarPhone',             ['+56911265984'],  'string',  '(+56911265984 -> Devuelve +56911265984)');
+        //--------------------- numberInit0 ---------------------
+        $this->runTest($test, 'FunctionsDataNumbers',   'numberInit0',                 [''],              'string',  '(""   -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'numberInit0',                 ['a'],             'string',  '("a"  -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'numberInit0',                 [1],               'string',  '(1    -> Devuelve 01)');
 
         /**********  FunctionsDataOperations  **********/
-        $this->runTest($test, 'FunctionsDataOperations',          'dividirHoras',                ['04:00:00', 4],                                        'int',     '(04:00:00 / 4 -> Devuelve 60)');
-        $this->runTest($test, 'FunctionsDataOperations',          'multiplicarHoras',            ['04:00:00', 4],                                        'string',  '(04:00:00 * 4 -> Devuelve 16:00:00)');
-        $this->runTest($test, 'FunctionsDataOperations',          'restarhoras',                 ['07:00:00', '14:00:00'],                               'string',  '(07:00:00-14:00:00 -> Devuelve 07:00:00)');
-        $this->runTest($test, 'FunctionsDataOperations',          'sumarhoras',                  ['07:00:00', '14:00:00'],                               'string',  '(07:00:00-14:00:00 -> Devuelve 21:00:00)');
-        $this->runTest($test, 'FunctionsDataOperations',          'sumarDias',                   ['2019-01-02', 5],                                      'string',  '(2019-01-02 + 5 -> Devuelve 2019-01-07)');
-        $this->runTest($test, 'FunctionsDataOperations',          'restarDias',                  ['2019-01-07', 5],                                      'string',  '(2019-01-02 - 5 -> Devuelve 2019-01-02)');
-        $this->runTest($test, 'FunctionsDataOperations',          'obtenerEdad',                 ['2022-01-01'],                                         'string',  '(2022-01-01 -> (a la fecha '.$this->Server->fechaActual().') Devuelve 3 años, 9 meses)');
-        $this->runTest($test, 'FunctionsDataOperations',          'obtenerNumeroAnos',           ['2022-01-01'],                                         'string',  '(2022-01-01 -> (a la fecha '.$this->Server->fechaActual().') Devuelve '.$FNC_DataOperations->obtenerNumeroAnos('2022-01-01').')');
-        $this->runTest($test, 'FunctionsDataOperations',          'diasTranscurridos',           ['2019-01-02', '2019-02-02'],                           'float',   '(2019-01-02 - 2019-02-02 -> Devuelve 31)');
-        $this->runTest($test, 'FunctionsDataOperations',          'horasTranscurridas',          ['2019-01-02', '2019-02-02', '14:00:00', '07:00:00'],   'string',  '(Devuelve 737:00:00)');
-        $this->runTest($test, 'FunctionsDataOperations',          'diferenciaMeses',             ['2019-01-02', '2019-02-02'],                           'int',     '(2019-01-02-2019-02-02 -> Devuelve 1)');
+        //--------------------- dividirHoras ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'dividirHoras',        ['', 4],                                                'string',  '("" / 4         -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'dividirHoras',        ['04:00:00', ''],                                       'string',  '(04:00:00 / ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'dividirHoras',        ['a', 4],                                               'string',  '("a" / 4        -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'dividirHoras',        ['04:00:00', 'a'],                                      'string',  '(04:00:00 / "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'dividirHoras',        ['04:00:00', 4],                                        'int',     '(04:00:00 / 4   -> Devuelve 60)');
+        //--------------------- multiplicarHoras ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'multiplicarHoras',    ['', 4],                                                'string',  '("" * 4         -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'multiplicarHoras',    ['04:00:00', ''],                                       'string',  '(04:00:00 * ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'multiplicarHoras',    ['a', 4],                                               'string',  '("a" * 4        -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'multiplicarHoras',    ['04:00:00', 'a'],                                      'string',  '(04:00:00 * "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'multiplicarHoras',    ['04:00:00', 4],                                        'string',  '(04:00:00 * 4   -> Devuelve 16:00:00)');
+        //--------------------- restarhoras ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'restarhoras',         ['', '14:00:00'],                                       'string',  '("" - 14:00:00       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarhoras',         ['07:00:00', ''],                                       'string',  '(07:00:00 - ""       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarhoras',         ['a', '14:00:00'],                                      'string',  '("a" - 14:00:00      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarhoras',         ['07:00:00', 'a'],                                      'string',  '(07:00:00 - "a"      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarhoras',         ['07:00:00', '14:00:00'],                               'string',  '(07:00:00 - 14:00:00 -> Devuelve 07:00:00)');
+        //--------------------- sumarhoras ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarhoras',          ['', '14:00:00'],                                       'string',  '("" + 14:00:00       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarhoras',          ['07:00:00', ''],                                       'string',  '(07:00:00 + ""       -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarhoras',          ['a', '14:00:00'],                                      'string',  '("a" + 14:00:00      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarhoras',          ['07:00:00', 'a'],                                      'string',  '(07:00:00 + "a"      -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarhoras',          ['07:00:00', '14:00:00'],                               'string',  '(07:00:00 + 14:00:00 -> Devuelve 21:00:00)');
+        //--------------------- sumarDias ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarDias',           ['', 5],                                                'string',  '("" + 5           -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarDias',           ['2019-01-02', ''],                                     'string',  '(2019-01-02 + ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarDias',           ['a', 5],                                               'string',  '("a" + 5          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarDias',           ['2019-01-02', 'a'],                                    'string',  '(2019-01-02 + "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'sumarDias',           ['2019-01-02', 5],                                      'string',  '(2019-01-02 + 5   -> Devuelve 2019-01-07)');
+        //--------------------- restarDias ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'restarDias',          ['', 5],                                                'string',  '("" - 5           -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarDias',          ['2019-01-07', ''],                                     'string',  '(2019-01-02 - ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarDias',          ['a', 5],                                               'string',  '("a" - 5          -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarDias',          ['2019-01-07', 'a'],                                    'string',  '(2019-01-02 - "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'restarDias',          ['2019-01-07', 5],                                      'string',  '(2019-01-02 - 5   -> Devuelve 2019-01-02)');
+        //--------------------- obtenerEdad ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'obtenerEdad',         [''],                                                   'string',  '(2022-01-01 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'obtenerEdad',         ['a'],                                                  'string',  '(2022-01-01 -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'obtenerEdad',         ['2022-01-01'],                                         'string',  '(2022-01-01 -> (a la fecha '.$this->Server->fechaActual().') Devuelve '.$FNC_DataOperations->obtenerEdad('2022-01-01').')');
+        //--------------------- obtenerNumeroAnos ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'obtenerNumeroAnos',   [''],                                                   'string',  '(2022-01-01 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'obtenerNumeroAnos',   ['a'],                                                  'string',  '(2022-01-01 -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'obtenerNumeroAnos',   ['2022-01-01'],                                         'string',  '(2022-01-01 -> (a la fecha '.$this->Server->fechaActual().') Devuelve '.$FNC_DataOperations->obtenerNumeroAnos('2022-01-01').')');
+        //--------------------- diasTranscurridos ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['', '2019-02-02'],                                     'string',  '(2019-01-02 - 2019-02-02 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['2019-01-02', ''],                                     'string',  '(2019-01-02 - 2019-02-02 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['a', '2019-02-02'],                                    'string',  '(2019-01-02 - 2019-02-02 -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['2019-01-02', 'a'],                                    'string',  '(2019-01-02 - 2019-02-02 -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['2019-01-02', '2019-02-02'],                           'int',     '(2019-01-02 - 2019-02-02 -> Devuelve 31)');
+        //--------------------- horasTranscurridas ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['', '', '', ''],                                       'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['a', 'a', 'a', 'a'],                                   'string',  '(Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['2019-01-02', '2019-02-02', '14:00:00', '07:00:00'],   'string',  '(Devuelve 737:00:00)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataOperations',   'diferenciaMeses',     ['', ''],                                               'string',  '(""-""                 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'diferenciaMeses',     ['a', 'a'],                                             'string',  '("a"-"a"               -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'diferenciaMeses',     ['2019-01-02', '2019-02-02'],                           'int',     '(2019-01-02-2019-02-02 -> Devuelve 1)');
 
         /**********  FunctionsDataText  **********/
-        $this->runTest($test, 'FunctionsDataText',                'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 10],        'string',  '(Devuelve Lorem ipsu...)');
-        $this->runTest($test, 'FunctionsDataText',                'eliminarVerificadorRut',      ['16.029.464-7'],                                       'string',  '(16.029.464-7 -> Devuelve 16029464)');
-        $this->runTest($test, 'FunctionsDataText',                'limpiarString',               ['Lorem ipsum\n dolor sit amet\n, consectetur\r'],      'string',  '(Devuelve Lorem ipsum dolor sit amet consectetur)');
-        $this->runTest($test, 'FunctionsDataText',                'reemplazarEspaciosxGuion',    ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem_ipsum_dolor_sit_amet,_consectetur)');
-        $this->runTest($test, 'FunctionsDataText',                'sanitizarTexto',              ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem ipsum dolor sit amet, consectetur)');
-        $this->runTest($test, 'FunctionsDataText',                'desanitizarTexto',            ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem ipsum dolor sit amet, consectetur)');
-        $this->runTest($test, 'FunctionsDataText',                'limpiezaTexto',               ["blabla'bla"],                                         'string',  '(Devuelve blabla%27bla)');
-        $this->runTest($test, 'FunctionsDataText',                'contarPalabrasCensuradas',    ['Lorem ipsum dolor sit amet, fuck d'],                 'int',     '(Devuelve 1)');
-        $this->runTest($test, 'FunctionsDataText',                'filtrarPalabrasCensuradas',   ['Lorem ipsum dolor sit amet, fuck d'],                 'string',  '(Devuelve lorem ipsum dolor sit amet, **** d)');
-        $this->runTest($test, 'FunctionsDataText',                'tituloMenu',                  ['01 - Titulo'],                                        'string',  '(Devuelve Titulo)');
-        //$this->runTest($test, 'FunctionsDataText',                'buscarPalabraYExtraer',       ['Lorem ipsum dolor sit amet', 'ipsum'],                'string',  '(Devuelve dolor sit amet)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['', 10],                                               'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', ''],        'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 'a'],       'string',  '(Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 10],        'string',  '(Devuelve Lorem ipsu...)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'eliminarVerificadorRut',      [''],                                                   'string',  '(16.029.464-7 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'eliminarVerificadorRut',      ['16.029.464-7'],                                       'string',  '(16.029.464-7 -> Devuelve 16029464)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'limpiarString',               [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'limpiarString',               ['Lorem ipsum\n dolor sit amet\n, consectetur\r'],      'string',  '(Devuelve Lorem ipsum dolor sit amet consectetur)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'reemplazarEspaciosxGuion',    [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'reemplazarEspaciosxGuion',    ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem_ipsum_dolor_sit_amet,_consectetur)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'sanitizarTexto',              [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'sanitizarTexto',              ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem ipsum dolor sit amet, consectetur)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'desanitizarTexto',            [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'desanitizarTexto',            ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem ipsum dolor sit amet, consectetur)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'limpiezaTexto',               [""],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'limpiezaTexto',               ["blabla'bla"],                                         'string',  '(Devuelve blabla%27bla)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'contarPalabrasCensuradas',    [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'contarPalabrasCensuradas',    ['Lorem ipsum dolor sit amet, fuck d'],                 'int',     '(Devuelve 1)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'filtrarPalabrasCensuradas',   [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'filtrarPalabrasCensuradas',   ['Lorem ipsum dolor sit amet, fuck d'],                 'string',  '(Devuelve lorem ipsum dolor sit amet, **** d)');
+        //--------------------- diferenciaMeses ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'tituloMenu',                  [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'tituloMenu',                  ['01 - Titulo'],                                        'string',  '(Devuelve Titulo)');
+        //--------------------- diferenciaMeses ---------------------
+        //$this->runTest($test, 'FunctionsDataText',    'buscarPalabraYExtraer',       ['Lorem ipsum dolor sit amet', 'ipsum'],                'string',  '(Devuelve dolor sit amet)');
 
         /**********  FunctionsDataTime  **********/
         $this->runTest($test, 'FunctionsDataTime',                'formatoHoraEstandar',         ['1:1'],                                                'string',  '(1:1 -> Devuelve 01:01)');
@@ -427,13 +611,24 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsDataValidations',         'validarLargoMaximo',          ['Lorem', 10],                                          'bool',    '(Lorem -> Devuelve true)');
 
         /**********  FunctionsLocation  **********/
-        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           [-40.807289, -72.634907, -42.176560, -73.425923],       'double',   '(Devuelve 165.89718855602)');
+        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           ['', '', '', ''],                                       'string',  '(Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           ['a', 'a', 'a', 'a'],                                   'string',  '(Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           [-40.807289, -72.634907, -42.176560, -73.425923],       'float',   '(Devuelve 165.89718855602)');
 
         /**********  FunctionsSecurityCodification  **********/
+        //--------------------- simpleEncode ---------------------
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["", "passkey"],                                        'string',  '(Devuelve Sin datos ingresados)');
         $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["php recipe", "passkey"],                              'string',  '(Devuelve lEKK57naUY4---VQ==)');
+        //--------------------- simpleDecode ---------------------
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["", "passkey"],                                        'string',  '(Devuelve Sin datos ingresados)');
         $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["lEKK57naUY4/VQ==", "passkey"],                        'string',  '(Devuelve php recipe)');
+        //--------------------- generateServerSpecificHash ---------------------
         $this->runTest($test, 'FunctionsSecurityCodification',    'generateServerSpecificHash',  [],                                                     'string',  '(Devuelve 49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763)');
+        //--------------------- encryptDecrypt ---------------------
+        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['encrypt',''],                                         'string',  '(Devuelve Sin datos ingresados)');
         $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['encrypt',5008],                                       'string',  '(Devuelve OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09)');
+        //--------------------- encryptDecrypt ---------------------
+        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt',''],                                         'string',  '(Devuelve Sin datos ingresados)');
         $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt','OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09'],         'string',  '(Devuelve 5008)');
 
         /**********  FunctionsSecurityPasswords  **********/
@@ -442,7 +637,7 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsSecurityPasswords',       'caracteresRandom',            [16, true, false, false],                               'string',  '(Devuelve asd)');
         $this->runTest($test, 'FunctionsSecurityPasswords',       'tokenBin2Hex',                [25],                                                   'string',  '(Devuelve asd)');
         $this->runTest($test, 'FunctionsSecurityPasswords',       'hashCreate',                  ['palabra'],                                                                  'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'hashVerify',                  ['palabra', '$2y$12$pd1.kBABacsBwq8YXNDieuqNELrjJiq68kXCFtHoaj7IwqljDLdj6'],  'string',  '(Devuelve 1)');
+        $this->runTest($test, 'FunctionsSecurityPasswords',       'hashVerify',                  ['palabra', '$2y$12$pd1.kBABacsBwq8YXNDieuqNELrjJiq68kXCFtHoaj7IwqljDLdj6'],  'bool',  '(Devuelve 1)');
 
         /**********  FunctionsDataText  **********/
         $this->runTest($test, 'FunctionsServerClient',            'getClientIp',                 [],                                                     'string',  '(Devuelve asd)');
@@ -473,8 +668,8 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Pruebas Unitarias de las funciones',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_DataText'      => $this->DataText,
             /*=========== Datos Consultados ===========*/
@@ -483,7 +678,7 @@ class testeos extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-funciones.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-funciones.php');
 
     }
 
@@ -511,7 +706,7 @@ class testeos extends ControllerBase {
         $instance = ${'FNC_'.str_replace('Functions', '', $class)};
         $data = call_user_func_array([$instance, $method], $args);
         $test->expect(method_exists($class, $method), "$method() es una funcion $desc");
-        $test->expect(!empty($data), "$method() Ha devuelto datos ($data)");
+        $test->expect($data !== null && $data !== '', "$method() Ha devuelto datos ($data)");
         $typeCheck = "is_$expectedType";
         $test->expect($typeCheck($data), "$method() Los datos obtenidos son del tipo " . gettype($data), $data);
         return $data;
@@ -520,11 +715,6 @@ class testeos extends ControllerBase {
     /******************************************************************************/
     //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     public function SMTPMail($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Llamo a las otras clases
         $TypeSend     = 'send_SMTPMail';
@@ -541,8 +731,8 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Pruebas Unitarias de envio de Correos',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'   => $this->FormInputs,
             'TypeSend'         => $TypeSend,
@@ -550,17 +740,12 @@ class testeos extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
     }
 
     /******************************************************************************/
     //Envio de correo por Gmail (solo un correo, con uno o varios receptores)
     public function GMail($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Llamo a las otras clases
         $TypeSend     = 'send_GMail';
@@ -577,8 +762,8 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Pruebas Unitarias de envio de Correos',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'   => $this->FormInputs,
             'TypeSend'         => $TypeSend,
@@ -586,17 +771,12 @@ class testeos extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
     }
 
     /******************************************************************************/
     //Envio de correo por Sending Blue
     public function SendingBlue($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************************/
         //Llamo a las otras clases
         $TypeSend     = 'send_SendingBlue';
@@ -613,8 +793,8 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Pruebas Unitarias de envio de Correos',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'   => $this->FormInputs,
             'TypeSend'         => $TypeSend,
@@ -622,17 +802,12 @@ class testeos extends ControllerBase {
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Mail.php');
     }
 
     /******************************************************************************/
     //Envio de correo por Sending Blue
     public function Whatsapp($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
@@ -645,25 +820,20 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Pruebas Unitarias de envio de mensaje por Whatsapp',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'   => $this->FormInputs,
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Whatsapp.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-Whatsapp.php');
     }
 
     /******************************************************************************/
     //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     public function testMailTemplateSelect($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
@@ -676,23 +846,18 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Testeos email template',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplateSelect.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplateSelect.php');
     }
 
     /******************************************************************************/
     //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     public function testMailTemplate($f3, $params){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /******************************/
         //Se agrega respuesta
         $Post = [
@@ -724,25 +889,20 @@ class testeos extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             'TableTitle'      => 'Testeos email template',
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'MailTemplate'   => $MailTemplate,
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 2, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplate.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplate.php');
     }
 
     /******************************************************************************/
     //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     public function IA_View($f3){
-        /*******************************************************************/
-        //Se llaman los datos
-        $UserData = $f3->get('SESSION.DataInfo');
-        $arrLevel = $f3->get('SESSION.arrLevel');
-
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
@@ -757,13 +917,13 @@ class testeos extends ControllerBase {
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'   => $this->FormInputs,
             /*===========  Datos del usuario ===========*/
-            'UserData'      => $UserData,
-            'UserAccess'    => $arrLevel[$this->controllerName],
+            'UserData'      => $this->getUserData($f3),
+            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
         ];
 
         /******************************************/
         //Se instancia la vista
-        $this->showVista($UserData['TypeSession'], 1, $this->returnRutaVista(__DIR__, 'app').'/testeos-IA_Chat.php');
+        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-IA_Chat.php');
     }
 
     /******************************************************************************/

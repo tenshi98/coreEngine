@@ -3,7 +3,7 @@
     <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
         <?php
         $UserIMG  = !empty($data['rowData']['Sistema_IMGLogo'])
-                    ? $BASE.'/upload/'.$data['rowData']['Sistema_IMGLogo']
+                    ? $data['UserData']['MainPathUrl'].$data['rowData']['Sistema_IMGLogo']
                     : $BASE.'/img/picture-img.jpg';
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100 mb-2">

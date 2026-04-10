@@ -80,7 +80,7 @@
                             <?php foreach ($data['arrParticipantes'] as $task){
                                 //verifico si existe imagen
                                 $UserIMG  = !empty($task['UsuarioImg'])
-                                            ? $BASE.'/upload/'.$task['UsuarioImg']
+                                            ? $data['UserData']['MainPathUrl'].$task['UsuarioImg']
                                             : $BASE.'/img/profile-img.jpg';
                                 ?>
                                 <tr>
