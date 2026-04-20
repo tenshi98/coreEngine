@@ -19,7 +19,6 @@ class FunctionsLocation {
 		$this->DataValidations = new FunctionsDataValidations();
 	}
 
-
     /*******************************************************************************************************************/
 	/*                                                                                                                 */
 	/*                                                  Metodos                                                        */
@@ -36,24 +35,23 @@ class FunctionsLocation {
      * @param float|string $longitude1 Longitud del punto de origen.
      * @param float|string $latitude2  Latitud del punto de destino.
      * @param float|string $longitude2 Longitud del punto de destino.
+     *
      * @return float|string Distancia calculada en kilómetros.
+	 *
+	 * @example
+	 * ```php
+	 * $Location->calcularDistancia(-40.807289, -72.634907, -42.176560, -73.425923);
+	 * ```
+	 *
      */
     public function calcularDistancia($latitude1, $longitude1, $latitude2, $longitude2): string | float {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * 	//se ejecuta codigo
-        * 	$Location->calcularDistancia(-40.807289, -72.634907, -42.176560, -73.425923);
-        *
-        *===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateValue($latitude1);
-		$dataVal_2 = $this->_validateValue($latitude2);
-		$dataVal_3 = $this->_validateValue($longitude1);
-		$dataVal_4 = $this->_validateValue($longitude2);
+		$dataVal_1 = $this->_validateValue($latitude1, 'latitude1');
+		$dataVal_2 = $this->_validateValue($latitude2, 'latitude2');
+		$dataVal_3 = $this->_validateValue($longitude1, 'longitude1');
+		$dataVal_4 = $this->_validateValue($longitude2, 'longitude2');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -91,24 +89,24 @@ class FunctionsLocation {
      *
      * @param string $address Dirección completa a consultar (ej: "Av. Siempreviva 742, Springfield").
      * @param string $ApiKey  Llave de API autorizada por Google Cloud Console.
+     *
      * @return array|bool Arreglo con [lat, lng, formatted_address] o false si falla.
+	 *
+	 * @example
+	 * ```php
+	 * 	//se ejecuta codigo
+     * 	$geocodeData = $Location->getGeocodeData($address, $ApiKey);
+     * 	if($geocodeData) {
+     * 		$latitude  = $geocodeData[0];
+     * 		$longitude = $geocodeData[1];
+     * 		$address   = $geocodeData[2];
+     * 	}else{
+     * 		echo "Detalles incorrectos!";
+     * 	}
+	 * ```
+	 *
      */
     public function getGeocodeData($address, $ApiKey): array|bool|string {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * 	//se ejecuta codigo
-        * 	$geocodeData = $Location->getGeocodeData($address, $ApiKey);
-        * 	if($geocodeData) {
-        * 		$latitude  = $geocodeData[0];
-        * 		$longitude = $geocodeData[1];
-        * 		$address   = $geocodeData[2];
-        * 	}else{
-        * 		echo "Detalles incorrectos!";
-        * 	}
-        *
-        *===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         if(!isset($address) || $address==''){ return 'No ha ingresado una direccion';}
@@ -155,13 +153,20 @@ class FunctionsLocation {
      * Nominatim mediante la definición de un User-Agent.
      *
      * @param string $street Dirección o calle a geocodificar.
+     *
      * @return array|bool Diccionario con 'lat', 'lon' y 'display_name', o false si no hay resultados.
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function geocodeAddress($street) {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
-        if ($street=='') { return 'Sin datos ingresados'; }
+        if ($street=='') { return 'Sin datos ingresados en street';}
 
         /********************** Si todo esta ok **********************/
         // Normalización y limpieza de la cadena de dirección
@@ -209,14 +214,14 @@ class FunctionsLocation {
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
     /************************************************************************************************************/
-	private function _validateValue($Data){
+	private function _validateValue($Data, $Name){
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) { return 'Sin datos ingresados'; }
+        if ($Data=='' || $Data==0) { return 'Sin datos ingresados en '.$Name;}
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data)) {
-            return 'El dato ingresado no es un numero ('.$Data.')';
+            return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
         }
 
 		/**********************  Retorno datos  **********************/

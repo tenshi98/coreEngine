@@ -16,17 +16,21 @@ class FunctionsServerWeb {
      * Utiliza el servicio externo geoplugin.net para recuperar datos de ubicación.
      * Permite extraer atributos específicos como ciudad, región, códigos de país y continente.
      *
-	 * 	Ejemplos
-	 * 	$ServerWeb->obtenerInfoIp('200.120.163.36', "city");
-	 *   $ServerWeb->obtenerInfoIp('200.120.163.36', "region");
-	 *   $ServerWeb->obtenerInfoIp('200.120.163.36', "regionCode");
-	 *   $ServerWeb->obtenerInfoIp('200.120.163.36', "countryCode");
-	 *   $ServerWeb->obtenerInfoIp('200.120.163.36', "countryName");
-	 *   $ServerWeb->obtenerInfoIp('200.120.163.36', "continentName");
-	 *
      * @param string $IP_Cliente La dirección IP que se desea consultar.
      * @param string $purpose El atributo específico a recuperar (city, region, regionCode, countryCode, countryName, continentName).
+     *
      * @return string El valor geográfico solicitado o un mensaje de error si los parámetros son inválidos.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerWeb->obtenerInfoIp('200.120.163.36', "city");
+	 * $ServerWeb->obtenerInfoIp('200.120.163.36', "region");
+	 * $ServerWeb->obtenerInfoIp('200.120.163.36', "regionCode");
+	 * $ServerWeb->obtenerInfoIp('200.120.163.36', "countryCode");
+	 * $ServerWeb->obtenerInfoIp('200.120.163.36', "countryName");
+	 * $ServerWeb->obtenerInfoIp('200.120.163.36', "continentName");
+	 * ```
+	 *
      */
 	public function obtenerInfoIp($IP_Cliente, $purpose): string {
 
@@ -67,17 +71,21 @@ class FunctionsServerWeb {
      * Calcula dinámicamente el protocolo, host y rutas de directorio. Permite
      * retornar la raíz del dominio, incluir el núcleo de la ruta o parsear el resultado.
 	 *
-     * 	se obtiene dato
-	 * 	$ServerWeb->getBaseUrl();                                                     //will produce something like: http://stackoverflow.com/questions/2820723/
-	 * 	$ServerWeb->getBaseUrl(TRUE);                                                 //will produce something like: http://stackoverflow.com/
-	 * 	$ServerWeb->getBaseUrl(TRUE, TRUE); || $ServerWeb->getBaseUrl(NULL, TRUE);    //will produce something like: http://stackoverflow.com/questions/
-	 * 	and finally
-	 * 	$ServerWeb->getBaseUrl(NULL, NULL, TRUE);
-	 *
      * @param bool $atRoot Define si se debe retornar solo la raíz del host.
      * @param bool $atCore Define si se debe incluir el directorio base del script.
      * @param bool $parse Define si el retorno debe ser un array procesado por parse_url.
+     *
      * @return string|array La URL base construida o un array con sus componentes.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerWeb->getBaseUrl();                 //retornara: http://stackoverflow.com/questions/2820723/
+	 * $ServerWeb->getBaseUrl(TRUE);             //retornara: http://stackoverflow.com/
+	 * $ServerWeb->getBaseUrl(TRUE, TRUE);       //retornara: http://stackoverflow.com/questions/
+	 * $ServerWeb->getBaseUrl(NULL, TRUE);       //retornara: http://stackoverflow.com/questions/
+	 * $ServerWeb->getBaseUrl(NULL, NULL, TRUE);
+	 * ```
+	 *
      */
 	public function getBaseUrl($atRoot=false, $atCore=false, $parse=false): string {
 
@@ -126,8 +134,18 @@ class FunctionsServerWeb {
      *
      * Soporta métodos GET, POST, PUT, PATCH y DELETE. Normaliza la respuesta
      * en una estructura consistente de éxito/error.
+	 *
+     * @param array $config Configuración de la petición:
+     *    - method (string): Método HTTP.
+     *    - url (string): Endpoint de la API.
+     *    - headers (array): Cabeceras HTTP.
+     *    - body (mixed): Datos a enviar.
+     *    - timeout (int): Tiempo de espera en segundos.
      *
-	 * 	Cómo usarla
+     * @return array Resultado normalizado con status, success, error y data.
+	 *
+	 * @example
+	 * ```php
 	 * 	$response = callExternalApi([
 	 *		'method' => 'GET',
 	 *		'url' => 'https://api.example.com/data',
@@ -144,14 +162,8 @@ class FunctionsServerWeb {
 	 *		Manejo de errores
 	 *		error_log("Error al conectar con API: " . $response['error']);
 	 *	}
+	 * ```
 	 *
-     * @param array $config Configuración de la petición:
-     * - method (string): Método HTTP.
-     * - url (string): Endpoint de la API.
-     * - headers (array): Cabeceras HTTP.
-     * - body (mixed): Datos a enviar.
-     * - timeout (int): Tiempo de espera en segundos.
-     * @return array Resultado normalizado con status, success, error y data.
      */
 	public function callExternalApi(array $config): array {
 
@@ -212,18 +224,21 @@ class FunctionsServerWeb {
      * Valida la seguridad de la conexión (HTTPS), descarga el contenido mediante contextos de flujo,
      * verifica la integridad mediante hash SHA-256 y convierte el XML a un array asociativo.
      *
-	 * Cómo usarla
+     * @param string $url Dirección URL del recurso XML (debe ser HTTPS).
+     *
+     * @return array Resultado del procesamiento con éxito, datos y hash de integridad.
+	 *
+	 * @example
+	 * ```php
 	 * 	try {
 	 *		$resultado = obtenerDatosXML("https://ejemplo.com/archivo.xml");
 	 *		print_r($resultado['datos']);
 	 *		echo "Hash de integridad: " . $resultado['hash_integridad'];
 	 *	} catch (Exception $e) {
 	 *		echo "Error: " . $e->getMessage();
-	 *	}
+	 *  }
+	 * ```
 	 *
-	 *
-     * @param string $url Dirección URL del recurso XML (debe ser HTTPS).
-     * @return array Resultado del procesamiento con éxito, datos y hash de integridad.
      */
 	public function obtenerDatosXML($url): array {
 

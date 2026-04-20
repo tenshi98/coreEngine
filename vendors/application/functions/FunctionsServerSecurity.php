@@ -17,17 +17,16 @@ class FunctionsServerSecurity {
      * la información de los indicadores (UF, UTM, Dólar, etc.) en un arreglo asociativo limpio.
      *
      * @param string $URL Dirección del recurso RSS/XML del SII.
+     *
      * @return array Resultado con éxito, datos procesados (título, link, descripción) o error.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerWeb->getDataSIIindicadores('https://zeus.sii.cl/admin/rss/sii_ind_rss.xml');
+	 * ```
+	 *
      */
     public function getDataSIIindicadores(string $URL): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$ServerWeb->getDataSIIindicadores('https://zeus.sii.cl/admin/rss/sii_ind_rss.xml');
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         // Verifica que la URL no sea una cadena vacía antes de instanciar servicios
@@ -74,7 +73,14 @@ class FunctionsServerSecurity {
      * ejecutar comandos de bloqueo (iptables) sobre una IP específica.
      *
      * @param string $IP Dirección IP que se desea bloquear.
+     *
      * @return array Resultado de la operación delegada al servidor.
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function sendIPtoBlackList(string $IP): array {
 

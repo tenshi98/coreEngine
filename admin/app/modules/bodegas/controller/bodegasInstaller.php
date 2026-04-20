@@ -41,9 +41,9 @@ class bodegasInstaller extends ControllerBase {
 
         /******************************************/
         //si es la respuesta esperada
-        $countPermisos = is_numeric($nData1) ? 1 : 0;
-        $DepInstall_1  = is_numeric($DepData1) ? 1 : 0;
-        $DepInstall_2  = is_numeric($DepData2) ? 1 : 0;
+        $countPermisos = is_numeric($nData1)&&$nData1!=0 ? 1 : 0;
+        $DepInstall_1  = is_numeric($DepData1)&&$DepData1!=0 ? 1 : 0;
+        $DepInstall_2  = is_numeric($DepData2)&&$DepData2!=0 ? 1 : 0;
 
         /******************************************/
         //Verificar que existan los permisos

@@ -13,6 +13,10 @@ class testeos extends ControllerBase {
     private $DataNumbers;
     private $ServerIA;
     private $DataText;
+    private $ServerClient;
+    private $ServerWeb;
+
+    
 
     /******************************************************************************/
     //Constructor
@@ -29,6 +33,8 @@ class testeos extends ControllerBase {
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->ServerIA       = new FunctionsServerIA();
 		$this->DataText       = new FunctionsDataText();
+		$this->ServerClient   = new FunctionsServerClient();
+		$this->ServerWeb      = new FunctionsServerWeb();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -308,18 +314,27 @@ class testeos extends ControllerBase {
         $test  = new Test;
         $FNC_DataOperations       = new FunctionsDataOperations;
 
+        /**********  FunctionsCommonData  **********/
+        //--------------------- numero2horas ---------------------
+        /*$this->runTest($test, 'FunctionsCommonData',   'safePath',     ['',''],                                                            'string',  '("",""                                                           -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsCommonData',   'safePath',     ['/var/www/uploads','/var/www/uploads/imagen.jpg'],                 'string',  '("/var/www/uploads","/var/www/uploads/imagen.jpg"                -> Devuelve /var/www/uploads/imagen.jpg)');
+        $this->runTest($test, 'FunctionsCommonData',   'safePath',     ['/var/www/uploads','/var/www/uploads/../uploads/documento.pdf'],   'string',  '("/var/www/uploads","/var/www/uploads/../uploads/documento.pdf"  -> Devuelve /var/www/uploads/documento.pdf)');
+        $this->runTest($test, 'FunctionsCommonData',   'safePath',     ['/var/www/uploads','/var/www/uploads/../../etc/passwd'],           'string',  '("/var/www/uploads","/var/www/uploads/../../etc/passwd"          -> Devuelve /var/www/uploads (bloqueado))');
+        $this->runTest($test, 'FunctionsCommonData',   'safePath',     ['/var/www/uploads','/var/www/uploads/no_existe.txt'],              'string',  '("/var/www/uploads","/var/www/uploads/no_existe.txt"             -> Devuelve /var/www/uploads (fallback por seguridad))');
+        $this->runTest($test, 'FunctionsCommonData',   'safePath',     ['/var/www/uploads','/home/user/secret.txt'],                       'string',  '("/var/www/uploads","/home/user/secret.txt"                      -> Devuelve /var/www/uploads (acceso denegado))');
+
         /**********  FunctionsConvertions  **********/
         //--------------------- numero2horas ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
         $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     [1.5],          'string',  '(1.5 -> Devuelve 01:30:00)');
         //--------------------- minutos2horas ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
         $this->runTest($test, 'FunctionsConvertions',   'minutos2horas',    [65],           'string',  '(65  -> Devuelve 01:05:00)');
         //--------------------- segundos2horas ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   [''],           'string',  '(""   -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   ['a'],          'string',  '("a"  -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   ['a'],          'string',  '("a"  -> Devuelve El dato ingresado no es un numero (a))');
         $this->runTest($test, 'FunctionsConvertions',   'segundos2horas',   [3600],         'string',  '(3600 -> Devuelve 01:00:00)');
         //--------------------- horas2minutos ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'horas2minutos',    [''],           'string',  '(""       -> Devuelve Sin datos ingresados)');
@@ -339,23 +354,26 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsConvertions',   'DevolverMes',      ['Ene'],        'string',  '(Ene -> Devuelve Enero)');
         //--------------------- numero2mes ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       [25],           'string',  '(25  -> Devuelve Numero fuera de parámetros esperados)');
         $this->runTest($test, 'FunctionsConvertions',   'numero2mes',       [1],            'string',  '(1   -> Devuelve Enero)');
         //--------------------- numero2mesCorto ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  [25],           'string',  '(25  -> Devuelve Numero fuera de parámetros esperados)');
         $this->runTest($test, 'FunctionsConvertions',   'numero2mesCorto',  [1],            'string',  '(1   -> Devuelve Ene)');
         //--------------------- numeroNombreDia ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  [''],           'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  ['a'],          'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  [25],           'string',  '(25  -> Devuelve Numero fuera de parámetros esperados)');
         $this->runTest($test, 'FunctionsConvertions',   'numeroNombreDia',  [3],            'string',  '(3   -> Devuelve Miercoles)');
         //--------------------- porcentaje ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       [''],           'string',  '(""   -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       ['a'],          'string',  '("a"  -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       ['a'],          'string',  '("a"  -> Devuelve El dato ingresado no es un numero (a))');
         $this->runTest($test, 'FunctionsConvertions',   'porcentaje',       [0.65],         'string',  '(0.65 -> Devuelve 65 %)');
         //--------------------- numeroApalabras ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  [''],           'string',  '(""        -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  ['a'],          'string',  '("a"       -> Devuelve El dato ingresado no es un numero)');
+        $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  ['a'],          'string',  '("a"       -> Devuelve El dato ingresado no es un numero (a))');
         $this->runTest($test, 'FunctionsConvertions',   'numeroApalabras',  [250000000],    'string',  '(250000000 -> Devuelve doscientos cincuenta millones)');
 
         /**********  FunctionsDataDate  **********/
@@ -442,23 +460,23 @@ class testeos extends ControllerBase {
 
         /**********  FunctionsDataNumbers  **********/
         //--------------------- Cantidades ---------------------
-        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  ['', 1],           'string',  '(""      -> Devuelve 0)');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, ''],     'string',  '(""      -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  ['a', 1],          'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, 'a'],    'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, 6],      'string',  '(1250.85 -> Devuelve 1.250,850000)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  ['', 1],           'string',  '("" - 1        -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, ''],     'string',  '(1250.85 - ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  ['a', 1],          'string',  '("a"  - 1      -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, 'a'],    'string',  '(1250.85 - "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Cantidades',                  [1250.85, 6],      'string',  '(1250.85       -> Devuelve 1.250,850000)');
         //--------------------- nDoc ---------------------
-        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        ['', 7],           'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, ''],          'string',  '(""  -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        ['a',1],           'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, 'a'],         'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, 7],           'string',  '(25  -> Devuelve 0000025)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        ['', 7],           'string',  '("" - 7   -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, ''],          'string',  '(25 - ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        ['a',7],           'string',  '("a" - 7  -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, 'a'],         'string',  '(25 - "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'nDoc',                        [25, 7],           'string',  '(25       -> Devuelve 0000025)');
         //--------------------- Valores ---------------------
-        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     ['', 1],           'string',  '(""         -> Devuelve 0)');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, ''],  'string',  '(""         -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     ['a', 1],          'string',  '("a"        -> Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, 'a'], 'string',  '("a"        -> Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, 2],   'string',  '(1500.85565 -> Devuelve $ 1.500,86)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     ['', 1],           'string',  '("" - 1           -> Devuelve 0)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, ''],  'string',  '(1500.85565 - ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     ['a', 1],          'string',  '("a" - 1          -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, 'a'], 'string',  '(1500.85565 - "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataNumbers',   'Valores',                     [1500.85565, 2],   'string',  '(1500.85565       -> Devuelve $ 1.500,86)');
         //--------------------- valoresEnteros ---------------------
         $this->runTest($test, 'FunctionsDataNumbers',   'valoresEnteros',              [''],              'string',  '(""      -> Devuelve 0)');
         $this->runTest($test, 'FunctionsDataNumbers',   'valoresEnteros',              ['a'],             'string',  '("a"     -> Devuelve El dato ingresado no es un numero (a))');
@@ -548,112 +566,198 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['2019-01-02', 'a'],                                    'string',  '(2019-01-02 - 2019-02-02 -> Devuelve El dato ingresado no es una fecha (a))');
         $this->runTest($test, 'FunctionsDataOperations',   'diasTranscurridos',   ['2019-01-02', '2019-02-02'],                           'int',     '(2019-01-02 - 2019-02-02 -> Devuelve 31)');
         //--------------------- horasTranscurridas ---------------------
-        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['', '', '', ''],                                       'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['a', 'a', 'a', 'a'],                                   'string',  '(Devuelve El dato ingresado no es una fecha (a))');
-        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['2019-01-02', '2019-02-02', '14:00:00', '07:00:00'],   'string',  '(Devuelve 737:00:00)');
+        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['', '', '', ''],                                       'string',  '(""                                        -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['a', 'a', 'a', 'a'],                                   'string',  '("a"                                       -> Devuelve El dato ingresado no es una fecha (a))');
+        $this->runTest($test, 'FunctionsDataOperations',   'horasTranscurridas',  ['2019-01-02', '2019-02-02', '14:00:00', '07:00:00'],   'string',  '(2019-01-02 14:00:00 - 2019-02-02 07:00:00 -> Devuelve 737:00:00)');
         //--------------------- diferenciaMeses ---------------------
         $this->runTest($test, 'FunctionsDataOperations',   'diferenciaMeses',     ['', ''],                                               'string',  '(""-""                 -> Devuelve Sin datos ingresados)');
         $this->runTest($test, 'FunctionsDataOperations',   'diferenciaMeses',     ['a', 'a'],                                             'string',  '("a"-"a"               -> Devuelve El dato ingresado no es una fecha (a))');
         $this->runTest($test, 'FunctionsDataOperations',   'diferenciaMeses',     ['2019-01-02', '2019-02-02'],                           'int',     '(2019-01-02-2019-02-02 -> Devuelve 1)');
 
         /**********  FunctionsDataText  **********/
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['', 10],                                               'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', ''],        'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 'a'],       'string',  '(Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 10],        'string',  '(Devuelve Lorem ipsu...)');
-        //--------------------- diferenciaMeses ---------------------
+        //--------------------- cortar ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['', 10],                                               'string',  '("" - 10               -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', ''],        'string',  '("Lorem ipsum.." - ""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 'a'],       'string',  '("Lorem ipsum.." - "a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsDataText',    'cortar',                      ['Lorem ipsum dolor sit amet, consectetur', 10],        'string',  '("Lorem ipsum.." - 10  -> Devuelve Lorem ipsu...)');
+        //--------------------- eliminarVerificadorRut ---------------------
         $this->runTest($test, 'FunctionsDataText',    'eliminarVerificadorRut',      [''],                                                   'string',  '(16.029.464-7 -> Devuelve Sin datos ingresados)');
         $this->runTest($test, 'FunctionsDataText',    'eliminarVerificadorRut',      ['16.029.464-7'],                                       'string',  '(16.029.464-7 -> Devuelve 16029464)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'limpiarString',               [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'limpiarString',               ['Lorem ipsum\n dolor sit amet\n, consectetur\r'],      'string',  '(Devuelve Lorem ipsum dolor sit amet consectetur)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'reemplazarEspaciosxGuion',    [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'reemplazarEspaciosxGuion',    ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem_ipsum_dolor_sit_amet,_consectetur)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'sanitizarTexto',              [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'sanitizarTexto',              ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem ipsum dolor sit amet, consectetur)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'desanitizarTexto',            [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'desanitizarTexto',            ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '(Devuelve Lorem ipsum dolor sit amet, consectetur)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'limpiezaTexto',               [""],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'limpiezaTexto',               ["blabla'bla"],                                         'string',  '(Devuelve blabla%27bla)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'contarPalabrasCensuradas',    [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'contarPalabrasCensuradas',    ['Lorem ipsum dolor sit amet, fuck d'],                 'int',     '(Devuelve 1)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'filtrarPalabrasCensuradas',   [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'filtrarPalabrasCensuradas',   ['Lorem ipsum dolor sit amet, fuck d'],                 'string',  '(Devuelve lorem ipsum dolor sit amet, **** d)');
-        //--------------------- diferenciaMeses ---------------------
-        $this->runTest($test, 'FunctionsDataText',    'tituloMenu',                  [''],                                                   'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsDataText',    'tituloMenu',                  ['01 - Titulo'],                                        'string',  '(Devuelve Titulo)');
-        //--------------------- diferenciaMeses ---------------------
-        //$this->runTest($test, 'FunctionsDataText',    'buscarPalabraYExtraer',       ['Lorem ipsum dolor sit amet', 'ipsum'],                'string',  '(Devuelve dolor sit amet)');
+        //--------------------- limpiarString ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'limpiarString',               [''],                                                   'string',  '(""                                              -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'limpiarString',               ['Lorem ipsum\n dolor sit amet\n, consectetur\r'],      'string',  '("Lorem ipsum\n dolor sit amet\n, consectetur\r" -> Devuelve Lorem ipsum dolor sit amet consectetur)');
+        //--------------------- reemplazarEspaciosxGuion ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'reemplazarEspaciosxGuion',    [''],                                                   'string',  '(""                                        -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'reemplazarEspaciosxGuion',    ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '("Lorem ipsum dolor sit amet, consectetur" -> Devuelve Lorem_ipsum_dolor_sit_amet,_consectetur)');
+        //--------------------- sanitizarTexto ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'sanitizarTexto',              [''],                                                   'string',  '(""                                        -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'sanitizarTexto',              ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '("Lorem ipsum dolor sit amet, consectetur" -> Devuelve Lorem ipsum dolor sit amet, consectetur)');
+        //--------------------- desanitizarTexto ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'desanitizarTexto',            [''],                                                   'string',  '(""                                        -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'desanitizarTexto',            ['Lorem ipsum dolor sit amet, consectetur'],            'string',  '("Lorem ipsum dolor sit amet, consectetur" -> Devuelve Lorem ipsum dolor sit amet, consectetur)');
+        //--------------------- limpiezaTexto ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'limpiezaTexto',               [""],                                                   'string',  '(""             -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'limpiezaTexto',               ["blabla'bla"],                                         'string',  '("blabla%27bla" -> Devuelve blabla%27bla)');
+        //--------------------- limpiezaTexto ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'limpiarOracion',              [""],                                                   'string',  '(""                -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'limpiarOracion',              ["ÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ"],                                    'string',  '("ÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ" -> Devuelve eeeeiiiidnooooo)');
+        //--------------------- contarPalabrasCensuradas ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'contarPalabrasCensuradas',    [''],                                                   'string',  '(""                                   -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'contarPalabrasCensuradas',    ['Lorem ipsum dolor sit amet, fuck d'],                 'int',     '("Lorem ipsum dolor sit amet, fuck d" -> Devuelve 1)');
+        //--------------------- filtrarPalabrasCensuradas ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'filtrarPalabrasCensuradas',   [''],                                                   'string',  '(""                                   -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'filtrarPalabrasCensuradas',   ['Lorem ipsum dolor sit amet, fuck d'],                 'string',  '("Lorem ipsum dolor sit amet, fuck d" -> Devuelve lorem ipsum dolor sit amet, **** d)');
+        //--------------------- tituloMenu ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'tituloMenu',                  [''],                                                   'string',  '(""            -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataText',    'tituloMenu',                  ['01 - Titulo'],                                        'string',  '("01 - Titulo" -> Devuelve Titulo)');
+        //--------------------- buscarPalabraYExtraer ---------------------
+        /*$this->runTest($test, 'FunctionsDataText',    'buscarPalabraYExtraer',       ['', ''],                                               'string',  '( -> Devuelve dolor sit amet)');
+        $this->runTest($test, 'FunctionsDataText',    'buscarPalabraYExtraer',       ['', 'ipsum'],                                          'string',  '( -> Devuelve dolor sit amet)');
+        $this->runTest($test, 'FunctionsDataText',    'buscarPalabraYExtraer',       ['Lorem ipsum dolor sit amet', ''],                     'string',  '( -> Devuelve dolor sit amet)');
+        $this->runTest($test, 'FunctionsDataText',    'buscarPalabraYExtraer',       ['Lorem ipsum dolor sit amet', 'ipsum'],                'string',  '( -> Devuelve dolor sit amet)');
+        //--------------------- dividirTexto ---------------------
+        $this->runTest($test, 'FunctionsDataText',    'dividirTexto',                ['', ''],                                               'string',  '( -> Devuelve dolor sit amet)');
+        $this->runTest($test, 'FunctionsDataText',    'dividirTexto',                ['', ':'],                                              'string',  '( -> Devuelve dolor sit amet)');
+        $this->runTest($test, 'FunctionsDataText',    'dividirTexto',                ['clave:valor', ''],                                    'string',  '( -> Devuelve dolor sit amet)');
+        $this->runTest($test, 'FunctionsDataText',    'dividirTexto',                ['clave:valor', ':'],                                   'array',  '( -> Devuelve dolor sit amet)');
+
+
+
 
         /**********  FunctionsDataTime  **********/
-        $this->runTest($test, 'FunctionsDataTime',                'formatoHoraEstandar',         ['1:1'],                                                'string',  '(1:1 -> Devuelve 01:01)');
-        $this->runTest($test, 'FunctionsDataTime',                'formatoHoraProgramada',       ['1:1'],                                                'string',  '(1:1 -> Devuelve 01:01:00)');
-        $this->runTest($test, 'FunctionsDataTime',                'formatoHoraArchivos',         ['1:1'],                                                'string',  '(1:1 -> Devuelve 010100)');
+        //--------------------- formatoHoraEstandar ---------------------
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraEstandar',   [''],       'string',  '(""    -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraEstandar',   ['a'],      'string',  '("a"   -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraEstandar',   ['01:01'],  'string',  '(01:01 -> Devuelve 01:01)');
+        //--------------------- formatoHoraProgramada ---------------------
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraProgramada', [''],       'string',  '(""    -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraProgramada', ['a'],      'string',  '("a"   -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraProgramada', ['01:01'],  'string',  '(01:01 -> Devuelve 01:01:00)');
+        //--------------------- formatoHoraArchivos ---------------------
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraArchivos',   [''],       'string',  '(""    -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraArchivos',   ['a'],      'string',  '("a"   -> Devuelve El dato ingresado no es una hora (a))');
+        $this->runTest($test, 'FunctionsDataTime',   'formatoHoraArchivos',   ['01:01'],  'string',  '(01:01 -> Devuelve 010100)');
 
         /**********  FunctionsDataValidations  **********/
-        $this->runTest($test, 'FunctionsDataValidations',         'validarRut',                  ['16.029.464-7'],                                       'bool',    '(16.029.464-7 -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarEmail',                ['asd@asd.cl'],                                         'bool',    '(asd@asd.cl -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarNumero',               ['25'],                                                 'bool',    '(25 -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarPatente',              ['au1825'],                                             'bool',    '(au1825 -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarURL',                  ['https://www.google.cl'],                              'bool',    '(https://www.google.cl -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarHora',                 ['16:24:00'],                                           'bool',    '(16:24:00 -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarFecha',                ['1900-01-01'],                                         'bool',    '(1900-01-01 -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarEntero',               [16],                                                   'bool',    '(16 -> Devuelve true)');
-        //$this->runTest($test, 'FunctionsDataValidations',         'validarDispositivoMovil',     [],                                                     'bool',    '(16 -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarLargoMinimo',          ['Lorem ipsum dolor sit amet, consectetur', 10],        'bool',    '(Lorem ipsum dolor sit amet, consectetur -> Devuelve true)');
-        $this->runTest($test, 'FunctionsDataValidations',         'validarLargoMaximo',          ['Lorem', 10],                                          'bool',    '(Lorem -> Devuelve true)');
+        //--------------------- validarRut ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarRut',              [''],                        'bool',  '(""           -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarRut',              ['a'],                       'bool',  '("a"          -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarRut',              ['16.029.464-7'],            'bool',  '(16.029.464-7 -> Devuelve true)');
+        //--------------------- validarEmail ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarEmail',            [''],                        'bool',  '(""         -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarEmail',            ['a'],                       'bool',  '("a"        -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarEmail',            ['asd@asd.cl'],              'bool',  '(asd@asd.cl -> Devuelve true)');
+        //--------------------- validarNumero ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarNumero',           [''],                        'bool',  '(""  -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarNumero',           ['a'],                       'bool',  '("a" -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarNumero',           ['25'],                      'bool',  '(25  -> Devuelve true)');
+        //--------------------- validarPatente ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarPatente',          [''],                        'bool',  '(""     -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarPatente',          ['a'],                       'bool',  '("a"    -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarPatente',          ['au1825'],                  'bool',  '(au1825 -> Devuelve true)');
+        //--------------------- validarURL ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarURL',              [''],                        'bool',  '(""                    -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarURL',              ['a'],                       'bool',  '("a"                   -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarURL',              ['https://www.google.cl'],   'bool',  '(https://www.google.cl -> Devuelve true)');
+        //--------------------- validarHora ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarHora',             [''],                        'bool',  '(""       -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarHora',             ['a'],                       'bool',  '("a"      -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarHora',             ['16:24:00'],                'bool',  '(16:24:00 -> Devuelve true)');
+        //--------------------- validarFecha ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarFecha',            [''],                        'bool',  '(""         -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarFecha',            ['a'],                       'bool',  '("a"        -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarFecha',            ['1900-01-01'],              'bool',  '(1900-01-01 -> Devuelve true)');
+        //--------------------- validarEntero ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarEntero',           [''],                        'bool',  '(""  -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarEntero',           ['a'],                       'bool',  '("a" -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarEntero',           [16],                        'bool',  '(16  -> Devuelve true)');
+        //--------------------- validarDispositivoMovil ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarDispositivoMovil', [],                          'bool',  '(""  -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarDispositivoMovil', [],                          'bool',  '("a" -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarDispositivoMovil', [],                          'bool',  '(16  -> Devuelve true)');
+        //--------------------- validarLargoMinimo ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMinimo',      ['', 10],                    'bool',  '("" - 10                -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMinimo',      ['Lorem ipsum dolor', ''],   'bool',  '(Lorem ipsum dolor - "" -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMinimo',      ['Lorem ipsum dolor', 'a'],  'bool',  '(Lorem ipsum dolor - "a"-> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMinimo',      ['Lorem ipsum dolor', 10],   'bool',  '(Lorem ipsum dolor - 10 -> Devuelve true)');
+        //--------------------- validarLargoMaximo ---------------------
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMaximo',      ['', 10],                    'bool',  '("" - 10     -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMaximo',      ['Lorem', ''],               'bool',  '(Lorem - ""  -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMaximo',      ['Lorem', 'a'],              'bool',  '(Lorem - "a" -> Devuelve false)');
+        $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMaximo',      ['Lorem', 10],               'bool',  '(Lorem - 10  -> Devuelve true)');
 
         /**********  FunctionsLocation  **********/
-        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           ['', '', '', ''],                                       'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           ['a', 'a', 'a', 'a'],                                   'string',  '(Devuelve El dato ingresado no es un numero (a))');
-        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           [-40.807289, -72.634907, -42.176560, -73.425923],       'float',   '(Devuelve 165.89718855602)');
+        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           ['', '', '', ''],                                       'string',  '(""                                             -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           ['a', 'a', 'a', 'a'],                                   'string',  '("a"                                            -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsLocation',                'calcularDistancia',           [-40.807289, -72.634907, -42.176560, -73.425923],       'float',   '(-40.807289, -72.634907, -42.176560, -73.425923 -> Devuelve 165.89718855602)');
 
         /**********  FunctionsSecurityCodification  **********/
         //--------------------- simpleEncode ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["", "passkey"],                                        'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["php recipe", "passkey"],                              'string',  '(Devuelve lEKK57naUY4---VQ==)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["", "passkey"],                                        'string',  '("", "passkey"           -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["php recipe", "passkey"],                              'string',  '("php recipe", "passkey" -> Devuelve lEKK57naUY4---VQ==)');
         //--------------------- simpleDecode ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["", "passkey"],                                        'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["lEKK57naUY4/VQ==", "passkey"],                        'string',  '(Devuelve php recipe)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["", "passkey"],                                        'string',  '("", "passkey"                 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["lEKK57naUY4/VQ==", "passkey"],                        'string',  '("lEKK57naUY4/VQ==", "passkey" -> Devuelve php recipe)');
         //--------------------- generateServerSpecificHash ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'generateServerSpecificHash',  [],                                                     'string',  '(Devuelve 49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'generateServerSpecificHash',  [],                                                     'string',  '("" -> Devuelve 49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763)');
         //--------------------- encryptDecrypt ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['encrypt',''],                                         'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['encrypt',5008],                                       'string',  '(Devuelve OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['encrypt',''],                                         'string',  '("encrypt",""     -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['encrypt',5008],                                       'string',  '("encrypt","5008" -> Devuelve OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09)');
         //--------------------- encryptDecrypt ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt',''],                                         'string',  '(Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt','OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09'],         'string',  '(Devuelve 5008)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt',''],                                         'string',  '("decrypt",""                                 -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt','OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09'],         'string',  '("decrypt","OExmMkRxL0ZtWWlRVzJLZHYyVWF3Zz09" -> Devuelve 5008)');
 
         /**********  FunctionsSecurityPasswords  **********/
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'generarPassword',             [10,'alfanumerico'],                                    'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'generarPasswordUnica',        [],                                                     'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'caracteresRandom',            [16, true, false, false],                               'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'tokenBin2Hex',                [25],                                                   'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'hashCreate',                  ['palabra'],                                                                  'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsSecurityPasswords',       'hashVerify',                  ['palabra', '$2y$12$pd1.kBABacsBwq8YXNDieuqNELrjJiq68kXCFtHoaj7IwqljDLdj6'],  'bool',  '(Devuelve 1)');
+        //--------------------- generarPassword ---------------------
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      ['','alfanumerico'],         'string',  '("","alfanumerico"   -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      [10,''],                     'string',  '("10",""             -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      ['a','alfanumerico'],        'string',  '("a","alfanumerico"  -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      [10,'a'],                    'string',  '("10","a"            -> Devuelve Dato fuera de parámetros esperados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      [10,'alfanumerico'],         'string',  '("10","alfanumerico" -> Devuelve asd)');
+        //--------------------- generarPasswordUnica ---------------------
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPasswordUnica', [],                          'string',  '( -> Devuelve asd)');
+        //--------------------- caracteresRandom ---------------------
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'caracteresRandom',     ['', '', '', ''],            'string',  '("","","",""            -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'caracteresRandom',     ['a', true, false, false],   'string',  '("a","a","a","a"        -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'caracteresRandom',     [16, 'a', 'a', 'a'],         'string',  '("a","a","a","a"        -> Devuelve Dato fuera de parámetros esperados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'caracteresRandom',     [16, true, false, false],    'string',  '(16, true, false, false -> Devuelve asd)');
+        //--------------------- tokenBin2Hex ---------------------
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         [''],                        'string',  '(""  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         ['a'],                       'string',  '("a" -> Devuelve El dato ingresado no es un numero (a))');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         [25],                        'string',  '(25  -> Devuelve asd)');
+        //--------------------- hashCreate ---------------------
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashCreate',           [''],                        'string',  '(""        -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashCreate',           ['palabra'],                 'string',  '("palabra" -> Devuelve asd)');
+        //--------------------- hashVerify ---------------------
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashVerify',           ['', ''],                                                                     'string',  '("",""                  -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashVerify',           ['palabra', '$2y$12$pd1.kBABacsBwq8YXNDieuqNELrjJiq68kXCFtHoaj7IwqljDLdj6'],  'bool',    '("palabra","$2y$12$..." -> Devuelve 1)');
 
         /**********  FunctionsDataText  **********/
-        $this->runTest($test, 'FunctionsServerClient',            'getClientIp',                 [],                                                     'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsServerClient',            'getBrowser',                  [],                                                     'string',  '(Devuelve asd)');
-        $this->runTest($test, 'FunctionsServerClient',            'getOperatingSystem',          [],                                                     'string',  '(Devuelve asd)');
+        $this->runTest($test, 'FunctionsServerClient',   'getClientIp',              [],   'string',  '( -> Devuelve '.$this->ServerClient->getClientIp().')');
+        //$this->runTest($test, 'FunctionsServerClient',   'getClientIpAlternative',   [],   'string',  '( -> Devuelve '.$this->ServerClient->getClientIpAlternative().')');
+        $this->runTest($test, 'FunctionsServerClient',   'getBrowser',               [],   'string',  '( -> Devuelve '.$this->ServerClient->getBrowser().')');
+        $this->runTest($test, 'FunctionsServerClient',   'getOperatingSystem',       [],   'string',  '( -> Devuelve '.$this->ServerClient->getOperatingSystem().')');
 
         /**********  FunctionsServerServer  **********/
-        $this->runTest($test, 'FunctionsServerServer',            'fechaActual',                 [],                                                     'string',  '(Devuelve '.$this->Server->fechaActual().')');
-        $this->runTest($test, 'FunctionsServerServer',            'fechaActualAlternative',      [],                                                     'string',  '(Devuelve '.$this->Server->fechaActualAlternative().')');
-        $this->runTest($test, 'FunctionsServerServer',            'horaActual',                  [],                                                     'string',  '(Devuelve '.$this->Server->horaActual().')');
-        $this->runTest($test, 'FunctionsServerServer',            'horaActualAlternative',       [],                                                     'string',  '(Devuelve '.$this->Server->horaActualAlternative().')');
-        $this->runTest($test, 'FunctionsServerServer',            'diaActual',                   [],                                                     'string',  '(Devuelve '.$this->Server->diaActual().')');
-        $this->runTest($test, 'FunctionsServerServer',            'semanaActual',                [],                                                     'string',  '(Devuelve '.$this->Server->semanaActual().')');
-        $this->runTest($test, 'FunctionsServerServer',            'mesActual',                   [],                                                     'string',  '(Devuelve '.$this->Server->mesActual().')');
-        $this->runTest($test, 'FunctionsServerServer',            'anoActual',                   [],                                                     'string',  '(Devuelve '.$this->Server->anoActual().')');
-        //$this->runTest($test, 'asd',    'asd',       [asd],            'asd',  '(Devuelve asd)');
+        $this->runTest($test, 'FunctionsServerServer',   'fechaActual',            [],  'string',  '( -> Devuelve '.$this->Server->fechaActual().')');
+        $this->runTest($test, 'FunctionsServerServer',   'fechaActualAlternative', [],  'string',  '( -> Devuelve '.$this->Server->fechaActualAlternative().')');
+        $this->runTest($test, 'FunctionsServerServer',   'horaActual',             [],  'string',  '( -> Devuelve '.$this->Server->horaActual().')');
+        $this->runTest($test, 'FunctionsServerServer',   'horaActualAlternative',  [],  'string',  '( -> Devuelve '.$this->Server->horaActualAlternative().')');
+        $this->runTest($test, 'FunctionsServerServer',   'diaActual',              [],  'string',  '( -> Devuelve '.$this->Server->diaActual().')');
+        $this->runTest($test, 'FunctionsServerServer',   'semanaActual',           [],  'string',  '( -> Devuelve '.$this->Server->semanaActual().')');
+        $this->runTest($test, 'FunctionsServerServer',   'mesActual',              [],  'string',  '( -> Devuelve '.$this->Server->mesActual().')');
+        $this->runTest($test, 'FunctionsServerServer',   'anoActual',              [],  'string',  '( -> Devuelve '.$this->Server->anoActual().')');
+
+        /**********  FunctionsServerWeb  **********/
+        //--------------------- hashVerify ---------------------
+        //$this->runTest($test, 'FunctionsServerWeb',   'obtenerInfoIp', ["200.120.163.36", "city"],          'string',  '("200.120.163.36", "city"          -> Devuelve asd)');
+        //$this->runTest($test, 'FunctionsServerWeb',   'obtenerInfoIp', ["200.120.163.36", "region"],        'string',  '("200.120.163.36", "region"        -> Devuelve asd)');
+        //$this->runTest($test, 'FunctionsServerWeb',   'obtenerInfoIp', ["200.120.163.36", "regionCode"],    'string',  '("200.120.163.36", "regionCode"    -> Devuelve asd)');
+        //$this->runTest($test, 'FunctionsServerWeb',   'obtenerInfoIp', ["200.120.163.36", "countryCode"],   'string',  '("200.120.163.36", "countryCode"   -> Devuelve asd)');
+        //$this->runTest($test, 'FunctionsServerWeb',   'obtenerInfoIp', ["200.120.163.36", "countryName"],   'string',  '("200.120.163.36", "countryName"   -> Devuelve asd)');
+        //$this->runTest($test, 'FunctionsServerWeb',   'obtenerInfoIp', ["200.120.163.36", "continentName"], 'string',  '("200.120.163.36", "continentName" -> Devuelve asd)');
+        //--------------------- hashVerify ---------------------
+        $this->runTest($test, 'FunctionsServerWeb',   'getBaseUrl', [],   'string',  '("200.120.163.36", "city"  -> Devuelve http://localhost/coreEngine/admin/public/)');
 
 
         /*******************************************************************/
@@ -689,6 +793,7 @@ class testeos extends ControllerBase {
         /******************************************/
         //Llamo a las otras clases
         $FNC_DataValidations      = new FunctionsDataValidations;
+        $FNC_CommonData           = new FunctionsCommonData;
         $FNC_Convertions          = new FunctionsConvertions;
         $FNC_DataOperations       = new FunctionsDataOperations;
         $FNC_DataDate             = new FunctionsDataDate;
@@ -700,15 +805,17 @@ class testeos extends ControllerBase {
         $FNC_SecurityPasswords    = new FunctionsSecurityPasswords;
         $FNC_ServerClient         = new FunctionsServerClient;
         $FNC_ServerServer         = new FunctionsServerServer;
+        $FNC_ServerWeb            = new FunctionsServerWeb;
 
         /******************************************/
         //Llamo a las otras clases
         $instance = ${'FNC_'.str_replace('Functions', '', $class)};
         $data = call_user_func_array([$instance, $method], $args);
-        $test->expect(method_exists($class, $method), "$method() es una funcion $desc");
-        $test->expect($data !== null && $data !== '', "$method() Ha devuelto datos ($data)");
+        $test->expect(method_exists($class, $method), "$method aaa $desc"); //Solo la clase y el dato
+        $test->expect($data !== null && $data !== '', "$data"); //Respuesta
         $typeCheck = "is_$expectedType";
-        $test->expect($typeCheck($data), "$method() Los datos obtenidos son del tipo " . gettype($data), $data);
+        $test->expect($typeCheck($data), gettype($data), $data); //Tiṕo dato
+
         return $data;
     }
 

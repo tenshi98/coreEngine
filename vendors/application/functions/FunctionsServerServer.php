@@ -13,17 +13,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene la fecha actual configurada para la zona horaria de Chile.
      * Establece el huso horario 'America/Santiago' y retorna la fecha en formato ISO 8601 extendido.
+     *
      * @return string Fecha actual en formato YYYY-MM-DD (ej: 2026-04-04).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->fechaActual(); //devuelve la fecha actual con formato 2024-07-01
+	 * ```
+	 *
      */
-    public function fechaActual(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->fechaActual(); //devuelve la fecha actual con formato 2024-07-01
-		*
-		*===================================================================================================================
-		*/
+    public function fechaActual($format = "Y-m-d"): string {
 
         /********************** Si todo esta ok **********************/
         // Establecer la zona horaria predeterminada a Chile para asegurar consistencia en los datos
@@ -31,7 +30,7 @@ class FunctionsServerServer {
 
         /********************** Retorno datos  **********************/
         // Devolvemos la fecha actual utilizando el separador de guion
-        return date("Y-m-d");
+        return date($format);
 
     }
 
@@ -39,17 +38,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene la fecha actual de Chile sin caracteres separadores.
      * Útil para la generación de nombres de archivos, folios o procesos que requieren un formato compacto.
+     *
      * @return string Fecha actual en formato YYYYMMDD (ej: 20260404).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->fechaActualAlternative(); //devuelve la fecha actual con formato 20240701
+	 * ```
+	 *
      */
     public function fechaActualAlternative(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->fechaActualAlternative(); //devuelve la fecha actual con formato 20240701
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Configura la zona horaria local de Chile
@@ -65,17 +63,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene la hora actual configurada para la zona horaria de Chile.
      * Retorna la representación del tiempo en formato de 24 horas con separadores de dos puntos.
+     *
      * @return string Hora actual en formato HH:ii:ss (ej: 18:28:58).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->horaActual(); //devuelve la hora actual con formato 18:28:58
+	 * ```
+	 *
      */
-    public function horaActual(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->horaActual(); //devuelve la hora actual con formato 18:28:58
-		*
-		*===================================================================================================================
-		*/
+    public function horaActual($format = "H:i:s"): string {
 
         /********************** Si todo esta ok **********************/
         // Asegura que la hora corresponda al huso horario de Chile
@@ -83,7 +80,7 @@ class FunctionsServerServer {
 
         /********************** Retorno datos  **********************/
         // Genera la cadena de tiempo con formato estándar de base de datos
-        return date("H:i:s");
+        return date($format);
 
     }
 
@@ -91,17 +88,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene la hora actual de Chile utilizando guiones como separadores.
      * Formato alternativo diseñado para compatibilidad con sistemas de archivos que restringen el uso de ':'.
+     *
      * @return string Hora actual en formato HH-ii-ss (ej: 18-28-58).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->horaActualAlternative(); //devuelve la hora actual con formato 18-28-58
+	 * ```
+	 *
      */
     public function horaActualAlternative(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->horaActualAlternative(); //devuelve la hora actual con formato 18-28-58
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Sincronización con la hora local de Chile
@@ -117,17 +113,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene el número del día actual del mes en curso.
      * Retorna el día sin ceros iniciales, basándose en la zona horaria de Chile.
+     *
      * @return string Día del mes (1 a 31).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->diaActual(); //devuelve 1 (para la fecha 2024-07-01)
+	 * ```
+	 *
      */
     public function diaActual(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->diaActual(); //devuelve 1 (para la fecha 2024-07-01)
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Configuración regional de horario
@@ -143,17 +138,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene el número de la semana actual del año.
      * Utiliza el estándar ISO-8601 donde las semanas comienzan en lunes.
+     *
      * @return string Número de la semana del año (01 a 52/53).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->semanaActual(); //devuelve 27 (para la fecha 2024-07-01)
+	 * ```
+	 *
      */
     public function semanaActual(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->semanaActual(); //devuelve 27 (para la fecha 2024-07-01)
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Sincronización horaria
@@ -169,17 +163,16 @@ class FunctionsServerServer {
 	/**
      * Obtiene el número del mes actual.
      * Retorna el valor numérico del mes sin ceros iniciales.
+     *
      * @return string Número del mes (1 a 12).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->mesActual(); //devuelve 7 (para la fecha 2024-07-01)
+	 * ```
+	 *
      */
     public function mesActual(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->mesActual(); //devuelve 7 (para la fecha 2024-07-01)
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Configuración de zona horaria local
@@ -194,17 +187,16 @@ class FunctionsServerServer {
     /************************************************************************************************************/
 	/**
      * Obtiene el año actual en formato de cuatro dígitos.
+     *
      * @return string Año actual (ej: 2026).
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->anoActual(); //devuelve 2024 (para la fecha 2024-07-01)
+	 * ```
+	 *
      */
     public function anoActual(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->anoActual(); //devuelve 2024 (para la fecha 2024-07-01)
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Asegura que la fecha base sea la de Chile
@@ -225,17 +217,16 @@ class FunctionsServerServer {
      *
      * @param string $tarea Dato de entrada (IP o URL) según el tipo de tarea.
      * @param int $Type Identificador del tipo de tarea (1: Iptables, 2: Wget, 3: Personalizado).
+     *
      * @return array Resultado de la ejecución con estado 'success' y mensaje descriptivo.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->tareasServer(https://www.ejemplo.com?param1=1&param2=2&param3=3);
+	 * ```
+	 *
      */
     public function tareasServer(string $tarea, int $Type): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerServer->tareasServer(https://www.ejemplo.com?param1=1&param2=2&param3=3);
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         try {
@@ -316,20 +307,18 @@ class FunctionsServerServer {
      * transformándolas en un objeto para facilitar el acceso orientado a objetos.
 	 *
      * @return object Objeto que contiene las claves de $_SERVER solicitadas o un mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerServer->indicesServer()->PHP_SELF;
+     * $ServerServer->indicesServer()->GATEWAY_INTERFACE;
+     * $ServerServer->indicesServer()->SERVER_NAME;
+     * $ServerServer->indicesServer()->SERVER_PROTOCOL;
+     * $ServerServer->indicesServer()->REQUEST_TIME;
+	 * ```
+	 *
      */
     public function indicesServer(): object {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$ServerServer->indicesServer()->PHP_SELF;
-		* 	$ServerServer->indicesServer()->GATEWAY_INTERFACE;
-		* 	$ServerServer->indicesServer()->SERVER_NAME;
-		* 	$ServerServer->indicesServer()->SERVER_PROTOCOL;
-		* 	$ServerServer->indicesServer()->REQUEST_TIME;
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         try {
@@ -374,18 +363,17 @@ class FunctionsServerServer {
      * primero los elementos internos (unlink/rmdir) para poder borrar el directorio raíz.
 	 *
      * @param string $src Ruta absoluta o relativa del directorio a eliminar.
+     *
      * @return array Estado de la operación ('success' true/false).
+	 *
+	 * @example
+	 * ```php
+	 * $structure = '/client_folder/client/tutor'; //carpeta
+	 * $ServerServer->removeDirectoryRecursive($structure);
+	 * ```
+	 *
      */
     public function removeDirectoryRecursive($src): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//elimino la carpeta en caso de existir
-		* 	$structure = '/client_folder/client/tutor'; //carpeta
-		* 	$ServerServer->removeDirectoryRecursive($structure);
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         // Validación de entrada obligatoria para evitar ejecuciones sobre rutas nulas
@@ -433,34 +421,31 @@ class FunctionsServerServer {
      * @param string $path Ruta completa del archivo destino.
      * @param array $variables Arreglo ['KEY' => 'VALUE'] con los datos de configuración.
      * @param bool $overwrite Si es true, reemplaza el archivo si ya existe.
+     *
      * @return array Estado del proceso y mensaje descriptivo.
+	 *
+	 * @example
+	 * ```php
+	 * 	$variables = [
+     * 	    'APP_NAME'    => 'Mi Aplicacion',
+     * 	    'APP_ENV'     => 'production',
+     * 	    'DB_HOST'     => 'localhost',
+     * 	    'DB_DATABASE' => 'mi_base',
+     * 	    'DB_USERNAME' => 'root',
+     * 	    'DB_PASSWORD' => '123456'
+     * 	];
+     *
+     * 	$result = writeEnvFile($envPath, $variables, true);
+     *
+     * 	if ($result['success']) {
+     * 	    echo $result['message'];
+     * 	} else {
+     * 	    echo "Error: " . $result['message'];
+     * 	}
+	 * ```
+	 *
      */
     public function writeEnvFile(string $path, array $variables, bool $overwrite = false): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//ejecucion
-		* 	$envPath = __DIR__ . '/.env';
-        *
-        * 	$variables = [
-        * 	    'APP_NAME'    => 'Mi Aplicacion',
-        * 	    'APP_ENV'     => 'production',
-        * 	    'DB_HOST'     => 'localhost',
-        * 	    'DB_DATABASE' => 'mi_base',
-        * 	    'DB_USERNAME' => 'root',
-        * 	    'DB_PASSWORD' => '123456'
-        * 	];
-        *
-        * 	$result = writeEnvFile($envPath, $variables, true);
-        *
-        * 	if ($result['success']) {
-        * 	    echo $result['message'];
-        * 	} else {
-        * 	    echo "Error: " . $result['message'];
-        * 	}
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         try {
@@ -531,44 +516,43 @@ class FunctionsServerServer {
      *
      * @param string $path Ruta absoluta del archivo .php a crear o modificar.
      * @param array $variables Arreglo asociativo donde cada clave será una constante de clase y su valor un array de configuración.
+     *
      * @return array Resultado de la operación con estado 'success' y mensaje detallado de constantes agregadas/existentes.
+	 *
+	 * @example
+	 * ```php
+	 * 	$phpPath = __DIR__ . '/config.php';
+     *
+     * 	$variables = [
+     * 		'MySQL_ADMIN' => [
+     * 			'HOSTNAME' => 'localhost',
+     * 			'USERNAME' => 'root',
+     * 			'PASSWORD' => '123456'
+     * 			'DATABASE' => 'mi_base',
+     * 			'CHARSET'  => 'utf8mb4',
+     * 			'PORT'     => 3306,
+     * 		],
+     * 		'MySQL_1' => [
+     * 			'HOSTNAME' => 'localhost',
+     * 			'USERNAME' => 'usuario',
+     * 			'PASSWORD' => '123456'
+     * 			'DATABASE' => 'mi_base',
+     * 			'CHARSET'  => 'utf8mb4',
+     * 			'PORT'     => 3306,
+     * 		],
+     * 	];
+     *
+     * 	$result = writeConfigClassFile($phpPath, $variables);
+     *
+     * 	if ($result['success']) {
+     * 	    echo $result['message'];
+     * 	} else {
+     * 	    echo "Error: " . $result['message'];
+     * 	}
+	 * ```
+	 *
      */
     public function writeConfigClassFile(string $path, array $variables): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//ejecucion
-		* 	$phpPath = __DIR__ . '/config.php';
-        *
-		* 	$variables = [
-		* 		'MySQL_ADMIN' => [
-		* 			'HOSTNAME' => 'localhost',
-		* 			'USERNAME' => 'root',
-		* 			'PASSWORD' => '123456'
-		* 			'DATABASE' => 'mi_base',
-		* 			'CHARSET'  => 'utf8mb4',
-		* 			'PORT'     => 3306,
-		* 		],
-		* 		'MySQL_1' => [
-		* 			'HOSTNAME' => 'localhost',
-		* 			'USERNAME' => 'usuario',
-		* 			'PASSWORD' => '123456'
-		* 			'DATABASE' => 'mi_base',
-		* 			'CHARSET'  => 'utf8mb4',
-		* 			'PORT'     => 3306,
-		* 		],
-		* 	];
-        *
-        * 	$result = writeConfigClassFile($phpPath, $variables);
-        *
-        * 	if ($result['success']) {
-        * 	    echo $result['message'];
-        * 	} else {
-        * 	    echo "Error: " . $result['message'];
-        * 	}
-		*
-		*===================================================================================================================
-		*/
 
         try {
 
@@ -755,19 +739,18 @@ class FunctionsServerServer {
      *
      * @param string $path Ruta inicial desde la cual se desea subir.
      * @param int $levels Número de niveles jerárquicos a ascender (por defecto 1).
+     *
      * @return string Ruta resultante normalizada sin separadores finales.
+	 *
+	 * @example
+	 * ```php
+	 * $envPath  = __DIR__;
+	 * $rootPath = getParentPath($envPath, 4);
+     * echo $rootPath;
+	 * ```
+	 *
      */
     public function getParentPath(string $path, int $levels = 1): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//ejecucion
-		* 	$envPath  = __DIR__;
-		* 	$rootPath = getParentPath($envPath, 4);
-		* 	echo $rootPath;
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         // Validar que la ruta de entrada no esté vacía
@@ -795,25 +778,24 @@ class FunctionsServerServer {
      *
      * @param string $directory Ruta absoluta del directorio a validar.
      * @param int $permission Máscara de permisos octal a aplicar en caso de fallo (por defecto 0755).
+     *
      * @return array Resultado de la validación y acciones tomadas con mensaje descriptivo.
+	 *
+	 * @example
+	 * ```php
+	 * 	$path = '/var/www/html/coreEngine/admin/storage';
+     *
+     * 	$result = ensureWritableDirectory($path, 0775);
+     *
+     * 	if ($result['success']) {
+     * 		echo $result['message'];
+     * 	} else {
+     * 		echo "Error: " . $result['message'];
+     * 	}
+	 * ```
+	 *
      */
     public function isWritableDirectory(string $directory, int $permission = 0755): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//ejecucion
-		* 	$path = '/var/www/html/coreEngine/admin/storage';
-		*
-		* 	$result = ensureWritableDirectory($path, 0775);
-		*
-		* 	if ($result['success']) {
-		* 		echo $result['message'];
-		* 	} else {
-		* 		echo "Error: " . $result['message'];
-		* 	}
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         if(!isset($directory) || $directory==''){ return ['success' => false,'message' => "No ha ingresado la ruta del directorio."];}
@@ -875,7 +857,14 @@ class FunctionsServerServer {
      * capturar errores de sistema durante la ejecución de mkdir.
      *
      * @param string $path Ruta del directorio a verificar o crear.
+     *
      * @return array Resultado indicando si el directorio existe o fue creado exitosamente.
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function ensureDirectoryExists(string $path): array {
 
@@ -922,11 +911,18 @@ class FunctionsServerServer {
      * intenta realizar la corrección mediante chmod, verificando el resultado final.
      *
      * @param string $path Ruta del archivo o directorio a validar.
+	 *
 	 * @return array Comparativa de permisos actuales vs esperados y resultado del cambio:
 	 *  - success : bool
      *  - message : string
      *  - current : string (permisos actuales)
      *  - expected: string (permisos esperados)
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function ensurePermissions755(string $path): array {
 
@@ -1001,7 +997,14 @@ class FunctionsServerServer {
 	 * - Puede fallar si el sistema bloquea creación de archivos
      *
      * @param string $path Ruta donde se desea verificar la capacidad de escritura.
+     *
      * @return bool True si la escritura y eliminación del archivo de prueba fueron exitosas.
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function canWrite(string $path): bool {
 

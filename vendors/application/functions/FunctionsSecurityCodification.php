@@ -18,18 +18,17 @@ class FunctionsSecurityCodification {
      *
      * @param string $simple_string Texto original que se desea codificar.
      * @param string $passkey (Opcional) Llave de cifrado personalizada.
+     *
      * @return string Texto codificado y sanitizado.
+	 *
+	 * @example
+	 * ```php
+	 * $Codification->simpleEncode("php recipe");
+	 * $Codification->simpleEncode("php recipe", "passkey"); //Devuelve 'lEKK57naUY4/VQ=='
+	 * ```
+	 *
      */
     public function simpleEncode($simple_string, $passkey): string {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * 	//se codifica texto
-        * 	$Codification->simpleEncode("php recipe");
-        * 	$Codification->simpleEncode("php recipe", "passkey"); //Devuelve 'lEKK57naUY4/VQ=='
-        *
-        *===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         if ($simple_string=='') { return 'Sin datos ingresados'; }
@@ -65,18 +64,17 @@ class FunctionsSecurityCodification {
      *
      * @param string $string Texto codificado que se desea recuperar.
      * @param string $passkey (Opcional) Llave de cifrado utilizada originalmente.
+     *
      * @return string Texto original decodificado.
+	 *
+	 * @example
+	 * ```php
+	 * $Codification->simpleDecode("qcnVhqjKxpuilw==");
+	 * $Codification->simpleDecode("lEKK57naUY4/VQ==", "passkey"); //Devuelve 'php recipe'
+	 * ```
+	 *
      */
     public function simpleDecode($string, $passkey): string {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * 	//se decodifica texto
-        * 	$Codification->simpleDecode("qcnVhqjKxpuilw==");
-        * 	$Codification->simpleDecode("lEKK57naUY4/VQ==", "passkey"); //Devuelve 'php recipe'
-        *
-        *===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         if ($string=='') { return 'Sin datos ingresados'; }
@@ -112,16 +110,14 @@ class FunctionsSecurityCodification {
      * validar que ciertos procesos o datos pertenezcan al entorno correcto.
      *
      * @return string Hash representativo del servidor.
+	 *
+	 * @example
+	 * ```php
+	 * $Codification->generateServerSpecificHash(); //Devuelve '421aa90e079fa326b6494f812ad13e79'
+	 * ```
+	 *
      */
     public function generateServerSpecificHash(): string {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * 	//se genera codigo
-        * 	$Codification->generateServerSpecificHash(); //Devuelve '421aa90e079fa326b6494f812ad13e79'
-        *
-        *===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Intenta obtener el nombre del servidor, de lo contrario usa el nombre del script
@@ -143,26 +139,26 @@ class FunctionsSecurityCodification {
      * @param string $action Acción a realizar: 'encrypt' para cifrar o 'decrypt' para descifrar.
      * @param mixed $string El contenido a procesar (texto o número).
      * @param string $passkey (Opcional) Llave personalizada de alta seguridad.
+     *
      * @return string|int El resultado procesado o False en caso de error.
+	 *
+	 * @example
+	 * ```php
+	 * 	// Encriptas id 5008
+     * 	$encriptar = $Codification->encryptDecrypt('encrypt',5008);
+     * 	echo $encriptar . '<br>';
+     *
+     * 	// Desencriptas el id para verlo de manera original
+     * 	$desencriptar = $Codification->encryptDecrypt('decrypt',$encriptar);
+     * 	echo $desencriptar;
+     *
+     * 	//salidas:
+     * 	bnR6UTRVTHAzYWd1dWEvWVdpMGo4QT09 (corresponde a 5008)
+     * 	5008
+	 * ```
+	 *
      */
     public function encryptDecrypt($action, $string, $passkey = '') : string | int | bool {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * 	// Encriptas id 5008
-        * 	$encriptar = $Codification->encryptDecrypt('encrypt',5008);
-        * 	echo $encriptar . '<br>';
-        *
-        * 	// Desencriptas el id para verlo de manera original
-        * 	$desencriptar = $Codification->encryptDecrypt('decrypt',$encriptar);
-        * 	echo $desencriptar;
-        *
-        * 	//salidas:
-        * 	bnR6UTRVTHAzYWd1dWEvWVdpMGo4QT09 (corresponde a 5008)
-        * 	5008
-        *
-        *===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         if ($action=='') { return 'Sin datos ingresados'; }

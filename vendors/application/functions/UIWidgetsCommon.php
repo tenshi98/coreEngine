@@ -2767,7 +2767,7 @@ class UIWidgetsCommon {
 
 					// BOTÓN DESCARGA GLOBAL
 					actions.innerHTML = `
-						<a href="${filePath}" class="btn btn-success" download>
+						<a href="${normalizarURL(filePath)}" class="btn btn-success" download>
 							<i class="bi bi-download"></i> Descargar
 						</a>
 					`;
@@ -2778,7 +2778,7 @@ class UIWidgetsCommon {
 					if (name.match(/\.(jpg|jpeg|png|gif|webp|svg|bmp)$/)) {
 						body.innerHTML = `
 							<div class="text-center">
-								<img src="${filePath}" class="img-fluid rounded shadow">
+								<img src="${normalizarURL(filePath)}" class="img-fluid rounded shadow">
 							</div>
 						`;
 					}
@@ -2788,7 +2788,7 @@ class UIWidgetsCommon {
 					* =============================== */
 					else if (name.endsWith(".pdf")) {
 						body.innerHTML = `
-							<iframe src="${filePath}" width="100%" height="600px" style="border:none;"></iframe>
+							<iframe src="${normalizarURL(filePath)}" width="100%" height="600px" style="border:none;"></iframe>
 						`;
 					}
 
@@ -2798,7 +2798,7 @@ class UIWidgetsCommon {
 					else if (name.match(/\.(mp4|webm|ogg|mov|mkv)$/)) {
 						body.innerHTML = `
 							<video controls class="w-100 rounded shadow">
-								<source src="${filePath}">
+								<source src="${normalizarURL(filePath)}">
 								Tu navegador no soporta video.
 							</video>
 						`;
@@ -2811,7 +2811,7 @@ class UIWidgetsCommon {
 						body.innerHTML = `
 							<div class="p-4">
 								<audio controls class="w-100">
-									<source src="${filePath}">
+									<source src="${normalizarURL(filePath)}">
 									Tu navegador no soporta audio.
 								</audio>
 							</div>
@@ -2822,7 +2822,7 @@ class UIWidgetsCommon {
 					* TEXTO / CÓDIGO
 					* =============================== */
 					else if (name.match(/\.(txt|json|js|css|html|md|xml|csv|log|env|ini)$/)) {
-						fetch(filePath)
+						fetch(normalizarURL(filePath))
 							.then(res => res.text())
 							.then(text => {
 								body.innerHTML = `
@@ -2848,7 +2848,7 @@ class UIWidgetsCommon {
 					* =============================== */
 					else if (name.endsWith(".html")) {
 						body.innerHTML = `
-							<iframe src="${filePath}" width="100%" height="600px" sandbox></iframe>
+							<iframe src="${normalizarURL(filePath)}" width="100%" height="600px" sandbox></iframe>
 						`;
 					}
 
@@ -2858,7 +2858,7 @@ class UIWidgetsCommon {
 					else if (name.match(/\.(doc|docx|xls|xlsx|ppt|pptx)$/)) {
 						body.innerHTML = `
 							<iframe 
-								src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(location.origin + filePath)}"
+								src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(location.origin + normalizarURL(filePath))}"
 								width="100%" 
 								height="600px"
 								style="border:none;">

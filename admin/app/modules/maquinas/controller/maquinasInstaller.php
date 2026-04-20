@@ -34,7 +34,7 @@ class maquinasInstaller extends ControllerBase {
 
         /******************************************/
         //si es la respuesta esperada
-        $countPermisos = is_numeric($nData1) ? 1 : 0;
+        $countPermisos = is_numeric($nData1)&&$nData1!=0 ? 1 : 0;
 
         /******************************************/
         //Verificar que existan los permisos

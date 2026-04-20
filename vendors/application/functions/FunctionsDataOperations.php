@@ -3,8 +3,7 @@
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
-class FunctionsDataOperations
-{
+class FunctionsDataOperations {
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
@@ -18,8 +17,7 @@ class FunctionsDataOperations
 
 	/************************************************************************************************************/
 	//Instancias
-	public function __construct()
-	{
+	public function __construct() {
 		$this->DataValidations = new FunctionsDataValidations();
 		$this->Convertions     = new FunctionsConvertions();
 	}
@@ -36,22 +34,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $hora Hora en formato 'HH:MM:SS'.
 	 * @param int $divisor Valor entero por el cual se dividirá el tiempo.
+	 *
 	 * @return int|string Resultado de la división en minutos o mensaje de error en validación.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->dividirHoras('04:00:00', 4); //Devuelve 60
+	 * ```
+	 *
 	 */
 	public function dividirHoras($hora, $divisor): string | int {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->dividirHoras('04:00:00', 4); //Devuelve 60
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateTime($hora);
-		$dataVal_2 = $this->_validateInteger($divisor);
+		$dataVal_1 = $this->_validateTime($hora, 'hora');
+		$dataVal_2 = $this->_validateInteger($divisor, 'divisor');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -71,22 +68,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $hora Hora en formato 'HH:MM:SS'.
 	 * @param int $multiplicador Factor entero para multiplicar el tiempo.
+	 *
 	 * @return string Resultado formateado como 'HH:MM:SS' o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->multiplicarHoras('04:00:00', 4); //Devuelve 16:00:00
+	 * ```
+	 *
 	 */
 	public function multiplicarHoras($hora, $multiplicador): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->multiplicarHoras('04:00:00', 4); //Devuelve 16:00:00
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateTime($hora);
-		$dataVal_2 = $this->_validateInteger($multiplicador);
+		$dataVal_1 = $this->_validateTime($hora, 'hora');
+		$dataVal_2 = $this->_validateInteger($multiplicador, 'multiplicador');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -122,22 +118,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $hora Hora inicial.
 	 * @param string $horaResta Hora a sustraer.
+	 *
 	 * @return string Diferencia en formato 'HH:MM:SS' o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->restarhoras('14:00:00', '07:00:00'); //Devuelve 07:00:00
+	 * ```
+	 *
 	 */
 	public function restarhoras($hora, $horaResta): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->restarhoras('14:00:00', '07:00:00'); //Devuelve 07:00:00
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateTime($hora);
-		$dataVal_2 = $this->_validateTime($horaResta);
+		$dataVal_1 = $this->_validateTime($hora, 'hora');
+		$dataVal_2 = $this->_validateTime($horaResta, 'horaResta');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -180,22 +175,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $hora Primera hora en formato 'HH:MM:SS'.
 	 * @param string $horaSuma Segunda hora a añadir.
+	 *
 	 * @return string Suma total en formato 'HH:MM:SS' o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->sumarhoras('14:00:00', '07:00:00'); //Devuelve 21:00:00
+	 * ```
+	 *
 	 */
 	public function sumarhoras($hora, $horaSuma): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->sumarhoras('14:00:00', '07:00:00'); //Devuelve 21:00:00
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateTime($hora);
-		$dataVal_2 = $this->_validateTime($horaSuma);
+		$dataVal_1 = $this->_validateTime($hora, 'hora');
+		$dataVal_2 = $this->_validateTime($horaSuma, 'horaSuma');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -233,22 +227,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $Fecha Fecha base en formato 'YYYY-MM-DD'.
 	 * @param int $nDias Cantidad de días a sumar.
+	 *
 	 * @return string Nueva fecha resultante o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->sumarDias('2019-01-02', 5); //Devuelve 2019-01-07
+	 * ```
+	 *
 	 */
 	public function sumarDias($Fecha, $nDias): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->sumarDias('2019-01-02', 5); //Devuelve 2019-01-07
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateDate($Fecha);
-		$dataVal_2 = $this->_validateInteger($nDias);
+		$dataVal_1 = $this->_validateDate($Fecha, 'Fecha');
+		$dataVal_2 = $this->_validateInteger($nDias, 'nDias');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -265,22 +258,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $Fecha Fecha base en formato 'YYYY-MM-DD'.
 	 * @param int $nDias Cantidad de días a restar.
+	 *
 	 * @return string Nueva fecha resultante o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->restarDias('2019-01-07', 5); //Devuelve 2019-01-02
+	 * ```
+	 *
 	 */
 	public function restarDias($Fecha, $nDias): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->restarDias('2019-01-07', 5); //Devuelve 2019-01-02
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateDate($Fecha);
-		$dataVal_2 = $this->_validateInteger($nDias);
+		$dataVal_1 = $this->_validateDate($Fecha, 'Fecha');
+		$dataVal_2 = $this->_validateInteger($nDias, 'nDias');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -295,28 +287,27 @@ class FunctionsDataOperations
 	/**
 	 * Calcula la edad en años y meses basándose en una fecha de nacimiento y la fecha actual.
 	 *
-	 * @param string $fechaNacimiento Fecha de origen en formato 'YYYY-MM-DD'.
+	 * @param string $fNacimiento Fecha de origen en formato 'YYYY-MM-DD'.
+	 *
 	 * @return string Representación textual de la edad (ej: "2 años, 5 meses") o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->obtenerEdad('2022-01-01'); //Devuelve 'dos años, 5 meses' (a la fecha '2024-06-01')
+	 * ```
+	 *
 	 */
-	public function obtenerEdad($fechaNacimiento): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->obtenerEdad('2022-01-01'); //Devuelve 'dos años, 5 meses' (a la fecha '2024-06-01')
-		*
-		*===================================================================================================================
-		*/
+	public function obtenerEdad($fNacimiento): string {
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal = $this->_validateDate($fechaNacimiento);
+		$dataVal = $this->_validateDate($fNacimiento, 'fNacimiento');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Instancia de objetos DateTime para realizar la comparación cronológica
-		$nacimiento = new DateTime($fechaNacimiento);
+		$nacimiento = new DateTime($fNacimiento);
 		$ahora      = new DateTime(date("Y-m-d"));
 		// Genera un objeto DateInterval con la diferencia entre fechas
 		$diferencia = $ahora->diff($nacimiento);
@@ -330,28 +321,27 @@ class FunctionsDataOperations
 	/**
 	 * Obtiene únicamente el número de años transcurridos desde una fecha hasta la actualidad.
 	 *
-	 * @param string $fechaNacimiento Fecha de origen en formato 'YYYY-MM-DD'.
+	 * @param string $fNacimiento Fecha de origen en formato 'YYYY-MM-DD'.
+	 *
 	 * @return string Número de años transcurridos como cadena o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->obtenerNumeroAnos('2022-01-01'); //Devuelve '2' (a la fecha '2024-06-01')
+	 * ```
+	 *
 	 */
-	public function obtenerNumeroAnos($fechaNacimiento): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->obtenerNumeroAnos('2022-01-01'); //Devuelve '2' (a la fecha '2024-06-01')
-		*
-		*===================================================================================================================
-		*/
+	public function obtenerNumeroAnos($fNacimiento): string {
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal = $this->_validateDate($fechaNacimiento);
+		$dataVal = $this->_validateDate($fNacimiento, 'fNacimiento');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Creación de instancias cronológicas
-		$nacimiento = new DateTime($fechaNacimiento);
+		$nacimiento = new DateTime($fNacimiento);
 		$ahora      = new DateTime(date("Y-m-d"));
 		$diferencia = $ahora->diff($nacimiento);
 
@@ -376,21 +366,19 @@ class FunctionsDataOperations
 	 * @return int|string
 	 *         - int: cantidad de días transcurridos (valor absoluto)
 	 *         - string: mensaje de error si la validación falla
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->diasTranscurridos('2019-01-02', '2019-02-02'); //Devuelve 31
+	 * ```
+	 *
 	 */
 	public function diasTranscurridos($fechaInicio, $fechaTermino): string | int {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->diasTranscurridos('2019-01-02', '2019-02-02'); //Devuelve 31
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateDate($fechaInicio);
-		$dataVal_2 = $this->_validateDate($fechaTermino);
+		$dataVal_1 = $this->_validateDate($fechaInicio, 'fechaInicio');
+		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -419,24 +407,23 @@ class FunctionsDataOperations
 	 * @param string $fechaTermino Fecha de término 'YYYY-MM-DD'.
 	 * @param string $horaInicio Hora de inicio 'HH:MM:SS'.
 	 * @param string $horaTermino Hora de término 'HH:MM:SS'.
+	 *
 	 * @return string Total de horas en formato 'HH:MM:SS' o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->horasTranscurridas('2019-01-02', '2019-02-02', '14:00:00', '07:00:00'); //Devuelve 737:00:00
+	 * ```
+	 *
 	 */
 	public function horasTranscurridas($fechaInicio, $fechaTermino, $horaInicio, $horaTermino): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->horasTranscurridas('2019-01-02', '2019-02-02', '14:00:00', '07:00:00'); //Devuelve 737:00:00
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateDate($fechaInicio);
-		$dataVal_2 = $this->_validateDate($fechaTermino);
-		$dataVal_3 = $this->_validateTime($horaInicio);
-		$dataVal_4 = $this->_validateTime($horaTermino);
+		$dataVal_1 = $this->_validateDate($fechaInicio, 'fechaInicio');
+		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
+		$dataVal_3 = $this->_validateTime($horaInicio, 'horaInicio');
+		$dataVal_4 = $this->_validateTime($horaTermino, 'horaTermino');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -477,22 +464,21 @@ class FunctionsDataOperations
 	 *
 	 * @param string $fechaInicio Fecha inicial.
 	 * @param string $fechaTermino Fecha final.
+	 *
 	 * @return string|int Total de meses transcurridos o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $DataOperations->diferenciaMeses('2019-01-02', '2019-02-02'); //Devuelve 1
+	 * ```
+	 *
 	 */
 	public function diferenciaMeses($fechaInicio, $fechaTermino): string | int {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* //se ejecuta operacion
-		* $DataOperations->diferenciaMeses('2019-01-02', '2019-02-02'); //Devuelve 1
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
-		$dataVal_1 = $this->_validateDate($fechaInicio);
-		$dataVal_2 = $this->_validateDate($fechaTermino);
+		$dataVal_1 = $this->_validateDate($fechaInicio, 'fechaInicio');
+		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
 		if ($dataVal_2 !== true) { return $dataVal_2; }
@@ -521,14 +507,14 @@ class FunctionsDataOperations
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
     /************************************************************************************************************/
-	private function _validateDate($Data){
+	private function _validateDate($Data, $Name){
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) {       return 'Sin datos ingresados'; }
+        if ($Data=='' || $Data==0) {return 'Sin datos ingresados en '.$Name;}
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarFecha($Data)) {
-			return 'El dato ingresado no es una fecha (' . $Data . ')';
+			return 'El dato ingresado en '.$Name.' no es una fecha (' . $Data . ')';
 		}
 
 		/**********************  Retorno datos  **********************/
@@ -536,14 +522,14 @@ class FunctionsDataOperations
 
 	}
     /************************************************************************************************************/
-	private function _validateTime($Data){
+	private function _validateTime($Data, $Name){
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) {       return 'Sin datos ingresados'; }
+        if ($Data=='' || $Data==0) {return 'Sin datos ingresados en '.$Name;}
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarHora($Data)) {
-			return 'El dato ingresado no es una hora (' . $Data . ')';
+			return 'El dato ingresado en '.$Name.' no es una hora (' . $Data . ')';
 		}
 
 		/**********************  Retorno datos  **********************/
@@ -551,14 +537,14 @@ class FunctionsDataOperations
 
 	}
     /************************************************************************************************************/
-	private function _validateInteger($Data){
+	private function _validateInteger($Data, $Name){
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) { return 'Sin datos ingresados'; }
+        if ($Data=='' || $Data==0) {return 'Sin datos ingresados en '.$Name;}
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
-            return 'El dato ingresado no es un numero ('.$Data.')';
+            return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
         }
 
 		/**********************  Retorno datos  **********************/

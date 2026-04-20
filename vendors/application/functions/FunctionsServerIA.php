@@ -18,17 +18,16 @@ class FunctionsServerIA {
      *
      * @param string $api_key Clave de API de OpenAI para la autenticación Bearer.
      * @param array $data Arreglo asociativo con la configuración de la consulta (payload).
+     *
      * @return array Resultado con éxito, la respuesta cruda de la IA o detalles del error.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerIA->senDataIA('asdasqw', $array);
+	 * ```
+	 *
      */
     public function senDataIA($api_key, $data): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerIA->senDataIA('asdasqw', $array);
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         // Verifica que la API Key no sea nula o una cadena vacía

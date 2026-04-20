@@ -19,26 +19,26 @@ class FunctionsCommonData {
 	 *
 	 * @param array $array Arreglo de entrada que se desea reordenar.
 	 * @param string $clave_orden Nombre de la columna que actuará como índice de agrupación.
+	 *
 	 * @return array Arreglo procesado y agrupado por niveles.
+	 *
+	 * @example
+	 * ```php
+	 * 	//se filtran los datos
+	 * 	$CommonData->agruparPorClave ($arreglo, 'categoria' );
+	 * 	//se recorre el nuevo arreglo
+	 * 	foreach ($arreglo as $categoria=>$arr1){
+	 * 		//imprimimos la categoría
+	 * 		echo $categoria;
+	 * 		//se recorren los datos dentro de la categoría
+	 * 		foreach ($arr1 as $arr2){
+	 * 			//imprimimos los datos dentro de la categoría
+	 * 		}
+	 * 	}
+	 * ```
+	 *
 	 */
 	public function agruparPorClave(array $array, string $clave_orden): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se filtran los datos
-		* 	$CommonData->agruparPorClave ($arreglo, 'categoria' );
-		* 	//se recorre el nuevo arreglo
-		* 	foreach ($arreglo as $categoria=>$arr1){
-		* 		//imprimimos la categoría
-		* 		echo $categoria;
-		* 		//se recorren los datos dentro de la categoría
-		* 		foreach ($arr1 as $arr2){
-		* 			//imprimimos los datos dentro de la categoría
-		* 		}
-		* 	}
-		*
-		*===================================================================================================================
-		*/
 
 		/**********************  Retorno datos  **********************/
 		// Utiliza array_reduce para iterar el arreglo y construir la estructura agrupada
@@ -62,17 +62,16 @@ class FunctionsCommonData {
 	 * utilizando las funciones nativas del sistema de archivos.
 	 *
 	 * @param string $nombreArchivo Nombre o ruta completa del archivo en el servidor.
+	 *
 	 * @return string Extensión del archivo resultante.
+	 *
+	 * @example
+	 * ```php
+	 * $CommonData->obtenerExtensionArchivo('nombre del archivo'); //devuelve la extension
+	 * ```
+	 *
 	 */
 	public function obtenerExtensionArchivo(string $nombreArchivo): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//obtener extension
-		* 	$CommonData->obtenerExtensionArchivo('nombre del archivo'); //devuelve la extension
-		*
-		*===================================================================================================================
-		*/
 
 		/**********************  Retorno datos  **********************/
 		// Retorna la extensión analizando la cadena de ruta mediante pathinfo
@@ -89,24 +88,24 @@ class FunctionsCommonData {
 	 * final sea un array.
 	 *
 	 * @param object $obj El objeto inicial que se desea convertir.
+	 *
 	 * @return array Arreglo asociativo con los datos del objeto original.
+	 *
+	 * @example
+	 * ```php
+	 * 	//se recorre el nuevo arreglo
+	 * 	$persona = (object)[
+	 *		'nombre' => 'Ana',
+	 *		'direccion' => (object)[
+	 *			'calle' => 'Av. Central',
+	 *			'ciudad' => 'Madrid'
+	 *		]
+	 *	];
+	 *   $CommonData->objectToArrayRecursive ($persona);
+	 * ```
+	 *
 	 */
 	public function objectToArrayRecursive(object $obj): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se recorre el nuevo arreglo
-		* 	$persona = (object)[
-		*		'nombre' => 'Ana',
-		*		'direccion' => (object)[
-		*			'calle' => 'Av. Central',
-		*			'ciudad' => 'Madrid'
-		*		]
-		*	];
-		*   $CommonData->objectToArrayRecursive ($persona);
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Si todo esta ok **********************/
 		// Realiza el casting inicial del objeto a un arreglo asociativo
@@ -129,17 +128,16 @@ class FunctionsCommonData {
 	 * alrededor de las comas y omitiendo fragmentos que resulten vacíos.
 	 *
 	 * @param string $Data Cadena de texto con elementos separados por comas.
+	 *
 	 * @return array Arreglo que contiene los elementos individuales extraídos.
+	 *
+	 * @example
+	 * ```php
+	 * $CommonData->parseDataCommas('uno,dos,tres');
+	 * ```
+	 *
 	 */
 	public function parseDataCommas($Data): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se recorre el nuevo arreglo
-		* 	$CommonData->parseDataCommas('uno,dos,tres');
-		*
-		*===================================================================================================================
-		*/
 
 		/**********************  Retorno datos  **********************/
 		// Divide la cadena basándose en comas, permitiendo espacios opcionales (\s*)
@@ -155,17 +153,16 @@ class FunctionsCommonData {
 	 * resultados vacíos.
 	 *
 	 * @param string $Data Cadena de texto que contiene los elementos separados por guiones.
+	 *
 	 * @return array Arreglo con los elementos individuales extraídos.
+	 *
+	 * @example
+	 * ```php
+	 * $CommonData->parseDataSeparator('uno-dos-tres');
+	 * ```
+	 *
 	 */
 	public function parseDataSeparator($Data): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se recorre el nuevo arreglo
-		* 	$CommonData->parseDataSeparator('uno-dos-tres');
-		*
-		*===================================================================================================================
-		*/
 
 		/**********************  Retorno datos  **********************/
 		// Divide la cadena basándose en guiones, permitiendo espacios opcionales (\s*)
@@ -181,17 +178,16 @@ class FunctionsCommonData {
 	 * de dichos símbolos.
 	 *
 	 * @param string $Data Cadena con datos y operadores de comparación.
+	 *
 	 * @return array Arreglo con los fragmentos de texto resultantes de la división.
+	 *
+	 * @example
+	 * ```php
+	 * $CommonData->parseDataSymbol('uno=dos!=tres');
+	 * ```
+	 *
 	 */
 	public function parseDataSymbol($Data): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se recorre el nuevo arreglo
-		* 	$CommonData->parseDataSymbol('uno=dos!=tres');
-		*
-		*===================================================================================================================
-		*/
 
 		/********************** Si todo esta ok **********************/
 		// Ejecuta la división mediante un grupo de no captura para los operadores lógicos
@@ -212,16 +208,60 @@ class FunctionsCommonData {
 	 *
 	 * @param string $path Ruta del archivo o directorio a validar.
 	 * @param string $root Ruta base permitida que actúa como límite de seguridad.
+	 *
 	 * @return string La ruta absoluta validada o la ruta raíz en caso de acceso denegado.
+	 *
+	 * @example
+	 * ```php
+	 * $root = '/var/www/uploads';
+	 * $path = '/var/www/uploads/imagen.jpg';
+	 *
+	 * echo $this->safePath($path, $root);
+	 * // Resultado: /var/www/uploads/imagen.jpg
+	 *
+	 *
+	 * $root = '/var/www/uploads';
+	 * $path = '/var/www/uploads/../uploads/documento.pdf';
+	 *
+	 * echo $this->safePath($path, $root);
+	 * // Resultado: /var/www/uploads/documento.pdf
+	 *
+	 *
+	 * $root = '/var/www/uploads';
+	 * $path = '/var/www/uploads/../../etc/passwd';
+	 *
+	 * echo $this->safePath($path, $root);
+	 * // Resultado: /var/www/uploads (bloqueado)
+	 *
+	 *
+	 * $root = '/var/www/uploads';
+	 * $path = '/var/www/uploads/no_existe.txt';
+	 *
+	 * echo $this->safePath($path, $root);
+	 * // Resultado: /var/www/uploads (fallback por seguridad)
+	 *
+	 *
+	 * $root = '/var/www/uploads';
+	 * $path = '/home/user/secret.txt';
+	 *
+	 * echo $this->safePath($path, $root);
+	 * // Resultado: /var/www/uploads (acceso denegado)
+	 * ```
+	 *
 	 */
 	public function safePath($path, $root) {
 
-		/********************** Si todo esta ok **********************/
+		/********************** Validaciones   **********************/
+        // Se verifica si esta vacio
+        if(!isset($path) || $path == ''){  return 'Sin datos ingresados'; }
+        if(!isset($root) || $root == ''){  return 'Sin datos ingresados'; }
+
+        /********************** Si todo esta ok **********************/
 		// Obtiene la ruta absoluta real eliminando enlaces simbólicos y relativos
 		$real = realpath($path);
 
 		// Valida si la ruta existe y si se mantiene dentro del directorio raíz
-		if ($real === false || strpos($real, $root) !== 0) {
+		if ($real === false || strpos($real, rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR) !== 0) {
 			// Retorno de seguridad si se detecta una ruta fuera de los límites
 			return $root;
 		}

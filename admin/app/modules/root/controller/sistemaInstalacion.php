@@ -398,7 +398,7 @@ class sistemaInstalacion extends ControllerBase {
             "tercerosEntidadesInstaller",
             "cotizacionInstaller",
             "maquinasInstaller",
-            "fileExplorerInstaller"
+            "archivosInstaller"
         );
 
         //devuelvo

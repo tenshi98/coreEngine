@@ -19,7 +19,6 @@ class FunctionsDataText {
 		$this->DataValidations = new FunctionsDataValidations();
 	}
 
-
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
 	/*                                                  Metodos                                                        */
@@ -33,17 +32,16 @@ class FunctionsDataText {
      *
      * @param string $texto El contenido de texto original.
      * @param int $cuantos Cantidad máxima de caracteres a conservar antes del recorte.
+     *
      * @return string Texto procesado con o sin puntos suspensivos según la longitud.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->cortar('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 'Lorem ipsu...'
+	 * ```
+	 *
      */
     public function cortar($texto, $cuantos): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->cortar('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 'Lorem ipsu...'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -71,17 +69,16 @@ class FunctionsDataText {
      * * Requiere que el RUT sea válido bajo los estándares chilenos (XXXXXXXX-X).
      *
      * @param string $Rut Cadena que representa el RUT (puede incluir puntos y guion).
+     *
      * @return string Parte numérica del RUT sin puntos ni el carácter posterior al guion.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->eliminarVerificadorRut('10294658-9'); //Devuelve 10294658
+	 * ```
+	 *
      */
     public function eliminarVerificadorRut($Rut): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->eliminarVerificadorRut('10294658-9'); //Devuelve 10294658
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -117,16 +114,14 @@ class FunctionsDataText {
 	 * @param bool $keepPunctuation Permite mantener puntuación básica (. , - _)
 	 *
 	 * @return string
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->limpiarString('Lorem ipsum\n dolor sit amet\n, consectetur\r'); //Devuelve 'Lorem ipsum dolor sit amet consectetur'
+	 * ```
+	 *
 	 */
     public function limpiarString($texto, $keepPunctuation = false): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->limpiarString('Lorem ipsum\n dolor sit amet\n, consectetur\r'); //Devuelve 'Lorem ipsum dolor sit amet consectetur'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
 		if (trim($texto) === '') {
@@ -171,17 +166,16 @@ class FunctionsDataText {
      * * Comúnmente utilizado para generar nombres de archivos o slugs a partir de títulos.
      *
      * @param string $texto Oración o palabra con espacios.
+     *
      * @return string Texto con guiones bajos en lugar de espacios.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->reemplazarEspaciosxGuion('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem_ipsum_dolor_sit_amet,_consectetur'
+	 * ```
+	 *
      */
     public function reemplazarEspaciosxGuion($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->reemplazarEspaciosxGuion('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem_ipsum_dolor_sit_amet,_consectetur'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -199,17 +193,16 @@ class FunctionsDataText {
      * * Transforma símbolos como <, >, &, ", ' en códigos seguros para el navegador.
      *
      * @param string $texto Texto con caracteres especiales o código HTML.
+     *
      * @return string Texto sanitizado con entidades HTML en formato UTF-8.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->sanitizarTexto('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem ipsum dolor sit amet, consectetur'
+	 * ```
+	 *
      */
     public function sanitizarTexto($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->sanitizarTexto('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem ipsum dolor sit amet, consectetur'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -227,17 +220,16 @@ class FunctionsDataText {
      * * Proceso inverso a sanitizarTexto, útil para editar contenido previamente guardado.
      *
      * @param string $texto Texto con entidades HTML (ej: &quot;).
+     *
      * @return string Texto con los caracteres originales recuperados.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->desanitizarTexto('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem ipsum dolor sit amet, consectetur'
+	 * ```
+	 *
      */
     public function desanitizarTexto($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->desanitizarTexto('Lorem ipsum dolor sit amet, consectetur'); //Devuelve 'Lorem ipsum dolor sit amet, consectetur'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -255,17 +247,16 @@ class FunctionsDataText {
      * y codificando comillas para evitar conflictos en el almacenamiento o visualización.
      *
      * @param string $texto Texto original a estandarizar.
+     *
      * @return string Texto sin etiquetas, sin saltos de línea y con comillas codificadas (%27 y %22).
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->limpiezaTexto("bla"bla'bla"); //Devuelve 'bla%27bla%27bla'
+	 * ```
+	 *
      */
     public function limpiezaTexto($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se verifica
-		* 	$DataText->limpiezaTexto("bla"bla'bla"); //Devuelve 'bla%27bla%27bla'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -293,17 +284,16 @@ class FunctionsDataText {
      * por sus equivalentes más cercanos en formato ASCII/Latín estándar.
      *
      * @param string $texto Oración con caracteres especiales o acentos.
+     *
      * @return string Oración convertida a minúsculas y sin caracteres especiales (ej: À -> a).
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->limpiarOracion('ÀÁÂÃÄÅÆ'); //devuelve aaaaaaae
+	 * ```
+	 *
      */
     public function limpiarOracion($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se verifica
-		* 	$DataText->limpiarOracion('ÀÁÂÃÄÅÆ'); //devuelve aaaaaaa
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -338,17 +328,16 @@ class FunctionsDataText {
      * Identifica y cuenta la cantidad de palabras prohibidas o censuradas presentes en un texto.
      *
      * @param string $texto Texto a analizar en busca de lenguaje ofensivo.
+     *
      * @return string|int Cantidad de palabras encontradas o mensaje de error si el input es nulo.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->contarPalabrasCensuradas('Lorem ipsum dolor sit amet, fuck d'); //Devuelve 1
+	 * ```
+	 *
      */
     public function contarPalabrasCensuradas($texto): string | int {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->contarPalabrasCensuradas('Lorem ipsum dolor sit amet, fuck d'); //Devuelve 1
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -356,7 +345,7 @@ class FunctionsDataText {
 
         /********************** Análisis de Contenido **********************/
         // Normaliza el texto para asegurar que la comparación no ignore acentos
-        $texto      = $this->limpiarOracion($texto);
+        $texto = $this->limpiarOracion($texto);
 
         // Recupera la lista negra de palabras mediante método del sistema
         $censuradas = $this->getListaPalabrasCensuradas();
@@ -375,17 +364,16 @@ class FunctionsDataText {
      * Busca palabras prohibidas en un texto y las oculta reemplazándolas por asteriscos.
      *
      * @param string $texto Texto original a filtrar.
+     *
      * @return string Texto resultante con las palabras censuradas sustituidas por '****'.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->filtrarPalabrasCensuradas('Lorem ipsum dolor sit amet, fuck d'); //Devuelve 'lorem ipsum dolor sit amet, **** d'
+	 * ```
+	 *
      */
     public function filtrarPalabrasCensuradas($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->filtrarPalabrasCensuradas('Lorem ipsum dolor sit amet, fuck d'); //Devuelve 'lorem ipsum dolor sit amet, **** d'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -393,7 +381,7 @@ class FunctionsDataText {
 
         /********************** Proceso de Filtrado **********************/
         // Normalización del texto para coincidencia exacta
-        $texto       = $this->limpiarOracion($texto);
+        $texto = $this->limpiarOracion($texto);
 
         // Obtención de la lista de términos prohibidos
         $censuradas   = $this->getListaPalabrasCensuradas();
@@ -410,17 +398,16 @@ class FunctionsDataText {
      * de ordenamiento (ej: "01 - ", "2.- ").
      *
      * @param string $texto Cadena que contiene una numeración inicial seguida de un título.
+     *
      * @return string Título limpio sin la numeración de orden.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->tituloMenu( '01 - titulo' ); //Devuelve 'titulo'
+	 * ```
+	 *
      */
     public function tituloMenu($texto): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataText->tituloMenu( '01 - titulo' ); //Devuelve 'titulo'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -450,17 +437,16 @@ class FunctionsDataText {
      *
      * @param string $cadena Texto completo donde se realizará la búsqueda.
      * @param string $palabra Término de referencia a ubicar.
+     *
      * @return array|string|false Array con 'posicion' y texto 'extraido', o false si no se encuentra.
+	 *
+	 * @example
+	 * ```php
+	 * $DataText->buscarPalabraYExtraer('01 - titulo', '01 - '); //Devuelve 'titulo'
+	 * ```
+	 *
      */
     public function buscarPalabraYExtraer($cadena, $palabra): array | string | false {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se verifica
-		* 	$DataText->buscarPalabraYExtraer('01 - titulo', '01 - '); //Devuelve 'titulo'
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
@@ -488,6 +474,62 @@ class FunctionsDataText {
             ];
         }
     }
+
+	/************************************************************************************************************/
+	/**
+	 * Divide un texto en dos partes utilizando un divisor específico.
+	 *
+	 * Esta función separa un string en un máximo de dos segmentos usando el primer
+	 * match encontrado del divisor. Si el divisor no existe en el texto, todo el
+	 * contenido se asigna a la parte izquierda y la derecha queda vacía.
+	 *
+	 * Se aplica `trim()` a ambos resultados para eliminar espacios en blanco
+	 * al inicio y al final.
+	 *
+	 * @param string $texto   Texto completo a dividir.
+	 * @param string $divisor Cadena utilizada como separador.
+	 *
+	 * @return array{
+	 *     izquierda: string,
+	 *     derecha: string
+	 * }
+	 * Retorna un arreglo asociativo con:
+	 *  - 'izquierda': Parte anterior al divisor.
+	 *  - 'derecha'  : Parte posterior al divisor (o vacío si no existe).
+	 *
+	 * @example
+	 * ```php
+	 * $resultado = dividirTexto('clave:valor', ':');
+	 *
+	 * // Resultado:
+	 * // [
+	 * //   'izquierda' => 'clave',
+	 * //   'derecha'   => 'valor'
+	 * // ]
+	 * ```
+	 *
+	 * @example
+	 * ```php
+	 * $resultado = dividirTexto('soloTexto', ':');
+	 *
+	 * // Resultado:
+	 * // [
+	 * //   'izquierda' => 'soloTexto',
+	 * //   'derecha'   => ''
+	 * // ]
+	 * ```
+	 *
+	 * @note Solo se realiza una división (límite = 2).
+	 * @note Si el divisor aparece múltiples veces, solo se considera la primera ocurrencia.
+	 */
+	public function dividirTexto(string $texto, string $divisor): array {
+		$partes = explode($divisor, $texto, 2); // solo divide en 2 partes
+
+		return [
+			'izquierda' => trim($partes[0] ?? ''),
+			'derecha'   => trim($partes[1] ?? '')
+		];
+	}
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */

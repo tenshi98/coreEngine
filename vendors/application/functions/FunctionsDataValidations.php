@@ -16,17 +16,16 @@ class FunctionsDataValidations {
      * regulares y el cálculo del dígito verificador utilizando el algoritmo del Módulo 11.
      *
      * @param string $Data El RUT a validar (ej: '12.345.678-9' o '12345678-9').
+     *
      * @return bool True si el RUT es válido, false en caso contrario.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarRut('10.569.874-5');
+	 * ```
+	 *
      */
     public function validarRut($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarRut('10.569.874-5');
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones Iniciales **********************/
         if($Data == '' || $Data == '0'){ return false; }
@@ -88,18 +87,17 @@ class FunctionsDataValidations {
      * gran parte de los estándares RFC.
      *
      * @param string $Data Correo electrónico a validar.
+     *
      * @return bool True si el formato es correcto.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarEmail('asd@asd.cl'); //Devuelve true
+	 * $DataValidations->validarEmail('asd@asd');    //Devuelve false
+	 * ```
+	 *
      */
     public function validarEmail($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarEmail('asd@asd.cl'); //Devuelve true
-		* 	$DataValidations->validarEmail('asd@asd');    //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         if($Data == ''){ return false; }
@@ -114,18 +112,17 @@ class FunctionsDataValidations {
      * * Acepta números enteros, decimales (usando punto o coma) y valores negativos.
      *
      * @param mixed $Data Dato a validar.
+     *
      * @return bool True si es un número válido.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarNumero(25);   //Devuelve true
+	 * $DataValidations->validarNumero('25'); //Devuelve false
+	 * ```
+	 *
      */
     public function validarNumero($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarNumero(25);   //Devuelve true
-		* 	$DataValidations->validarNumero('25'); //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         if($Data === ''){ return false; }
@@ -145,18 +142,17 @@ class FunctionsDataValidations {
      * validando que no se utilicen vocales en el formato nuevo según la norma.
      *
      * @param string $Data Patente a validar.
+     *
      * @return bool True si cumple con el patrón RegEx.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->ValidarPatente('AU1825');  //Devuelve true
+	 * $DataValidations->ValidarPatente('512369');  //Devuelve false
+	 * ```
+	 *
      */
     public function ValidarPatente($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->ValidarPatente('AU1825');  //Devuelve true
-		* 	$DataValidations->ValidarPatente('512369');  //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         if($Data == ''){ return false; }
@@ -178,18 +174,17 @@ class FunctionsDataValidations {
      * Valida si una cadena de texto es una URL con formato válido.
      *
      * @param string $Data URL a validar.
+     *
      * @return bool True si es una URL válida (incluyendo protocolo).
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarURL(https://www.google.cl');  //Devuelve true
+	 * $DataValidations->validarURL(https://www.  SSS  ');    //Devuelve false
+	 * ```
+	 *
      */
     public function validarURL($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarURL(https://www.google.cl');  //Devuelve true
-		* 	$DataValidations->validarURL(https://www.  SSS  ');    //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         if($Data == ''){ return false; }
@@ -205,21 +200,29 @@ class FunctionsDataValidations {
      * sumatoria de tiempos, validando que los minutos y segundos no excedan de 59.
      *
      * @param string $Data Hora a validar (ej: '16:24:00' o '120:30').
+     *
      * @return bool True si el formato y los valores son correctos.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarHora('16:24:00'); //Devuelve true
+	 * $DataValidations->validarHora(16);         //Devuelve false
+	 * ```
+	 *
      */
     public function validarHora($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarHora('16:24:00'); //Devuelve true
-		* 	$DataValidations->validarHora(16);         //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
-        if($Data == ''){ return false; }
+        // Limpia espacios en blanco al inicio y final
+        // (muy común cuando los datos vienen de formularios o BD)
+        $Data = trim($Data);
+
+        // Validaciones básicas de entrada
+        // - Evita string vacío
+        // - Evita fechas "nulas" típicas de BD
+        if ($Data === '' || $Data === '00:00:00') {
+            return false;
+        }
 
         /********************** Definición de Patrón **********************/
         /**
@@ -257,18 +260,16 @@ class FunctionsDataValidations {
      * @param string $format Formato esperado (por defecto 'Y-m-d')
      *
      * @return bool True si la fecha es válida y coincide exactamente con el formato
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarFecha('1900-01-01');          //Devuelve true
+	 * $DataValidations->validarFecha('1900-01-01', 'Y-m-d'); //Devuelve true
+     * $DataValidations->validarFecha('a');                   //Devuelve false
+	 * ```
+	 *
      */
     public function validarFecha($Data, $format = 'Y-m-d'): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarFecha('1900-01-01');          //Devuelve true
-		* 	$DataValidations->validarFecha('1900-01-01', 'Y-m-d'); //Devuelve true
-		* 	$DataValidations->validarFecha('a');                   //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         // Limpia espacios en blanco al inicio y final
@@ -320,18 +321,17 @@ class FunctionsDataValidations {
      * como strings (común en formularios) siempre que no contengan decimales.
      *
      * @param mixed $Data Dato a validar.
+     *
      * @return bool True si es un número entero.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarEntero(16);   //Devuelve true
+	 * $DataValidations->validarEntero('16'); //Devuelve false
+	 * ```
+	 *
      */
     public function validarEntero($Data): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarEntero(16);   //Devuelve true
-		* 	$DataValidations->validarEntero('16'); //Devuelve false
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Validaciones   **********************/
         if($Data === ''){ return false; }
@@ -350,16 +350,14 @@ class FunctionsDataValidations {
      * comunes de sistemas operativos y navegadores móviles.
      *
      * @return bool True si se detecta un dispositivo móvil o tablet.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarDispositivoMovil();
+	 * ```
+	 *
      */
     public function validarDispositivoMovil(): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se valida dato
-		* 	$DataValidations->validarDispositivoMovil();
-		*
-		*===================================================================================================================
-		*/
 
         // Obtiene el User Agent del servidor
         $userAgent = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
@@ -389,20 +387,24 @@ class FunctionsDataValidations {
      *
      * @param string $oracion Texto a validar.
      * @param int $largo Cantidad mínima de caracteres requerida.
+     *
      * @return bool True si cumple con el largo mínimo.
+	 *
+	 * @example
+	 * ```php
+	 * 	$DataValidations->validarLargoMinimo('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 'El dato ingresado debe tener no mas de 10 caracteres'
+	 * 	$DataValidations->validarLargoMinimo('Lorem', 10); //Devuelve 1
+	 * ```
+	 *
      */
-    public function validarLargoMinimo($oracion, int $largo): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validarLargoMinimo('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 'El dato ingresado debe tener no mas de 10 caracteres'
-		* 	$DataValidations->validarLargoMinimo('Lorem', 10); //Devuelve 1
-		*
-		*===================================================================================================================
-		*/
+    public function validarLargoMinimo($oracion, $largo): bool {
 
         /********************** Validaciones   **********************/
+        // Validaciones básicas de entrada
+        // - Evita string vacío
+        if ($oracion === '') {
+            return false;
+        }
         // Asegura que el parámetro de comparación sea un número válido
         if (!$this->validarNumero($largo) || !$this->validarEntero($largo)){  return false; }
 
@@ -418,20 +420,24 @@ class FunctionsDataValidations {
      *
      * @param string $oracion Texto a validar.
      * @param int $largo Cantidad máxima de caracteres permitida.
+     *
      * @return bool True si el texto es igual o menor al largo indicado.
+	 *
+	 * @example
+	 * ```php
+	 * 	$DataValidations->validarLargoMaximo('Lorem', 10); //Devuelve 'El dato ingresado debe tener al menos 10 caracteres'
+	 * 	$DataValidations->validarLargoMaximo('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 1
+	 * ```
+	 *
      */
-    public function validarLargoMaximo($oracion, int $largo): bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validarLargoMaximo('Lorem', 10); //Devuelve 'El dato ingresado debe tener al menos 10 caracteres'
-		* 	$DataValidations->validarLargoMaximo('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve 1
-		*
-		*===================================================================================================================
-		*/
+    public function validarLargoMaximo($oracion, $largo): bool {
 
         /********************** Validaciones   **********************/
+        // Validaciones básicas de entrada
+        // - Evita string vacío
+        if ($oracion === '') {
+            return false;
+        }
         if (!$this->validarNumero($largo) || !$this->validarEntero($largo)){  return false; }
 
         /********************** Si todo esta ok **********************/
@@ -450,27 +456,27 @@ class FunctionsDataValidations {
      * @param mixed $dataToCheck Datos a validar (array de configuración o valor simple).
      * @param string $placeholder Texto de referencia para identificar el origen del dato en el mensaje.
      * @param int $type Identificador del motor de validación a utilizar (del 1 al 9).
+     *
      * @return array Estructura con la cuenta de errores ['nErrors'] y las alertas HTML ['alerts'].
+	 *
+	 * @example
+	 * ```php
+	 * 	//Definir opciones válidas
+     * 	$validOptions = [
+     * 		'type'  => range(1, 7),
+     * 	];
+     *
+     * 	//Opciones a validar
+     * 	$optionsToCheck = [
+     * 		['value' => $type,  'name' => 'type',  'label' => '$type'],
+     * 	];
+     *
+     * 	//se ejecuta operacion
+     * 	$DataValidations->checkData($validOptions, $optionsToCheck, '', 1); //Devuelve un array
+	 * ```
+	 *
      */
     public function checkData($validOptions, $dataToCheck, $placeholder, $type): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//Definir opciones válidas
-		* 	$validOptions = [
-		* 		'type'  => range(1, 7),
-		* 	];
-		*
-		* 	//Opciones a validar
-		* 	$optionsToCheck = [
-		* 		['value' => $type,  'name' => 'type',  'label' => '$type'],
-		* 	];
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->checkData($validOptions, $optionsToCheck, '', 1); //Devuelve un array
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Definiciones   **********************/
         // Inicialización de contadores y componentes de interfaz
@@ -584,17 +590,16 @@ class FunctionsDataValidations {
      * @param string|int $port Puerto de red del servicio MySQL.
      * @param string $charset Juego de caracteres de la conexión.
      * @param string $type Nivel de permisos a validar: 'admin' o 'basic'.
+     *
      * @return array Resultado de la validación con claves 'status', 'success' y 'message'.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validateCredentials($host, $username, $password);
+	 * ```
+	 *
      */
     public function validateCredentials($host, $username, $password, $port, $charset, $type): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validateCredentials($host, $username, $password);
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Definiciones   **********************/
         // Empaquetado de parámetros para verificación de existencia
@@ -781,17 +786,15 @@ class FunctionsDataValidations {
      * @param string|int $port Puerto de conexión.
      * @param string $charset Juego de caracteres.
      * @param string $dbName Nombre de la base de datos a verificar.
+     *
      * @return array Resultado con claves 'status', 'success' y 'message'.
+	 *
+	 * @example
+	 * ```php
+	 * ```
+	 *
      */
     public function validateDatabase($host, $username, $password, $port, $charset, $dbName): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validateCredentials($host, $username, $password);
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         // Validación de campos obligatorios
@@ -882,17 +885,16 @@ class FunctionsDataValidations {
      * Verifica la existencia y accesibilidad de un archivo en el sistema de archivos local.
      *
      * @param string $PathFile Ruta absoluta o relativa al archivo.
+     *
      * @return array Resultado con claves 'success', 'message' y 'path'.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validatePathFile('Path');
+	 * ```
+	 *
      */
     public function validatePathFile($PathFile): array {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se ejecuta operacion
-		* 	$DataValidations->validatePathFile('Path');
-		*
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         // Comprobación de parámetro obligatorio

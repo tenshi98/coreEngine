@@ -18,16 +18,14 @@ class FunctionsServerClient {
      * la IP sea pública, excluyendo rangos privados o reservados.
      *
      * @return string|bool Retorna la IP del cliente en formato string o false si no se detecta una IP pública válida.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerClient->getClientIp();
+	 * ```
+	 *
      */
     public function getClientIp(): string | bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerClient->getClientIp();
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Listado de cabeceras estándar y personalizadas donde se suele alojar la IP
@@ -67,17 +65,16 @@ class FunctionsServerClient {
      * exhaustivo por claves comunes de clusters y proxies, validando formato IPv4.
      *
      * @param string|null $headerContainingIPAddress Nombre de la cabecera específica a consultar.
+     *
      * @return string|bool La IP detectada o false en caso de error.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerClient->getClientIpAlternative();
+	 * ```
+	 *
      */
     public function getClientIpAlternative($headerContainingIPAddress = null): string | bool {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerClient->getClientIpAlternative();
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Si se especifica una cabecera manualmente, se prioriza su lectura directa
@@ -123,16 +120,14 @@ class FunctionsServerClient {
      * extensa de navegadores conocidos, priorizando los más específicos.
      *
      * @return string Nombre del navegador detectado o un mensaje de error si no se identifica.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerClient->getBrowser();
+	 * ```
+	 *
      */
     public function getBrowser(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerClient->getBrowser();
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         // Validación de existencia de la cadena User Agent en la petición
@@ -201,16 +196,14 @@ class FunctionsServerClient {
      * distribuciones de Linux, sistemas móviles y consolas de videojuegos.
      *
      * @return string Nombre del sistema operativo o 'Plataforma Desconocida'.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerClient->getOperatingSystem();
+	 * ```
+	 *
      */
     public function getOperatingSystem(): string {
-		/*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se obtiene dato
-		* 	$ServerClient->getOperatingSystem();
-		*
-		*===================================================================================================================
-		*/
 
         /********************** Si todo esta ok **********************/
         if (empty($_SERVER['HTTP_USER_AGENT'])) {

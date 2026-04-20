@@ -45,11 +45,11 @@ class gestionDocumentosInstaller extends ControllerBase {
 
         /******************************************/
         //si es la respuesta esperada
-        $countPermisos = is_numeric($nData1) ? 1 : 0;
-        $DepInstall_1  = is_numeric($DepData1) ? 1 : 0;
-        $DepInstall_2  = is_numeric($DepData2) ? 1 : 0;
-        $DepInstall_3  = is_numeric($DepData3) ? 1 : 0;
-        $DepInstall_4  = is_numeric($DepData4) ? 1 : 0;
+        $countPermisos = is_numeric($nData1)&&$nData1!=0 ? 1 : 0;
+        $DepInstall_1  = is_numeric($DepData1)&&$DepData1!=0 ? 1 : 0;
+        $DepInstall_2  = is_numeric($DepData2)&&$DepData2!=0 ? 1 : 0;
+        $DepInstall_3  = is_numeric($DepData3)&&$DepData3!=0 ? 1 : 0;
+        $DepInstall_4  = is_numeric($DepData4)&&$DepData4!=0 ? 1 : 0;
 
         /******************************************/
         //Verificar que existan los permisos

@@ -34,7 +34,14 @@ class FunctionsServerSocial {
      *
      * @param array $Config Configuración que incluye 'Token', 'InstanceId', 'namespace', 'template' y 'Type'.
      * @param array $Body Datos del mensaje como 'Phone', 'Titulo', 'Mensaje', 'Entidad', 'Link' o 'Cuerpo'.
+     *
      * @return array Resultado de la operación con estado 'success' y los datos de respuesta o error.
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function sendWhatsappTemplate($Config, $Body): array {
 
@@ -168,7 +175,14 @@ class FunctionsServerSocial {
      * negrita en el formato de asteriscos utilizado por la sintaxis de WhatsApp.
      *
      * @param string $Texto El texto original que contiene etiquetas HTML.
+     *
      * @return string El texto procesado y compatible con el formato de WhatsApp.
+	 *
+	 * @example
+	 * ```php
+	 *
+	 * ```
+	 *
      */
     public function formatWhatsappText($Texto): string {
 

@@ -11,7 +11,11 @@
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th scope="col">Test</th>
+                                    <th scope="col">Funcion</th>
+                                    <th scope="col">Verificacion Funcion</th>
+                                    <th scope="col">Devolucion Datos</th>
+                                    <th scope="col">Tipo Datos</th>
+                                    <th scope="col">Comparacion Datos</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -23,38 +27,79 @@
                                 foreach ($data['test'] as $result) {
                                     //sumo
                                     $i++;
-                                    //
+                                    //Solo si es el primer dato
                                     if($i==1){
                                         echo '<tr><td>';
                                         $dearch = $result['text'];
                                     }else{
-                                        echo '<br/>';
+                                        echo '</td><td>';
                                     }
-                                    echo '<strong>' . ($result['status'] === true ? 'Pasa' : 'Falla') . '</strong> ';
-                                    echo $result['text'];
+
+                                    //Divido texto
+                                    $resultado = $data['Fnc_DataText']->dividirTexto($result['text'], 'aaa');
+                                    //si hay efectivamente datos en ambos lados
+                                    if(isset($resultado['derecha'])&&$resultado['derecha']!=''){
+                                        //Variables
+                                        $col_left   = $resultado['izquierda'];
+                                        $resultado2 = $data['Fnc_DataText']->dividirTexto($resultado['derecha'], ' -&gt; ');
+                                        $col_right  = ltrim($resultado2['izquierda'], '(');
+                                        //Se dibuja
+                                        echo $col_left;
+                                        echo '</td><td>';
+                                        echo '<strong>' . ($result['status'] === true ? 'Pasa' : 'Falla') . '</strong> ';
+                                        //Se verifica si hay datos
+                                        if(isset($col_right)&&$col_right!=''){
+                                            echo '<button type="button" class="btn btn-sm btn-default tooltiplink" data-title="'.$col_right.'"><i class="bi bi-card-list"></i></button>';
+                                        }
+                                    //Solo datos en un lado
+                                    }else{
+                                        //Variables
+                                        $resultado2 = $data['Fnc_DataText']->dividirTexto($resultado['izquierda'], ' -&gt; ');
+                                        $col_right  = ltrim($resultado2['izquierda'], '(');
+                                        //Se dibuja
+                                        echo '<strong>' . ($result['status'] === true ? 'Pasa' : 'Falla') . '</strong> ';
+                                        //Se verifica si hay datos
+                                        if(isset($col_right)&&$col_right!=''){
+                                            echo '<button type="button" class="btn btn-sm btn-default tooltiplink" data-title="'.$col_right.'"><i class="bi bi-card-list"></i></button>';
+                                        }
+                                    }
+
+                                    //Si existen datos extras
                                     if(isset($result['extraText'])&&$result['extraText']!=''){
+                                        // Extrae texto posterior a la palabra clave 'Devuelve '
                                         $resultado = $data['Fnc_DataText']->buscarPalabraYExtraer($dearch, 'Devuelve ');
+                                        // Validar que la extracción fue exitosa
                                         if ($resultado !== false) {
-                                            if($result['extraText']==substr($resultado['extraido'], 0, -1)){
+                                            // Elimina el último carácter del texto extraído
+                                            $extraido = substr($resultado['extraido'], 0, -1);
+                                            // Caso 1: Coincidencia exacta
+                                            if ($result['extraText'] == $extraido) {
                                                 $SubData = 'OK: '.$result['extraText'];
-                                                echo '<br/><div style="border: solid #dee2e6;border-width: 1px;border-radius: 0.375rem;background-color: #f8f9fa;"><code>'.$SubData.'</code></div>';
-                                            }elseif(substr($resultado['extraido'], 0, -1)!='asd'){
-                                                $SubData = 'Hay diferencias:'.$result['extraText'].' - '.substr($resultado['extraido'], 0, -1);
-                                                echo '<br/><div style="border: solid #af3434;border-width: 1px;border-radius: 0.375rem;background-color: #f9cccc;"><code>'.$SubData.'</code></div>';
+
+                                                echo '</td><td>
+                                                <div style="border: solid #dee2e6; border-width: 1px; border-radius: 0.375rem; background-color: #f8f9fa;">
+                                                    <code>' . $SubData . '</code>
+                                                </div>';
+
+                                            // Caso 2: Diferencia (excluyendo valor especial 'asd')
+                                            } elseif ($extraido != 'asd') {
+                                                $SubData = 'Hay diferencias: ' . $result['extraText'] . ' - ' . $extraido;
+                                                echo '</td><td>
+                                                <div style="border: solid #af3434; border-width: 1px; border-radius: 0.375rem; background-color: #f9cccc;">
+                                                    <code>' . $SubData . '</code>
+                                                </div>';
                                             }
                                         }
                                     }
                                     if ($result['status']!==true){
-                                        echo '<br/><div style="border: solid #af3434;border-width: 1px;border-radius: 0.375rem;background-color: #f9cccc;"><code>'.$result['source'].'</code></div>';
+                                        echo '</td><td><div style="border: solid #af3434;border-width: 1px;border-radius: 0.375rem;background-color: #f9cccc;"><code>'.$result['source'].'</code></div>';
                                     }
                                     //
                                     if($i==3){echo '</td></tr>';$i = 0;}
 
-
-
-
                                     ?>
                                 <?php } ?>
+
                             </tbody>
                         </table>
                     </div>
@@ -65,3 +110,7 @@
     </div>
 
 </section>
+
+<?php
+
+?>
