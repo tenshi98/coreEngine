@@ -126,7 +126,7 @@ class WeatherWidget{
         this.qs(".weatherMin").innerText      = daily.temperature_2m_min[0]+"°";
         this.qs(".weatherMax").innerText      = daily.temperature_2m_max[0]+"°";
         let icon = this.iconMap(current.weather_code);
-        this.qs(".weatherIcon").src = this.Base+"/icons/"+icon+".svg";
+        this.qs(".weatherIcon").src = this.Base+"/img/meteo/icons/"+icon+".svg";
     }
 
     renderCurrent_v2(current,daily){
@@ -153,7 +153,7 @@ class WeatherWidget{
             col.className = "col weather-day";
             col.innerHTML=`
                 <div>${date.toLocaleDateString("es",{weekday:"short"})}</div>
-                <img src="${this.Base}/icons/${icon}.svg">
+                <img src="${this.Base}/img/meteo/icons/${icon}.svg">
                 <div>${daily.temperature_2m_max[i]}°</div>
                 <div style="font-size:12px;color:#777">
                 🌧 ${daily.precipitation_probability_max[i]}%
@@ -174,7 +174,7 @@ class WeatherWidget{
                 <li>
                     <span class="date">${date.toLocaleDateString("es",{weekday:"short"})}</span>
                     <span class="lnr lnr-sun condition">
-                        <img style="width: 32px;" src="${this.Base}/icons/${icon}.svg">
+                        <img style="width: 32px;" src="${this.Base}/img/meteo/icons/${icon}.svg">
                         ${daily.temperature_2m_max[i]}°
                         🌧 ${daily.precipitation_probability_max[i]}%
                     </span>
@@ -194,7 +194,7 @@ class WeatherWidget{
             col.innerHTML=`
                 <div class="day">
                     <div>${date.toLocaleDateString("es",{weekday:"short"})}</div>
-                    <img src="${this.Base}/icons/${icon}.svg">
+                    <img src="${this.Base}/img/meteo/icons/${icon}.svg">
                     <div>${daily.temperature_2m_max[i]}°</div>
                     <div style="font-size:12px;color:#777">
                     🌧 ${daily.precipitation_probability_max[i]}%
