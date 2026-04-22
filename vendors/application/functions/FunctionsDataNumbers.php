@@ -312,11 +312,11 @@ class FunctionsDataNumbers {
 	 *
 	 * @example
 	 * ```php
-	 * $DataNumbers->formatFono('+56911265984'); //Devuelve (+56) 9 1126 5984
+	 * $DataNumbers->formatPhone('+56911265984'); //Devuelve (+56) 9 1126 5984
 	 * ```
 	 *
      */
-    public function formatFono($Fono): string{
+    public function formatPhone($Fono): string{
 
 		/**********************  Validaciones   **********************/
         // Validaciones de existencia y longitud mínima/máxima
@@ -326,7 +326,7 @@ class FunctionsDataNumbers {
 
 		/********************** Si todo esta ok **********************/
         // Llama a la función interna para estandarizar el prefijo y limpiar caracteres
-        $miFono = $this->normalizarFono($Fono);
+        $miFono = $this->normalizarPhone($Fono);
 
 		/**********************  Retorno datos  **********************/
         // Divide la cadena normalizada en bloques usando substr para aplicar la máscara final
@@ -348,11 +348,11 @@ class FunctionsDataNumbers {
 	 *
 	 * @example
 	 * ```php
-	 * $DataNumbers->normalizarFono('+56911265984'); //Devuelve +56 9 1126 5984
+	 * $DataNumbers->normalizarPhone('+56911265984'); //Devuelve +56 9 1126 5984
 	 * ```
 	 *
      */
-    public function normalizarFono($Fono): string{
+    public function normalizarPhone($Fono): string{
 
         /**********************  Validaciones   **********************/
         // Validaciones de longitud y presencia de datos

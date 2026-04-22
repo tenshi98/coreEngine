@@ -50,12 +50,11 @@ class FunctionsConvertions {
 	 */
 	public function numero2horas($horasDecimales): string {
 
-		/**********************  Validaciones   **********************/
-		// Verificación de existencia de datos en la entrada
-		if ($horasDecimales==''){                                     return 'Sin datos ingresados';}
-
-		// Validación de tipo de dato numérico mediante dependencia externa
-		if (!$this->DataValidations->validarNumero($horasDecimales)){ return 'El dato ingresado no es un numero ('.$horasDecimales.')';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateValue($horasDecimales, 'horasDecimales');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Extracción de la parte entera para representar las horas
@@ -91,14 +90,11 @@ class FunctionsConvertions {
 	 */
 	public function minutos2horas($nMinutos): string {
 
-		/**********************  Validaciones   **********************/
-		// Comprobación de campo vacío
-		if ($nMinutos==''){ return 'Sin datos ingresados';}
-
-		// Validación doble: debe ser un valor numérico y de tipo entero
-		if (!$this->DataValidations->validarNumero($nMinutos) || !$this->DataValidations->validarEntero($nMinutos)) {
-			return 'El dato ingresado no es un numero ('.$nMinutos.')';
-		}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateInteger($nMinutos, 'nMinutos');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Cálculo de horas mediante división entera
@@ -131,14 +127,11 @@ class FunctionsConvertions {
 	 */
 	public function segundos2horas($nSegundos): string {
 
-		/**********************  Validaciones   **********************/
-		// Validación inicial de presencia de valor
-		if ($nSegundos==''){   return 'Sin datos ingresados';}
-
-		// Validación de integridad del dato como número entero
-		if (!$this->DataValidations->validarNumero($nSegundos) || !$this->DataValidations->validarEntero($nSegundos)) {
-			return 'El dato ingresado no es un numero ('.$nSegundos.')';
-		}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateInteger($nSegundos, 'nSegundos');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Obtención de horas totales dividiendo por la cantidad de segundos en una hora
@@ -174,12 +167,11 @@ class FunctionsConvertions {
 	 */
 	public function horas2minutos($horas): string | int {
 
-		/**********************  Validaciones   **********************/
-		// Verificación de entrada vacía
-		if ($horas==''){                                  return 'Sin datos ingresados';}
-
-		// Validación externa del formato de hora
-		if (!$this->DataValidations->validarHora($horas)){return 'El dato ingresado no es una hora ('.$horas.')';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateHour($horas, 'horas');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Creación de objeto DateTime a partir del formato específico
@@ -214,12 +206,11 @@ class FunctionsConvertions {
 	 */
 	public function horas2segundos($horas): string | int{
 
-		/**********************  Validaciones   **********************/
-		// Validación de presencia de datos
-		if ($horas==''){                                  return 'Sin datos ingresados';}
-
-		// Validación de formato mediante componente de validación
-		if (!$this->DataValidations->validarHora($horas)){return 'El dato ingresado no es una hora ('.$horas.')';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateHour($horas, 'horas');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Instanciación de DateTime para segmentar la cadena horaria
@@ -254,12 +245,11 @@ class FunctionsConvertions {
 	 */
 	public function horas2decimales($horas): string | float{
 
-		/**********************  Validaciones   **********************/
-		// Comprobación de parámetro obligatorio
-		if ($horas==''){                                  return 'Sin datos ingresados';}
-
-		// Validación de estructura horaria
-		if (!$this->DataValidations->validarHora($horas)){return 'El dato ingresado no es una hora ('.$horas.')';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateHour($horas, 'horas');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Generación del objeto DateTime para extracción de partes
@@ -347,15 +337,13 @@ class FunctionsConvertions {
 	 */
 	public function numero2mes($numero): string{
 
-		/**********************  Validaciones   **********************/
-		// Validación de presencia de datos
-		if ($numero==''){                                     return 'Sin datos ingresados';}
-
-		// Validación de tipo numérico mediante dependencia de validación externa
-		if (!$this->DataValidations->validarNumero($numero)){ return 'El dato ingresado no es un numero ('.$numero.')';}
-
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateInteger($numero, 'numero');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 		// Restricción del rango permitido para meses del año
-		if ($numero < 1 || $numero > 12){                     return 'Numero fuera de parámetros esperados';}
+		if ($numero < 1 || $numero > 12){return 'Numero fuera de parámetros esperados';}
 
 		/**********************  Definiciones   **********************/
 		// Listado indexado de meses
@@ -386,15 +374,13 @@ class FunctionsConvertions {
 	 */
 	public function numero2mesCorto($numero): string{
 
-		/**********************  Validaciones   **********************/
-		// Verificación de entrada obligatoria
-		if ($numero==''){                                     return 'Sin datos ingresados';}
-
-		// Validación de tipo de dato
-		if (!$this->DataValidations->validarNumero($numero)){ return 'El dato ingresado no es un numero ('.$numero.')';}
-
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateInteger($numero, 'numero');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 		// Validación de límites para meses
-		if ($numero < 1 || $numero > 12){                     return 'Numero fuera de parámetros esperados';}
+		if ($numero < 1 || $numero > 12){return 'Numero fuera de parámetros esperados';}
 
 		/**********************  Definiciones   **********************/
 		// Definición de etiquetas cortas para meses
@@ -425,15 +411,13 @@ class FunctionsConvertions {
 	 */
 	public function numeroNombreDia($numero): string{
 
-		/**********************  Validaciones   **********************/
-		// Comprobación de parámetro nulo o vacío
-		if ($numero==''){                                     return 'Sin datos ingresados';}
-
-		// Validación de integridad numérica
-		if (!$this->DataValidations->validarNumero($numero)){ return 'El dato ingresado no es un numero ('.$numero.')';}
-
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateInteger($numero, 'numero');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 		// Control de rango permitido para la semana (nota: el código permite técnicamente hasta el índice 8 antes de fallar)
-		if($numero<0 || $numero>8){                           return 'Numero fuera de parámetros esperados';}
+		if($numero<0 || $numero>8){return 'Numero fuera de parámetros esperados';}
 
 		/**********************  Definiciones   **********************/
 		// Definición secuencial de los días de la semana iniciando en Lunes
@@ -473,12 +457,11 @@ class FunctionsConvertions {
 	 */
 	public function porcentaje($valor): string{
 
-		/**********************  Validaciones   **********************/
-		// Verificación de que el parámetro no sea una cadena vacía
-		if ($valor==''){                                    return 'Sin datos ingresados';}
-
-		// Validación de integridad numérica mediante el componente DataValidations
-		if (!$this->DataValidations->validarNumero($valor)){return 'El dato ingresado no es un numero ('.$valor.')';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateValue($valor, 'valor');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/**********************  Retorno datos  **********************/
 		// Cálculo del porcentaje y formateo numérico
@@ -516,12 +499,11 @@ class FunctionsConvertions {
 	 */
 	public function numeroApalabras($numero): string {
 
-		/********************** Validaciones   **********************/
-		// Comprobación de parámetro obligatorio
-		if ($numero==''){                                    return 'Sin datos ingresados';}
-
-		// Validación de tipo numérico mediante dependencia externa
-		if (!$this->DataValidations->validarNumero($numero)){return 'El dato ingresado no es un numero ('.$numero.')';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateValue($numero, 'numero');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Si todo esta ok **********************/
 		// Gestión del signo: almacenamiento del estado negativo y conversión a valor absoluto para procesamiento
@@ -645,6 +627,59 @@ class FunctionsConvertions {
 
 		/********************** Retorno datos  **********************/
 		return $resultado;
+	}
+
+
+	/*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Internos                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+    /************************************************************************************************************/
+	/************************************************************************************************************/
+	private function _validateValue($Data, $Name){
+
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
+        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        // Validación de tipos de datos mediante el componente externo DataValidations
+        if (!$this->DataValidations->validarNumero($Data)) {
+            return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
+        }
+
+		/**********************  Retorno datos  **********************/
+		return true;
+
+	}
+    /************************************************************************************************************/
+	private function _validateInteger($Data, $Name){
+
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
+        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        // Validación de tipos de datos mediante el componente externo DataValidations
+        if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
+            return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
+        }
+
+		/**********************  Retorno datos  **********************/
+		return true;
+
+	}
+    /************************************************************************************************************/
+	private function _validateHour($Data, $Name){
+
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
+        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        // Validación de tipos de datos mediante el componente externo DataValidations
+        if (!$this->DataValidations->validarHora($Data)) {
+            return 'El dato ingresado en '.$Name.' no es una hora ('.$Data.')';
+        }
+
+		/**********************  Retorno datos  **********************/
+		return true;
+
 	}
 
 

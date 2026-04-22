@@ -926,5 +926,520 @@ class FunctionsDataValidations {
         ];
     }
 
+    /************************************************************************************************************/
+	/**
+     * Valida una query SQL MySQL con distintos niveles de seguridad.
+     *
+     * CAPAS DE VALIDACIÓN (en orden de ejecución):
+     *  1. Null bytes
+     *  2. Longitud máxima
+     *  3. Normalización (strip comentarios, espacios)
+     *  4. Extracción de literales (simple, doble, backtick)
+     *  5. Múltiples sentencias
+     *  6. Detección de tipo
+     *  7. Lista deny global
+     *  8. Funciones peligrosas globales (SLEEP, BENCHMARK, encoding)
+     *  9. Modo strict  / safe / paranoid
+     * 10. SELECT sin FROM
+     * 11. Tautologías (OR 1=1, OR 'x'='x', OR true, OR 2>1, IS NOT NULL)
+     * 12. Whitelist de tablas (opcional)
+     *
+     * @param string $query   Query SQL a validar.
+     * @param array  $options {
+     *     @type string   $mode       Nivel de seguridad: default|strict|safe|paranoid.
+     *                                - default  : validaciones básicas.
+     *                                - strict   : solo tipos en $allowed; keywords en $deny bloqueadas globalmente.
+     *                                - safe     : anti-mezcla de operaciones destructivas + subqueries peligrosas.
+     *                                - paranoid : solo SELECT plano sin JOIN/UNION/subqueries.
+     *     @type array    $allowed    Tipos de query permitidos (usado en strict).
+     *                                Default: ['SELECT','INSERT','UPDATE','DELETE'].
+     *     @type array    $deny       Keywords/tipos siempre bloqueados sin importar el modo.
+     *                                Default: [].
+     *     @type bool     $single     Si true, bloquea múltiples sentencias separadas por ';'.
+     *                                Default: true.
+     *     @type int      $max_length Longitud máxima permitida de la query en caracteres.
+     *                                Default: 10000.
+     *     @type array    $tables     Whitelist de tablas permitidas en FROM (vacío = sin restricción).
+     *                                Default: [].
+     * }
+     *
+     * @return array {
+     *     @type bool        $valid  true si la query pasó todas las validaciones.
+     *     @type string|null $error  Mensaje de error legible, null si válida.
+     *     @type string|null $type   Tipo detectado (SELECT, INSERT, etc.), null si no detectado.
+     * }
+     */
+    public function validateSQL(string $query, array $options = []): array {
+        // =========================================================================
+        // Opciones con sus defaults
+        // =========================================================================
+        $mode             = $options['mode']       ?? 'default';
+        $allowed          = $options['allowed']    ?? ['SELECT', 'INSERT', 'UPDATE', 'DELETE'];
+        $deny             = $options['deny']       ?? ['REPLACE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'];
+        $single           = $options['single']     ?? true;
+        $maxLength        = $options['max_length'] ?? 10000;
+        $tables           = $options['tables']     ?? [];
+        $blacklistTables  = $options['blacklist_tables']  ?? [];
+        $sensitiveColumns = $options['sensitive_columns'] ?? ['password', 'passwd', 'token'];
+
+        // Closure de respuesta negativa — evita repetir la estructura del array.
+        $fail = fn(string $msg, ?string $type = null): array => [
+            'valid' => false,
+            'error' => $msg,
+            'type'  => $type,
+        ];
+
+        // =========================================================================
+        // [1] NULL BYTES
+        // Un null byte (\0) puede truncar el análisis en ciertas implementaciones
+        // de C subyacentes a PHP/MySQL y se usa para evadir filtros de texto.
+        // Ejemplo de ataque: "SELECT *\0 FROM users-- "
+        // =========================================================================
+        if (str_contains($query, "\0")) {
+            return $fail('Query contiene caracteres nulos');
+        }
+
+        // =========================================================================
+        // [2] LONGITUD MÁXIMA
+        // Previene DoS por queries gigantes que disparen backtracking catastrófico
+        // en los regex posteriores (ReDoS) o saturen memoria.
+        // =========================================================================
+        if (strlen($query) > $maxLength) {
+            return $fail("Query excede el límite de {$maxLength} caracteres");
+        }
+
+        // =========================================================================
+        // [3] NORMALIZACIÓN
+        // Orden importante:
+        //   a) trim()            — elimina espacios externos.
+        //   b) strip comentarios — elimina -- , # y /* */ ANTES de analizar.
+        //      Sin este paso, "SELECT 1 -- comentario falso" podría romper
+        //      regex posteriores o esconder keywords.
+        //   c) colapsar espacios — un único espacio entre tokens facilita
+        //      los patrones \b en los regex siguientes.
+        //   d) rtrim ';'         — el punto y coma final es ruido para la
+        //      detección de múltiples sentencias.
+        // =========================================================================
+        $query = trim($query);
+        $query = preg_replace('/(--[^\n]*$)|(#[^\n]*$)/m', '', $query); // comentarios de línea
+        $query = preg_replace('/\/\*.*?\*\//s', '', $query);             // comentarios de bloque
+        $query = preg_replace('/\s+/', ' ', $query);                     // colapsar whitespace
+        $query = rtrim($query, '; ');
+
+        if ($query === '') {
+            return $fail('Query vacía');
+        }
+
+        // =========================================================================
+        // [4] EXTRACCIÓN DE LITERALES STRING → $sanitized
+        //
+        // PROBLEMA que resuelve:
+        //   WHERE name = 'DROP TABLE users'  → antes disparaba falso positivo.
+        //   WHERE name = "SLEEP(5)"          → idem con comillas dobles.
+        //
+        // SOLUCIÓN:
+        //   Reemplazar cada literal string por un placeholder neutral __STR_N__
+        //   antes de cualquier análisis estructural. Así los regex de seguridad
+        //   nunca "ven" el contenido de los valores, solo la estructura SQL.
+        //
+        // COBERTURA de comillas (punto 1 del plan de mejoras):
+        //   '...'  — estándar SQL / MySQL
+        //   "..."  — MySQL con ANSI_QUOTES desactivado
+        //   `...`  — identifiers MySQL (nombres de tabla/columna)
+        //
+        // El regex maneja escapes internos:
+        //   \'  dentro de '...'
+        //   \"  dentro de "..."
+        //   \`  dentro de `...`
+        // =========================================================================
+        $literals  = [];
+        $sanitized = preg_replace_callback(
+            "/'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`/",
+            function (array $m) use (&$literals): string {
+                $placeholder           = '__STR_' . count($literals) . '__';
+                $literals[$placeholder] = $m[0];
+                return $placeholder;
+            },
+            $query
+        );
+
+        // =========================================================================
+        // [5] MÚLTIPLES SENTENCIAS
+        // Detecta patrones como: "SELECT 1; DROP TABLE x"
+        // Se analiza sobre $sanitized para que un ';' dentro de un literal
+        // ('val;ue') no dispare un falso positivo.
+        // =========================================================================
+        if ($single && preg_match('/;.+\S/', $sanitized)) {
+            return $fail('Múltiples sentencias no permitidas');
+        }
+
+        // =========================================================================
+        // [6] DETECCIÓN DE TIPO
+        // Solo acepta los verbos SQL reconocidos al inicio de la query.
+        // Cualquier otra cosa (o query vacía post-normalización) es inválida.
+        // =========================================================================
+        $knownTypes = 'SELECT|INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE';
+        if (!preg_match('/^(' . $knownTypes . ')\b/i', $sanitized, $match)) {
+            return $fail('Tipo de query no reconocido');
+        }
+        $type = strtoupper($match[1]);
+
+        // =========================================================================
+        // [7] LISTA DENY GLOBAL
+        // Se evalúa ANTES de cualquier modo para que $deny actúe como lista negra
+        // absoluta independiente del modo activo.
+        // Ejemplo: ['DROP', 'TRUNCATE'] bloqueará esos tipos siempre.
+        // =========================================================================
+        if (!empty($deny) && in_array($type, $deny, true)) {
+            return $fail("Tipo '$type' está en la lista de denegación", $type);
+        }
+
+        // =========================================================================
+        // [8] FUNCIONES PELIGROSAS GLOBALES (aplican a todos los modos)
+        //
+        // 8a. TIMING / BLIND SQLi
+        //     SLEEP y BENCHMARK se usan para inferir datos mediante retardos.
+        //     Ejemplo: WHERE IF(1=1, SLEEP(5), 0)
+        //
+        // 8b. FUNCIONES DE ENCODING / OFUSCACIÓN (punto 2 del plan)
+        //     Permiten ofuscar keywords para evadir los regex.
+        //     Ejemplo: WHERE id = CHAR(49,32,79,82)  →  "1 OR"
+        //              WHERE id = 0x44524f50         →  "DROP"
+        //     Se detectan por el patrón FUNCION( para no bloquear
+        //     nombres de columna que casualmente se llamen 'hex', etc.
+        // =========================================================================
+
+        // 8a — Timing/blind
+        if (preg_match('/\b(SLEEP|BENCHMARK|WAIT\s+FOR\s+DELAY|PG_SLEEP)\s*\(/i', $sanitized)) {
+            return $fail('Query contiene funciones de timing prohibidas', $type);
+        }
+
+        // 8b — Encoding/ofuscación
+        if (preg_match('/\b(CHAR|HEX|UNHEX|ASCII|ORD|CONV|BIN)\s*\(/i', $sanitized)) {
+            return $fail('Query contiene funciones de encoding/ofuscación prohibidas', $type);
+        }
+
+        // =========================================================================
+        // [9a] MODO STRICT
+        //
+        // Dos controles:
+        //   A) El tipo principal debe estar en $allowed.
+        //   B) Ninguna keyword de $deny puede aparecer en cualquier parte
+        //      de la query sanitizada (no solo como tipo principal).
+        //      Esto bloquea, p.ej., un SELECT que contenga DROP en una subquery.
+        // =========================================================================
+        if ($mode === 'strict') {
+            if (!in_array($type, $allowed, true)) {
+                return $fail("Tipo '$type' no permitido en modo strict", $type);
+            }
+
+            foreach ($deny as $kw) {
+                if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $sanitized)) {
+                    return $fail("Keyword '$kw' no permitida en modo strict", $type);
+                }
+            }
+        }
+
+        // =========================================================================
+        // [9b] MODO SAFE
+        //
+        // Control A — Mezcla de operaciones destructivas (punto 7 del plan):
+        //   Lista ampliada con REPLACE, CREATE, RENAME, LOCK además de los
+        //   originales. Si aparecen más de una de estas keywords en la query,
+        //   es señal de una query compuesta peligrosa.
+        //
+        // Control B — Subqueries destructivas en IN/EXISTS/ANY/ALL:
+        //   Cubre el caso: WHERE id IN (SELECT id FROM x WHERE ... DELETE ...)
+        //
+        // Control C — SELECT con operaciones destructivas fuera de subqueries:
+        //   Cubre inyecciones directas en el cuerpo del SELECT.
+        // =========================================================================
+        if ($mode === 'safe') {
+            // A — keywords destructivas (lista ampliada)
+            $dangerKeywords = [
+                'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER',
+                'TRUNCATE', 'REPLACE', 'CREATE', 'RENAME', 'LOCK',
+            ];
+
+            $found = array_values(array_filter(
+                $dangerKeywords,
+                fn(string $kw): bool => (bool) preg_match('/\b' . $kw . '\b/i', $sanitized)
+            ));
+
+            if (count($found) > 1) {
+                return $fail(
+                    'Query mezcla múltiples operaciones peligrosas: ' . implode(', ', $found),
+                    $type
+                );
+            }
+
+            // B — Operación destructiva dentro de subquery IN/EXISTS/ANY/ALL
+            if (preg_match('/\b(?:IN|EXISTS|ANY|ALL)\s*\(.*\b(?:DELETE|UPDATE|DROP|INSERT)\b/is', $sanitized)) {
+                return $fail('Subquery contiene operación destructiva', $type);
+            }
+
+            // C — SELECT cuyo cuerpo contiene verbos destructivos
+            if ($type === 'SELECT' && preg_match('/\b(UPDATE|DELETE|INSERT|DROP)\b/i', $sanitized)) {
+                return $fail('SELECT contiene operaciones peligrosas', $type);
+            }
+        }
+
+        // =========================================================================
+        // [9c] MODO PARANOID
+        //
+        // El modo más restrictivo: solo acepta SELECT plano.
+        //
+        // Control A — Solo SELECT.
+        // Control B — Sin subqueries anidadas: bloquea ( ... SELECT ...
+        // Control C — Sin UNION ni ninguna variante de JOIN ni INTO.
+        //   UNION permite extraer datos de otras tablas.
+        //   JOIN expone relaciones entre tablas.
+        //   INTO permite escribir archivos (INTO OUTFILE).
+        // Control D — Sin funciones de exfiltración/timing (ya cubiertas
+        //   globalmente en [8], se repite aquí como documentación explícita
+        //   del contrato del modo paranoid).
+        // =========================================================================
+        if ($mode === 'paranoid') {
+            // A — Solo SELECT
+            if ($type !== 'SELECT') {
+                return $fail("Modo paranoid solo permite SELECT, se recibió '$type'", $type);
+            }
+
+            // B — Sin subqueries
+            if (preg_match('/\(.*\bSELECT\b/i', $sanitized)) {
+                return $fail('Modo paranoid no permite subqueries', $type);
+            }
+
+            // C — Sin UNION, JOIN (cualquier variante), INTO
+            $forbiddenClauses = implode('|', [
+                'UNION',
+                'INNER\s+JOIN', 'LEFT\s+JOIN', 'RIGHT\s+JOIN',
+                'FULL\s+JOIN',  'CROSS\s+JOIN', 'JOIN',
+                'INTO',
+            ]);
+            if (preg_match('/\b(?:' . $forbiddenClauses . ')\b/i', $sanitized)) {
+                return $fail('Modo paranoid no permite UNION, JOIN ni INTO', $type);
+            }
+        }
+
+        // =========================================================================
+        // [10] SELECT SIN FROM
+        // Un SELECT sin FROM es casi siempre un error o una inyección de prueba
+        // (p.ej. "SELECT 1", "SELECT version()").
+        // Se evalúa sobre $sanitized para ignorar 'FROM' dentro de literales.
+        // =========================================================================
+        if ($type === 'SELECT' && !preg_match('/\bFROM\b/i', $sanitized)) {
+            return $fail('SELECT sin FROM (posible query inválida)', $type);
+        }
+
+        // =========================================================================
+        // [11] TAUTOLOGÍAS (anti OR 1=1 y variantes)
+        //
+        // Se opera sobre $sanitized: los literales ya fueron extraídos, por lo
+        // que un WHERE name = '1 OR 1=1' NO dispara esta validación (correcto),
+        // pero un WHERE id = 1 OR 1=1 SÍ la dispara (correcto).
+        //
+        // Variantes cubiertas (punto 3 del plan):
+        //   A) Igualdad numérica trivial   : OR 1=1, OR 2=2
+        //   B) Igualdad de identificadores : OR x=x (mismo token ambos lados)
+        //   C) Booleano directo            : OR true, OR false (siempre sospechoso en WHERE)
+        //   D) Comparación numérica obvia  : OR 2>1, OR 1<2
+        //   E) IS NOT NULL incondicional   : OR id IS NOT NULL (siempre true si hay filas)
+        // =========================================================================
+
+        // A — OR/AND con número igual a sí mismo: OR 1=1, AND 2=2
+        if (preg_match('/\b(?:OR|AND)\b\s*[\'"]?\d+[\'"]?\s*=\s*[\'"]?\d+[\'"]?/i', $sanitized)) {
+            return $fail('Posible inyección SQL: condición numérica tautológica', $type);
+        }
+
+        // B — OR/AND con mismo identificador ambos lados: OR x=x
+        if (preg_match('/\b(?:OR|AND)\b\s*(\w+)\s*=\s*\1\b/i', $sanitized)) {
+            return $fail('Posible inyección SQL: condición tautológica (OR x=x)', $type);
+        }
+
+        // C — OR/AND con booleano literal: OR true, OR false
+        if (preg_match('/\b(?:OR|AND)\b\s*\b(?:true|false)\b/i', $sanitized)) {
+            return $fail('Posible inyección SQL: condición booleana literal', $type);
+        }
+
+        // D — OR/AND con comparación numérica obvia: OR 2>1, OR 1<2
+        if (preg_match('/\b(?:OR|AND)\b\s*\d+\s*[><]\s*\d+/i', $sanitized)) {
+            return $fail('Posible inyección SQL: comparación numérica siempre verdadera', $type);
+        }
+
+        // E — OR/AND <columna> IS NOT NULL (sospechoso en contexto de inyección)
+        if (preg_match('/\b(?:OR|AND)\b\s*\w+\s+IS\s+NOT\s+NULL/i', $sanitized)) {
+            return $fail('Posible inyección SQL: condición IS NOT NULL sospechosa', $type);
+        }
+
+        // =========================================================================
+        // [12] WHITELIST DE TABLAS (punto 9 del plan)
+        //
+        // Si $tables no está vacío, extrae el nombre de tabla inmediatamente
+        // después de FROM y verifica que esté en la whitelist.
+        //
+        // Limitación conocida: solo valida la primera tabla del FROM.
+        // Para queries con múltiples tablas (JOIN, subqueries) se recomienda
+        // usar esto solo en modo paranoid donde JOIN/subqueries ya están bloqueados.
+        // =========================================================================
+        if (!empty($tables)) {
+            if (!preg_match('/\bFROM\s+(\w+)/i', $sanitized, $tableMatch)) {
+                return $fail('No se pudo determinar la tabla de destino', $type);
+            }
+
+            $targetTable = strtolower($tableMatch[1]);
+            $allowedTables = array_map('strtolower', $tables);
+
+            if (!in_array($targetTable, $allowedTables, true)) {
+                return $fail("Tabla '$targetTable' no está en la whitelist de tablas permitidas", $type);
+            }
+        }
+        // =========================================================================
+        // [13] BLACKLIST DE TABLAS SENSIBLES (control contextual)
+        //
+        // Objetivo:
+        //  - Evitar acceso directo o modificación de tablas sensibles (ej: users)
+        //  - Permitir JOIN siempre que NO se acceda a columnas sensibles
+        //
+        // Opciones nuevas:
+        //   @type array $blacklist_tables   Tablas sensibles restringidas.
+        //   @type array $sensitive_columns  Columnas prohibidas (ej: password).
+        //
+        // Ejemplo:
+        //   'blacklist_tables'  => ['users'],
+        //   'sensitive_columns' => ['password', 'passwd', 'token']
+        // =========================================================================
+        if (!empty($blacklistTables)) {
+
+            $lowerQuery = strtolower($sanitized);
+            $blacklistTables = array_map('strtolower', $blacklistTables);
+
+            // ---------------------------------------------------------------------
+            // A — Detectar tablas involucradas (FROM + JOIN)
+            // ---------------------------------------------------------------------
+            preg_match_all('/\b(?:from|join)\s+(\w+)/i', $lowerQuery, $matches);
+            $usedTables = array_map('strtolower', $matches[1] ?? []);
+
+            $intersectTables = array_intersect($usedTables, $blacklistTables);
+
+            if (!empty($intersectTables)) {
+
+                // -----------------------------------------------------------------
+                // B — Bloquear modificaciones directas
+                // -----------------------------------------------------------------
+                if (in_array($type, ['UPDATE', 'DELETE', 'INSERT', 'REPLACE'], true)) {
+
+                    // Detectar tabla objetivo principal
+                    if (preg_match('/\b(?:update|into)\s+(\w+)/i', $lowerQuery, $mainTableMatch)) {
+                        $mainTable = strtolower($mainTableMatch[1]);
+
+                        if (in_array($mainTable, $blacklistTables, true)) {
+                            return $fail("Modificación directa a tabla sensible '$mainTable' no permitida", $type);
+                        }
+                    }
+                }
+
+                // -----------------------------------------------------------------
+                // C — SELECT directo sin JOIN (acceso completo)
+                // -----------------------------------------------------------------
+                if ($type === 'SELECT') {
+
+                    $hasJoin = preg_match('/\bjoin\b/i', $lowerQuery);
+
+                    if (!$hasJoin) {
+                        return $fail(
+                            'Acceso directo a tabla sensible no permitido (use JOIN controlado)',
+                            $type
+                        );
+                    }
+
+                    // -----------------------------------------------------------------
+                    // D — Detección avanzada de columnas sensibles (soporte alias real)
+                    // -----------------------------------------------------------------
+
+                    // -------------------------------------------------------------
+                    // 1. Construir mapa alias → tabla
+                    //    Soporta:
+                    //      FROM users u
+                    //      FROM users AS u
+                    //      JOIN users u2
+                    // -------------------------------------------------------------
+                    $aliasMap = [];
+
+                    // FROM + JOIN con alias
+                    preg_match_all(
+                        '/\b(from|join)\s+(\w+)(?:\s+as)?\s+(\w+)/i',
+                        $lowerQuery,
+                        $aliasMatches,
+                        PREG_SET_ORDER
+                    );
+
+                    foreach ($aliasMatches as $m) {
+                        $table = strtolower($m[2]);
+                        $alias = strtolower($m[3]);
+                        $aliasMap[$alias] = $table;
+                    }
+
+                    // También incluir tablas sin alias (alias implícito = nombre tabla)
+                    foreach ($usedTables as $tbl) {
+                        $aliasMap[$tbl] = $tbl;
+                    }
+
+                    // -------------------------------------------------------------
+                    // 2. Detectar acceso a columnas con alias (u.password)
+                    // -------------------------------------------------------------
+                    foreach ($aliasMap as $alias => $table) {
+
+                        // Solo validar tablas sensibles
+                        if (!in_array($table, $blacklistTables, true)) {
+                            continue;
+                        }
+
+                        foreach ($sensitiveColumns as $col) {
+
+                            // Detecta:
+                            //   u.password
+                            //   users.password
+                            if (preg_match('/\b' . preg_quote($alias, '/') . '\.' . preg_quote($col, '/') . '\b/i', $lowerQuery)) {
+                                return $fail(
+                                    "Acceso a columna sensible '{$table}.{$col}' mediante alias '{$alias}' no permitido",
+                                    $type
+                                );
+                            }
+                        }
+
+                        // ---------------------------------------------------------
+                        // 3. Detectar SELECT alias.* (ej: u.*)
+                        // ---------------------------------------------------------
+                        if (preg_match('/\b' . preg_quote($alias, '/') . '\.\*/i', $lowerQuery)) {
+                            return $fail(
+                                "Acceso wildcard '{$alias}.*' a tabla sensible '{$table}' no permitido",
+                                $type
+                            );
+                        }
+                    }
+
+                    // -------------------------------------------------------------
+                    // 4. Fallback (por si no usan alias)
+                    // -------------------------------------------------------------
+                    foreach ($sensitiveColumns as $col) {
+                        if (preg_match('/\b' . preg_quote(strtolower($col), '/') . '\b/i', $lowerQuery)) {
+                            return $fail(
+                                "Acceso a columna sensible '$col' no permitido",
+                                $type
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        // =========================================================================
+        // Query válida
+        // =========================================================================
+        return ['valid' => true, 'error' => null, 'type' => $type];
+    }
+
+
 
 }

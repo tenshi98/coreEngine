@@ -43,14 +43,13 @@ class FunctionsDataText {
      */
     public function cortar($texto, $cuantos): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if (!isset($texto) || $texto==''){     return 'Sin datos ingresados';}
-        if (!isset($cuantos) || $cuantos==''){ return 'Sin datos ingresados';}
-        // Verifica mediante la clase de validación externa que el límite sea un entero válido
-        if (!$this->DataValidations->validarNumero($cuantos) || !$this->DataValidations->validarEntero($cuantos)) {
-            return 'El dato ingresado no es un numero ('.$cuantos.')';
-        }
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_1 = $this->_validateEmpty($texto, 'texto');
+		$dataVal_2 = $this->_validateInteger($cuantos, 'cuantos');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal_1 !== true) { return $dataVal_1; }
+		if ($dataVal_2 !== true) { return $dataVal_2; }
 
         /********************** Proceso de Recorte **********************/
         // Operación compatible con caracteres especiales y acentos
@@ -80,9 +79,11 @@ class FunctionsDataText {
      */
     public function eliminarVerificadorRut($Rut): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if (!isset($Rut) || $Rut==''){                   return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($Rut, 'Rut');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
         // Validación lógica del formato RUT antes de proceder
         if (!$this->DataValidations->validarRut($Rut)){  return 'El dato ingresado no es un Rut';}
 
@@ -123,10 +124,11 @@ class FunctionsDataText {
 	 */
     public function limpiarString($texto, $keepPunctuation = false): string {
 
-        /********************** Validaciones **********************/
-		if (trim($texto) === '') {
-			return 'Sin datos ingresados';
-		}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
 		/********************** Normalización base **********************/
 		// Elimina secuencias literales "\n" y "\r"
@@ -177,9 +179,11 @@ class FunctionsDataText {
      */
     public function reemplazarEspaciosxGuion($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Retorno de Datos **********************/
 		// Reemplazo de datos
@@ -204,9 +208,11 @@ class FunctionsDataText {
      */
     public function sanitizarTexto($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Proceso de Seguridad **********************/
         // ENT_QUOTES asegura que tanto comillas simples como dobles sean convertidas
@@ -231,9 +237,11 @@ class FunctionsDataText {
      */
     public function desanitizarTexto($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Proceso de Reversión **********************/
         // Traduce entidades como &amp; de nuevo a &
@@ -258,9 +266,11 @@ class FunctionsDataText {
      */
     public function limpiezaTexto($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Proceso de Limpieza **********************/
         // Elimina etiquetas HTML y remueve saltos de línea (\r, \n)
@@ -295,9 +305,11 @@ class FunctionsDataText {
      */
     public function limpiarOracion($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){  return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Proceso de Transliteración **********************/
         // Intenta utilizar la extensión 'intl' para una transliteración precisa y moderna
@@ -339,9 +351,11 @@ class FunctionsDataText {
      */
     public function contarPalabrasCensuradas($texto): string | int {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){   return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Análisis de Contenido **********************/
         // Normaliza el texto para asegurar que la comparación no ignore acentos
@@ -375,9 +389,11 @@ class FunctionsDataText {
      */
     public function filtrarPalabrasCensuradas($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){   return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Proceso de Filtrado **********************/
         // Normalización del texto para coincidencia exacta
@@ -409,9 +425,11 @@ class FunctionsDataText {
      */
     public function tituloMenu($texto): string {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($texto) || $texto==''){   return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal = $this->_validateEmpty($texto, 'texto');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
 
         /********************** Generación de Patrones **********************/
         $xdata = [];
@@ -448,10 +466,13 @@ class FunctionsDataText {
      */
     public function buscarPalabraYExtraer($cadena, $palabra): array | string | false {
 
-        /********************** Validaciones **********************/
-        // Retorno inmediato si el valor es nulo o cadena vacía
-        if(!isset($cadena) || $cadena==''){     return 'Sin datos ingresados';}
-        if(!isset($palabra) || $palabra==''){   return 'Sin datos ingresados';}
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_1 = $this->_validateEmpty($cadena, 'cadena');
+		$dataVal_2 = $this->_validateEmpty($palabra, 'palabra');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal_1 !== true) { return $dataVal_1; }
+		if ($dataVal_2 !== true) { return $dataVal_2; }
 
         /********************** Localización y Extracción **********************/
         // Encuentra el índice numérico de la primera aparición de la palabra
@@ -522,10 +543,21 @@ class FunctionsDataText {
 	 * @note Solo se realiza una división (límite = 2).
 	 * @note Si el divisor aparece múltiples veces, solo se considera la primera ocurrencia.
 	 */
-	public function dividirTexto(string $texto, string $divisor): array {
-		$partes = explode($divisor, $texto, 2); // solo divide en 2 partes
+	public function dividirTexto($texto, $divisor): array {
 
-		return [
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_1 = $this->_validateEmpty($texto, 'texto');
+		$dataVal_2 = $this->_validateEmpty($divisor, 'divisor');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal_1 !== true) { return ['izquierda' => trim($dataVal_1 ?? ''),'derecha'   => ''];}
+		if ($dataVal_2 !== true) { return ['izquierda' => trim($dataVal_2 ?? ''),'derecha'   => ''];}
+
+		/********************** Si todo esta ok **********************/
+        $partes = explode($divisor, $texto, 2); // solo divide en 2 partes
+
+		/********************** Retorno datos **********************/
+        return [
 			'izquierda' => trim($partes[0] ?? ''),
 			'derecha'   => trim($partes[1] ?? '')
 		];
@@ -639,6 +671,32 @@ class FunctionsDataText {
 
 		/**********************  Retorno datos  **********************/
 		return $censuradas;
+
+	}
+    /************************************************************************************************************/
+	private function _validateEmpty($Data, $Name){
+
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
+        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+
+		/**********************  Retorno datos  **********************/
+		return true;
+
+	}
+    /************************************************************************************************************/
+	private function _validateInteger($Data, $Name){
+
+		/**********************  Validaciones   **********************/
+        // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
+        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        // Validación de tipos de datos mediante el componente externo DataValidations
+        if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
+            return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
+        }
+
+		/**********************  Retorno datos  **********************/
+		return true;
 
 	}
 
