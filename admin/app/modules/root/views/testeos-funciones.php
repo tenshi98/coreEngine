@@ -12,9 +12,9 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Funcion</th>
-                                    <th scope="col">Verificacion Funcion</th>
-                                    <th scope="col">Devolucion Datos</th>
-                                    <th scope="col">Tipo Datos</th>
+                                    <th scope="col" style="width: 120px;" class="text-center">Verificacion Funcion</th>
+                                    <th scope="col" style="width: 120px;" class="text-center">Devolucion Datos</th>
+                                    <th scope="col" style="width: 120px;" class="text-center">Tipo Datos</th>
                                     <th scope="col">Comparacion Datos</th>
                                 </tr>
                             </thead>
@@ -46,22 +46,41 @@
                                         //Se dibuja
                                         echo $col_left;
                                         echo '</td><td>';
-                                        echo '<strong>' . ($result['status'] === true ? 'Pasa' : 'Falla') . '</strong> ';
-                                        //Se verifica si hay datos
-                                        if(isset($col_right)&&$col_right!=''){
-                                            echo '<button type="button" class="btn btn-sm btn-default tooltiplink" data-title="'.$col_right.'"><i class="bi bi-card-list"></i></button>';
+                                        //Se crea boton
+                                        if($result['status'] === true){
+                                            $x_text  = 'Pasa';
+                                            $x_color = 'text-success';
+                                        }else{
+                                            $x_text  = 'Falla';
+                                            $x_color = 'text-danger';
                                         }
+                                        if(isset($col_right)&&$col_right!=''){
+                                            $x_color .= ' tooltiplink';
+                                            $x_title  = 'data-title="'.$col_right.'"';
+                                        }else{
+                                            $x_title = '';
+                                        }
+                                        echo '<p class="text-center fw-bold '.$x_color.'" '.$x_title.'>'.$x_text.'</p>';
                                     //Solo datos en un lado
                                     }else{
                                         //Variables
                                         $resultado2 = $data['Fnc_DataText']->dividirTexto($resultado['izquierda'], ' -&gt; ');
                                         $col_right  = ltrim($resultado2['izquierda'], '(');
-                                        //Se dibuja
-                                        echo '<strong>' . ($result['status'] === true ? 'Pasa' : 'Falla') . '</strong> ';
-                                        //Se verifica si hay datos
-                                        if(isset($col_right)&&$col_right!=''){
-                                            echo '<button type="button" class="btn btn-sm btn-default tooltiplink" data-title="'.$col_right.'"><i class="bi bi-card-list"></i></button>';
+                                        //Se crea boton
+                                        if($result['status'] === true){
+                                            $x_text  = 'Pasa';
+                                            $x_color = 'text-success';
+                                        }else{
+                                            $x_text  = 'Falla';
+                                            $x_color = 'text-danger';
                                         }
+                                        if(isset($col_right)&&$col_right!=''){
+                                            $x_color .= ' tooltiplink';
+                                            $x_title  = 'data-title="'.$col_right.'"';
+                                        }else{
+                                            $x_title = '';
+                                        }
+                                        echo '<p class="text-center fw-bold '.$x_color.'" '.$x_title.'>'.$x_text.'</p>';
                                     }
 
                                     //Si existen datos extras
