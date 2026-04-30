@@ -1,12 +1,18 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <table class="table table-sm table-hover datatable">
     <thead>
         <tr>
-            <th>Fecha Pago</th>
-            <th>Usuario Pago</th>
-            <th>Documento Pago</th>
-            <th class="text-end">Monto pago</th>
+            <th scope="col">Fecha Pago</th>
+            <th scope="col">Usuario Pago</th>
+            <th scope="col">Documento Pago</th>
+            <th scope="col" class="text-end">Monto pago</th>
             <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){ ?>
-                <th style="width: 10px;">Acciones</th>
+                <th scope="col" style="width: 10px;">Acciones</th>
             <?php } ?>
         </tr>
     </thead>

@@ -1,4 +1,8 @@
 <?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
 //Nombre aleatorio para la variable
 $ProdName = 'room_'.rand(1, 999999);
 $RandName = 'rand_'.rand(1, 999999);

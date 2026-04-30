@@ -1101,15 +1101,16 @@ class testeos extends ControllerBase {
             //si se envia correctamente
             if($Result['success']===true){
                 // Devuelvo true con código 200 (OK)
-                echo Response::sendData(200, $Result['success']);
+                Response::success($Result['success']);
             }else{
+                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Result['error']);
+                Response::error('Error al enviar mensaje', 500, $Result['error']);
             }
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
-
     }
 
     /******************************************************************************/
@@ -1124,7 +1125,7 @@ class testeos extends ControllerBase {
 
             //generacion de errores
             if($Pregunta==0) {
-                echo Response::sendData(500, 'No hay productos ingresados');
+                Response::error('No hay productos ingresados', 500);
             }else{
                 //La API
                 $api_key = "";
@@ -1145,14 +1146,15 @@ class testeos extends ControllerBase {
                     $decoded_response = json_decode($response['data'], true);
                     //Se muestra el resultado
                     if (isset($decoded_response['choices'][0]['message']['content'])) {
-                        echo Response::sendData(200, $decoded_response['choices'][0]['message']['content']);
+                        Response::success($decoded_response['choices'][0]['message']['content']);
                     }
                 }else{
-                    echo Response::sendData(500, $response['error']);
+                    Response::error($response['error'], 500, $response['error']);
                 }
             }
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
 
     }

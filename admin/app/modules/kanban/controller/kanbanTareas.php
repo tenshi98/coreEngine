@@ -815,7 +815,7 @@ class kanbanTareas extends ControllerBase {
 
         //generacion de errores
         if($ndata_2==0) {
-            echo Response::sendData(500, 'No hay Participantes en la tarea');
+            Response::error('No hay Participantes en la tarea', 500);
         }else{
             /******************************/
             //Se genera la query
@@ -920,11 +920,11 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Si es un ID numérico, se envía con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
 
         }
@@ -1049,15 +1049,15 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -1142,17 +1142,16 @@ class kanbanTareas extends ControllerBase {
                     $this->Base_insert($xParams);
                     /******************************/
                     // Devuelvo $Response con código 200 (OK)
-                    echo Response::sendData(200, $Response);
+                    Response::success($Response);
                 } else {
                     // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    echo Response::sendData(500, $Response);
+                    Response::error('Error al operar con la BBDD', 500, $Response);
                 }
-
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -1201,15 +1200,15 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

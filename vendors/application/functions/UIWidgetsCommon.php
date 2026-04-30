@@ -1670,10 +1670,10 @@ class UIWidgetsCommon {
 					<table id="listView" class="table table-hover bg-white d-none">
 						<thead>
 							<tr>
-								<th>Nombre</th>
-								<th>Tamaño</th>
-								<th>Fecha</th>';
-								if($levelPermission>=3){$widget  .= '<th>Acciones</th>';}
+								<th scope="col">Nombre</th>
+								<th scope="col">Tamaño</th>
+								<th scope="col">Fecha</th>';
+								if($levelPermission>=3){$widget  .= '<th scope="col">Acciones</th>';}
 								$widget  .= '
 							</tr>
 						</thead>

@@ -289,11 +289,11 @@ class gestionDocumentosServicios extends ControllerBase {
             $gestionDocumentos->updateFact(3, $_POST['idFacturacion']);
             /******************************************/
             // Si es un ID numérico, se envía con código 200 (OK)
-            echo Response::sendData(200, $Response);
+            Response::success($Response);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            echo Response::sendData(500, $Response);
+            Response::error('Error al operar con la BBDD', 500, $Response);
         }
     }
 
@@ -331,14 +331,15 @@ class gestionDocumentosServicios extends ControllerBase {
                 $gestionDocumentos->updateFact(3, $_POST['idFacturacion']);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -389,14 +390,15 @@ class gestionDocumentosServicios extends ControllerBase {
                 $gestionDocumentos->updateFact(3, $rowFacturacion['idFacturacion']);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

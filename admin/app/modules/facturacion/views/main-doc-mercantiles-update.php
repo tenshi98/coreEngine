@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <?php if(isset($data['MainViewData']['Data_ComprasTotal']['ValorTotal'])){ ?>
     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
         <div class="card">
@@ -12,8 +18,8 @@
                     <table class="table table-sm table-hover datatable">
                         <thead>
                             <tr>
-                                <th>Proveedor</th>
-                                <th class="text-end">Valor</th>
+                                <th scope="col">Proveedor</th>
+                                <th scope="col" class="text-end">Valor</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -63,8 +69,8 @@
                     <table class="table table-sm table-hover datatable">
                         <thead>
                             <tr>
-                                <th>Cliente</th>
-                                <th class="text-end">Valor</th>
+                                <th scope="col">Cliente</th>
+                                <th scope="col" class="text-end">Valor</th>
                             </tr>
                         </thead>
                         <tbody>

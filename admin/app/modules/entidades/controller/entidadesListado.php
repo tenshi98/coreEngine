@@ -990,11 +990,11 @@ class entidadesListado extends ControllerBase {
         if (is_numeric($Response)) {
             // Si es un ID numérico, encripta y envía con código 200 (OK)
             $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
-            echo Response::sendData(200, $Data);
+            Response::success($Data);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            echo Response::sendData(500, $Response);
+            Response::error('Error al operar con la BBDD', 500, $Response);
         }
     }
 
@@ -1097,14 +1097,15 @@ class entidadesListado extends ControllerBase {
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
             if ($Response===true) {
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -1154,15 +1155,15 @@ class entidadesListado extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -1189,14 +1190,15 @@ class entidadesListado extends ControllerBase {
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
             if ($Response===true) {
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

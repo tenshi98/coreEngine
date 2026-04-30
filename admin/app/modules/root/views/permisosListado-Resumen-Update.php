@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
         <?php
@@ -23,10 +29,10 @@
             <table class="table table-sm table-hover">
                 <thead>
                     <tr>
-                        <th>Metodo</th>
-                        <th>Ruta</th>
-                        <th>Descripcion</th>
-                        <th>Objetivo</th>
+                        <th scope="col">Metodo</th>
+                        <th scope="col">Ruta</th>
+                        <th scope="col">Descripcion</th>
+                        <th scope="col">Objetivo</th>
                     </tr>
                 </thead>
                 <tbody>

@@ -871,7 +871,7 @@ class ControllerBase {
             /**********************************/
             //Vista de la API con sesion
             case 2:
-                echo $view->render('../app/templates/api-vew.php');  // Vista
+                echo $view->render('../app/templates/api-view.php');  // Vista
                 break;
             /**********************************/
             //Vista de la API con token
@@ -935,12 +935,12 @@ class ControllerBase {
             /**********************************/
             //Vista de la API con sesion
             case 2:
-                echo $view->render('../app/templates/api-vew.php');  // Vista
+                Response::error('Error Consulta', 400);
                 break;
             /**********************************/
             //Vista de la API con token
             case 3:
-                echo $view->render('../app/templates/api-vew.php');  // Vista
+                Response::error('Error Consulta', 400);
                 break;
         }
 

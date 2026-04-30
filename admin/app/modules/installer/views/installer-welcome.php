@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <main>
     <div class="container">
         <section class="section register min-vh-100 d-flex flex-column align-items-center justify-content-center py-4">
@@ -84,31 +90,25 @@
 </script>
 
 <style>
-.wizardTittle {font-size: 20px;color: #222;font-weight: bold;text-transform: uppercase;text-align: center;margin: 0px;margin-top: 30px;margin-bottom: 30px;line-height: 1.6;font-family: 'Roboto Slab';}
+    .wizardTittle {font-size: 20px;color: #222;font-weight: bold;text-transform: uppercase;text-align: center;margin: 0px;margin-top: 30px;margin-bottom: 30px;line-height: 1.6;font-family: 'Roboto Slab';}
 
-
-
-.steps {border-top: 1px solid #ebebeb;border-bottom: 1px solid #ebebeb;padding: 12px 20px;}
-.steps ul {justify-content: space-around;-moz-justify-content: space-around;-webkit-justify-content: space-around;-o-justify-content: space-around;-ms-justify-content: space-around;display: flex;display: -webkit-flex;list-style-type: none;margin: 0;padding: 0;}
-.steps ul li {padding-right: 80px;padding-left: 0px;position: relative;}
-.steps ul li:after {position: absolute;width: 1px;height: 30px;content: "";background: #ebebeb;right: 18px;top: 50%;transform: translateY(-50%);-moz-transform: translateY(-50%);-webkit-transform: translateY(-50%);-o-transform: translateY(-50%);-ms-transform: translateY(-50%);}
-.steps ul li a {color: #999;text-decoration: none;font-weight: bold;}
-.steps ul li:last-child:after {width: 0px;}
-.steps ul li .title {align-items: center;-moz-align-items: center;-webkit-align-items: center;-o-align-items: center;-ms-align-items: center;}
-.steps ul li .title .number {width: 31px;height: 31px;border-radius: 50%;-moz-border-radius: 50%;-webkit-border-radius: 50%;-o-border-radius: 50%;-ms-border-radius: 50%;align-items: center;-moz-align-items: center;-webkit-align-items: center;-o-align-items: center;-ms-align-items: center;justify-content: center;-moz-justify-content: center;-webkit-justify-content: center;-o-justify-content: center;-ms-justify-content: center;border: 2px solid #999;margin-right: 15px;text-align: center;}
-.steps ul li .title,
-.steps ul li .title .number {display: flex;display: -webkit-flex;color: #999;}
-.steps ul .current a,
-.steps ul .current a .title,
-.steps ul .current a .title .number {color: #222;}
-.steps ul .current a .title .number {border: 2px solid #222;}
-.steps ul .done a,
-.steps ul .done a .title,
-.steps ul .done a .title .number {color: #1abc9c;}
-.steps ul .done a .title .number {border: 2px solid #1abc9c;}
-
-
-
-
+    .steps {border-top: 1px solid #ebebeb;border-bottom: 1px solid #ebebeb;padding: 12px 20px;}
+    .steps ul {justify-content: space-around;-moz-justify-content: space-around;-webkit-justify-content: space-around;-o-justify-content: space-around;-ms-justify-content: space-around;display: flex;display: -webkit-flex;list-style-type: none;margin: 0;padding: 0;}
+    .steps ul li {padding-right: 80px;padding-left: 0px;position: relative;}
+    .steps ul li:after {position: absolute;width: 1px;height: 30px;content: "";background: #ebebeb;right: 18px;top: 50%;transform: translateY(-50%);-moz-transform: translateY(-50%);-webkit-transform: translateY(-50%);-o-transform: translateY(-50%);-ms-transform: translateY(-50%);}
+    .steps ul li a {color: #999;text-decoration: none;font-weight: bold;}
+    .steps ul li:last-child:after {width: 0px;}
+    .steps ul li .title {align-items: center;-moz-align-items: center;-webkit-align-items: center;-o-align-items: center;-ms-align-items: center;}
+    .steps ul li .title .number {width: 31px;height: 31px;border-radius: 50%;-moz-border-radius: 50%;-webkit-border-radius: 50%;-o-border-radius: 50%;-ms-border-radius: 50%;align-items: center;-moz-align-items: center;-webkit-align-items: center;-o-align-items: center;-ms-align-items: center;justify-content: center;-moz-justify-content: center;-webkit-justify-content: center;-o-justify-content: center;-ms-justify-content: center;border: 2px solid #999;margin-right: 15px;text-align: center;}
+    .steps ul li .title,
+    .steps ul li .title .number {display: flex;display: -webkit-flex;color: #999;}
+    .steps ul .current a,
+    .steps ul .current a .title,
+    .steps ul .current a .title .number {color: #222;}
+    .steps ul .current a .title .number {border: 2px solid #222;}
+    .steps ul .done a,
+    .steps ul .done a .title,
+    .steps ul .done a .title .number {color: #1abc9c;}
+    .steps ul .done a .title .number {border: 2px solid #1abc9c;}
 
 </style>

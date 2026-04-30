@@ -34,26 +34,13 @@ class sistemaFuncionalidad extends ControllerBase {
         $files        = $FileManager->fileExplorer($params);
 
         /*******************************************************************/
-        /*                         Imprimir Datos                          */
+        /*                     Se devuelven los Datos                      */
         /*******************************************************************/
         //Si hay resultados
         if(is_array($files)){
-
-            /******************************************/
-            //Datos enviados a la pagina
-            $f3->data = [
-                /*=========== Datos de la Pagina ===========*/
-                'TableTitle'      => 'Explorador Archivos',
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*=========== Datos Consultados ===========*/
-                'files'         => $files,
-            ];
-
             /******************************************/
             //Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileExplorer.php');
+            Response::direct($files);
         /*******************************************************************/
         //si no hay resultados
         } else {
@@ -72,22 +59,10 @@ class sistemaFuncionalidad extends ControllerBase {
             $response     = $FileManager->createFolder($_POST);
 
             /*******************************************************************/
-            /*                         Imprimir Datos                          */
+            /*                     Se devuelven los Datos                      */
             /*******************************************************************/
-            //Datos enviados a la pagina
-            $f3->data = [
-                /*=========== Datos de la Pagina ===========*/
-                'TableTitle'      => 'Explorador Archivos',
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*=========== Datos Consultados ===========*/
-                'response'      => $response,
-            ];
-
-            /******************************************/
-            //Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+            //Imprimir respuesta
+            Response::fileData($response['success'], $response['message']);
 
         }
     }
@@ -139,22 +114,10 @@ class sistemaFuncionalidad extends ControllerBase {
             }
 
             /*******************************************************************/
-            /*                         Imprimir Datos                          */
+            /*                     Se devuelven los Datos                      */
             /*******************************************************************/
-            //Datos enviados a la pagina
-            $f3->data = [
-                /*=========== Datos de la Pagina ===========*/
-                'TableTitle'      => 'Explorador Archivos',
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*=========== Datos Consultados ===========*/
-                'response'      => $response,
-            ];
-
-            /******************************************/
-            //Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+            //Imprimir respuesta
+            Response::fileData($response['success'], $response['message']);
 
         }
     }
@@ -169,22 +132,10 @@ class sistemaFuncionalidad extends ControllerBase {
             $response     = $FileManager->deleteFolder($_POST);
 
             /*******************************************************************/
-            /*                         Imprimir Datos                          */
+            /*                     Se devuelven los Datos                      */
             /*******************************************************************/
-            //Datos enviados a la pagina
-            $f3->data = [
-                /*=========== Datos de la Pagina ===========*/
-                'TableTitle'      => 'Explorador Archivos',
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*=========== Datos Consultados ===========*/
-                'response'      => $response,
-            ];
-
-            /******************************************/
-            //Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+            //Imprimir respuesta
+            Response::fileData($response['success'], $response['message']);
 
         }
     }
@@ -215,22 +166,10 @@ class sistemaFuncionalidad extends ControllerBase {
             }
 
             /*******************************************************************/
-            /*                         Imprimir Datos                          */
+            /*                     Se devuelven los Datos                      */
             /*******************************************************************/
-            //Datos enviados a la pagina
-            $f3->data = [
-                /*=========== Datos de la Pagina ===========*/
-                'TableTitle'      => 'Explorador Archivos',
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*=========== Datos Consultados ===========*/
-                'response'      => $response,
-            ];
-
-            /******************************************/
-            //Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/sistemaFuncionalidad-UpdateFileResponse.php');
+            //Imprimir respuesta
+            Response::fileData($response['success'], $response['message']);
 
         }
     }

@@ -2,66 +2,184 @@
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
+/**
+ * Clase Response
+ *
+ * Encapsula la generación de respuestas HTTP en formato JSON
+ * para la API, asegurando una estructura estandarizada.
+ *
+ * Responsabilidades:
+ * - Definir códigos HTTP
+ * - Enviar headers adecuados
+ * - Formatear respuestas JSON consistentes
+ * - Finalizar la ejecución del script
+ *
+ * Estructura estándar de respuesta:
+ * {
+ *   "status": 200,
+ *   "message": "Mensaje descriptivo",
+ *   "data": {...}
+ * }
+ *
+ * @package App\Core
+ */
 class Response {
-    /******************************************************************************/
     /**
-     * Genera y envía una respuesta estructurada en formato JSON al cliente.
-     * * Esta función configura el código de estado HTTP de la respuesta y construye un
-     * objeto JSON que contiene un mensaje descriptivo y, opcionalmente, datos adicionales.
+     * Envía una respuesta JSON al cliente y finaliza la ejecución.
      *
-     * @param int $code Código de estado HTTP (ej. 200, 400, 404, 500).
-     * @param string $message Mensaje descriptivo sobre el resultado de la operación.
-     * @param mixed $Extra Información adicional o datos de respuesta opcionales.
-     * @return string Cadena en formato JSON con la estructura de la respuesta.
+     * Este método:
+     * - Define el código HTTP
+     * - Establece headers necesarios (JSON + CORS básico)
+     * - Codifica la respuesta en formato JSON
+     * - Termina la ejecución del script con exit
+     *
+     * Headers incluidos:
+     * - Content-Type: application/json
+     * - Access-Control-Allow-Origin: * (CORS abierto)
+     *
+     * @param int         $status  Código HTTP (200, 201, 400, 404, etc.)
+     * @param string      $message Mensaje descriptivo de la respuesta
+     * @param mixed|null  $data    Datos adicionales (payload)
+     *
+     * @return void
+     *
+     * @example
+     * Response::json(200, 'OK', ['id' => 1]);
      */
-    public static function sendData($code, $message = "", $Extra = "") {
-        /*
-        Codigos de respuestas
+    public static function json($status, $message, $data = null) {
 
-        Errores en las solicitudes de los clientes
-        400 — Solicitud incorrecta: estructura de URL no válida. El servidor no puede comprender la solicitud realizada por el usuario.
-        401 — Autorización requerida: estos mensajes se muestran cuando los webmasters han restringido el acceso a la página.
-        402 — Pago requerido (aún no se utiliza): si el inicio del pago no se realiza, generalmente se muestra este código.
-        403 — Prohibido: la razón por la que aparece un error 403 es porque estás intentando acceder a un recurso que tiene permisos restringidos. Un sitio web muestra errores 403 prohibidos cuando los usuarios intentan acceder a una página que requiere autenticación.
-        404 — No encontrado: 404 es una indicación clara para los usuarios de que la URL solicitada no está disponible en el sitio web. Puede deberse a un error tipográfico en la URL o a que la página se haya eliminado del sitio.
-        405 — Método no permitido: este código de estado de respuesta HTTP indica que el servidor se ha negado a aceptar el método de solicitud a pesar de comprender el propósito de la solicitud.
-        406 — No aceptable (codificación): esto suele suceder cuando el servidor no puede responder con la solicitud de encabezado de aceptación.
-        407 — Se requiere autenticación de proxy: este error indica que la solicitud no se puede cumplir debido a la falta de autenticación del servidor proxy entre el navegador y el servidor.
-        408 — Tiempo de solicitud agotado: este es uno de los errores HTTP más comunes que encuentran los webmasters cuando el servidor no recibe una solicitud completa del lado del cliente dentro del período de tiempo de espera asignado.
-        409 — Solicitud conflictiva: este error se produce cuando el estado del recurso de destino entra en conflicto con el estado actual. Para resolver el error, identifique el conflicto y vuelva a enviar el documento.
-        410 — Desactivado: este código de error representa que el acceso al recurso solicitado se ha eliminado permanentemente del servidor y permanecerá así en todo momento.
-        411 — Longitud de contenido requerida: el error representa la incapacidad del servidor para aceptar la solicitud del cliente debido a la falla al definir el encabezado de longitud de contenido.
-        412 — Condición previa fallida: se trata de un error causado por un conflicto de seguridad con una o varias de las configuraciones de seguridad que se han implementado en su servidor.
-        413 — Entidad de solicitud demasiado larga: cuando el recurso solicitado es demasiado grande para que el servidor lo cargue, el usuario puede experimentar el error 413.
-        414 — La URL de solicitud es demasiado larga: piense en una estructura de URL de más de 2048 caracteres. El servidor no puede descifrar el error 414 resultante.
-        415 — Tipo de medio no compatible: este error aparece cuando el servidor se niega a cargar un recurso que está en un formato de medio no compatible.
+        // Definir código de respuesta HTTP
+        http_response_code($status);
 
-        Errores del servidor
-        500 — Error interno del servidor
-        501 — No implementado
-        502 — Puerta de enlace no válida
-        503 — Servicio no disponible
-        504 — Tiempo de espera de la puerta de enlace
-        505 — Versión HTTP no compatible.
+        // Headers de respuesta
+        header('Content-Type: application/json; charset=utf-8');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        header('Access-Control-Allow-Origin: *');
 
-        */
-        // Configura el encabezado de estado HTTP en la cabecera de la respuesta actual
-        http_response_code($code);
+        // Estructura estándar de respuesta
+        $response = [
+            'status'  => $status,
+            'message' => $message,
+            'data'    => $data
+        ];
 
-        // Declara el contenedor de datos para la respuesta final
-        $MSG = [];
-
-        // Asigna el mensaje informativo proporcionado a la estructura de respuesta
-        $MSG['message'] = $message;
-
-        // Evalúa si el parámetro de datos adicionales contiene información válida y no vacía
-        if (!empty($Extra) && $Extra != '') {
-            // Adjunta los datos adicionales al cuerpo de la respuesta bajo la clave 'Extra'
-            $MSG['Extra'] = $Extra;
-        }
-
-        // Transforma el arreglo asociativo en una representación de texto JSON
-        return json_encode($MSG);
+        // Codificar y enviar respuesta
+        echo json_encode($response, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        // Detengo la ejecucion
+        exit;
 
     }
+
+    /**
+     * Envía una respuesta exitosa.
+     *
+     * Método helper para simplificar respuestas HTTP exitosas.
+     *
+     * Códigos típicos:
+     * - 200 OK
+     * - 201 Created
+     *
+     * @param string     $message Mensaje de éxito
+     * @param mixed|null $data    Datos de respuesta
+     * @param int        $status  Código HTTP (default: 200)
+     *
+     * @example
+     * Response::success('Usuario creado', ['id' => 10], 201);
+     */
+    public static function success($message = 'Success', $data = null, $status = 200) {
+        self::json($status, $message, $data);
+    }
+
+    /**
+     * Envía una respuesta de error.
+     *
+     * Método helper para respuestas de fallo.
+     *
+     * Códigos típicos:
+     * - 400 Bad Request
+     * - 401 Unauthorized
+     * - 404 Not Found
+     * - 422 Unprocessable Entity
+     * - 500 Internal Server Error
+     *
+     * @param string     $message Mensaje de error
+     * @param int        $status  Código HTTP (default: 400)
+     * @param mixed|null $data    Información adicional (ej: errores de validación)
+     *
+     * @example
+     * Response::error('No autorizado', 401);
+     * Response::error('Error de validación', 422, ['email' => ['Requerido']]);
+     */
+    public static function error($message = 'Error', $status = 500, $data = null) {
+        self::json($status, $message, $data);
+    }
+
+    /**
+     * Se codifica directamente un dato.
+     *
+     * Método helper para codificacion directa.
+     *
+     * Códigos típicos:
+     * - 400 Bad Request
+     * - 401 Unauthorized
+     * - 404 Not Found
+     * - 422 Unprocessable Entity
+     * - 500 Internal Server Error
+     *
+     * @param int        $status  Código HTTP (default: 400)
+     * @param mixed|null $data    Información a pasar
+     *
+     * @example
+     * Response::direct('No autorizado', 401);
+     * Response::direct('Error de validación', 422);
+     */
+    public static function direct($data = null, $status = 200) {
+
+        // Definir código de respuesta HTTP
+        http_response_code($status);
+
+        // Headers de respuesta
+        header('Content-Type: application/json; charset=utf-8');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        header('Access-Control-Allow-Origin: *');
+
+        // Codificar y enviar respuesta
+        echo json_encode($data, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        // Detengo la ejecucion
+        exit;
+
+    }
+
+    /**
+     * Envía una respuesta de manejo de datos.
+     *
+     * Método helper para el manejo de datos del filemanager.
+     *
+     * @param bool    $success true o false
+     * @param string  $message Mensaje de notificacion
+     *
+     * @example
+     * Response::fileData(true, 'No autorizado');
+     * Response::fileData(false, 'Error de validación');
+     */
+    public static function fileData($success = null, $message = null) {
+
+        // Definir código de respuesta HTTP
+        http_response_code(200);
+
+        // Headers de respuesta
+        header('Content-Type: application/json; charset=utf-8');
+        header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
+        header('Access-Control-Allow-Headers: Content-Type, Authorization');
+        header('Access-Control-Allow-Origin: *');
+
+        // Codificar y enviar respuesta
+        echo json_encode(["success" => $success, "message" => $message], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        // Detengo la ejecucion
+        exit;
+
+    }
+
 }

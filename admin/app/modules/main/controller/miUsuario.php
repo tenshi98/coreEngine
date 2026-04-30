@@ -48,11 +48,11 @@ class miUsuario extends ControllerBase {
             //Se genera la cookie
             setcookie('Sesion_tk_'.date("Y-m-d"),$f3->get('SESSION.TokenUser'),time() + (60*60*24));
             //imprimo resultados
-            echo Response::sendData($Response['code'], $Response['message']);
+            Response::success($Response['message']);
         //Si da otro error
         }else{
             //imprimo resultados
-            echo Response::sendData($Response['code'], $Response['message']);
+            Response::error($Response['message'], $Response['code'], $Response['message']);
         }
 
     }
@@ -67,7 +67,7 @@ class miUsuario extends ControllerBase {
 
         /******************************************/
         //imprimo resultados
-        echo Response::sendData($Response['code'], $Response['message']);
+        Response::error($Response['message'], $Response['code'], $Response['message']);
 
     }
 
@@ -90,11 +90,11 @@ class miUsuario extends ControllerBase {
             //Se redirige al index
             $f3->reroute('/');
             //imprimo resultados
-            echo Response::sendData($Response['code'], $Response['message']);
+            Response::success($Response['message']);
         //Si da otro error
         }else{
             //imprimo resultados
-            echo Response::sendData($Response['code'], $Response['message']);
+            Response::error($Response['message'], $Response['code'], $Response['message']);
         }
 
     }
@@ -405,15 +405,15 @@ class miUsuario extends ControllerBase {
                 //Se actualiza la sesion del usuario
                 $this->userSession->updateSession($_POST['idUsuario'], $f3, 1);
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -442,15 +442,15 @@ class miUsuario extends ControllerBase {
                 //Se actualiza la sesion del usuario
                 $this->userSession->updateSession($dataPut['idUsuario'], $f3, 1);
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

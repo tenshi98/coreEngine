@@ -211,7 +211,7 @@ class kanbanTareasTareas extends ControllerBase {
         $ndata_1 = isset($_POST['Tarea']) ? count($_POST['Tarea']) : 0;
         //generacion de errores
         if($ndata_1==0) {
-            echo Response::sendData(500, 'No hay Tareas nuevas creadas');
+            Response::error('No hay Tareas nuevas creadas', 500);
         }else{
             /******************************/
             //Se genera el chequeo
@@ -276,7 +276,7 @@ class kanbanTareasTareas extends ControllerBase {
 
             /******************************/
             //devuelvo el ultimo id
-            echo Response::sendData(200, $_POST['idKanban']);
+            Response::success($_POST['idKanban']);
         }
 
     }
@@ -397,15 +397,15 @@ class kanbanTareasTareas extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

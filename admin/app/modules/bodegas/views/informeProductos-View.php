@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="modal-header">
     <?php
     switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -29,13 +35,13 @@
                             <?php
                             //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
                             if($data['UserData']["gestionDocumentosUsoBodega"]==2){
-                                echo '<th>Documento</th>';
+                                echo '<th scope="col">Documento</th>';
                             } ?>
-                            <th>Fecha</th>
-                            <th>Hora</th>
-                            <th>Tipo Movimiento</th>
-                            <th>Ingreso</th>
-                            <th>Egreso</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Hora</th>
+                            <th scope="col">Tipo Movimiento</th>
+                            <th scope="col">Ingreso</th>
+                            <th scope="col">Egreso</th>
                         </tr>
                     </thead>
                     <tbody>

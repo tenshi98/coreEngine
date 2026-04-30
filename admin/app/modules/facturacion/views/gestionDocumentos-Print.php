@@ -1,4 +1,8 @@
 <?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
 /********************************/
 $CompanyLogo =  !empty($data['UserData']['Sistema_IMGLogo'])
                 ? $data['UserData']['MainPathUrl'].$data['UserData']['Sistema_IMGLogo']

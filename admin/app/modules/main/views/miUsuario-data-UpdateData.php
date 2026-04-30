@@ -1,4 +1,9 @@
 <?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+//Se cargan los arreglos
 $arrData_1 = [
     ['Icon' => '','Titulo' => 'Email',           'Texto' => $data['rowData']['email']],
     ['Icon' => '','Titulo' => 'Tipo de usuario', 'Texto' => $data['rowData']['TipoUsuario']],

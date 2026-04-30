@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
 
     <div class="card">
@@ -25,13 +31,17 @@
                 <?php
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
+                //Se obtiene el nombre o la razón social
+                $Entidad_2  = !empty($data['rowData']['Nombre'])
+                              ? $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']
+                              : $data['rowData']['RazonSocial'];
                 ?>
 
                 <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-planes">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                                Planes de <?php echo $Entidad; ?>
+                                Planes de <?php echo $Entidad_2; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabPlanesNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                             </div>
                         </h5>
@@ -46,7 +56,7 @@
                     <div class="tab-pane fade" id="resumen-usuarios">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                                Usuarios de <?php echo $Entidad; ?>
+                                Usuarios de <?php echo $Entidad_2; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabUsuariosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                             </div>
                         </h5>
@@ -61,7 +71,7 @@
                     <div class="tab-pane fade" id="resumen-maquinas">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                                Máquinas de <?php echo $Entidad; ?>
+                                Máquinas de <?php echo $Entidad_2; ?>
                                 <button type="button" class="btn btn-success"  onclick="tabMaquinasNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                             </div>
                         </h5>

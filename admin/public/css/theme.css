@@ -1645,3 +1645,11 @@ body::-webkit-scrollbar-thumb {background-color: #aab7cf;}
 .ribbon-box .ribbon-two-dark span:before {border-left:3px solid var(--btn-dark-bg);border-top:3px solid var(--btn-dark-bg);}
 .ribbon-box .ribbon-two-dark span:after {border-right:3px solid var(--btn-dark-bg);border-top:3px solid var(--btn-dark-bg);}
 
+/*--------------------------------------------------------------
+# Chat IA
+--------------------------------------------------------------*/
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-user {background-color: #f4f4f4;color: #212529;border: 1px solid var(--card-border-color);}
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-ai {background-color: #ffffff;border: 1px solid var(--card-border-color);}
+.chatIA .main-content .input-container .input-box {background: white;border: 1px solid #e5e5e5;box-shadow: 0 10px 30px rgba(0,0,0,0.05);}
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-bubble .card-custom {border: 1px solid #eee;background: white;}
+

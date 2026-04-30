@@ -1203,13 +1203,12 @@ class permisosListado extends ControllerBase {
             /****************************************/
             // Si es un ID numérico, encripta y envía con código 200 (OK)
             $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
-            echo Response::sendData(200, $Data);
+            Response::success($Data);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            echo Response::sendData(500, $Response);
+            Response::error('Error al operar con la BBDD', 500, $Response);
         }
-
     }
 
     /******************************************************************************/
@@ -1245,15 +1244,15 @@ class permisosListado extends ControllerBase {
                 $this->updatePermisos($f3);
                 /****************************************/
                 // Devuelvo $Response con código 200 (OK)
-                echo Response::sendData(200, $Response);
+                Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 
@@ -1299,20 +1298,20 @@ class permisosListado extends ControllerBase {
                     //Se actualizan los permisos al crear uno nuevo
                     $this->updatePermisos($f3);
                     // Devuelvo $Response con código 200 (OK)
-                    echo Response::sendData(200, $ResponseDelRutas);
+                    Response::success($ResponseDelRutas);
                 } else {
                     // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    echo Response::sendData(500, $ResponseDelRutas);
+                    Response::error('Error al operar con la BBDD', 500, $ResponseDelRutas);
                 }
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                echo Response::sendData(500, $Response);
+                Response::error('Error al operar con la BBDD', 500, $Response);
             }
-
         }else {
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

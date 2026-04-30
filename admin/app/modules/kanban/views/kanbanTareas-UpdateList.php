@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="tab-pane fade active show" id="tab_kanban_1" role="tabpanel" aria-labelledby="home-tab_kanban_1">
     <div class="table-responsive">
         <div class="d-flex">

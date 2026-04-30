@@ -237,7 +237,7 @@ class QueryBuilder{
         * //Formato de la query
         * $query = [
         *   'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *   'table'  => 'data_table', -> Tabla
+        *   'table'  => 'data_table',          -> Tabla
         *   'join'   => '',                    -> Ver opciones de los join
         *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
         *   'group'  => '',                    -> Ver agrupaciones
@@ -421,7 +421,7 @@ class QueryBuilder{
         *   'Post'      => $_POST,                                       -> Datos $_POST entregados
         *   'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
         *     [
-        *     'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
+        *      'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
         *      'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
         *      'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
         *      'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
@@ -802,7 +802,7 @@ class QueryBuilder{
         *
         * //Formato de la query
         * $query = [
-        *   'table'      => 'usuarios_listado',                                    -> Tabla donde se ejecuta la consulta
+        * 'table'      => 'usuarios_listado',                                    -> Tabla donde se ejecuta la consulta
         * 'data'       => '`idCorreosCat` int UNSIGNED NOT NULL AUTO_INCREMENT', -> Datos a crear
         * 'primaryKey' => 'idusuario',                                           -> Clave Primaria
         * 'comentario' => 'fija',                                                -> Comentario de la tabla

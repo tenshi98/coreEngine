@@ -1,14 +1,15 @@
 <?php
-// Establece el código de respuesta HTTP correspondiente al error.
-// Por ejemplo, 400 para "Bad Request", 404 para "Not Found", etc.
-http_response_code(404);
+// Se eliminan datos innecesarios
+function filterKeysByPrefix(array $data, string $prefix): array {
+    return array_filter(
+        $data,
+        fn($key) => strpos($key, $prefix) !== 0,
+        ARRAY_FILTER_USE_KEY
+    );
+}
 
-// Crea un arreglo asociativo con el mensaje de error.
-// Este mensaje será enviado al cliente en formato JSON.
-$MSG['message'] = $data;
+// Se ejecuta
+$dataX = filterKeysByPrefix($data, 'Fnc_');
 
-// Codifica el arreglo en formato JSON y lo devuelve como respuesta.
-// Esto permite que el cliente reciba el mensaje de error de forma estructurada.
-return json_encode($MSG);
-
-?>
+// Se imprime
+Response::success('Success', $dataX);

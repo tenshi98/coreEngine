@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="modal fade" id="newFormModalEstado" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">

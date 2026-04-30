@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="row">
 
     <?php
@@ -12,7 +18,6 @@
     foreach ($data['MainViewData'] as $value) {
         require_once($value);
     }
-
 
     ?>
 </div>

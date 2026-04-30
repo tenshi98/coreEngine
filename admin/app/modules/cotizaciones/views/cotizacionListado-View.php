@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="modal-header">
     <?php
     switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -47,9 +53,9 @@
                             <table class="table table-sm table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Item</th>
-                                        <th class="text-end">Cantidad</th>
-                                        <th class="text-end">Valor</th>
+                                        <th scope="col">Item</th>
+                                        <th scope="col" class="text-end">Cantidad</th>
+                                        <th scope="col" class="text-end">Valor</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -79,9 +85,9 @@
                             <table class="table table-sm table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Producto</th>
-                                        <th class="text-end">Cantidad</th>
-                                        <th class="text-end">Valor</th>
+                                        <th scope="col">Producto</th>
+                                        <th scope="col" class="text-end">Cantidad</th>
+                                        <th scope="col" class="text-end">Valor</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -111,9 +117,9 @@
                             <table class="table table-sm table-hover">
                                 <thead>
                                     <tr>
-                                        <th>Servicio</th>
-                                        <th class="text-end">Cantidad</th>
-                                        <th class="text-end">Valor</th>
+                                        <th scope="col">Servicio</th>
+                                        <th scope="col" class="text-end">Cantidad</th>
+                                        <th scope="col" class="text-end">Valor</th>
                                     </tr>
                                 </thead>
                                 <tbody>

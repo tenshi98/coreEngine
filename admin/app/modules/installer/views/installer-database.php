@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <h5 class="wizardTittle text-danger">Configuración de Base de Datos</h5>
 <div class="steps clearfix">
     <ul>

@@ -1,9 +1,15 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <table class="table table-sm table-hover datatable">
     <thead>
         <tr>
-            <th>Fecha Creacion</th>
-            <th>Observacion</th>
-            <th style="width: 10px;">Acciones</th>
+            <th scope="col">Fecha Creacion</th>
+            <th scope="col">Observacion</th>
+            <th scope="col" style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>

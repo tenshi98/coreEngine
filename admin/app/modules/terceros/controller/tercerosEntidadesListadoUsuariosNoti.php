@@ -206,10 +206,10 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
 
             /******************************/
             // Devuelvo true con código 200 (OK)
-            echo Response::sendData(200, true);
+            Response::success(true);
         }else {
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            echo Response::sendData(500, "Error en el Request Method");
+            // Request Method no esperado
+            Response::error('Error en el Request Method', 500);
         }
     }
 

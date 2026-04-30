@@ -191,14 +191,18 @@ function SendDataErrors(Options, jqXHR, textStatus, errorThrown) {
         let message = '';
         var jsonData = JSON.parse(jqXHR.responseText);
         //se verifica si resultado es un array
-        if(Array.isArray(jsonData.message)===true){
-            for (var i = 0; i < jsonData.message.length; i++) {
-                var counter = jsonData.message[i];
+        if(Array.isArray(jsonData.data)===true){
+            for (var i = 0; i < jsonData.data.length; i++) {
+                var counter = jsonData.data[i];
                 message += counter.message + '<br>';
             }
         //si no lo es solo se muestra
         }else{
             message = jsonData.message;
+        }
+        // fallback por si queda vacío
+        if (!message) {
+            message = jsonData.message || 'Error desconocido';
         }
         /******************************/
         //se muestra el mensaje

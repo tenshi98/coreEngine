@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <section class="section" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -16,32 +22,32 @@
                         <table class="table table-sm table-hover" id="tableData">
                             <thead>
                                 <tr>
-                                    <th>Nombre</th>
-                                    <th>Nick</th>
-                                    <th>Rut</th>
-                                    <th>Ciudad</th>
-                                    <th>Comuna</th>
-                                    <th>Sector</th>
-                                    <th>Dirección</th>
-                                    <th>Fecha Nacimiento</th>
-                                    <th>Email</th>
-                                    <th>Celular</th>
-                                    <th>Teléfono</th>
-                                    <th>Web</th>
-                                    <th>Giro</th>
-                                    <th>Tipo</th>
-                                    <th>Tipo Entidad</th>
-                                    <th>Estado</th>
-                                    <th>Sexo</th>
-                                    <th>Rep Legal Nombre</th>
-                                    <th>Rep Legal Rut</th>
-                                    <th>Rep Legal Email</th>
-                                    <th>Rep Legal Celular</th>
-                                    <th>Rep Legal Teléfono</th>
-                                    <th>X (twiter)</th>
-                                    <th>Facebook</th>
-                                    <th>Instagram</th>
-                                    <th>Linkedin</th>
+                                    <th scope="col">Nombre</th>
+                                    <th scope="col">Nick</th>
+                                    <th scope="col">Rut</th>
+                                    <th scope="col">Ciudad</th>
+                                    <th scope="col">Comuna</th>
+                                    <th scope="col">Sector</th>
+                                    <th scope="col">Dirección</th>
+                                    <th scope="col">Fecha Nacimiento</th>
+                                    <th scope="col">Email</th>
+                                    <th scope="col">Celular</th>
+                                    <th scope="col">Teléfono</th>
+                                    <th scope="col">Web</th>
+                                    <th scope="col">Giro</th>
+                                    <th scope="col">Tipo</th>
+                                    <th scope="col">Tipo Entidad</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Sexo</th>
+                                    <th scope="col">Rep Legal Nombre</th>
+                                    <th scope="col">Rep Legal Rut</th>
+                                    <th scope="col">Rep Legal Email</th>
+                                    <th scope="col">Rep Legal Celular</th>
+                                    <th scope="col">Rep Legal Teléfono</th>
+                                    <th scope="col">X (twiter)</th>
+                                    <th scope="col">Facebook</th>
+                                    <th scope="col">Instagram</th>
+                                    <th scope="col">Linkedin</th>
                                 </tr>
                             </thead>
                             <tbody>

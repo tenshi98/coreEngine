@@ -54,11 +54,11 @@ class apiSession extends ControllerBase {
             //OAuth JWT
             $Resultado = JWT::encode($payload, ConfigToken::JWT["SECRET_KEY"], 'HS256');
             //imprimo resultados
-            echo Response::sendData($Response['code'], $Resultado);
+            Response::success($Resultado);
         //Si da otro error
         }else{
             //imprimo resultados
-            echo Response::sendData($Response['code'], $Response['message']);
+            Response::error($Response['message'], $Response['code']);
         }
 
     }
@@ -73,7 +73,7 @@ class apiSession extends ControllerBase {
 
         /******************************************/
         //imprimo resultados
-        echo Response::sendData($Response['code'], $Response['message']);
+        Response::error($Response['message'], $Response['code']);
 
     }
 

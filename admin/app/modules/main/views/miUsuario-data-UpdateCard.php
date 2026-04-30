@@ -1,4 +1,9 @@
 <?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+//Se verifica la existencia
 if(isset($data['rowData']['Direccion_img'])&&$data['rowData']['Direccion_img']!=''){
     $UserIMG = $data['UserData']['MainPathUrl'].$data['rowData']['Direccion_img'];
 }else{

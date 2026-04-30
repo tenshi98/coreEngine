@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
 
     <div class="card">
@@ -64,6 +70,15 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-prod">
+                    <?php
+                    /*****************************************/
+                    //Se verifica movimiento
+                    switch ($data['rowData']['idEstadoIngreso']) {
+                        case 1: $Movimiento = $data['rowData']['BodegaIngreso']; break;                                        //Ingreso
+                        case 2: $Movimiento = $data['rowData']['BodegaEgreso']; break;                                         //Egreso
+                        case 3: $Movimiento = $data['rowData']['BodegaEgreso'].' a '.$data['rowData']['BodegaIngreso']; break; //Traspaso
+                    }
+                    ?>
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Productos de <?php echo $data['rowData']['TipoMovimiento'].' '.$Movimiento; ?>

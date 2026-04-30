@@ -807,7 +807,25 @@ textarea {resize:none !important;	}
 .ribbon-box .ribbon-two span:before {content:"";position:absolute;left:0;top:100%;z-index:-1;border-right:3px solid transparent;border-bottom:3px solid transparent;}
 .ribbon-box .ribbon-two span:after {content:"";position:absolute;right:0;top:100%;z-index:-1;border-left:3px solid transparent;border-bottom:3px solid transparent;}
 
-
-
+/*--------------------------------------------------------------
+# Chat IA
+--------------------------------------------------------------*/
+/* Área de Chat Principal */
+.chatIA .main-content {flex: 1;display: flex;flex-direction: column;height: 80vh;position: relative;}
+.chatIA .main-content .chat-scroll-area {flex: 1;overflow-y: auto;padding-top: 2rem;padding-bottom: 150px;}
+/* Contenedor centralizado de mensajes */
+.chatIA .main-content .chat-scroll-area .message-wrapper {max-width: 850px;margin: 0 auto;padding: 0 1.5rem;}
+/* Estilo de Mensajes */
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-bubble {border-radius: 1.2rem;padding: 1rem 1.25rem;margin-bottom: 1.5rem;position: relative;}
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-user {border-bottom-right-radius: 0.2rem;margin-left: 15%;}
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-ai {border-bottom-left-radius: 0.2rem;margin-right: 15%;}
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-bubble .avatar-circle {width: 32px;height: 32px;border-radius: 8px;display: flex;align-items: center;justify-content: center;font-size: 0.8rem;}
+/* Input Flotante */
+.chatIA .main-content .input-container {position: absolute;bottom: 0;left: 0;right: 0;padding: 2rem 0;}
+.chatIA .main-content .input-container .input-box {max-width: 750px;margin: 0 auto;border-radius: 16px;padding: 8px;}
+.chatIA .main-content .input-container .input-box input {border: none;box-shadow: none !important;}
+/* Tablas y Gráficos */
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-bubble .card-custom {border-radius: 12px;overflow: hidden;margin-top: 1rem;}
+.chatIA .main-content .chat-scroll-area .message-wrapper .msg-bubble .card-custom .chart-placeholder {min-height: 300px;width: 100%;}
 
 

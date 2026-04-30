@@ -1,10 +1,16 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <form id="FormUpdatePermisos" name="FormUpdatePermisos" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <table class="table table-sm table-hover">
         <thead>
             <tr>
-                <th>Nombre</th>
-                <th style="width: 120px;">Permitido</th>
-                <th style="width: 280px;">Nivel Acceso</th>
+                <th scope="col">Nombre</th>
+                <th scope="col" style="width: 120px;">Permitido</th>
+                <th scope="col" style="width: 280px;">Nivel Acceso</th>
             </tr>
         </thead>
         <tbody>

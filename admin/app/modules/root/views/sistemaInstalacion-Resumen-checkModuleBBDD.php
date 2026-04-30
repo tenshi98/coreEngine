@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <div class="modal-header">
     <?php
     switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -23,10 +29,10 @@
         <table class="table table-sm table-hover datatable">
             <thead>
                 <tr>
-                    <th>N°</th>
-                    <th>Ruta Web</th>
-                    <th>Ruta Controller</th>
-                    <th>Estado</th>
+                    <th scope="col">N°</th>
+                    <th scope="col">Ruta Web</th>
+                    <th scope="col">Ruta Controller</th>
+                    <th scope="col">Estado</th>
                 </tr>
             </thead>
             <tbody>

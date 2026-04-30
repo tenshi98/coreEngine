@@ -1,4 +1,10 @@
 <?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
+<?php
 //Verifico si hay datos
 if(!empty($data['MainViewData']['Data_arrBodegas'])&&is_array($data['MainViewData']['Data_arrBodegas'])){
     //Recorro
@@ -16,8 +22,8 @@ if(!empty($data['MainViewData']['Data_arrBodegas'])&&is_array($data['MainViewDat
                         <table class="table table-sm table-hover datatable">
                             <thead>
                                 <tr>
-                                    <th>Producto</th>
-                                    <th class="text-end">Stock</th>
+                                    <th scope="col">Producto</th>
+                                    <th scope="col" class="text-end">Stock</th>
                                 </tr>
                             </thead>
                             <tbody>

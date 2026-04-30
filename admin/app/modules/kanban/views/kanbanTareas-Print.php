@@ -1,1 +1,1 @@
-<?php require_once('common-Print.php'); ?>
+<?php require_once('common-Print.php');

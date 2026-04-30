@@ -1,3 +1,9 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
 <section class="section">
 
     <div class="row">
@@ -13,11 +19,11 @@
                         <table class="table datatable">
                             <thead>
                                 <tr>
-                                    <th><b>N</b>ame</th>
-                                    <th>Ext.</th>
-                                    <th>City</th>
+                                    <th scope="col"><b>N</b>ame</th>
+                                    <th scope="col">Ext.</th>
+                                    <th scope="col">City</th>
                                     <th data-type="date" data-format="YYYY/DD/MM">Start Date</th>
-                                    <th>Completion</th>
+                                    <th scope="col">Completion</th>
                                 </tr>
                             </thead>
                             <tbody>
