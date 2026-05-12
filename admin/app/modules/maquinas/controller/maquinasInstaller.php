@@ -25,7 +25,7 @@ class maquinasInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -53,30 +53,8 @@ class maquinasInstaller extends ControllerBase {
 
         /******************************************/
         //Variables
-        $arrTables    = array();
+        $arrTables    = $this->listTables();
         $arrPermisos  = array();
-
-        /*******************************************************/
-        /*                 SE GENERAN LAS TABLAS               */
-        /*******************************************************/
-        $arrTables[] = [
-            'table'      => 'maquinas_listado',
-            'data'       => '`idMaquina` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
-            'primaryKey' => 'idMaquina',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'maquinas_listado_documentos',
-            'data'       => '`idDocumentos` int UNSIGNED NOT NULL AUTO_INCREMENT,`idMaquina` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
-            'primaryKey' => 'idDocumentos',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'maquinas_listado_observaciones',
-            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idMaquina` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
-            'primaryKey' => 'idObservaciones',
-            'comentario' => 'Creado desde el Instalador',
-        ];
 
         /************************************************/
         /************************************************/
@@ -161,7 +139,7 @@ class maquinasInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -265,7 +243,7 @@ class maquinasInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
@@ -344,6 +322,60 @@ class maquinasInstaller extends ControllerBase {
         /******************************************/
         //devuelvo
         return $RutaController;
+    }
+    /******************************************************************************/
+    //Se listan las tablas
+    public function listTables(){
+
+        /******************************************/
+        //Variables
+        $arrTables    = array();
+
+        /*******************************************************/
+        /*                 SE GENERAN LAS TABLAS               */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'maquinas_listado',
+            'data'       => '`idMaquina` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'primaryKey' => 'idMaquina',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_listado_documentos',
+            'data'       => '`idDocumentos` int UNSIGNED NOT NULL AUTO_INCREMENT,`idMaquina` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
+            'primaryKey' => 'idDocumentos',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_listado_observaciones',
+            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idMaquina` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'primaryKey' => 'idObservaciones',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+
+        /************************************************/
+        //devuelvo true
+        return $arrTables;
+
+    }
+    /******************************************************************************/
+    //Mapeo de las tablas
+    public function mapTables(){
+
+        $Data = '
+        core_estados(idEstado,Nombre)
+        ';
+
+        /******************************************/
+        //Variables
+        $arrTables = $this->listTables();
+        $dataSQL   = new FunctionsDataSQL();
+        $Data     .= $dataSQL->minifyArrayTables($arrTables);
+
+        /************************************************/
+        //devuelvo true
+        return $Data;
+
     }
 
 }

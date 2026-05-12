@@ -48,7 +48,7 @@
             //texto
             $Texto = $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']).'
                 <div class="btn-group" role="group">
-                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']).'" class="btn btn-primary btn-sm" ><i class="bi bi-eye"></i> Ver Documento</a>
+                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']).'" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
                 </div>';
 
             $arrData2 = [

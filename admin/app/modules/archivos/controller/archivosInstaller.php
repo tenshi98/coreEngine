@@ -25,7 +25,7 @@ class archivosInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
 		/*******************************************************/
@@ -125,7 +125,7 @@ class archivosInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -210,7 +210,7 @@ class archivosInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/

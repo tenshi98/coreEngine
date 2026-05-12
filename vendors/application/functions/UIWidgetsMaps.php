@@ -82,10 +82,11 @@ class UIWidgetsMaps {
 		/********************** Si todo esta ok **********************/
         //Se selecciona el tipo
         switch ($MapTypeId) {
-            case 1: $int_map_type = 'ROADMAP';   break; //muestra la vista predeterminada del mapa de carreteras. Este es el tipo de mapa predeterminado.
-            case 2: $int_map_type = 'SATELLITE'; break; //muestra imágenes de satélite de Google Earth.
-            case 3: $int_map_type = 'HYBRID';    break; //muestra una mezcla de vistas normales y de satélite.
-            case 4: $int_map_type = 'TERRAIN';   break; //muestra un mapa físico basado en la información del terreno.
+            case 1:  $int_map_type = 'ROADMAP';   break; //muestra la vista predeterminada del mapa de carreteras. Este es el tipo de mapa predeterminado.
+            case 2:  $int_map_type = 'SATELLITE'; break; //muestra imágenes de satélite de Google Earth.
+            case 3:  $int_map_type = 'HYBRID';    break; //muestra una mezcla de vistas normales y de satélite.
+            case 4:  $int_map_type = 'TERRAIN';   break; //muestra un mapa físico basado en la información del terreno.
+            default: $int_map_type = 'ROADMAP';   break; // valor por defecto
         }
 
         /**********************/
@@ -262,10 +263,11 @@ class UIWidgetsMaps {
 		/********************** Si todo esta ok **********************/
         //Se selecciona el tipo
         switch ($MapTypeId) {
-            case 1: $int_map_type = 'ROADMAP';   break; //muestra la vista predeterminada del mapa de carreteras. Este es el tipo de mapa predeterminado.
-            case 2: $int_map_type = 'SATELLITE'; break; //muestra imágenes de satélite de Google Earth.
-            case 3: $int_map_type = 'HYBRID';    break; //muestra una mezcla de vistas normales y de satélite.
-            case 4: $int_map_type = 'TERRAIN';   break; //muestra un mapa físico basado en la información del terreno.
+            case 1:  $int_map_type = 'ROADMAP';   break; //muestra la vista predeterminada del mapa de carreteras. Este es el tipo de mapa predeterminado.
+            case 2:  $int_map_type = 'SATELLITE'; break; //muestra imágenes de satélite de Google Earth.
+            case 3:  $int_map_type = 'HYBRID';    break; //muestra una mezcla de vistas normales y de satélite.
+            case 4:  $int_map_type = 'TERRAIN';   break; //muestra un mapa físico basado en la información del terreno.
+            default: $int_map_type = 'ROADMAP';   break; // valor por defecto
         }
 
         /**********************/
@@ -464,10 +466,11 @@ class UIWidgetsMaps {
 		/********************** Si todo esta ok **********************/
         //Se selecciona el tipo
         switch ($MapTypeId) {
-            case 1: $int_map_type = 'ROADMAP';   break; //muestra la vista predeterminada del mapa de carreteras. Este es el tipo de mapa predeterminado.
-            case 2: $int_map_type = 'SATELLITE'; break; //muestra imágenes de satélite de Google Earth.
-            case 3: $int_map_type = 'HYBRID';    break; //muestra una mezcla de vistas normales y de satélite.
-            case 4: $int_map_type = 'TERRAIN';   break; //muestra un mapa físico basado en la información del terreno.
+            case 1:  $int_map_type = 'ROADMAP';   break; //muestra la vista predeterminada del mapa de carreteras. Este es el tipo de mapa predeterminado.
+            case 2:  $int_map_type = 'SATELLITE'; break; //muestra imágenes de satélite de Google Earth.
+            case 3:  $int_map_type = 'HYBRID';    break; //muestra una mezcla de vistas normales y de satélite.
+            case 4:  $int_map_type = 'TERRAIN';   break; //muestra un mapa físico basado en la información del terreno.
+            default: $int_map_type = 'ROADMAP';   break; // valor por defecto
         }
 
         /**********************/

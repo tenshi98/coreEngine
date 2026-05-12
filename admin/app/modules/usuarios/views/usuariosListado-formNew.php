@@ -4,7 +4,7 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<div class="modal fade" id="newFormModal" >
+<div class="modal fade" id="newFormModal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form id="FormNewData" name="FormNewData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">

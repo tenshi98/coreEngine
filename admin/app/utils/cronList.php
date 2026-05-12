@@ -2,10 +2,11 @@
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
-//  */5 * * * * wget -q -O /dev/null "https://URL/cronList/v1/example" > /dev/null 2>&1
+//  */5 * * * * wget -q -O /dev/null "https://URL/cronList/v1/example"> /dev/null 2>&1
 
 
 /********************* VERSION 1 *********************/
 $f3->route('GET /cronList/v1/example', 'cronExample->listData');
+
 /********************* VERSION 2 *********************/
 $f3->route('GET /cronList/v2/example', 'cronExample->listDataV2');

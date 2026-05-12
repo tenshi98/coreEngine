@@ -93,9 +93,21 @@
         if($data['rowData']['Config_Principal_Feed']==2){
              $arrData_4[] = ['Icon' => '','Titulo' => 'URL Feed Noticias',         'Texto' => $data['rowData']['Config_Principal_FeedURL']];
         }
+        /**************************************/
+        $arrData_5   = [];
+        //Se condiciona el uso de IA
+        if($data['UserData']["Config_IA_Uso"]==2){
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Provider',             'Texto' => $data['rowData']['IAProvider']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'API Key',              'Texto' => $data['rowData']['Config_IA_ApiKey']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'API Model',            'Texto' => $data['rowData']['Config_IA_Model']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'API Base URL',         'Texto' => $data['rowData']['Config_IA_Base_URL']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Nombre IA',            'Texto' => $data['rowData']['Config_IA_Name']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Tono IA',              'Texto' => $data['rowData']['Config_IA_Tone']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Uso Memoria Cache IA', 'Texto' => activo($data['rowData']['Config_IA_UsoCache'])];
+        }
 
         /**************************************/
-        $arrData_5 = [
+        $arrData_6 = [
             ['Icon' => '','Titulo' => 'URL Twitter',    'Texto' => (!empty($data['rowData']['Social_X']) ? '<a href="'.$data['rowData']['Social_X'].'" class="twitter"><i class="bi bi-twitter"></i> Twitter</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Facebook',   'Texto' => (!empty($data['rowData']['Social_Facebook']) ? '<a href="'.$data['rowData']['Social_Facebook'].'"  class="facebook"><i class="bi bi-facebook"></i> Facebook</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Instagram',  'Texto' => (!empty($data['rowData']['Social_Instagram']) ? '<a href="'.$data['rowData']['Social_Instagram'].'" class="instagram"><i class="bi bi-instagram"></i> Instagram</a>' : '')],
@@ -116,8 +128,11 @@
         echo '<h5 class="box-title text-color-red-dark">APIS Y Configuraciones</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 7);
 
-        echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Inteligencia Artificial</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
+
+        echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
+        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_6, 8);
 
         //funcion para devolver el uso
         function activo($valor){

@@ -377,15 +377,9 @@ class ControllerBase {
 		*=================================================    Modo de uso  =================================================
 		*
 		* 	//Formato de la query
-        *   $params = [
-        *       'query' => [
-        *           'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
-        *           'table'       => 'usuarios_listado', -> Tabla donde esta el dato
-        *           'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
-        *           'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
-        *           'Post'        => $_POST              -> Datos $_POST
-        *       ],
-        *   ];
+        *   $query_1 = 'DELETE FROM `usuarios_listado_permisos` WHERE idPermisos = 1';
+        *   $query_2 = 'DELETE FROM `core_permisos_listado` WHERE RutaController = 1';
+        *   $query_3 = 'DELETE FROM `core_permisos_listado_rutas` WHERE Controller = 1';
 		*
 		*===================================================================================================================
 		*/

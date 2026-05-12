@@ -3,7 +3,7 @@
     <input name="<?php echo $name; ?>" id="<?php echo $name; ?>" type="file" class="upload" />
 </div>
 
-<div class="modal" id="<?php echo $name; ?>Modal" >
+<div class="modal" id="<?php echo $name; ?>Modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">

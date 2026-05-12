@@ -56,10 +56,10 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
 
     /*******************************/
     //Pruebas
-    $f3->route('GET /Core/testeos/controladores',            'testeos->controladores');  //Pruebas al controlador base
-    $f3->route('GET /Core/testeos/funciones',                'testeos->funciones');      //Pruebas a las funciones
-    $f3->route('GET /Core/testeos/inteligenciaArtificial',   'testeos->IA_View');        //Prueba del chat GPT
-    $f3->route('POST /Core/testeos/inteligenciaArtificial',  'testeos->IA_Response');    //Respuesta del chat GPT
+    $f3->route('GET  /Core/testeos/controladores',            'testeos->controladores');  //Pruebas al controlador base
+    $f3->route('GET  /Core/testeos/funciones',                'testeos->funciones');      //Pruebas a las funciones
+    $f3->route('GET  /Core/testeos/inteligenciaArtificial',   'testeos->IA_View');        //Prueba del chat GPT
+    $f3->route('POST /Core/testeos/inteligenciaArtificial',   'testeos->IA_Response');    //Respuesta del chat GPT
     //Envios de datos
     $f3->route('GET /Core/testeos/send_SMTPMail',            'testeos->SMTPMail');                 //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     $f3->route('GET /Core/testeos/send_GMail',               'testeos->GMail');                    //Envio de correo por Gmail (solo un correo, con uno o varios receptores)
@@ -79,47 +79,47 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Vistas
     $f3->route('GET /Core/pruebas/crudNormal/listAll', 'crudNormal->listAll');        //Listar Toda la Información
     //Fragments
-    $f3->route('POST /Core/pruebas/crudNormal/search',    'crudNormal->UpdateList');  //Filtrar datos
-    $f3->route('GET /Core/pruebas/crudNormal/updateList', 'crudNormal->UpdateList');  //Actualizar Lista
-    $f3->route('GET /Core/pruebas/crudNormal/view/@id',   'crudNormal->View');        //Mostrar Detallado
-    $f3->route('GET /Core/pruebas/crudNormal/getID/@id',  'crudNormal->GetID');       //Mostrar información
+    $f3->route('POST /Core/pruebas/crudNormal/search',     'crudNormal->UpdateList');  //Filtrar datos
+    $f3->route('GET  /Core/pruebas/crudNormal/updateList', 'crudNormal->UpdateList');  //Actualizar Lista
+    $f3->route('GET  /Core/pruebas/crudNormal/view/@id',   'crudNormal->View');        //Mostrar Detallado
+    $f3->route('GET  /Core/pruebas/crudNormal/getID/@id',  'crudNormal->GetID');       //Mostrar información
     //Acciones
-    $f3->route('POST /Core/pruebas/crudNormal',        'crudNormal->Insert');  //Crear
-    $f3->route('POST /Core/pruebas/crudNormal/update', 'crudNormal->Update');  //Editar por post (modificar y subir archivos)
-    $f3->route('DELETE /Core/pruebas/crudNormal',      'crudNormal->Delete');  //Borrar dato y archivos
+    $f3->route('POST   /Core/pruebas/crudNormal',        'crudNormal->Insert');  //Crear
+    $f3->route('POST   /Core/pruebas/crudNormal/update', 'crudNormal->Update');  //Editar por post (modificar y subir archivos)
+    $f3->route('DELETE /Core/pruebas/crudNormal',        'crudNormal->Delete');  //Borrar dato y archivos
     /*************************************************************/
     /*                       Crud Resumen                         */
     /*************************************************************/
     //Vistas
     $f3->route('GET /Core/pruebas/crudResumen/listAll', 'crudResumen->listAll');        //Listar Toda la Información
     //Fragments
-    $f3->route('POST /Core/pruebas/crudResumen/search',            'crudResumen->UpdateList');     //Filtrar datos
-    $f3->route('GET /Core/pruebas/crudResumen/updateList',         'crudResumen->UpdateList');     //Actualizar Lista
-    $f3->route('GET /Core/pruebas/crudResumen/view/@id',           'crudResumen->View');           //Mostrar Detallado
-    $f3->route('GET /Core/pruebas/crudResumen/resumen/@id',        'crudResumen->Resumen');        //Mostrar información
-    $f3->route('GET /Core/pruebas/crudResumen/resumenUpdate/@id',  'crudResumen->ResumenUpdate');  //Mostrar Detallado
+    $f3->route('POST /Core/pruebas/crudResumen/search',             'crudResumen->UpdateList');     //Filtrar datos
+    $f3->route('GET  /Core/pruebas/crudResumen/updateList',         'crudResumen->UpdateList');     //Actualizar Lista
+    $f3->route('GET  /Core/pruebas/crudResumen/view/@id',           'crudResumen->View');           //Mostrar Detallado
+    $f3->route('GET  /Core/pruebas/crudResumen/resumen/@id',        'crudResumen->Resumen');        //Mostrar información
+    $f3->route('GET  /Core/pruebas/crudResumen/resumenUpdate/@id',  'crudResumen->ResumenUpdate');  //Mostrar Detallado
     //Acciones
-    $f3->route('POST /Core/pruebas/crudResumen',         'crudResumen->Insert');    //Crear
-    $f3->route('POST /Core/pruebas/crudResumen/update',  'crudResumen->Update');    //Editar por post (modificar y subir archivos)
-    $f3->route('PUT /Core/pruebas/crudResumen/delFiles', 'crudResumen->DelFiles');  //Permite eliminar archivos
-    $f3->route('DELETE /Core/pruebas/crudResumen',       'crudResumen->Delete');    //Borrar dato y archivos
+    $f3->route('POST   /Core/pruebas/crudResumen',          'crudResumen->Insert');    //Crear
+    $f3->route('POST   /Core/pruebas/crudResumen/update',   'crudResumen->Update');    //Editar por post (modificar y subir archivos)
+    $f3->route('PUT    /Core/pruebas/crudResumen/delFiles', 'crudResumen->DelFiles');  //Permite eliminar archivos
+    $f3->route('DELETE /Core/pruebas/crudResumen',          'crudResumen->Delete');    //Borrar dato y archivos
     //Observaciones - Fragments
     $f3->route('GET /Core/pruebas/crudResumen/observaciones/new/@id',        'crudResumenObservaciones->New');         //Mostrar modal nuevo
     $f3->route('GET /Core/pruebas/crudResumen/observaciones/updateList/@id', 'crudResumenObservaciones->UpdateList');  //Actualizar Lista
     $f3->route('GET /Core/pruebas/crudResumen/observaciones/view/@id',       'crudResumenObservaciones->View');        //Mostrar Detallado
     $f3->route('GET /Core/pruebas/crudResumen/observaciones/getID/@id',      'crudResumenObservaciones->GetID');       //Mostrar información
     //Observaciones - Acciones
-    $f3->route('POST /Core/pruebas/crudResumen/observaciones',        'crudResumenObservaciones->Insert');  //Crear
-    $f3->route('POST /Core/pruebas/crudResumen/observaciones/update', 'crudResumenObservaciones->Update');  //Editar por post (modificar y subir archivos)
-    $f3->route('DELETE /Core/pruebas/crudResumen/observaciones',      'crudResumenObservaciones->Delete');  //Borrar dato y archivos
+    $f3->route('POST   /Core/pruebas/crudResumen/observaciones',        'crudResumenObservaciones->Insert');  //Crear
+    $f3->route('POST   /Core/pruebas/crudResumen/observaciones/update', 'crudResumenObservaciones->Update');  //Editar por post (modificar y subir archivos)
+    $f3->route('DELETE /Core/pruebas/crudResumen/observaciones',        'crudResumenObservaciones->Delete');  //Borrar dato y archivos
     /*************************************************************/
     /*                       INFORMES                         */
     /*************************************************************/
     //Vistas
     $f3->route('GET /Core/pruebas/crudInforme/listAll', 'crudInforme->listAll');        //Listar Toda la Información
     //Fragments
-    $f3->route('POST /Core/pruebas/crudInforme/search',  'crudInforme->UpdateList');     //Filtrar datos
-    $f3->route('GET /Core/pruebas/crudInforme/view/@id', 'crudInforme->View');           //Mostrar Detallado
+    $f3->route('POST /Core/pruebas/crudInforme/search',   'crudInforme->UpdateList');     //Filtrar datos
+    $f3->route('GET  /Core/pruebas/crudInforme/view/@id', 'crudInforme->View');           //Mostrar Detallado
 
     /*************************************************************/
     /*               Categoria de los Permisos                   */
@@ -127,62 +127,62 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Vistas
     $f3->route('GET /Core/permisos/categorias/listAll', 'permisosCategorias->listAll');        //Listar Toda la Información
     //Fragments
-    $f3->route('POST /Core/permisos/categorias/search',    'permisosCategorias->UpdateList');  //Filtrar datos
-    $f3->route('GET /Core/permisos/categorias/updateList', 'permisosCategorias->UpdateList');  //Actualizar Lista
-    $f3->route('GET /Core/permisos/categorias/view/@id',   'permisosCategorias->View');        //Mostrar Detallado
-    $f3->route('GET /Core/permisos/categorias/getID/@id',  'permisosCategorias->GetID');       //Mostrar información
+    $f3->route('POST /Core/permisos/categorias/search',     'permisosCategorias->UpdateList');  //Filtrar datos
+    $f3->route('GET  /Core/permisos/categorias/updateList', 'permisosCategorias->UpdateList');  //Actualizar Lista
+    $f3->route('GET  /Core/permisos/categorias/view/@id',   'permisosCategorias->View');        //Mostrar Detallado
+    $f3->route('GET  /Core/permisos/categorias/getID/@id',  'permisosCategorias->GetID');       //Mostrar información
     //Acciones
-    $f3->route('POST /Core/permisos/categorias',        'permisosCategorias->Insert');  //Crear
-    $f3->route('POST /Core/permisos/categorias/update', 'permisosCategorias->Update');  //Editar por post (modificar y subir archivos)
-    $f3->route('DELETE /Core/permisos/categorias',      'permisosCategorias->Delete');  //Borrar dato y archivos
+    $f3->route('POST   /Core/permisos/categorias',        'permisosCategorias->Insert');  //Crear
+    $f3->route('POST   /Core/permisos/categorias/update', 'permisosCategorias->Update');  //Editar por post (modificar y subir archivos)
+    $f3->route('DELETE /Core/permisos/categorias',        'permisosCategorias->Delete');  //Borrar dato y archivos
     /*************************************************************/
     /*                         Permisos                          */
     /*************************************************************/
     //Vistas
     $f3->route('GET /Core/permisos/listado/listAll', 'permisosListado->listAll');        //Listar Toda la Información
     //Fragments
-    $f3->route('POST /Core/permisos/listado/search',           'permisosListado->UpdateList');     //Filtrar datos
-    $f3->route('GET /Core/permisos/listado/updateList',        'permisosListado->UpdateList');     //Actualizar Lista
-    $f3->route('GET /Core/permisos/listado/viewAll',           'permisosListado->ViewAll');        //Mostrar todas las rutas
-    $f3->route('GET /Core/permisos/listado/view/@id',          'permisosListado->View');           //Mostrar Detallado
-    $f3->route('GET /Core/permisos/listado/resumen/@id',       'permisosListado->Resumen');        //Mostrar información
-    $f3->route('GET /Core/permisos/listado/resumenUpdate/@id', 'permisosListado->ResumenUpdate');  //Mostrar Detallado
+    $f3->route('POST /Core/permisos/listado/search',            'permisosListado->UpdateList');     //Filtrar datos
+    $f3->route('GET  /Core/permisos/listado/updateList',        'permisosListado->UpdateList');     //Actualizar Lista
+    $f3->route('GET  /Core/permisos/listado/viewAll',           'permisosListado->ViewAll');        //Mostrar todas las rutas
+    $f3->route('GET  /Core/permisos/listado/view/@id',          'permisosListado->View');           //Mostrar Detallado
+    $f3->route('GET  /Core/permisos/listado/resumen/@id',       'permisosListado->Resumen');        //Mostrar información
+    $f3->route('GET  /Core/permisos/listado/resumenUpdate/@id', 'permisosListado->ResumenUpdate');  //Mostrar Detallado
     //Acciones
-    $f3->route('POST /Core/permisos/listado',         'permisosListado->Insert');  //Crear
-    $f3->route('POST /Core/permisos/listado/update',  'permisosListado->Update');  //Editar por post (modificar y subir archivos)
-    $f3->route('DELETE /Core/permisos/listado',       'permisosListado->Delete');  //Borrar dato y archivos
+    $f3->route('POST   /Core/permisos/listado',         'permisosListado->Insert');  //Crear
+    $f3->route('POST   /Core/permisos/listado/update',  'permisosListado->Update');  //Editar por post (modificar y subir archivos)
+    $f3->route('DELETE /Core/permisos/listado',         'permisosListado->Delete');  //Borrar dato y archivos
     //Rutas - Fragments
     $f3->route('GET /Core/permisos/listado/rutas/updateList/@id', 'permisosListadoRutas->UpdateList');  //Actualizar Lista
     $f3->route('GET /Core/permisos/listado/rutas/view/@id',       'permisosListadoRutas->View');        //Mostrar Detallado
     $f3->route('GET /Core/permisos/listado/rutas/getID/@id',      'permisosListadoRutas->GetID');       //Mostrar información
     //Rutas - Acciones
-    $f3->route('POST /Core/permisos/listado/rutas',        'permisosListadoRutas->Insert');  //Crear
-    $f3->route('POST /Core/permisos/listado/rutas/update', 'permisosListadoRutas->Update');  //Editar por post (modificar y subir archivos)
-    $f3->route('DELETE /Core/permisos/listado/rutas',      'permisosListadoRutas->Delete');  //Borrar dato y archivos
+    $f3->route('POST   /Core/permisos/listado/rutas',        'permisosListadoRutas->Insert');  //Crear
+    $f3->route('POST   /Core/permisos/listado/rutas/update', 'permisosListadoRutas->Update');  //Editar por post (modificar y subir archivos)
+    $f3->route('DELETE /Core/permisos/listado/rutas',        'permisosListadoRutas->Delete');  //Borrar dato y archivos
     /*************************************************************/
     /*                   Administracion de usuarios              */
     /*************************************************************/
     //Vistas
     $f3->route('GET /Core/administracion/usuarios/listAll', 'usuarios->listAll');        //Listar Toda la Información
     //Fragments
-    $f3->route('POST /Core/administracion/usuarios/search',           'usuarios->UpdateList');     //Filtrar datos
-    $f3->route('GET /Core/administracion/usuarios/updateList',        'usuarios->UpdateList');     //Actualizar Lista
-    $f3->route('GET /Core/administracion/usuarios/view/@id',          'usuarios->View');           //Mostrar Detallado
-    $f3->route('GET /Core/administracion/usuarios/resumen/@id',       'usuarios->Resumen');        //Mostrar información
-    $f3->route('GET /Core/administracion/usuarios/resumenUpdate/@id', 'usuarios->ResumenUpdate');  //Mostrar Detallado
+    $f3->route('POST /Core/administracion/usuarios/search',            'usuarios->UpdateList');     //Filtrar datos
+    $f3->route('GET  /Core/administracion/usuarios/updateList',        'usuarios->UpdateList');     //Actualizar Lista
+    $f3->route('GET  /Core/administracion/usuarios/view/@id',          'usuarios->View');           //Mostrar Detallado
+    $f3->route('GET  /Core/administracion/usuarios/resumen/@id',       'usuarios->Resumen');        //Mostrar información
+    $f3->route('GET  /Core/administracion/usuarios/resumenUpdate/@id', 'usuarios->ResumenUpdate');  //Mostrar Detallado
     //Acciones
-    $f3->route('POST /Core/administracion/usuarios',         'usuarios->Insert');   //Crear
-    $f3->route('POST /Core/administracion/usuarios/update',  'usuarios->Update');   //Editar por post (modificar y subir archivos)
-    $f3->route('PUT /Core/administracion/usuarios/delFiles', 'usuarios->DelFiles'); //Permite eliminar archivos
-    $f3->route('DELETE /Core/administracion/usuarios',       'usuarios->Delete');   //Borrar dato y archivos
+    $f3->route('POST   /Core/administracion/usuarios',          'usuarios->Insert');   //Crear
+    $f3->route('POST   /Core/administracion/usuarios/update',   'usuarios->Update');   //Editar por post (modificar y subir archivos)
+    $f3->route('PUT    /Core/administracion/usuarios/delFiles', 'usuarios->DelFiles'); //Permite eliminar archivos
+    $f3->route('DELETE /Core/administracion/usuarios',          'usuarios->Delete');   //Borrar dato y archivos
     //Observaciones - Fragments
     $f3->route('GET /Core/administracion/usuarios/observaciones/updateList/@id', 'usuariosObservaciones->UpdateList');  //Actualizar Lista
     $f3->route('GET /Core/administracion/usuarios/observaciones/view/@id',       'usuariosObservaciones->View');        //Mostrar Detallado
     $f3->route('GET /Core/administracion/usuarios/observaciones/getID/@id',      'usuariosObservaciones->GetID');       //Mostrar información
     //Observaciones - Acciones
-    $f3->route('POST /Core/administracion/usuarios/observaciones',        'usuariosObservaciones->Insert');   //Crear
-    $f3->route('POST /Core/administracion/usuarios/observaciones/update', 'usuariosObservaciones->Update');   //Editar por post (modificar y subir archivos)
-    $f3->route('DELETE /Core/administracion/usuarios/observaciones',      'usuariosObservaciones->Delete');   //Borrar dato y archivos
+    $f3->route('POST   /Core/administracion/usuarios/observaciones',        'usuariosObservaciones->Insert');   //Crear
+    $f3->route('POST   /Core/administracion/usuarios/observaciones/update', 'usuariosObservaciones->Update');   //Editar por post (modificar y subir archivos)
+    $f3->route('DELETE /Core/administracion/usuarios/observaciones',        'usuariosObservaciones->Delete');   //Borrar dato y archivos
     /*************************************************************/
     /*                      Bloqueos de usuarios                 */
     /*************************************************************/
@@ -200,8 +200,8 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Fragments
     $f3->route('GET /Core/plataforma/configuracion/resumenUpdate', 'sistemaOpciones->ResumenUpdate');  //Mostrar Detallado
     //Acciones
-    $f3->route('POST /Core/plataforma/configuracion/update',  'sistemaOpciones->Update');    //Editar por post (modificar y subir archivos)
-    $f3->route('PUT /Core/plataforma/configuracion/delFiles', 'sistemaOpciones->DelFiles');  //Permite eliminar archivos
+    $f3->route('POST /Core/plataforma/configuracion/update',   'sistemaOpciones->Update');    //Editar por post (modificar y subir archivos)
+    $f3->route('PUT  /Core/plataforma/configuracion/delFiles', 'sistemaOpciones->DelFiles');  //Permite eliminar archivos
     /*************************************************************/
     /*                  Instalacion de Modulos                   */
     /*************************************************************/

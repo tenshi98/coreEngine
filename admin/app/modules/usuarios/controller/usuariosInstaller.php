@@ -25,7 +25,7 @@ class usuariosInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -39,7 +39,7 @@ class usuariosInstaller extends ControllerBase {
         /******************************************/
         //Verificar que existan los permisos
         $arrData = [
-            'Nombre'        => 'Modulo de Administracion de Usuarios',
+            'Nombre'        => 'Módulo de Administracion de Usuarios',
             'Descripcion'   => 'Módulo para gestionar a los Usuarios',
             'Controller'    => $this->controllerName,
             'countPermisos' => $countPermisos,
@@ -125,7 +125,7 @@ class usuariosInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -210,7 +210,7 @@ class usuariosInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/

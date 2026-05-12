@@ -239,12 +239,13 @@ class UIWidgetsCommon {
 
             //Selecciono el tipo de mensaje
             switch ($type) {
-                case 1:$alertType = 'alert-'.$alertColor;                                                     $alertIcon = '';                                                             break;//Default
-                case 2:$alertType = 'alert-'.$alertColor;                                                     $alertIcon = '<i class="bi bi-'.$icon.' me-1"></i>';                         break;//Default With Icon
-                case 3:$alertType = 'border-'.$alertColor;                                                    $alertIcon = '';                                                             break;//Outlined
-                case 4:$alertType = 'alert-'.$alertColor.' alert-white';                                      $alertIcon = '<div class="icon"><i class="bi bi-'.$icon.' me-1"></i></div>'; break;//Outlined With Icon
-                case 5:$alertType = 'border-'.$alertColor.' alert-information';                               $alertIcon = '';                                                             break;//Outlined info
-                case 6:$alertType = 'alert-'.$alertColor.' bg-'.$alertColor.'-gradient text-white border-0';  $alertIcon = '';                                                             break;//Default Solid Color
+                case 1:  $alertType = 'alert-'.$alertColor;                                                     $alertIcon = '';                                                             break;//Default
+                case 2:  $alertType = 'alert-'.$alertColor;                                                     $alertIcon = '<i class="bi bi-'.$icon.' me-1"></i>';                         break;//Default With Icon
+                case 3:  $alertType = 'border-'.$alertColor;                                                    $alertIcon = '';                                                             break;//Outlined
+                case 4:  $alertType = 'alert-'.$alertColor.' alert-white';                                      $alertIcon = '<div class="icon"><i class="bi bi-'.$icon.' me-1"></i></div>'; break;//Outlined With Icon
+                case 5:  $alertType = 'border-'.$alertColor.' alert-information';                               $alertIcon = '';                                                             break;//Outlined info
+                case 6:  $alertType = 'alert-'.$alertColor.' bg-'.$alertColor.'-gradient text-white border-0';  $alertIcon = '';                                                             break;//Default Solid Color
+            	default: $alertType = 'alert-primary';                                                          $alertIcon = '';                                                             break;//valor Default
             }
 
             //Selecciono el tipo de mensaje
@@ -332,15 +333,17 @@ class UIWidgetsCommon {
 
             //Selecciono el tipo de tab
             switch ($type) {
-                case 1:$tabType = '';                     break; //Default Tabs
-                case 2:$tabType = 'nav-tabs-inverted';    break; //Inverted Tabs
-                case 3:$tabType = 'nav-tabs-complement';  break; //Complement Tabs
-                case 4:$tabType = 'nav-tabs-bordered';    break; //Bordered Tabs
+                case 1:  $tabType = '';                     break; //Default Tabs
+                case 2:  $tabType = 'nav-tabs-inverted';    break; //Inverted Tabs
+                case 3:  $tabType = 'nav-tabs-complement';  break; //Complement Tabs
+                case 4:  $tabType = 'nav-tabs-bordered';    break; //Bordered Tabs
+                default: $tabType = '';                     break; //valor default
             }
 			//Selecciono la justificacion del tab
             switch ($justif) {
-                case 1:$justifContent = '';       $justifElem = '';          $wbuton = '';      break; //Normal
-				case 2:$justifContent = 'd-flex'; $justifElem = 'flex-fill'; $wbuton = 'w-100'; break; //Justificado
+                case 1:  $justifContent = '';       $justifElem = '';          $wbuton = '';      break; //Normal
+				case 2:  $justifContent = 'd-flex'; $justifElem = 'flex-fill'; $wbuton = 'w-100'; break; //Justificado
+				default: $justifContent = '';       $justifElem = '';          $wbuton = '';      break; //valor default
             }
 			//Genero nombre unico
 			$nameID = 'tabId_'.uniqid();
@@ -741,6 +744,7 @@ class UIWidgetsCommon {
 			case 11: $tittle = 'Codigo CSharp';     $class  = 'language-csharp';     break;//CSharp Code Example
 			case 12: $tittle = 'Codigo SQL';        $class  = 'language-sql';        break;//SQL Code Example
 			case 13: $tittle = 'Codigo PLSQL';      $class  = 'language-plsql';      break;//PLSQL Code Example
+			default: $tittle = 'Nada';              $class  = 'language-markup';     break;//valor default
 		}
 		//Limpieza
 		$code = str_replace('<','&lt;',$code);
@@ -1006,7 +1010,7 @@ class UIWidgetsCommon {
 					foreach ($arr as $prod) {
 						$input .='
 						<li>
-						<div class="track-info" >
+						<div class="track-info">
 								<img class="station__title__logo" src="'.$BASE.'/vendor/mejs-player/emisoras/'.$prod[1].'" alt="'.$prod[2].'" title="'.$prod[2].'">
 								<a href="#" data-value="'.$prod[0].'">'.$prod[2].'</a>
 							</div>
@@ -1201,6 +1205,7 @@ class UIWidgetsCommon {
 		$Type       = $Options['Type'] ?? 1;
 		$latitude   = $Options['latitude'] ?? -33.45;
 		$longitude  = $Options['longitude'] ?? -70.66;
+		$widget     = '';
 
 		/********************** Si todo esta ok **********************/
 		switch ($Type) {

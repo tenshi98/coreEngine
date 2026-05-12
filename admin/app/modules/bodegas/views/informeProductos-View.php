@@ -64,7 +64,7 @@
                                             <td>
                                                 '.$crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacion']).'
                                                 <div class="btn-group" role="group">
-                                                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']).'" class="btn btn-primary btn-sm" ><i class="bi bi-eye"></i> Ver Documento</a>
+                                                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']).'" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
                                                 </div>
                                             </td>';
                                         }else{

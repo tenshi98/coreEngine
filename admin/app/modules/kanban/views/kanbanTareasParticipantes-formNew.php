@@ -41,7 +41,7 @@ $RandName = 'rand_'.rand(1, 999999);
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
             <p class="text-facture">
                 <i class="fa fa-list" aria-hidden="true"></i> Participantes para <strong><?php echo $data['rowData']['Titulo']; ?></strong>
-                <a onclick="participanteNew_add();" class="btn btn-primary btn-sm float-end" ><i class="bi bi-person-plus"></i> Agregar Participante</a>
+                <a onclick="participanteNew_add();" class="btn btn-primary btn-sm float-end"><i class="bi bi-person-plus"></i> Agregar Participante</a>
             </p>
         </div>
         <div class="clearfix"></div>

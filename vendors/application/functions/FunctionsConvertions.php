@@ -548,7 +548,7 @@ class FunctionsConvertions {
 			}
 			// Procesamiento de decenas hasta el 99 con conjunción "y"
 			elseif ($n < 100) {
-				$decena = floor($n / 10) * 10;
+				$decena = (int)(floor($n / 10) * 10);
 				$unidad = $n % 10;
 				if ($unidad === 0) {
 					return $dieces[$decena];
@@ -558,7 +558,7 @@ class FunctionsConvertions {
 			}
 			// Procesamiento de centenas (100-999)
 			elseif ($n < 1000) {
-				$cifra = floor($n / 100);
+				$cifra = (int)(floor($n / 100));
 				$resto = $n % 100;
 
 				$centenas = [

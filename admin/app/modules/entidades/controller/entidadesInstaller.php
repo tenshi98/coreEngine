@@ -25,7 +25,7 @@ class entidadesInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -53,48 +53,8 @@ class entidadesInstaller extends ControllerBase {
 
         /******************************************/
         //Variables
-        $arrTables    = array();
+        $arrTables    = $this->listTables();
         $arrPermisos  = array();
-
-        /*******************************************************/
-        /*                 SE GENERAN LAS TABLAS               */
-        /*******************************************************/
-        $arrTables[] = [
-            'table'      => 'entidades_listado',
-            'data'       => '`idEntidad` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`idSector` int UNSIGNED NULL DEFAULT NULL,`idSexo` int UNSIGNED NULL DEFAULT NULL,`idTipo` int UNSIGNED NOT NULL,`idTipoEntidad` int UNSIGNED NOT NULL,`password` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RazonSocial` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Nick` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int UNSIGNED NULL DEFAULT NULL,`idComuna` int UNSIGNED NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Web` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Giro` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalNombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalRut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalEmail` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_X` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Facebook` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Instagram` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Linkedin` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`Latitud` double DEFAULT NULL,`Longitud` double DEFAULT NULL',
-            'primaryKey' => 'idEntidad',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'entidades_listado_cargas',
-            'data'       => '`idCargas` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idSexo` int UNSIGNED NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`idEstado` int UNSIGNED NULL DEFAULT NULL,`idParentesco` int UNSIGNED NULL DEFAULT NULL,`idEstudios` int UNSIGNED NULL DEFAULT NULL,`idEstadoEstudio` int UNSIGNED NULL DEFAULT NULL,`ObsEstudios` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FechaVigencia` date NULL DEFAULT NULL,`FechaVencimiento` date NULL DEFAULT NULL',
-            'primaryKey' => 'idCargas',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'entidades_listado_contactos',
-            'data'       => '`idContacto` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int UNSIGNED NULL DEFAULT NULL,`idComuna` int UNSIGNED NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idTipoContacto` int UNSIGNED NULL DEFAULT NULL,`Cargo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idEstado` int UNSIGNED NOT NULL',
-            'primaryKey' => 'idContacto',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'entidades_listado_documentos',
-            'data'       => '`idDocumentos` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
-            'primaryKey' => 'idDocumentos',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'entidades_listado_observaciones',
-            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
-            'primaryKey' => 'idObservaciones',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'entidades_sectores',
-            'data'       => '`idSector` int UNSIGNED NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL',
-            'primaryKey' => 'idSector',
-            'comentario' => 'Creado desde el Instalador',
-        ];
 
         /************************************************/
         /************************************************/
@@ -189,7 +149,7 @@ class entidadesInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -296,7 +256,7 @@ class entidadesInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
@@ -387,6 +347,87 @@ class entidadesInstaller extends ControllerBase {
 
         //devuelvo
         return $RutaController;
+    }
+    /******************************************************************************/
+    //Se listan las tablas
+    public function listTables(){
+
+        /******************************************/
+        //Variables
+        $arrTables    = array();
+
+        /*******************************************************/
+        /*                 SE GENERAN LAS TABLAS               */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'entidades_listado',
+            'data'       => '`idEntidad` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`idSector` int UNSIGNED NULL DEFAULT NULL,`idSexo` int UNSIGNED NULL DEFAULT NULL,`idTipo` int UNSIGNED NOT NULL,`idTipoEntidad` int UNSIGNED NOT NULL,`password` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RazonSocial` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Nick` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int UNSIGNED NULL DEFAULT NULL,`idComuna` int UNSIGNED NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Web` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Giro` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalNombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalRut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalEmail` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_X` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Facebook` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Instagram` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Linkedin` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`Latitud` double DEFAULT NULL,`Longitud` double DEFAULT NULL',
+            'primaryKey' => 'idEntidad',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'entidades_listado_cargas',
+            'data'       => '`idCargas` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idSexo` int UNSIGNED NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`idEstado` int UNSIGNED NULL DEFAULT NULL,`idParentesco` int UNSIGNED NULL DEFAULT NULL,`idEstudios` int UNSIGNED NULL DEFAULT NULL,`idEstadoEstudio` int UNSIGNED NULL DEFAULT NULL,`ObsEstudios` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FechaVigencia` date NULL DEFAULT NULL,`FechaVencimiento` date NULL DEFAULT NULL',
+            'primaryKey' => 'idCargas',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'entidades_listado_contactos',
+            'data'       => '`idContacto` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int UNSIGNED NULL DEFAULT NULL,`idComuna` int UNSIGNED NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idTipoContacto` int UNSIGNED NULL DEFAULT NULL,`Cargo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idEstado` int UNSIGNED NOT NULL',
+            'primaryKey' => 'idContacto',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'entidades_listado_documentos',
+            'data'       => '`idDocumentos` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
+            'primaryKey' => 'idDocumentos',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'entidades_listado_observaciones',
+            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'primaryKey' => 'idObservaciones',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'entidades_sectores',
+            'data'       => '`idSector` int UNSIGNED NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL',
+            'primaryKey' => 'idSector',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+
+        /************************************************/
+        //devuelvo true
+        return $arrTables;
+
+    }
+    /******************************************************************************/
+    //Mapeo de las tablas
+    public function mapTables(){
+
+        $Data = '
+        core_tipos_entidad(idTipo,Nombre)
+        core_tipos_entidades(idTipoEntidad,Nombre)
+        core_tipos_rrhh_trabajadores_cargas_parentesco(idParentesco,Nombre)
+        core_estudios(idEstudios,Nombre)
+        core_estados_estudio(idEstadoEstudio,Nombre)
+        core_tipos_contactos(idTipoContacto,Nombre)
+        core_estados(idEstado,Nombre)
+        core_sexo(idSexo,Nombre)
+        core_ubicacion_ciudad(idCiudad,Nombre)
+        core_ubicacion_comunas(idComuna,idCiudad,Nombre)
+        ';
+
+        /******************************************/
+        //Variables
+        $arrTables = $this->listTables();
+        $dataSQL   = new FunctionsDataSQL();
+        $Data     .= $dataSQL->minifyArrayTables($arrTables);
+
+        /************************************************/
+        //devuelvo true
+        return $Data;
+
     }
 
 }

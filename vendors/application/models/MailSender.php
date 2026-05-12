@@ -321,7 +321,7 @@ class MailSender{
                     foreach ($icons as $key => [$img, $alt]) {
                         // Solo genera el HTML del icono si la URL está definida en el sistema
                         if (!empty($TemplateData[$key])) {
-                            $Social_icon .= '<td style="padding-top: 3px; padding-right: 20px;"><a target="_blank" rel="noopener noreferrer" href="'.$TemplateData[$key].'" ><img src="'.$TemplateData['baseUrl'].'/img/social_icons/'.$img.'" width="16" alt="'.$alt.'" draggable="false"></a></td>';
+                            $Social_icon .= '<td style="padding-top: 3px; padding-right: 20px;"><a target="_blank" rel="noopener noreferrer" href="'.$TemplateData[$key].'"><img src="'.$TemplateData['baseUrl'].'/img/social_icons/'.$img.'" width="16" alt="'.$alt.'" draggable="false"></a></td>';
                         }
                     }
 

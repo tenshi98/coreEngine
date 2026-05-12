@@ -25,7 +25,7 @@ class cotizacionInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -54,7 +54,7 @@ class cotizacionInstaller extends ControllerBase {
         /******************************************/
         //Verificar que existan los permisos
         $arrData = [
-            'Nombre'        => 'Modulo de Cotizaciones',
+            'Nombre'        => 'Módulo de Cotizaciones',
             'Descripcion'   => 'Módulo para gestionar las cotizaciones de los clientes',
             'Controller'    => $this->controllerName,
             'countPermisos' => $countPermisos,
@@ -86,36 +86,8 @@ class cotizacionInstaller extends ControllerBase {
 
         /******************************************/
         //Variables
-        $arrTables    = array();
+        $arrTables    = $this->listTables();
         $arrPermisos  = array();
-
-        /*******************************************************/
-        /*                 SE GENERAN LAS TABLAS               */
-        /*******************************************************/
-        $arrTables[] = [
-            'table'      => 'cotizacion_listado',
-            'data'       => '`idCotizacion` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idEntidad` int UNSIGNED NOT NULL,`fecha_auto` date NOT NULL,`Creacion_fecha` date NOT NULL,`Creacion_Semana` int UNSIGNED NULL DEFAULT NULL,`Creacion_mes` int UNSIGNED NULL DEFAULT NULL,`Creacion_ano` int UNSIGNED NULL DEFAULT NULL,`Creacion_hora` time NULL DEFAULT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`ValorNeto` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`IVA` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalItems` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalProductos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalServicios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalGuias` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
-            'primaryKey' => 'idCotizacion',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'cotizacion_listado_items',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'cotizacion_listado_productos',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`idProducto` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'cotizacion_listado_servicios',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
 
         /************************************************/
         /************************************************/
@@ -210,7 +182,7 @@ class cotizacionInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -315,7 +287,7 @@ class cotizacionInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
@@ -389,6 +361,76 @@ class cotizacionInstaller extends ControllerBase {
 
         //devuelvo
         return $RutaController;
+    }
+    /******************************************************************************/
+    //Se listan las tablas
+    public function listTables(){
+
+        /******************************************/
+        //Variables
+        $arrTables    = array();
+
+        /*******************************************************/
+        /*                 SE GENERAN LAS TABLAS               */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'cotizacion_listado',
+            'data'       => '`idCotizacion` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idEntidad` int UNSIGNED NOT NULL,`fecha_auto` date NOT NULL,`Creacion_fecha` date NOT NULL,`Creacion_Semana` int UNSIGNED NULL DEFAULT NULL,`Creacion_mes` int UNSIGNED NULL DEFAULT NULL,`Creacion_ano` int UNSIGNED NULL DEFAULT NULL,`Creacion_hora` time NULL DEFAULT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`ValorNeto` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`IVA` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalItems` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalProductos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalServicios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalGuias` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
+            'primaryKey' => 'idCotizacion',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'cotizacion_listado_items',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'cotizacion_listado_productos',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`idProducto` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'cotizacion_listado_servicios',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+
+        /************************************************/
+        //devuelvo true
+        return $arrTables;
+
+    }
+    /******************************************************************************/
+    //Mapeo de las tablas
+    public function mapTables(){
+
+        $Data = '
+        usuarios_listado(idUsuario,idCiudad,idComuna,idTipoUsuario,Nombre)
+        core_tipos_usuario(idTipoUsuario,Nombre)
+        entidades_listado(idEntidad,idSector,idSexo,idTipoEntidad,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2)
+        core_tipos_entidades(idTipoEntidad,Nombre)
+        entidades_sectores(idSector,Nombre)
+        productos_listado(idProducto,idUniMed,Nombre)
+        core_unidades_medida(idUniMed,Nombre)
+        servicios_listado(idServicio,Nombre)
+        core_sexo(idSexo,Nombre)
+        core_ubicacion_ciudad(idCiudad,Nombre)
+        core_ubicacion_comunas(idComuna,idCiudad,Nombre)
+        ';
+
+        /******************************************/
+        //Variables
+        $arrTables = $this->listTables();
+        $dataSQL   = new FunctionsDataSQL();
+        $Data     .= $dataSQL->minifyArrayTables($arrTables);
+
+        /************************************************/
+        //devuelvo true
+        return $Data;
+
     }
 
 }

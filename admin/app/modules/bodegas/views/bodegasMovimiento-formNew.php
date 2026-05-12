@@ -67,7 +67,7 @@ $RandName = 'rand_'.rand(1, 999999);
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                         <p class="text-facture">
                             <i class="fa fa-list" aria-hidden="true"></i> Productos
-                            <a onclick="productos_add();" class="btn btn-primary btn-sm float-end" ><i class="bi bi-clipboard-plus"></i> Agregar Productos</a>
+                            <a onclick="productos_add();" class="btn btn-primary btn-sm float-end"><i class="bi bi-clipboard-plus"></i> Agregar Productos</a>
                         </p>
                     </div>
                     <div class="clearfix"></div>

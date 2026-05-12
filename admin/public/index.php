@@ -36,7 +36,7 @@ foreach ($arrDirectory as $x_Directory) {
 
 //Base
 $f3 = require_once('../../vendors/fatfree/base.php'); //Base
-$f3->set('AUTOLOAD',$Autoload);                  //Autoload
+$f3->set('AUTOLOAD',$Autoload);                       //Autoload
 
 /**********************************************************************************************************************************/
 /*                                                          Variables                                                             */
@@ -48,15 +48,15 @@ $validateSession = new validateSession();
 
 /*******************************************************/
 //Se verifica token
-$Token = isset($_COOKIE['Sesion_tk_'.date("Y-m-d")])
-        ? $_COOKIE['Sesion_tk_'.date("Y-m-d")]
-        : false;
+$cockieToken = isset($_COOKIE['Sesion_tk_'.date("Y-m-d")])
+             ? $_COOKIE['Sesion_tk_'.date("Y-m-d")]
+             : false;
 
 /*******************************************************/
 //Se verifica si existen datos
 $UserSesion   = (!$f3->get('SESSION.TokenUser') || !$f3->get('SESSION.TokenExpires'))
-                ? $validateSession->checkLogin($Token, $f3, getallheaders())
-                : $validateSession->validateSession($Token, $f3, getallheaders());
+                ? $validateSession->checkLogin($cockieToken, $f3, getallheaders())
+                : $validateSession->validateSession($cockieToken, $f3, getallheaders());
 
 /**********************************************************************************************************************************/
 /*                                                        Usuarios Logueados                                                      */

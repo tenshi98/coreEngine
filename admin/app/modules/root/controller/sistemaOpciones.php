@@ -96,14 +96,14 @@ class sistemaOpciones extends ControllerBase {
                 core_sistemas.Config_Principal_Radio,
                 core_sistemas.Config_Principal_Feed,
                 core_sistemas.Config_Principal_FeedURL,
-                core_sistemas.idOpcionesGen_29,
-                core_sistemas.idOpcionesGen_30,
-                core_sistemas.idOpcionesGen_31,
-                core_sistemas.idOpcionesGen_32,
-                core_sistemas.idOpcionesGen_33,
-                core_sistemas.idOpcionesGen_34,
-                core_sistemas.idOpcionesGen_35,
-                core_sistemas.idOpcionesGen_36,
+                core_sistemas.Config_IA_Provider,
+                core_sistemas.Config_IA_ApiKey,
+                core_sistemas.Config_IA_Model,
+                core_sistemas.Config_IA_Base_URL,
+                core_sistemas.Config_IA_Name,
+                core_sistemas.Config_IA_Tone,
+                core_sistemas.Config_IA_Uso,
+                core_sistemas.Config_IA_UsoCache,
                 core_sistemas.idOpcionesGen_37,
                 core_sistemas.idOpcionesGen_38,
                 core_sistemas.idOpcionesGen_39,
@@ -117,14 +117,16 @@ class sistemaOpciones extends ControllerBase {
                 core_ubicacion_comunas.Nombre AS Comuna,
                 core_temas.Nombre AS Tema,
                 core_config_email.Nombre AS ConfigEmail,
-                core_config_map.Nombre AS ConfigMap',
+                core_config_map.Nombre AS ConfigMap,
+                core_ia_provider.Nombre AS IAProvider',
             'table'   => 'core_sistemas',
             'join'    => '
-                LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad   = core_sistemas.Sistema_idCiudad
-                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna  = core_sistemas.Sistema_idComuna
-                LEFT JOIN core_temas             ON core_temas.idTema                = core_sistemas.Sistema_idTema
-                LEFT JOIN core_config_email      ON core_config_email.idConfigEmail  = core_sistemas.Config_motorEmail
-                LEFT JOIN core_config_map        ON core_config_map.idConfigMap      = core_sistemas.Config_motorMap',
+                LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad        = core_sistemas.Sistema_idCiudad
+                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna       = core_sistemas.Sistema_idComuna
+                LEFT JOIN core_temas             ON core_temas.idTema                     = core_sistemas.Sistema_idTema
+                LEFT JOIN core_config_email      ON core_config_email.idConfigEmail       = core_sistemas.Config_motorEmail
+                LEFT JOIN core_config_map        ON core_config_map.idConfigMap           = core_sistemas.Config_motorMap
+                LEFT JOIN core_ia_provider       ON core_ia_provider.idIAProvider         = core_sistemas.Config_IA_Provider',
             'where'   => 'core_sistemas.idSistema = "1"',
             'group'   => '',
             'having'  => '',
@@ -214,6 +216,22 @@ class sistemaOpciones extends ControllerBase {
         $xParams  = ['query' => $query];
         $arrTemas = $this->Base_GetList($xParams);
 
+        /******************************/
+        //Se genera la query
+        $query = [
+            'data'    => 'idIAProvider AS ID,Nombre',
+            'table'   => 'core_ia_provider',
+            'join'    => '',
+            'where'   => '',
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'Nombre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        //Ejecuto la query
+        $xParams  = ['query' => $query];
+        $arrIAProvider = $this->Base_GetList($xParams);
+
         /*******************************************************************/
         //Variables
         $MainViewData = [
@@ -291,6 +309,7 @@ class sistemaOpciones extends ControllerBase {
                 'arrConfigEmail'   => $arrConfigEmail,
                 'arrConfigMap'     => $arrConfigMap,
                 'MainViewData'     => $MainViewData,
+                'arrIAProvider'    => $arrIAProvider,
             ];
 
             /******************************************/
@@ -362,14 +381,14 @@ class sistemaOpciones extends ControllerBase {
                 core_sistemas.Config_Principal_Radio,
                 core_sistemas.Config_Principal_Feed,
                 core_sistemas.Config_Principal_FeedURL,
-                core_sistemas.idOpcionesGen_29,
-                core_sistemas.idOpcionesGen_30,
-                core_sistemas.idOpcionesGen_31,
-                core_sistemas.idOpcionesGen_32,
-                core_sistemas.idOpcionesGen_33,
-                core_sistemas.idOpcionesGen_34,
-                core_sistemas.idOpcionesGen_35,
-                core_sistemas.idOpcionesGen_36,
+                core_sistemas.Config_IA_Provider,
+                core_sistemas.Config_IA_ApiKey,
+                core_sistemas.Config_IA_Model,
+                core_sistemas.Config_IA_Base_URL,
+                core_sistemas.Config_IA_Name,
+                core_sistemas.Config_IA_Tone,
+                core_sistemas.Config_IA_Uso,
+                core_sistemas.Config_IA_UsoCache,
                 core_sistemas.idOpcionesGen_37,
                 core_sistemas.idOpcionesGen_38,
                 core_sistemas.idOpcionesGen_39,
@@ -383,14 +402,16 @@ class sistemaOpciones extends ControllerBase {
                 core_ubicacion_comunas.Nombre AS Comuna,
                 core_temas.Nombre AS Tema,
                 core_config_email.Nombre AS ConfigEmail,
-                core_config_map.Nombre AS ConfigMap',
+                core_config_map.Nombre AS ConfigMap,
+                core_ia_provider.Nombre AS IAProvider',
             'table'   => 'core_sistemas',
             'join'    => '
-                LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad   = core_sistemas.Sistema_idCiudad
-                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna  = core_sistemas.Sistema_idComuna
-                LEFT JOIN core_temas             ON core_temas.idTema                = core_sistemas.Sistema_idTema
-                LEFT JOIN core_config_email      ON core_config_email.idConfigEmail  = core_sistemas.Config_motorEmail
-                LEFT JOIN core_config_map        ON core_config_map.idConfigMap      = core_sistemas.Config_motorMap',
+                LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad        = core_sistemas.Sistema_idCiudad
+                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna       = core_sistemas.Sistema_idComuna
+                LEFT JOIN core_temas             ON core_temas.idTema                     = core_sistemas.Sistema_idTema
+                LEFT JOIN core_config_email      ON core_config_email.idConfigEmail       = core_sistemas.Config_motorEmail
+                LEFT JOIN core_config_map        ON core_config_map.idConfigMap           = core_sistemas.Config_motorMap
+                LEFT JOIN core_ia_provider       ON core_ia_provider.idIAProvider         = core_sistemas.Config_IA_Provider',
             'where'   => 'core_sistemas.idSistema = "1"',
             'group'   => '',
             'having'  => '',
@@ -506,7 +527,7 @@ class sistemaOpciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,idOpcionesGen_29,idOpcionesGen_30,idOpcionesGen_31,idOpcionesGen_32,idOpcionesGen_33,idOpcionesGen_34,idOpcionesGen_35,idOpcionesGen_36,idOpcionesGen_37,idOpcionesGen_38,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
+                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,Config_IA_Provider,Config_IA_ApiKey,Config_IA_Model,Config_IA_Base_URL,Config_IA_Name,Config_IA_Tone,Config_IA_Uso,Config_IA_UsoCache,idOpcionesGen_37,idOpcionesGen_38,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
                 'required'  => 'Sistema_Nombre',
                 'unique'    => '',
                 'encode'    => '',

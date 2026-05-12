@@ -37,11 +37,11 @@
                             ?>
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                                 <div class="float-end">
-                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$encryptedId; ?>" class="btn btn-primary btn-sm" ><i class="bi bi-printer"></i> Imprimir Tarea</a>
+                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$encryptedId; ?>" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Imprimir Tarea</a>
                                     <?php
                                     if($data['rowData']['idEstadoCierre']==1){
                                         if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                            <a onclick="listTableDataEdit('<?php echo $encryptedId; ?>')" class="btn btn-secondary btn-sm" ><i class="bi bi-pencil-square"></i> Editar Información</a>
+                                            <a onclick="listTableDataEdit('<?php echo $encryptedId; ?>')" class="btn btn-secondary btn-sm"><i class="bi bi-pencil-square"></i> Editar Información</a>
                                         <?php }
                                     } ?>
                                 </div>
@@ -86,7 +86,7 @@
                                     <?php
                                     if($data['rowData']['idEstadoCierre']==1){
                                         if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                            <a onclick="tareas_Add('<?php echo $encryptedId; ?>');" class="btn btn-primary btn-sm float-end" ><i class="bi bi-clipboard-plus"></i> Agregar Tarea</a>
+                                            <a onclick="tareas_Add('<?php echo $encryptedId; ?>');" class="btn btn-primary btn-sm float-end"><i class="bi bi-clipboard-plus"></i> Agregar Tarea</a>
                                         <?php }
                                     } ?>
                                 </p>
@@ -143,7 +143,7 @@
                                     <strong><i class="bi bi-person-plus"></i> Participantes</strong>
                                     <?php if($data['rowData']['idEstadoCierre']==1){
                                         if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                            <a onclick="participantes_Add('<?php echo $encryptedId; ?>');" class="btn btn-primary btn-sm float-end" ><i class="bi bi-person-plus"></i> Agregar Participante</a>
+                                            <a onclick="participantes_Add('<?php echo $encryptedId; ?>');" class="btn btn-primary btn-sm float-end"><i class="bi bi-person-plus"></i> Agregar Participante</a>
                                         <?php }
                                     } ?>
                                 </p>

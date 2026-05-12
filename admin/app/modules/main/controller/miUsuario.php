@@ -45,8 +45,8 @@ class miUsuario extends ControllerBase {
         /******************************************/
         //Si el acceso es correcto
         if($Response['code']==200){
-            //Se genera la cookie
-            setcookie('Sesion_tk_'.date("Y-m-d"),$f3->get('SESSION.TokenUser'),time() + (60*60*24));
+            //Se genera la cookie con tiempo de expiracion de 1 dia
+            setcookie('Sesion_tk_'.date("Y-m-d"),$f3->get('SESSION.TokenUser'),time() + (86400));
             //imprimo resultados
             Response::success($Response['message']);
         //Si da otro error

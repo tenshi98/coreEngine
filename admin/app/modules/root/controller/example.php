@@ -66,7 +66,7 @@ class example extends ControllerBase {
             }
         }
 
-        //  */5 * * * * wget -q -O /dev/null "https://democoreengine.digitalcreations.cl/cron/tab/run" > /dev/null 2>&1
+        //  */5 * * * * wget -q -O /dev/null "https://democoreengine.digitalcreations.cl/cron/tab/run"> /dev/null 2>&1
     }
 
 }

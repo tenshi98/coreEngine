@@ -9,6 +9,7 @@ class installer extends ControllerBase {
     private $FormInputs;
     private $DataValidations;
     private $FunctionsServer;
+    private $DataSQL;
 
     /******************************************************************************/
     //Constructor
@@ -21,6 +22,7 @@ class installer extends ControllerBase {
 		$this->FormInputs         = new UIFormInputs();
 		$this->DataValidations    = new FunctionsDataValidations();
 		$this->FunctionsServer    = new FunctionsServerServer();
+		$this->DataSQL            = new FunctionsDataSQL();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn, $queryBuilder, $checkData);
     }
@@ -229,8 +231,8 @@ class installer extends ControllerBase {
             //Si no hay errores
             if(empty($Response)){
                 // Validar credenciales
-                $result_Admin = $this->DataValidations->validateCredentials($Host, $Admin_Usuario, $Admin_Password, $Port, $Charset, 'admin');
-                $result_Prod  = $this->DataValidations->validateCredentials($Host, $Prod_Usuario,  $Prod_Password,  $Port, $Charset, 'basic');
+                $result_Admin = $this->DataSQL->validateCredentials($Host, $Admin_Usuario, $Admin_Password, $Port, $Charset, 'admin');
+                $result_Prod  = $this->DataSQL->validateCredentials($Host, $Prod_Usuario,  $Prod_Password,  $Port, $Charset, 'basic');
                 // Se valida resultado
                 if ($result_Admin['success'] && $result_Prod['success']) {
                     // Guardar credenciales en sesión (no guardamos la conexión porque PDO no es serializable)
@@ -287,7 +289,7 @@ class installer extends ControllerBase {
             //Si no hay errores
             if(empty($Response)){
                 // Validar credenciales
-                $result = $this->DataValidations->validateDatabase($Host, $Admin_Usuario, $Admin_Password, $Port, $Charset, $DBName);
+                $result = $this->DataSQL->validateDatabase($Host, $Admin_Usuario, $Admin_Password, $Port, $Charset, $DBName);
                 // Se valida resultado
                 if ($result['success']) {
                     // Guardar credenciales en sesión (no guardamos la conexión porque PDO no es serializable)

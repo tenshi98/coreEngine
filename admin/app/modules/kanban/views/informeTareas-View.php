@@ -35,7 +35,7 @@
 
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                                 <div class="float-end">
-                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']); ?>" class="btn btn-primary btn-sm" ><i class="bi bi-printer"></i> Imprimir Tarea</a>
+                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']); ?>" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Imprimir Tarea</a>
                                 </div>
                             </div>
                             <div class="clearfix"></div>

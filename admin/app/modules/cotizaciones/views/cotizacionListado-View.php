@@ -33,8 +33,8 @@
         <?php if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){ ?>  <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_4" data-bs-toggle="tab" data-bs-target="#tab_id_4" type="button" role="tab" aria-controls="tab_id_4" aria-selected="false" tabindex="-1"><i class="bi bi-patch-check"></i> Servicios</button></li><?php } ?>
         <li class="flex-grow-1">
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>" class="btn btn-primary btn-sm" ><i class="bi bi-eye"></i> Ver Documento</a>
-                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>" class="btn btn-secondary btn-sm" ><i class="bi bi-printer"></i> Imprimir</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>" class="btn btn-secondary btn-sm"><i class="bi bi-printer"></i> Imprimir</a>
             </div>
         </li>
     </ul>

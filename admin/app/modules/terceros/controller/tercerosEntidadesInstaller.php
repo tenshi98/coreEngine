@@ -25,7 +25,7 @@ class tercerosEntidadesInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -79,48 +79,8 @@ class tercerosEntidadesInstaller extends ControllerBase {
 
         /******************************************/
         //Variables
-        $arrTables    = array();
+        $arrTables    = $this->listTables();
         $arrPermisos  = array();
-
-        /*******************************************************/
-        /*                 SE GENERAN LAS TABLAS               */
-        /*******************************************************/
-        $arrTables[] = [
-            'table'      => 'terceros_entidades_listado',
-            'data'       => '`idTerceros` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL',
-            'primaryKey' => 'idTerceros',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'terceros_entidades_listado_maquinas',
-            'data'       => '`idMaq` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`idMaquina` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`Fecha` date NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL',
-            'primaryKey' => 'idMaq',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'terceros_entidades_listado_planes',
-            'data'       => '`idPlan` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`Fecha` date NULL DEFAULT NULL,`Monto` decimal(10, 2) UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL',
-            'primaryKey' => 'idPlan',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'terceros_entidades_listado_usuarios',
-            'data'       => '`idUsuario` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`password` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idTipoUsuario` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`email` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Rut` varchar(13) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
-            'primaryKey' => 'idUsuario',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'terceros_entidades_listado_usuarios_maq',
-            'data'       => '`idPermiso` int UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idMaquina` int UNSIGNED NOT NULL',
-            'primaryKey' => 'idPermiso',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'terceros_entidades_listado_usuarios_noti',
-            'data'       => '`idPermiso` int UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idTipoNoti` int UNSIGNED NOT NULL',
-            'primaryKey' => 'idPermiso',
-            'comentario' => 'Creado desde el Instalador',
-        ];
 
         /************************************************/
         /************************************************/
@@ -204,7 +164,7 @@ class tercerosEntidadesInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -310,7 +270,7 @@ class tercerosEntidadesInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
@@ -380,5 +340,90 @@ class tercerosEntidadesInstaller extends ControllerBase {
         //devuelvo
         return $RutaController;
     }
+    /******************************************************************************/
+    //Se listan las tablas
+    public function listTables(){
+
+        /******************************************/
+        //Variables
+        $arrTables    = array();
+
+        /*******************************************************/
+        /*                 SE GENERAN LAS TABLAS               */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'terceros_entidades_listado',
+            'data'       => '`idTerceros` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL',
+            'primaryKey' => 'idTerceros',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'terceros_entidades_listado_maquinas',
+            'data'       => '`idMaq` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`idMaquina` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`Fecha` date NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL',
+            'primaryKey' => 'idMaq',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'terceros_entidades_listado_planes',
+            'data'       => '`idPlan` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`Fecha` date NULL DEFAULT NULL,`Monto` decimal(10, 2) UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL',
+            'primaryKey' => 'idPlan',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'terceros_entidades_listado_usuarios',
+            'data'       => '`idUsuario` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEntidad` int UNSIGNED NOT NULL,`password` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idTipoUsuario` int UNSIGNED NOT NULL,`idEstado` int UNSIGNED NOT NULL,`email` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Rut` varchar(13) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'primaryKey' => 'idUsuario',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'terceros_entidades_listado_usuarios_maq',
+            'data'       => '`idPermiso` int UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idMaquina` int UNSIGNED NOT NULL',
+            'primaryKey' => 'idPermiso',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'terceros_entidades_listado_usuarios_noti',
+            'data'       => '`idPermiso` int UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idTipoNoti` int UNSIGNED NOT NULL',
+            'primaryKey' => 'idPermiso',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+
+        /************************************************/
+        //devuelvo true
+        return $arrTables;
+
+    }
+    /******************************************************************************/
+    //Mapeo de las tablas
+    public function mapTables(){
+
+        $Data = '
+        usuarios_listado(idUsuario,idCiudad,idComuna,idTipoUsuario,Nombre)
+        core_tipos_usuario(idTipoUsuario,Nombre)
+        entidades_listado(idEntidad,idSector,idSexo,idTipoEntidad,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2)
+        core_tipos_entidades(idTipoEntidad,Nombre)
+        entidades_sectores(idSector,Nombre)
+        servicios_listado(idServicio,Nombre)
+        maquinas_listado(idMaquina,Nombre)
+        core_telemetria_tipo_noti(idTipoNoti,Nombre)
+        core_sexo(idSexo,Nombre)
+        core_ubicacion_ciudad(idCiudad,Nombre)
+        core_ubicacion_comunas(idComuna,idCiudad,Nombre)
+        ';
+
+        /******************************************/
+        //Variables
+        $arrTables = $this->listTables();
+        $dataSQL   = new FunctionsDataSQL();
+        $Data     .= $dataSQL->minifyArrayTables($arrTables);
+
+        /************************************************/
+        //devuelvo true
+        return $Data;
+
+    }
+
+
+
 
 }

@@ -31,6 +31,7 @@
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
                                 //se dibujan los inputs
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Basicos', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',     'Name'  => 'Sistema_Nombre',    'Value'  => $data['rowData']['Sistema_Nombre'] ?? '',    'Required'  => 2]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',      'Name'  => 'Sistema_Email',     'Value'  => $data['rowData']['Sistema_Email'] ?? '',     'Required'  => 1, 'Icon'     => 'bx bx-mail-send']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',        'Name'  => 'Sistema_Rut',       'Value'  => $data['rowData']['Sistema_Rut'] ?? '',       'Required'  => 1, 'Icon'     => 'bi bi-person-circle']);
@@ -70,6 +71,7 @@
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
                                 //se dibujan los inputs
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos de Contacto', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Contacto_Nombre',   'Value' => $data['rowData']['Contacto_Nombre'] ?? '', 'Required' => 1]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'Contacto_Fono1',    'Value' => $data['rowData']['Contacto_Fono1'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 2', 'Name' => 'Contacto_Fono2',    'Value' => $data['rowData']['Contacto_Fono2'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
@@ -96,6 +98,7 @@
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
                                 //se dibujan los inputs
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos del Representante', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'RepresentanteNombre',  'Value' => $data['rowData']['RepresentanteNombre'] ?? '', 'Required' => 1]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',    'Name' => 'RepresentanteRut',     'Value' => $data['rowData']['RepresentanteRut'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-person-circle']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'RepresentanteFono',    'Value' => $data['rowData']['RepresentanteFono'] ?? '',   'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
@@ -120,6 +123,7 @@
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
                                 //se dibujan los inputs
+                                $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'APIS', 'Clase' => 'box-title text-color-red-dark']);
                                 //Se condiciona el motor de mapas
                                 switch ($data['UserData']["Config_motorMap"]) {
                                     case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => $data['rowData']['Config_API_GoogleMaps'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
@@ -128,6 +132,20 @@
                                 if($data['UserData']["sistemaUsoWhatsapp"]==2){
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => $data['rowData']['Config_WhatsappToken'] ?? '',      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => $data['rowData']['Config_WhatsappInstanceId'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                }
+                                //Se condiciona el uso de IA
+                                if($data['UserData']["Config_IA_Uso"]==2){
+                                    //se dibujan los inputs
+                                    $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Uso de IA', 'Clase' => 'box-title text-color-red-dark']);
+                                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Provider',     'Name' => 'Config_IA_Provider',   'Value' => $data['rowData']['Config_IA_Provider'] ?? '', 'Required' => 1, 'arrData'  => $data['arrIAProvider'], 'BASE' => $BASE]);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Key',      'Name' => 'Config_IA_ApiKey',     'Value' => $data['rowData']['Config_IA_ApiKey'] ?? '',   'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Model',    'Name' => 'Config_IA_Model',      'Value' => $data['rowData']['Config_IA_Model'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Base URL', 'Name' => 'Config_IA_Base_URL',   'Value' => $data['rowData']['Config_IA_Base_URL'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre IA',    'Name' => 'Config_IA_Name',       'Value' => $data['rowData']['Config_IA_Name'] ?? '',     'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Tono IA',      'Name' => 'Config_IA_Tone',       'Value' => $data['rowData']['Config_IA_Tone'] ?? '',     'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $Title = 'Uso Memoria Cache IA';
+                                    $Info  = 'Uso de memoria de cache en la Inteligencia Artificial (solo Gemini)';
+                                    $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_UsoCache',  'Value' => $data['rowData']['Config_IA_UsoCache'] ?? '',  'Required' => 1,'Color' => 3]);
                                 }
 
                                 //datos ocultos
@@ -199,6 +217,10 @@
                                         $Title = 'Configuracion Motor Mapas';
                                         $Info  = 'Permite configurar el tipo de motor de mapas a utilizar';
                                         $data['Fnc_FormInputs']->formSelect([ 'FormAling' => 2,'FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_motorMap', 'Id' => 'Config_motorMap', 'Value' => $data['rowData']['Config_motorMap'] ?? '' ,'Required' => 2,'arrData' => $data['arrConfigMap']]);
+                                        /********************************/
+                                        $Title = 'Configuracion Uso IA';
+                                        $Info  = 'Permite la configuracion de la IA en las transacciones que hace uso de esta';
+                                        $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_Uso',  'Value' => $data['rowData']['Config_IA_Uso'] ?? '',  'Required' => 1,'Color' => 3]);
                                         ?>
                                     </div>
                                 </div>
@@ -618,16 +640,25 @@
     }
     /******************************************/
     //Oculto
-    document.getElementById('div_Config_Principal_FeedURL').style.display     = 'none';
-    //cargo
-    const checkbox = document.getElementById("Config_Principal_Feed");
-    //Ejecutar logica
-    checkbox.addEventListener("change", function () {
-        if (this.checked) {
-            document.getElementById('div_Config_Principal_FeedURL').style.display     = '';
-        } else {
-            document.getElementById('div_Config_Principal_FeedURL').style.display     = 'none';
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const checkbox   = document.getElementById("Config_Principal_Feed");
+        const divFeedURL = document.getElementById("div_Config_Principal_FeedURL");
+
+        function toggleFeedURL() {
+            if (checkbox.checked) {
+                divFeedURL.style.display = '';
+            } else {
+                divFeedURL.style.display = 'none';
+            }
         }
+
+        // Ejecutar al cargar la página
+        toggleFeedURL();
+
+        // Ejecutar al cambiar el checkbox
+        checkbox.addEventListener("change", toggleFeedURL);
+
     });
 
 </script>

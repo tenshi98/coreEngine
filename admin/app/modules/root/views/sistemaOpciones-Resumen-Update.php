@@ -46,7 +46,7 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
         <?php
-        /**************************************/
+        /**********************************************************/
         $arrData_1   = [];
         $arrData_1[] = ['Icon' => '','Titulo' => 'Nombre',     'Texto' => $data['rowData']['Sistema_Nombre']];
         $arrData_1[] = ['Icon' => '','Titulo' => 'Email',      'Texto' => $data['rowData']['Sistema_Email']];
@@ -59,7 +59,7 @@
         if($data['UserData']["sistemaUsoWhatsapp"]==2){
             $arrData_1[] = ['Icon' => '','Titulo' => 'Fono Noti Whatsapp',  'Texto' => $data['rowData']['Sistema_NotiWhatsapp']];
         }
-        /**************************************/
+        /**********************************************************/
         $arrData_2 = [
             ['Icon' => '','Titulo' => 'Contacto Nombre', 'Texto' => $data['rowData']['Contacto_Nombre']],
             ['Icon' => '','Titulo' => 'Contacto Fono1',  'Texto' => $data['rowData']['Contacto_Fono1']],
@@ -68,14 +68,14 @@
             ['Icon' => '','Titulo' => 'Contacto Email',  'Texto' => $data['rowData']['Contacto_Email']],
             ['Icon' => '','Titulo' => 'Contacto Web',    'Texto' => $data['rowData']['Contacto_Web']],
         ];
-        /**************************************/
+        /**********************************************************/
         $arrData_3 = [
             ['Icon' => '','Titulo' => 'Representante Nombre',  'Texto' => $data['rowData']['RepresentanteNombre']],
             ['Icon' => '','Titulo' => 'Representante Rut',     'Texto' => $data['rowData']['RepresentanteRut']],
             ['Icon' => '','Titulo' => 'Representante Fono',    'Texto' => $data['rowData']['RepresentanteFono']],
             ['Icon' => '','Titulo' => 'Representante Email',   'Texto' => $data['rowData']['RepresentanteEmail']],
         ];
-        /**************************************/
+        /**********************************************************/
         $arrData_4   = [];
         //Se condiciona el motor de mapas
         switch ($data['UserData']["Config_motorMap"]) {
@@ -86,15 +86,28 @@
             $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Token',        'Texto' => $data['rowData']['Config_WhatsappToken']];
             $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Instance Id',  'Texto' => $data['rowData']['Config_WhatsappInstanceId']];
         }
-        /**************************************/
-        $arrData_5 = [
+        /**********************************************************/
+        $arrData_5   = [];
+        //Se condiciona el uso de IA
+        if($data['UserData']["Config_IA_Uso"]==2){
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Provider',             'Texto' => $data['rowData']['IAProvider']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'API Key',              'Texto' => $data['rowData']['Config_IA_ApiKey']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'API Model',            'Texto' => $data['rowData']['Config_IA_Model']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'API Base URL',         'Texto' => $data['rowData']['Config_IA_Base_URL']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Nombre IA',            'Texto' => $data['rowData']['Config_IA_Name']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Tono IA',              'Texto' => $data['rowData']['Config_IA_Tone']];
+            $arrData_5[] = ['Icon' => '','Titulo' => 'Uso Memoria Cache IA', 'Texto' => activo($data['rowData']['Config_IA_UsoCache'])];
+        }
+
+        /**********************************************************/
+        $arrData_6 = [
             ['Icon' => '','Titulo' => 'URL Twitter',    'Texto' => (!empty($data['rowData']['Social_X']) ? '<a href="'.$data['rowData']['Social_X'].'" class="twitter"><i class="bi bi-twitter"></i> Twitter</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Facebook',   'Texto' => (!empty($data['rowData']['Social_Facebook']) ? '<a href="'.$data['rowData']['Social_Facebook'].'"  class="facebook"><i class="bi bi-facebook"></i> Facebook</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Instagram',  'Texto' => (!empty($data['rowData']['Social_Instagram']) ? '<a href="'.$data['rowData']['Social_Instagram'].'" class="instagram"><i class="bi bi-instagram"></i> Instagram</a>' : '')],
             ['Icon' => '','Titulo' => 'URL Linkedin',   'Texto' => (!empty($data['rowData']['Social_Linkedin']) ? '<a href="'.$data['rowData']['Social_Linkedin'].'"  class="linkedin"><i class="bi bi-linkedin"></i> Linkedin</a>' : '')],
         ];
-        /**************************************/
-        $arrData_6 = [
+        /**********************************************************/
+        $arrData_7 = [
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Modal - Subtítulos',                                     'Texto' => activo($data['rowData']['sistemaModalSubtitle'])],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Modal - Botón Cerrar',                                   'Texto' => activo($data['rowData']['sistemaModalCloseBTN'])],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Uso Whatsapp',                                           'Texto' => activo($data['rowData']['sistemaUsoWhatsapp'])],
@@ -104,6 +117,7 @@
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Radio',                                   'Texto' => activo($data['rowData']['Config_Principal_Radio'])],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Feed',                                    'Texto' => activo($data['rowData']['Config_Principal_Feed'])],
             ['Icon' => '','Titulo' => '<strong>Sistema:</strong> URL Feed Noticias',                                      'Texto' => $data['rowData']['Config_Principal_FeedURL']],
+            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Configuracion Uso IA',                                   'Texto' => activo($data['rowData']['Config_IA_Uso'])],
             ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Uso listados de tareas en las Tareas Pendientes',  'Texto' => activo($data['rowData']['KanbanTareasUsoTareas'])],
             ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Admin Tableros Independiente de las Tareas',       'Texto' => activo($data['rowData']['KanbanTareasAdminTabIndepend'])],
             ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Cargas',                                   'Texto' => activo($data['rowData']['entidadesListadoVerCargas'])],
@@ -147,11 +161,14 @@
         echo '<h5 class="box-title text-color-red-dark">APIS</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
 
-        echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Inteligencia Artificial</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
 
-        echo '<h5 class="box-title text-color-red-dark">Configuracion Sistema</h5>';
+        echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
         $data['Fnc_WidgetsCommon']->responsiveTable($arrData_6, 4);
+
+        echo '<h5 class="box-title text-color-red-dark">Configuracion Sistema</h5>';
+        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_7, 4);
 
         //funcion para devolver el uso
         function activo($valor){

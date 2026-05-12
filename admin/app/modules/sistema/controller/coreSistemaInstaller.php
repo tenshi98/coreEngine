@@ -25,7 +25,7 @@ class coreSistemaInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -39,7 +39,7 @@ class coreSistemaInstaller extends ControllerBase {
         /******************************************/
         //Verificar que existan los permisos
         $arrData = [
-            'Nombre'        => 'Modulo Datos de la Empresa',
+            'Nombre'        => 'Módulo Datos de la Empresa',
             'Descripcion'   => 'Módulo para gestionar los Datos de la Empresa',
             'Controller'    => $this->controllerName,
             'countPermisos' => $countPermisos,
@@ -124,7 +124,7 @@ class coreSistemaInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -209,7 +209,7 @@ class coreSistemaInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/

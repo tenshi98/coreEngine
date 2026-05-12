@@ -25,7 +25,7 @@ class gestionDocumentosInstaller extends ControllerBase {
     /*                               INSTALACION                                  */
     /******************************************************************************/
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Se lista la informacion
     public function ListDataModule(){
 
         /*******************************************************/
@@ -86,48 +86,8 @@ class gestionDocumentosInstaller extends ControllerBase {
 
         /******************************************/
         //Variables
-        $arrTables    = array();
+        $arrTables    = $this->listTables();
         $arrPermisos  = array();
-
-        /*******************************************************/
-        /*                 SE GENERAN LAS TABLAS               */
-        /*******************************************************/
-        $arrTables[] = [
-            'table'      => 'facturacion_listado',
-            'data'       => '`idFacturacion` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idTipo` int UNSIGNED NOT NULL,`idEntidad` int UNSIGNED NOT NULL,`idBodegasIngreso` int UNSIGNED NULL DEFAULT NULL,`idBodegasEgreso` int UNSIGNED NULL DEFAULT NULL,`fecha_auto` date NOT NULL,`idDocumentos` int UNSIGNED NOT NULL,`N_Doc` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Creacion_fecha` date NOT NULL,`Creacion_Semana` int UNSIGNED NULL DEFAULT NULL,`Creacion_mes` int UNSIGNED NULL DEFAULT NULL,`Creacion_ano` int UNSIGNED NULL DEFAULT NULL,`Creacion_hora` time NULL DEFAULT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`ValorNeto` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`IVA` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalItems` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalProductos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalServicios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalGuias` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`idEstadoPago` int UNSIGNED NOT NULL,`MontoPagado` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
-            'primaryKey' => 'idFacturacion',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'facturacion_listado_guias',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idFacturacionRel` bigint UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'facturacion_listado_items',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'facturacion_listado_pagos',
-            'data'       => '`idPago` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`idDocumentoPago` int UNSIGNED NOT NULL,`N_Doc` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`MontoPagado` decimal(15, 2) UNSIGNED NOT NULL,`FechaPago` date NOT NULL',
-            'primaryKey' => 'idPago',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'facturacion_listado_productos',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idEstadoIngreso` int UNSIGNED NOT NULL,`idBodegas` int UNSIGNED NOT NULL,`idProducto` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
-        $arrTables[] = [
-            'table'      => 'facturacion_listado_servicios',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
-            'primaryKey' => 'idExistencia',
-            'comentario' => 'Creado desde el Instalador',
-        ];
 
         /************************************************/
         /************************************************/
@@ -232,7 +192,7 @@ class gestionDocumentosInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Instalacion del modulo completo
+    //Desinstalacion del modulo
     public function UninstallModule(){
 
         /*******************************************************/
@@ -339,7 +299,7 @@ class gestionDocumentosInstaller extends ControllerBase {
 
     }
     /******************************************************************************/
-    //Se cuentan las rutas del controlador
+    //Se listan las rutas
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
@@ -464,6 +424,94 @@ class gestionDocumentosInstaller extends ControllerBase {
 
         //devuelvo
         return $RutaController;
+    }
+    /******************************************************************************/
+    //Se listan las tablas
+    public function listTables(){
+
+        /******************************************/
+        //Variables
+        $arrTables    = array();
+
+        /*******************************************************/
+        /*                 SE GENERAN LAS TABLAS               */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'facturacion_listado',
+            'data'       => '`idFacturacion` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idTipo` int UNSIGNED NOT NULL,`idEntidad` int UNSIGNED NOT NULL,`idBodegasIngreso` int UNSIGNED NULL DEFAULT NULL,`idBodegasEgreso` int UNSIGNED NULL DEFAULT NULL,`fecha_auto` date NOT NULL,`idDocumentos` int UNSIGNED NOT NULL,`N_Doc` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Creacion_fecha` date NOT NULL,`Creacion_Semana` int UNSIGNED NULL DEFAULT NULL,`Creacion_mes` int UNSIGNED NULL DEFAULT NULL,`Creacion_ano` int UNSIGNED NULL DEFAULT NULL,`Creacion_hora` time NULL DEFAULT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`ValorNeto` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`IVA` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalItems` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalProductos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalServicios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalGuias` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`idEstadoPago` int UNSIGNED NOT NULL,`MontoPagado` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
+            'primaryKey' => 'idFacturacion',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'facturacion_listado_guias',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idFacturacionRel` bigint UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'facturacion_listado_items',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'facturacion_listado_pagos',
+            'data'       => '`idPago` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`idDocumentoPago` int UNSIGNED NOT NULL,`N_Doc` varchar(60) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`MontoPagado` decimal(15, 2) UNSIGNED NOT NULL,`FechaPago` date NOT NULL',
+            'primaryKey' => 'idPago',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'facturacion_listado_productos',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idEstadoIngreso` int UNSIGNED NOT NULL,`idBodegas` int UNSIGNED NOT NULL,`idProducto` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'facturacion_listado_servicios',
+            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idFacturacion` bigint UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'primaryKey' => 'idExistencia',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+
+        /************************************************/
+        //devuelvo true
+        return $arrTables;
+
+    }
+    /******************************************************************************/
+    //Mapeo de las tablas
+    public function mapTables(){
+
+        $Data = '
+        usuarios_listado(idUsuario,idCiudad,idComuna,idTipoUsuario,Nombre)
+        core_tipos_usuario(idTipoUsuario,Nombre)
+        entidades_listado(idEntidad,idSector,idSexo,idTipoEntidad,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2)
+        core_tipos_entidades(idTipoEntidad,Nombre)
+        entidades_sectores(idSector,Nombre)
+        core_facturacion_tipo(idTipo,Nombre)
+        bodegas_listado(idBodegas,Nombre)
+        core_documentos_mercantiles(idDocumentos,Nombre)
+        core_estados_pago(idEstadoPago,Nombre)
+        productos_listado(idProducto,idUniMed,Nombre)
+        core_unidades_medida(idUniMed,Nombre)
+        core_documentos_pago(idDocumentoPago,Nombre)
+        core_estados_ingreso(idEstadoIngreso,Nombre)
+        servicios_listado(idServicio,Nombre)
+        core_sexo(idSexo,Nombre)
+        core_ubicacion_ciudad(idCiudad,Nombre)
+        core_ubicacion_comunas(idComuna,idCiudad,Nombre)
+        ';
+
+        /******************************************/
+        //Variables
+        $arrTables = $this->listTables();
+        $dataSQL   = new FunctionsDataSQL();
+        $Data     .= $dataSQL->minifyArrayTables($arrTables);
+
+        /************************************************/
+        //devuelvo true
+        return $Data;
+
     }
 
 }

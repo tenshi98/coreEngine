@@ -35,8 +35,8 @@
         <?php if(is_array($data['arrPagos'])&&!empty($data['arrPagos'])){ ?>          <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_6" data-bs-toggle="tab" data-bs-target="#tab_id_6" type="button" role="tab" aria-controls="tab_id_6" aria-selected="false" tabindex="-1"><i class="bi bi-currency-dollar"></i> Pagos</button></li><?php } ?>
         <li class="flex-grow-1">
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-primary btn-sm" ><i class="bi bi-eye"></i> Ver Documento</a>
-                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-secondary btn-sm" ><i class="bi bi-printer"></i> Imprimir</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-secondary btn-sm"><i class="bi bi-printer"></i> Imprimir</a>
             </div>
         </li>
     </ul>
