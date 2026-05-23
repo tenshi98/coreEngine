@@ -378,6 +378,24 @@
                                 </div>
                             <?php } ?>
 
+                            <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+                                <div class="card">
+                                    <div class="card-header">Usuarios</div>
+                                    <div class="card-body">
+                                        <?php
+                                        /********************************/
+                                        $Title = 'Uso Permisos Bodegas';
+                                        $Info  = 'Permite el uso de permisos de acceso a las bodegas';
+                                        $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosBodegas',  'Value' => $data['rowData']['usuariosPermisosBodegas'] ?? '',  'Required' => 1,'Color' => 3]);
+                                        /********************************/
+                                        $Title = 'Uso Permisos Maquinas';
+                                        $Info  = 'Permite el uso de permisos de acceso a las maquinas';
+                                        $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosMaquinas',  'Value' => $data['rowData']['usuariosPermisosMaquinas'] ?? '',  'Required' => 1,'Color' => 3]);
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
 
                         <div class="justify-content-center pt-4">

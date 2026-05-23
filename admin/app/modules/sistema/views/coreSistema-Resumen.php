@@ -167,6 +167,14 @@
                                 $Title = 'Configuracion Uso IA';
                                 $Info  = 'Permite la configuracion de la IA en las transacciones que hace uso de esta';
                                 $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_Uso',  'Value' => $data['rowData']['Config_IA_Uso'] ?? '',  'Required' => 1,'Color' => 3]);
+                                /********************************/
+                                $Title = 'Uso Permisos Bodegas';
+                                $Info  = 'Permite el uso de permisos de acceso a las bodegas';
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosBodegas',  'Value' => $data['rowData']['usuariosPermisosBodegas'] ?? '',  'Required' => 1,'Color' => 3]);
+                                /********************************/
+                                $Title = 'Uso Permisos Maquinas';
+                                $Info  = 'Permite el uso de permisos de acceso a las maquinas';
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosMaquinas',  'Value' => $data['rowData']['usuariosPermisosMaquinas'] ?? '',  'Required' => 1,'Color' => 3]);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);

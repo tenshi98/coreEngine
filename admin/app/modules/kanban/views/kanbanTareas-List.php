@@ -13,7 +13,7 @@
                     <h5 class="card-title">
                         <?php echo $data['TableTitle']; ?>
                         <?php if($data['UserAccess']['LevelAccess']>=3){
-                            //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+                            // Se verifica si se tiene el permiso para visualizar el dato
                             if($data['UserData']["KanbanTareasAdminTabIndepend"]==2){ ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <?php if(is_array($data['arrList'])){ ?>
@@ -51,7 +51,7 @@
 </section>
 
 <?php
-//Se verifica si se permite Administrar Tableros Independiente de las Tareas
+// Se verifica si se tiene el permiso para visualizar el dato
 if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     require_once('kanbanEstados-formNew.php');
 }
@@ -123,7 +123,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         });
     }
     <?php
-    //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+    // Se verifica si se tiene el permiso para visualizar el dato
     if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){ ?>
         /*********************************************************************/
         /*                        OPCIONES DE LA TABLA                       */

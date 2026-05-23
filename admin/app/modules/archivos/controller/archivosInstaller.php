@@ -92,7 +92,7 @@ class archivosInstaller extends ControllerBase {
 
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -153,8 +153,8 @@ class archivosInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -206,7 +206,7 @@ class archivosInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/

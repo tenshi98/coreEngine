@@ -85,7 +85,7 @@ class gestionDocumentosGuias extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrGuias['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -96,8 +96,8 @@ class gestionDocumentosGuias extends ControllerBase {
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrGuias'        => $arrGuias,
+                'rowData'         => $rowData['data'],
+                'arrGuias'        => $arrGuias['data'],
                 'idTipo'          => $idTipo,
             ];
 
@@ -107,8 +107,10 @@ class gestionDocumentosGuias extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrGuias]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
     /******************************************************************************/
@@ -161,7 +163,7 @@ class gestionDocumentosGuias extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrGuias)){
+        if($rowData['status'] && $arrGuias['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -174,8 +176,8 @@ class gestionDocumentosGuias extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_DataDate'        => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'rowData'     => $rowData,
-                'arrGuias'    => $arrGuias,
+                'rowData'     => $rowData['data'],
+                'arrGuias'    => $arrGuias['data'],
                 'idTipo'      => $idTipo,
             ];
 
@@ -185,8 +187,10 @@ class gestionDocumentosGuias extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrGuias]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -215,17 +219,17 @@ class gestionDocumentosGuias extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             /******************************************/
             //Se actualizan los datos de la factura
             $this->updateFact($_POST, 2);
             /******************************************/
             // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response);
+            Response::success($Response['data']);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
 
     }
@@ -270,17 +274,17 @@ class gestionDocumentosGuias extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($rowFacturacion['status'] && $Response['status']){
                 /******************************************/
                 //Se actualizan los datos de la factura
-                $this->updateFact($rowFacturacion, 1);
+                $this->updateFact($rowFacturacion['data'], 1);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -391,17 +395,17 @@ class gestionDocumentosGuias extends ControllerBase {
 
         /******************************/
         //Calculo
-        $x_ValorTotal = $rowData['TotalItem'] + $rowData['TotalProducto'] + $rowData['TotalServicio'] + $rowData['TotalGuia'];
+        $x_ValorTotal = $rowData['data']['TotalItem'] + $rowData['data']['TotalProducto'] + $rowData['data']['TotalServicio'] + $rowData['data']['TotalGuia'];
         //Se agrega respuesta
         $arrTareas = [
             'idFacturacion'   => $PostData['idFacturacion'],
             'ValorNeto'       => ($x_ValorTotal/1.19),
             'IVA'             => $x_ValorTotal - ($x_ValorTotal/1.19),
             'ValorTotal'      => $x_ValorTotal,
-            'TotalItems'      => $rowData['TotalItem'],
-            'TotalProductos'  => $rowData['TotalProducto'],
-            'TotalServicios'  => $rowData['TotalServicio'],
-            'TotalGuias'      => $rowData['TotalGuia'],
+            'TotalItems'      => $rowData['data']['TotalItem'],
+            'TotalProductos'  => $rowData['data']['TotalProducto'],
+            'TotalServicios'  => $rowData['data']['TotalServicio'],
+            'TotalGuias'      => $rowData['data']['TotalGuia'],
         ];
         /******************************/
         //Se genera la query

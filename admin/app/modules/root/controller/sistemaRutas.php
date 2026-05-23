@@ -64,7 +64,7 @@ class sistemaRutas extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'idRutas ASC',
-            'limit'   => 10000
+            'limit'   => 9999
         ];
         //Ejecuto la query
         $xParams  = ['query' => $query];
@@ -74,7 +74,7 @@ class sistemaRutas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrModules)){
+        if(is_array($arrModules) && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -89,7 +89,7 @@ class sistemaRutas extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'arrModules' => $arrModules,
-                'arrRutas'   => $arrRutas,
+                'arrRutas'   => $arrRutas['data'],
             ];
 
             /******************************************/
@@ -98,8 +98,10 @@ class sistemaRutas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrRutas]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 

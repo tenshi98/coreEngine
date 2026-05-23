@@ -54,7 +54,7 @@ class main extends ControllerBase {
             'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
             /*=========== Datos Consultados ===========*/
-            'rowOpciones'    => $rowOpciones,
+            'rowOpciones'    => $rowOpciones['data'],
 
         ];
 

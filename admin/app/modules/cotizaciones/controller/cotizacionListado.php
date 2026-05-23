@@ -126,7 +126,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrEntidades['status'] && $arrProductos['status'] && $arrServicios['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -148,10 +148,10 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_ServerServer'    => $this->ServerServer,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
-                'arrEntidades'    => $arrEntidades,
-                'arrProductos'    => $arrProductos,
-                'arrServicios'    => $arrServicios,
+                'arrList'         => $arrList['data'],
+                'arrEntidades'    => $arrEntidades['data'],
+                'arrProductos'    => $arrProductos['data'],
+                'arrServicios'    => $arrServicios['data'],
 
             ];
 
@@ -161,8 +161,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrEntidades,$arrProductos,$arrServicios]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -211,7 +213,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -226,7 +228,7 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrList'  => $arrList,
+                'arrList'  => $arrList['data'],
             ];
 
             /******************************************/
@@ -235,8 +237,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -334,7 +338,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -347,10 +351,10 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrItems'         => $arrItems,
-                'arrProductos'     => $arrProductos,
-                'arrServicios'     => $arrServicios,
+                'rowData'          => $rowData['data'],
+                'arrItems'         => $arrItems['data'],
+                'arrProductos'     => $arrProductos['data'],
+                'arrServicios'     => $arrServicios['data'],
             ];
 
             /******************************************/
@@ -359,8 +363,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrItems,$arrProductos,$arrServicios]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -488,7 +494,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $rowSistema['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -500,11 +506,11 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'rowSistema'       => $rowSistema,
-                'arrItems'         => $arrItems,
-                'arrProductos'     => $arrProductos,
-                'arrServicios'     => $arrServicios,
+                'rowData'          => $rowData['data'],
+                'rowSistema'       => $rowSistema['data'],
+                'arrItems'         => $arrItems['data'],
+                'arrProductos'     => $arrProductos['data'],
+                'arrServicios'     => $arrServicios['data'],
                 'Imprimir'         => $Imprimir,
             ];
 
@@ -514,8 +520,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$rowSistema,$arrItems,$arrProductos,$arrServicios]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -573,7 +581,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrEntidades['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -592,8 +600,8 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrEntidades'    => $arrEntidades,
+                'rowData'         => $rowData['data'],
+                'arrEntidades'    => $arrEntidades['data'],
             ];
 
             /******************************************/
@@ -602,8 +610,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrEntidades]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -644,7 +654,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -656,7 +666,7 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -665,8 +675,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -758,7 +770,7 @@ class cotizacionListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if (is_numeric($Response)) {
+            if ($Response['status']){
 
                 /*******************************************************/
                 //Items
@@ -768,7 +780,7 @@ class cotizacionListado extends ControllerBase {
                         /******************************/
                         //Se agrega respuesta
                         $arrTareas = [
-                            'idCotizacion' => $Response,
+                            'idCotizacion' => $Response['data'],
                             'Item'          => $_POST['Item_Item'][$j1],
                             'Number'        => $_POST['Item_Number'][$j1],
                             'ValorTotal'    => $_POST['Item_ValorTotal'][$j1],
@@ -801,7 +813,7 @@ class cotizacionListado extends ControllerBase {
                         /******************************/
                         //Se agrega respuesta
                         $arrTareas = [
-                            'idCotizacion'   => $Response,
+                            'idCotizacion'   => $Response['data'],
                             'idProducto'      => $_POST['Producto_idProducto'][$j1],
                             'Number'          => $_POST['Producto_Number'][$j1],
                             'ValorTotal'      => $_POST['Producto_ValorTotal'][$j1],
@@ -832,7 +844,7 @@ class cotizacionListado extends ControllerBase {
                         /******************************/
                         //Se agrega respuesta
                         $arrTareas = [
-                            'idCotizacion' => $Response,
+                            'idCotizacion' => $Response['data'],
                             'idServicio'    => $_POST['Servicio_idServicio'][$j1],
                             'Number'        => $_POST['Servicio_Number'][$j1],
                             'ValorTotal'    => $_POST['Servicio_ValorTotal'][$j1],
@@ -856,12 +868,12 @@ class cotizacionListado extends ControllerBase {
                 }
 
                 // Si es un ID numérico, encripta y envía con código 200 (OK)
-                $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+                $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
                 Response::success($Data);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
 
         }
@@ -901,13 +913,13 @@ class cotizacionListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -937,7 +949,7 @@ class cotizacionListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -960,11 +972,11 @@ class cotizacionListado extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1027,16 +1039,16 @@ class cotizacionListado extends ControllerBase {
 
         /******************************/
         //Calculo
-        $x_ValorTotal = $rowData['TotalItems'] + $rowData['TotalProductos'] + $rowData['TotalServicios'];
+        $x_ValorTotal = $rowData['data']['TotalItems'] + $rowData['data']['TotalProductos'] + $rowData['data']['TotalServicios'];
         //Se agrega respuesta
         $arrTareas = [
             'idCotizacion'   => $CotizacionID,
             'ValorNeto'       => ($x_ValorTotal/1.19),
             'IVA'             => $x_ValorTotal - ($x_ValorTotal/1.19),
             'ValorTotal'      => $x_ValorTotal,
-            'TotalItems'      => $rowData['TotalItems'],
-            'TotalProductos'  => $rowData['TotalProductos'],
-            'TotalServicios'  => $rowData['TotalServicios'],
+            'TotalItems'      => $rowData['data']['TotalItems'],
+            'TotalProductos'  => $rowData['data']['TotalProductos'],
+            'TotalServicios'  => $rowData['data']['TotalServicios'],
         ];
         /******************************/
         //Se genera la query

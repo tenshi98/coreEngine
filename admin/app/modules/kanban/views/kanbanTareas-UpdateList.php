@@ -17,7 +17,7 @@
                             <h5 class="title text-center">
                                 <span class="<?php echo 'badge-sp1 badge-sp1-'.$crud['Color']; ?>"><?php echo $crud['Nombre']; ?></span>
                                 <?php
-                                //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+                                // Se verifica si se tiene el permiso para visualizar el dato
                                 if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
                                     //Variables
                                     $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']);

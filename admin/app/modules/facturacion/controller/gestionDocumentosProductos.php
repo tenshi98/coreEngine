@@ -67,15 +67,26 @@ class gestionDocumentosProductos extends ControllerBase {
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+            $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $X_join  = '';
+            $X_where = 'bodegas_listado.idEstado=1';
+        }
         //Se genera la query
         $query = [
-            'data'    => 'idBodegas AS ID,Nombre',
+            'data'    => 'bodegas_listado.idBodegas AS ID, bodegas_listado.Nombre',
             'table'   => 'bodegas_listado',
-            'join'    => '',
-            'where'   => 'idEstado=1',
+            'join'    => $X_join,
+            'where'   => $X_where,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Nombre ASC',
+            'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -102,7 +113,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrBodegas['status'] && $arrProductos['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -113,9 +124,9 @@ class gestionDocumentosProductos extends ControllerBase {
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrBodegas'      => $arrBodegas,
-                'arrProductos'    => $arrProductos,
+                'rowData'         => $rowData['data'],
+                'arrBodegas'      => $arrBodegas['data'],
+                'arrProductos'    => $arrProductos['data'],
                 'idTipo'          => $idTipo,
             ];
 
@@ -125,8 +136,10 @@ class gestionDocumentosProductos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrBodegas,$arrProductos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
     /******************************************************************************/
@@ -182,7 +195,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrProductos)){
+        if($rowData['status'] && $arrProductos['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -194,8 +207,8 @@ class gestionDocumentosProductos extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrProductos'    => $arrProductos,
+                'rowData'         => $rowData['data'],
+                'arrProductos'    => $arrProductos['data'],
                 'idTipo'          => $idTipo,
             ];
 
@@ -205,8 +218,10 @@ class gestionDocumentosProductos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrProductos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -246,7 +261,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -258,7 +273,7 @@ class gestionDocumentosProductos extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'       => $rowData,
+                'rowData'       => $rowData['data'],
             ];
 
             /******************************************/
@@ -267,8 +282,10 @@ class gestionDocumentosProductos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -299,18 +316,18 @@ class gestionDocumentosProductos extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             /******************************************/
             //Se actualizan los datos de la factura
             $gestionDocumentos = new gestionDocumentos();
             $gestionDocumentos->updateFact(2, $_POST['idFacturacion']);
             /******************************************/
             // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response);
+            Response::success($Response['data']);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -341,18 +358,18 @@ class gestionDocumentosProductos extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /******************************************/
                 //Se actualizan los datos de la factura
                 $gestionDocumentos = new gestionDocumentos();
                 $gestionDocumentos->updateFact(2, $_POST['idFacturacion']);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -400,18 +417,18 @@ class gestionDocumentosProductos extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($rowFacturacion['status'] && $Response['status']){
                 /******************************************/
                 //Se actualizan los datos de la factura
                 $gestionDocumentos = new gestionDocumentos();
-                $gestionDocumentos->updateFact(2, $rowFacturacion['idFacturacion']);
+                $gestionDocumentos->updateFact(2, $rowFacturacion['data']['idFacturacion']);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

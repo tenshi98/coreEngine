@@ -13,7 +13,9 @@
                 <li class="nav-item flex-fill"><button class="nav-link w-100 active" data-bs-toggle="tab" data-bs-target="#resumen"><i class="bi bi-card-list"></i> Resumen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
-                <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>  <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-documentos" onclick="tabDocumentosLoadList()"><i class="bi bi-file-text"></i> Documentos</button></li><?php } ?>
+                <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
+                    <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-documentos" onclick="tabDocumentosLoadList()"><i class="bi bi-file-text"></i> Documentos</button></li>
+                <?php } ?>
                 <li class="nav-item flex-fill dropdown">
                     <button class="nav-link w-100 dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-plus-square"></i> Ver Mas

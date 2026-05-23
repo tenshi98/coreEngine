@@ -165,7 +165,7 @@ class bodegasInstaller extends ControllerBase {
 
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -226,8 +226,8 @@ class bodegasInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -300,7 +300,7 @@ class bodegasInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/
@@ -439,31 +439,37 @@ class bodegasInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'bodegas_listado',
-            'data'       => '`idBodegas` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idCiudad` int UNSIGNED NULL DEFAULT NULL,`idComuna` int UNSIGNED NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idBodegas` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idBodegas',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'bodegas_listado_observaciones',
-            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idBodegas` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idBodegas` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
+            'table'      => 'bodegas_listado_permisos_usuarios',
+            'data'       => '`idPermisoUsuario` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idBodegas` int(10) unsigned NOT NULL,`fechaCreacion` date DEFAULT NULL',
+            'primaryKey' => 'idPermisoUsuario',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
             'table'      => 'bodegas_movimientos',
-            'data'       => '`idMovimiento` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idEstadoIngreso` int UNSIGNED NOT NULL,`idBodegasIngreso` int UNSIGNED NULL DEFAULT NULL,`idBodegasEgreso` int UNSIGNED NULL DEFAULT NULL,`Creacion_fecha` date NOT NULL,`Creacion_hora` time NOT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`fecha_auto` date NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`idFacturacion` bigint UNSIGNED NULL DEFAULT NULL',
+            'data'       => '`idMovimiento` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idEstadoIngreso` int(10) unsigned NOT NULL,`idBodegasIngreso` int(10) unsigned NULL DEFAULT NULL,`idBodegasEgreso` int(10) unsigned NULL DEFAULT NULL,`Creacion_fecha` date NOT NULL,`Creacion_hora` time NOT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`fecha_auto` date NOT NULL,`idUsuario` int(10) unsigned NOT NULL,`idFacturacion` bigint(20) unsigned NULL DEFAULT NULL',
             'primaryKey' => 'idMovimiento',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'bodegas_movimientos_productos',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idMovimiento` bigint UNSIGNED NOT NULL,`idEstadoIngreso` int UNSIGNED NOT NULL,`idBodegas` int UNSIGNED NOT NULL,`idProducto` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NOT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idMovimiento` bigint(20) unsigned NOT NULL,`idEstadoIngreso` int(10) unsigned NOT NULL,`idBodegas` int(10) unsigned NOT NULL,`idProducto` int(10) unsigned NOT NULL,`Number` decimal(10, 2) UNSIGNED NOT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'bodegas_productos_stocks',
-            'data'       => '`idStocks` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idProducto` int UNSIGNED NOT NULL,`Cantidad_idBodegas_1` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_2` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_3` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_4` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_5` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_6` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_7` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_8` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_9` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_10` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_11` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_12` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_13` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_14` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_15` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_16` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_17` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_18` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_19` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_20` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_21` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_22` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_23` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_24` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_25` decimal(10, 2) NULL DEFAULT NULL',
+            'data'       => '`idStocks` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idProducto` int(10) unsigned NOT NULL,`Cantidad_idBodegas_1` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_2` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_3` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_4` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_5` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_6` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_7` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_8` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_9` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_10` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_11` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_12` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_13` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_14` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_15` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_16` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_17` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_18` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_19` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_20` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_21` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_22` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_23` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_24` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_25` decimal(10, 2) NULL DEFAULT NULL',
             'primaryKey' => 'idStocks',
             'comentario' => 'Creado desde el Instalador',
         ];

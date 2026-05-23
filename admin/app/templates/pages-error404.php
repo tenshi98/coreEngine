@@ -31,16 +31,8 @@
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/remixicon/remixicon.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/glyphicons/glyphicons.min.css'; ?>">
 
-        <!-- Scripts -->
-        <script type="text/javascript" src="<?php echo $BASE.'/js/jquery-3.6.0.min.js'; ?>"></script>
-        <script type="text/javascript" src="<?php echo $BASE.'/js/form_functions.js'; ?>"></script>
-
-        <!-- Animaciones Div -->
-        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/aos/aos.css'; ?>">
-        <script type="text/javascript" src="<?php echo $BASE.'/vendor/aos/aos.js'; ?>"></script>
-
         <!-- Archivos de la Plataforma -->
-        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color.css'; ?>">
+        <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/base_color_1.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/style.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/theme.css'; ?>">
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/media.css'; ?>">
@@ -49,28 +41,19 @@
     </head>
 
     <body>
-
         <main>
             <div class="container">
-
                 <section class="section error-404 min-vh-100 d-flex flex-column align-items-center justify-content-center">
                     <h1>404</h1>
                     <h2>La pagina que intentas ver no existe.</h2>
-                    <a class="btn" href="<?php echo $BASE.'/login'; ?>">Volver al inicio</a>
+                    <a class="btn" href="<?php echo $BASE.'/login'; ?>"><i class="bi bi-arrow-left-circle"></i> Volver al inicio</a>
                     <img src="<?php echo $BASE.'/img/not-found.svg'; ?>" class="img-fluid py-5" alt="Page Not Found">
                 </section>
-
             </div>
         </main>
 
-        <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
         <!-- Vendor JS Files -->
         <script type="text/javascript" src="<?php echo $BASE.'/vendor/bootstrap/js/bootstrap.bundle.min.js'; ?>"></script>
-
-        <!-- Archivos de la Plataforma -->
-        <script type="text/javascript" src="<?php echo $BASE.'/js/main.js'; ?>"></script>
-        <script type="text/javascript" src="<?php echo $BASE.'/js/functions.js'; ?>"></script>
 
     </body>
 

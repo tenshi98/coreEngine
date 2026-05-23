@@ -148,7 +148,7 @@ class cotizacionInstaller extends ControllerBase {
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -210,8 +210,8 @@ class cotizacionInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -283,7 +283,7 @@ class cotizacionInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/
@@ -375,25 +375,25 @@ class cotizacionInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'cotizacion_listado',
-            'data'       => '`idCotizacion` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idUsuario` int UNSIGNED NOT NULL,`idEntidad` int UNSIGNED NOT NULL,`fecha_auto` date NOT NULL,`Creacion_fecha` date NOT NULL,`Creacion_Semana` int UNSIGNED NULL DEFAULT NULL,`Creacion_mes` int UNSIGNED NULL DEFAULT NULL,`Creacion_ano` int UNSIGNED NULL DEFAULT NULL,`Creacion_hora` time NULL DEFAULT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`ValorNeto` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`IVA` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalItems` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalProductos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalServicios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalGuias` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
+            'data'       => '`idCotizacion` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idEntidad` int(10) unsigned NOT NULL,`fecha_auto` date NOT NULL,`Creacion_fecha` date NOT NULL,`Creacion_Semana` int(10) unsigned NULL DEFAULT NULL,`Creacion_mes` int(10) unsigned NULL DEFAULT NULL,`Creacion_ano` int(10) unsigned NULL DEFAULT NULL,`Creacion_hora` time NULL DEFAULT NULL,`Observaciones` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`ValorNeto` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`IVA` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalItems` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalProductos` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalServicios` decimal(15, 2) UNSIGNED NULL DEFAULT NULL,`TotalGuias` decimal(15, 2) UNSIGNED NULL DEFAULT NULL',
             'primaryKey' => 'idCotizacion',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'cotizacion_listado_items',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idCotizacion` bigint(20) unsigned NOT NULL,`Item` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'cotizacion_listado_productos',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`idProducto` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idCotizacion` bigint(20) unsigned NOT NULL,`idProducto` int(10) unsigned NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'cotizacion_listado_servicios',
-            'data'       => '`idExistencia` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idCotizacion` bigint UNSIGNED NOT NULL,`idServicio` int UNSIGNED NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idCotizacion` bigint(20) unsigned NOT NULL,`idServicio` int(10) unsigned NOT NULL,`Number` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorTotal` decimal(15, 2) UNSIGNED NOT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];

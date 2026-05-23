@@ -98,8 +98,9 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'order'   => ''
             ];
             //Ejecuto la query
-            $xParams = ['query' => $query];
-            $MainViewData['Data_ComprasTotal'] = $this->Base_GetByID($xParams);
+            $xParams                           = ['query' => $query];
+            $TempData                          = $this->Base_GetByID($xParams);
+            $MainViewData['Data_ComprasTotal'] = $TempData['data'];
 
             /******************************************/
             //Listado Compras
@@ -118,11 +119,12 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
-                'limit'   => 10
+                'limit'   => 9
             ];
             //Ejecuto la query
             $xParams                             = ['query' => $query];
-            $MainViewData['Data_ComprasListado'] = $this->Base_GetList($xParams);
+            $TempData                            = $this->Base_GetList($xParams);
+            $MainViewData['Data_ComprasListado'] = $TempData['data'];
 
             /******************************************/
             //Total Compras
@@ -139,7 +141,8 @@ class gestionDocumentosWidgets extends ControllerBase {
             ];
             //Ejecuto la query
             $xParams                          = ['query' => $query];
-            $MainViewData['Data_VentasTotal'] = $this->Base_GetByID($xParams);
+            $TempData                         = $this->Base_GetByID($xParams);
+            $MainViewData['Data_VentasTotal'] = $TempData['data'];
 
             /******************************************/
             //Listado Ventas
@@ -163,11 +166,12 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
-                'limit'   => 10
+                'limit'   => 9
             ];
             //Ejecuto la query
             $xParams                            = ['query' => $query];
-            $MainViewData['Data_VentasListado'] = $this->Base_GetList($xParams);
+            $TempData                           = $this->Base_GetList($xParams);
+            $MainViewData['Data_VentasListado'] = $TempData['data'];
         }
 
         /******************************************/

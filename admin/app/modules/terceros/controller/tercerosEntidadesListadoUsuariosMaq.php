@@ -70,7 +70,7 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrPermisos)){
+        if($rowData['status'] && $arrPermisos['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -82,8 +82,8 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'rowData'     => $rowData,
-                'arrPermisos' => $arrPermisos,
+                'rowData'     => $rowData['data'],
+                'arrPermisos' => $arrPermisos['data'],
             ];
 
             /******************************************/
@@ -92,8 +92,10 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrPermisos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -127,80 +129,83 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
             $arrPermisos = $this->Base_GetList($xParams);
 
             /*******************************************************************/
-            //Recorro los permisos
-            foreach ($arrPermisos as $permisos){
-                //Se verifica si esta marcado
-                switch ($_POST['switch_'.$permisos['idMaq']]) {
-                    /*******************************************************************/
-                    //Inactivo
-                    case 1:
-                        //Se verifica si permiso existe
-                        switch ($permisos['IsActivo']) {
-                            /*******************************************************************/
-                            //No existe permiso previo
-                            case 0:
-                                //nada
-                                break;
-                            /*******************************************************************/
-                            //Si hay al menos un permiso
-                            default:
-                                /******************************/
-                                //Se borran los datos
-                                $Post = [
-                                    'idUsuario' => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
-                                    'idMaquina' => $this->Codification->encryptDecrypt('encrypt',$permisos['idMaq']),
-                                ];
+            // Si hay datos
+            if ($arrPermisos['status']){
+                //Recorro los permisos
+                foreach ($arrPermisos['data'] as $permisos){
+                    //Se verifica si esta marcado
+                    switch ($_POST['switch_'.$permisos['idMaq']]) {
+                        /*******************************************************************/
+                        //Inactivo
+                        case 1:
+                            //Se verifica si permiso existe
+                            switch ($permisos['IsActivo']) {
+                                /*******************************************************************/
+                                //No existe permiso previo
+                                case 0:
+                                    //nada
+                                    break;
+                                /*******************************************************************/
+                                //Si hay al menos un permiso
+                                default:
+                                    /******************************/
+                                    //Se borran los datos
+                                    $Post = [
+                                        'idUsuario' => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
+                                        'idMaquina' => $this->Codification->encryptDecrypt('encrypt',$permisos['idMaq']),
+                                    ];
 
-                                /******************************/
-                                //Se genera la query
-                                $query = [
-                                    'files'       => '',
-                                    'table'       => 'terceros_entidades_listado_usuarios_maq',
-                                    'where'       => 'idUsuario,idMaquina',
-                                    'SubCarpeta'  => '',
-                                    'Post'        => $Post
-                                ];
-                                //Ejecuto la query
-                                $xParams = ['query' => $query];
-                                $this->Base_delete($xParams);
+                                    /******************************/
+                                    //Se genera la query
+                                    $query = [
+                                        'files'       => '',
+                                        'table'       => 'terceros_entidades_listado_usuarios_maq',
+                                        'where'       => 'idUsuario,idMaquina',
+                                        'SubCarpeta'  => '',
+                                        'Post'        => $Post
+                                    ];
+                                    //Ejecuto la query
+                                    $xParams = ['query' => $query];
+                                    $this->Base_delete($xParams);
 
-                                break;
-                        }
-                        break;
-                    /*******************************************************************/
-                    //Activo
-                    case 2:
-                        //Verifico si existe
-                        switch ($permisos['IsActivo']) {
-                            /*******************************************************************/
-                            //Si no hay permisos se crea
-                            case 0:
-                                /******************************/
-                                //Se borran los datos
-                                $Post = [
-                                    'idUsuario'   => $_POST['idUsuario'],
-                                    'idMaquina'   => $permisos['idMaq'],
-                                ];
+                                    break;
+                            }
+                            break;
+                        /*******************************************************************/
+                        //Activo
+                        case 2:
+                            //Verifico si existe
+                            switch ($permisos['IsActivo']) {
+                                /*******************************************************************/
+                                //Si no hay permisos se crea
+                                case 0:
+                                    /******************************/
+                                    //Se borran los datos
+                                    $Post = [
+                                        'idUsuario'   => $_POST['idUsuario'],
+                                        'idMaquina'   => $permisos['idMaq'],
+                                    ];
 
-                                /******************************/
-                                //Se genera la query
-                                $query = [
-                                    'data'      => 'idUsuario,idMaquina',
-                                    'required'  => 'idUsuario,idMaquina',
-                                    'unique'    => '',
-                                    'encode'    => '',
-                                    'table'     => 'terceros_entidades_listado_usuarios_maq',
-                                    'Post'      => $Post
-                                ];
-                                //Se genera el chequeo
-                                $dataCheck_1 = $this->dataCheck_1($Post);
-                                //Ejecuto la query
-                                $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
-                                $this->Base_insert($xParams);
-                                break;
+                                    /******************************/
+                                    //Se genera la query
+                                    $query = [
+                                        'data'      => 'idUsuario,idMaquina',
+                                        'required'  => 'idUsuario,idMaquina',
+                                        'unique'    => '',
+                                        'encode'    => '',
+                                        'table'     => 'terceros_entidades_listado_usuarios_maq',
+                                        'Post'      => $Post
+                                    ];
+                                    //Se genera el chequeo
+                                    $dataCheck_1 = $this->dataCheck_1($Post);
+                                    //Ejecuto la query
+                                    $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
+                                    $this->Base_insert($xParams);
+                                    break;
 
-                        }
-                        break;
+                            }
+                            break;
+                    }
                 }
             }
 

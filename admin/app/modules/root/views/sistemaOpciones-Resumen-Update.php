@@ -135,6 +135,8 @@
             ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Uso Telemetría',                              'Texto' => activo($data['rowData']['maquinasListadoTelemetria'])],
             ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Uso Backups Telemetría',                      'Texto' => activo($data['rowData']['maquinasListadoBackups'])],
             ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Envío de Notificaciones',                     'Texto' => activo($data['rowData']['maquinasListadoNotificaciones'])],
+            ['Icon' => '','Titulo' => '<strong>Usuarios - Listado:</strong> Uso Permisos Bodegas',                        'Texto' => activo($data['rowData']['usuariosPermisosBodegas'])],
+            ['Icon' => '','Titulo' => '<strong>Usuarios - Listado:</strong> Uso Permisos Maquinas',                       'Texto' => activo($data['rowData']['usuariosPermisosMaquinas'])],
         ];
 
         /**************************************/

@@ -1600,6 +1600,50 @@ body::-webkit-scrollbar-thumb {background-color: #aab7cf;}
 .infographicBox .value .timer{color: #666;}
 
 /*--------------------------------------------------------------
+# Titulos
+--------------------------------------------------------------*/
+.box-title{border-bottom-width: 2px;border-bottom-style: dotted;}
+.box-title.text-color-red{border-color:var(--color-red)!important}
+.box-title.text-color-red-light{border-color:var(--color-red-light)!important}
+.box-title.text-color-red-dark{border-color:var(--color-red-dark)!important}
+.box-title.text-color-blue{border-color:var(--color-blue)!important}
+.box-title.text-color-blue-light{border-color:var(--color-blue-light)!important}
+.box-title.text-color-blue-dark{border-color:var(--color-blue-dark)!important}
+.box-title.text-color-green{border-color:var(--color-green)!important}
+.box-title.text-color-green-light{border-color:var(--color-green-light)!important}
+.box-title.text-color-green-dark{border-color:var(--color-green-dark)!important}
+.box-title.text-color-yellow{border-color:var(--color-yellow)!important}
+.box-title.text-color-yellow-light{border-color:var(--color-yellow-light)!important}
+.box-title.text-color-yellow-dark{border-color:var(--color-yellow-dark)!important}
+.box-title.text-color-dark{border-color:var(--color-dark)!important}
+.box-title.text-color-dark-light{border-color:var(--color-dark-light)!important}
+.box-title.text-color-dark-dark{border-color:var(--color-dark-dark)!important}
+.box-title.text-color-gray{border-color:var(--color-gray)!important}
+.box-title.text-color-gray-light{border-color:var(--color-gray-light)!important}
+.box-title.text-color-gray-dark{border-color:var(--color-gray-dark)!important}
+.box-title.text-color-white{border-color:var(--color-white)!important}
+.box-title.text-color-mdb-text{border-color:var(--color-mdb-text)!important}
+.box-title.text-color-red-text{border-color:var(--color-red-text)!important}
+.box-title.text-color-pink-text{border-color:var(--color-pink-text)!important}
+.box-title.text-color-purple-text{border-color:var(--color-purple-text)!important}
+.box-title.text-color-deep-purple-text{border-color:var(--color-deep-purple-text)!important}
+.box-title.text-color-indigo-text{border-color:var(--color-indigo-text)!important}
+.box-title.text-color-blue-text{border-color:var(--color-blue-text)!important}
+.box-title.text-color-light-blue-text{border-color:var(--color-light-blue-text)!important}
+.box-title.text-color-cyan-text{border-color:var(--color-cyan-text)!important}
+.box-title.text-color-teal-text{border-color:var(--color-teal-text)!important}
+.box-title.text-color-green-text{border-color:var(--color-green-text)!important}
+.box-title.text-color-light-green-text{border-color:var(--color-light-green-text)!important}
+.box-title.text-color-lime-text{border-color:var(--color-lime-text)!important}
+.box-title.text-color-yellow-text{border-color:var(--color-yellow-text)!important}
+.box-title.text-color-amber-text{border-color:var(--color-amber-text)!important}
+.box-title.text-color-orange-text{border-color:var(--color-orange-text)!important}
+.box-title.text-color-deep-orange-text{border-color:var(--color-deep-orange-text)!important}
+.box-title.text-color-brown-text{border-color:var(--color-brown-text)!important}
+.box-title.text-color-blue-grey-text{border-color:var(--color-blue-grey-text)!important}
+.box-title.text-color-grey-text{border-color:var(--color-grey-text)!important}
+
+/*--------------------------------------------------------------
 # Ribbons
 --------------------------------------------------------------*/
 .ribbon-box .ribbon {-webkit-box-shadow:2px 5px 10px rgba(49,58,70,.15);box-shadow:2px 5px 10px rgba(49,58,70,.15);color:#fff;}
@@ -1652,4 +1696,24 @@ body::-webkit-scrollbar-thumb {background-color: #aab7cf;}
 .chatIA .main-content .chat-scroll-area .message-wrapper .msg-ai {background-color: #ffffff;border: 1px solid var(--card-border-color);}
 .chatIA .main-content .input-container .input-box {background: white;border: 1px solid #e5e5e5;box-shadow: 0 10px 30px rgba(0,0,0,0.05);}
 .chatIA .main-content .chat-scroll-area .message-wrapper .msg-bubble .card-custom {border: 1px solid #eee;background: white;}
+
+/*--------------------------------------------------------------
+/* ── Terminal / Detalles ──
+--------------------------------------------------------------*/
+.terminal-box {background: var(--header-bg);border: 1px solid var(--header-bg);}
+.terminal-header {border-bottom: 1px solid var(--btn-secondary-border);}
+.terminal-dot {width: 10px;height: 10px;border-radius: 50%;}
+.terminal-dot.red { background: var(--btn-danger-bg); }
+.terminal-dot.yellow { background: var(--btn-warning-bg); }
+.terminal-dot.green { background: var(--btn-success-bg); }
+.terminal-body {color: #adb5bd;}
+.terminal-body .prompt {color: var(--btn-primary-bg);}
+.terminal-body .path {color: var(--text-color09);}
+.terminal-body .cmd {color: var(--text-color07);}
+.terminal-body .output {color: var(--btn-danger-bg);}
+.cursor-blink {background: var(--btn-primary-bg);}
+
+
+
+
 

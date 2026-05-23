@@ -16,7 +16,6 @@ class testeos extends ControllerBase {
     private $ServerClient;
     private $ServerWeb;
 
-    
 
     /******************************************************************************/
     //Constructor

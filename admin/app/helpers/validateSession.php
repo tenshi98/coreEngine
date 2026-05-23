@@ -63,11 +63,11 @@ class validateSession {
 
         /******************************/
         //Si no hay resultados
-        if ($result===false) {return $result;}
+        if ($result['status']===false) {return false;}
 
         /******************************/
 		//Se compara la IP para evitar accesos no autorizados
-        if ($result['IP_Client'] != $ServerClient->getClientIp()) { return false;}
+        if (!isset($result['data']['IP_Client']) || $result['data']['IP_Client'] != $ServerClient->getClientIp()) { return false;}
 
         /***************************************************/
         /*          Consulta del usuario logueado          */
@@ -88,7 +88,7 @@ class validateSession {
             'join'   => '
                 LEFT JOIN core_tipos_usuario     ON core_tipos_usuario.idTipoUsuario   = usuarios_listado.idTipoUsuario
                 LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad     = usuarios_listado.idCiudad',
-            'where'  => 'usuarios_listado.idUsuario = "'.$result['idUsuario'].'"',
+            'where'  => 'usuarios_listado.idUsuario = "'.$result['data']['idUsuario'].'"',
             'group'  => '',
             'having' => '',
             'order'  => 'usuarios_listado.Nombre DESC'
@@ -98,11 +98,11 @@ class validateSession {
 
         /******************************/
         //Si hay resultados y el estado es correcto, se recrea la sesion en el servidor
-        if($rowData!==false&&isset($rowData['idEstado'])&&$rowData['idEstado']==1){
+        if($rowData['status']===true && isset($rowData['data']['idEstado']) && $rowData['data']['idEstado']==1){
             //Se carga la clase del usuario
             $userSession = new userSession();
             //Se cargan los datos de la sesion
-            $userSession->createSession($f3, $rowData, $result, $TypeSession);
+            $userSession->createSession($f3, $rowData['data'], $result['data'], $TypeSession);
             //si no hay problemas se da como valido
             return true;
         }else{

@@ -54,64 +54,60 @@ class CheckData{
      * 2. Validación de tipos, formatos y reglas de negocio dinámicas.
      * 3. Encriptación de datos sensibles para persistencia segura.
      *
+     * El método sigue un pipeline ordenado:
+     * 1. Valida campos obligatorios → corta inmediatamente si hay vacíos (Early Return)
+     * 2. Encripta los campos indicados en 'encode' antes de continuar
+     * 3. Ejecuta todas las reglas de validación restantes sobre los campos indicados
+     *
+     * Notas de comportamiento:
+     * - 'emptyData' usa Early Return: si hay campos vacíos, no se ejecutan las demás validaciones.
+     * - 'encode' muta $config['Post'] con los valores encriptados; los validadores posteriores operan sobre el valor ya encriptado.
+     * - Los campos que no existan en 'Post' o estén vacíos son ignorados por las validaciones de formato (no generan error si no son obligatorios).
+     * - 'ValidarCoincidencias' ignora el par si ambos campos están vacíos.
+     *
      * @param array $config Arreglo con reglas (ValidarEmail, ValidarRut, etc.) y los datos 'Post'.
      * @return array|bool Retorna un arreglo de errores con clave 'message' o false si la validación es exitosa.
+     *
+	 * @example
+	 * ```php
+	 * $DataCheck = [
+     *   'emptyData'                 => 'password',    -> Validar campos obligatorios: no pueden estar vacíos
+     *   'encode'                    => 'oldPassword', -> Codificar los datos sensibles antes de procesarlos
+     *   'ValidarEmail'              => 'email',       -> Validar formato de email
+     *   'ValidarNumero'             => '',            -> Validar si es un número
+     *   'ValidarEntero'             => '',            -> Validar si es un número entero
+     *   'ValidarRut'                => 'Rut',         -> Validar si es un Rut chileno válido
+     *   'ValidarPatente'            => '',            -> Validar si es una patente vehicular
+     *   'ValidarFecha'              => 'fNacimiento', -> Validar si es una fecha válida
+     *   'ValidarHora'               => '',            -> Validar si es una hora válida
+     *   'ValidarURL'                => '',            -> Validar si es una URL válida
+     *   'ValidarLargoMinimo'        => '',            -> Validar longitud mínima de caracteres
+     *   'ValidarLargoMinimoN'       => 3,             -> Número mínimo de caracteres
+     *   'ValidarLargoMaximo'        => '',            -> Validar longitud máxima de caracteres
+     *   'ValidarLargoMaximoN'       => 255,           -> Número máximo de caracteres
+     *   'ValidarPalabrasCensuradas' => '',            -> Validar si contiene palabras censuradas
+     *   'ValidarEspaciosVacios'     => 'password',    -> Validar que no existan espacios en blanco
+     *   'ValidarMayusculas'         => '',            -> Validar que no existan letras mayúsculas
+     *   'ValidarCoincidencias'      => 'mainPassword-oldPassword', -> Validar coincidencia entre pares de campos
+     *
+     *   // --- Nuevas validaciones ---
+     *   'ValidarDominioEmail'      => 'email',              -> Validar dominio de email: comprobar que el dominio existe con checkdnsrr()
+     *   'ValidarPasswordSegura'    => 'password',           -> Validar contraseñas seguras: mínimo 8 caracteres, mayúscula, número y símbolo
+     *   'ValidarFechaRango'        => 'fNacimiento',        -> Validar rango de fechas: entre 1900 y la fecha actual
+     *   'ValidarEdadMinima'        => 'fNacimiento',        -> Validar edad mínima: calcular edad y verificar que sea >= 18 años
+     *   'ValidarJSON'              => 'jsonData',           -> Validar que el campo contenga un JSON válido (json_decode)
+     *   'ValidarUUID'              => 'uuid',               -> Validar que el campo sea un UUID válido
+     *   'ValidarIP'                => 'ipAddress',          -> Validar dirección IP con filter_var
+     *   'ValidarSoloAlfanumerico'  => 'username',           -> Validar que el campo contenga solo caracteres alfanuméricos
+     *   'ValidarSoloLetras'        => 'firstName,lastName', -> Validar que el campo contenga solo letras
+     *
+     *   // --- Datos del formulario ---
+     *   'Post' => $DataPOST, -> Datos entregados por el formulario
+     * ];
+	 * ```
+	 *
      */
     public function checkingData(array $config): array|bool {
-        /*
-        *================================================= Modo de uso =================================================
-        *
-        * El método sigue un pipeline ordenado:
-        * 1. Valida campos obligatorios → corta inmediatamente si hay vacíos (Early Return)
-        * 2. Encripta los campos indicados en 'encode' antes de continuar
-        * 3. Ejecuta todas las reglas de validación restantes sobre los campos indicados
-        *
-        * Formato del array $config:
-        * -------------------------
-        * @example
-        * $DataCheck = [
-        *   'emptyData'                 => 'password',    -> Validar campos obligatorios: no pueden estar vacíos
-        *   'encode'                    => 'oldPassword', -> Codificar los datos sensibles antes de procesarlos
-        *   'ValidarEmail'              => 'email',       -> Validar formato de email
-        *   'ValidarNumero'             => '',            -> Validar si es un número
-        *   'ValidarEntero'             => '',            -> Validar si es un número entero
-        *   'ValidarRut'                => 'Rut',         -> Validar si es un Rut chileno válido
-        *   'ValidarPatente'            => '',            -> Validar si es una patente vehicular
-        *   'ValidarFecha'              => 'fNacimiento', -> Validar si es una fecha válida
-        *   'ValidarHora'               => '',            -> Validar si es una hora válida
-        *   'ValidarURL'                => '',            -> Validar si es una URL válida
-        *   'ValidarLargoMinimo'        => '',            -> Validar longitud mínima de caracteres
-        *   'ValidarLargoMinimoN'       => 3,             -> Número mínimo de caracteres
-        *   'ValidarLargoMaximo'        => '',            -> Validar longitud máxima de caracteres
-        *   'ValidarLargoMaximoN'       => 255,           -> Número máximo de caracteres
-        *   'ValidarPalabrasCensuradas' => '',            -> Validar si contiene palabras censuradas
-        *   'ValidarEspaciosVacios'     => 'password',    -> Validar que no existan espacios en blanco
-        *   'ValidarMayusculas'         => '',            -> Validar que no existan letras mayúsculas
-        *   'ValidarCoincidencias'      => 'mainPassword-oldPassword', -> Validar coincidencia entre pares de campos
-        *
-        *   // --- Nuevas validaciones ---
-        *   'ValidarDominioEmail'      => 'email',              -> Validar dominio de email: comprobar que el dominio existe con checkdnsrr()
-        *   'ValidarPasswordSegura'    => 'password',           -> Validar contraseñas seguras: mínimo 8 caracteres, mayúscula, número y símbolo
-        *   'ValidarFechaRango'        => 'fNacimiento',        -> Validar rango de fechas: entre 1900 y la fecha actual
-        *   'ValidarEdadMinima'        => 'fNacimiento',        -> Validar edad mínima: calcular edad y verificar que sea >= 18 años
-        *   'ValidarJSON'              => 'jsonData',           -> Validar que el campo contenga un JSON válido (json_decode)
-        *   'ValidarUUID'              => 'uuid',               -> Validar que el campo sea un UUID válido
-        *   'ValidarIP'                => 'ipAddress',          -> Validar dirección IP con filter_var
-        *   'ValidarSoloAlfanumerico'  => 'username',           -> Validar que el campo contenga solo caracteres alfanuméricos
-        *   'ValidarSoloLetras'        => 'firstName,lastName', -> Validar que el campo contenga solo letras
-        *
-        *   // --- Datos del formulario ---
-        *   'Post' => $DataPOST, -> Datos entregados por el formulario
-        * ];
-        *
-        * Notas de comportamiento:
-        * - 'emptyData' usa Early Return: si hay campos vacíos, no se ejecutan las demás validaciones.
-        * - 'encode' muta $config['Post'] con los valores encriptados; los validadores posteriores operan sobre el valor ya encriptado.
-        * - Los campos que no existan en 'Post' o estén vacíos son ignorados por las validaciones de formato (no generan error si no son obligatorios).
-        * - 'ValidarCoincidencias' ignora el par si ambos campos están vacíos.
-        *
-        *===================================================================================================================
-        */
 
         /******************************************************************/
         // Variables iniciales

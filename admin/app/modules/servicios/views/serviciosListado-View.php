@@ -27,7 +27,9 @@
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100 active" id="view_tab_1" data-bs-toggle="tab" data-bs-target="#tab_id_1" type="button" role="tab" aria-controls="tab_id_1" aria-selected="true"><i class="bi bi-card-list"></i> Datos Básicos</button></li>
-        <?php if($data['UserData']["serviciosListadoVerDocumentos"]==2){ ?><li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_4" data-bs-toggle="tab" data-bs-target="#tab_id_4" type="button" role="tab" aria-controls="tab_id_4" aria-selected="false" tabindex="-1"><i class="bi bi-file-text"></i> Documentos</button></li><?php } ?>
+        <?php if($data['UserData']["serviciosListadoVerDocumentos"]==2){ ?>
+            <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_4" data-bs-toggle="tab" data-bs-target="#tab_id_4" type="button" role="tab" aria-controls="tab_id_4" aria-selected="false" tabindex="-1"><i class="bi bi-file-text"></i> Documentos</button></li>
+        <?php } ?>
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_5" data-bs-toggle="tab" data-bs-target="#tab_id_5" type="button" role="tab" aria-controls="tab_id_5" aria-selected="false" tabindex="-1"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
     </ul>
     <div class="tab-content pt-2" id="tabId_560_Content">

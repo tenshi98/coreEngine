@@ -108,15 +108,26 @@ class gestionDocumentos extends ControllerBase {
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+            $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $X_join  = '';
+            $X_where = 'bodegas_listado.idEstado=1';
+        }
         //Se genera la query
         $query = [
-            'data'    => 'idBodegas AS ID,Nombre',
+            'data'    => 'bodegas_listado.idBodegas AS ID, bodegas_listado.Nombre',
             'table'   => 'bodegas_listado',
-            'join'    => '',
-            'where'   => 'idEstado=1',
+            'join'    => $X_join,
+            'where'   => $X_where,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Nombre ASC',
+            'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -223,7 +234,7 @@ class gestionDocumentos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrEntidades['status'] && $arrDocumentos['status'] && $arrServicios['status'] && $arrGuias['status'] && $arrEstadoPago['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -245,14 +256,14 @@ class gestionDocumentos extends ControllerBase {
                 'Fnc_ServerServer'    => $this->ServerServer,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
-                'arrBodegas'      => $arrBodegas,
-                'arrProductos'    => $arrProductos,
-                'arrEntidades'    => $arrEntidades,
-                'arrDocumentos'   => $arrDocumentos,
-                'arrServicios'    => $arrServicios,
-                'arrGuias'        => $arrGuias,
-                'arrEstadoPago'   => $arrEstadoPago,
+                'arrList'         => $arrList['data'],
+                'arrBodegas'      => $arrBodegas['data'],
+                'arrProductos'    => $arrProductos['data'],
+                'arrEntidades'    => $arrEntidades['data'],
+                'arrDocumentos'   => $arrDocumentos['data'],
+                'arrServicios'    => $arrServicios['data'],
+                'arrGuias'        => $arrGuias['data'],
+                'arrEstadoPago'   => $arrEstadoPago['data'],
                 'idTipo'          => $idTipo,
 
             ];
@@ -263,8 +274,10 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrBodegas,$arrProductos,$arrEntidades,$arrDocumentos,$arrServicios,$arrGuias,$arrEstadoPago]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -326,7 +339,7 @@ class gestionDocumentos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -341,7 +354,7 @@ class gestionDocumentos extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrList'  => $arrList,
+                'arrList'  => $arrList['data'],
                 'idTipo'   => $idTipo,
             ];
 
@@ -351,8 +364,10 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -522,7 +537,7 @@ class gestionDocumentos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status'] && $arrGuias['status'] && $arrPagos['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -535,12 +550,12 @@ class gestionDocumentos extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrItems'         => $arrItems,
-                'arrProductos'     => $arrProductos,
-                'arrServicios'     => $arrServicios,
-                'arrGuias'         => $arrGuias,
-                'arrPagos'         => $arrPagos,
+                'rowData'          => $rowData['data'],
+                'arrItems'         => $arrItems['data'],
+                'arrProductos'     => $arrProductos['data'],
+                'arrServicios'     => $arrServicios['data'],
+                'arrGuias'         => $arrGuias['data'],
+                'arrPagos'         => $arrPagos['data'],
             ];
 
             /******************************************/
@@ -549,8 +564,10 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrItems,$arrProductos,$arrServicios,$arrGuias,$arrPagos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -747,7 +764,7 @@ class gestionDocumentos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $rowSistema['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status'] && $arrGuias['status'] && $arrPagos['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -759,13 +776,13 @@ class gestionDocumentos extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'rowSistema'       => $rowSistema,
-                'arrItems'         => $arrItems,
-                'arrProductos'     => $arrProductos,
-                'arrServicios'     => $arrServicios,
-                'arrGuias'         => $arrGuias,
-                'arrPagos'         => $arrPagos,
+                'rowData'          => $rowData['data'],
+                'rowSistema'       => $rowSistema['data'],
+                'arrItems'         => $arrItems['data'],
+                'arrProductos'     => $arrProductos['data'],
+                'arrServicios'     => $arrServicios['data'],
+                'arrGuias'         => $arrGuias['data'],
+                'arrPagos'         => $arrPagos['data'],
                 'Imprimir'         => $Imprimir,
             ];
 
@@ -775,8 +792,10 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$rowSistema,$arrItems,$arrProductos,$arrServicios,$arrGuias,$arrPagos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -872,7 +891,7 @@ class gestionDocumentos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrEntidades['status'] && $arrDocumentos['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -891,9 +910,9 @@ class gestionDocumentos extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrEntidades'    => $arrEntidades,
-                'arrDocumentos'   => $arrDocumentos,
+                'rowData'         => $rowData['data'],
+                'arrEntidades'    => $arrEntidades['data'],
+                'arrDocumentos'   => $arrDocumentos['data'],
             ];
 
             /******************************************/
@@ -902,8 +921,10 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrEntidades,$arrDocumentos]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -962,7 +983,7 @@ class gestionDocumentos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -974,7 +995,7 @@ class gestionDocumentos extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -983,8 +1004,10 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -1033,14 +1056,14 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if (is_numeric($Response)) {
+            if ($Response['status']){
                 // Si es un ID numérico, encripta y envía con código 200 (OK)
-                $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+                $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
                 Response::success($Data);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
 
         }
@@ -1080,13 +1103,13 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1115,7 +1138,7 @@ class gestionDocumentos extends ControllerBase {
             $Response = $this->Base_delete($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -1140,11 +1163,11 @@ class gestionDocumentos extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1224,7 +1247,7 @@ class gestionDocumentos extends ControllerBase {
 
             /******************************************/
             //Se suman los totales de las guias
-            $x_ValorTotal += $rowData['Total'];
+            $x_ValorTotal += $rowData['data']['Total'];
         }
 
         /*******************************************************/
@@ -1261,7 +1284,7 @@ class gestionDocumentos extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             /*******************************************************/
             //Items
             if(isset($ndata_1)&&$ndata_1!=0){
@@ -1270,7 +1293,7 @@ class gestionDocumentos extends ControllerBase {
                     /******************************/
                     //Se agrega respuesta
                     $arrTareas = [
-                        'idFacturacion' => $Response,
+                        'idFacturacion' => $Response['data'],
                         'Item'          => $PostData['Item_Item'][$j1],
                         'Number'        => $PostData['Item_Number'][$j1],
                         'ValorTotal'    => $PostData['Item_ValorTotal'][$j1],
@@ -1313,7 +1336,7 @@ class gestionDocumentos extends ControllerBase {
                     /******************************/
                     //Se agrega respuesta
                     $arrTareas = [
-                        'idFacturacion'   => $Response,
+                        'idFacturacion'   => $Response['data'],
                         'idEstadoIngreso' => $PostData['idTipo'],
                         'idBodegas'       => $idBodegas,
                         'idProducto'      => $PostData['Producto_idProducto'][$j1],
@@ -1351,7 +1374,7 @@ class gestionDocumentos extends ControllerBase {
                     $PostMovProd['Observaciones']    = 'Movimiento generado desde una facturacion';
                     $PostMovProd['fecha_auto']       = $PostData['fecha_auto'];
                     $PostMovProd['idUsuario']        = $PostData['idUsuario'];
-                    $PostMovProd['idFacturacion']    = $Response;
+                    $PostMovProd['idFacturacion']    = $Response['data'];
                     //productos
                     $PostMovProd['idProducto']       = $PostData['Producto_idProducto'];
                     $PostMovProd['Number']           = $PostData['Producto_Number'];
@@ -1372,7 +1395,7 @@ class gestionDocumentos extends ControllerBase {
                     /******************************/
                     //Se agrega respuesta
                     $arrTareas = [
-                        'idFacturacion' => $Response,
+                        'idFacturacion' => $Response['data'],
                         'idServicio'    => $PostData['Servicio_idServicio'][$j1],
                         'Number'        => $PostData['Servicio_Number'][$j1],
                         'ValorTotal'    => $PostData['Servicio_ValorTotal'][$j1],
@@ -1403,7 +1426,7 @@ class gestionDocumentos extends ControllerBase {
                     /******************************/
                     //Se agrega respuesta
                     $arrTareas = [
-                        'idFacturacion'    => $Response,
+                        'idFacturacion'    => $Response['data'],
                         'idFacturacionRel' => $PostData['idFacturacionRel'][$j1],
                     ];
                     /******************************/
@@ -1423,35 +1446,30 @@ class gestionDocumentos extends ControllerBase {
                     $ResponseGuias = $this->Base_insert($xParams);
                     /******************************/
                     //Verifico si hay respuesta para actualizar datos
-                    if(is_array($ResponseGuias)){
-                    //si no hay resultados
-                    }else{
-                        //si es la respuesta esperada
-                        if (is_numeric($ResponseGuias)===true) {
-                            /******************************/
-                            //Se agrega respuesta
-                            $arrTareas = [
-                                'idFacturacion' => $PostData['idFacturacionRel'][$j1],
-                                'idEstadoPago'  => 2,
-                            ];
-                            /******************************/
-                            //Se genera la query
-                            $query = [
-                                'data'      => 'idFacturacion,idEstadoPago',
-                                'required'  => 'idFacturacion,idEstadoPago',
-                                'unique'    => '',
-                                'encode'    => '',
-                                'table'     => 'facturacion_listado',
-                                'where'     => 'idFacturacion',
-                                'Post'      => $arrTareas
-                            ];
-                            //Se genera el chequeo
-                            $dataCheck_4 = $this->dataCheck_4($arrTareas);
-                            //Ejecuto la query
-                            $xParams = ['DataCheck' => $dataCheck_4, 'query' => $query];
-                            $this->Base_update($xParams);
+                    if($ResponseGuias['status']){
+                        /******************************/
+                        //Se agrega respuesta
+                        $arrTareas = [
+                            'idFacturacion' => $PostData['idFacturacionRel'][$j1],
+                            'idEstadoPago'  => 2,
+                        ];
+                        /******************************/
+                        //Se genera la query
+                        $query = [
+                            'data'      => 'idFacturacion,idEstadoPago',
+                            'required'  => 'idFacturacion,idEstadoPago',
+                            'unique'    => '',
+                            'encode'    => '',
+                            'table'     => 'facturacion_listado',
+                            'where'     => 'idFacturacion',
+                            'Post'      => $arrTareas
+                        ];
+                        //Se genera el chequeo
+                        $dataCheck_4 = $this->dataCheck_4($arrTareas);
+                        //Ejecuto la query
+                        $xParams = ['DataCheck' => $dataCheck_4, 'query' => $query];
+                        $this->Base_update($xParams);
 
-                        }
                     }
                 }
             }
@@ -1527,17 +1545,17 @@ class gestionDocumentos extends ControllerBase {
 
         /******************************/
         //Calculo
-        $x_ValorTotal = $rowData['TotalItems'] + $rowData['TotalProductos'] + $rowData['TotalServicios'] + $rowData['TotalGuias'];
+        $x_ValorTotal = $rowData['data']['TotalItems'] + $rowData['data']['TotalProductos'] + $rowData['data']['TotalServicios'] + $rowData['data']['TotalGuias'];
         //Se agrega respuesta
         $arrTareas = [
             'idFacturacion'   => $FacturacionID,
             'ValorNeto'       => ($x_ValorTotal/1.19),
             'IVA'             => $x_ValorTotal - ($x_ValorTotal/1.19),
             'ValorTotal'      => $x_ValorTotal,
-            'TotalItems'      => $rowData['TotalItems'],
-            'TotalProductos'  => $rowData['TotalProductos'],
-            'TotalServicios'  => $rowData['TotalServicios'],
-            'TotalGuias'      => $rowData['TotalGuias'],
+            'TotalItems'      => $rowData['data']['TotalItems'],
+            'TotalProductos'  => $rowData['data']['TotalProductos'],
+            'TotalServicios'  => $rowData['data']['TotalServicios'],
+            'TotalGuias'      => $rowData['data']['TotalGuias'],
         ];
         /******************************/
         //Se genera la query

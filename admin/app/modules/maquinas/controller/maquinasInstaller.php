@@ -105,7 +105,7 @@ class maquinasInstaller extends ControllerBase {
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -167,8 +167,8 @@ class maquinasInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -239,7 +239,7 @@ class maquinasInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/
@@ -336,20 +336,26 @@ class maquinasInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'maquinas_listado',
-            'data'       => '`idMaquina` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idMaquina` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idMaquina',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'maquinas_listado_documentos',
-            'data'       => '`idDocumentos` int UNSIGNED NOT NULL AUTO_INCREMENT,`idMaquina` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
+            'data'       => '`idDocumentos` int(10) unsigned NOT NULL AUTO_INCREMENT,`idMaquina` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
             'primaryKey' => 'idDocumentos',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'maquinas_listado_observaciones',
-            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idMaquina` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idMaquina` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
             'primaryKey' => 'idObservaciones',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_listado_permisos_usuarios',
+            'data'       => '`idPermisoUsuario` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idMaquina` int(10) unsigned NOT NULL,`fechaCreacion` date DEFAULT NULL',
+            'primaryKey' => 'idPermisoUsuario',
             'comentario' => 'Creado desde el Instalador',
         ];
 

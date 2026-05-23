@@ -74,8 +74,10 @@ class sistemaInstalacion extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrModules]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -124,8 +126,10 @@ class sistemaInstalacion extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrModules]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -175,7 +179,6 @@ class sistemaInstalacion extends ControllerBase {
         //Se filtran los controladores
         $subWhere   = $arrControlers ? implode(',', $arrControlers) : '';
 
-
         /******************************************/
         //Se genera la query
         $query = [
@@ -186,7 +189,7 @@ class sistemaInstalacion extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'idRutas ASC',
-            'limit'   => 10000
+            'limit'   => 9999
         ];
         //Ejecuto la query
         $xParams  = ['query' => $query];
@@ -196,7 +199,7 @@ class sistemaInstalacion extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrModules)){
+        if(is_array($arrModules) && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -205,7 +208,7 @@ class sistemaInstalacion extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'arrModules' => $arrModules,
-                'arrRutas'   => $arrRutas,
+                'arrRutas'   => $arrRutas['data'],
             ];
 
             /******************************************/
@@ -214,8 +217,10 @@ class sistemaInstalacion extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrRutas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -265,7 +270,6 @@ class sistemaInstalacion extends ControllerBase {
         //Se filtran los controladores
         $subWhere   = $arrControlers ? implode(',', $arrControlers) : '';
 
-
         /******************************************/
         //Se genera la query
         $query = [
@@ -276,7 +280,7 @@ class sistemaInstalacion extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'idRutas ASC',
-            'limit'   => 10000
+            'limit'   => 9999
         ];
         //Ejecuto la query
         $xParams  = ['query' => $query];
@@ -286,7 +290,7 @@ class sistemaInstalacion extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrModules)){
+        if(is_array($arrModules) && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -295,7 +299,7 @@ class sistemaInstalacion extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
                 'arrModules' => $arrModules,
-                'arrRutas'   => $arrRutas,
+                'arrRutas'   => $arrRutas['data'],
             ];
 
             /******************************************/
@@ -304,8 +308,10 @@ class sistemaInstalacion extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrRutas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -328,14 +334,14 @@ class sistemaInstalacion extends ControllerBase {
                 $ControllerData = new $dataPut['Controller'];
                 $Response       = $ControllerData->InstallModule();
                 //si es la respuesta esperada
-                if ($Response===true) {
+                if ($Response['status']){
                     // Devuelvo true con código 200 (OK)
                     Response::success(true);
                 //si no lo es
                 } else {
                     // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la BBDD', 500, $Response);
+                    Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
                 }
             }else{
                 Response::error('Instalador no existe', 500);
@@ -362,13 +368,13 @@ class sistemaInstalacion extends ControllerBase {
                 $ControllerData = new $dataPut['Controller'];
                 $Response       = $ControllerData->UninstallModule();
                 //si es la respuesta esperada
-                if ($Response===true) {
+                if ($Response['status']){
                     // Devuelvo true con código 200 (OK)
                     Response::success(true);
                 //si no lo es
                 } else {
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la BBDD', 500, $Response);
+                    Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
                 }
             }else{
                 Response::error('Desinstalador no existe', 500);

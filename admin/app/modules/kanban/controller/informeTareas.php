@@ -85,8 +85,8 @@ class informeTareas extends ControllerBase {
             'Fnc_FormInputs'   => $this->FormInputs,
             'Fnc_Codification' => $this->Codification,
             /*=========== Datos Consultados ===========*/
-            'arrPrioridad'     => $arrPrioridad,
-            'arrEstadoCierre'  => $arrEstadoCierre,
+            'arrPrioridad'     => $arrPrioridad['data'],
+            'arrEstadoCierre'  => $arrEstadoCierre['data'],
         ];
 
         /******************************************/
@@ -145,10 +145,10 @@ class informeTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrTareas)){
+        if($arrTareas['status']){
 
             //Se agrupan los menus
-            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas, 'ID' );
+            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
             /******************************************/
             //Datos enviados a la pagina
@@ -171,8 +171,10 @@ class informeTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrTareas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -277,7 +279,7 @@ class informeTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status'] && $arrHistorial['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -290,10 +292,10 @@ class informeTareas extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrTareas'        => $arrTareas,
-                'arrParticipantes' => $arrParticipantes,
-                'arrHistorial'     => $arrHistorial,
+                'rowData'          => $rowData['data'],
+                'arrTareas'        => $arrTareas['data'],
+                'arrParticipantes' => $arrParticipantes['data'],
+                'arrHistorial'     => $arrHistorial['data'],
             ];
 
             /******************************************/
@@ -302,8 +304,10 @@ class informeTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes,$arrHistorial]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -387,7 +391,7 @@ class informeTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -400,9 +404,9 @@ class informeTareas extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrTareas'        => $arrTareas,
-                'arrParticipantes' => $arrParticipantes,
+                'rowData'          => $rowData['data'],
+                'arrTareas'        => $arrTareas['data'],
+                'arrParticipantes' => $arrParticipantes['data'],
             ];
 
             /******************************************/
@@ -411,8 +415,10 @@ class informeTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 

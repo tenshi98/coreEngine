@@ -104,8 +104,8 @@ class sistemaOpciones extends ControllerBase {
                 core_sistemas.Config_IA_Tone,
                 core_sistemas.Config_IA_Uso,
                 core_sistemas.Config_IA_UsoCache,
-                core_sistemas.idOpcionesGen_37,
-                core_sistemas.idOpcionesGen_38,
+                core_sistemas.usuariosPermisosBodegas,
+                core_sistemas.usuariosPermisosMaquinas,
                 core_sistemas.idOpcionesGen_39,
                 core_sistemas.idOpcionesGen_40,
                 core_sistemas.Social_X,
@@ -229,7 +229,7 @@ class sistemaOpciones extends ControllerBase {
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
-        $xParams  = ['query' => $query];
+        $xParams       = ['query' => $query];
         $arrIAProvider = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -282,7 +282,7 @@ class sistemaOpciones extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTemas['status'] && $arrConfigEmail['status'] && $arrConfigMap['status'] && $arrIAProvider['status'] && is_array($MainViewData)){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -302,14 +302,14 @@ class sistemaOpciones extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrCiudad'        => $arrCiudad,
-                'arrComuna'        => $arrComuna,
-                'arrTemas'         => $arrTemas,
-                'arrConfigEmail'   => $arrConfigEmail,
-                'arrConfigMap'     => $arrConfigMap,
+                'rowData'          => $rowData['data'],
+                'arrCiudad'        => $arrCiudad['data'],
+                'arrComuna'        => $arrComuna['data'],
+                'arrTemas'         => $arrTemas['data'],
+                'arrConfigEmail'   => $arrConfigEmail['data'],
+                'arrConfigMap'     => $arrConfigMap['data'],
+                'arrIAProvider'    => $arrIAProvider['data'],
                 'MainViewData'     => $MainViewData,
-                'arrIAProvider'    => $arrIAProvider,
             ];
 
             /******************************************/
@@ -318,8 +318,10 @@ class sistemaOpciones extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrTemas,$arrConfigEmail,$arrConfigMap,$arrIAProvider]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -389,8 +391,8 @@ class sistemaOpciones extends ControllerBase {
                 core_sistemas.Config_IA_Tone,
                 core_sistemas.Config_IA_Uso,
                 core_sistemas.Config_IA_UsoCache,
-                core_sistemas.idOpcionesGen_37,
-                core_sistemas.idOpcionesGen_38,
+                core_sistemas.usuariosPermisosBodegas,
+                core_sistemas.usuariosPermisosMaquinas,
                 core_sistemas.idOpcionesGen_39,
                 core_sistemas.idOpcionesGen_40,
                 core_sistemas.Social_X,
@@ -425,7 +427,7 @@ class sistemaOpciones extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -438,7 +440,7 @@ class sistemaOpciones extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -447,8 +449,10 @@ class sistemaOpciones extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -488,8 +492,8 @@ class sistemaOpciones extends ControllerBase {
                     $xParams = ['query' => $query];
                     $rowData = $this->Base_GetByID($xParams);
                     //Si hay resultados
-                    if ($rowData!==false) {
-                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    if($rowData['status']){
+                        $Ubicacion .= ', '.$rowData['data']['Nombre'];
                     }
                 }
                 //Si existe ciudad
@@ -508,8 +512,8 @@ class sistemaOpciones extends ControllerBase {
                     $xParams = ['query' => $query];
                     $rowData = $this->Base_GetByID($xParams);
                     //Si hay resultados
-                    if ($rowData!==false) {
-                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    if($rowData['status']){
+                        $Ubicacion .= ', '.$rowData['data']['Nombre'];
                     }
                 }
                 //Pais
@@ -527,7 +531,7 @@ class sistemaOpciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,Config_IA_Provider,Config_IA_ApiKey,Config_IA_Model,Config_IA_Base_URL,Config_IA_Name,Config_IA_Tone,Config_IA_Uso,Config_IA_UsoCache,idOpcionesGen_37,idOpcionesGen_38,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
+                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,Config_IA_Provider,Config_IA_ApiKey,Config_IA_Model,Config_IA_Base_URL,Config_IA_Name,Config_IA_Tone,Config_IA_Uso,Config_IA_UsoCache,usuariosPermisosBodegas,usuariosPermisosMaquinas,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
                 'required'  => 'Sistema_Nombre',
                 'unique'    => '',
                 'encode'    => '',
@@ -552,18 +556,18 @@ class sistemaOpciones extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /****************************************/
                 //Actualizo los datos de la sesion
                 $userSession = new userSession();
                 $userSession->updateSession($_SESSION['DataInfo']['UserID'], $f3, 1);
                 /****************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -592,13 +596,13 @@ class sistemaOpciones extends ControllerBase {
             $Response = $this->Base_delFiles($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

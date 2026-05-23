@@ -56,7 +56,7 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -68,7 +68,7 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_ServerServer'     => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -77,10 +77,13 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
+
     /******************************************************************************/
     //List
     public function UpdateList($f3, $params){
@@ -104,7 +107,7 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrObservaciones)){
+        if($arrObservaciones['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -116,7 +119,7 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrObservaciones' => $arrObservaciones,
+                'arrObservaciones' => $arrObservaciones['data'],
             ];
 
             /******************************************/
@@ -125,8 +128,10 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrObservaciones]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -152,7 +157,7 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -163,7 +168,7 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'rowData'       => $rowData,
+                'rowData'       => $rowData['data'],
             ];
 
             /******************************************/
@@ -172,8 +177,10 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -199,7 +206,7 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -211,7 +218,7 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'rowData'       => $rowData,
+                'rowData'       => $rowData['data'],
             ];
 
             /******************************************/
@@ -220,8 +227,10 @@ class bodegasListadoObservaciones extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -252,13 +261,13 @@ class bodegasListadoObservaciones extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response);
+            Response::success($Response['data']);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -289,13 +298,13 @@ class bodegasListadoObservaciones extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -325,13 +334,13 @@ class bodegasListadoObservaciones extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

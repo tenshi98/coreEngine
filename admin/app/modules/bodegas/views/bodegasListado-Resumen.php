@@ -14,6 +14,8 @@
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs" onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
+                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-pasillos"><i class="bi bi-image"></i> Pasillos</button></li>
+                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-visual"><i class="bi bi-image"></i> Visual</button></li>
             </ul>
             <div class="tab-content pt-2">
 
@@ -88,6 +90,32 @@
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
+                            <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idBodegas']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                        </div>
+                    </h5>
+                    <div class="clearfix"></div>
+                    <div class="table-responsive" id="tabObsDataTable">
+
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="resumen-pasillos">
+                    <h5 class="text-color-red-dark">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                            Pasillos de <?php echo $data['rowData']['Nombre']; ?>
+                            <button type="button" class="btn btn-success" onclick="addEditBlock()"><i class="bi bi-plus-lg me-1"></i> Agregar Pasillo</button>
+                        </div>
+                    </h5>
+                    <div class="clearfix"></div>
+                    <div id="editBlocksContainer">
+
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="resumen-visual">
+                    <h5 class="text-color-red-dark">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                            Visual de <?php echo $data['rowData']['Nombre']; ?>
                             <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idBodegas']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                         </div>
                     </h5>
@@ -282,4 +310,288 @@
         });
     }
 
+
+    // ============================================================
+    // Simulated PHP Backend Data
+    // In a real app, this would come from an API/PHP endpoint
+    // ============================================================
+    let pasillos = [
+        { id: 1, name: 'Pasillo 1', filas: '4', columnas: '10', consolidado: 'No' },
+        { id: 2, name: 'Pasillo 2', filas: '2', columnas: '10', consolidado: 'No' },
+        { id: 3, name: 'Pasillo 3', filas: '2', columnas: '10', consolidado: 'No' },
+        { id: 4, name: 'Pasillo 4', filas: '3', columnas: '10', consolidado: 'No' },
+    ];
+
+    let nextId = 5;
+
+    // ============================================================
+    // EDIT VIEW
+    // ============================================================
+    let editBlocks = [];
+
+    function initEditView() {
+        editBlocks = pasillos.map(p => ({ ...p }));
+        renderEditBlocks();
+    }
+
+    function renderEditBlocks() {
+        const container = document.getElementById('editBlocksContainer');
+        if (editBlocks.length === 0) {
+            container.innerHTML = `
+                <div class="empty-state">
+                    <i class="bi bi-plus-circle"></i>
+                    <h5>No hay pasillos para editar</h5>
+                    <p>Agrega pasillos desde el formulario de creación.</p>
+                </div>`;
+            return;
+        }
+
+        container.innerHTML = editBlocks.map((block, index) => `
+            <div class="card" id="editBlock_${index}" data-index="${index}">
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill bg-primary block-number">${index + 1}</span>
+                            <span class="fw-bold text-warning">
+                                <i class="bi bi-pencil-fill me-1"></i>${escapeHtml(block.name || 'Sin nombre')}
+                            </span>
+                            ${block.id ? `<small class="text-muted">(ID: ${block.id})</small>` : '<small class="text-muted">(Nuevo)</small>'}
+                        </div>
+                        <div class="d-flex gap-1">
+                            <button type="button" class="btn btn-outline-success btn-move-up" onclick="moveEditBlock(${index}, -1)" title="Mover arriba" ${index === 0 ? 'disabled' : ''}>
+                                <i class="bi bi-chevron-up"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-success btn-move-down" onclick="moveEditBlock(${index}, 1)" title="Mover abajo" ${index === editBlocks.length - 1 ? 'disabled' : ''}>
+                                <i class="bi bi-chevron-down"></i>
+                            </button>
+                            <button type="button" class="btn btn-outline-danger btn-remove ms-2" onclick="removeEditBlock(${index})" title="Eliminar">
+                                <i class="bi bi-x-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-semibold">Nombre</label>
+                            <input type="text" class="form-control" placeholder="Ej: Pasillo 1"
+                                value="${escapeHtml(block.name)}"
+                                onchange="editBlocks[${index}].name = this.value">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Filas</label>
+                            <input type="number" class="form-control" min="1" placeholder="4"
+                                value="${escapeHtml(block.filas)}"
+                                onchange="editBlocks[${index}].filas = this.value">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Columnas</label>
+                            <input type="number" class="form-control" min="1" placeholder="10"
+                                value="${escapeHtml(block.columnas)}"
+                                onchange="editBlocks[${index}].columnas = this.value">
+                        </div>
+                        <div class="col-md-2">
+                            <label class="form-label fw-semibold">Consolidado</label>
+                            <select class="form-select" onchange="editBlocks[${index}].consolidado = this.value">
+                                <option value="No" ${block.consolidado === 'No' ? 'selected' : ''}>No</option>
+                                <option value="Sí" ${block.consolidado === 'Sí' ? 'selected' : ''}>Sí</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-end">
+                            <div class="w-100 text-center p-2 rounded" style="background: #fff3e0;">
+                                <small class="text-muted d-block">Posición</small>
+                                <strong class="text-warning fs-5">${index + 1}</strong>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function addEditBlock() {
+        editBlocks.push({ id: null, name: '', filas: '', columnas: '', consolidado: 'No' });
+        renderEditBlocks();
+        setTimeout(() => {
+            const newBlock = document.getElementById(`editBlock_${editBlocks.length - 1}`);
+            if (newBlock) {
+                newBlock.classList.add('highlight-up');
+                newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }, 50);
+        showToast('Bloque agregado', 'success');
+    }
+
+    function removeEditBlock(index) {
+        editBlocks.splice(index, 1);
+        renderEditBlocks();
+        showToast('Bloque eliminado', 'info');
+    }
+
+    function moveEditBlock(index, direction) {
+        const newIndex = index + direction;
+        if (newIndex < 0 || newIndex >= editBlocks.length) return;
+
+        // Sync current values
+        syncEditInputs();
+
+        const temp = editBlocks[index];
+        editBlocks[index] = editBlocks[newIndex];
+        editBlocks[newIndex] = temp;
+
+        renderEditBlocks();
+
+        setTimeout(() => {
+            const block = document.getElementById(`editBlock_${newIndex}`);
+            if (block) {
+                block.classList.add(direction < 0 ? 'highlight-up' : 'highlight-down');
+            }
+        }, 50);
+    }
+
+    function syncEditInputs() {
+        editBlocks.forEach((block, i) => {
+            const container = document.getElementById(`editBlock_${i}`);
+            if (container) {
+                const inputs = container.querySelectorAll('input, select');
+                if (inputs[0]) block.name = inputs[0].value;
+                if (inputs[1]) block.filas = inputs[1].value;
+                if (inputs[2]) block.columnas = inputs[2].value;
+                if (inputs[3]) block.consolidado = inputs[3].value;
+            }
+        });
+    }
+
+    function saveEdited() {
+        syncEditInputs();
+
+        // Validate
+        let valid = true;
+        const errors = [];
+
+        editBlocks.forEach((block, i) => {
+            if (!block.name.trim()) {
+                errors.push(`Bloque ${i + 1}: El nombre es requerido`);
+                valid = false;
+            }
+            if (!block.filas || parseInt(block.filas) < 1) {
+                errors.push(`Bloque ${i + 1}: Las filas deben ser mayor a 0`);
+                valid = false;
+            }
+            if (!block.columnas || parseInt(block.columnas) < 1) {
+                errors.push(`Bloque ${i + 1}: Las columnas deben ser mayor a 0`);
+                valid = false;
+            }
+        });
+
+        if (!valid) {
+            errors.forEach(err => showToast(err, 'danger'));
+            return;
+        }
+
+        // Save
+        pasillos = editBlocks.map(block => ({
+            id: block.id || nextId++,
+            name: block.name.trim(),
+            filas: block.filas,
+            columnas: block.columnas,
+            consolidado: block.consolidado
+        }));
+
+        showToast('Cambios guardados exitosamente', 'success');
+        showView('list');
+    }
+
+    // ============================================================
+    // DELETE
+    // ============================================================
+    function confirmDelete(id) {
+        const pasillo = pasillos.find(p => p.id === id);
+        if (!pasillo) return;
+
+        const modal = document.getElementById('confirmModal');
+        modal.innerHTML = `
+            <div class="confirm-overlay" id="confirmOverlay">
+                <div class="card" style="max-width: 420px; width: 90%;">
+                    <div class="card-body p-4 text-center">
+                        <div class="mb-3">
+                            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
+                        </div>
+                        <h5 class="fw-bold mb-2">¿Eliminar Pasillo?</h5>
+                        <p class="text-muted mb-4">Se eliminará <strong>${escapeHtml(pasillo.name)}</strong> permanentemente.</p>
+                        <div class="d-flex gap-2 justify-content-center">
+                            <button class="btn btn-outline-secondary px-4" onclick="closeConfirm()">Cancelar</button>
+                            <button class="btn btn-danger px-4" onclick="deletePasillo(${id})">
+                                <i class="bi bi-trash me-1"></i>Eliminar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>`;
+    }
+
+    function closeConfirm() {
+        document.getElementById('confirmModal').innerHTML = '';
+    }
+
+    function deletePasillo(id) {
+        pasillos = pasillos.filter(p => p.id !== id);
+        closeConfirm();
+        showToast('Pasillo eliminado correctamente', 'success');
+        renderList();
+    }
+
+    // ============================================================
+    // TOAST NOTIFICATIONS
+    // ============================================================
+    function showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        const icons = {
+            success: 'bi-check-circle-fill',
+            danger: 'bi-exclamation-circle-fill',
+            warning: 'bi-exclamation-triangle-fill',
+            info: 'bi-info-circle-fill'
+        };
+        const bgColors = {
+            success: '#2e7d32',
+            danger: '#c62828',
+            warning: '#e65100',
+            info: '#1565c0'
+        };
+
+        const toastEl = document.createElement('div');
+        toastEl.className = 'toast show mb-2';
+        toastEl.setAttribute('role', 'alert');
+        toastEl.innerHTML = `
+            <div class="toast-body d-flex align-items-center gap-2 text-white" style="background: ${bgColors[type] || bgColors.info}; border-radius: 8px;">
+                <i class="bi ${icons[type] || icons.info}"></i>
+                <span>${message}</span>
+                <button type="button" class="btn-close btn-close-white ms-auto" onclick="this.closest('.toast').remove()"></button>
+            </div>`;
+        container.appendChild(toastEl);
+
+        setTimeout(() => {
+            toastEl.classList.remove('show');
+            setTimeout(() => toastEl.remove(), 300);
+        }, 3500);
+    }
+
+    // ============================================================
+    // HELPERS
+    // ============================================================
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text || '';
+        return div.innerHTML;
+    }
+
+    // ============================================================
+    // INIT
+    // ============================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        initEditView();
+    });
+
+    
+
 </script>
+
+

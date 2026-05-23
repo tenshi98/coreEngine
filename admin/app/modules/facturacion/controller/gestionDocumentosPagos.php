@@ -89,7 +89,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrDocumentoPago['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -101,8 +101,8 @@ class gestionDocumentosPagos extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_ServerServer'    => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'rowData'           => $rowData,
-                'arrDocumentoPago'  => $arrDocumentoPago,
+                'rowData'           => $rowData['data'],
+                'arrDocumentoPago'  => $arrDocumentoPago['data'],
                 'idTipo'            => $idTipo,
             ];
 
@@ -112,8 +112,10 @@ class gestionDocumentosPagos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrDocumentoPago]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
     /******************************************************************************/
@@ -166,7 +168,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrPagos)){
+        if($rowData['status'] && $arrPagos['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -179,8 +181,8 @@ class gestionDocumentosPagos extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_DataDate'        => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'rowData'     => $rowData,
-                'arrPagos'    => $arrPagos,
+                'rowData'     => $rowData['data'],
+                'arrPagos'    => $arrPagos['data'],
                 'idTipo'      => $idTipo,
             ];
 
@@ -190,8 +192,10 @@ class gestionDocumentosPagos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrPagos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -244,7 +248,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrDocumentoPago['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -257,8 +261,8 @@ class gestionDocumentosPagos extends ControllerBase {
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 'Fnc_ServerServer'  => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'rowData'           => $rowData,
-                'arrDocumentoPago'  => $arrDocumentoPago,
+                'rowData'           => $rowData['data'],
+                'arrDocumentoPago'  => $arrDocumentoPago['data'],
             ];
 
             /******************************************/
@@ -267,8 +271,10 @@ class gestionDocumentosPagos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrDocumentoPago]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -311,7 +317,7 @@ class gestionDocumentosPagos extends ControllerBase {
 
             /******************************/
             //Se verifica si el monto es superior al valor del documento
-            if(isset($rowData['ValorTotal'], $rowData['MontoPagado'], $_POST['MontoPagado'])&&$rowData['ValorTotal']<($rowData['MontoPagado']+$_POST['MontoPagado'])){
+            if(isset($rowData['data']['ValorTotal'], $rowData['data']['MontoPagado'], $_POST['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$_POST['MontoPagado'])){
                 Response::error('Ha ingresado un monto superior al valor total del documento', 500);
             }else{
                 /******************************/
@@ -333,17 +339,17 @@ class gestionDocumentosPagos extends ControllerBase {
 
                 /******************************/
                 // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-                if ($Response===true) {
+                if ($Response['status']){
                     /******************************/
                     // Se actualiza el estado de la factura
                     $this->updateFact($_POST['idFacturacion']);
                     /******************************/
                     // Devuelvo $Response con código 200 (OK)
-                    Response::success($Response);
+                    Response::success($Response['data']);
                 } else {
                     // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la BBDD', 500, $Response);
+                    Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
                 }
             }
         }else {
@@ -392,17 +398,17 @@ class gestionDocumentosPagos extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($rowFacturacion['status'] && $Response['status']){
                 /******************************/
                 // Se actualiza el estado de la factura
-                $this->updateFact($rowFacturacion['idFacturacion']);
+                $this->updateFact($rowFacturacion['data']['idFacturacion']);
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -437,16 +443,16 @@ class gestionDocumentosPagos extends ControllerBase {
 
         /******************************/
         //Se determina si esta pagado
-        if(isset($rowData['ValorTotal'], $rowData['MontoPagado'])&&$rowData['ValorTotal']<=$rowData['MontoPagado']){
+        if(isset($rowData['data']['ValorTotal'], $rowData['data']['MontoPagado'])&&$rowData['data']['ValorTotal']<=$rowData['data']['MontoPagado']){
             $idEstadoPago = 2; //Pagado
         }else{
             $idEstadoPago = 1; //No Pagado
         }
         //Se agrega respuesta
         $arrTareas = [
-            'idFacturacion'   => $rowData['idFacturacion'],
+            'idFacturacion'   => $rowData['data']['idFacturacion'],
             'idEstadoPago'    => $idEstadoPago,
-            'MontoPagado'     => $rowData['MontoPagado'],
+            'MontoPagado'     => $rowData['data']['MontoPagado'],
         ];
         /******************************/
         //Se genera la query
@@ -490,7 +496,7 @@ class gestionDocumentosPagos extends ControllerBase {
 
         /******************************/
         //Se verifica si el monto es superior al valor del documento
-        if(isset($rowData['ValorTotal'], $Data['MontoPagado'])&&$rowData['ValorTotal']<($rowData['MontoPagado']+$Data['MontoPagado'])){
+        if(isset($rowData['data']['ValorTotal'], $Data['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$Data['MontoPagado'])){
             return ['status' => 500, 'Response' => 'Ha ingresado un monto superior al valor total del documento'];
         }else{
             /******************************/
@@ -511,17 +517,17 @@ class gestionDocumentosPagos extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if (is_numeric($Response)) {
+            if ($Response['status']){
                 /******************************/
                 // Se actualiza el estado de la factura
                 $this->updateFact($Data['idFacturacion']);
                 /******************************/
                 // Si es un ID numérico, se envía con código 200 (OK)
-                return ['status' => 200, 'Response' => $Response];
+                return ['status' => 200, 'Response' => $Response['data']];
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                return ['status' => 500, 'Response' => $Response];
+                return ['status' => 500, 'Response' => $Response['error']];
             }
 
         }

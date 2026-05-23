@@ -185,7 +185,7 @@ class entidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrEstado['status'] && $arrSector['status'] && $arrSexo['status'] && $arrTipo['status'] && $arrTipoEntidad['status'] && $arrCiudad['status'] && $arrComuna['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -203,14 +203,14 @@ class entidadesListado extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
-                'arrEstado'       => $arrEstado,
-                'arrSector'       => $arrSector,
-                'arrSexo'         => $arrSexo,
-                'arrTipo'         => $arrTipo,
-                'arrTipoEntidad'  => $arrTipoEntidad,
-                'arrCiudad'       => $arrCiudad,
-                'arrComuna'       => $arrComuna,
+                'arrList'         => $arrList['data'],
+                'arrEstado'       => $arrEstado['data'],
+                'arrSector'       => $arrSector['data'],
+                'arrSexo'         => $arrSexo['data'],
+                'arrTipo'         => $arrTipo['data'],
+                'arrTipoEntidad'  => $arrTipoEntidad['data'],
+                'arrCiudad'       => $arrCiudad['data'],
+                'arrComuna'       => $arrComuna['data'],
             ];
 
             /******************************************/
@@ -219,8 +219,10 @@ class entidadesListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrEstado,$arrSector,$arrSexo,$arrTipo,$arrTipoEntidad,$arrCiudad,$arrComuna]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -277,7 +279,7 @@ class entidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -290,7 +292,7 @@ class entidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
             ];
 
             /******************************************/
@@ -299,8 +301,10 @@ class entidadesListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
     /******************************************************************************/
@@ -364,7 +368,7 @@ class entidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -383,7 +387,7 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
             ];
 
             /******************************************/
@@ -392,8 +396,10 @@ class entidadesListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -464,7 +470,7 @@ class entidadesListado extends ControllerBase {
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+        // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["entidadesListadoVerCargas"]==2){
             //Se genera la query
             $query = [
@@ -486,11 +492,12 @@ class entidadesListado extends ControllerBase {
             $arrCargas = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
         }else{
-            $arrCargas   = [];
+            $arrCargas['status'] = true;
+            $arrCargas['data']   = [];
         }
 
         /*******************************************************************/
-        //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+        // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["entidadesListadoVerContactos"]==2){
             //Se genera la query
             $query = [
@@ -508,11 +515,12 @@ class entidadesListado extends ControllerBase {
             $arrContactos = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
         }else{
-            $arrContactos   = [];
+            $arrContactos['status'] = true;
+            $arrContactos['data']   = [];
         }
 
         /*******************************************************************/
-        //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+        // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["entidadesListadoVerDocumentos"]==2){
             //Se genera la query
             $query = [
@@ -530,7 +538,8 @@ class entidadesListado extends ControllerBase {
             $arrDocumentos = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
         }else{
-            $arrDocumentos   = [];
+            $arrDocumentos['status'] = true;
+            $arrDocumentos['data']   = [];
         }
 
         /*******************************************************************/
@@ -553,7 +562,7 @@ class entidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrCargas['status'] && $arrContactos['status'] && $arrDocumentos['status'] && $arrObservaciones['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -566,11 +575,11 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrCargas'        => $arrCargas,
-                'arrContactos'     => $arrContactos,
-                'arrDocumentos'    => $arrDocumentos,
-                'arrObservaciones' => $arrObservaciones,
+                'rowData'          => $rowData['data'],
+                'arrCargas'        => $arrCargas['data'],
+                'arrContactos'     => $arrContactos['data'],
+                'arrDocumentos'    => $arrDocumentos['data'],
+                'arrObservaciones' => $arrObservaciones['data'],
             ];
 
             /******************************************/
@@ -579,8 +588,10 @@ class entidadesListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrCargas,$arrContactos,$arrDocumentos,$arrObservaciones]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -768,7 +779,7 @@ class entidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrEstado['status'] && $arrSector['status'] && $arrSexo['status'] && $arrTipo['status'] && $arrTipoEntidad['status'] && $arrCiudad['status'] && $arrComuna['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -788,14 +799,14 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrEstado'       => $arrEstado,
-                'arrSector'       => $arrSector,
-                'arrSexo'         => $arrSexo,
-                'arrTipo'         => $arrTipo,
-                'arrTipoEntidad'  => $arrTipoEntidad,
-                'arrCiudad'       => $arrCiudad,
-                'arrComuna'       => $arrComuna,
+                'rowData'         => $rowData['data'],
+                'arrEstado'       => $arrEstado['data'],
+                'arrSector'       => $arrSector['data'],
+                'arrSexo'         => $arrSexo['data'],
+                'arrTipo'         => $arrTipo['data'],
+                'arrTipoEntidad'  => $arrTipoEntidad['data'],
+                'arrCiudad'       => $arrCiudad['data'],
+                'arrComuna'       => $arrComuna['data'],
             ];
 
             /******************************************/
@@ -804,8 +815,10 @@ class entidadesListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrEstado,$arrSector,$arrSexo,$arrTipo,$arrTipoEntidad,$arrCiudad,$arrComuna]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -874,7 +887,7 @@ class entidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -887,7 +900,7 @@ class entidadesListado extends ControllerBase {
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -896,8 +909,10 @@ class entidadesListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -935,8 +950,8 @@ class entidadesListado extends ControllerBase {
                 $xParams = ['query' => $query];
                 $rowData = $this->Base_GetByID($xParams);
                 //Si hay resultados
-                if ($rowData!==false) {
-                    $Ubicacion .= ', '.$rowData['Nombre'];
+                if($rowData['status']){
+                    $Ubicacion .= ', '.$rowData['data']['Nombre'];
                 }
             }
             //Si existe ciudad
@@ -955,8 +970,8 @@ class entidadesListado extends ControllerBase {
                 $xParams = ['query' => $query];
                 $rowData = $this->Base_GetByID($xParams);
                 //Si hay resultados
-                if ($rowData!==false) {
-                    $Ubicacion .= ', '.$rowData['Nombre'];
+                if($rowData['status']){
+                    $Ubicacion .= ', '.$rowData['data']['Nombre'];
                 }
             }
             //Pais
@@ -987,14 +1002,14 @@ class entidadesListado extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             // Si es un ID numérico, encripta y envía con código 200 (OK)
-            $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+            $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
             Response::success($Data);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -1031,8 +1046,8 @@ class entidadesListado extends ControllerBase {
                     $xParams = ['query' => $query];
                     $rowData = $this->Base_GetByID($xParams);
                     //Si hay resultados
-                    if ($rowData!==false) {
-                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    if($rowData['status']){
+                        $Ubicacion .= ', '.$rowData['data']['Nombre'];
                     }
                 }
                 //Si existe ciudad
@@ -1051,8 +1066,8 @@ class entidadesListado extends ControllerBase {
                     $xParams = ['query' => $query];
                     $rowData = $this->Base_GetByID($xParams);
                     //Si hay resultados
-                    if ($rowData!==false) {
-                        $Ubicacion .= ', '.$rowData['Nombre'];
+                    if($rowData['status']){
+                        $Ubicacion .= ', '.$rowData['data']['Nombre'];
                     }
                 }
                 //Pais
@@ -1095,13 +1110,13 @@ class entidadesListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1131,7 +1146,7 @@ class entidadesListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -1155,11 +1170,11 @@ class entidadesListado extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1188,13 +1203,13 @@ class entidadesListado extends ControllerBase {
             $Response = $this->Base_delFiles($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

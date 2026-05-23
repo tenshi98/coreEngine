@@ -67,6 +67,7 @@ class userSession extends ControllerBase {
         if ($this->checkBrute($Email, $IP_Client) === true) {
             $errors[] = ["message" => "Demasiados accesos fallidos, usuario bloqueado por 2 horas"];
         }
+
         //Se obtiene la uicacion
         $loc = Web\Geo::instance()->location();
         //Si no esta en chile
@@ -111,7 +112,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Si no hay resultados
-        if($rowData===false){
+        if($rowData['status']===false){
             //Se guarda registro
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
             //Mensaje
@@ -120,11 +121,11 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Verifico el estado
-        if(isset($rowData['idEstado'])&&$rowData['idEstado']!=1){ return ['code' => 400, 'message' => 'Usuario Inactivo'];}
+        if(isset($rowData['data']['idEstado'])&&$rowData['data']['idEstado']!=1){ return ['code' => 400, 'message' => 'Usuario Inactivo'];}
 
         /******************************/
         //Se cargan los datos de la sesion
-        $this->createSession($f3, $rowData, '', $TypeSession);
+        $this->createSession($f3, $rowData['data'], '', $TypeSession);
         //imprimo resultados
         return ['code' => 200, 'message' => 'Acceso Correcto'];
 
@@ -197,7 +198,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Si no hay resultados
-        if($rowData===false){
+        if($rowData['status']===false){
             //Se guarda registro
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
             //Mensaje
@@ -206,7 +207,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Verifico el estado
-        if(isset($rowData['idEstado'])&&$rowData['idEstado']!=1){ return ['code' => 400, 'message' => 'Usuario Inactivo'];}
+        if(isset($rowData['data']['idEstado'])&&$rowData['data']['idEstado']!=1){ return ['code' => 400, 'message' => 'Usuario Inactivo'];}
 
         /******************************/
         //Se generan Variables
@@ -215,7 +216,7 @@ class userSession extends ControllerBase {
         /******************************/
         //Se agrega respuesta
         $arrData = [
-            'idUsuario' => $rowData['idUsuario'],
+            'idUsuario' => $rowData['data']['idUsuario'],
             'password'  => $NewPasswords,
         ];
 
@@ -236,7 +237,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-        if ($Response===true) {
+        if ($Response['status']){
             /******************************/
             //Se envia el correo
             try {
@@ -260,8 +261,8 @@ class userSession extends ControllerBase {
                 //Se agrega respuesta
                 $arrData = [
                     'Asunto'  => 'Cambio de contraseña',
-                    'Hacia'   => $rowData['email'],
-                    'Mensaje' => 'Se ha generado una nueva contraseña para el email '.$rowData['email'].', su nueva contraseña es: '.$NewPasswords,
+                    'Hacia'   => $rowData['data']['email'],
+                    'Mensaje' => 'Se ha generado una nueva contraseña para el email '.$rowData['data']['email'].', su nueva contraseña es: '.$NewPasswords,
                 ];
                 //Se genera la query
                 $query = [
@@ -270,7 +271,7 @@ class userSession extends ControllerBase {
                     'Post'      => $arrData,
                 ];
                 /******************************/
-                $Respuesta = $this->Base_SelectMail($f3, $query, $rowOpciones['Config_motorEmail']);
+                $Respuesta = $this->Base_SelectMail($f3, $query, $rowOpciones['data']['Config_motorEmail']);
                 //si es la respuesta esperada
                 if ($Respuesta===true) {
                     //imprimo resultados
@@ -317,7 +318,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Si hay resultados
-        if ($queryUpdate===true) {
+        if ($queryUpdate['status']) {
             /******************************/
             //Se limpian las variables
             $f3->clear('SESSION.TokenUser');    //Token del usuario
@@ -377,14 +378,14 @@ class userSession extends ControllerBase {
         /***************************************************/
         //Armo
         $rowUsuario = [
-            'UserID'             => $rowData['idUsuario'],
-            'UserType'           => $rowData['idTipoUsuario'],
-            'UserIMG'            => $rowData['Direccion_img'],
-            'UserName'           => $rowData['Nombre'],
-            'UserPosition'       => $rowData['Posicion'],
-            'idMenuPosicion'     => $rowData['idMenuPosicion'],
-            'UbicacionNombre'    => $rowData['UbicacionNombre'],
-            'UbicacionWheater'   => $rowData['UbicacionWheater'],
+            'UserID'             => $rowData['data']['idUsuario'],
+            'UserType'           => $rowData['data']['idTipoUsuario'],
+            'UserIMG'            => $rowData['data']['Direccion_img'],
+            'UserName'           => $rowData['data']['Nombre'],
+            'UserPosition'       => $rowData['data']['Posicion'],
+            'idMenuPosicion'     => $rowData['data']['idMenuPosicion'],
+            'UbicacionNombre'    => $rowData['data']['UbicacionNombre'],
+            'UbicacionWheater'   => $rowData['data']['UbicacionWheater'],
             'TypeSession'        => $TypeSession,
             'UserIP'             => $this->Client->getClientIp(),
         ];
@@ -405,7 +406,7 @@ class userSession extends ControllerBase {
         $rowOpciones = $this->Base_GetByID($xParams);
 
         //Se fucionan arreglos
-        $Resultado = array_merge($rowUsuario, $rowOpciones);
+        $Resultado = array_merge($rowUsuario, $rowOpciones['data']);
 
         /******************************/
         //Se actualizan datos de la sesion
@@ -436,20 +437,19 @@ class userSession extends ControllerBase {
         $num_rows = $this->QBuilder->queryNRows($query, $this->DBConn);
 
         /**********************************************************************/
-        // Si ha habido más de 5 intentos de inicio de sesión fallidos.
-        if($num_rows > ConfigAPP::APP["checkBruteConections"]){
-            //dar respuesta de bloqueo
-            $result = true;
-        //Verifico si sobrepasa el maximo de intentos fallidos
-        }elseif($num_rows > ConfigAPP::APP["checkBruteMaxConections"]){
-            //Le envio al servidor la tarea de enviarlo al black list
-            //se envian los datos
+        // REGLA: Evaluar primero el límite más alto (Máximo / Lista Negra)
+        if ($num_rows['data'] > ConfigAPP::APP["checkBruteMaxConections"]) {
+            // Le envio al servidor la tarea de enviarlo al black list
             $Server = new FunctionsServerSecurity();
             $Server->sendIPtoBlackList($IP_Client);
-            //dar respuesta de bloqueo
+            // Dar respuesta de bloqueo
             $result = true;
-        }else{
-            //dar respuesta de bloqueo
+        // Si no pasó el máximo, evaluamos si al menos pasó el límite normal de bloqueo
+        } elseif ($num_rows['data'] > ConfigAPP::APP["checkBruteConections"]) {
+            // Dar respuesta de bloqueo standard
+            $result = true;
+        } else {
+            // No está bloqueado, puede intentar iniciar sesión
             $result = false;
         }
 
@@ -610,7 +610,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Se fucionan arreglos
-        $Resultado = array_merge($rowUsuario, $rowOpciones);
+        $Resultado = array_merge($rowUsuario, $rowOpciones['data']);
 
         /***************************************************/
         /*        Consulta para los permisos y menus       */
@@ -719,15 +719,17 @@ class userSession extends ControllerBase {
 
                 break;
         }
-
         /******************************/
         //se crea variable para los niveles de permisos
         $arrLevel = [];
-        //se recorren las variables
-        foreach ($arrMenu as $value) {
-            //se crea la variable
-            $arrLevel[$value['PermisosController']]['LevelAccess']  = $value['PermisosLevel'];
-            $arrLevel[$value['PermisosController']]['RouteAccess']  = $value['RutaWeb'];
+        //Si hay datos
+        if ($arrMenu['status']){
+            //se recorren las variables
+            foreach ($arrMenu['data'] as $value) {
+                //se crea la variable
+                $arrLevel[$value['PermisosController']]['LevelAccess']  = $value['PermisosLevel'];
+                $arrLevel[$value['PermisosController']]['RouteAccess']  = $value['RutaWeb'];
+            }
         }
         //Si es un inicio normal
         if($TypeSession==1){
@@ -746,14 +748,14 @@ class userSession extends ControllerBase {
         /*          Se guardan lo datos del usuario        */
         /***************************************************/
         //Se agrupan los menus
-        $arrMenuNew = $this->CommonData->agruparPorClave ($arrMenu, 'PermisosCat' );
+        $arrMenuNew = $this->CommonData->agruparPorClave ($arrMenu['data'], 'PermisosCat' );
         //Seteo las variables
-        $f3->set('SESSION.TokenUser', $TokenUser);       //Token del usuario
-        $f3->set('SESSION.TokenExpires', $TokenExpires); //token valido por 1 dia
-        $f3->set('SESSION.DataInfo', $Resultado);        //Datos del usuario
-        $f3->set('SESSION.arrMenu', $arrMenuNew);        //Menu
-        $f3->set('SESSION.arrPermisos', $arrPermisos);   //Rutas
-        $f3->set('SESSION.arrLevel', $arrLevel);         //Niveles de permisos
+        $f3->set('SESSION.TokenUser', $TokenUser);              // Token del usuario
+        $f3->set('SESSION.TokenExpires', $TokenExpires);        // Token valido por 1 dia
+        $f3->set('SESSION.DataInfo', $Resultado);               // Datos del usuario
+        $f3->set('SESSION.arrMenu', $arrMenuNew);               // Menu
+        $f3->set('SESSION.arrPermisos', $arrPermisos['data']);  // Rutas
+        $f3->set('SESSION.arrLevel', $arrLevel);                // Niveles de permisos
 
     }
 

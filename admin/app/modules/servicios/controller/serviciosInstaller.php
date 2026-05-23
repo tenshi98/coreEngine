@@ -115,7 +115,7 @@ class serviciosInstaller extends ControllerBase {
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -177,8 +177,8 @@ class serviciosInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -250,7 +250,7 @@ class serviciosInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/
@@ -339,25 +339,25 @@ class serviciosInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'servicios_categorias',
-            'data'       => '`idCategoria` int UNSIGNED NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL',
+            'data'       => '`idCategoria` int(10) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL',
             'primaryKey' => 'idCategoria',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'servicios_listado',
-            'data'       => '`idServicio` int UNSIGNED NOT NULL AUTO_INCREMENT,`idEstado` int UNSIGNED NOT NULL,`idCategoria` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ValorIngreso` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorEgreso` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Codigo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idServicio` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`idCategoria` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`ValorIngreso` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`ValorEgreso` decimal(10, 2) UNSIGNED NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Codigo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idServicio',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'servicios_listado_documentos',
-            'data'       => '`idDocumentos` int UNSIGNED NOT NULL AUTO_INCREMENT,`idServicio` int UNSIGNED NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
+            'data'       => '`idDocumentos` int(10) unsigned NOT NULL AUTO_INCREMENT,`idServicio` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`FVencimiento` date NULL DEFAULT NULL',
             'primaryKey' => 'idDocumentos',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'servicios_listado_observaciones',
-            'data'       => '`idObservaciones` int UNSIGNED NOT NULL AUTO_INCREMENT,`idServicio` int UNSIGNED NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idServicio` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];

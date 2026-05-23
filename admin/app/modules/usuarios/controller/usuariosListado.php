@@ -113,7 +113,7 @@ class usuariosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTipoUsuario['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -132,10 +132,10 @@ class usuariosListado extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
-                'arrCiudad'       => $arrCiudad,
-                'arrComuna'       => $arrComuna,
-                'arrTipoUsuario'  => $arrTipoUsuario,
+                'arrList'         => $arrList['data'],
+                'arrCiudad'       => $arrCiudad['data'],
+                'arrComuna'       => $arrComuna['data'],
+                'arrTipoUsuario'  => $arrTipoUsuario['data'],
             ];
 
             /******************************************/
@@ -144,8 +144,10 @@ class usuariosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrCiudad,$arrComuna,$arrTipoUsuario]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -192,7 +194,7 @@ class usuariosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -206,7 +208,7 @@ class usuariosListado extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
             ];
 
             /******************************************/
@@ -215,14 +217,21 @@ class usuariosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
     /******************************************************************************/
     //View
     public function View($f3, $params){
+
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+
         /******************************************/
         //Se genera la query
         $query = [
@@ -299,10 +308,56 @@ class usuariosListado extends ControllerBase {
         $arrObservaciones = $this->Base_GetList($xParams);
 
         /*******************************************************************/
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2){
+            //Se genera la query
+            $query = [
+                'data'    => 'bodegas_listado.Nombre',
+                'table'   => 'bodegas_listado_permisos_usuarios',
+                'join'    => 'LEFT JOIN bodegas_listado ON bodegas_listado.idBodegas = bodegas_listado_permisos_usuarios.idBodegas',
+                'where'   => 'bodegas_listado_permisos_usuarios.idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'bodegas_listado.Nombre ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            //Ejecuto la query
+            $xParams            = ['query' => $query];
+            $arrPermisosBodegas = $this->Base_GetList($xParams);
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $arrPermisosBodegas['status'] = true;
+            $arrPermisosBodegas['data']   = [];
+        }
+
+        /*******************************************************************/
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosMaquinas"]==2){
+            //Se genera la query
+            $query = [
+                'data'    => 'maquinas_listado.Nombre',
+                'table'   => 'maquinas_listado_permisos_usuarios',
+                'join'    => 'LEFT JOIN maquinas_listado ON maquinas_listado.idMaquina = maquinas_listado_permisos_usuarios.idMaquina',
+                'where'   => 'maquinas_listado_permisos_usuarios.idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'maquinas_listado.Nombre ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            //Ejecuto la query
+            $xParams             = ['query' => $query];
+            $arrPermisosMaquinas = $this->Base_GetList($xParams);
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $arrPermisosMaquinas['status'] = true;
+            $arrPermisosMaquinas['data']   = [];
+        }
+
+        /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrPermisos['status'] && $arrObservaciones['status'] && $arrPermisosBodegas['status'] && $arrPermisosMaquinas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -314,9 +369,11 @@ class usuariosListado extends ControllerBase {
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrPermisos'      => $arrPermisos,
-                'arrObservaciones' => $arrObservaciones,
+                'rowData'             => $rowData['data'],
+                'arrPermisos'         => $arrPermisos['data'],
+                'arrObservaciones'    => $arrObservaciones['data'],
+                'arrPermisosBodegas'  => $arrPermisosBodegas['data'],
+                'arrPermisosMaquinas' => $arrPermisosMaquinas['data'],
             ];
 
             /******************************************/
@@ -325,14 +382,21 @@ class usuariosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrPermisos,$arrObservaciones,$arrPermisosBodegas,$arrPermisosMaquinas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
     /******************************************************************************/
     //Resumen
     public function Resumen($f3, $params){
+
+        /******************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+
         /******************************************/
         //Se genera la query
         $query = [
@@ -465,10 +529,65 @@ class usuariosListado extends ControllerBase {
         $arrPermisos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2){
+            //Se genera la query
+            $query = [
+                'data'    => '
+                    idBodegas,
+                    idBodegas AS ID,
+                    Nombre,
+                    (SELECT COUNT(idPermisoUsuario) FROM bodegas_listado_permisos_usuarios WHERE idBodegas = ID AND idUsuario = '.$this->Codification->encryptDecrypt('decrypt', $params['id']).' LIMIT 1) AS cuentaPerms',
+                'table'   => 'bodegas_listado',
+                'join'    => '',
+                'where'   => 'idEstado=1',
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'Nombre ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            //Ejecuto la query
+            $xParams            = ['query' => $query];
+            $arrPermisosBodegas = $this->Base_GetList($xParams);
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $arrPermisosBodegas['status'] = true;
+            $arrPermisosBodegas['data']   = [];
+        }
+
+        /*******************************************************************/
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosMaquinas"]==2){
+            //Se genera la query
+            $query = [
+                'data'    => '
+                    idMaquina,
+                    idMaquina AS ID,
+                    Nombre,
+                    (SELECT COUNT(idPermisoUsuario) FROM maquinas_listado_permisos_usuarios WHERE idMaquina = ID AND idUsuario = '.$this->Codification->encryptDecrypt('decrypt', $params['id']).' LIMIT 1) AS cuentaPerms',
+                'table'   => 'maquinas_listado',
+                'join'    => '',
+                'where'   => 'idEstado=1',
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'Nombre ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            //Ejecuto la query
+            $xParams             = ['query' => $query];
+            $arrPermisosMaquinas = $this->Base_GetList($xParams);
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $arrPermisosMaquinas['status'] = true;
+            $arrPermisosMaquinas['data']   = [];
+        }
+
+
+        /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTipoUsuario['status'] && $arrEstado['status'] && $arrPermisos['status'] && $arrPermisosBodegas['status'] && $arrPermisosMaquinas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -488,12 +607,14 @@ class usuariosListado extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_CommonData'       => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrCiudad'        => $arrCiudad,
-                'arrComuna'        => $arrComuna,
-                'arrTipoUsuario'   => $arrTipoUsuario,
-                'arrEstado'        => $arrEstado,
-                'arrPermisos'      => $arrPermisos,
+                'rowData'               => $rowData['data'],
+                'arrCiudad'             => $arrCiudad['data'],
+                'arrComuna'             => $arrComuna['data'],
+                'arrTipoUsuario'        => $arrTipoUsuario['data'],
+                'arrEstado'             => $arrEstado['data'],
+                'arrPermisos'           => $arrPermisos['data'],
+                'arrPermisosBodegas'    => $arrPermisosBodegas['data'],
+                'arrPermisosMaquinas'   => $arrPermisosMaquinas['data'],
             ];
 
             /******************************************/
@@ -502,8 +623,10 @@ class usuariosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrTipoUsuario,$arrEstado,$arrPermisos,$arrPermisosBodegas,$arrPermisosMaquinas]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -558,7 +681,7 @@ class usuariosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -570,7 +693,7 @@ class usuariosListado extends ControllerBase {
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -579,8 +702,10 @@ class usuariosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -611,14 +736,14 @@ class usuariosListado extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             // Si es un ID numérico, encripta y envía con código 200 (OK)
-            $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+            $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
             Response::success($Data);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -660,13 +785,13 @@ class usuariosListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -695,7 +820,7 @@ class usuariosListado extends ControllerBase {
             $Response = $this->Base_delete($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -716,11 +841,11 @@ class usuariosListado extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -749,13 +874,13 @@ class usuariosListado extends ControllerBase {
             $Response = $this->Base_delFiles($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

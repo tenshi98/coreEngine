@@ -91,7 +91,7 @@ class usuariosInstaller extends ControllerBase {
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -153,8 +153,8 @@ class usuariosInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -206,7 +206,7 @@ class usuariosInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/
@@ -222,24 +222,26 @@ class usuariosInstaller extends ControllerBase {
         switch ($Type) {
             /******************************************/
             case 1:
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/listAll',                       'RutaController' => 'usuariosListado->listAll',        'Descripcion' => 'Listar Toda la Información',                   'idLevelLimit' => 1, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/search',                        'RutaController' => 'usuariosListado->UpdateList',     'Descripcion' => 'Filtrar datos',                                'idLevelLimit' => 1, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/updateList',                    'RutaController' => 'usuariosListado->UpdateList',     'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/view/@id',                      'RutaController' => 'usuariosListado->View',           'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 1, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/resumen/@id',                   'RutaController' => 'usuariosListado->Resumen',        'Descripcion' => 'Mostrar Resúmen',                              'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/resumenUpdate/@id',             'RutaController' => 'usuariosListado->ResumenUpdate',  'Descripcion' => 'Mostrar información',                          'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios',                               'RutaController' => 'usuariosListado->Insert',         'Descripcion' => 'Crear Información',                            'idLevelLimit' => 3, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/update',                        'RutaController' => 'usuariosListado->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)', 'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 4, 'RutaWeb' => 'administracion/usuarios/delFiles',                      'RutaController' => 'usuariosListado->DelFiles',       'Descripcion' => 'Permite eliminar archivos',                    'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'administracion/usuarios',                               'RutaController' => 'usuariosListado->Delete',         'Descripcion' => 'Borrar dato y archivos',                       'idLevelLimit' => 4, 'Controller' => 'usuariosListado'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/new/@id',         'RutaController' => 'usuariosListadoObs->New',         'Descripcion' => 'Mostrar modal nuevo',                          'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/updateList/@id',  'RutaController' => 'usuariosListadoObs->UpdateList',  'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/view/@id',        'RutaController' => 'usuariosListadoObs->View',        'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/getID/@id',       'RutaController' => 'usuariosListadoObs->GetID',       'Descripcion' => 'Información para el formulario edición',       'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/observaciones',                 'RutaController' => 'usuariosListadoObs->Insert',      'Descripcion' => 'Crear Información',                            'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/observaciones/update',          'RutaController' => 'usuariosListadoObs->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)', 'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'administracion/usuarios/observaciones',                 'RutaController' => 'usuariosListadoObs->Delete',      'Descripcion' => 'Borrar dato y archivos',                       'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
-                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/permisos/update',               'RutaController' => 'usuariosListadoPermisos->Update', 'Descripcion' => 'Modificar los permisos de los usuarios',       'idLevelLimit' => 2, 'Controller' => 'usuariosListadoPermisos'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/listAll',                       'RutaController' => 'usuariosListado->listAll',                'Descripcion' => 'Listar Toda la Información',                                       'idLevelLimit' => 1, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/search',                        'RutaController' => 'usuariosListado->UpdateList',             'Descripcion' => 'Filtrar datos',                                                    'idLevelLimit' => 1, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/updateList',                    'RutaController' => 'usuariosListado->UpdateList',             'Descripcion' => 'Actualizar Lista',                                                 'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/view/@id',                      'RutaController' => 'usuariosListado->View',                   'Descripcion' => 'Mostrar Detallado',                                                'idLevelLimit' => 1, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/resumen/@id',                   'RutaController' => 'usuariosListado->Resumen',                'Descripcion' => 'Mostrar Resúmen',                                                  'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/resumenUpdate/@id',             'RutaController' => 'usuariosListado->ResumenUpdate',          'Descripcion' => 'Mostrar información',                                              'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios',                               'RutaController' => 'usuariosListado->Insert',                 'Descripcion' => 'Crear Información',                                                'idLevelLimit' => 3, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/update',                        'RutaController' => 'usuariosListado->Update',                 'Descripcion' => 'Editar por post (modificar y subir archivos)',                     'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 4, 'RutaWeb' => 'administracion/usuarios/delFiles',                      'RutaController' => 'usuariosListado->DelFiles',               'Descripcion' => 'Permite eliminar archivos',                                        'idLevelLimit' => 2, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'administracion/usuarios',                               'RutaController' => 'usuariosListado->Delete',                 'Descripcion' => 'Borrar dato y archivos',                                           'idLevelLimit' => 4, 'Controller' => 'usuariosListado'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/new/@id',         'RutaController' => 'usuariosListadoObs->New',                 'Descripcion' => 'Mostrar modal nuevo',                                              'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/updateList/@id',  'RutaController' => 'usuariosListadoObs->UpdateList',          'Descripcion' => 'Actualizar Lista',                                                 'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/view/@id',        'RutaController' => 'usuariosListadoObs->View',                'Descripcion' => 'Mostrar Detallado',                                                'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'administracion/usuarios/observaciones/getID/@id',       'RutaController' => 'usuariosListadoObs->GetID',               'Descripcion' => 'Información para el formulario edición',                           'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/observaciones',                 'RutaController' => 'usuariosListadoObs->Insert',              'Descripcion' => 'Crear Información',                                                'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/observaciones/update',          'RutaController' => 'usuariosListadoObs->Update',              'Descripcion' => 'Editar por post (modificar y subir archivos)',                     'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'administracion/usuarios/observaciones',                 'RutaController' => 'usuariosListadoObs->Delete',              'Descripcion' => 'Borrar dato y archivos',                                           'idLevelLimit' => 2, 'Controller' => 'usuariosListadoObs'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/permisos/update',               'RutaController' => 'usuariosListadoPermisos->Update',         'Descripcion' => 'Modificar los permisos de los usuarios',                           'idLevelLimit' => 2, 'Controller' => 'usuariosListadoPermisos'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/bodegas/update',                'RutaController' => 'usuariosListadoPermisosBodegas->Update',  'Descripcion' => 'Modificar los permisos de acceso a bodegas de los usuarios',       'idLevelLimit' => 2, 'Controller' => 'usuariosListadoPermisosBodegas'];
+                $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 2, 'RutaWeb' => 'administracion/usuarios/maquinas/update',               'RutaController' => 'usuariosListadoPermisosMaquinas->Update', 'Descripcion' => 'Modificar los permisos de acceso a maquinas de los usuarios',      'idLevelLimit' => 2, 'Controller' => 'usuariosListadoPermisosMaquinas'];
 
                 break;
         }

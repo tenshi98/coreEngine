@@ -86,13 +86,17 @@
             $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Token',        'Texto' => $data['rowData']['Config_WhatsappToken']];
             $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Instance Id',  'Texto' => $data['rowData']['Config_WhatsappInstanceId']];
         }
-        $arrData_4[] = ['Icon' => '','Titulo' => 'Mostrar Widget Meteorologico',   'Texto' => activo($data['rowData']['Config_Principal_Meteo'])];
-        $arrData_4[] = ['Icon' => '','Titulo' => 'Mostrar Widget Radio',           'Texto' => activo($data['rowData']['Config_Principal_Radio'])];
-        $arrData_4[] = ['Icon' => '','Titulo' => 'Mostrar Widget Feed',            'Texto' => activo($data['rowData']['Config_Principal_Feed'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Meteorologico',   'Texto' => activo($data['rowData']['Config_Principal_Meteo'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Radio',           'Texto' => activo($data['rowData']['Config_Principal_Radio'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Feed',            'Texto' => activo($data['rowData']['Config_Principal_Feed'])];
         //Solo si se muestra
         if($data['rowData']['Config_Principal_Feed']==2){
-             $arrData_4[] = ['Icon' => '','Titulo' => 'URL Feed Noticias',         'Texto' => $data['rowData']['Config_Principal_FeedURL']];
+             $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Sistema:</strong> URL Feed Noticias',         'Texto' => $data['rowData']['Config_Principal_FeedURL']];
         }
+        $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Configuracion Uso IA',             'Texto' => activo($data['rowData']['Config_IA_Uso'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Usuarios - Listado:</strong> Uso Permisos Bodegas',  'Texto' => activo($data['rowData']['usuariosPermisosBodegas'])];
+        $arrData_4[] = ['Icon' => '','Titulo' => '<strong>Usuarios - Listado:</strong> Uso Permisos Maquinas', 'Texto' => activo($data['rowData']['usuariosPermisosMaquinas'])];
+
         /**************************************/
         $arrData_5   = [];
         //Se condiciona el uso de IA

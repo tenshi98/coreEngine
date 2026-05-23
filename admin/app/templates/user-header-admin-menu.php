@@ -132,7 +132,8 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             </ul>
             <ul>
                 <li class="dropdown-tittle">Páginas</li>
-
+                <li><a href="<?php echo $BASE.'/Core/Paginas/error404'; ?>">     <i class="bi bi-file-earmark-code text-color-amber-text"></i> Error 404</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Paginas/error5xx'; ?>">     <i class="bi bi-file-earmark-code text-color-amber-text"></i> Error 5xx</a></li>
                 <li class="divider"></li>
             </ul>
         </li>

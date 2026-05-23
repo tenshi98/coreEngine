@@ -53,7 +53,7 @@ class usuariosBloqueados extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -72,7 +72,7 @@ class usuariosBloqueados extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
             ];
 
             /******************************************/
@@ -81,8 +81,10 @@ class usuariosBloqueados extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -109,7 +111,7 @@ class usuariosBloqueados extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -123,7 +125,7 @@ class usuariosBloqueados extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
             ];
 
             /******************************************/
@@ -132,8 +134,10 @@ class usuariosBloqueados extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -161,13 +165,13 @@ class usuariosBloqueados extends ControllerBase {
             $Response = $this->Base_delete($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

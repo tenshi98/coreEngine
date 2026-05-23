@@ -81,20 +81,32 @@ class bodegasWidgets extends ControllerBase {
         /******************************************/
         if($MainViewData['Count_Bodegas']!=0){
             /*******************************************************************/
+            //Se instancia
+            $arrUserData = $this->getUserData($f3);
+            // Se verifica si se tiene el permiso para visualizar el dato
+            if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+                $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+                $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+            //Si se permite junto con la creacion de tareas
+            }else{
+                $X_join  = '';
+                $X_where = 'bodegas_listado.idEstado=1';
+            }
             //Se genera la query
             $query = [
-                'data'    => 'idBodegas,Nombre',
+                'data'    => 'bodegas_listado.idBodegas, bodegas_listado.Nombre',
                 'table'   => 'bodegas_listado',
-                'join'    => '',
-                'where'   => 'idEstado=1',
+                'join'    => $X_join,
+                'where'   => $X_where,
                 'group'   => '',
                 'having'  => '',
-                'order'   => 'Nombre ASC',
+                'order'   => 'bodegas_listado.Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
             //Ejecuto la query
             $xParams                         = ['query' => $query];
-            $MainViewData['Data_arrBodegas'] = $this->Base_GetList($xParams);
+            $TempData                        = $this->Base_GetList($xParams);
+            $MainViewData['Data_arrBodegas'] = $TempData['data'];
 
             //Se genera la consulta
             $ActionSQL = '';
@@ -123,7 +135,8 @@ class bodegasWidgets extends ControllerBase {
             ];
             //Ejecuto la query
             $xParams                        = ['query' => $query];
-            $MainViewData['Data_arrStocks'] = $this->Base_GetList($xParams);
+            $TempData                       = $this->Base_GetList($xParams);
+            $MainViewData['Data_arrStocks'] = $TempData['data'];
 
         }
 

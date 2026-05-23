@@ -96,7 +96,7 @@ class crudInforme extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -111,7 +111,7 @@ class crudInforme extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'        => $arrList,
+                'arrList'        => $arrList['data'],
             ];
 
             /******************************************/
@@ -120,8 +120,10 @@ class crudInforme extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -147,7 +149,7 @@ class crudInforme extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -159,7 +161,7 @@ class crudInforme extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
+                'rowData'         => $rowData['data'],
             ];
 
             /******************************************/
@@ -168,8 +170,10 @@ class crudInforme extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 

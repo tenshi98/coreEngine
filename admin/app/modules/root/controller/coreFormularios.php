@@ -96,8 +96,8 @@ class coreFormularios extends ControllerBase {
             /*===========   Funcionalidad   ===========*/
             'Fnc_FormInputs'  => $this->FormInputs,
             /*=========== Datos Consultados ===========*/
-            'arrCiudad'       => $arrCiudad,
-            'arrComuna'       => $arrComuna,
+            'arrCiudad'       => $arrCiudad['data'],
+            'arrComuna'       => $arrComuna['data'],
             'arrGroup'        => $arrGroup,
         ];
 

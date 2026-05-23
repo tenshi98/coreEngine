@@ -67,9 +67,11 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         //Ejecuto la query
         $xParams = ['query' => $query];
         $arrMaq  = $this->Base_GetList($xParams);
+
+        // Se crea filtro
         $X_Where = 'idEstado=1  AND idMaquina NOT IN (0';
         //Se genera la consulta
-        if (!empty($arrMaq)) {$X_Where .= ',' . implode(',', array_column($arrMaq, 'idMaquina'));}
+        if ($arrMaq['status']) {$X_Where .= ',' . implode(',', array_column($arrMaq['data'], 'idMaquina'));}
         $X_Where .= ')';
 
         /*******************************************************************/
@@ -92,7 +94,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrMaquinas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -103,8 +105,8 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrMaquinas'    => $arrMaquinas,
+                'rowData'        => $rowData['data'],
+                'arrMaquinas'    => $arrMaquinas['data'],
             ];
 
             /******************************************/
@@ -113,8 +115,10 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrMaquinas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
     /******************************************************************************/
@@ -147,7 +151,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrMaq)){
+        if($arrMaq['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -160,7 +164,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrMaq' => $arrMaq,
+                'arrMaq' => $arrMaq['data'],
             ];
 
             /******************************************/
@@ -169,8 +173,10 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrMaq]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -203,7 +209,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -215,7 +221,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'Fnc_DataDate'      => $this->DataDate,
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'       => $rowData,
+                'rowData'       => $rowData['data'],
             ];
 
             /******************************************/
@@ -224,8 +230,10 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -253,7 +261,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'data'    => 'idMaquina',
             'table'   => 'terceros_entidades_listado_maquinas',
             'join'    => '',
-            'where'   => 'idMaquina!='.$rowData['idMaquina'],
+            'where'   => 'idMaquina!='.$rowData['data']['idMaquina'],
             'group'   => '',
             'having'  => '',
             'order'   => 'idMaquina ASC',
@@ -262,9 +270,11 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         //Ejecuto la query
         $xParams = ['query' => $query];
         $arrMaq  = $this->Base_GetList($xParams);
+
+        // Se crea filtro
         $X_Where = 'idEstado=1  AND idMaquina NOT IN (0';
         //Se genera la consulta
-        if (!empty($arrMaq)) {$X_Where .= ',' . implode(',', array_column($arrMaq, 'idMaquina'));}
+        if ($arrMaq['status']) {$X_Where .= ',' . implode(',', array_column($arrMaq['data'], 'idMaquina'));}
         $X_Where .= ')';
 
         /*******************************************************************/
@@ -303,7 +313,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrMaquinas['status'] && $arrEstado['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -315,9 +325,9 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'           => $rowData,
-                'arrMaquinas'      => $arrMaquinas,
-                'arrEstado'         => $arrEstado,
+                'rowData'          => $rowData['data'],
+                'arrMaquinas'      => $arrMaquinas['data'],
+                'arrEstado'        => $arrEstado['data'],
             ];
 
             /******************************************/
@@ -326,8 +336,10 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrMaquinas,$arrEstado]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -358,13 +370,13 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response);
+            Response::success($Response['data']);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -395,13 +407,13 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -431,13 +443,13 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

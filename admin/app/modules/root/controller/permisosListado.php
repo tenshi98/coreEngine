@@ -169,7 +169,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrPermisos)){
+        if($arrPermisos['status'] && $arrPermisosCat['status'] && $arrEstados['status'] && $arrTipos['status'] && $arrLevelLimit['status'] && $arrMetodo['status'] && $arrObjetivo['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -188,13 +188,13 @@ class permisosListado extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrPermisos'     => $arrPermisos,
-                'arrPermisosCat'  => $arrPermisosCat,
-                'arrEstados'      => $arrEstados,
-                'arrTipos'        => $arrTipos,
-                'arrLevelLimit'   => $arrLevelLimit,
-                'arrMetodo'       => $arrMetodo,
-                'arrObjetivo'     => $arrObjetivo,
+                'arrPermisos'     => $arrPermisos['data'],
+                'arrPermisosCat'  => $arrPermisosCat['data'],
+                'arrEstados'      => $arrEstados['data'],
+                'arrTipos'        => $arrTipos['data'],
+                'arrLevelLimit'   => $arrLevelLimit['data'],
+                'arrMetodo'       => $arrMetodo['data'],
+                'arrObjetivo'     => $arrObjetivo['data'],
             ];
 
             /******************************************/
@@ -203,8 +203,10 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrPermisos,$arrPermisosCat,$arrEstados,$arrTipos,$arrLevelLimit,$arrMetodo,$arrObjetivo]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -257,7 +259,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrPermisos)){
+        if($arrPermisos['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -271,7 +273,7 @@ class permisosListado extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrPermisos'     => $arrPermisos,
+                'arrPermisos'     => $arrPermisos['data'],
             ];
 
             /******************************************/
@@ -280,8 +282,10 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrPermisos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -345,7 +349,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -356,8 +360,8 @@ class permisosListado extends ControllerBase {
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrRutas'        => $arrRutas,
+                'rowData'         => $rowData['data'],
+                'arrRutas'        => $arrRutas['data'],
             ];
 
             /******************************************/
@@ -366,8 +370,10 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrRutas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -402,7 +408,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrRutas)){
+        if($arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -412,7 +418,7 @@ class permisosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrRutas' => $arrRutas,
+                'arrRutas' => $arrRutas['data'],
             ];
 
             /******************************************/
@@ -421,8 +427,10 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrRutas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -588,7 +596,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrRutas['status'] && $arrPermisosCat['status'] && $arrEstados['status'] && $arrTipos['status'] && $arrLevelLimit['status'] && $arrMetodo['status'] && $arrObjetivo['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -606,14 +614,14 @@ class permisosListado extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrRutas'        => $arrRutas,
-                'arrPermisosCat'  => $arrPermisosCat,
-                'arrEstados'      => $arrEstados,
-                'arrTipos'        => $arrTipos,
-                'arrLevelLimit'   => $arrLevelLimit,
-                'arrMetodo'       => $arrMetodo,
-                'arrObjetivo'     => $arrObjetivo,
+                'rowData'         => $rowData['data'],
+                'arrRutas'        => $arrRutas['data'],
+                'arrPermisosCat'  => $arrPermisosCat['data'],
+                'arrEstados'      => $arrEstados['data'],
+                'arrTipos'        => $arrTipos['data'],
+                'arrLevelLimit'   => $arrLevelLimit['data'],
+                'arrMetodo'       => $arrMetodo['data'],
+                'arrObjetivo'     => $arrObjetivo['data'],
             ];
 
             /******************************************/
@@ -622,8 +630,10 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrRutas,$arrPermisosCat,$arrEstados,$arrTipos,$arrLevelLimit,$arrMetodo,$arrObjetivo]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -686,7 +696,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -697,8 +707,8 @@ class permisosListado extends ControllerBase {
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrRutas'        => $arrRutas,
+                'rowData'         => $rowData['data'],
+                'arrRutas'        => $arrRutas['data'],
             ];
 
             /******************************************/
@@ -707,8 +717,10 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrRutas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -741,14 +753,14 @@ class permisosListado extends ControllerBase {
         /******************************/
         //Se genera la query
         $newPermiso = [
-            'idPermisosCat'   => $_POST['idPermisosCat'],                    //Categoria Permiso
-            'idEstado'        => $_POST['idEstado'],                         //Estado - Activo por defecto
-            'idTipo'          => $_POST['idTipo'],                           //Tipo
-            'Nombre'          => $_POST['Nombre'],                           //Nombre
-            'Descripcion'     => $_POST['Descripcion'],                      //Descripcion
-            'idLevelLimit'    => $_POST['idLevelLimit'],                     //Nivel Acceso
-            'RutaWeb'         => $rowData['Carpeta'].'/'.$_POST['RutaWeb'],  //Ruta Web
-            'RutaController'  => $_POST['RutaController'],                   //Controlador
+            'idPermisosCat'   => $_POST['idPermisosCat'],                            //Categoria Permiso
+            'idEstado'        => $_POST['idEstado'],                                 //Estado - Activo por defecto
+            'idTipo'          => $_POST['idTipo'],                                   //Tipo
+            'Nombre'          => $_POST['Nombre'],                                   //Nombre
+            'Descripcion'     => $_POST['Descripcion'],                              //Descripcion
+            'idLevelLimit'    => $_POST['idLevelLimit'],                             //Nivel Acceso
+            'RutaWeb'         => $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'],  //Ruta Web
+            'RutaController'  => $_POST['RutaController'],                           //Controlador
         ];
 
         /******************************/
@@ -767,13 +779,13 @@ class permisosListado extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             /****************************************/
             //Variable vacia
             $arrRutas = [];
             /******************************/
             //variables
-            $RutaWeb         = $rowData['Carpeta'].'/'.$_POST['RutaWeb'];
+            $RutaWeb         = $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'];
             $RutaController  = $_POST['RutaController'];
             //Se generan las rutas de forma automatica
             switch ($_POST['idTipo']) {
@@ -787,7 +799,7 @@ class permisosListado extends ControllerBase {
                         /*                        Vistas                            */
                         /************************************************************/
                         [
-                            'idPermisos'     => $Response,                    //idPermisos
+                            'idPermisos'     => $Response['data'],            //idPermisos
                             'idMetodo'       => 1,                            //GET
                             'RutaWeb'        => $RutaWeb.'/listAll',          //Ruta
                             'RutaController' => $RutaController.'->listAll',  //Controlador
@@ -799,7 +811,7 @@ class permisosListado extends ControllerBase {
                         /*                       Fragments                          */
                         /************************************************************/
                         [
-                            'idPermisos'     => $Response,                      //idPermisos
+                            'idPermisos'     => $Response['data'],              //idPermisos
                             'idMetodo'       => 2,                              //POST
                             'RutaWeb'        => $RutaWeb.'/search',             //Ruta
                             'RutaController' => $RutaController.'->UpdateList', //Controlador
@@ -808,7 +820,7 @@ class permisosListado extends ControllerBase {
                             'Controller'     => $RutaController,                //Controlador
                         ],
                         [
-                            'idPermisos'     => $Response,                      //idPermisos
+                            'idPermisos'     => $Response['data'],              //idPermisos
                             'idMetodo'       => 1,                              //GET
                             'RutaWeb'        => $RutaWeb.'/updateList',         //Ruta
                             'RutaController' => $RutaController.'->UpdateList', //Controlador
@@ -817,7 +829,7 @@ class permisosListado extends ControllerBase {
                             'Controller'     => $RutaController,                //Controlador
                         ],
                         [
-                            'idPermisos'     => $Response,                //idPermisos
+                            'idPermisos'     => $Response['data'],        //idPermisos
                             'idMetodo'       => 1,                        //GET
                             'RutaWeb'        => $RutaWeb.'/view/@id',     //Ruta
                             'RutaController' => $RutaController.'->View', //Controlador
@@ -826,7 +838,7 @@ class permisosListado extends ControllerBase {
                             'Controller'     => $RutaController,          //Controlador
                         ],
                         [
-                            'idPermisos'     => $Response,                                //idPermisos
+                            'idPermisos'     => $Response['data'],                        //idPermisos
                             'idMetodo'       => 1,                                        //GET
                             'RutaWeb'        => $RutaWeb.'/getID/@id',                    //Ruta
                             'RutaController' => $RutaController.'->GetID',                //Controlador
@@ -838,7 +850,7 @@ class permisosListado extends ControllerBase {
                         /*                         Acciones                         */
                         /************************************************************/
                         [
-                            'idPermisos'     => $Response,                  //idPermisos
+                            'idPermisos'     => $Response['data'],          //idPermisos
                             'idMetodo'       => 2,                          //POST
                             'RutaWeb'        => $RutaWeb,                   //Ruta
                             'RutaController' => $RutaController.'->Insert', //Controlador
@@ -847,7 +859,7 @@ class permisosListado extends ControllerBase {
                             'Controller'     => $RutaController,            //Controlador
                         ],
                         [
-                            'idPermisos'     => $Response,                                      //idPermisos
+                            'idPermisos'     => $Response['data'],                              //idPermisos
                             'idMetodo'       => 2,                                              //POST
                             'RutaWeb'        => $RutaWeb.'/update',                             //Ruta
                             'RutaController' => $RutaController.'->Update',                     //Controlador
@@ -856,7 +868,7 @@ class permisosListado extends ControllerBase {
                             'Controller'     => $RutaController,                                //Controlador
                         ],
                         [
-                            'idPermisos'     => $Response,                  //idPermisos
+                            'idPermisos'     => $Response['data'],          //idPermisos
                             'idMetodo'       => 3,                          //DELETE
                             'RutaWeb'        => $RutaWeb,                   //Ruta
                             'RutaController' => $RutaController.'->Delete', //Controlador
@@ -877,7 +889,7 @@ class permisosListado extends ControllerBase {
                     /*                        Vistas                            */
                     /************************************************************/
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                    //idPermisos
+                        'idPermisos'     => $Response['data'],            //idPermisos
                         'idMetodo'       => 1,                            //GET
                         'RutaWeb'        => $RutaWeb.'/listAll',          //Ruta
                         'RutaController' => $RutaController.'->listAll',  //Controlador
@@ -889,7 +901,7 @@ class permisosListado extends ControllerBase {
                     /*                       Fragments                          */
                     /************************************************************/
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                      //idPermisos
+                        'idPermisos'     => $Response['data'],              //idPermisos
                         'idMetodo'       => 2,                              //POST
                         'RutaWeb'        => $RutaWeb.'/search',             //Ruta
                         'RutaController' => $RutaController.'->UpdateList', //Controlador
@@ -898,7 +910,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,                //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                      //idPermisos
+                        'idPermisos'     => $Response['data'],              //idPermisos
                         'idMetodo'       => 1,                              //GET
                         'RutaWeb'        => $RutaWeb.'/updateList',         //Ruta
                         'RutaController' => $RutaController.'->UpdateList', //Controlador
@@ -907,7 +919,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,                //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                //idPermisos
+                        'idPermisos'     => $Response['data'],        //idPermisos
                         'idMetodo'       => 1,                        //GET
                         'RutaWeb'        => $RutaWeb.'/view/@id',     //Ruta
                         'RutaController' => $RutaController.'->View', //Controlador
@@ -916,7 +928,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,          //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                    //idPermisos
+                        'idPermisos'     => $Response['data'],            //idPermisos
                         'idMetodo'       => 1,                            //GET
                         'RutaWeb'        => $RutaWeb.'/resumen/@id',      //Ruta
                         'RutaController' => $RutaController.'->Resumen',  //Controlador
@@ -925,7 +937,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,              //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                          //idPermisos
+                        'idPermisos'     => $Response['data'],                  //idPermisos
                         'idMetodo'       => 1,                                  //GET
                         'RutaWeb'        => $RutaWeb.'/resumenUpdate/@id',      //Ruta
                         'RutaController' => $RutaController.'->ResumenUpdate',  //Controlador
@@ -937,7 +949,7 @@ class permisosListado extends ControllerBase {
                     /*                         Acciones                         */
                     /************************************************************/
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                  //idPermisos
+                        'idPermisos'     => $Response['data'],          //idPermisos
                         'idMetodo'       => 2,                          //POST
                         'RutaWeb'        => $RutaWeb,                   //Ruta
                         'RutaController' => $RutaController.'->Insert', //Controlador
@@ -946,7 +958,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,            //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                                      //idPermisos
+                        'idPermisos'     => $Response['data'],                              //idPermisos
                         'idMetodo'       => 2,                                              //POST
                         'RutaWeb'        => $RutaWeb.'/update',                             //Ruta
                         'RutaController' => $RutaController.'->Update',                     //Controlador
@@ -955,7 +967,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,                                //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                    //idPermisos
+                        'idPermisos'     => $Response['data'],            //idPermisos
                         'idMetodo'       => 4,                            //PUT
                         'RutaWeb'        => $RutaWeb.'/delFiles',         //Ruta
                         'RutaController' => $RutaController.'->DelFiles', //Controlador
@@ -964,7 +976,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaController,              //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                  //idPermisos
+                        'idPermisos'     => $Response['data'],          //idPermisos
                         'idMetodo'       => 3,                          //DELETE
                         'RutaWeb'        => $RutaWeb,                   //Ruta
                         'RutaController' => $RutaController.'->Delete', //Controlador
@@ -975,13 +987,13 @@ class permisosListado extends ControllerBase {
                     /******************************************************************/
                     /******************************************************************/
                     //variables
-                    $SubRutaWeb         = $rowData['Carpeta'].'/'.$_POST['RutaWeb'].'/observaciones';
+                    $SubRutaWeb         = $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'].'/observaciones';
                     $RutaSubController  = $_POST['RutaController'].'Observaciones';
                     /************************************************************/
                     /*                 Observaciones - Fragments                */
                     /************************************************************/
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                  //idPermisos
+                        'idPermisos'     => $Response['data'],          //idPermisos
                         'idMetodo'       => 1,                          //GET
                         'RutaWeb'        => $SubRutaWeb.'/new/@id',     //Ruta
                         'RutaController' => $RutaSubController.'->New', //Controlador
@@ -990,7 +1002,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaSubController,         //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                         //idPermisos
+                        'idPermisos'     => $Response['data'],                 //idPermisos
                         'idMetodo'       => 1,                                 //GET
                         'RutaWeb'        => $SubRutaWeb.'/updateList/@id',     //Ruta
                         'RutaController' => $RutaSubController.'->UpdateList', //Controlador
@@ -999,7 +1011,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaSubController,                //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                    //idPermisos
+                        'idPermisos'     => $Response['data'],            //idPermisos
                         'idMetodo'       => 1,                            //GET
                         'RutaWeb'        => $SubRutaWeb.'/view/@id',      //Ruta
                         'RutaController' => $RutaSubController.'->View',  //Controlador
@@ -1008,7 +1020,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaSubController,           //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                                //idPermisos
+                        'idPermisos'     => $Response['data'],                        //idPermisos
                         'idMetodo'       => 1,                                        //GET
                         'RutaWeb'        => $SubRutaWeb.'/getID/@id',                 //Ruta
                         'RutaController' => $RutaSubController.'->GetID',             //Controlador
@@ -1020,7 +1032,7 @@ class permisosListado extends ControllerBase {
                     /*                  Observaciones - Aciones                 */
                     /************************************************************/
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                     //idPermisos
+                        'idPermisos'     => $Response['data'],             //idPermisos
                         'idMetodo'       => 2,                             //POST
                         'RutaWeb'        => $SubRutaWeb,                   //Ruta
                         'RutaController' => $RutaSubController.'->Insert', //Controlador
@@ -1029,7 +1041,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaSubController,            //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                                      //idPermisos
+                        'idPermisos'     => $Response['data'],                              //idPermisos
                         'idMetodo'       => 2,                                              //POST
                         'RutaWeb'        => $SubRutaWeb.'/update',                          //Ruta
                         'RutaController' => $RutaSubController.'->Update',                  //Controlador
@@ -1038,7 +1050,7 @@ class permisosListado extends ControllerBase {
                         'Controller'     => $RutaSubController,                             //Controlador
                     ];
                     $arrRutas[] = [
-                        'idPermisos'     => $Response,                     //idPermisos
+                        'idPermisos'     => $Response['data'],             //idPermisos
                         'idMetodo'       => 3,                             //DELETE
                         'RutaWeb'        => $SubRutaWeb,                   //Ruta
                         'RutaController' => $RutaSubController.'->Delete', //Controlador
@@ -1053,13 +1065,13 @@ class permisosListado extends ControllerBase {
                         for($j1 = 0; $j1 < $ndata_1; $j1++){
                             /******************************/
                             //variables
-                            $SubRutaWeb         = $rowData['Carpeta'].'/'.$_POST['RutaWeb'].'/'.$_POST['SubRuta'][$j1];
+                            $SubRutaWeb         = $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'].'/'.$_POST['SubRuta'][$j1];
                             $RutaSubController  = $_POST['RutaController'].$_POST['Controller'][$j1];
                             /************************************************************/
                             /*                 Observaciones - Fragments                */
                             /************************************************************/
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                  //idPermisos
+                                'idPermisos'     => $Response['data'],          //idPermisos
                                 'idMetodo'       => 1,                          //GET
                                 'RutaWeb'        => $SubRutaWeb.'/new/@id',     //Ruta
                                 'RutaController' => $RutaSubController.'->New', //Controlador
@@ -1068,7 +1080,7 @@ class permisosListado extends ControllerBase {
                                 'Controller'     => $RutaSubController,         //Controlador
                             ];
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                         //idPermisos
+                                'idPermisos'     => $Response['data'],                 //idPermisos
                                 'idMetodo'       => 1,                                 //GET
                                 'RutaWeb'        => $SubRutaWeb.'/updateList/@id',     //Ruta
                                 'RutaController' => $RutaSubController.'->UpdateList', //Controlador
@@ -1077,7 +1089,7 @@ class permisosListado extends ControllerBase {
                                 'Controller'     => $RutaSubController,                //Controlador
                             ];
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                    //idPermisos
+                                'idPermisos'     => $Response['data'],            //idPermisos
                                 'idMetodo'       => 1,                            //GET
                                 'RutaWeb'        => $SubRutaWeb.'/view/@id',      //Ruta
                                 'RutaController' => $RutaSubController.'->View',  //Controlador
@@ -1086,7 +1098,7 @@ class permisosListado extends ControllerBase {
                                 'Controller'     => $RutaSubController,           //Controlador
                             ];
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                                //idPermisos
+                                'idPermisos'     => $Response['data'],                        //idPermisos
                                 'idMetodo'       => 1,                                        //GET
                                 'RutaWeb'        => $SubRutaWeb.'/getID/@id',                 //Ruta
                                 'RutaController' => $RutaSubController.'->GetID',             //Controlador
@@ -1098,7 +1110,7 @@ class permisosListado extends ControllerBase {
                             /*                  Observaciones - Aciones                 */
                             /************************************************************/
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                     //idPermisos
+                                'idPermisos'     => $Response['data'],             //idPermisos
                                 'idMetodo'       => 2,                             //POST
                                 'RutaWeb'        => $SubRutaWeb,                   //Ruta
                                 'RutaController' => $RutaSubController.'->Insert', //Controlador
@@ -1107,7 +1119,7 @@ class permisosListado extends ControllerBase {
                                 'Controller'     => $RutaSubController,            //Controlador
                             ];
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                                      //idPermisos
+                                'idPermisos'     => $Response['data'],                              //idPermisos
                                 'idMetodo'       => 2,                                              //POST
                                 'RutaWeb'        => $SubRutaWeb.'/update',                          //Ruta
                                 'RutaController' => $RutaSubController.'->Update',                  //Controlador
@@ -1116,7 +1128,7 @@ class permisosListado extends ControllerBase {
                                 'Controller'     => $RutaSubController,                             //Controlador
                             ];
                             $arrRutas[] = [
-                                'idPermisos'     => $Response,                     //idPermisos
+                                'idPermisos'     => $Response['data'],             //idPermisos
                                 'idMetodo'       => 3,                             //DELETE
                                 'RutaWeb'        => $SubRutaWeb,                   //Ruta
                                 'RutaController' => $RutaSubController.'->Delete', //Controlador
@@ -1137,7 +1149,7 @@ class permisosListado extends ControllerBase {
                         /*                        Vistas                            */
                         /************************************************************/
                         [
-                            'idPermisos'     => $Response,                    //idPermisos
+                            'idPermisos'     => $Response['data'],            //idPermisos
                             'idMetodo'       => 1,                            //GET
                             'RutaWeb'        => $RutaWeb.'/listAll',          //Ruta
                             'RutaController' => $RutaController.'->listAll',  //Controlador
@@ -1149,7 +1161,7 @@ class permisosListado extends ControllerBase {
                         /*                       Fragments                          */
                         /************************************************************/
                         [
-                            'idPermisos'     => $Response,                      //idPermisos
+                            'idPermisos'     => $Response['data'],              //idPermisos
                             'idMetodo'       => 2,                              //POST
                             'RutaWeb'        => $RutaWeb.'/search',             //Ruta
                             'RutaController' => $RutaController.'->UpdateList', //Controlador
@@ -1161,7 +1173,7 @@ class permisosListado extends ControllerBase {
                         /*                         Acciones                         */
                         /************************************************************/
                         [
-                            'idPermisos'     => $Response,                //idPermisos
+                            'idPermisos'     => $Response['data'],        //idPermisos
                             'idMetodo'       => 1,                        //GET
                             'RutaWeb'        => $RutaWeb.'/view/@id',     //Ruta
                             'RutaController' => $RutaController.'->View', //Controlador
@@ -1202,12 +1214,12 @@ class permisosListado extends ControllerBase {
             $this->updatePermisos($f3);
             /****************************************/
             // Si es un ID numérico, encripta y envía con código 200 (OK)
-            $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+            $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
             Response::success($Data);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -1238,17 +1250,17 @@ class permisosListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /****************************************/
                 //Se actualizan los permisos al crear uno nuevo
                 $this->updatePermisos($f3);
                 /****************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1277,7 +1289,7 @@ class permisosListado extends ControllerBase {
             $Response = $this->Base_delete($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /******************************/
                 //Se genera la query
                 $query = [
@@ -1293,21 +1305,21 @@ class permisosListado extends ControllerBase {
 
                 /******************************/
                 // Se asume que $ResponseDelRutas contendrá un array de errores/datos, un true o algún otro valor.
-                if ($ResponseDelRutas===true) {
+                if ($ResponseDelRutas['status']) {
                     /****************************************/
                     //Se actualizan los permisos al crear uno nuevo
                     $this->updatePermisos($f3);
                     // Devuelvo $Response con código 200 (OK)
-                    Response::success($ResponseDelRutas);
+                    Response::success($ResponseDelRutas['data']);
                 } else {
                     // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la BBDD', 500, $ResponseDelRutas);
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseDelRutas['error']);
                 }
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

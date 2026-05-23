@@ -111,10 +111,12 @@ class kanbanTareas extends ControllerBase {
         $arrPrioridad = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+        // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["KanbanTareasAdminTabIndepend"]==2){
-            $arrColores   = [];
-            $arrCierre    = [];
+            $arrColores['status']   = true;
+            $arrColores['data']     = [];
+            $arrCierre['status']    = true;
+            $arrCierre['data']      = [];
         //Si se permite junto con la creacion de tareas
         }else{
             /*******************************************************************/
@@ -183,7 +185,7 @@ class kanbanTareas extends ControllerBase {
         $arrUsuarios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+        // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["KanbanTareasUsoTareas"]==2){
             /*******************************************************************/
             //Se genera la query
@@ -202,18 +204,19 @@ class kanbanTareas extends ControllerBase {
             $arrTrabajos = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
         }else{
-            $arrTrabajos   = [];
+            $arrTrabajos['status']   = true;
+            $arrTrabajos['data']     = [];
         }
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrTareas['status'] && $arrColores['status'] && $arrPrioridad['status'] && $arrCierre['status'] && $arrEstadoCierre['status'] && $arrUsuarios['status'] && $arrTrabajos['status']){
 
             /******************************************/
             //Se agrupan los menus
-            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas, 'ID' );
+            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
             /******************************************/
             //Datos enviados a la pagina
@@ -233,14 +236,14 @@ class kanbanTareas extends ControllerBase {
                 'Fnc_Codification' => $this->Codification,
                 'Fnc_ServerServer' => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
                 'arrTareas'       => $arrTareasNew,
-                'arrColores'      => $arrColores,
-                'arrPrioridad'    => $arrPrioridad,
-                'arrCierre'       => $arrCierre,
-                'arrEstadoCierre' => $arrEstadoCierre,
-                'arrUsuarios'     => $arrUsuarios,
-                'arrTrabajos'     => $arrTrabajos,
+                'arrColores'      => $arrColores['data'],
+                'arrPrioridad'    => $arrPrioridad['data'],
+                'arrCierre'       => $arrCierre['data'],
+                'arrEstadoCierre' => $arrEstadoCierre['data'],
+                'arrUsuarios'     => $arrUsuarios['data'],
+                'arrTrabajos'     => $arrTrabajos['data'],
             ];
 
             /******************************************/
@@ -249,8 +252,10 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrTareas,$arrColores,$arrPrioridad,$arrCierre,$arrEstadoCierre,$arrUsuarios,$arrTrabajos]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -346,10 +351,10 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrTareas['status'] && $arrPrioridad['status'] && $arrEstadoCierre['status']){
 
             //Se agrupan los menus
-            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas, 'ID' );
+            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
             /******************************************/
             //Datos enviados a la pagina
@@ -365,10 +370,10 @@ class kanbanTareas extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_ServerServer'    => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
                 'arrTareas'       => $arrTareasNew,
-                'arrPrioridad'    => $arrPrioridad,
-                'arrEstadoCierre' => $arrEstadoCierre,
+                'arrPrioridad'    => $arrPrioridad['data'],
+                'arrEstadoCierre' => $arrEstadoCierre['data'],
             ];
 
             /******************************************/
@@ -377,8 +382,10 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrTareas,$arrPrioridad,$arrEstadoCierre]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -433,10 +440,10 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrTareas)){
+        if($arrTareas['status']){
 
             //Se agrupan los menus
-            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas, 'ID' );
+            $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
             /******************************************/
             //Datos enviados a la pagina
@@ -459,8 +466,10 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrTareas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -565,7 +574,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status'] && $arrHistorial['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -578,10 +587,10 @@ class kanbanTareas extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrTareas'        => $arrTareas,
-                'arrParticipantes' => $arrParticipantes,
-                'arrHistorial'     => $arrHistorial,
+                'rowData'          => $rowData['data'],
+                'arrTareas'        => $arrTareas['data'],
+                'arrParticipantes' => $arrParticipantes['data'],
+                'arrHistorial'     => $arrHistorial['data'],
             ];
 
             /******************************************/
@@ -590,8 +599,10 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes,$arrHistorial]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -675,7 +686,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -688,9 +699,9 @@ class kanbanTareas extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrTareas'        => $arrTareas,
-                'arrParticipantes' => $arrParticipantes,
+                'rowData'          => $rowData['data'],
+                'arrTareas'        => $arrTareas['data'],
+                'arrParticipantes' => $arrParticipantes['data'],
             ];
 
             /******************************************/
@@ -699,8 +710,10 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -733,7 +746,7 @@ class kanbanTareas extends ControllerBase {
 
         /*******************************************************************/
         //Verifico si permite el cierre
-        if($rowData['idCierre']==1){
+        if($rowData['data']['idCierre']==1){
             //Se genera la query
             $query = [
                 'data'    => 'idEstadoCierre AS ID,Nombre',
@@ -750,7 +763,8 @@ class kanbanTareas extends ControllerBase {
             $arrEstadoCierre = $this->Base_GetList($xParams);
         //Si no lo permite se envia array vacio
         }else{
-            $arrEstadoCierre =[];
+            $arrEstadoCierre['status'] = true;
+            $arrEstadoCierre['data']   = [];
         }
 
         /*******************************************************************/
@@ -773,7 +787,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrPrioridad['status'] && $arrEstadoCierre['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -785,9 +799,9 @@ class kanbanTareas extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_ServerServer'  => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrPrioridad'     => $arrPrioridad,
-                'arrEstadoCierre'  => $arrEstadoCierre,
+                'rowData'          => $rowData['data'],
+                'arrPrioridad'     => $arrPrioridad['data'],
+                'arrEstadoCierre'  => $arrEstadoCierre['data'],
             ];
 
             /******************************************/
@@ -796,8 +810,10 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrPrioridad,$arrEstadoCierre]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -835,7 +851,7 @@ class kanbanTareas extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if (is_numeric($Response)) {
+            if ($Response['status']){
                 /******************************/
                 //Recorro las tareas ingresadas
                 if(isset($ndata_1)&&$ndata_1!=0){
@@ -843,7 +859,7 @@ class kanbanTareas extends ControllerBase {
                         /******************************/
                         //Se agrega respuesta
                         $arrTareas = [
-                            'idKanban'         => $Response,                        //idKanban
+                            'idKanban'         => $Response['data'],                //idKanban
                             'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
                             'idEstadoTrabajo'  => 1,                                //Estado abierto
                             'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
@@ -872,7 +888,7 @@ class kanbanTareas extends ControllerBase {
                         /******************************/
                         //Se agrega respuesta
                         $arrParticipantes = [
-                            'idKanban'  => $Response,                     //idKanban
+                            'idKanban'  => $Response['data'],             //idKanban
                             'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
                         ];
                         /******************************/
@@ -896,7 +912,7 @@ class kanbanTareas extends ControllerBase {
                 /******************************/
                 //Se agrega historial
                 $arrTareas = [
-                    'idKanban'    => $Response,               //idKanban
+                    'idKanban'    => $Response['data'],       //idKanban
                     'idUsuario'   => $_POST['idUsuario'],     //Usuario creador
                     'Descripcion' => 'Tarea Creada',          //Descripcion
                     'Fecha'       => $_POST['Fecha_Actual'],  //Fecha actual
@@ -920,11 +936,11 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Si es un ID numérico, se envía con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
 
         }
@@ -955,7 +971,7 @@ class kanbanTareas extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
 
                 /*******************************************************************/
                 //Se genera la query
@@ -994,8 +1010,8 @@ class kanbanTareas extends ControllerBase {
                 $arrPrioridadNew = [];
                 $arrEstadoNew    = [];
                 //Se guardan los datos
-                foreach ($arrPrioridad as $task){       $arrPrioridadNew[$task['ID']] = $task['Nombre'];}
-                foreach ($arrEstadoCierre as $task){    $arrEstadoNew[$task['ID']]    = $task['Nombre'];}
+                foreach ($arrPrioridad['data'] as $task){       $arrPrioridadNew[$task['ID']] = $task['Nombre'];}
+                foreach ($arrEstadoCierre['data'] as $task){    $arrEstadoNew[$task['ID']]    = $task['Nombre'];}
 
                 /******************************/
                 //Se hacen comparaciones
@@ -1011,9 +1027,9 @@ class kanbanTareas extends ControllerBase {
                 foreach ($campos as $campo => $config) {
                     $oldCampo = 'Old_' . $campo;
                     if (isset($_POST[$campo], $_POST[$oldCampo]) && $_POST[$campo] != $_POST[$oldCampo]) {
-                        $valorAntiguo = $config['array'][$_POST[$oldCampo]] ?? $_POST[$oldCampo];
-                        $valorNuevo = $config['array'][$_POST[$campo]] ?? $_POST[$campo];
-                        $comparacion .= "<br/> - Se cambia la {$config['label']} (de {$valorAntiguo} a {$valorNuevo})";
+                        $valorAntiguo  = $config['array'][$_POST[$oldCampo]] ?? $_POST[$oldCampo];
+                        $valorNuevo    = $config['array'][$_POST[$campo]] ?? $_POST[$campo];
+                        $comparacion  .= "<br/> - Se cambia la {$config['label']} (de {$valorAntiguo} a {$valorNuevo})";
                     }
                 }
 
@@ -1023,7 +1039,7 @@ class kanbanTareas extends ControllerBase {
                     /******************************/
                     //Se agrega historial
                     $arrTareas = [
-                        'idKanban'    => $Response,                                            //idKanban
+                        'idKanban'    => $Response['data'],                                    //idKanban
                         'idUsuario'   => $_POST['idUsuario'],                                  //Usuario creador
                         'Descripcion' => 'Se cambian datos basicos de la tarea:'.$comparacion, //Descripcion
                         'Fecha'       => $_POST['Fecha_Actual'],                               //Fecha actual
@@ -1049,11 +1065,11 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -1089,7 +1105,7 @@ class kanbanTareas extends ControllerBase {
 
             /******************************/
             //Verifico si son diferente
-            if($rowData['idKanbanEstado']!=$idKanbanEstado){
+            if($rowData['status'] && $rowData['data']['idKanbanEstado']!=$idKanbanEstado){
                 /******************************/
                 //Se agrega respuesta
                 $arrTareas = [
@@ -1115,11 +1131,11 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-                if ($Response===true) {
+                if ($Response['status']){
                     /******************************/
                     //Se agrega historial
                     $arrTareas = [
-                        'idKanban'    => $Response,                       //idKanban
+                        'idKanban'    => $Response['data'],               //idKanban
                         'idUsuario'   => $_POST['idUsuario'],             //Usuario creador
                         'Descripcion' => 'Tarea Actualizada de tablero',  //Descripcion
                         'Fecha'       => $_POST['Fecha_Actual'],          //Fecha actual
@@ -1142,11 +1158,11 @@ class kanbanTareas extends ControllerBase {
                     $this->Base_insert($xParams);
                     /******************************/
                     // Devuelvo $Response con código 200 (OK)
-                    Response::success($Response);
+                    Response::success($Response['data']);
                 } else {
                     // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                     // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la BBDD', 500, $Response);
+                    Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
                 }
             }
         }else {
@@ -1177,7 +1193,7 @@ class kanbanTareas extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -1200,11 +1216,11 @@ class kanbanTareas extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

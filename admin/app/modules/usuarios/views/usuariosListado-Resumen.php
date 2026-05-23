@@ -15,6 +15,8 @@
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos"><i class="bi bi-exclamation-diamond"></i> Permisos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs" onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
+                <?php if($data['UserData']["usuariosPermisosBodegas"]==2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos-bodegas"><i class="bi bi-file-text"></i> Permisos Bodegas</button></li><?php } ?>
+                <?php if($data['UserData']["usuariosPermisosMaquinas"]==2){ ?>  <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos-maquinas"><i class="bi bi-file-text"></i> Permisos Maquinas</button></li><?php } ?>
             </ul>
             <div class="tab-content pt-2">
 
@@ -133,6 +135,34 @@
 
                     </div>
                 </div>
+
+                <?php if($data['UserData']["usuariosPermisosBodegas"]==2){ ?>
+                    <div class="tab-pane fade" id="resumen-permisos-bodegas">
+                        <h5 class="text-color-red-dark">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                Permisos de <?php echo $data['rowData']['Nombre']; ?> de acceso a Bodegas
+                            </div>
+                        </h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <?php require_once('usuariosListado-Resumen-PermisosBodegas-List.php'); ?>
+                        </div>
+                    </div>
+                <?php } ?>
+
+                <?php if($data['UserData']["usuariosPermisosMaquinas"]==2){ ?>
+                    <div class="tab-pane fade" id="resumen-permisos-maquinas">
+                        <h5 class="text-color-red-dark">
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                Permisos de <?php echo $data['rowData']['Nombre']; ?> de acceso a Maquinas
+                            </div>
+                        </h5>
+                        <div class="clearfix"></div>
+                        <div class="table-responsive">
+                            <?php require_once('usuariosListado-Resumen-PermisosMaquinas-List.php'); ?>
+                        </div>
+                    </div>
+                <?php } ?>
 
             </div>
 

@@ -75,7 +75,7 @@ class maquinasListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrEstado['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -93,8 +93,8 @@ class maquinasListado extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
-                'arrEstado'       => $arrEstado,
+                'arrList'         => $arrList['data'],
+                'arrEstado'       => $arrEstado['data'],
             ];
 
             /******************************************/
@@ -103,8 +103,10 @@ class maquinasListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrEstado]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -149,7 +151,7 @@ class maquinasListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -162,7 +164,7 @@ class maquinasListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
             ];
 
             /******************************************/
@@ -171,8 +173,10 @@ class maquinasListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -229,7 +233,7 @@ class maquinasListado extends ControllerBase {
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se verifica si se permite Administrar Tableros Independiente de las Tareas
+        // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["maquinasListadoVerDocumentos"]==2){
             //Se genera la query
             $query = [
@@ -247,7 +251,8 @@ class maquinasListado extends ControllerBase {
             $arrDocumentos = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
         }else{
-            $arrDocumentos   = [];
+            $arrDocumentos['status'] = true;
+            $arrDocumentos['data']   = [];
         }
 
         /*******************************************************************/
@@ -270,7 +275,7 @@ class maquinasListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrDocumentos['status'] && $arrObservaciones['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -281,9 +286,9 @@ class maquinasListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrDocumentos'    => $arrDocumentos,
-                'arrObservaciones' => $arrObservaciones,
+                'rowData'          => $rowData['data'],
+                'arrDocumentos'    => $arrDocumentos['data'],
+                'arrObservaciones' => $arrObservaciones['data'],
             ];
 
             /******************************************/
@@ -292,8 +297,10 @@ class maquinasListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrDocumentos,$arrObservaciones]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -398,7 +405,7 @@ class maquinasListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrEstado['status'] && $arrOpciones['status'] && $arrTabs['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -416,10 +423,10 @@ class maquinasListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrEstado'       => $arrEstado,
-                'arrOpciones'     => $arrOpciones,
-                'arrTabs'         => $arrTabs,
+                'rowData'         => $rowData['data'],
+                'arrEstado'       => $arrEstado['data'],
+                'arrOpciones'     => $arrOpciones['data'],
+                'arrTabs'         => $arrTabs['data'],
             ];
 
             /******************************************/
@@ -428,8 +435,10 @@ class maquinasListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrEstado,$arrOpciones,$arrTabs]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -485,7 +494,7 @@ class maquinasListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -496,7 +505,7 @@ class maquinasListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -505,8 +514,10 @@ class maquinasListado extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -537,14 +548,14 @@ class maquinasListado extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             // Si es un ID numérico, encripta y envía con código 200 (OK)
-            $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+            $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
             Response::success($Data);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
     }
 
@@ -586,13 +597,13 @@ class maquinasListado extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -621,7 +632,7 @@ class maquinasListado extends ControllerBase {
             $Response = $this->Base_delete($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -643,11 +654,11 @@ class maquinasListado extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -676,13 +687,13 @@ class maquinasListado extends ControllerBase {
             $Response = $this->Base_delFiles($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

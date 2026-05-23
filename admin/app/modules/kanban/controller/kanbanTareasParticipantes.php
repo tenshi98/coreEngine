@@ -64,10 +64,12 @@ class kanbanTareasParticipantes extends ControllerBase {
         $xParams       = ['query' => $query];
         $arrExistentes = $this->Base_GetList($xParams);
 
-        //Recorro
-        $xWhere = 'idTipoUsuario!=1 AND idEstado=1';
-        foreach ($arrExistentes as $usr){
-            $xWhere .= ' AND idUsuario!='.$usr['idUsuario'];
+        /******************************/
+        //Se crea cadena
+        $xWhere = 'idTipoUsuario != 1 AND idEstado = 1';
+        //Se verifica si hay datos
+        if ($arrExistentes['status'] && !empty($arrExistentes['data'])) {
+            $xWhere .= ' AND idUsuario NOT IN (' . implode(',', array_column($arrExistentes['data'], 'idUsuario')) . ')';
         }
 
         /*******************************************************************/
@@ -90,7 +92,7 @@ class kanbanTareasParticipantes extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrUsuarios['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -102,8 +104,8 @@ class kanbanTareasParticipantes extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_ServerServer'  => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'rowData'       => $rowData,
-                'arrUsuarios'   => $arrUsuarios,
+                'rowData'       => $rowData['data'],
+                'arrUsuarios'   => $arrUsuarios['data'],
             ];
 
             /******************************************/
@@ -112,8 +114,10 @@ class kanbanTareasParticipantes extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrUsuarios]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -227,13 +231,13 @@ class kanbanTareasParticipantes extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($rowData['status'] && $Response['status']){
                 /******************************/
                 //Se agrega historial
                 $arrTareas = [
                     'idKanban'    => $this->Codification->encryptDecrypt('decrypt', $dataDelete['idKanbanDel']),  //idKanban
                     'idUsuario'   => $dataDelete['idUsuarioDel'],                                                 //Usuario creador
-                    'Descripcion' => 'Encargado '.$rowData['Nombre'].' Borrado',                                  //Descripcion
+                    'Descripcion' => 'Encargado '.$rowData['data']['Nombre'].' Borrado',                          //Descripcion
                     'Fecha'       => $dataDelete['Fecha_Actual'],                                                 //Fecha actual
                     'Hora'        => $dataDelete['Hora_Actual'],                                                  //Hora actual
                 ];
@@ -254,11 +258,11 @@ class kanbanTareasParticipantes extends ControllerBase {
                 $this->Base_insert($xParams);
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

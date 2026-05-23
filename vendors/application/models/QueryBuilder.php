@@ -100,35 +100,34 @@ class QueryBuilder{
      * @param array $query Arreglo asociativo con las partes de la consulta (data, table, join, where, group, having, order).
      * @param mixed $DBConn Recurso o instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna el string de la consulta SQL en lugar de ejecutarla.
-     * @return array|string|bool Retorna un arreglo con la fila, el string SQL, o false si no hay resultados/error.
+     * @return array Retorna un arreglo con los resultados.
      * @throws Exception Si ocurre un error durante la ejecución capturado por el bloque try-catch.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'data'   => 'data1,data2,data3',   -> Ver opciones select
+     *   'table'  => 'data_table',          -> Tabla
+     *   'join'   => '',                    -> Ver opciones de los join
+     *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
+     *   'group'  => '',                    -> Ver agrupaciones
+     *   'having' => '',
+     *   'order'  => 'data1 DESC'
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryRow($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryRow(array $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *   'table'  => 'data_table',          -> Tabla
-        *   'join'   => '',                    -> Ver opciones de los join
-        *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
-        *   'group'  => '',                    -> Ver agrupaciones
-        *   'having' => '',
-        *   'order'  => 'data1 DESC'
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryRow($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
-        // Comprueba la existencia y contenido de las columnas a seleccionar
-        if(!isset($query['data']) || $query['data']==''){   return 'Query Error: No hay datos en $data'; }
         // Comprueba la existencia y contenido de la tabla objetivo
-        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
+        // Comprueba la existencia y contenido de las columnas a seleccionar
+        if(!isset($query['data']) || $query['data']==''){   return ['status' => false, 'error' => 'Query Error: No hay datos en $data',  'data' => [], 'table' => $query['table']];}
 
         /*************** Generacion Query ***************/
         // Llama al método interno para construir la sentencia SQL base
@@ -139,17 +138,35 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna la cadena SQL si se ha solicitado el modo de depuración/visualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Intento de ejecución de la consulta contra el motor de base de datos
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn);
-            // Retorna el primer índice del conjunto de resultados si es válido, de lo contrario false
-            return (!empty($result)&&$result !== false) ? $result[0] : false;
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, true);
+            // Obtiene el primer índice del conjunto de resultados si es válido, de lo contrario false
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
             // Registra el fallo y retorna la información del error procesada
-            return $this->logError($ActionSQL, $e);
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -164,34 +181,33 @@ class QueryBuilder{
      * @param array $query Arreglo asociativo con las partes de la consulta (data, table, join, where, etc.).
      * @param mixed $DBConn Recurso o instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna el string de la consulta SQL de conteo en lugar de ejecutarla.
-     * @return int|string|bool Retorna el conteo como entero, el string SQL, o el log de error en caso de fallo.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'data'   => 'data1,data2,data3',   -> Ver opciones select
+     *   'table'  => 'data_table',          -> Tabla
+     *   'join'   => '',                    -> Ver opciones de los join
+     *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
+     *   'group'  => '',                    -> Ver agrupaciones
+     *   'having' => '',
+     *   'order'  => 'data1 DESC'
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryNRows($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryNRows(array $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *   'table'  => 'data_table',          -> Tabla
-        *   'join'   => '',                    -> Ver opciones de los join
-        *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
-        *   'group'  => '',                    -> Ver agrupaciones
-        *   'having' => '',
-        *   'order'  => 'data1 DESC'
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryNRows($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
-        // Valida que existan columnas definidas para la selección
-        if(!isset($query['data']) || $query['data']==''){   return 'Query Error: No hay datos en $data'; }
         // Valida que se haya especificado una tabla de origen
-        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
+        // Valida que existan columnas definidas para la selección
+        if(!isset($query['data']) || $query['data']==''){   return ['status' => false, 'error' => 'Query Error: No hay datos en $data',  'data' => [], 'table' => $query['table']];}
 
         /*************** Generacion Query ***************/
         // Genera la sentencia SQL base mediante el método interno createQuery
@@ -202,17 +218,35 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna la sentencia SQL de conteo si se solicita la visualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Bloque de ejecución con manejo de excepciones
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn);
-            // Retorna el valor numérico de la columna virtual '_total' convertido a entero
-            return (!empty($result)&&$result !== false) ? (int)$result[0]['_total'] : 0;
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, true);
+            // Obtiene el valor numérico de la columna virtual '_total' convertido a entero
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => (int)$result['data']['_total']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // En caso de excepción, delega el manejo al log de errores interno
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -227,36 +261,35 @@ class QueryBuilder{
      * @param array $query Arreglo asociativo con las partes de la consulta (data, table, join, where, group, having, order, limit).
      * @param mixed $DBConn Recurso o instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna el string de la consulta SQL generada en lugar de ejecutarla.
-     * @return array|string|bool Retorna un arreglo multidimensional con los registros, el string SQL, o el registro de error.
+     * @return array Retorna un arreglo con los resultados.
      * @throws Exception Captura cualquier error surgido durante la ejecución de la sentencia SQL.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'data'   => 'data1,data2,data3',   -> Ver opciones select
+     *   'table'  => 'data_table',          -> Tabla
+     *   'join'   => '',                    -> Ver opciones de los join
+     *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
+     *   'group'  => '',                    -> Ver agrupaciones
+     *   'having' => '',
+     *   'order'  => 'data1 DESC',
+     *   'limit'  => 60
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryArray($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryArray(array $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'data'   => 'data1,data2,data3',   -> Ver opciones select
-        *   'table'  => 'data_table',          -> Tabla
-        *   'join'   => '',                    -> Ver opciones de los join
-        *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
-        *   'group'  => '',                    -> Ver agrupaciones
-        *   'having' => '',
-        *   'order'  => 'data1 DESC',
-        *   'limit'  => 60
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryArray($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
-        // Verifica que se hayan especificado las columnas o campos de retorno
-        if(!isset($query['data']) || $query['data']==''){   return 'Query Error: No hay datos en $data'; }
         // Verifica que se haya definido la tabla principal de la consulta
-        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
+        // Verifica que se hayan especificado las columnas o campos de retorno
+        if(!isset($query['data']) || $query['data']==''){   return ['status' => false, 'error' => 'Query Error: No hay datos en $data',  'data' => [], 'table' => $query['table']];}
 
         /*************** Generacion Query ***************/
         // Llama al constructor de consultas para armar la sentencia SQL completa
@@ -265,19 +298,36 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna la cadena de texto de la consulta si se activó el parámetro de visualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Intento de ejecución de la consulta
         try {
             // Ejecuta la sentencia a través del método de conexión de bajo nivel
             $result = $this->queryExecute($ActionSQL, $DBConn);
-
-            // Retorna el conjunto completo de resultados obtenidos
-            return $result;
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // En caso de fallo, procesa el error y registra el contexto de la consulta fallida
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -294,49 +344,50 @@ class QueryBuilder{
      * @param mixed $DBConn Instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna la cadena SQL sin ejecutar la acción.
      * @param bool $novalidate Si es true, omite la limpieza/sanitización de los datos del Post.
-     * @return string|int|bool Retorna el ID del registro insertado, la cadena SQL o un mensaje de error/false.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
+     *   'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
+     *   'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
+     *   'encode'    => 'password',                                   -> Datos a codificar
+     *   'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
+     *   'Post'      => $_POST,                                       -> Datos $_POST entregados
+     *   'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
+     *     [
+     *      'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
+     *      'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
+     *      'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
+     *      'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
+     *      'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
+     *      'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
+     *      'Base64'        => true                                                   -> Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
+     *     ],
+     *    ]
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryInsert($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryInsert(array $query, $DBConn, bool $showQuery = false, bool $novalidate = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
-        *   'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
-        *   'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
-        *   'encode'    => 'password',                                   -> Datos a codificar
-        *   'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
-        *   'Post'      => $_POST,                                       -> Datos $_POST entregados
-        *   'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
-        *     [
-        *      'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
-        *      'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
-        *      'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
-        *      'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
-        *      'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
-        *      'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
-        *      'Base64'        => true                                                   -> Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
-        *     ],
-        *    ]
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryInsert($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
+        // Verifica que se haya definido la tabla principal de la consulta
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
         // Ejecuta la validación de presencia para los campos definidos como obligatorios
         if(isset($query['required'])&&$query['required']!=''){
             $dataVal  = $this->validateRequired($query['required'], $query['Post']);
-            if ($dataVal !== true) {return $dataVal;}
+            if ($dataVal['status'] !== true) {return ['status' => false, 'error' => $dataVal['error'], 'data' => [], 'table' => $query['table']];}
         }
         // Verifica que los valores para campos únicos no existan previamente en la tabla
         if(isset($query['unique'])&&$query['unique']!=''){
             $dataUniq = $this->validateUnique($query['unique'], $query['table'], $query['Post'], '', $DBConn);
-            if ($dataUniq !== true) {return $dataUniq;}
+            if ($dataUniq['status'] !== true) {return ['status' => false, 'error' => $dataUniq['error'], 'data' => [], 'table' => $query['table']];}
         }
 
         /*************** Datos    ***************/
@@ -346,7 +397,7 @@ class QueryBuilder{
         /*************** Archivos   ***************/
         // Gestiona la lógica de carga física de archivos y obtiene los nombres de columnas y valores para el SQL
         $fileProc      = $this->processFiles($query, 'insert');
-        if ($fileProc['success'] === false) {return $fileProc['error'];}
+        if ($fileProc['success'] === false) {return ['status' => false, 'error' => $fileProc['error'], 'data' => [], 'table' => $query['table']];}
         $DatosNombres  = $fileProc['nombres'];
         $DatosArchivos = $fileProc['archivos'];
 
@@ -378,17 +429,35 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna el texto de la consulta si se activó el modo de visualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Ejecución de la sentencia dentro de un bloque de control de excepciones
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn);
-            // Si la inserción es exitosa, retorna el ID autogenerado del nuevo registro
-            return ($result > 0) ? $DBConn->lastInsertId() : false;
+            // Obtiene el ID autogenerado del nuevo registro
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $DBConn->lastInsertId()
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // En caso de error crítico, registra el evento y retorna la información del log
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -405,54 +474,55 @@ class QueryBuilder{
      * @param mixed $DBConn Instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna la cadena SQL sin ejecutar la actualización.
      * @param bool $novalidate Si es true, omite la limpieza/sanitización de los datos del Post.
-     * @return bool|string|array Retorna true si tiene éxito, la cadena SQL o un mensaje/array de error.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
+     *   'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
+     *   'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
+     *   'encode'    => 'password',                                   -> Datos a codificar
+     *   'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
+     *   'Post'      => $_POST,                                       -> Datos $_POST entregados
+     *   'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
+     *     [
+     *      'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
+     *      'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
+     *      'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
+     *      'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
+     *      'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
+     *      'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
+     *      'Base64'        => true                                                   -> true-false ->Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
+     *     ],
+     *   ]
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryUpdate($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryUpdate(array $query, $DBConn, bool $showQuery = false, bool $novalidate = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'data'      => 'usuario,idEstado,email,Nombre,Rut,password', -> Datos a insertar, dejar fuera los archivos
-        *   'required'  => 'email,Nombre,Rut',                           -> Datos obligatorios a insertar, son validados, si no existen impide la ejecucion
-        *   'unique'    => 'email,Nombre-Rut',                           -> Datos unicos, se consulta en la BD que el dato ingresado no este repetido
-        *   'encode'    => 'password',                                   -> Datos a codificar
-        *   'table'     => 'usuarios_listado',                           -> Tabla donde se ejecuta la consulta
-        *   'Post'      => $_POST,                                       -> Datos $_POST entregados
-        *   'files'     => [                                             -> Arreglo con los archivos, cada uno va dentro de su propio array
-        *     [
-        *      'Identificador' => 'Direccion_img',                                       -> Columna dentro de la BD, identificador del archivo
-        *      'SubCarpeta'    => '',                                                    -> Opcional, si el archivo se guarda en una subcarpeta
-        *      'NombreArchivo' => '',                                                    -> Se se utiliza un nombre particular, sino, se utiliza el sufijo
-        *      'SufijoArchivo' => 'Sufijo_',                                             -> Si al nombre del archivo se le pone un sufijo
-        *      'ValidarTipo'   => 'word,excel,powerpoint,pdf,image,txt,zip,video,music', -> Formato archivo a validar
-        *      'ValidarPeso'   => 10,                                                    -> Validacion peso maximo del archivo (en megas)
-        *      'Base64'        => true                                                   -> true-false ->Si el archivo es entregado como texto (base64), esto hace que se ignoren todas las validaciones
-        *     ],
-        *   ]
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryUpdate($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
+        // Verifica que se haya definido la tabla principal de la consulta
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
         // Valida la presencia de datos en los campos marcados como requeridos
         if(isset($query['required'])&&$query['required']!=''){
             $dataVal  = $this->validateRequired($query['required'], $query['Post']);
-            if ($dataVal !== true) {return $dataVal;}
+            if ($dataVal['status'] !== true) {return ['status' => false, 'error' => $dataVal['error'], 'data' => [], 'table' => $query['table']];}
         }
 
         // El campo 'where' es mandatorio para evitar actualizaciones accidentales de toda la tabla
         $dataWhere = $this->validateRequired($query['where'], $query['Post']);
-        if ($dataWhere !== true) {return $dataWhere;}
+        if ($dataWhere['status'] !== true) {return ['status' => false, 'error' => $dataWhere['error'], 'data' => [], 'table' => $query['table']];}
 
         // Verifica unicidad ignorando el registro actual definido en el 'where'
         if(isset($query['unique'])&&$query['unique']!=''){
             $dataUniq = $this->validateUnique($query['unique'], $query['table'], $query['Post'], $query['where'], $DBConn);
-            if ($dataUniq !== true) {return $dataUniq;}
+            if ($dataUniq['status'] !== true) {return ['status' => false, 'error' => $dataUniq['error'], 'data' => [], 'table' => $query['table']];}
         }
 
         /*************** Datos    ***************/
@@ -463,7 +533,7 @@ class QueryBuilder{
         /*************** Archivos   ***************/
         // Procesa la actualización de archivos (reemplazo o carga nueva)
         $fileProc  = $this->processFiles($query, 'update');
-        if ($fileProc['success'] === false) {return $fileProc['error'];}
+        if ($fileProc['success'] === false) {return ['status' => false, 'error' => $fileProc['error'], 'data' => [], 'table' => $query['table']];}
         // Fragmento SQL generado para la sección SET relacionado con archivos
         $FilesData = $fileProc['update'];
 
@@ -500,17 +570,35 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna el SQL generado si se solicita el modo de depuración
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Ejecución de la transacción
         try {
-            $this->queryExecute($ActionSQL, $DBConn);
-            // Confirma la ejecución exitosa
-            return true;
+            $result = $this->queryExecute($ActionSQL, $DBConn);
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // Captura el error y lo registra en el log del sistema
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -526,36 +614,35 @@ class QueryBuilder{
      * @param array $query Configuración de la eliminación (table, where, Post, files, SubCarpeta).
      * @param mixed $DBConn Instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna la cadena SQL sin ejecutar la eliminación.
-     * @return bool|string|array Retorna true si tiene éxito, la cadena SQL o un mensaje de error.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
+     *   'table'       => 'usuarios_listado', -> Tabla donde esta el dato
+     *   'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
+     *   'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
+     *   'Post'        => $_POST              -> Datos $_POST
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryDelete($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryDelete(array $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
-        *   'table'       => 'usuarios_listado', -> Tabla donde esta el dato
-        *   'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
-        *   'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
-        *   'Post'        => $_POST              -> Datos $_POST
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryDelete($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
         // Valida que se haya especificado la tabla de destino
-        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
         // Valida que se haya definido el campo de condición para la eliminación
-        if(!isset($query['where']) || $query['where']==''){ return 'Query Error: No hay datos en $where'; }
+        if(!isset($query['where']) || $query['where']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $where', 'data' => [], 'table' => $query['table']];}
 
         // Verifica que los valores necesarios para el WHERE estén presentes en los datos recibidos (Post)
         $dataVal  = $this->validateRequired($query['where'], $query['Post']);
-        if ($dataVal !== true) {return $dataVal;}
+        if ($dataVal['status'] !== true) {return ['status' => false, 'error' => $dataVal['error'], 'data' => [], 'table' => $query['table']];}
 
         /*************** Datos    ***************/
         // Fracciona los campos del WHERE en un arreglo indexado
@@ -590,7 +677,7 @@ class QueryBuilder{
 
             // Invoca al gestor de archivos para borrar los recursos del almacenamiento físico
             $delFile  = $this->FileManager->deleteFilesMassive($query['files'], $query['SubCarpeta'], $result);
-            if ($delFile !== true) {return $delFile;}
+            if ($delFile !== true) {return ['status' => false, 'error' => $delFile, 'data' => [], 'table' => $query['table']];}
         }
 
         /*************** Generacion Datos ***************/
@@ -612,17 +699,35 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna la cadena SQL si se ha solicitado el modo de visualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Ejecución de la eliminación en la base de datos
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn);
-            // Retorna éxito tras la ejecución correcta
-            return true;
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // En caso de fallo, registra el error y el SQL que lo originó
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -638,29 +743,37 @@ class QueryBuilder{
      * @param string $query Sentencia SQL completa a ejecutar.
      * @param mixed $DBConn Instancia de conexión a la base de datos (compatible con PDO).
      * @param bool $showQuery Si es true, retorna la cadena SQL sin ejecutarla.
-     * @return array|int|string|bool Lista de registros (lectura), filas afectadas (escritura), o error.
+     * @param bool $singleRow Si es true o false, indica si debe traer una fila o muchas.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = 'SELECT * FROM Test';
+     *
+     * //ejecucion
+     * $qbuilder->queryExecute($query, $DBConn);
+	 * ```
+	 *
      */
-    public function queryExecute(string $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = 'SELECT * FROM Test';
-        *
-        * //ejecucion
-        * $qbuilder->queryExecute($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
+    public function queryExecute(string $query, $DBConn, bool $showQuery = false, bool $singleRow = false){
 
         /*************** Validaciones ***************/
         // Verifica que la cadena de la consulta no esté vacía o nula
-        if(!isset($query) || $query==''){ return 'Query Error: No hay datos en $query'; }
+        if(!isset($query) || $query==''){
+            return [
+                'status' => false,
+                'error'  => 'Query Error: No hay datos en $query'
+            ];
+        }
 
         /*************** Ejecutar   ***************/
         // Retorna el texto de la consulta si se activó el modo de previsualización
         if ($showQuery) {
-            return $query;
+            return [
+                'status' => true,
+                'query'  => $query
+            ];
         }
 
         // Intento de ejecución de la sentencia mediante sentencias preparadas
@@ -675,10 +788,29 @@ class QueryBuilder{
             $stmt->execute();
 
             // Evalúa el tipo de respuesta: fetchAll para consultas de lectura, rowCount para escritura
-            return $isSelect ? $stmt->fetchAll(PDO::FETCH_ASSOC) : $stmt->rowCount();
+            $data = $isSelect
+                    ? (
+                        $singleRow
+                            ? $stmt->fetch(PDO::FETCH_ASSOC)
+                            : $stmt->fetchAll(PDO::FETCH_ASSOC)
+                    )
+                    : $stmt->rowCount();
+
+            // Se retornan los datos
+            return [
+                'status' => true,
+                'data'   => $data
+            ];
         } catch (Exception $e) {
+            // Se listan los errores
+            $Error = $this->logError($query, $e);
             // En caso de error, delega el registro al método logError
-            return $this->logError($query, $e);
+            return [
+                'status'          => false,
+                'error'           => $Error['error'],
+                'internal_error'  => $Error['internal_error'],
+                'query'           => $query
+            ];
         }
 
     }
@@ -693,36 +825,37 @@ class QueryBuilder{
      *
      * @param array $query Configuración de la operación (files, table, where, SubCarpeta, Post).
      * @param mixed $DBConn Instancia de conexión a la base de datos.
-     * @return bool|string Retorna true si la operación es exitosa o un mensaje de error en caso de fallo.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
+     *   'table'       => 'usuarios_listado', -> Tabla donde esta el dato
+     *   'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
+     *   'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
+     *   'Post'        => $_POST              -> Datos $_POST
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->delFiles($query, $DBConn);
+	 * ```
+	 *
      */
     public function delFiles(array $query, $DBConn){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'files'       => 'Direccion_img',    -> Nombre del archivo dentro de la base de datos
-        *   'table'       => 'usuarios_listado', -> Tabla donde esta el dato
-        *   'where'       => 'idUsuario',        -> Dato del where, es validado con los datos $_POST
-        *   'SubCarpeta'  => '',                 -> Si el archivo esta dentro de una subcarpeta
-        *   'Post'        => $_POST              -> Datos $_POST
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->delFiles($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
         // Valida la existencia de los parámetros críticos para identificar columnas y tablas
-        if(!isset($query['files']) || $query['files']==''){ return 'Query Error: No hay datos en $files'; }
-        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
-        if(!isset($query['where']) || $query['where']==''){ return 'Query Error: No hay datos en $where'; }
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
+        // Valida que se haya definido el listado de archivos a eliminar
+        if(!isset($query['files']) || $query['files']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $files', 'data' => [], 'table' => $query['table']];}
+        // Valida que se haya definido el campo de condición para la eliminación
+        if(!isset($query['where']) || $query['where']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $where', 'data' => [], 'table' => $query['table']];}
 
         // Verifica que los campos definidos en el 'where' estén presentes en el arreglo 'Post'
         $dataVal  = $this->validateRequired($query['where'], $query['Post']);
-        if ($dataVal !== true) {return $dataVal;}
+        if ($dataVal['status'] !== true) {return ['status' => false, 'error' => $dataVal['error'], 'data' => [], 'table' => $query['table']];}
 
         /*************** Datos    ***************/
         // Convierte las cadenas de texto separadas por comas en arreglos indexados
@@ -741,14 +874,13 @@ class QueryBuilder{
                 // Solicita al gestor de archivos la eliminación del recurso en el disco
                 $delFile  = $this->FileManager->deleteFile($query['Post'][$file], $query['SubCarpeta']);
                 /******************************************/
+                // Si falla la eliminación física, interrumpe el proceso y retorna el error
+                if($delFile !== true){
+                    return ['status' => false, 'error' => $delFile, 'data' => [], 'table' => $query['table']];
+                }
 
                 // Si el archivo se borró correctamente, prepara la columna para ser limpiada en la BD
-                if($delFile === true){
-                    $matrixData[] = $file." = ''";
-                }else{
-                    // Si falla la eliminación física, interrumpe el proceso y retorna el error
-                    return $delFile;
-                }
+                $matrixData[] = $file." = ''";
             }
         }
 
@@ -771,15 +903,31 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Ejecuta la actualización en el servidor de base de datos
         try {
-            $this->queryExecute($ActionSQL, $DBConn);
+            $result = $this->queryExecute($ActionSQL, $DBConn);
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // Registra cualquier fallo en la ejecución de la consulta
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
-
-        /******************************************/
-        // Indica la finalización exitosa de la limpieza de archivos y registros
-        return true;
 
     }
 
@@ -794,33 +942,32 @@ class QueryBuilder{
      * @param array $query Configuración de la tabla (table, data, primaryKey, comentario).
      * @param mixed $DBConn Instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna la sentencia SQL sin ejecutarla.
-     * @return mixed Resultado de la ejecución o mensaje de error en caso de fallo.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     * 'table'      => 'usuarios_listado',                                    -> Tabla donde se ejecuta la consulta
+     * 'data'       => '`idCorreosCat` int(10) unsigned NOT NULL AUTO_INCREMENT', -> Datos a crear
+     * 'primaryKey' => 'idusuario',                                           -> Clave Primaria
+     * 'comentario' => 'fija',                                                -> Comentario de la tabla
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryCreateTable($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryCreateTable(array $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        * 'table'      => 'usuarios_listado',                                    -> Tabla donde se ejecuta la consulta
-        * 'data'       => '`idCorreosCat` int UNSIGNED NOT NULL AUTO_INCREMENT', -> Datos a crear
-        * 'primaryKey' => 'idusuario',                                           -> Clave Primaria
-        * 'comentario' => 'fija',                                                -> Comentario de la tabla
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryCreateTable($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
         // Valida que el nombre de la tabla esté presente
-        if(!isset($query['table']) || $query['table']==''){           return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['table']) || $query['table']==''){           return ['status' => false, 'error' => 'Query Error: No hay datos en $table',      'data' => []];}
         // Valida que se hayan definido las columnas y tipos de datos
-        if(!isset($query['data']) || $query['data']==''){             return 'Query Error: No hay datos en $data'; }
+        if(!isset($query['data']) || $query['data']==''){             return ['status' => false, 'error' => 'Query Error: No hay datos en $data',       'data' => [], 'table' => $query['table']];}
         // Valida la definición de la clave primaria obligatoria
-        if(!isset($query['primaryKey']) || $query['primaryKey']==''){ return 'Query Error: No hay datos en $primaryKey'; }
+        if(!isset($query['primaryKey']) || $query['primaryKey']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $primaryKey', 'data' => [], 'table' => $query['table']];}
 
         /*************** Generacion Query ***************/
         // Construcción de la sentencia DDL (Data Definition Language) con parámetros fijos de motor y codificación
@@ -829,18 +976,36 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna el string de la consulta si se solicita previsualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Intento de creación de la tabla
         try {
             // Ejecuta la sentencia a través del driver de conexión
             $result = $this->queryExecute($ActionSQL, $DBConn);
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
             // Retorna el resultado de la operación
-            return $result;
+            return $response;
         } catch (Exception $e) {
-            // Registra el error técnico y el SQL fallido en el log
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -855,26 +1020,25 @@ class QueryBuilder{
      * @param array $query Arreglo asociativo que debe contener la clave 'table'.
      * @param mixed $DBConn Recurso o instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna la sentencia SQL sin ejecutarla.
-     * @return mixed Resultado de la ejecución (vía queryExecute) o mensaje de error.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'table' => 'usuarios_listado', -> Tabla donde se ejecuta la consulta
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryDropTable($query, $DBConn);
+	 * ```
+	 *
      */
     public function queryDropTable(array $query, $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        *   'table' => 'usuarios_listado', -> Tabla donde se ejecuta la consulta
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->queryDropTable($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
         // Verifica que el nombre de la tabla objetivo haya sido proporcionado
-        if(!isset($query['table']) || $query['table']==''){ return 'Query Error: No hay datos en $table'; }
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
 
         /*************** Generacion Query ***************/
         // Construye la sentencia DDL. Se incluyen backticks para proteger nombres de tabla con caracteres especiales o reservados
@@ -883,18 +1047,36 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Retorna la cadena de la consulta si se solicita el modo de previsualización
         if ($showQuery) {
-            return $ActionSQL;
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
         }
 
         // Intento de ejecución de la eliminación de la estructura
         try {
             // Ejecuta la sentencia mediante el método central de ejecución
             $result = $this->queryExecute($ActionSQL, $DBConn);
-            // Retorna el resultado obtenido del driver de base de datos
-            return $result;
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
         } catch (Exception $e) {
-            // Captura excepciones y registra el fallo junto con la consulta SQL
-            return $this->logError($ActionSQL, $e);
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
         }
 
     }
@@ -912,30 +1094,30 @@ class QueryBuilder{
      * @param array $query Configuración de la base de datos (dbName, charset, collation).
      * @param array $DBConn Credenciales y parámetros de conexión al servidor (HOSTNAME, USERNAME, PASSWORD, PORT, CHARSET).
      * @param bool $showQuery Si es true, retorna la sentencia SQL sin ejecutarla.
-     * @return bool|string Retorna true si se creó exitosamente o un mensaje de error descriptivo.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *  'dbName'    => 'Nombre_db',          -> Nombre de la base de datos
+     *  'charset'   => 'utf8mb4',            -> Charset (opcional)
+     *  'collation' => 'utf8mb4_unicode_ci', -> Collation (opcional)
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->createDatabase($query, $DBConn);
+	 * ```
+	 *
      */
     public function createDatabase(array $query, array $DBConn, bool $showQuery = false){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //Formato de la query
-        * $query = [
-        * 'dbName'    => 'Nombre_db',          -> Nombre de la base de datos
-        * 'charset'   => 'utf8mb4',            -> Charset (opcional)
-        * 'collation' => 'utf8mb4_unicode_ci', -> Collation (opcional)
-        * ];
-        *
-        * //ejecucion
-        * $qbuilder->createDatabase($query, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
         // Valida que el nombre de la base de datos no sea nulo o vacío
-        if(!isset($query['dbName']) || $query['dbName']==''){          return 'Query Error: No hay datos en $dbName'; }
+        if(!isset($query['dbName']) || $query['dbName']==''){          return ['status' => false, 'error' => 'Query Error: No hay datos en $dbName',          'data' => []];}
         // Aplica una expresión regular para restringir el nombre a caracteres alfanuméricos y guiones bajos (3-64 caracteres)
-        if (!preg_match('/^[A-Za-z0-9_]{3,64}$/', $query['dbName'])) { return 'Query Error: Nombre de base de datos inválido'; }
+        if (!preg_match('/^[A-Za-z0-9_]{3,64}$/', $query['dbName'])) { return ['status' => false, 'error' => 'Query Error: Nombre de base de datos inválido', 'data' => []];}
+
 
         // Configura valores predeterminados para la codificación si no se proporcionan
         $charset      = $query['charset'] ?? 'utf8mb4';
@@ -972,17 +1154,35 @@ class QueryBuilder{
             /*************** Ejecutar   ***************/
             // Retorna la cadena de la consulta si se solicita el modo de previsualización
             if ($showQuery) {
-                return $ActionSQL;
+                return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
             }
 
             // Ejecución interna de la sentencia SQL
             try {
-                $this->queryExecute($ActionSQL, $NewDBConn);
-                // Retorno exitoso tras la creación
-                return true;
+                $result = $this->queryExecute($ActionSQL, $NewDBConn);
+                // Obtiene el conjunto completo de resultados obtenidos
+                if($result['status']){
+                    // Estructura estándar de respuesta
+                    $response = [
+                        'status'  => true,
+                        'data'    => $result['data']
+                    ];
+                }else{
+                    // Estructura estándar de respuesta
+                    $response = [
+                        'status'  => false,
+                        'error'   => $result['error'],
+                        'data'    => $result['internal_error'],
+                        'table'   => $query['dbName'],
+                    ];
+                }
+                // Retorna los datos
+                return $response;
             }  catch (PDOException $e) {
-                // Registra el error si la ejecución falla tras establecer la conexión
-                return $this->logError($ActionSQL, $e);
+                // Se listan los errores
+                $Error = $this->logError($ActionSQL, $e);
+                // Registra el fallo y retorna la información del error procesada
+                return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['dbName']];
             }
 
         } catch (\PDOException $e) {
@@ -991,16 +1191,16 @@ class QueryBuilder{
 
             // Evalúa códigos de error estándar de MySQL (1044: Acceso denegado, 1045: Usuario/Pass inválido)
             if (str_contains($message, '1044') || str_contains($message, '1045')) {
-                return 'Query Error: El usuario no tiene permisos para crear bases de datos';
+                return ['status' => false, 'error' => 'Query Error: El usuario no tiene permisos para crear bases de datos', 'data' => [], 'table' => $query['dbName']];
             }
 
             // Evalúa código de error 1007: La base de datos ya existe
             if (str_contains($message, '1007')) {
-                return 'Query Error: La base de datos ya existe';
+                return ['status' => false, 'error' => 'Query Error: La base de datos ya existe', 'data' => [], 'table' => $query['dbName']];
             }
 
             // Retorna el mensaje de error genérico si no coincide con los casos anteriores
-            return 'Query Error: '.$message;
+            return ['status' => false, 'error' => 'Query Error: '.$message, 'data' => [], 'table' => $query['dbName']];
         }
 
     }
@@ -1014,29 +1214,28 @@ class QueryBuilder{
      *
      * @param string $filepath Ruta física completa hacia el archivo .sql.
      * @param mixed $DBConn Instancia de conexión a la base de datos.
-     * @return bool|string Retorna true si todas las consultas se ejecutaron con éxito o un mensaje de error.
+     * @return array Retorna un arreglo con los resultados.
      * @throws Exception Si el archivo no es accesible o la sintaxis SQL es inválida.
+     *
+	 * @example
+	 * ```php
+	 * //ejecucion
+     * $qbuilder->executeFile($filepath, $DBConn);
+	 * ```
+	 *
      */
     public function executeFile(string $filepath, $DBConn){
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * //ejecucion
-        * $qbuilder->executeFile($filepath, $DBConn);
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validaciones ***************/
         // Verifica que se haya proporcionado una ruta de archivo
-        if(!isset($filepath) || $filepath==''){ return 'Query Error: No hay datos en $filepath'; }
+        if(!isset($filepath) || $filepath==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $filepath', 'data' => []];}
 
         // Inicializa la utilidad de validación para comprobar la integridad de la ruta
         $DataSQL = new FunctionsDataSQL();
         $result  = $DataSQL->validatePathFile($filepath);
 
         // Valida la existencia física del archivo antes de intentar leerlo
-        if($result['success']===false){ return 'Query Error: Archivo SQL no encontrado:'.$filepath; }
+        if($result['success']===false){ return ['status' => false, 'error' => 'Query Error: Archivo SQL no encontrado:'.$filepath, 'data' => []];}
 
         /*************** Ejecutar   ***************/
         try {
@@ -1069,10 +1268,12 @@ class QueryBuilder{
             }
 
             // Retorna true indicando que el script finalizó sin errores críticos
-            return true;
+            return ['status' => true, 'query' => $query, 'data' => []];
         } catch (PDOException $e) {
-            // En caso de fallo en alguna consulta, registra el error referenciando la ruta del archivo
-            return $this->logError($filepath, $e);
+            // Se listan los errores
+            $Error = $this->logError('', $e, $filepath);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error']];
         }
     }
 
@@ -1092,25 +1293,24 @@ class QueryBuilder{
      *
      * @param string $SIS_data Cadena de texto con los nombres de campos separados por comas (ej: "nombre,email,password").
      * @param array $SIS_Post Arreglo asociativo con los datos a validar (normalmente $_POST o un JSON decodificado).
-     * @return bool|array Retorna true si todos los campos son válidos, o un arreglo con los mensajes de error encontrados.
+     * @return array Retorna true si todos los campos son válidos, o un arreglo con los mensajes de error encontrados.
+     *
+	 * @example
+	 * ```php
+	 * $campos    = "usuario,password";
+     * $datos     = ["usuario" => "admin", "password" => ""];
+     * $resultado = $this->validateRequired($campos, $datos);
+     * // Retorna: [["message" => "password es obligatorio"]]
+	 * ```
+	 *
      */
     private function validateRequired(string $SIS_data, array $SIS_Post): bool|array{
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * $campos = "usuario,password";
-        * $datos  = ["usuario" => "admin", "password" => ""];
-        * $resultado = $this->validateRequired($campos, $datos);
-        * // Retorna: [["message" => "password es obligatorio"]]
-        *
-        *===================================================================================================================
-        */
 
         /*************** Preparación ***************/
         // Descompone la cadena de campos separados por comas en un arreglo manejable
         $arrData = $this->CommonData->parseDataCommas($SIS_data);
         // Inicializa el contenedor de errores
-        $errors  = [];
+        $errors  = '';
 
         /*************** Validación ***************/
         // Itera sobre cada campo marcado como obligatorio
@@ -1120,13 +1320,17 @@ class QueryBuilder{
             // 2. empty($SIS_Post[$field]): El valor no debe ser nulo, falso, cadena vacía o 0.
             if(isset($SIS_Post[$field]) && empty($SIS_Post[$field])){
                 // Si el campo existe pero su valor es considerado "vacío" por PHP
-                $errors[] = ["message" => "$field es obligatorio"];
+                $errors .= $field.' es obligatorio';
             }
         }
 
         /*************** Resultado ***************/
         // Retorna true si el arreglo de errores permanece vacío; de lo contrario, devuelve los errores
-        return (empty($errors)) ? true : $errors;
+        if(empty($errors)){
+            return ['status' => true];
+        }else{
+            return ['status' => false, 'error' => $errors];
+        }
 
     }
     /******************************************************************************/
@@ -1142,7 +1346,7 @@ class QueryBuilder{
      * @param array $SIS_Post Arreglo de datos de entrada (generalmente $_POST).
      * @param string $SIS_Where Campos que identifican el registro actual (para exclusión en UPDATE).
      * @param mixed $DBConn Instancia de conexión a la base de datos.
-     * @return bool|array Retorna true si los datos son únicos, o un arreglo con mensajes de error.
+     * @return array Retorna true si los datos son únicos, o un arreglo con mensajes de error.
      */
     private function validateUnique(string $SIS_Data, string $SIS_Table, array $SIS_Post, string $SIS_Where, $DBConn): bool|array{
 
@@ -1150,7 +1354,7 @@ class QueryBuilder{
         // Preparación de variables iniciales
         $arrData   = $this->CommonData->parseDataCommas($SIS_Data); // Campos a validar (separados por comas)
         $subWhere  = ''; // Cláusula WHERE base (usada para exclusión en actualizaciones)
-        $errors    = [];
+        $errors    = '';
 
         /******************************************/
         /**
@@ -1230,6 +1434,7 @@ class QueryBuilder{
              * Si se construyó una consulta válida, se cuenta cuántos registros coinciden.
              */
             if($DataInternal != ''){
+                // Se genera la query
                 $query = [
                     'data'  => $DataInternal,
                     'table' => $SIS_Table,
@@ -1240,14 +1445,19 @@ class QueryBuilder{
                 $ndata = $this->queryNRows($query, $DBConn);
 
                 // Si el conteo es mayor a 0, existe una colisión de datos
-                if($ndata > 0) {
-                    $errors[] = ["message" => "Los datos que intenta ingresar ya existen en el Sistema"];
+                if ($ndata['status'] && $ndata['data'] > 0){
+                    $errors .= 'Los datos que intenta ingresar ya existen en el Sistema';
                 }
+
             }
         }
 
         // Retorna true si es único, o el arreglo de errores si hubo duplicados
-        return (empty($errors)) ? true : $errors;
+        if(empty($errors)){
+            return ['status' => true];
+        }else{
+            return ['status' => false, 'error' => $errors];
+        }
     }
     /******************************************************************************/
     /**
@@ -1260,25 +1470,24 @@ class QueryBuilder{
      *
      * @param string $Data Cadena de texto cruda (proveniente de $_POST, $_GET, etc.).
      * @return string Cadena procesada y escapada lista para SQL.
+     *
+	 * @example
+	 * ```php
+	 * $input  = " O'Connor ";
+     * $limpio = $this->clearData($input);
+     * // Resultado: "O\'Connor" (Listo para: INSERT INTO tabla VALUES ('O\'Connor'))
+	 * ```
+	 *
      */
     private function clearData(string $Data): string{
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * $input = " O'Connor ";
-        * $limpio = $this->clearData($input);
-        * // Resultado: "O\'Connor" (Listo para: INSERT INTO tabla VALUES ('O\'Connor'))
-        *
-        *===================================================================================================================
-        */
 
-        // 1. Elimina espacios en blanco accidentales al inicio y al final de la cadena
+        // Elimina espacios en blanco accidentales al inicio y al final de la cadena
         $Data = trim($Data);
 
-        // 2. Elimina barras invertidas (\) para evitar el doble escapado si magic_quotes estuviera activo
+        // Elimina barras invertidas (\) para evitar el doble escapado si magic_quotes estuviera activo
         $Data = stripslashes($Data);
 
-        // 3. Escapa caracteres que podrían romper la consulta SQL (comillas simples, dobles, barras y NUL)
+        // Escapa caracteres que podrían romper la consulta SQL (comillas simples, dobles, barras y NUL)
         // Agrega una barra invertida antes de estos caracteres para que el motor SQL los trate como texto
         $Data = addslashes($Data);
 
@@ -1293,21 +1502,20 @@ class QueryBuilder{
      *
      * @param array $query Arreglo con las partes de la consulta (data, table, join, where, group, having, order, limit).
      * @return string Sentencia SQL concatenada y lista para ser ejecutada o procesada.
+     *
+	 * @example
+	 * ```php
+	 * $query = [
+     *  'data'  => '*',
+     *  'table' => 'usuarios',
+     *  'where' => 'id = 1'
+     * ];
+     * $sql = $this->createQuery($query);
+     * // Resultado: "SELECT * FROM `usuarios` WHERE id = 1"
+	 * ```
+	 *
      */
     private function createQuery(array $query): string{
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * $query = [
-        * 'data'  => '*',
-        *   'table' => 'usuarios',
-        *   'where' => 'id = 1'
-        * ];
-        * $sql = $this->createQuery($query);
-        * // Resultado: "SELECT * FROM `usuarios` WHERE id = 1"
-        *
-        *===================================================================================================================
-        */
 
         /*************** Construcción Base ***************/
         // Define las columnas a seleccionar
@@ -1349,29 +1557,40 @@ class QueryBuilder{
      *
      * @param string $sql La sentencia SQL que originó el error.
      * @param Exception|PDOException $exception El objeto de excepción capturado.
-     * @return string Mensaje de error genérico para mostrar en la interfaz.
+     * @return array Mensajes de error genérico y real para mostrar en la interfaz.
+     *
+	 * @example
+	 * ```php
+	 * try {
+     *  // ... código ...
+     * } catch (Exception $e) {
+     *  return $this->logError($sql, $e);
+     * }
+	 * ```
+	 *
      */
-    private function logError($sql, $exception) {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * try {
-        * // ... código ...
-        * } catch (Exception $e) {
-        * return $this->logError($sql, $e);
-        * }
-        *
-        *===================================================================================================================
-        */
+    private function logError($sql, $exception, $filepath = null) {
+
+        /*************** Generacion Error ***************/
+        // Se obtiene el error
+        $error = $filepath!=''
+                ? 'QueryBuilder Error: '.$filepath
+                : 'QueryBuilder Error: [' . $exception->getMessage() . '] SQL: ' . $sql;
 
         /*************** Registro Interno ***************/
         // Escribe en el archivo de registro de errores del servidor (ej. error_log de Apache/Nginx)
         // Incluye el mensaje técnico detallado y la query exacta para diagnóstico del desarrollador.
-        error_log('QueryBuilder Error: [' . $exception->getMessage() . '] SQL: ' . $sql);
+        error_log($error);
 
         /*************** Respuesta Segura ***************/
-        // Retorna una cadena simple que no da pistas sobre nombres de tablas, columnas o credenciales.
-        return 'Query Error: Se produjo un error al procesar la solicitud.';
+        // Retorna un array con dos datos:
+        // - Cadena simple que no da pistas sobre nombres de tablas, columnas o credenciales.
+        // - Cadena simple con el error Real.
+        return [
+            'error'          => 'Query Error: Se produjo un error al procesar la solicitud.',
+            'internal_error' => $error,
+        ];
+
     }
     /******************************************************************************/
     /**
@@ -1450,20 +1669,19 @@ class QueryBuilder{
      *
      * @param array $query Configuración que contiene la clave 'encode' (campos a cifrar) y 'Post' (datos).
      * @return array Retorna el arreglo de datos del Post con los campos seleccionados ya cifrados.
+     *
+	 * @example
+	 * ```php
+	 * $query = [
+     * 'encode' => 'password,pin_seguridad',
+     *   'Post'   => ['usuario' => 'admin', 'password' => '123456']
+     * ];
+     * $datosCifrados = $this->encodeFormData($query);
+     * // Resultado: ['usuario' => 'admin', 'password' => 'T3xToCifrad0...']
+	 * ```
+	 *
      */
     private function encodeFormData($query) {
-        /*
-        *=================================================    Modo de uso  =================================================
-        *
-        * $query = [
-        * 'encode' => 'password,pin_seguridad',
-        *   'Post'   => ['usuario' => 'admin', 'password' => '123456']
-        * ];
-        * $datosCifrados = $this->encodeFormData($query);
-        * // Resultado: ['usuario' => 'admin', 'password' => 'T3xToCifrad0...']
-        *
-        *===================================================================================================================
-        */
 
         /*************** Validación de Requerimientos ***************/
         // Si no se definieron campos para codificar, retorna el Post original de inmediato

@@ -253,13 +253,13 @@ class installer extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response){
                 // Devuelvo $Response con código 200 (OK)
                 Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response);
             }
         }else {
             // Request Method no esperado
@@ -310,13 +310,13 @@ class installer extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response){
                 // Devuelvo $Response con código 200 (OK)
                 Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response);
             }
         }else {
             // Request Method no esperado
@@ -365,7 +365,7 @@ class installer extends ControllerBase {
 
                 /******************************/
                 //Si se ejecuta correctamente
-                if ($CreateDB===true) {
+                if ($CreateDB['status']) {
 
                     /***************   Se ejecuta un archivo SQL para llenar de datos la BD recien creada   ***************/
                     //Se generan los datos
@@ -389,7 +389,7 @@ class installer extends ControllerBase {
                     //Ejecuto la query
                     $ExecuteFileSQL = $this->Base_executeFile($xParams);
                     //Si se ejecuta correctamente
-                    if ($ExecuteFileSQL===true) {
+                    if ($ExecuteFileSQL['status']) {
 
                         //Obtener la ruta del directorio
                         $rootPath   = __DIR__;
@@ -448,22 +448,22 @@ class installer extends ControllerBase {
                             $Response = $isWritableDirectory['message'];
                         }
                     } else {
-                        $Response = $ExecuteFileSQL;
+                        $Response = $ExecuteFileSQL['error'];
                     }
                 } else {
-                    $Response = $CreateDB;
+                    $Response = $CreateDB['error'];
                 }
             }
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response){
                 // Devuelvo $Response con código 200 (OK)
                 Response::success($Response);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response);
             }
         }else {
             // Request Method no esperado

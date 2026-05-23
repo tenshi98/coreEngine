@@ -147,7 +147,7 @@ class kanbanTareasInstaller extends ControllerBase {
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
-                $arrRutas = $this->listRouteModule($IntCounter, $permisosID);
+                $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
                 //Verifico si existe
                 if($arrRutas){
@@ -209,8 +209,8 @@ class kanbanTareasInstaller extends ControllerBase {
         /*******************************************************/
         /*        SE ELIMINAN PERMISOS DE LOS USUARIOS         */
         /*******************************************************/
-        $subQuery = !empty($arrPermisos)
-                    ? ',' . implode(',', array_column($arrPermisos, 'idPermisos'))
+        $subQuery = $arrPermisos['status']
+                    ? ',' . implode(',', array_column($arrPermisos['data'], 'idPermisos'))
                     : '';
 
         /************************************************/
@@ -284,7 +284,7 @@ class kanbanTareasInstaller extends ControllerBase {
 
         /******************************************/
         //devuelvo
-        return $nData;
+        return $nData['data'];
 
     }
     /******************************************************************************/
@@ -393,37 +393,37 @@ class kanbanTareasInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'kanban_estados',
-            'data'       => '`idKanbanEstado` int UNSIGNED NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idColor` int UNSIGNED NOT NULL,`idPrioridad` int UNSIGNED NOT NULL,`idCierre` int UNSIGNED NOT NULL',
+            'data'       => '`idKanbanEstado` int(10) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idColor` int(10) unsigned NOT NULL,`idPrioridad` int(10) unsigned NOT NULL,`idCierre` int(10) unsigned NOT NULL',
             'primaryKey' => 'idKanbanEstado',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'kanban_tareas',
-            'data'       => '`idKanban` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idKanbanEstado` int UNSIGNED NOT NULL,`idEstadoCierre` int UNSIGNED NOT NULL,`idPrioridad` int UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`Fecha` date NOT NULL,`Titulo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idKanban` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idKanbanEstado` int(10) unsigned NOT NULL,`idEstadoCierre` int(10) unsigned NOT NULL,`idPrioridad` int(10) unsigned NOT NULL,`idUsuario` int(10) unsigned NOT NULL,`Fecha` date NOT NULL,`Titulo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
             'primaryKey' => 'idKanban',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'kanban_tareas_historial',
-            'data'       => '`idHistorial` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idKanban` bigint UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Fecha` date NOT NULL,`Hora` time NOT NULL',
+            'data'       => '`idHistorial` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idKanban` bigint(20) unsigned NOT NULL,`idUsuario` int(10) unsigned NOT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Fecha` date NOT NULL,`Hora` time NOT NULL',
             'primaryKey' => 'idHistorial',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'kanban_tareas_participantes',
-            'data'       => '`idParticipantes` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idKanban` bigint UNSIGNED NOT NULL,`idUsuario` int UNSIGNED NOT NULL',
+            'data'       => '`idParticipantes` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idKanban` bigint(20) unsigned NOT NULL,`idUsuario` int(10) unsigned NOT NULL',
             'primaryKey' => 'idParticipantes',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'kanban_tareas_tareas',
-            'data'       => '`idTareas` bigint UNSIGNED NOT NULL AUTO_INCREMENT,`idKanban` bigint UNSIGNED NOT NULL,`Tarea` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idEstadoTrabajo` int UNSIGNED NOT NULL,`idTrabajo` int UNSIGNED NULL DEFAULT NULL',
+            'data'       => '`idTareas` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idKanban` bigint(20) unsigned NOT NULL,`Tarea` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idEstadoTrabajo` int(10) unsigned NOT NULL,`idTrabajo` int(10) unsigned NULL DEFAULT NULL',
             'primaryKey' => 'idTareas',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'kanban_trabajos',
-            'data'       => '`idTrabajo` int UNSIGNED NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idEstado` int UNSIGNED NOT NULL',
+            'data'       => '`idTrabajo` int(10) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idEstado` int(10) unsigned NOT NULL',
             'primaryKey' => 'idTrabajo',
             'comentario' => 'Creado desde el Instalador',
         ];

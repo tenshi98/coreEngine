@@ -97,15 +97,26 @@ class bodegasMovimiento extends ControllerBase {
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+            $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $X_join  = '';
+            $X_where = 'bodegas_listado.idEstado=1';
+        }
         //Se genera la query
         $query = [
-            'data'    => 'idBodegas AS ID,Nombre',
+            'data'    => 'bodegas_listado.idBodegas AS ID, bodegas_listado.Nombre',
             'table'   => 'bodegas_listado',
-            'join'    => '',
-            'where'   => 'idEstado=1',
+            'join'    => $X_join,
+            'where'   => $X_where,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Nombre ASC',
+            'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -148,7 +159,7 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrDocumentos['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -169,11 +180,11 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_ServerServer'    => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
-                'arrBodegas'      => $arrBodegas,
-                'arrProductos'    => $arrProductos,
+                'arrList'         => $arrList['data'],
+                'arrBodegas'      => $arrBodegas['data'],
+                'arrProductos'    => $arrProductos['data'],
+                'arrDocumentos'   => $arrDocumentos['data'],
                 'idTipoIngreso'   => $idTipoIngreso,
-                'arrDocumentos'   => $arrDocumentos,
 
             ];
 
@@ -183,8 +194,10 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList,$arrBodegas,$arrProductos,$arrDocumentos]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -248,7 +261,7 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -262,7 +275,7 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList,
+                'arrList'         => $arrList['data'],
                 'idTipoIngreso'   => $idTipoIngreso,
             ];
 
@@ -272,8 +285,10 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -366,7 +381,7 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrProductos['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -379,8 +394,8 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrProductos'     => $arrProductos,
+                'rowData'          => $rowData['data'],
+                'arrProductos'     => $arrProductos['data'],
             ];
 
             /******************************************/
@@ -389,8 +404,10 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrProductos]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -461,7 +478,7 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -480,7 +497,7 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
+                'rowData'         => $rowData['data'],
             ];
 
             /******************************************/
@@ -489,8 +506,10 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
     }
 
@@ -538,6 +557,7 @@ class bodegasMovimiento extends ControllerBase {
             LEFT JOIN facturacion_listado           ON facturacion_listado.idFacturacion          = bodegas_movimientos.idFacturacion
             LEFT JOIN core_documentos_mercantiles   ON core_documentos_mercantiles.idDocumentos   = facturacion_listado.idDocumentos';
         }
+
         /******************************************/
         //Se genera la query
         $query = [
@@ -557,7 +577,7 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -568,7 +588,7 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
+                'rowData'          => $rowData['data'],
             ];
 
             /******************************************/
@@ -577,8 +597,10 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -605,14 +627,14 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if (is_numeric($Response)) {
+            if ($Response['status']){
                 // Si es un ID numérico, encripta y envía con código 200 (OK)
-                $Data = $this->Codification->encryptDecrypt('encrypt', $Response);
+                $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
                 Response::success($Data);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
 
         }
@@ -645,13 +667,13 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -681,7 +703,7 @@ class bodegasMovimiento extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /************************************************/
                 //Listado de las tablas a eliminar los datos relacionados
                 $arrTableDel  = array();
@@ -702,11 +724,11 @@ class bodegasMovimiento extends ControllerBase {
 
                 /******************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -743,7 +765,7 @@ class bodegasMovimiento extends ControllerBase {
 
         /******************************/
         //si es la respuesta esperada
-        if (is_numeric($Response)) {
+        if ($Response['status']){
 
             /*******************************************************/
             //Variable
@@ -793,12 +815,14 @@ class bodegasMovimiento extends ControllerBase {
             $arrStocks = $this->Base_GetList($xParams);
 
             /******************************/
-            //Recorro
-            foreach($arrStocks as $crud){
-                $arrProdStock[$crud['idProducto']]['idStocks']   = $crud['idStocks'];
-                $arrProdStock[$crud['idProducto']]['Cantidad_1'] = $crud['Cantidad_1'];
-                if(isset($crud['Cantidad_2'])&&$crud['Cantidad_2']!=''){
-                    $arrProdStock[$crud['idProducto']]['Cantidad_2'] = $crud['Cantidad_2'];
+            //Recorro solo si hay datos
+            if ($arrStocks['status']){
+                foreach ($arrStocks['data'] as $crud){
+                    $arrProdStock[$crud['idProducto']]['idStocks']   = $crud['idStocks'];
+                    $arrProdStock[$crud['idProducto']]['Cantidad_1'] = $crud['Cantidad_1'];
+                    if(isset($crud['Cantidad_2'])&&$crud['Cantidad_2']!=''){
+                        $arrProdStock[$crud['idProducto']]['Cantidad_2'] = $crud['Cantidad_2'];
+                    }
                 }
             }
 
@@ -815,7 +839,7 @@ class bodegasMovimiento extends ControllerBase {
                             /******************************/
                             //Se agrega respuesta
                             $arrTareas = [
-                                'idMovimiento'    => $Response,
+                                'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => $PostData['idEstadoIngreso'],
                                 'idBodegas'       => $PostData['idBodegasIngreso'],
                                 'idProducto'      => $PostData['idProducto'][$j1],
@@ -894,7 +918,7 @@ class bodegasMovimiento extends ControllerBase {
                             /******************************/
                             //Se agrega respuesta
                             $arrTareas = [
-                                'idMovimiento'    => $Response,
+                                'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => $PostData['idEstadoIngreso'],
                                 'idBodegas'       => $PostData['idBodegasEgreso'],
                                 'idProducto'      => $PostData['idProducto'][$j1],
@@ -972,7 +996,7 @@ class bodegasMovimiento extends ControllerBase {
                             /******************************/
                             //Se agrega respuesta
                             $arrTareas = [
-                                'idMovimiento'    => $Response,
+                                'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => 2,
                                 'idBodegas'       => $PostData['idBodegasEgreso'],
                                 'idProducto'      => $PostData['idProducto'][$j1],
@@ -997,7 +1021,7 @@ class bodegasMovimiento extends ControllerBase {
                             /************************************************************/
                             //Se agrega respuesta
                             $arrTareas = [
-                                'idMovimiento'    => $Response,
+                                'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => 1,
                                 'idBodegas'       => $PostData['idBodegasIngreso'],
                                 'idProducto'      => $PostData['idProducto'][$j1],

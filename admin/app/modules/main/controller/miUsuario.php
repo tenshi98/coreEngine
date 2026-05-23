@@ -201,7 +201,7 @@ class miUsuario extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrPosicion['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -220,10 +220,10 @@ class miUsuario extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrCiudad'       => $arrCiudad,
-                'arrComuna'       => $arrComuna,
-                'arrPosicion'     => $arrPosicion,
+                'rowData'         => $rowData['data'],
+                'arrCiudad'       => $arrCiudad['data'],
+                'arrComuna'       => $arrComuna['data'],
+                'arrPosicion'     => $arrPosicion['data'],
             ];
 
             /******************************************/
@@ -233,8 +233,10 @@ class miUsuario extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrPosicion]);
             //Muestra los errores
-            $this->showError(1, $f3);
+            $this->showError(1, $f3, $result);
         }
 
     }
@@ -283,7 +285,7 @@ class miUsuario extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -296,7 +298,7 @@ class miUsuario extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
+                'rowData'         => $rowData['data'],
             ];
 
             /******************************************/
@@ -305,8 +307,10 @@ class miUsuario extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -339,7 +343,7 @@ class miUsuario extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -347,7 +351,7 @@ class miUsuario extends ControllerBase {
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*=========== Datos Consultados ===========*/
-                'rowData' => $rowData,
+                'rowData' => $rowData['data'],
             ];
 
             /******************************************/
@@ -356,8 +360,10 @@ class miUsuario extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -401,15 +407,15 @@ class miUsuario extends ControllerBase {
             $Response = $this->Base_update($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 //Se actualiza la sesion del usuario
                 $this->userSession->updateSession($_POST['idUsuario'], $f3, 1);
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -438,15 +444,15 @@ class miUsuario extends ControllerBase {
             $Response = $this->Base_delFiles($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 //Se actualiza la sesion del usuario
                 $this->userSession->updateSession($dataPut['idUsuario'], $f3, 1);
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

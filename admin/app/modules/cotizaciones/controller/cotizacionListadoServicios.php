@@ -68,7 +68,7 @@ class cotizacionListadoServicios extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -79,8 +79,8 @@ class cotizacionListadoServicios extends ControllerBase {
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrServicios'    => $arrServicios,
+                'rowData'         => $rowData['data'],
+                'arrServicios'    => $arrServicios['data'],
             ];
 
             /******************************************/
@@ -89,8 +89,10 @@ class cotizacionListadoServicios extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrServicios]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
     /******************************************************************************/
@@ -135,7 +137,7 @@ class cotizacionListadoServicios extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrServicios)){
+        if($rowData['status'] && $arrServicios['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -147,8 +149,8 @@ class cotizacionListadoServicios extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData,
-                'arrServicios'    => $arrServicios,
+                'rowData'         => $rowData['data'],
+                'arrServicios'    => $arrServicios['data'],
             ];
 
             /******************************************/
@@ -157,8 +159,10 @@ class cotizacionListadoServicios extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrServicios]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -200,7 +204,7 @@ class cotizacionListadoServicios extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
             $f3->data = [
@@ -212,8 +216,8 @@ class cotizacionListadoServicios extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'       => $rowData,
-                'arrServicios'  => $arrServicios,
+                'rowData'       => $rowData['data'],
+                'arrServicios'  => $arrServicios['data'],
             ];
 
             /******************************************/
@@ -222,8 +226,10 @@ class cotizacionListadoServicios extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrServicios]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -254,18 +260,18 @@ class cotizacionListadoServicios extends ControllerBase {
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if (is_numeric($Response)) {
+        if ($Response['status']){
             /******************************************/
             //Se actualizan los datos de la factura
             $cotizacionListado = new cotizacionListado();
             $cotizacionListado->updateFact(3, $_POST['idCotizacion']);
             /******************************************/
             // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response);
+            Response::success($Response['data']);
         } else {
             // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
             // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la BBDD', 500, $Response);
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
         }
 
     }
@@ -297,18 +303,18 @@ class cotizacionListadoServicios extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($Response['status']){
                 /******************************************/
                 //Se actualizan los datos de la factura
                 $cotizacionListado = new cotizacionListado();
                 $cotizacionListado->updateFact(3, $_POST['idCotizacion']);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado
@@ -356,18 +362,18 @@ class cotizacionListadoServicios extends ControllerBase {
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response===true) {
+            if ($rowFacturacion['status'] && $Response['status']){
                 /******************************************/
                 //Se actualizan los datos de la factura
                 $cotizacionListado = new cotizacionListado();
-                $cotizacionListado->updateFact(3, $rowFacturacion['idCotizacion']);
+                $cotizacionListado->updateFact(3, $rowFacturacion['data']['idCotizacion']);
                 /******************************************/
                 // Devuelvo $Response con código 200 (OK)
-                Response::success($Response);
+                Response::success($Response['data']);
             } else {
                 // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
                 // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la BBDD', 500, $Response);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
         }else {
             // Request Method no esperado

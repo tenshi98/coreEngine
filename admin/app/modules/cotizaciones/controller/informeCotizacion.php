@@ -67,7 +67,7 @@ class informeCotizacion extends ControllerBase {
             'Fnc_FormInputs'   => $this->FormInputs,
             'Fnc_Codification' => $this->Codification,
             /*=========== Datos Consultados ===========*/
-            'arrEntidades'    => $arrEntidades,
+            'arrEntidades'    => $arrEntidades['data'],
         ];
 
         /******************************************/
@@ -117,7 +117,7 @@ class informeCotizacion extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrList)){
+        if($arrList['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -132,7 +132,7 @@ class informeCotizacion extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrList'       => $arrList,
+                'arrList'       => $arrList['data'],
             ];
 
             /******************************************/
@@ -141,8 +141,10 @@ class informeCotizacion extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrList]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 

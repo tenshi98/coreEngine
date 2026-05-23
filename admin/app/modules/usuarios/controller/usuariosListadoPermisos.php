@@ -7,6 +7,7 @@ class usuariosListadoPermisos extends ControllerBase {
     /******************************************************************************/
     //Variables
     private $Codification;
+    private $ServerServer;
 
     /******************************************************************************/
     //Constructor
@@ -16,7 +17,8 @@ class usuariosListadoPermisos extends ControllerBase {
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
-		$this->Codification = new FunctionsSecurityCodification();
+		$this->Codification   = new FunctionsSecurityCodification();
+		$this->ServerServer   = new FunctionsServerServer();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -51,101 +53,105 @@ class usuariosListadoPermisos extends ControllerBase {
             $arrPermisos = $this->Base_GetList($xParams);
 
             /*******************************************************************/
-            //Recorro los permisos
-            foreach ($arrPermisos as $permisos){
-                //Se verifica si esta marcado
-                switch ($_POST['switch_'.$permisos['idPermisos']]) {
-                    /*******************************************************************/
-                    //Inactivo
-                    case 1:
-                        //Se verifica si permiso existe
-                        switch ($permisos['level']) {
-                            /*******************************************************************/
-                            //No existe permiso previo
-                            case 0:
-                                //nada
-                                break;
-                            /*******************************************************************/
-                            //Si hay al menos un permiso
-                            default:
-                                /******************************/
-                                //Se borran los datos
-                                $Post = [
-                                    'idUsuario'  => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
-                                    'idPermisos' => $this->Codification->encryptDecrypt('encrypt',$permisos['idPermisos']),
-                                ];
+            // Si hay datos
+            if ($arrPermisos['status']){
+                //Recorro los permisos
+                foreach ($arrPermisos['data'] as $permisos){
+                    //Se verifica si esta marcado
+                    switch ($_POST['switch_'.$permisos['idPermisos']]) {
+                        /*******************************************************************/
+                        //Inactivo
+                        case 1:
+                            //Se verifica si permiso existe
+                            switch ($permisos['level']) {
+                                /*******************************************************************/
+                                //No existe permiso previo
+                                case 0:
+                                    //nada
+                                    break;
+                                /*******************************************************************/
+                                //Si hay al menos un permiso
+                                default:
+                                    /******************************/
+                                    //Se borran los datos
+                                    $Post = [
+                                        'idUsuario'  => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
+                                        'idPermisos' => $this->Codification->encryptDecrypt('encrypt',$permisos['idPermisos']),
+                                    ];
 
-                                /******************************/
-                                //Se genera la query
-                                $query = [
-                                    'files'       => '',
-                                    'table'       => 'usuarios_listado_permisos',
-                                    'where'       => 'idUsuario,idPermisos',
-                                    'SubCarpeta'  => '',
-                                    'Post'        => $Post
-                                ];
-                                //Ejecuto la query
-                                $xParams = ['query' => $query];
-                                $this->Base_delete($xParams);
+                                    /******************************/
+                                    //Se genera la query
+                                    $query = [
+                                        'files'       => '',
+                                        'table'       => 'usuarios_listado_permisos',
+                                        'where'       => 'idUsuario,idPermisos',
+                                        'SubCarpeta'  => '',
+                                        'Post'        => $Post
+                                    ];
+                                    //Ejecuto la query
+                                    $xParams = ['query' => $query];
+                                    $this->Base_delete($xParams);
 
-                                break;
-                        }
-                        break;
-                    /*******************************************************************/
-                    //Activo
-                    case 2:
-                        /******************************/
-                        //Se borran los datos
-                        $Post = [
-                            'idUsuario'    => $_POST['idUsuario'],
-                            'idPermisos'   => $permisos['idPermisos'],
-                            'idLevelLimit' => $_POST['level_'.$permisos['idPermisos']],
-                        ];
+                                    break;
+                            }
+                            break;
+                        /*******************************************************************/
+                        //Activo
+                        case 2:
+                            /******************************/
+                            //Se borran los datos
+                            $Post = [
+                                'idUsuario'     => $_POST['idUsuario'],
+                                'idPermisos'    => $permisos['idPermisos'],
+                                'idLevelLimit'  => $_POST['level_'.$permisos['idPermisos']],
+                                'fechaCreacion' => $this->ServerServer->fechaActual(),
+                            ];
 
-                        //Verifico si existe
-                        switch ($permisos['level']) {
-                            /*******************************************************************/
-                            //Si no hay permisos se crea
-                            case 0:
-                                /******************************/
-                                //Se genera la query
-                                $query = [
-                                    'data'      => 'idUsuario,idPermisos,idLevelLimit',
-                                    'required'  => 'idUsuario,idPermisos,idLevelLimit',
-                                    'unique'    => '',
-                                    'encode'    => '',
-                                    'table'     => 'usuarios_listado_permisos',
-                                    'Post'      => $Post
-                                ];
-                                //Se genera el chequeo
-                                $dataCheck = $this->dataCheck($Post);
-                                //Ejecuto la query
-                                $xParams = ['DataCheck' => $dataCheck, 'query' => $query];
-                                $this->Base_insert($xParams);
-                                break;
+                            //Verifico si existe
+                            switch ($permisos['level']) {
+                                /*******************************************************************/
+                                //Si no hay permisos se crea
+                                case 0:
+                                    /******************************/
+                                    //Se genera la query
+                                    $query = [
+                                        'data'      => 'idUsuario,idPermisos,idLevelLimit,fechaCreacion',
+                                        'required'  => 'idUsuario,idPermisos,idLevelLimit',
+                                        'unique'    => '',
+                                        'encode'    => '',
+                                        'table'     => 'usuarios_listado_permisos',
+                                        'Post'      => $Post
+                                    ];
+                                    //Se genera el chequeo
+                                    $dataCheck = $this->dataCheck($Post);
+                                    //Ejecuto la query
+                                    $xParams = ['DataCheck' => $dataCheck, 'query' => $query];
+                                    $this->Base_insert($xParams);
+                                    break;
 
-                            /*******************************************************************/
-                            //Si existe se actualiza
-                            default:
-                                /******************************/
-                                //Se genera la query
-                                $query = [
-                                    'data'      => 'idLevelLimit',
-                                    'required'  => 'idLevelLimit',
-                                    'unique'    => '',
-                                    'encode'    => '',
-                                    'table'     => 'usuarios_listado_permisos',
-                                    'where'     => 'idUsuario,idPermisos',
-                                    'Post'      => $Post,
-                                ];
-                                //Se genera el chequeo
-                                $dataCheck = $this->dataCheck($Post);
-                                //Ejecuto la query
-                                $xParams = ['DataCheck' => $dataCheck, 'query' => $query];
-                                $this->Base_update($xParams);
-                                break;
-                        }
-                        break;
+                                /*******************************************************************/
+                                //Si existe se actualiza
+                                default:
+                                    /******************************/
+                                    //Se genera la query
+                                    $query = [
+                                        'data'      => 'idLevelLimit,fechaCreacion',
+                                        'required'  => 'idLevelLimit',
+                                        'unique'    => '',
+                                        'encode'    => '',
+                                        'table'     => 'usuarios_listado_permisos',
+                                        'where'     => 'idUsuario,idPermisos',
+                                        'Post'      => $Post,
+                                    ];
+                                    //Se genera el chequeo
+                                    $dataCheck = $this->dataCheck($Post);
+                                    //Ejecuto la query
+                                    $xParams = ['DataCheck' => $dataCheck, 'query' => $query];
+                                    $this->Base_update($xParams);
+                                    break;
+                            }
+                            break;
+                    }
                 }
             }
 

@@ -52,6 +52,8 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     $f3->route('GET /Core/Graficos/chartjs',     'coreGraficos->chartjs');       //Chartjs
     $f3->route('GET /Core/Graficos/echarts',     'coreGraficos->echarts');       //Echarts
     //Páginas
+    $f3->route('GET /Core/Paginas/error404',     'corePaginas->error404');       //Error 404
+    $f3->route('GET /Core/Paginas/error5xx',     'corePaginas->error5xx');       //Error 5xx
 
 
     /*******************************/

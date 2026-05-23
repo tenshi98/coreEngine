@@ -38,15 +38,26 @@ class informeProductos extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+            $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $X_join  = '';
+            $X_where = 'bodegas_listado.idEstado=1';
+        }
         //Se genera la query
         $query = [
-            'data'    => 'idBodegas AS ID,Nombre',
+            'data'    => 'bodegas_listado.idBodegas AS ID, bodegas_listado.Nombre',
             'table'   => 'bodegas_listado',
-            'join'    => '',
-            'where'   => 'idEstado=1',
+            'join'    => $X_join,
+            'where'   => $X_where,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Nombre ASC',
+            'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -85,8 +96,8 @@ class informeProductos extends ControllerBase {
             'Fnc_FormInputs'   => $this->FormInputs,
             'Fnc_Codification' => $this->Codification,
             /*=========== Datos Consultados ===========*/
-            'arrBodegas'     => $arrBodegas,
-            'arrProductos'   => $arrProductos,
+            'arrBodegas'     => $arrBodegas['data'],
+            'arrProductos'   => $arrProductos['data'],
         ];
 
         /******************************************/
@@ -124,15 +135,25 @@ class informeProductos extends ControllerBase {
         $whereInt_2 = $this->searchWhere($whereInt_2, $WhereData_between_2, 'bodegas_productos_stocks', 3);
 
         /*******************************************************************/
+        //Se instancia
+        $arrUserData = $this->getUserData($f3);
+        // Se verifica si se tiene el permiso para visualizar el dato
+        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+            $X_join     = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            $whereInt1 .= ' AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+        //Si se permite junto con la creacion de tareas
+        }else{
+            $X_join = '';
+        }
         //Se genera la query
         $query = [
-            'data'    => 'idBodegas,Nombre',
+            'data'    => 'bodegas_listado.idBodegas, bodegas_listado.Nombre',
             'table'   => 'bodegas_listado',
-            'join'    => '',
+            'join'    => $X_join,
             'where'   => $whereInt1,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Nombre ASC',
+            'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -141,8 +162,10 @@ class informeProductos extends ControllerBase {
 
         //Se genera la consulta
         $ActionSQL = '';
-        foreach ($arrBodegas as $bod) {
-            $ActionSQL .= ',Cantidad_idBodegas_'.$bod['idBodegas'];
+        if($arrBodegas['status']){
+            foreach ($arrBodegas['data'] as $bod) {
+                $ActionSQL .= ',Cantidad_idBodegas_'.$bod['idBodegas'];
+            }
         }
 
         /*******************************************************************/
@@ -171,7 +194,7 @@ class informeProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrStocks)){
+        if($arrBodegas['status'] && $arrStocks['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -185,8 +208,8 @@ class informeProductos extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrStocks'       => $arrStocks,
-                'arrBodegas'      => $arrBodegas,
+                'arrStocks'       => $arrStocks['data'],
+                'arrBodegas'      => $arrBodegas['data'],
             ];
 
             /******************************************/
@@ -195,8 +218,10 @@ class informeProductos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$arrStocks,$arrBodegas]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -266,6 +291,7 @@ class informeProductos extends ControllerBase {
             LEFT JOIN facturacion_listado           ON facturacion_listado.idFacturacion          = bodegas_movimientos.idFacturacion
             LEFT JOIN core_documentos_mercantiles   ON core_documentos_mercantiles.idDocumentos   = facturacion_listado.idDocumentos';
         }
+
         //Se genera la query
         $query = [
             'data'    => $DataQuery,
@@ -285,7 +311,7 @@ class informeProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if(is_array($arrStocks)){
+        if($rowProducto['status'] && $rowBodega['status'] && $arrStocks['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -298,9 +324,9 @@ class informeProductos extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowProducto' => $rowProducto,
-                'rowBodega'   => $rowBodega,
-                'arrStocks'   => $arrStocks,
+                'rowProducto' => $rowProducto['data'],
+                'rowBodega'   => $rowBodega['data'],
+                'arrStocks'   => $arrStocks['data'],
             ];
 
             /******************************************/
@@ -309,8 +335,10 @@ class informeProductos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowProducto,$rowBodega,$arrStocks]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
@@ -394,7 +422,7 @@ class informeProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         //Si hay resultados
-        if ($rowData!==false) {
+        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
 
             /******************************************/
             //Datos enviados a la pagina
@@ -407,9 +435,9 @@ class informeProductos extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData,
-                'arrTareas'        => $arrTareas,
-                'arrParticipantes' => $arrParticipantes,
+                'rowData'          => $rowData['data'],
+                'arrTareas'        => $arrTareas['data'],
+                'arrParticipantes' => $arrParticipantes['data'],
             ];
 
             /******************************************/
@@ -418,8 +446,10 @@ class informeProductos extends ControllerBase {
         /*******************************************************************/
         //si no hay resultados
         } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes]);
             //Muestra los errores
-            $this->showError(2, $f3);
+            $this->showError(2, $f3, $result);
         }
     }
 
