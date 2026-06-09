@@ -630,7 +630,7 @@ class FunctionsDataText {
 			'pelatigres', 'pelazarzas', 'pelele', 'pelma', 'percebe', 'perrocostra',
 			'perroflauta', 'peterete', 'petimetre', 'picapleitos', 'pichabrava',
 			'pillavispas', 'piltrafa', 'pinchauvas', 'pintamonas', 'piojoso', 'pitañoso',
-			'pitofloro', 'plomo', 'pocasluces', 'pollopera', 'quitahipos', 'rastrapajo',
+			'pitofloro', 'pocasluces', 'pollopera', 'quitahipos', 'rastrapajo',
 			'rebañasandias', 'revientabaules', 'rieleches', 'robaperas', 'sabandija',
 			'sacamuelas', 'sanguijuela', 'sinentraero', 'sinsustancia', 'sonajas',
 			'sonso', 'soplagaitas', 'soplaguindas', 'sosco', 'tagarote', 'tarado',
