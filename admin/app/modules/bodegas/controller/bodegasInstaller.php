@@ -439,7 +439,7 @@ class bodegasInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'bodegas_listado',
-            'data'       => '`idBodegas` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idBodegas` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`DistribucionFisica` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`DistribucionVisual` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idBodegas',
             'comentario' => 'Creado desde el Instalador',
         ];
