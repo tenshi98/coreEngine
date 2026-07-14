@@ -57,6 +57,7 @@ class gestionDocumentos extends ControllerBase {
     public function noPrint_0($f3, $params){$this->Print($f3, $params, 0, 0);}
     public function noPrint_1($f3, $params){$this->Print($f3, $params, 1, 0);}
     public function noPrint_2($f3, $params){$this->Print($f3, $params, 2, 0);}
+    public function noPrintDoc($f3, $params){$this->Print($f3, $params, 2, 2);}
     //Resumen
     public function Resumen_1($f3, $params){$this->Resumen($f3, $params, 1);}
     public function Resumen_2($f3, $params){$this->Resumen($f3, $params, 2);}
