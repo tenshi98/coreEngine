@@ -35,7 +35,7 @@ switch ($data['rowData']['idTipo']) {
         $From .= '</p>';
         $To = '
         <b class="cs-primary_color">Receptor:</b>
-        <p>
+        <p class="cs-mb8">
             <strong>'.$data['rowSistema']['Sistema_Nombre'].'</strong><br>';
             if(isset($data['rowSistema']['Sistema_Direccion'])&&$data['rowSistema']['Sistema_Direccion']!=''){ $To .= $data['rowSistema']['Sistema_Direccion'].'<br>';}
             if(isset($data['rowSistema']['Sistema_Comuna'])&&$data['rowSistema']['Sistema_Comuna']!=''){       $To .= $data['rowSistema']['Sistema_Comuna'].'<br>';}
@@ -61,7 +61,7 @@ switch ($data['rowData']['idTipo']) {
         $From .= '</p>';
         $To = '
         <b class="cs-primary_color">Cliente:</b>
-        <p>
+        <p class="cs-mb8">
             <strong>'.$NombreEntidad.'</strong><br>';
             if(isset($data['rowData']['EntidadesDireccion'])&&$data['rowData']['EntidadesDireccion']!=''){ $To .= $data['rowData']['EntidadesDireccion'].'<br>';}
             if(isset($data['rowData']['EntidadesComuna'])&&$data['rowData']['EntidadesComuna']!=''){       $To .= $data['rowData']['EntidadesComuna'].'<br>';}
@@ -80,17 +80,27 @@ switch ($data['rowData']['idTipo']) {
         <div class="cs-logo cs-mb5 cs-mr20"><img src="<?php echo $CompanyLogo; ?>" alt="Logo" style="max-width: 60px;"></div>
     </div>
     <div class="cs-invoice_right cs-text_right">
-        <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
-            <p class="cs-primary_color cs-mb0"><b><?php echo $data['rowData']['TipoFacturacion']; ?></b></p>
-        </div>
-        <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
-            <p class="cs-primary_color cs-mb0"><b><?php echo $data['rowData']['Documento']; ?>:</b></p>
-            <p class="cs-mb0"><?php echo '#'.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?></p>
-        </div>
-        <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
-            <p class="cs-primary_color cs-mb0"><b>Fecha:</b></p>
-            <p class="cs-mb0"><?php echo $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha']); ?></p>
-        </div>
+        <?php if($data['Imprimir']==2){ ?>
+            <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
+                <p class="cs-primary_color cs-mb0"><b>Comprobante de Entrega</b></p>
+            </div>
+            <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
+                <p class="cs-primary_color cs-mb0"><b>Fecha:</b></p>
+                <p class="cs-mb0"><?php echo $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha']); ?></p>
+            </div>
+        <?php }else{ ?>
+            <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
+                <p class="cs-primary_color cs-mb0"><b><?php echo $data['rowData']['TipoFacturacion']; ?></b></p>
+            </div>
+            <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
+                <p class="cs-primary_color cs-mb0"><b><?php echo $data['rowData']['Documento']; ?>:</b></p>
+                <p class="cs-mb0"><?php echo '#'.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?></p>
+            </div>
+            <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
+                <p class="cs-primary_color cs-mb0"><b>Fecha:</b></p>
+                <p class="cs-mb0"><?php echo $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha']); ?></p>
+            </div>
+        <?php } ?>
     </div>
 </div>
 
@@ -173,23 +183,33 @@ switch ($data['rowData']['idTipo']) {
 </div>
 
 <div class="cs-table cs-style2 cs-mt20">
-    <div class="cs-table_responsive">
-        <table>
-            <tbody>
-                <tr class="cs-table_baseline">
-                    <td class="cs-width_6 cs-primary_color"><?php if(isset($data['rowData']['Observaciones'])&&$data['rowData']['Observaciones']!=''){echo $data['rowData']['Observaciones'];}else{echo 'Sin Observaciones.';} ?></td>
-                    <td class="cs-width_3 cs-text_right">
-                        <p class="cs-mb5 cs-mb5 cs-f15 cs-primary_color cs-semi_bold">Subtotal:</p>
-                        <p class="cs-primary_color cs-bold cs-f16 cs-mb5 ">IVA:</p>
-                        <p class="cs-primary_color cs-bold cs-f16 cs-mb5 ">Total:</p>
-                    </td>
-                    <td class="cs-width_3 cs-text_rightcs-f16">
-                        <p class="cs-mb5 cs-mb5 cs-text_right cs-f15 cs-primary_color cs-semi_bold"><?php echo $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorNeto'], 2); ?></p>
-                        <p class="cs-primary_color cs-bold cs-f16 cs-mb5 cs-text_right"><?php echo $data['Fnc_DataNumbers']->Valores($data['rowData']['IVA'], 2); ?></p>
-                        <p class="cs-primary_color cs-bold cs-f16 cs-mb5 cs-text_right"><?php echo $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorTotal'], 2); ?></p>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+    <div class="cs-fact-value">
+        <div class="cs-fact_left">
+            <table>
+                <tbody>
+                    <tr class="cs-table_baseline">
+                        <td class="cs-width_6 cs-primary_color"><?php if(isset($data['rowData']['Observaciones'])&&$data['rowData']['Observaciones']!=''){echo $data['rowData']['Observaciones'];}else{echo 'Sin Observaciones.';} ?></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="cs-fact_right">
+            <table>
+                <tbody>
+                    <tr class="cs-table_baseline">
+                        <td class="cs-width_3 cs-text_right">
+                            <p class="cs-mb5 cs-mb5 cs-f15 cs-primary_color cs-semi_bold">Subtotal:</p>
+                            <p class="cs-primary_color cs-bold cs-f16 cs-mb5 ">IVA:</p>
+                            <p class="cs-primary_color cs-bold cs-f16 cs-mb5 ">Total:</p>
+                        </td>
+                        <td class="cs-width_3 cs-text_rightcs-f16">
+                            <p class="cs-mb5 cs-mb5 cs-text_right cs-f15 cs-primary_color cs-semi_bold"><?php echo $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorNeto'], 2); ?></p>
+                            <p class="cs-primary_color cs-bold cs-f16 cs-mb5 cs-text_right"><?php echo $data['Fnc_DataNumbers']->Valores($data['rowData']['IVA'], 2); ?></p>
+                            <p class="cs-primary_color cs-bold cs-f16 cs-mb5 cs-text_right"><?php echo $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorTotal'], 2); ?></p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
