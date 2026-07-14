@@ -1944,6 +1944,45 @@ kbd {
     .mq-align-items {
         align-items: flex-end;
     }
+
+    .cs-fact-value .cs-fact_left, .cs-fact-value .cs-fact_right {
+        max-width: 100%;
+        width: 100%;
+    }
+    .cs-fact-value .cs-fact_left table td,
+    .cs-fact-value .cs-fact_right table td,
+    .cs-fact-value .cs-fact_left table th,
+    .cs-fact-value .cs-fact_right table th {
+        padding: 2px 5px;
+    }
+    .cs-invoice.cs-style1 .cs-invoice_head.cs-type1 {
+        padding-bottom: 0px;
+    }
+    .cs-fact-value .cs-fact_right .cs-mb5 {
+        margin-bottom: 1px;
+    }
+    .cs-invoice_head .cs-mb10 {
+        margin-bottom: 10px;
+    }
+    .cs-mt20 {
+        margin-top: 5px;
+    }
+    .cs-mb25 {
+        margin-bottom: 5px;
+    }
+    h5  {
+        margin: 0 0 0px 0;
+    }
+    .cs-invoice.cs-style1 .cs-logo {
+        margin-bottom: 1px;
+    }
+    .cs-mr20 {
+    margin-right: 0px;
+    }
+    .cs-mb8 {
+        margin-bottom: 1px;
+    }
+
 }
 
 @media print {

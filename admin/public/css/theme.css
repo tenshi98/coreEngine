@@ -1713,7 +1713,12 @@ body::-webkit-scrollbar-thumb {background-color: #aab7cf;}
 .terminal-body .output {color: var(--btn-danger-bg);}
 .cursor-blink {background: var(--btn-primary-bg);}
 
-
-
-
-
+/*--------------------------------------------------------------
+# Colores dropdown
+--------------------------------------------------------------*/
+.dropdown-item-primary {color: var(--btn-primary-border);}
+.dropdown-item-secondary {color: var(--btn-secondary-border);}
+.dropdown-item-success {color: var(--btn-success-border);}
+.dropdown-item-danger {color: var(--btn-danger-border);}
+.dropdown-item-warning {color: var(--btn-warning-border);}
+.dropdown-item-info {color: var(--btn-info-border);}
