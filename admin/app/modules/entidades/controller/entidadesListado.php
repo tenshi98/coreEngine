@@ -336,6 +336,7 @@ class entidadesListado extends ControllerBase {
                 entidades_listado.Social_Facebook,
                 entidades_listado.Social_Instagram,
                 entidades_listado.Social_Linkedin,
+                entidades_listado.idTipoEntidad,
 
                 core_estados.Nombre AS Estado,
                 entidades_sectores.Nombre AS Sector,
@@ -480,7 +481,7 @@ class entidadesListado extends ControllerBase {
                     entidades_listado_cargas.ApellidoMat,
                     core_tipos_rrhh_trabajadores_cargas_parentesco.Nombre AS Parentesco',
                 'table'   => 'entidades_listado_cargas',
-                'join'    => 'LEFT JOIN core_tipos_rrhh_trabajadores_cargas_parentesco   ON core_tipos_rrhh_trabajadores_cargas_parentesco.idParentesco     = entidades_listado.idParentesco',
+                'join'    => 'LEFT JOIN core_tipos_rrhh_trabajadores_cargas_parentesco   ON core_tipos_rrhh_trabajadores_cargas_parentesco.idParentesco  = entidades_listado_cargas.idParentesco',
                 'where'   => 'entidades_listado_cargas.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
                 'group'   => '',
                 'having'  => '',
@@ -1024,12 +1025,29 @@ class entidadesListado extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Si hay datos
-            if(isset($_POST['Direccion'])&&$_POST['Direccion']!=''){
+            //Solo si hay datos y se ha cambiado la direccion
+            if(isset($_POST['Direccion'], $_POST['OldDireccion'], $_POST['OldLatitud'])&&(($_POST['Direccion']!=''&&$_POST['Direccion']!=$_POST['OldDireccion']) OR ($_POST['OldLatitud']=='xxxxxxx'))){
+
                 //Se instancia
                 $fncLocation = new FunctionsLocation;
                 //Se obtiene la direccion
                 $Ubicacion = $_POST['Direccion'];
+
+                // Cambia comas por puntos
+                $Ubicacion = str_replace(',', '.', $Ubicacion);
+
+                // Conserva letras, números, espacios y puntos
+                $Ubicacion = preg_replace('/[^\p{L}\p{N}\s.]/u', ' ', $Ubicacion);
+
+                // Reemplaza varios puntos consecutivos por uno solo
+                $Ubicacion = preg_replace('/\.{2,}/', '.', $Ubicacion);
+
+                // Reemplaza múltiples espacios por uno
+                $Ubicacion = preg_replace('/\s+/', ' ', $Ubicacion);
+
+                // Elimina espacios y puntos al inicio y al final
+                $Ubicacion = trim($Ubicacion, " .");
+
                 //Si existe comuna
                 if(isset($_POST['idComuna'])&&$_POST['idComuna']!=''){
                     //Se genera la query
@@ -1072,6 +1090,7 @@ class entidadesListado extends ControllerBase {
                 }
                 //Pais
                 $Ubicacion .= ', Chile';
+
                 //Se hace la busqueda de lat y long por su direccion
                 $result = $fncLocation->geocodeAddress($Ubicacion);
                 //Si hay resultados se guarda
@@ -1079,7 +1098,12 @@ class entidadesListado extends ControllerBase {
                     //Se guarda el ultimo dato
                     $_POST['Latitud']  = $result['lat'];
                     $_POST['Longitud'] = $result['lon'];
+                }else{
+                    //Se agregan datos por defecto
+                    $_POST['Latitud']  = $_SESSION['DataInfo']['Latitud'];
+                    $_POST['Longitud'] = $_SESSION['DataInfo']['Longitud'];
                 }
+
             }
 
             /******************************/
