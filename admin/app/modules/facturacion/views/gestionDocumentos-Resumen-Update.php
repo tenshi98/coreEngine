@@ -18,14 +18,16 @@
             case 1: $Movimiento = $data['rowData']['BodegaIngreso']; $Entidad = 'Proveedor';break;  //Ingreso
             case 2: $Movimiento = $data['rowData']['BodegaEgreso'];  $Entidad = 'Cliente';break;   //Egreso
         }
-        //Se verifica si existe
-        $NombreEntidad = '';
-        if(isset($data['rowData']['EntidadesNombre'])&&$data['rowData']['EntidadesNombre']){
-            $NombreEntidad .= $data['rowData']['EntidadesNombre'].' '.$data['rowData']['EntidadesApellido'];
-        }else{
-            $NombreEntidad .= $data['rowData']['EntidadesRazonSocial'];
+        //valido
+        $NombreEntidad  = '';
+        //Se obtiene el nombre o la razón social
+        switch ($data['rowData']['idTipoEntidad']) {
+            case 1: $NombreEntidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
+            case 2: $NombreEntidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas
         }
-        if (isset($data['rowData']['EntidadesNick'])&&$data['rowData']['EntidadesNick']!='') { $NombreEntidad .= ' ('.$data['rowData']['EntidadesNick'].')';}
+        $NombreEntidad .= !empty($data['rowData']['EntidadesNick'])
+                        ? ' ('.$data['rowData']['EntidadesNick'].')'
+                        : '';
 
         $arrData1 = [
             ['Icon' => '','Titulo' => 'Tipo Facturacion',    'Texto' => $data['rowData']['TipoFacturacion']],

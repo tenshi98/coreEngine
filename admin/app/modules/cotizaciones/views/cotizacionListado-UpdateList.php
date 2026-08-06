@@ -21,9 +21,11 @@
             //Recorro
             foreach($data['arrList'] as $crud){
                 $Entidad  = '';
-                $Entidad .= !empty($crud['EntidadesNombre'])
-                            ? $crud['EntidadesNombre'].' '.$crud['EntidadesApellido']
-                            : $crud['EntidadesRazonSocial'];
+                //Se obtiene el nombre o la razón social
+                switch ($crud['idTipoEntidad']) {
+                    case 1: $Entidad .= $crud['EntidadesApellido'].', '.$crud['EntidadesNombre']; break; //Persona Natural
+                    case 2: $Entidad .= $crud['EntidadesRazonSocial']; break;                            //Empresas
+                }
                 $Entidad .= !empty($crud['EntidadesNick'])
                             ? ' ('.$crud['EntidadesNick'].')'
                             : '';

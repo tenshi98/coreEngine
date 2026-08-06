@@ -25,9 +25,11 @@
                 $Entidad .= !empty($crud['Nick'])
                             ? '<strong>'.$crud['Nick'].'</strong> | '
                             : '';
-                $Entidad .= !empty($crud['Nombre'])
-                            ? $crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']
-                            : $crud['RazonSocial'];
+                //Se obtiene el nombre o la razón social
+                switch ($crud['idTipoEntidad']) {
+                    case 1: $Entidad .= $crud['ApellidoPat'].' '.$crud['ApellidoMat'].', '.$crud['Nombre']; break; //Persona Natural
+                    case 2: $Entidad .= $crud['RazonSocial']; break;                                               //Empresas
+                }
 
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idEntidad']);

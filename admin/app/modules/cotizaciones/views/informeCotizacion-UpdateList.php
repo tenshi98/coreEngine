@@ -31,9 +31,11 @@
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
                                             <td>
                                                 <?php
-                                                $Entidad =  !empty($crud['EntidadesNombre'])
-                                                            ? $crud['EntidadesNombre'].' '.$crud['EntidadesApellido']
-                                                            : $crud['EntidadesRazonSocial'];
+                                                //Se obtiene el nombre o la razón social
+                                                switch ($crud['idTipoEntidad']) {
+                                                    case 1: $Entidad = $crud['EntidadesApellido'].', '.$crud['EntidadesNombre']; break; //Persona Natural
+                                                    case 2: $Entidad = $crud['EntidadesRazonSocial']; break;                            //Empresas
+                                                }
                                                 //imprimir
                                                 echo $Entidad;
                                                 ?>

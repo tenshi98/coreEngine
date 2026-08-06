@@ -32,9 +32,11 @@
                                     $Entidad .= !empty($datos['EntidadesNick'])
                                                 ? $datos['EntidadesNick'].'<br>'
                                                 : '';
-                                    $Entidad .= !empty($datos['EntidadesNombre'])
-                                                ? $datos['EntidadesApellido'].' '.$datos['EntidadesNombre']
-                                                : $datos['EntidadesRazonSocial'];
+                                    //Se obtiene el nombre o la razón social
+                                    switch ($datos['idTipoEntidad']) {
+                                        case 1: $Entidad .= $datos['EntidadesApellido'].', '.$datos['EntidadesNombre']; break; //Persona Natural
+                                        case 2: $Entidad .= $datos['EntidadesRazonSocial']; break;                             //Empresas
+                                    }
                                     echo '
                                     <tr>
                                         <td>'.$Entidad.'</td>
@@ -83,9 +85,11 @@
                                     $Entidad .= !empty($datos['EntidadesNick'])
                                                 ? $datos['EntidadesNick'].' | '
                                                 : '';
-                                    $Entidad .= !empty($datos['EntidadesNombre'])
-                                                ? $datos['EntidadesApellido'].' '.$datos['EntidadesNombre']
-                                                : $datos['EntidadesRazonSocial'];
+                                    //Se obtiene el nombre o la razón social
+                                    switch ($datos['idTipoEntidad']) {
+                                        case 1: $Entidad .= $datos['EntidadesApellido'].', '.$datos['EntidadesNombre']; break; //Persona Natural
+                                        case 2: $Entidad .= $datos['EntidadesRazonSocial']; break;                             //Empresas
+                                    }
                                     echo '
                                     <tr>
                                         <td>'.$Entidad.'</td>

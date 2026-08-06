@@ -10,9 +10,11 @@ $CompanyLogo =  !empty($data['UserData']['Sistema_IMGLogo'])
 
 /********************************/
 $NombreEntidad  = '';
-$NombreEntidad .=   !empty($data['rowData']['EntidadesNombre'])
-                    ? $data['rowData']['EntidadesNombre'].' '.$data['rowData']['EntidadesApellido']
-                    : $data['rowData']['EntidadesRazonSocial'];
+//Se obtiene el nombre o la razón social
+switch ($data['rowData']['idTipoEntidad']) {
+    case 1: $NombreEntidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
+    case 2: $NombreEntidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas
+}
 $NombreEntidad .=   !empty($data['rowData']['EntidadesNick'])
                     ? ' ('.$data['rowData']['EntidadesNick'].')'
                     : '';
@@ -147,4 +149,3 @@ $To .= '</p>';
         </table>
     </div>
 </div>
-

@@ -32,9 +32,10 @@
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
                 //Se obtiene el nombre o la razón social
-                $Entidad_2  = !empty($data['rowData']['Nombre'])
-                              ? $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']
-                              : $data['rowData']['RazonSocial'];
+                switch ($data['rowData']['idTipoEntidad']) {
+                    case 1: $Entidad_2  = $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']; break; //Persona Natural
+                    case 2: $Entidad_2  = $data['rowData']['RazonSocial']; break;                                                                     //Empresas
+                }
                 ?>
 
                 <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>

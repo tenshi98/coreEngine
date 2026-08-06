@@ -59,9 +59,11 @@
                                     case 3:
                                         //valido
                                         $Entidad  = '';
-                                        $Entidad .= !empty($data['rowData']['EntidadesNombre'])
-                                                    ? $data['rowData']['EntidadesNombre'].' '.$data['rowData']['EntidadesApellido']
-                                                    : $data['rowData']['EntidadesRazonSocial'];
+                                        //Se obtiene el nombre o la razón social
+                                        switch ($data['rowData']['idTipoEntidad']) {
+                                            case 1: $Entidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
+                                            case 2: $Entidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas
+                                        }
                                         $Entidad .= !empty($data['rowData']['EntidadesNick'])
                                                     ? ' ('.$data['rowData']['EntidadesNick'].')'
                                                     : '';
