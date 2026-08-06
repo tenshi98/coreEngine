@@ -498,6 +498,7 @@ class tercerosEntidadesListado extends ControllerBase {
                 entidades_listado.RazonSocial,
                 entidades_listado.Nick,
                 entidades_listado.Direccion_img,
+                entidades_listado.idTipoEntidad,
 
                 core_sexo.Nombre AS Sexo,
                 core_tipos_entidades.Nombre AS TipoEntidad',

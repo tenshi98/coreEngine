@@ -109,6 +109,7 @@ class gestionDocumentosWidgets extends ControllerBase {
                     facturacion_listado.ValorTotal,
                     facturacion_listado.MontoPagado,
 
+                    entidades_listado.idTipoEntidad,
                     entidades_listado.Nombre AS EntidadesNombre,
                     entidades_listado.ApellidoPat AS EntidadesApellido,
                     entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -153,6 +154,7 @@ class gestionDocumentosWidgets extends ControllerBase {
                     facturacion_listado.ValorTotal,
                     facturacion_listado.MontoPagado,
 
+                    entidades_listado.idTipoEntidad,
                     entidades_listado.Nombre AS EntidadesNombre,
                     entidades_listado.ApellidoPat AS EntidadesApellido,
                     entidades_listado.RazonSocial AS EntidadesRazonSocial,

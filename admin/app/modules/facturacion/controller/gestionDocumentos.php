@@ -86,6 +86,7 @@ class gestionDocumentos extends ControllerBase {
                 facturacion_listado.ValorTotal,
                 facturacion_listado.MontoPagado,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -101,7 +102,7 @@ class gestionDocumentos extends ControllerBase {
             'where'   => 'facturacion_listado.idTipo = "'.$idTipo.'"',
             'group'   => '',
             'having'  => '',
-            'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
+            'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -154,7 +155,7 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //Se genera la query
         $query = [
-            'data'    => 'idEntidad AS ID,CONCAT((CASE WHEN ( Nombre = "" OR Nombre IS NULL ) THEN RazonSocial ELSE CONCAT(Nombre,IFNULL( CONCAT( " ", ApellidoPat ), "" )) END ),CASE WHEN ( Nick = "" OR Nick IS NULL ) THEN "" ELSE CONCAT( " (", Nick, ")" ) END ) AS Nombre ',
+            'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEstado=1 AND idTipo='.$idTipo,
@@ -314,6 +315,7 @@ class gestionDocumentos extends ControllerBase {
                 facturacion_listado.ValorTotal,
                 facturacion_listado.MontoPagado,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -329,7 +331,7 @@ class gestionDocumentos extends ControllerBase {
             'where'   => $whereInt2,
             'group'   => '',
             'having'  => '',
-            'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
+            'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -399,6 +401,7 @@ class gestionDocumentos extends ControllerBase {
                 facturacion_listado.MontoPagado,
 
                 core_facturacion_tipo.Nombre AS TipoFacturacion,
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -597,6 +600,7 @@ class gestionDocumentos extends ControllerBase {
                 facturacion_listado.IVA,
                 facturacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -828,6 +832,7 @@ class gestionDocumentos extends ControllerBase {
                 facturacion_listado.idEstadoPago,
 
                 core_facturacion_tipo.Nombre AS TipoFacturacion,
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -859,7 +864,7 @@ class gestionDocumentos extends ControllerBase {
         /*******************************************************************/
         //Se genera la query
         $query = [
-            'data'    => 'idEntidad AS ID,CONCAT((CASE WHEN ( Nombre = "" OR Nombre IS NULL ) THEN RazonSocial ELSE CONCAT(Nombre,IFNULL( CONCAT( " ", ApellidoPat ), "" )) END ),CASE WHEN ( Nick = "" OR Nick IS NULL ) THEN "" ELSE CONCAT( " (", Nick, ")" ) END ) AS Nombre ',
+            'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEstado=1 AND idTipo='.$idTipo,
@@ -952,6 +957,7 @@ class gestionDocumentos extends ControllerBase {
                 facturacion_listado.MontoPagado,
 
                 core_facturacion_tipo.Nombre AS TipoFacturacion,
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,

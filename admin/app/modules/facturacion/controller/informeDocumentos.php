@@ -37,7 +37,7 @@ class informeDocumentos extends ControllerBase {
         /*******************************************************************/
         //Se genera la query
         $query = [
-            'data'    => 'idEntidad AS ID,CONCAT((CASE WHEN ( Nombre = "" OR Nombre IS NULL ) THEN RazonSocial ELSE CONCAT(Nombre,IFNULL( CONCAT( " ", ApellidoPat ), "" )) END ),CASE WHEN ( Nick = "" OR Nick IS NULL ) THEN "" ELSE CONCAT( " (", Nick, ")" ) END ) AS Nombre ',
+            'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEstado=1',
@@ -150,6 +150,7 @@ class informeDocumentos extends ControllerBase {
                 facturacion_listado.ValorTotal,
                 facturacion_listado.MontoPagado,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,

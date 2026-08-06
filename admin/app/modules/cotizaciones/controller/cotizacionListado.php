@@ -58,6 +58,7 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado.Creacion_fecha,
                 cotizacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -67,7 +68,7 @@ class cotizacionListado extends ControllerBase {
             'where'   => 'cotizacion_listado.idCotizacion != 0',
             'group'   => '',
             'having'  => '',
-            'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC',
+            'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -77,7 +78,7 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //Se genera la query
         $query = [
-            'data'    => 'idEntidad AS ID,CONCAT((CASE WHEN ( Nombre = "" OR Nombre IS NULL ) THEN RazonSocial ELSE CONCAT(Nombre,IFNULL( CONCAT( " ", ApellidoPat ), "" )) END ),CASE WHEN ( Nick = "" OR Nick IS NULL ) THEN "" ELSE CONCAT( " (", Nick, ")" ) END ) AS Nombre ',
+            'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEstado=1 AND idTipo=2',
@@ -193,6 +194,7 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado.Creacion_fecha,
                 cotizacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -202,7 +204,7 @@ class cotizacionListado extends ControllerBase {
             'where'   => $whereInt2,
             'group'   => '',
             'having'  => '',
-            'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC',
+            'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         //Ejecuto la query
@@ -259,6 +261,7 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado.IVA,
                 cotizacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -385,6 +388,7 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado.IVA,
                 cotizacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -543,6 +547,7 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado.IVA,
                 cotizacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
@@ -564,7 +569,7 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         //Se genera la query
         $query = [
-            'data'    => 'idEntidad AS ID,CONCAT((CASE WHEN ( Nombre = "" OR Nombre IS NULL ) THEN RazonSocial ELSE CONCAT(Nombre,IFNULL( CONCAT( " ", ApellidoPat ), "" )) END ),CASE WHEN ( Nick = "" OR Nick IS NULL ) THEN "" ELSE CONCAT( " (", Nick, ")" ) END ) AS Nombre ',
+            'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEstado=1 AND idTipo=2',
@@ -632,6 +637,7 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado.IVA,
                 cotizacion_listado.ValorTotal,
 
+                entidades_listado.idTipoEntidad,
                 entidades_listado.Nombre AS EntidadesNombre,
                 entidades_listado.ApellidoPat AS EntidadesApellido,
                 entidades_listado.RazonSocial AS EntidadesRazonSocial,
