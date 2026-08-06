@@ -112,7 +112,7 @@ class userSession extends ControllerBase {
 
         /******************************/
         //Si no hay resultados
-        if($rowData['status']===false){
+        if($rowData['data']===false){
             //Se guarda registro
             $this->insertBrute($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp);
             //Mensaje
@@ -376,18 +376,22 @@ class userSession extends ControllerBase {
         /***************************************************/
         /*         Se generan los datos del usuario        */
         /***************************************************/
-        //Armo
+        //Se instancia la libreria
+        $FileManager  = new FileManager();
+
+        //Armo los datos del usuario
         $rowUsuario = [
-            'UserID'             => $rowData['data']['idUsuario'],
-            'UserType'           => $rowData['data']['idTipoUsuario'],
-            'UserIMG'            => $rowData['data']['Direccion_img'],
-            'UserName'           => $rowData['data']['Nombre'],
-            'UserPosition'       => $rowData['data']['Posicion'],
-            'idMenuPosicion'     => $rowData['data']['idMenuPosicion'],
-            'UbicacionNombre'    => $rowData['data']['UbicacionNombre'],
-            'UbicacionWheater'   => $rowData['data']['UbicacionWheater'],
+            'UserID'             => $rowData['idUsuario'],
+            'UserType'           => $rowData['idTipoUsuario'],
+            'UserIMG'            => $rowData['Direccion_img'],
+            'UserName'           => $rowData['Nombre'],
+            'UserPosition'       => $rowData['Posicion'],
+            'idMenuPosicion'     => $rowData['idMenuPosicion'],
+            'UbicacionNombre'    => $rowData['UbicacionNombre'],
+            'UbicacionWheater'   => $rowData['UbicacionWheater'],
             'TypeSession'        => $TypeSession,
             'UserIP'             => $this->Client->getClientIp(),
+            'MainPathUrl'        => $FileManager->getMainPathUrl(),
         ];
 
         /******************************/
