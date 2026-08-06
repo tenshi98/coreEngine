@@ -98,7 +98,7 @@ class coreFormularios extends ControllerBase {
             /*=========== Datos Consultados ===========*/
             'arrCiudad'       => $arrCiudad['data'],
             'arrComuna'       => $arrComuna['data'],
-            'arrGroup'        => $arrGroup,
+            'arrGroup'        => $arrGroup['data'],
         ];
 
         /******************************************/

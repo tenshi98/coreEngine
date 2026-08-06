@@ -9,7 +9,7 @@
     const DEFAULT_DISPLAY_STYLE_<?php echo $RandName; ?>     = "<?php echo $XDisplay; ?>";
 
     // Valor preseleccionado
-    let preselectedValue_<?php echo $RandName; ?> = 0; // Se inicializa con el valor 0 o el valor que venga del backend
+    let preselectedValue_<?php echo $RandName; ?> = <?php echo $value; ?>; // Se inicializa con el que venga del backend
 
     /**
      * Función que carga las opciones en el select dependiente.

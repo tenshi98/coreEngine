@@ -1447,7 +1447,7 @@ class permisosListado extends ControllerBase {
         /*          Se guardan lo datos del usuario        */
         /***************************************************/
         //Se agrupan los menus
-        $arrMenuNew = $this->CommonData->agruparPorClave ($arrMenu, 'PermisosCat' );
+        $arrMenuNew = $this->CommonData->agruparPorClave ($arrMenu['data'], 'PermisosCat' );
         //Seteo las variables
         $f3->set('SESSION.arrMenu', $arrMenuNew);        //Menu
         $f3->set('SESSION.arrPermisos', $arrPermisos);   //Rutas
