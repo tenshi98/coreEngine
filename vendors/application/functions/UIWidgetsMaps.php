@@ -823,21 +823,23 @@ class UIWidgetsMaps {
 		if(!isset($Options['Longitud']) || $Options['Longitud']==''){ echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Longitud.'); exit;}
 
 		/**********************  Definiciones   **********************/
-		$Latitud          = $Options['Latitud'];
-		$Longitud         = $Options['Longitud'];
-		$ID_Map           = $Options['ID_Map'] ?? 'div_map_'.uniqid();
-		$Zoom             = $Options['Zoom'] ?? 13;
-		$attribution      = $Options['attribution'] ?? '&copy; Todos los derechos reservados.';
-		$arrMarkers       = $Options['arrMarkers'] ?? "";
-		$arrPolygon       = $Options['arrPolygon'] ?? "";
-		$arrCircles       = $Options['arrCircles'] ?? "";
-		$arrPolyLine      = $Options['arrPolyLine'] ?? "";
-		$arrRectangle     = $Options['arrRectangle'] ?? "";
-		$arrHeatMap       = $Options['arrHeatMap'] ?? "";
-		$events           = $Options['events'] ?? false;
-		$ConfMode         = $Options['ConfMode'] ?? 1;
-		$defaultLayer     = $Options['defaultLayer'] ?? "OpenStreetMap";
-		$scrollWheelZoom  = $Options['scrollWheelZoom'] ?? true;
+		$Latitud             = $Options['Latitud'];
+		$Longitud            = $Options['Longitud'];
+		$ID_Map              = $Options['ID_Map'] ?? 'div_map_'.uniqid();
+		$Zoom                = $Options['Zoom'] ?? 13;
+		$attribution         = $Options['attribution'] ?? '&copy; Todos los derechos reservados.';
+        $arrMarkers          = $Options['arrMarkers'] ?? "";
+		$arrPolygon          = $Options['arrPolygon'] ?? "";
+		$arrCircles          = $Options['arrCircles'] ?? "";
+		$arrPolyLine         = $Options['arrPolyLine'] ?? "";
+		$arrRectangle        = $Options['arrRectangle'] ?? "";
+		$arrHeatMap          = $Options['arrHeatMap'] ?? "";
+		$events              = $Options['events'] ?? false;
+		$ConfMode            = $Options['ConfMode'] ?? 1;
+		$defaultLayer        = $Options['defaultLayer'] ?? "OpenStreetMap";
+		$scrollWheelZoom     = $Options['scrollWheelZoom'] ?? true;
+		$dragabbleMarker     = $Options['dragabbleMarker'] ?? false;
+		$dragabbleFormItems  = $Options['dragabbleFormItems'] ?? '';
 
         /*******************************************/
         // Se seleccionan los colores mediante un array
@@ -967,11 +969,6 @@ class UIWidgetsMaps {
                     break;
                 case 3:
                     $mapa .= "
-                    //Carga de los layers
-                    var baseMaps = {
-                        'OpenStreetMap': OpenStreetMap,
-                    };
-
                     //Se inicia mapa
                     var ".$ID_Map." = L.map('".$ID_Map."', {
                         center: [".$Latitud.", ".$Longitud."],
@@ -979,6 +976,23 @@ class UIWidgetsMaps {
                         layers: [".$defaultLayer."],
                         zoomControl: false,
                         dragging: false,
+                        scrollWheelZoom: false,
+                        doubleClickZoom: false,
+                        boxZoom: false,
+                        touchZoom: false,
+                        keyboard: false
+                    });
+                    ";
+                    break;
+                case 4:
+                    $mapa .= "
+                    //Se inicia mapa
+                    var ".$ID_Map." = L.map('".$ID_Map."', {
+                        center: [".$Latitud.", ".$Longitud."],
+                        zoom: ".$Zoom.",
+                        layers: [".$defaultLayer."],
+                        zoomControl: true,
+                        dragging: true,
                         scrollWheelZoom: false,
                         doubleClickZoom: false,
                         boxZoom: false,
@@ -1013,6 +1027,7 @@ class UIWidgetsMaps {
             if(is_array($arrMarkers)){
                 //Id dinamico para los elementos
                 $ID_marker    = 'marker_'.uniqid();
+                $ID_multi     = 'marker_'.uniqid();
                 //Se agrega elemento
                 $mapa .= 'var '.$ID_marker.' = [';
                 foreach ($arrMarkers as $item) {
@@ -1029,7 +1044,7 @@ class UIWidgetsMaps {
                 $mapa .= '];';
 
                 $mapa .= '
-                    new L.MultiMarkers('.$ID_marker.', {
+                var '.$ID_multi.' = new L.MultiMarkers('.$ID_marker.', {
                     iconExPredefined: {
                         default: {
                             iconStrokeOpacity: .5,
@@ -1362,9 +1377,12 @@ class UIWidgetsMaps {
                             return {}
                         return { contentColor: ["#a11", "#1a1", "#11a", "#aa1", "#1aa", "#a1a"][Math.floor(Math.random() * 6)] };
                     },
-
                     markerOptions: {
-                        riseOnHover: true,
+                        riseOnHover: true,';
+                        if($dragabbleMarker){
+                            $mapa .= 'draggable: true,';
+                        }
+                        $mapa .= '
                     },
                     setMarkerOptions: (elem) => {
                         return {
@@ -1372,18 +1390,36 @@ class UIWidgetsMaps {
                             alt: `${elem["content"]}`,
                         }
                     },
-
                     defaultPopupContent: `<div>Simulate "Data Fetching"</div><div style="display: flex; align-items: center; justify-content: center; height: 6rem"><div class="leaflet-iconex-loader"></div></div>`,
-                    fetchPopupContent: (marker) => {
+                    fetchPopupContent: ('.$ID_marker.') => {
                         return new Promise((resolve, reject) => {
-                            resolve(`<pre style="color:${marker.elem.iconFill}">${marker.elem.content}</pre>`);
+                            resolve(`<pre style="color:${'.$ID_marker.'.elem.iconFill}">${'.$ID_marker.'.elem.content}</pre>`);
                         });
                     },
-
                     onClick: (event) => {
                         console.log("marker clicked. id:", event.target.elem["id"]);
                     },
                 }).addTo('.$ID_Map.');';
+
+                if($dragabbleMarker){
+                    //Separo los elementos
+                    $items = $dragabbleFormItems ? explode(',', $dragabbleFormItems) : null;
+                    $item1 = $items[0] ?? null;
+                    $item2 = $items[1] ?? null;
+
+
+                    $mapa .= '
+                    Object.values('.$ID_multi.'._layers).forEach(function('.$ID_marker.'){
+                        '.$ID_marker.'.dragging.enable();
+                        '.$ID_marker.'.on("dragend", function(e){
+                            var pos = e.target.getLatLng();
+                            console.log(pos.lat, pos.lng);
+                            document.getElementById("'.$item1.'").value = pos.lat;
+                            document.getElementById("'.$item2.'").value = pos.lng;
+                        });
+                    });
+                    ';
+                }
 
             }
 
@@ -1511,6 +1547,8 @@ class UIWidgetsMaps {
                 ";
             }
 
+
+
         $mapa .= "
             //Se centra el mapa
             ".$ID_Map.".setView([".$Latitud.", ".$Longitud."], ".$Zoom.");
@@ -1598,4 +1636,3 @@ class UIWidgetsMaps {
     }
 
 }
-

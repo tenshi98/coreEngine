@@ -237,7 +237,7 @@ class UIFormInputs {
 			case 2: $XDisplay = 'block';break;//Vertical Form
 			case 3: $XDisplay = 'block';break;//Multi Columns Form
 			case 4: $XDisplay = 'block';break;//No Labels Form
-			case 4: $XDisplay = 'block';break;//Floating Labels Form
+			case 5: $XDisplay = 'block';break;//Floating Labels Form
 		}
 
 		//caracteres prohibidos
@@ -281,6 +281,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('name1',       $name1);
 		$this->TemplateRender->assign('name2',       $name2);
 		$this->TemplateRender->assign('XDisplay',    $XDisplay);
+		$this->TemplateRender->assign('value',       $value);
 
 		/******************************************/
 		//devuelvo
@@ -3791,4 +3792,3 @@ class UIFormInputs {
 
 
 }
-
