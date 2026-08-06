@@ -189,11 +189,15 @@
                 </div>
 
                 <div class="tab-pane fade" id="resumen-edit_5">
-                    <h5 class="text-color-red-dark">
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                            Imagen de <?php echo $data['rowData']['Sistema_Nombre']; ?>
+                    <div class="d-flex justify-content-center pt-4">
+                        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
+                            <h4 class="title_h4 box-title text-color-red-dark">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                    Imagen de <?php echo $data['rowData']['Sistema_Nombre']; ?>
+                                </div>
+                            </h4>
                         </div>
-                    </h5>
+                    </div>
                     <div class="clearfix"></div>
                     <?php
                     if(isset($data['rowData']['Sistema_IMGLogo'])&&$data['rowData']['Sistema_IMGLogo']!=''){ ?>
