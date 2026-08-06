@@ -162,17 +162,37 @@ class FunctionsLocation {
 	 * ```
 	 *
      */
-    public function geocodeAddress($street) {
+    public function geocodeAddress($ubicacion) {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
-        if ($street=='') { return 'Sin datos ingresados en street';}
+        if ($ubicacion=='') { return 'Sin datos ingresados en ubicacion';}
 
         /********************** Si todo esta ok **********************/
-        // Normalización y limpieza de la cadena de dirección
-        $buscar     = ['Nº', 'nº', ' n ', "'", 'Av.', 'av.'];
-        $reemplazar = ['',   '',   '',   '',  'Avenida', 'Avenida'];
-        $ubicacion  = trim(str_replace($buscar, $reemplazar, $street));
+        // Normaliza las abreviaturas
+        $reemplazos = [
+            '/\bAVENIDA\b|\bAV(?:\.|\s|$)/iu'   => 'Avenida',   // Avenida
+            '/\bCALLE\b|\bCLL(?:\.|\s|$)/iu'    => 'Calle',     // Calle
+            '/\bPASAJE\b|\bPSJE(?:\.|\s|$)/iu'  => 'Pasaje',    // Pasaje
+            '/\bCAMINO\b|\bCAM(?:\.|\s|$)/iu'   => 'Camino',    // Camino
+            '/\bRUTA\b|\bRTA(?:\.|\s|$)/iu'     => 'Ruta',      // Ruta
+            '/\bKILOMETRO\b|\bKM(?:\.|\s|$)/iu' => 'Kilometro', // Kilómetro
+            '/\bN[°º]\b|\bNO\.\b|#/iu'          => '',          // Número
+        ];
+
+        // Realiza el cambio
+        foreach ($reemplazos as $patron => $reemplazo) {
+            $ubicacion = preg_replace($patron, $reemplazo, $ubicacion);
+        }
+
+        // Eliminacion de acentos y letras raras
+        $ubicacion = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $ubicacion);
+
+        // Elimina espacios múltiples
+        $ubicacion = preg_replace('/\s+/', ' ', $ubicacion);
+
+        // Eliminacion de espacios en blanco
+        $ubicacion = trim($ubicacion);
 
         // Construcción de la URL de consulta para Nominatim (formato JSON, límite 1 resultado)
         $url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" . urlencode($ubicacion);
@@ -295,8 +315,8 @@ class subpointLocation {
             if ($vertex1['y'] == $vertex2['y'] and $vertex1['y'] == $point['y'] and $point['x'] > min($vertex1['x'], $vertex2['x']) and $point['x'] < max($vertex1['x'], $vertex2['x'])) { // Check if point is on an horizontal polygon boundary
                 return "boundary";
             }
-            if ($point['y'] > min($vertex1['y'], $vertex2['y']) and $point['y'] <= max($vertex1['y'], $vertex2['y']) and $point['x'] <= max($vertex1['x'], $vertex2['x']) and $vertex1['y'] != $vertex2['y']) { 
-                $xinters = ($point['y'] - $vertex1['y']) * ($vertex2['x'] - $vertex1['x']) / ($vertex2['y'] - $vertex1['y']) + $vertex1['x']; 
+            if ($point['y'] > min($vertex1['y'], $vertex2['y']) and $point['y'] <= max($vertex1['y'], $vertex2['y']) and $point['x'] <= max($vertex1['x'], $vertex2['x']) and $vertex1['y'] != $vertex2['y']) {
+                $xinters = ($point['y'] - $vertex1['y']) * ($vertex2['x'] - $vertex1['x']) / ($vertex2['y'] - $vertex1['y']) + $vertex1['x'];
                 if ($xinters == $point['x']) { // Check if point is on the polygon boundary (other than horizontal)
                     return "boundary";
                 }
