@@ -14,43 +14,48 @@
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100 mb-2">
 
-        <?php if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'){ ?>
-            <div class="square-rounded-2 square-border-3 w-100">
-                <?php
-                //variable para los marcadores
-                $arrMarkers = [
-                    [
-                        $data['rowData']['Latitud'],
-                        $data['rowData']['Longitud'],
-                        'A',
-                        '#81a1c1',
-                        "<i class='bi bi-cursor-fill text-primary'></i>",
-                        '<b>Direccion</b><br>'.$data['rowData']['Direccion']
-                    ],
-                ];
-                //se imprime input
-                $Options = [
-                    'Latitud'      => $data['rowData']['Latitud'],   //Latitud de la ubicacion
-                    'Longitud'     => $data['rowData']['Longitud'],  //Longitud de la ubicacion
-                    'ID_Map'       => 'map_1',                       //ID del div donde se dibuja el html
-                    'Zoom'         => 14,                            //Zoom del mapa
-                    'attribution'  => '&copy; Ubicacion',            //Pie de pagina del mapa
-                    'arrMarkers'   => $arrMarkers,                   //array con los marcadores
-                    'defaultLayer' => 'Esri_WorldTopoMap',           //Layer a mostrar en la carga
-                    'ConfMode'     => 3,                             //Modo del mapa
-                ];
-                echo $data['Fnc_WidgetsMaps']->leaFletMap_from_gps($Options);
-                ?>
-            </div>
-        <?php } ?>
+        <?php if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'){
+            echo '<div class="square-rounded-2 square-border-3 w-100">';
+                // Valido segun mapa
+                switch ($data['UserData']['Config_motorMap']) {
+                    /********************************/
+                    // Google maps
+                    case 1:
+                        # code...
+                        break;
+                    /********************************/
+                    // leaFlet maps
+                    case 2:
+                        //variable para los marcadores
+                        $arrMarkers = [
+                            [
+                                $data['rowData']['Latitud'],
+                                $data['rowData']['Longitud'],
+                                'A',
+                                '#81a1c1',
+                                "<i class='bi bi-cursor-fill text-primary'></i>",
+                                '<b>Direccion</b><br>'.$data['rowData']['Direccion']
+                            ],
+                        ];
+                        //se imprime input
+                        $Options = [
+                            'Latitud'      => $data['rowData']['Latitud'],   //Latitud de la ubicacion
+                            'Longitud'     => $data['rowData']['Longitud'],  //Longitud de la ubicacion
+                            'ID_Map'       => 'map_1',                       //ID del div donde se dibuja el html
+                            'Zoom'         => 14,                            //Zoom del mapa
+                            'attribution'  => '&copy; Ubicacion',            //Pie de pagina del mapa
+                            'arrMarkers'   => $arrMarkers,                   //array con los marcadores
+                            'defaultLayer' => 'Esri_WorldTopoMap',           //Layer a mostrar en la carga
+                            'ConfMode'     => 3,                             //Modo del mapa
+                        ];
+                        echo $data['Fnc_WidgetsMaps']->leaFletMap_from_gps($Options);
+                        break;
+                }
+            echo '</div>';
+        } ?>
     </div>
     <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
         <?php
-        //Se obtiene el nombre o la razón social
-        $Entidad = '';
-        $Entidad .= !empty($data['rowData']['Nombre'])
-                    ? $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']
-                    : $data['rowData']['RazonSocial'];
         //selecciona
         switch ($data['rowData']['idTipoEntidad']) {
             //Persona Natural
@@ -58,7 +63,7 @@
                 $arrData_1 = [
                     ['Icon' => '','Titulo' => 'Tipo',             'Texto' => $data['rowData']['Tipo']],
                     ['Icon' => '','Titulo' => 'Tipo Entidad',     'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $Entidad],
+                    ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']],
                     ['Icon' => '','Titulo' => 'Nick',             'Texto' => $data['rowData']['Nick']],
                     ['Icon' => '','Titulo' => 'Fecha Nacimiento', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FNacimiento'])],
                     ['Icon' => '','Titulo' => 'Sexo',             'Texto' => $data['rowData']['Sexo']],
@@ -69,7 +74,7 @@
                 $arrData_1 = [
                     ['Icon' => '','Titulo' => 'Tipo',         'Texto' => $data['rowData']['Tipo']],
                     ['Icon' => '','Titulo' => 'Tipo Entidad', 'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $Entidad],
+                    ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $data['rowData']['RazonSocial']],
                     ['Icon' => '','Titulo' => 'Nick',         'Texto' => $data['rowData']['Nick']],
                     ['Icon' => '','Titulo' => 'Web',          'Texto' => $data['rowData']['Web']],
                     ['Icon' => '','Titulo' => 'Giro',         'Texto' => $data['rowData']['Giro']],

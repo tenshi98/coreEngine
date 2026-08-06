@@ -13,9 +13,10 @@
                 <li class="nav-item flex-fill"><button class="nav-link w-100 active" data-bs-toggle="tab" data-bs-target="#resumen"><i class="bi bi-card-list"></i> Resumen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
-                <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>      <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-cargas"     onclick="tabCargasLoadList()"><i class="bi bi-person"></i> Cargas</button></li><?php } ?>
-                <?php if($data['UserData']["entidadesListadoVerContactos"]==2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-contactos"  onclick="tabContactosLoadList()"><i class="bi bi-book"></i> Contactos</button></li><?php } ?>
-                <?php if($data['UserData']["entidadesListadoVerDocumentos"]==2){ ?>  <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-documentos" onclick="tabDocumentosLoadList()"><i class="bi bi-file-text"></i> Documentos</button></li><?php } ?>
+                <?php if($data['rowData']['Direccion']!=''&&$data['rowData']['Latitud']!='0'){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-map" id="map-tab"><i class="bi bi-geo-alt"></i> Centrar Mapa</button></li><?php } ?>
+                <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>                     <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-cargas"     onclick="tabCargasLoadList()"><i class="bi bi-person"></i> Cargas</button></li><?php } ?>
+                <?php if($data['UserData']["entidadesListadoVerContactos"]==2){ ?>                  <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-contactos"  onclick="tabContactosLoadList()"><i class="bi bi-book"></i> Contactos</button></li><?php } ?>
+                <?php if($data['UserData']["entidadesListadoVerDocumentos"]==2){ ?>                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-documentos" onclick="tabDocumentosLoadList()"><i class="bi bi-file-text"></i> Documentos</button></li><?php } ?>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs"        onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
             </ul>
             <div class="tab-content pt-2">
@@ -109,7 +110,10 @@
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'Edit_password',  'Value'  => '','Required' => 1,'Icon' => 'bi bi-key']);
                                 }
                                 //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad',     'Value' => $data['rowData']['idEntidad'],              'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'OldDireccion',  'Value' => $data['rowData']['Direccion'] ?? 'xxxxxxx', 'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'OldLatitud',    'Value' => $data['rowData']['Latitud'] ?? 'xxxxxxx',   'Required' => 2]);
+
                                 ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                     <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
@@ -125,18 +129,21 @@
                 //Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
                 //Se obtiene el nombre o la razón social
-                $Entidad  = '';
-                $Entidad .= !empty($data['rowData']['Nombre'])
-                            ? $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']
-                            : $data['rowData']['RazonSocial'];
-                ?>
+                switch ($data['rowData']['idTipoEntidad']) {
+                    case 1: $Entidad  = $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']; break; //Persona Natural
+                    case 2: $Entidad  = $data['rowData']['RazonSocial']; break;                                                                     //Empresas
+                } ?>
 
                 <div class="tab-pane fade" id="resumen-img">
-                    <h5 class="text-color-red-dark">
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                            Imagen de <?php echo $Entidad; ?>
+                    <div class="d-flex justify-content-center pt-4">
+                        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
+                            <h4 class="title_h4 box-title text-color-red-dark">
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                    Imagen de <?php echo $Entidad; ?>
+                                </div>
+                            </h4>
                         </div>
-                    </h5>
+                    </div>
                     <div class="clearfix"></div>
                     <?php
                     if(isset($data['rowData']['Direccion_img'])&&$data['rowData']['Direccion_img']!=''){ ?>
@@ -158,6 +165,107 @@
                         </div>
                     <?php } ?>
                 </div>
+
+                <?php if($data['rowData']['Direccion']!=''&&$data['rowData']['Latitud']!='0'){ ?>
+                    <div class="tab-pane fade" id="resumen-map">
+                        <div class="d-flex justify-content-center pt-4">
+                            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
+                                <h4 class="title_h4 box-title text-color-red-dark">
+                                    <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                                        Centrar Mapa a la dirección <?php echo $data['rowData']['Direccion']; ?>
+                                    </div>
+                                </h4>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        <div class="d-flex justify-content-center pt-4">
+                            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
+                                <div class="square-rounded-2 square-border-3 w-100" style="border-radius: 4px !important;">
+                                    <?php
+                                    if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'){
+                                        // Valido segun mapa
+                                        switch ($data['UserData']['Config_motorMap']) {
+                                            /********************************/
+                                            // Google maps
+                                            case 1:
+                                                # code...
+                                                break;
+                                            /********************************/
+                                            // leaFlet maps
+                                            case 2:
+                                                //variable para los marcadores
+                                                $arrMarkers = [
+                                                    [
+                                                        $data['rowData']['Latitud'],
+                                                        $data['rowData']['Longitud'],
+                                                        'A',
+                                                        '#81a1c1',
+                                                        "<i class='bi bi-cursor-fill text-primary'></i>",
+                                                        '<b>Direccion</b><br>'.$data['rowData']['Direccion']
+                                                    ],
+                                                ];
+                                                //se imprime input
+                                                $Options = [
+                                                    'Latitud'             => $data['rowData']['Latitud'],   //Latitud de la ubicacion
+                                                    'Longitud'            => $data['rowData']['Longitud'],  //Longitud de la ubicacion
+                                                    'ID_Map'              => 'map_center',                  //ID del div donde se dibuja el html
+                                                    'Zoom'                => 16,                            //Zoom del mapa
+                                                    'attribution'         => '&copy; Ubicacion',            //Pie de pagina del mapa
+                                                    'arrMarkers'          => $arrMarkers,                   //array con los marcadores
+                                                    'defaultLayer'        => 'Esri_WorldTopoMap',           //Layer a mostrar en la carga
+                                                    'ConfMode'            => 4,                             //Modo del mapa
+                                                    'dragabbleMarker'     => true,                          //Se indica que los marcadores son movibles
+                                                    'dragabbleFormItems'  => 'Edit_Latitud,Edit_Longitud',  //
+
+                                                ];
+                                                echo $data['Fnc_WidgetsMaps']->leaFletMap_from_gps($Options);
+                                                break;
+                                        }
+                                    }
+                                    ?>
+                                </div>
+                                <script>
+                                    document.getElementById('map-tab').addEventListener('shown.bs.tab', function () {
+                                        setTimeout(function () {
+                                            map_center.invalidateSize();
+                                        }, 50);
+                                    });
+                                </script>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-center pt-4">
+                            <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
+                                <form id="FormEditDataMap" name="FormEditDataMap" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+                                    <div class="d-flex justify-content-center">
+                                        <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
+                                            <?php
+                                            //Se verifican si existen los datos
+                                            $x1  = $data['rowData']['Latitud'] ?? '';
+                                            $x2  = $data['rowData']['Longitud'] ?? '';
+
+                                            //se dibujan los inputs
+                                            echo '<div class="row">';
+                                                echo '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
+                                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-geo-alt', 'Placeholder' => 'Latitud',  'Name' => 'Latitud',  'Id' => 'Edit_Latitud',  'Value' => $x1, 'Required' => 2]);
+                                                echo '</div>';
+                                                echo '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
+                                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-geo-alt', 'Placeholder' => 'Longitud', 'Name' => 'Longitud', 'Id' => 'Edit_Longitud', 'Value' => $x2, 'Required' => 2]);
+                                                echo '</div>';
+                                            echo '</div>';
+
+                                            //datos ocultos
+                                            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
+                                            ?>
+                                            <div class="d-grid gap-2 d-md-flex justify-content-md-center pt-4">
+                                                <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                <?php } ?>
 
                 <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-cargas">
@@ -266,6 +374,40 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
+    /******************************************/
+    $("#FormEditDataMap").submit(function(e) {
+        //Se validan los datos de los formularios
+        var validatorResult = validator.checkAll(this);
+        //verifico el resultado
+        if(validatorResult.valid===false){
+            return !!validatorResult.valid;
+        }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
+            e.preventDefault();
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Metodo      = 'POST';
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update'; ?>';
+            let Informacion = $("#FormEditDataMap").serialize();
+            const Options     = {
+                UpdateDiv : [
+                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>'},
+                ],
+                showNoti:'Datos Editados Correctamente',
+                triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
+                closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
+            };
+            //Se envian los datos al formulario
+            SendDataForms(Metodo, Direccion, Informacion, Options);
+        }
+    });
+
     /******************************************/
     //Oculto
     document.getElementById('div_Edit_Nombre').style.display          = 'none';

@@ -15,18 +15,13 @@
     </div>
     <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
         <?php
-        //Se obtiene el nombre o la razón social
-        $Entidad  = !empty($data['rowData']['Nombre'])
-                    ? $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']
-                    : $data['rowData']['RazonSocial'];
-
         //selecciono
         switch ($data['rowData']['idTipoEntidad']) {
             //Persona Natural
             case 1:
                 $arrData_1 = [
                     ['Icon' => '','Titulo' => 'Tipo Entidad',     'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $Entidad],
+                    ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']],
                     ['Icon' => '','Titulo' => 'Nick',             'Texto' => $data['rowData']['Nick']],
                     ['Icon' => '','Titulo' => 'Sexo',             'Texto' => $data['rowData']['Sexo']],
                 ];
@@ -35,7 +30,7 @@
             case 2:
                 $arrData_1 = [
                     ['Icon' => '','Titulo' => 'Tipo Entidad', 'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $Entidad],
+                    ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $data['rowData']['RazonSocial']],
                     ['Icon' => '','Titulo' => 'Nick',         'Texto' => $data['rowData']['Nick']],
                 ];
                 break;
