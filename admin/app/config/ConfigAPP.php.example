@@ -6,12 +6,12 @@ class ConfigAPP{
 
     //Datos del Software
     const SOFTWARE = [
-        'SoftwareName'    => 'loremIpsum',               //Nombre del software
+        'SoftwareName'    => 'coreEngine',               //Nombre del software
         'SoftwareSlogan'  => 'Software Modular',         //Slogan del software
-        'CompanyName'     => 'loremIpsum',               //Nombre de la compañia
-        'CompanyEmail'    => 'loremIpsum@loremIpsum.cl', //Email de la compañia
+        'CompanyName'     => 'coreEngine',               //Nombre de la compañia
+        'CompanyEmail'    => 'coreEngine@coreEngine.cl', //Email de la compañia
         'CompanyCredits'  => '',                         //Creditos
-        'URL'             => 'https://loremIpsum.cl',      //URL
+        'URL'             => 'http://localhost/coreEngine/admin/public/',      //URL
     ];
 
     //Configuracion de la aplicacion
@@ -21,7 +21,7 @@ class ConfigAPP{
          * Numero maximo de registros sin paginar
          * Por defecto 1000 antes de paginar
          **********************************************************************/
-        'N_MaxItems'              => 1000,
+        'N_MaxItems'              => 2000,
 
         /***********************************************************************
          * Seguridad
@@ -43,7 +43,7 @@ class ConfigAPP{
          * Requiere: Ninguna librería externa
          **********************************************************************/
         'uploadFolder' => __DIR__ . '/../../../admin/public/upload/',  // Ruta absoluta en disco
-        'uploadUrl'    => 'https://miapp.com/admin/public/upload',     // URL pública base (sin slash final)
+        'uploadUrl'    => self::SOFTWARE['URL'].'upload',              // URL pública base (sin slash final)
 
         /***********************************************************************
          * AMAZON S3 (o servicios compatibles: MinIO, DigitalOcean Spaces,
