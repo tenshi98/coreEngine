@@ -321,10 +321,6 @@ class entidadesInstaller extends ControllerBase {
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 3, 'RutaWeb' => 'administracion/entidades/listado/documentos',                    'RutaController' => 'entidadesListadoDocumentos->Delete',         'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'];
 
                 break;
-            /******************************************/
-            case 3:
-                //
-                break;
         }
 
         /******************************************/

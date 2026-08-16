@@ -339,10 +339,6 @@ class cotizacionInstaller extends ControllerBase {
                 $arrRutas[] = ['idPermisos' => $permisosID, 'idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/informe/busqueda/listado/print/@id', 'RutaController' => 'cotizacionListado->Print',      'Descripcion' => 'Pantalla imprimir',  'idLevelLimit' => 1, 'Controller' => 'informeCotizacion'];
 
                 break;
-            /******************************************/
-            case 3:
-                //nada
-                break;
         }
 
         /******************************************/
