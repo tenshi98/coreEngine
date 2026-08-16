@@ -185,9 +185,6 @@ class FunctionsLocation {
             $ubicacion = preg_replace($patron, $reemplazo, $ubicacion);
         }
 
-        // Eliminacion de acentos y letras raras
-        $ubicacion = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $ubicacion);
-
         // Elimina espacios múltiples
         $ubicacion = preg_replace('/\s+/', ' ', $ubicacion);
 
