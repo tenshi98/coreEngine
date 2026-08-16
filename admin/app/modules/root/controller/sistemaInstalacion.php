@@ -334,7 +334,7 @@ class sistemaInstalacion extends ControllerBase {
                 $ControllerData = new $dataPut['Controller'];
                 $Response       = $ControllerData->InstallModule();
                 //si es la respuesta esperada
-                if ($Response['status']){
+                if ($Response){
                     // Devuelvo true con código 200 (OK)
                     Response::success(true);
                 //si no lo es
@@ -368,7 +368,7 @@ class sistemaInstalacion extends ControllerBase {
                 $ControllerData = new $dataPut['Controller'];
                 $Response       = $ControllerData->UninstallModule();
                 //si es la respuesta esperada
-                if ($Response['status']){
+                if ($Response){
                     // Devuelvo true con código 200 (OK)
                     Response::success(true);
                 //si no lo es
@@ -410,6 +410,9 @@ class sistemaInstalacion extends ControllerBase {
             "archivosInstaller",
             "IA_moduleInstaller",
         );
+
+        //Ordenar Alfabeticamente
+        sort($array);
 
         //devuelvo
         return $array;
