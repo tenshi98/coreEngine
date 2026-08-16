@@ -283,7 +283,7 @@ class productosListadoObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idProducto,Observacion',
+                'data'      => 'idObservaciones,idProducto,Observacion',
                 'required'  => 'idProducto,Observacion',
                 'unique'    => '',
                 'encode'    => '',

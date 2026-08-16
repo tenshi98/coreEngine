@@ -297,7 +297,7 @@ class entidadesSectores extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'Nombre',
+                'data'      => 'idSector,Nombre',
                 'required'  => 'Nombre',
                 'unique'    => 'Nombre',
                 'encode'    => '',

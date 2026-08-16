@@ -307,7 +307,7 @@ class crudNormal extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
+                'data'      => 'idCrud,idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
                 'required'  => 'idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
                 'unique'    => 'Email,Rut',
                 'encode'    => '',

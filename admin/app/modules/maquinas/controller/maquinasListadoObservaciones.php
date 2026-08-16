@@ -283,7 +283,7 @@ class maquinasListadoObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idMaquina,Observacion',
+                'data'      => 'idObservaciones,idMaquina,Observacion',
                 'required'  => 'idMaquina,Observacion',
                 'unique'    => '',
                 'encode'    => '',

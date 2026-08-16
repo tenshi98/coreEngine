@@ -297,7 +297,7 @@ class productosTipos extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'Nombre',
+                'data'      => 'idTipoProducto,Nombre',
                 'required'  => 'Nombre',
                 'unique'    => 'Nombre',
                 'encode'    => '',

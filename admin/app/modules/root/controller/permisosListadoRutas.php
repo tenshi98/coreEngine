@@ -282,7 +282,7 @@ class permisosListadoRutas extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
+                'data'      => 'idRutas,idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
                 'required'  => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
                 'unique'    => '',
                 'encode'    => '',

@@ -284,7 +284,7 @@ class bodegasListadoObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idBodegas,Observacion',
+                'data'      => 'idObservaciones,idBodegas,Observacion',
                 'required'  => 'idBodegas,Observacion',
                 'unique'    => '',
                 'encode'    => '',

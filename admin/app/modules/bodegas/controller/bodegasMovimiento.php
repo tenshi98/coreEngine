@@ -653,7 +653,7 @@ class bodegasMovimiento extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,Creacion_fecha,Creacion_hora,Observaciones,fecha_auto,idUsuario,idFacturacion',
+                'data'      => 'idMovimiento,idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,Creacion_fecha,Creacion_hora,Observaciones,fecha_auto,idUsuario,idFacturacion',
                 'required'  => 'idEstadoIngreso,Creacion_fecha,Creacion_hora,fecha_auto',
                 'unique'    => '',
                 'encode'    => '',

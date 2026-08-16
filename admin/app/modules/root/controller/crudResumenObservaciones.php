@@ -283,7 +283,7 @@ class crudResumenObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idCrud,Observacion',
+                'data'      => 'idObservaciones,idCrud,Observacion',
                 'required'  => 'idCrud,Observacion',
                 'unique'    => '',
                 'encode'    => '',

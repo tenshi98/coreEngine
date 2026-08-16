@@ -283,7 +283,7 @@ class serviciosListadoObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idServicio,Observacion',
+                'data'      => 'idObservaciones,idServicio,Observacion',
                 'required'  => 'idServicio,Observacion',
                 'unique'    => '',
                 'encode'    => '',

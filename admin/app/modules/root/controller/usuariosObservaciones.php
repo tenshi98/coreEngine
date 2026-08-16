@@ -227,7 +227,7 @@ class usuariosObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idUsuario,Observacion',
+                'data'      => 'idObservaciones,idUsuario,Observacion',
                 'required'  => 'idUsuario,Observacion',
                 'unique'    => '',
                 'encode'    => '',

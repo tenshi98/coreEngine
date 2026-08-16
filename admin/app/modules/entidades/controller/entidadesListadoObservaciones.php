@@ -283,7 +283,7 @@ class entidadesListadoObservaciones extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idEntidad,Observacion,FechaCreacion',
+                'data'      => 'idObservaciones,idEntidad,Observacion,FechaCreacion',
                 'required'  => 'idEntidad,Observacion',
                 'unique'    => '',
                 'encode'    => '',

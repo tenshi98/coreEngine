@@ -955,7 +955,7 @@ class kanbanTareas extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
+                'data'      => 'idKanban,idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
                 'required'  => 'idPrioridad,Fecha,Titulo,Descripcion',
                 'unique'    => '',
                 'encode'    => '',

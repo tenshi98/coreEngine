@@ -366,7 +366,7 @@ class permisosCategorias extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'Nombre,Icon,IdIconColor,Descripcion,Carpeta',
+                'data'      => 'idPermisosCat,Nombre,Icon,IdIconColor,Descripcion,Carpeta',
                 'required'  => 'Nombre,Icon,IdIconColor,Carpeta',
                 'unique'    => 'Nombre',
                 'encode'    => '',

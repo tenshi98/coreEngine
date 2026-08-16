@@ -297,7 +297,7 @@ class serviciosCategorias extends ControllerBase {
             /******************************/
             //Se genera la query
             $query = [
-                'data'      => 'Nombre',
+                'data'      => 'idCategoria,Nombre',
                 'required'  => 'Nombre',
                 'unique'    => 'Nombre',
                 'encode'    => '',
