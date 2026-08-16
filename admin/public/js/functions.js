@@ -188,22 +188,33 @@ function SendDataErrors(Options, jqXHR, textStatus, errorThrown) {
     // Se verifica la respuesta
     if (jqXHR.responseText) {
         //variable
-        let message = '';
-        var jsonData = JSON.parse(jqXHR.responseText);
+        let message    = '';
+        const jsonData = JSON.parse(jqXHR.responseText);
         //se verifica si resultado es un array
-        if(Array.isArray(jsonData.data)===true){
-            for (var i = 0; i < jsonData.data.length; i++) {
-                var counter = jsonData.data[i];
-                message += counter.message + '<br>';
-            }
+        if (Array.isArray(jsonData.data)) {
+            // data es un array
+            jsonData.data.forEach(item => {
+                if (item.message) {
+                    message += item.message + '<br>';
+                }
+            });
+        //si hay datos
+        } else if (jsonData.data) {
+            // data es un string u otro valor
+            message = jsonData.message
+                ? `${jsonData.message}<br>${jsonData.data}`
+                : jsonData.data;
         //si no lo es solo se muestra
-        }else{
-            message = jsonData.message;
-        }
-        // fallback por si queda vacío
-        if (!message) {
+        } else {
+            // No existe data
             message = jsonData.message || 'Error desconocido';
         }
+
+        // Fallback por si queda vacío
+        if (!message) {
+            message = 'Error desconocido';
+        }
+
         /******************************/
         //se muestra el mensaje
         Swal.fire({position: "top-end",timer: 5000,showConfirmButton: false,timerProgressBar: true,icon: 'error',html: message});
@@ -375,20 +386,3 @@ function exportTableToExcel(tableID, filename = ''){
         downloadLink.click();
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
