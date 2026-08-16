@@ -1157,7 +1157,7 @@ class UIFormInputs {
 			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
 			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
+			$this->TemplateRender->assign('placeholder', ($FormCol==12 ? '' : $placeholder));
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
