@@ -109,9 +109,11 @@
                                     $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'Edit_password',  'Value'  => '','Required' => 1,'Icon' => 'bi bi-key']);
                                 }
+                                //Se verifica
+                                $OldDireccion = (isset($data['rowData']['Direccion'])&&$data['rowData']['Direccion']!='') ? $data['rowData']['Direccion'] : 'xxxxxxx';
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad',     'Value' => $data['rowData']['idEntidad'],              'Required' => 2]);
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'OldDireccion',  'Value' => $data['rowData']['Direccion'] ?? 'xxxxxxx', 'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'OldDireccion',  'Value' => $OldDireccion,                              'Required' => 2]);
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'OldLatitud',    'Value' => $data['rowData']['Latitud'] ?? 'xxxxxxx',   'Required' => 2]);
 
                                 ?>
