@@ -107,7 +107,7 @@ class CheckData{
 	 * ```
 	 *
      */
-    public function checkingData(array $config): array|bool {
+    public function checkingData(array $config): array {
 
         /******************************************************************/
         // Variables iniciales
@@ -129,7 +129,13 @@ class CheckData{
                     $errors[] = ["message" => "No ha llenado el campo obligatorio: $field."];
                 }
             }
-            if (!empty($errors)) { return $errors; }
+            // Si existen errores, retornar respuesta estándar
+            if (!empty($errors)) {
+                return [
+                    'status' => false,
+                    'error'  => $errors
+                ];
+            }
         }
 
         /******************************************************************/
@@ -176,7 +182,13 @@ class CheckData{
         }
 
         // Si se acumularon errores de formato, se retornan antes de proceder a la encriptación
-        if (!empty($errors)) { return $errors; }
+        // Si existen errores de validación
+        if (!empty($errors)) {
+            return [
+                'status' => false,
+                'error'  => $errors
+            ];
+        }
 
         /******************************************************************/
         // PASO 3: Encriptación de campos sensibles (Seguridad)
@@ -200,7 +212,11 @@ class CheckData{
         }
 
         // Retorno final: false indica "Sin Errores" (Lógica inversa para compatibilidad con condicionales)
-        return empty($errors) ? false : $errors;
+        // Retorno exitoso
+        return [
+            'status' => true,
+            'error'  => []
+        ];
     }
 
     /*******************************************************************************************************************/

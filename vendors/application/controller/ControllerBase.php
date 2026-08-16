@@ -268,7 +268,9 @@ class ControllerBase {
         /********************** Si todo esta ok **********************/
         //Ejecuto el chequeo
         $checkData = $this->checkData->checkingData($DataCheck);
-        if ($checkData!==false) { return $checkData;}
+        if ($checkData['status'] === false) {
+            return $checkData;
+        }
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -321,7 +323,9 @@ class ControllerBase {
         /********************** Si todo esta ok **********************/
         //Ejecuto el chequeo
         $checkData = $this->checkData->checkingData($DataCheck);
-        if ($checkData!==false) { return $checkData;}
+        if ($checkData['status'] === false) {
+            return $checkData;
+        }
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
@@ -786,7 +790,7 @@ class ControllerBase {
      *
      * Esta función asume una arquitectura de carpetas basada en convenciones donde las rutas
      * contienen los directorios "controller" y "views". Realiza una manipulación de strings
-     * para extraer la ruta relativa desde el nombre de la aplicación y sustituir el 
+     * para extraer la ruta relativa desde el nombre de la aplicación y sustituir el
      * segmento de lógica por el de presentación.
      *
      * @param string $directorio El path absoluto o relativo completo del archivo del controlador.
