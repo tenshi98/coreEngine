@@ -46,7 +46,7 @@
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password',       'Value' => '1234', 'Required' => 2]);//password por defecto
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',       'Value' => 1,      'Required' => 2]);//Usuario Activo
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMenuPosicion', 'Value' => 1,      'Required' => 2]);//Lateral
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMenuPosicion', 'Value' => 2,      'Required' => 2]);//Superior
                     ?>
                 </div>
                 <div class="modal-footer">
@@ -96,4 +96,3 @@
     });
 
 </script>
-
