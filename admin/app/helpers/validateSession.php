@@ -15,7 +15,7 @@ class validateSession {
 
     /******************************************************************************/
     //Checkeo Login
-    public static function checkLogin($cockieToken, $f3, $Headers){
+    public static function checkLogin($cookieToken, $f3, $Headers){
 
         /******************************************/
         //Llamo a las otras clases
@@ -42,7 +42,7 @@ class validateSession {
         //Protocolo web, acceso normal
         }else{
             //Devuelvo el valor contenido en el token
-           $Token = $cockieToken;
+           $Token = $cookieToken;
            //tipo de sesion
            $TypeSession = 1;
         }

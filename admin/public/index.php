@@ -48,15 +48,15 @@ $validateSession = new validateSession();
 
 /*******************************************************/
 //Se verifica token
-$cockieToken = isset($_COOKIE['Sesion_tk_'.date("Y-m-d")])
+$cookieToken = isset($_COOKIE['Sesion_tk_'.date("Y-m-d")])
              ? $_COOKIE['Sesion_tk_'.date("Y-m-d")]
              : false;
 
 /*******************************************************/
 //Se verifica si existen datos
 $UserSesion   = (!$f3->get('SESSION.TokenUser') || !$f3->get('SESSION.TokenExpires'))
-                ? $validateSession->checkLogin($cockieToken, $f3, getallheaders())
-                : $validateSession->validateSession($cockieToken, $f3, getallheaders());
+                ? $validateSession->checkLogin($cookieToken, $f3, getallheaders())
+                : $validateSession->validateSession($cookieToken, $f3, getallheaders());
 
 /**********************************************************************************************************************************/
 /*                                                        Usuarios Logueados                                                      */
