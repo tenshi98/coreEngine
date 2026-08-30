@@ -1011,14 +1011,14 @@ class UIWidgetsMaps {
                     ".$ID_Map.".invalidateSize();
                 });
             } catch (error) {
-                //nada
+                // Nada
             }
             try {
                 document.getElementById('viewModal-lg').addEventListener('shown.bs.modal', function () {
                     ".$ID_Map.".invalidateSize();
                 });
             } catch (error) {
-                //nada
+                // Nada
             }
             ";
 
@@ -1605,7 +1605,7 @@ class UIWidgetsMaps {
                 $content     = $item[4] ?? $Ubicacion;
                 //Se hace la busqueda de lat y long por su direccion
                 $result = $fncLocation->geocodeAddress($Ubicacion);
-                //Si hay resultados se guarda
+                // Si hay resultados se guarda
                 if ($result) {
                     //Se guarda el dato
                     $arrMarkers[] = [$result['lat'], $result['lon'], $iconExName, $iconFill, $contentHtml, $content];

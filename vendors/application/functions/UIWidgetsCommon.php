@@ -45,7 +45,7 @@ class UIWidgetsCommon {
 
 		/********************** Si todo esta ok **********************/
         /**********************  Retorno datos  **********************/
-		//Variables
+		// Variables
 		$counter    = 1;
 		$widgetData = '';
 
@@ -626,7 +626,7 @@ class UIWidgetsCommon {
 			//Recorro
 			foreach ( $arrData as $data ) {
 				/*************************************/
-				//Verifico si existe un titulo
+				// Verifico si existe un titulo
 				if(isset($data['Titulo'])&&$data['Titulo']!=''){
 					//Verifico si se envian datos para el icono
 					$Icon = (isset($data['Icon']) && $data['Icon'] != '') ? $data['Icon'] : 'bi bi-chevron-double-right text-color-red';
@@ -2862,9 +2862,9 @@ class UIWidgetsCommon {
 					* =============================== */
 					else if (name.match(/\.(doc|docx|xls|xlsx|ppt|pptx)$/)) {
 						body.innerHTML = `
-							<iframe 
+							<iframe
 								src="https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(location.origin + normalizarURL(filePath))}"
-								width="100%" 
+								width="100%"
 								height="600px"
 								style="border:none;">
 							</iframe>
@@ -2915,4 +2915,3 @@ class UIWidgetsCommon {
 
 
 }
-
