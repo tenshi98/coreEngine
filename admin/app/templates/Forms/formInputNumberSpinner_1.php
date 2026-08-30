@@ -1,17 +1,19 @@
-<div class="row mb-3" id="div_<?php echo $nameID; ?>">
-    <label class="col-sm-<?php echo $otrcol; ?> col-form-label" id="label_<?php echo $name; ?>" for="<?php echo $nameID; ?>"><?php echo $placeholderIcon.$placeholder.$dataPopover; ?></label>
-    <div class="col-sm-<?php echo $FormCol; ?> field">
-        <input type="text" name="<?php echo $name; ?>" id="<?php echo $nameID; ?>" class="form-control" value="<?php echo $valor; ?>" placeholder="<?php echo $placeholder; ?>" <?php echo $requerido; ?>  onkeydown="return soloNumeroRealRacional(event)" style="text-align: center;">
+<div class="row mb-3" id="div_<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>">
+    <label class="col-sm-<?php echo htmlspecialchars($otrcol, ENT_QUOTES, 'UTF-8'); ?> col-form-label" id="label_<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>" for="<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>">
+        <?php echo $placeholderIcon.htmlspecialchars($placeholder, ENT_QUOTES, 'UTF-8').$dataPopover; ?>
+    </label>
+    <div class="col-sm-<?php echo htmlspecialchars($FormCol, ENT_QUOTES, 'UTF-8'); ?> field">
+        <input type="text" name="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>" id="<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>" class="form-control" value="<?php echo htmlspecialchars($valor, ENT_QUOTES, 'UTF-8'); ?>" placeholder="<?php echo htmlspecialchars($placeholder, ENT_QUOTES, 'UTF-8'); ?>" <?php echo $requerido; ?>  onkeydown="return soloNumeroRealRacional(event)" style="text-align: center;">
     </div>
 </div>
 
 <script>
     //se inicializa el plugin
-    $("#<?php echo $nameID; ?>").TouchSpin({
-        min: <?php echo $min; ?>,
-        max: <?php echo $max; ?>,
-        step: <?php echo $step; ?>,
-        decimals: <?php echo $ndecimal; ?>,
+    $("#<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>").TouchSpin({
+        min: <?php echo htmlspecialchars($min, ENT_QUOTES, 'UTF-8'); ?>,
+        max: <?php echo htmlspecialchars($max, ENT_QUOTES, 'UTF-8'); ?>,
+        step: <?php echo htmlspecialchars($step, ENT_QUOTES, 'UTF-8'); ?>,
+        decimals: <?php echo htmlspecialchars($ndecimal, ENT_QUOTES, 'UTF-8'); ?>,
         boostat: 5,
         maxboostedstep: 10
     });

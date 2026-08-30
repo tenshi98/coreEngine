@@ -1,9 +1,9 @@
 <div class="fileUpload btn btn-primary">
     <span><i class="fa fa-search" aria-hidden="true"></i> Seleccionar Imagen</span>
-    <input name="<?php echo $name; ?>" id="<?php echo $name; ?>" type="file" class="upload" />
+    <input name="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>" id="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>" type="file" class="upload" />
 </div>
 
-<div class="modal" id="<?php echo $name; ?>Modal">
+<div class="modal" id="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Modal">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
@@ -11,7 +11,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" style="min-height: 410px;">
-                <div id="<?php echo $name; ?>Preview"></div>
+                <div id="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Preview"></div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cerrar</button>
@@ -25,7 +25,7 @@
     /******************************************/
     $(document).ready(function(){
         //medidas de la imagen
-        $image_crop = $("#<?php echo $name; ?>Preview").croppie({
+        $image_crop = $("#<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Preview").croppie({
             enableExif: true,
             viewport: {
                 width:200,
@@ -38,7 +38,7 @@
             }
         });
         //se abre el modal
-        $("#<?php echo $name; ?>").on("change", function(){
+        $("#<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>").on("change", function(){
             var reader = new FileReader();
             reader.onload = function (event) {
                 $image_crop.croppie("bind", {
@@ -48,7 +48,7 @@
                 });
             }
             reader.readAsDataURL(this.files[0]);
-            $("#<?php echo $name; ?>Modal").modal("show");
+            $("#<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Modal").modal("show");
         });
         //se corta la imagen y se envia al formulario
         $("#cortar_image").click(function(event){
@@ -60,11 +60,11 @@
                     url:"<?php echo $URL; ?>",
                     type: "POST",
                     data:{
-                        "<?php echo $name; ?>": response,
+                        "<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>": response,
                         <?php echo $ExtraData; ?>,
                     },
                     success:function(data){
-                        $("#<?php echo $name; ?>Modal").modal("hide");
+                        $("#<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Modal").modal("hide");
                         location.reload();
                     }
                 });

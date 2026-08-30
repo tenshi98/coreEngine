@@ -1,6 +1,8 @@
-<div class="row mb-3" id="div_<?php echo $nameID; ?>">
-    <label class="col-sm-<?php echo $otrcol; ?> col-form-label" for="<?php echo $name; ?>"><?php echo $placeholderIcon.$placeholder.$dataPopover; ?></label>
-    <div class="col-sm-<?php echo $FormCol; ?> field">
-        <textarea name="<?php echo $name; ?>" id="<?php echo $nameID; ?>"  class="form-control" style="height: 100px" <?php echo $requerido; ?>><?php echo $value; ?></textarea>
+<div class="row mb-3" id="div_<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>">
+    <label class="col-sm-<?php echo htmlspecialchars($otrcol, ENT_QUOTES, 'UTF-8'); ?> col-form-label" for="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>">
+        <?php echo $placeholderIcon.htmlspecialchars($placeholder, ENT_QUOTES, 'UTF-8').$dataPopover; ?>
+    </label>
+    <div class="col-sm-<?php echo htmlspecialchars($FormCol, ENT_QUOTES, 'UTF-8'); ?> field">
+        <textarea name="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>" id="<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>"  class="form-control" style="height: 100px" <?php echo $requerido; ?>><?php echo htmlspecialchars($value, ENT_QUOTES, 'UTF-8'); ?></textarea>
     </div>
 </div>
