@@ -237,15 +237,15 @@ class FunctionsSecurityPasswords {
 	 * ```
 	 *
      */
-    public static function hashCreate($Texto): string {
+    public static function hashCreate($Texto, $costo = 12): string {
 
         /********************** Validaciones   **********************/
         // Se verifica si esta vacio
         if(!isset($Texto) || $Texto == ''){  return 'Sin datos ingresados en Texto'; }
 
         /********************** Si todo esta ok **********************/
-        // 'cost' 12 define el número de iteraciones del algoritmo (2^12).
-        $options = ['cost' => 12];
+        // 'cost' define el número de iteraciones del algoritmo (2^n).
+        $options = ['cost' => $costo];
 
         /********************** Retorno datos  **********************/
         // password_hash maneja automáticamente la generación de la sal (salt)
