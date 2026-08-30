@@ -510,7 +510,7 @@ class FunctionsServerServer {
 	/**
      * Crea o actualiza un archivo de clase PHP con constantes de configuración.
      *
-     * Esta función genera dinámicamente una clase denominada 'ConfigData'. Si el archivo no existe,
+     * Esta función genera dinámicamente una clase denominada 'ConfigDataBase'. Si el archivo no existe,
      * crea la estructura completa. Si existe, verifica la presencia de la clase y añade únicamente
      * las constantes que no se encuentren ya definidas para evitar duplicidad.
      *
@@ -591,7 +591,7 @@ class FunctionsServerServer {
                 // Sanitización del nombre de la constante (Mayúsculas y caracteres permitidos)
                 $constName  = preg_replace('/[^A-Z0-9_]/', '', strtoupper($constName));
                 $constBlock  = "    /*****************************************************/\n";
-                $constBlock .= "    //Variables para MySQL\n";
+                $constBlock .= "    // Variables para MySQL\n";
                 $constBlock .= "    const {$constName} = [\n";
 
                 foreach ($fields as $key => $value) {
@@ -627,7 +627,7 @@ class FunctionsServerServer {
                 $content .= "/*******************************************************************************************************************/\n";
                 $content .= "/* Se define la clase                                                 */\n";
                 $content .= "/*******************************************************************************************************************/\n";
-                $content .= "class ConfigData{\n";
+                $content .= "class ConfigDataBase{\n";
 
                 // Iterar y construir bloques para todas las variables recibidas
                 foreach ($variables as $constName => $fields) {
@@ -649,9 +649,9 @@ class FunctionsServerServer {
             $existingContent = file_get_contents($path);
 
             // Si el archivo existe pero no contiene la declaración de la clase
-            if (!preg_match('/class\s+ConfigData/i', $existingContent)) {
+            if (!preg_match('/class\s+ConfigDataBase/i', $existingContent)) {
 
-                $existingContent .= "\n\nclass ConfigData{\n";
+                $existingContent .= "\n\nclass ConfigDataBase{\n";
 
                 foreach ($variables as $constName => $fields) {
                     $existingContent .= $buildConstBlock($constName, $fields);
