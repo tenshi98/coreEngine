@@ -1,33 +1,55 @@
 <?php
+require_once __DIR__ . '/EnvLoader.php';
+
+/*******************************************************************************************************************/
+/*                                          Variables de entorno (credenciales de correo)                          */
+/*******************************************************************************************************************/
+define('ENV_MAIL_SMTP_SERVERURL', getenv('MAIL_SMTP_SERVERURL'));
+define('ENV_MAIL_SMTP_SERVERPORT', (int) getenv('MAIL_SMTP_SERVERPORT'));
+define('ENV_MAIL_SMTP_SERVERSECURE', getenv('MAIL_SMTP_SERVERSECURE'));
+define('ENV_MAIL_SMTP_USEREMAIL', getenv('MAIL_SMTP_USEREMAIL'));
+define('ENV_MAIL_SMTP_USERNAME', getenv('MAIL_SMTP_USERNAME'));
+define('ENV_MAIL_SMTP_PASSWORD', getenv('MAIL_SMTP_PASSWORD'));
+
+define('ENV_MAIL_GMAIL_SERVERURL', getenv('MAIL_GMAIL_SERVERURL'));
+define('ENV_MAIL_GMAIL_SERVERPORT', (int) getenv('MAIL_GMAIL_SERVERPORT'));
+define('ENV_MAIL_GMAIL_SERVERSECURE', getenv('MAIL_GMAIL_SERVERSECURE'));
+define('ENV_MAIL_GMAIL_USEREMAIL', getenv('MAIL_GMAIL_USEREMAIL'));
+define('ENV_MAIL_GMAIL_USERNAME', getenv('MAIL_GMAIL_USERNAME'));
+define('ENV_MAIL_GMAIL_PASSWORD', getenv('MAIL_GMAIL_PASSWORD'));
+
+define('ENV_MAIL_SENDINGBLUE_SERVERURL', getenv('MAIL_SENDINGBLUE_SERVERURL'));
+define('ENV_MAIL_SENDINGBLUE_SERVERAPI', getenv('MAIL_SENDINGBLUE_SERVERAPI'));
+
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
 class ConfigMail{
     /*****************************************************/
-    //Variables globales del servidor
+    // Variables globales del servidor
     const SMTPSender = [
-        'SERVERURL'    => 'smtp.mail.com',
-        'SERVERPORT'   => 465,
-        'SERVERSECURE' => 'SSL',
-        'USEREMAIL'    => 'joebloggs@gmail.com',
-        'USERNAME'     => 'joebloggs',
-        'PASSWORD'     => 'mypass',
+        'SERVERURL'    => ENV_MAIL_SMTP_SERVERURL,
+        'SERVERPORT'   => ENV_MAIL_SMTP_SERVERPORT,
+        'SERVERSECURE' => ENV_MAIL_SMTP_SERVERSECURE,
+        'USEREMAIL'    => ENV_MAIL_SMTP_USEREMAIL,
+        'USERNAME'     => ENV_MAIL_SMTP_USERNAME,
+        'PASSWORD'     => ENV_MAIL_SMTP_PASSWORD,
     ];
     /*****************************************************/
-    //Variables globales del servidor
+    // Variables globales del servidor
     const GmailSender = [
-        'SERVERURL'    => 'smtp.gmail.com',
-        'SERVERPORT'   => 465,
-        'SERVERSECURE' => 'SSL',
-        'USEREMAIL'    => 'joebloggs@gmail.com',
-        'USERNAME'     => 'joebloggs',
-        'PASSWORD'     => 'mypass',
+        'SERVERURL'    => ENV_MAIL_GMAIL_SERVERURL,
+        'SERVERPORT'   => ENV_MAIL_GMAIL_SERVERPORT,
+        'SERVERSECURE' => ENV_MAIL_GMAIL_SERVERSECURE,
+        'USEREMAIL'    => ENV_MAIL_GMAIL_USEREMAIL,
+        'USERNAME'     => ENV_MAIL_GMAIL_USERNAME,
+        'PASSWORD'     => ENV_MAIL_GMAIL_PASSWORD,
     ];
     /*****************************************************/
-    //Variables globales del servidor
+    // Variables globales del servidor
     const SendingBlueSender = [
-        'SERVERURL'   => 'https://api.brevo.com/v3/smtp/email',
-        'SERVERAPI'   => '',
+        'SERVERURL'   => ENV_MAIL_SENDINGBLUE_SERVERURL,
+        'SERVERAPI'   => ENV_MAIL_SENDINGBLUE_SERVERAPI,
     ];
 
 }

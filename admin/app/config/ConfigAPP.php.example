@@ -1,4 +1,28 @@
 <?php
+require_once __DIR__ . '/EnvLoader.php';
+
+/*******************************************************************************************************************/
+/*                              Variables de entorno (credenciales de almacenamiento)                              */
+/*******************************************************************************************************************/
+define('ENV_S3_KEY', getenv('S3_KEY'));
+define('ENV_S3_SECRET', getenv('S3_SECRET'));
+define('ENV_S3_REGION', getenv('S3_REGION'));
+define('ENV_S3_BUCKET', getenv('S3_BUCKET'));
+define('ENV_S3_PREFIX', getenv('S3_PREFIX'));
+define('ENV_S3_ENDPOINT', getenv('S3_ENDPOINT'));
+
+define('ENV_GCS_PROJECT_ID', getenv('GCS_PROJECT_ID'));
+define('ENV_GCS_BUCKET', getenv('GCS_BUCKET'));
+define('ENV_GCS_PREFIX', getenv('GCS_PREFIX'));
+
+define('ENV_SFTP_HOST', getenv('SFTP_HOST'));
+define('ENV_SFTP_PORT', (int) getenv('SFTP_PORT'));
+define('ENV_SFTP_USER', getenv('SFTP_USER'));
+define('ENV_SFTP_PASSWORD', getenv('SFTP_PASSWORD'));
+define('ENV_SFTP_KEY_PASS', getenv('SFTP_KEY_PASS'));
+define('ENV_SFTP_BASE_PATH', getenv('SFTP_BASE_PATH'));
+define('ENV_SFTP_BASE_URL', getenv('SFTP_BASE_URL'));
+
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
@@ -6,12 +30,21 @@ class ConfigAPP{
 
     //Datos del Software
     const SOFTWARE = [
-        'SoftwareName'    => 'coreEngine',               //Nombre del software
-        'SoftwareSlogan'  => 'Software Modular',         //Slogan del software
-        'CompanyName'     => 'coreEngine',               //Nombre de la compañia
-        'CompanyEmail'    => 'coreEngine@coreEngine.cl', //Email de la compañia
-        'CompanyCredits'  => '',                         //Creditos
-        'URL'             => 'http://localhost/coreEngine/admin/public/',      //URL
+        /***********************************************************************
+         * Datos del Software
+         * SoftwareName:   Nombre del software
+         * SoftwareSlogan: Slogan del software
+         * CompanyName:    Nombre de la compañia
+         * CompanyEmail:   Email de la compañia
+         * CompanyCredits: Creditos
+         * URL:            URL
+         **********************************************************************/
+        'SoftwareName'    => 'coreEngine',
+        'SoftwareSlogan'  => 'Software Modular',
+        'CompanyName'     => 'coreEngine',
+        'CompanyEmail'    => 'coreEngine@coreEngine.cl',
+        'CompanyCredits'  => '',
+        'URL'             => 'http://localhost/coreEngine/admin/public/',
     ];
 
     //Configuracion de la aplicacion
@@ -25,7 +58,7 @@ class ConfigAPP{
 
         /***********************************************************************
          * Seguridad
-         * checkBruteConections: Numero maximo de intentos de login fallidos antes de banear
+         * checkBruteConections:    Numero maximo de intentos de login fallidos antes de banear
          * checkBruteMaxConections: Numero maximo de intentos de login fallidos antes de enviar a la lista negra
          **********************************************************************/
         'checkBruteConections'    => 5,
@@ -39,7 +72,7 @@ class ConfigAPP{
 
         /***********************************************************************
          * LOCAL — Sistema de archivos del servidor Apache/Nginx
-         * Driver: LocalStorageDriver
+         * Driver:   LocalStorageDriver
          * Requiere: Ninguna librería externa
          **********************************************************************/
         'uploadFolder' => __DIR__ . '/../../../admin/public/upload/',  // Ruta absoluta en disco
@@ -53,12 +86,12 @@ class ConfigAPP{
          *   Instalación: cd coreEngine/vendors/libs/aws-sdk
          *                composer require aws/aws-sdk-php
          **********************************************************************/
-        's3Key'       => 'AKIAIOSFODNN7EXAMPLE',                // IAM Access Key ID
-        's3Secret'    => 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYKEY',   // IAM Secret Access Key
-        's3Region'    => 'us-east-1',                           // Región AWS (ej: sa-east-1 para São Paulo)
-        's3Bucket'    => 'mi-bucket-produccion',                // Nombre del bucket
-        's3Prefix'    => 'uploads',                             // Prefijo global (carpeta raíz en el bucket)
-        's3Endpoint'  => '',                                    // Solo para S3-compatible (ej: 'https://minio.miapp.com')
+        's3Key'       => ENV_S3_KEY,                             // IAM Access Key ID
+        's3Secret'    => ENV_S3_SECRET,                          // IAM Secret Access Key
+        's3Region'    => ENV_S3_REGION,                          // Región AWS (ej: sa-east-1 para São Paulo)
+        's3Bucket'    => ENV_S3_BUCKET,                          // Nombre del bucket
+        's3Prefix'    => ENV_S3_PREFIX,                          // Prefijo global (carpeta raíz en el bucket)
+        's3Endpoint'  => ENV_S3_ENDPOINT,                        // Solo para S3-compatible (ej: 'https://minio.miapp.com')
         's3Acl'       => 'private',                             // 'private' | 'public-read'
         's3UrlSigned' => true,                                  // true = URLs pre-firmadas (seguro)
         's3UrlExpiry' => 3600,                                  // Segundos de validez de la URL firmada
@@ -70,10 +103,10 @@ class ConfigAPP{
          *   Instalación: cd coreEngine/vendors/libs/gcs-sdk
          *                composer require google/cloud-storage
          **********************************************************************/
-        'gcsProjectId' => 'mi-proyecto-gcp',                            // ID del proyecto en GCP
+        'gcsProjectId' => ENV_GCS_PROJECT_ID,                           // ID del proyecto en GCP
         'gcsKeyFile'   => __DIR__ . '/keys/service-account.json',       // Ruta al JSON de cuenta de servicio
-        'gcsBucket'    => 'mi-bucket-gcs',                              // Nombre del bucket GCS
-        'gcsPrefix'    => 'uploads',                                    // Prefijo global dentro del bucket
+        'gcsBucket'    => ENV_GCS_BUCKET,                               // Nombre del bucket GCS
+        'gcsPrefix'    => ENV_GCS_PREFIX,                               // Prefijo global dentro del bucket
         'gcsUrlSigned' => true,                                         // true = URLs firmadas
         'gcsUrlExpiry' => 3600,                                         // Segundos de validez (firmadas)
 
@@ -84,15 +117,38 @@ class ConfigAPP{
          *   Instalación: cd coreEngine/vendors/libs/sftp-sdk
          *                composer require phpseclib/phpseclib:~3.0
          **********************************************************************/
-        'sftpHost'       => 'sftp.ejemplo.com',                 // Hostname o IP del servidor
-        'sftpPort'       => 22,                                 // Puerto SSH (default: 22)
-        'sftpUser'       => 'deploy_user',                      // Usuario SSH
-        'sftpPassword'   => 'contraseña_segura',                // Password (vacío si usa clave privada)
+        'sftpHost'       => ENV_SFTP_HOST,                      // Hostname o IP del servidor
+        'sftpPort'       => ENV_SFTP_PORT,                      // Puerto SSH (default: 22)
+        'sftpUser'       => ENV_SFTP_USER,                      // Usuario SSH
+        'sftpPassword'   => ENV_SFTP_PASSWORD,                  // Password (vacío si usa clave privada)
         'sftpPrivateKey' => __DIR__ . '/keys/id_rsa',           // Ruta a clave privada RSA (opcional)
-        'sftpKeyPass'    => '',                                 // Passphrase de la clave privada (si aplica)
+        'sftpKeyPass'    => ENV_SFTP_KEY_PASS,                  // Passphrase de la clave privada (si aplica)
         'sftpTimeout'    => 30,                                 // Timeout de conexión en segundos
-        'sftpBasePath'   => '/var/www/html/admin/public/upload',// Ruta absoluta en el servidor remoto
-        'sftpBaseUrl'    => 'https://cdn.ejemplo.com/uploads',  // URL pública base (para getFileUrl())
+        'sftpBasePath'   => ENV_SFTP_BASE_PATH,                 // Ruta absoluta en el servidor remoto
+        'sftpBaseUrl'    => ENV_SFTP_BASE_URL,                  // URL pública base (para getFileUrl())
+
+        /***********************************************************************
+         * Seguridad
+         * --- Auditorias ---
+         * auditLoggerPath: Ruta base donde se almacenan los archivos de auditoría
+         * --- Auditorias ---
+         * rateLimiterFileIP:             Ruta del archivo utilizado para el control de rate limiting de las IP
+         * rateLimiterFileUser:           Ruta del archivo utilizado para el control de rate limiting de los Usuarios logueados
+         * rateLimiterGuestMaxAttempts:   Número máximo de intentos permitidos Usuarios desconocidos
+         * rateLimiterGuestWindowSeconds: Ventana de tiempo en segundos Usuarios desconocidos
+         * rateLimiterUserMaxAttempts:    Número máximo de intentos permitidos Usuarios logueados
+         * rateLimiterUserWindowSeconds:  Ventana de tiempo en segundos Usuarios logueados
+         * --- Auditorias ---
+         * errorLogFile: Ruta del archivo utilizado para los errores
+         **********************************************************************/
+        'auditLoggerPath'               => __DIR__ . '/../../security/',
+        'rateLimiterFileIP'             => __DIR__ . '/../../security/rateLimit_IP.json',
+        'rateLimiterFileUser'           => __DIR__ . '/../../security/rateLimit_User.json',
+        'rateLimiterGuestMaxAttempts'   => 5,
+        'rateLimiterGuestWindowSeconds' => 60,
+        'rateLimiterUserMaxAttempts'    => 20,
+        'rateLimiterUserWindowSeconds'  => 120,
+        'errorLogFile'                  => __DIR__ . '/../../security/error.log',
 
     ];
 
