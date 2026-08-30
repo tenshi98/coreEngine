@@ -13,18 +13,20 @@ class FunctionsSecurityCodification {
     /**
      * Codifica un texto utilizando el algoritmo AES-128-CTR para hacerlo ilegible.
      * * Permite el uso de una llave personalizada (passkey). Si no se proporciona, utiliza
-     * una llave interna predefinida. El resultado se sanitiza para ser seguro en URLs
-     * reemplazando caracteres conflictivos ('+' por '_' y '/' por '---').
+     * una llave interna predefinida. Genera un IV aleatorio en cada llamada y lo antepone
+     * al ciphertext (el IV no es secreto, pero nunca debe reutilizarse con la misma llave).
+     * El resultado se sanitiza para ser seguro en URLs reemplazando caracteres conflictivos
+     * ('+' por '_' y '/' por '---').
      *
      * @param string $simple_string Texto original que se desea codificar.
      * @param string $passkey (Opcional) Llave de cifrado personalizada.
      *
-     * @return string Texto codificado y sanitizado.
+     * @return string Texto codificado y sanitizado. Distinto en cada llamada aunque el texto sea el mismo.
 	 *
 	 * @example
 	 * ```php
 	 * $Codification->simpleEncode("php recipe");
-	 * $Codification->simpleEncode("php recipe", "passkey"); //Devuelve 'lEKK57naUY4/VQ=='
+	 * $Codification->simpleEncode("php recipe", "passkey");
 	 * ```
 	 *
      */
@@ -36,18 +38,21 @@ class FunctionsSecurityCodification {
         /********************** Si todo esta ok **********************/
         // Configuración de la llave de cifrado
         if (!isset($passkey) || empty($passkey)) {
-            $encryption_key = sha1('EnCRypT10nK#Y!RiSRNn');
+            $encryption_key = sha1(ConfigToken::ENCODE_KEYS["KEY_2"]);
         } else {
             $encryption_key = $passkey;
         }
 
         // Configuración de OpenSSL
         $ciphering     = "AES-128-CTR";
-        $options       = 0;
-        $encryption_iv = '1234567891011121'; // Vector de inicialización (IV) fijo
+        $options       = OPENSSL_RAW_DATA;
+        $encryption_iv = openssl_random_pseudo_bytes(openssl_cipher_iv_length($ciphering)); // IV aleatorio por operación
 
-        // Ejecución del cifrado
-        $encryption = openssl_encrypt($simple_string, $ciphering, $encryption_key, $options, $encryption_iv);
+        // Ejecución del cifrado (datos crudos, se codifica en Base64 más abajo junto al IV)
+        $ciphertext_raw = openssl_encrypt($simple_string, $ciphering, $encryption_key, $options, $encryption_iv);
+
+        // El IV no es secreto: se antepone al ciphertext para poder recuperarlo al decodificar
+        $encryption = base64_encode($encryption_iv . $ciphertext_raw);
 
         // Sanitización para transporte (URL friendly)
         $encryption = str_replace(['+', '/'], ['_', '---'], $encryption);
@@ -59,8 +64,9 @@ class FunctionsSecurityCodification {
     /************************************************************************************************************/
     /**
      * Decodifica un texto previamente cifrado con el método simpleEncode.
-     * * Revierte la sanitización de caracteres y aplica el proceso inverso de AES-128-CTR
-     * utilizando la misma llave y vector de inicialización con los que fue cifrado.
+     * * Revierte la sanitización de caracteres, extrae el IV que viaja al inicio de los
+     * datos y aplica el proceso inverso de AES-128-CTR utilizando la misma llave con la
+     * que fue cifrado.
      *
      * @param string $string Texto codificado que se desea recuperar.
      * @param string $passkey (Opcional) Llave de cifrado utilizada originalmente.
@@ -69,8 +75,7 @@ class FunctionsSecurityCodification {
 	 *
 	 * @example
 	 * ```php
-	 * $Codification->simpleDecode("qcnVhqjKxpuilw==");
-	 * $Codification->simpleDecode("lEKK57naUY4/VQ==", "passkey"); //Devuelve 'php recipe'
+	 * $Codification->simpleDecode($Codification->simpleEncode("php recipe"));
 	 * ```
 	 *
      */
@@ -85,18 +90,23 @@ class FunctionsSecurityCodification {
 
         // Configuración de la llave de descifrado
         if (!isset($passkey) || empty($passkey)) {
-            $decryption_key = sha1('EnCRypT10nK#Y!RiSRNn');
+            $decryption_key = sha1(ConfigToken::ENCODE_KEYS["KEY_2"]);
         } else {
             $decryption_key = $passkey;
         }
 
         // Configuración de OpenSSL idéntica al proceso de codificación
-        $ciphering     = "AES-128-CTR";
-        $options       = 0;
-        $decryption_iv = '1234567891011121';
+        $ciphering = "AES-128-CTR";
+        $options   = OPENSSL_RAW_DATA;
+        $iv_length = openssl_cipher_iv_length($ciphering);
+
+        // El IV viaja concatenado al inicio de los datos, se separa del ciphertext
+        $raw            = base64_decode($simple_string);
+        $decryption_iv  = substr($raw, 0, $iv_length);
+        $ciphertext_raw = substr($raw, $iv_length);
 
         // Ejecución del descifrado
-        $decryption = openssl_decrypt($simple_string, $ciphering, $decryption_key, $options, $decryption_iv);
+        $decryption = openssl_decrypt($ciphertext_raw, $ciphering, $decryption_key, $options, $decryption_iv);
 
         /********************** Retorno datos  **********************/
         return (string)$decryption;
@@ -132,12 +142,13 @@ class FunctionsSecurityCodification {
     /************************************************************************************************************/
     /**
      * Realiza operaciones de cifrado y descifrado utilizando el algoritmo AES-256-CBC.
-     * * A diferencia del método "simple", este utiliza una llave de 256 bits y un vector
-     * de inicialización derivado de un hash, proporcionando una capa de seguridad
-     * superior. Es ideal para proteger IDs o datos sensibles en bases de datos o sesiones.
+     * * A diferencia del método "simple", este utiliza una llave de 256 bits. Genera un
+     * IV aleatorio en cada operación de cifrado y lo antepone al ciphertext (el IV no es
+     * secreto, pero nunca debe reutilizarse con la misma llave). Es ideal para proteger
+     * IDs o datos sensibles en bases de datos o sesiones.
      *
      * @param string $action Acción a realizar: 'encrypt' para cifrar o 'decrypt' para descifrar.
-     * @param mixed $string El contenido a procesar (texto o número).
+     * @param mixed  $string El contenido a procesar (texto o número).
      * @param string $passkey (Opcional) Llave personalizada de alta seguridad.
      *
      * @return string|int El resultado procesado o False en caso de error.
@@ -153,7 +164,6 @@ class FunctionsSecurityCodification {
      * 	echo $desencriptar;
      *
      * 	//salidas:
-     * 	bnR6UTRVTHAzYWd1dWEvWVdpMGo4QT09 (corresponde a 5008)
      * 	5008
 	 * ```
 	 *
@@ -168,20 +178,28 @@ class FunctionsSecurityCodification {
         $output         = false;
         $encrypt_method = "AES-256-CBC";
         // Llave secreta por defecto si no se entrega una personalizada
-        $secret_key     = !empty($passkey) ? $passkey : 'YzJRMk5XWm5NVFpsT0hKbmN6WmtablkxTVRaelpEVm1kakZ6Tm1SbU5YWXhObUZsWmpWbk5ERTJOR2MyWlRobllYYzJaR1kxTVdFeU1R';
-        $secret_iv      = 'salt_secreto';
+        $secret_key     = !empty($passkey) ? $passkey : ConfigToken::ENCODE_KEYS["KEY_4"];
 
-        // Generación de llave y IV mediante hashing para cumplir con los requisitos de 256 bits
-        $key = hash('sha256', $secret_key);
-        $iv  = substr(hash('sha256', $secret_iv), 0, 16);
+        // Generación de llave mediante hashing para cumplir con los requisitos de 256 bits
+        $key       = hash('sha256', $secret_key);
+        $iv_length = openssl_cipher_iv_length($encrypt_method);
 
         if ($action == 'encrypt') {
-            // Cifrado y posterior codificación en Base64 para manejo de caracteres
-            $output = openssl_encrypt($string, $encrypt_method, $key, 0, $iv);
-            $output = base64_encode($output);
+            // IV aleatorio por operación, antepuesto al ciphertext (crudo) antes de Base64
+            $iv             = openssl_random_pseudo_bytes($iv_length);
+            $ciphertext_raw = openssl_encrypt($string, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
+            // Base64 URL-safe (sin '+', '/' ni '=' de relleno) para evitar problemas en URLs
+            $output         = rtrim(strtr(base64_encode($iv . $ciphertext_raw), '+/', '-_'), '=');
         } elseif ($action == 'decrypt') {
-            // Decodificación Base64 y descifrado posterior
-            $output = openssl_decrypt(base64_decode($string), $encrypt_method, $key, 0, $iv);
+            // Revierte Base64 URL-safe y restaura el relleno '=' antes de decodificar
+            $base64  = strtr($string, '-_', '+/');
+            $base64 .= str_repeat('=', (4 - strlen($base64) % 4) % 4);
+
+            // El IV viaja concatenado al inicio de los datos, se separa del ciphertext
+            $raw            = base64_decode($base64);
+            $iv             = substr($raw, 0, $iv_length);
+            $ciphertext_raw = substr($raw, $iv_length);
+            $output         = openssl_decrypt($ciphertext_raw, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
         }
 
         /********************** Retorno datos  **********************/
