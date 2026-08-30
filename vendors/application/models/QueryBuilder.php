@@ -14,6 +14,7 @@ class QueryBuilder{
 	private $FileManager;
 	private $Codification;
 	private $CommonData;
+    private $Passwords;
 
 	/******************************************************************************/
 	//Instancias
@@ -21,6 +22,7 @@ class QueryBuilder{
 		$this->FileManager  = new FileManager();
 		$this->Codification = new FunctionsSecurityCodification();
 		$this->CommonData   = new FunctionsCommonData();
+        $this->Passwords    = new FunctionsSecurityPasswords();
 	}
 
 	/*******************************************************************************************************************/
@@ -83,6 +85,18 @@ class QueryBuilder{
         Agrupaciones
         'group'  => 'DATETRUNC(MONTH, Fecha)', -> Por fechas en base al mes
 
+        *****************************
+        parametros bindeados (queryRow, queryNRows, queryArray)
+        Cualquier valor variable dentro de 'where'/'join'/'group'/'having'/'order' debe ir como
+        placeholder '?' y su valor real en 'params', en el mismo orden en que aparecen los '?'.
+        NUNCA concatenar directamente un valor externo (Post/Get) dentro de estos strings.
+
+        'where'  => 'data1 = ? AND data2 LIKE ?',
+        'params' => [$idData1, '%'.$textoBusqueda.'%'],
+
+        Si 'where'/'join'/etc no contienen '?', 'params' puede omitirse (se mantiene compatibilidad
+        con el formato anterior, sin binding).
+
     */
 
     /*******************************************************************************************************************/
@@ -134,6 +148,8 @@ class QueryBuilder{
         $ActionSQL = $this->createQuery($query);
         // Restringe el conjunto de resultados a un solo registro
         $ActionSQL.= ' LIMIT 1';
+        // Valores a bindear contra los placeholders (?) opcionales dentro de 'where'/'join'/etc.
+        $Params    = $query['params'] ?? [];
 
         /*************** Ejecutar   ***************/
         // Retorna la cadena SQL si se ha solicitado el modo de depuración/visualización
@@ -143,7 +159,7 @@ class QueryBuilder{
 
         // Intento de ejecución de la consulta contra el motor de base de datos
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn, false, true);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, true, $Params);
             // Obtiene el primer índice del conjunto de resultados si es válido, de lo contrario false
             if($result['status']){
                 // Estructura estándar de respuesta
@@ -214,6 +230,8 @@ class QueryBuilder{
         $BaseSQL   = $this->createQuery($query);
         // Encapsula la consulta base en una subconsulta para realizar el conteo total de registros
         $ActionSQL = 'SELECT COUNT(*) AS _total FROM (' . $BaseSQL . ') AS _t';
+        // Valores a bindear contra los placeholders (?) opcionales dentro de 'where'/'join'/etc.
+        $Params    = $query['params'] ?? [];
 
         /*************** Ejecutar   ***************/
         // Retorna la sentencia SQL de conteo si se solicita la visualización
@@ -223,7 +241,7 @@ class QueryBuilder{
 
         // Bloque de ejecución con manejo de excepciones
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn, false, true);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, true, $Params);
             // Obtiene el valor numérico de la columna virtual '_total' convertido a entero
             if($result['status']){
                 // Estructura estándar de respuesta
@@ -294,6 +312,8 @@ class QueryBuilder{
         /*************** Generacion Query ***************/
         // Llama al constructor de consultas para armar la sentencia SQL completa
         $ActionSQL = $this->createQuery($query);
+        // Valores a bindear contra los placeholders (?) opcionales dentro de 'where'/'join'/etc.
+        $Params    = $query['params'] ?? [];
 
         /*************** Ejecutar   ***************/
         // Retorna la cadena de texto de la consulta si se activó el parámetro de visualización
@@ -304,7 +324,7 @@ class QueryBuilder{
         // Intento de ejecución de la consulta
         try {
             // Ejecuta la sentencia a través del método de conexión de bajo nivel
-            $result = $this->queryExecute($ActionSQL, $DBConn);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $Params);
             // Obtiene el conjunto completo de resultados obtenidos
             if($result['status']){
                 // Estructura estándar de respuesta
@@ -409,13 +429,16 @@ class QueryBuilder{
         // Inicializa contenedores para construir dinámicamente las partes de la sentencia SQL
         $matrixColumn = [];
         $matrixValue  = [];
+        // Valores reales a bindear (en el mismo orden que sus placeholders '?')
+        $bindings     = [];
 
         // Filtra los datos del Post que coinciden con las columnas definidas en 'data'
         foreach ($arrData as $data) {
             if (!empty($Post[$data])) {
                 $matrixColumn[] = $data;
-                // Aplica limpieza de caracteres especiales a menos que se indique lo contrario en $novalidate
-                $matrixValue[]  = "'".($novalidate ? $Post[$data] : $this->clearData($Post[$data]))."'";
+                // El valor nunca se concatena al SQL: viaja como parámetro bindeado
+                $matrixValue[]  = '?';
+                $bindings[]     = $novalidate ? $Post[$data] : trim($Post[$data]);
             }
         }
         // Consolida los arreglos en cadenas separadas por comas
@@ -434,13 +457,131 @@ class QueryBuilder{
 
         // Ejecución de la sentencia dentro de un bloque de control de excepciones
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el ID autogenerado del nuevo registro
             if($result['status']){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
                     'data'    => $DBConn->lastInsertId()
+                ];
+            }else{
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => false,
+                    'error'   => $result['error'],
+                    'data'    => $result['internal_error'],
+                    'table'   => $query['table'],
+                ];
+            }
+            // Retorna los datos
+            return $response;
+        } catch (Exception $e) {
+            // Se listan los errores
+            $Error = $this->logError($ActionSQL, $e);
+            // Registra el fallo y retorna la información del error procesada
+            return ['status' => false, 'error' => $Error['error'], 'data' => $Error['internal_error'], 'table' => $query['table']];
+        }
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Inserta múltiples filas en una sola sentencia INSERT (INSERT INTO tabla (cols) VALUES (...), (...), ...).
+     * * A diferencia de queryInsert(), que ejecuta un INSERT por cada llamada, este método recibe
+     * un arreglo de filas y las inserta todas en una única sentencia SQL, evitando el patrón N+1
+     * (una consulta por elemento dentro de un foreach). Todos los valores viajan bindeados mediante
+     * parámetros preparados, en el mismo orden en que aparecen sus placeholders '?' en el SQL.
+     * Pensado para usarse dentro de la misma transacción que la operación principal (ej. asociar
+     * varios recursos a una reserva junto con el insert de la reserva).
+     *
+     * @param array $query Configuración del insert múltiple:
+     *   'table'    => Tabla donde se ejecuta la consulta.
+     *   'data'     => Columnas a insertar, separadas por coma (ej. 'idReserva,idRecurso').
+     *   'required' => (Opcional) Columnas obligatorias por fila; si falta alguna en cualquier fila,
+     *                 no se ejecuta ningún insert (todo o nada).
+     *   'rows'     => Arreglo de filas; cada fila es un arreglo asociativo columna => valor.
+     * @param mixed $DBConn Instancia de conexión a la base de datos.
+     * @param bool $showQuery Si es true, retorna la cadena SQL sin ejecutarla.
+     * @return array Retorna un arreglo con los resultados.
+     *
+	 * @example
+	 * ```php
+	 * //Formato de la query
+     * $query = [
+     *   'data'      => 'idReserva,idRecurso',
+     *   'required'  => 'idReserva,idRecurso',
+     *   'table'     => 'reservas_listado_recursos',
+     *   'rows'      => [
+     *     ['idReserva' => 10, 'idRecurso' => 3],
+     *     ['idReserva' => 10, 'idRecurso' => 7],
+     *   ],
+     * ];
+     *
+     * //ejecucion
+     * $qbuilder->queryInsertMultiple($query, $DBConn);
+	 * ```
+	 *
+     */
+    public function queryInsertMultiple(array $query, $DBConn, bool $showQuery = false){
+
+        /*************** Validaciones ***************/
+        // Verifica que se haya definido la tabla principal de la consulta
+        if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
+        // Verifica que se hayan especificado las columnas a insertar
+        if(!isset($query['data']) || $query['data']==''){   return ['status' => false, 'error' => 'Query Error: No hay datos en $data',  'data' => [], 'table' => $query['table']];}
+        // Verifica que se haya entregado al menos una fila para insertar
+        if(!isset($query['rows']) || !is_array($query['rows']) || count($query['rows'])===0){
+            return ['status' => false, 'error' => 'Query Error: No hay datos en $rows', 'data' => [], 'table' => $query['table']];
+        }
+
+        /*************** Datos    ***************/
+        // Descompone la cadena de nombres de columnas en un arreglo indexado
+        $arrData = $this->CommonData->parseDataCommas($query['data']);
+
+        /*************** Validacion filas ***************/
+        // Si se definieron columnas obligatorias, se validan todas las filas antes de insertar cualquiera
+        if(isset($query['required']) && $query['required']!=''){
+            foreach ($query['rows'] as $i => $row) {
+                $dataVal = $this->validateRequired($query['required'], $row);
+                if ($dataVal['status'] !== true) {
+                    return ['status' => false, 'error' => 'Fila '.$i.': '.$dataVal['error'], 'data' => [], 'table' => $query['table']];
+                }
+            }
+        }
+
+        /*************** Guardar   ***************/
+        // Por cada fila se genera un grupo '(?, ?, ...)' y se acumulan sus valores en el mismo orden
+        $matrixRows = [];
+        $bindings   = [];
+        foreach ($query['rows'] as $row) {
+            $placeholders = [];
+            foreach ($arrData as $data) {
+                $placeholders[] = '?';
+                $bindings[]     = $row[$data] ?? null;
+            }
+            $matrixRows[] = '('.implode(', ', $placeholders).')';
+        }
+
+        /*************** Generacion Query ***************/
+        // Ensambla la sentencia INSERT multi-fila final
+        $ActionSQL = 'INSERT INTO '.$query['table'].' ('.implode(', ', $arrData).') VALUES '.implode(', ', $matrixRows);
+
+        /*************** Ejecutar   ***************/
+        // Retorna el texto de la consulta si se activó el modo de visualización
+        if ($showQuery) {
+            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+        }
+
+        // Ejecución de la sentencia dentro de un bloque de control de excepciones
+        try {
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
+            // Obtiene el conjunto completo de resultados obtenidos
+            if($result['status']){
+                // Estructura estándar de respuesta
+                $response = [
+                    'status'  => true,
+                    'data'    => $result['data']
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -542,26 +683,32 @@ class QueryBuilder{
         $Post = $this->encodeFormData($query);
 
         /*************** Generacion Datos ***************/
-        $matrixData  = [];
-        $matrixWhere = [];
+        $matrixData   = [];
+        $matrixWhere  = [];
+        // Valores a bindear: primero los del SET, luego los del WHERE (mismo orden que sus '?' en el SQL)
+        $bindingsData  = [];
+        $bindingsWhere = [];
 
-        // Construye los pares columna='valor' para la cláusula SET
+        // Construye los pares columna=? para la cláusula SET
         foreach ($arrData as $data) {
             if (!empty($Post[$data])) {
-                $matrixData[] = "`".$data."`='".($novalidate ? $Post[$data] : $this->clearData($Post[$data]))."'";
+                $matrixData[]    = "`".$data."` = ?";
+                $bindingsData[]  = $novalidate ? $Post[$data] : trim($Post[$data]);
             }
         }
 
         // Construye las condiciones para la cláusula WHERE unidas por AND
         foreach ($arrWhere as $where) {
             if (!empty($Post[$where])) {
-                $matrixWhere[] = $where." = '".($novalidate ? $Post[$where] : $this->clearData($Post[$where]))."'";
+                $matrixWhere[]    = $where." = ?";
+                $bindingsWhere[]  = $novalidate ? $Post[$where] : trim($Post[$where]);
             }
         }
 
         // Formatea los arreglos en strings finales para la consulta
         $DataColumn = $matrixData ? implode(', ', $matrixData) : '';
         $DataWhere  = $matrixWhere ? implode(' AND ', $matrixWhere) : '';
+        $bindings   = array_merge($bindingsData, $bindingsWhere);
 
         /*************** Generacion Query ***************/
         // Ensambla la sentencia UPDATE completa
@@ -575,7 +722,7 @@ class QueryBuilder{
 
         // Ejecución de la transacción
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el conjunto completo de resultados obtenidos
             if($result['status']){
                 // Estructura estándar de respuesta
@@ -653,11 +800,13 @@ class QueryBuilder{
         if(isset($query['files'])&&$query['files']!=''){
 
             $matrixColumn = [];
+            $bindingsFile = [];
             // Construye la condición de búsqueda para localizar las rutas de archivos en la BD
             foreach ($arrWhere as $where) {
                 if (!empty($query['Post'][$where])) {
-                    // Desencripta y limpia el identificador recibido para la consulta de búsqueda
-                    $matrixColumn[] = $where." = '".$this->clearData($this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]))."'";
+                    // Desencripta el identificador recibido; el valor viaja bindeado, no concatenado
+                    $matrixColumn[] = $where." = ?";
+                    $bindingsFile[] = $this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]);
                 }
             }
             $DataColumn = $matrixColumn ? implode(', ', $matrixColumn) : '';
@@ -670,7 +819,8 @@ class QueryBuilder{
                 'where'  => $DataColumn,
                 'group'  => '',
                 'having' => '',
-                'order'  => ''
+                'order'  => '',
+                'params' => $bindingsFile
             ];
             // Recupera la fila con la información de los archivos
             $result = $this->queryRow($queryRow, $DBConn);
@@ -682,11 +832,13 @@ class QueryBuilder{
 
         /*************** Generacion Datos ***************/
         $matrixWhere = [];
+        $bindings    = [];
         // Reconstruye la cláusula WHERE final para la sentencia DELETE
         foreach ($arrWhere as $where) {
             if (!empty($query['Post'][$where])) {
-                // Aplica desencriptación y sanitización a los valores de condición
-                $matrixWhere[] = $where." = '".$this->clearData($this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]))."'";
+                // Desencripta el valor de condición; viaja bindeado, no concatenado
+                $matrixWhere[] = $where." = ?";
+                $bindings[]    = $this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]);
             }
         }
         // Une las condiciones con el operador lógico AND
@@ -704,7 +856,7 @@ class QueryBuilder{
 
         // Ejecución de la eliminación en la base de datos
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el conjunto completo de resultados obtenidos
             if($result['status']){
                 // Estructura estándar de respuesta
@@ -740,23 +892,24 @@ class QueryBuilder{
      * un conjunto de resultados, o de escritura (INSERT, UPDATE, DELETE) para devolver
      * el número de filas afectadas.
      *
-     * @param string $query Sentencia SQL completa a ejecutar.
+     * @param string $query Sentencia SQL completa a ejecutar. Puede contener placeholders posicionales (?).
      * @param mixed $DBConn Instancia de conexión a la base de datos (compatible con PDO).
      * @param bool $showQuery Si es true, retorna la cadena SQL sin ejecutarla.
      * @param bool $singleRow Si es true o false, indica si debe traer una fila o muchas.
+     * @param array $params Valores a bindear posicionalmente contra los placeholders (?) de $query.
      * @return array Retorna un arreglo con los resultados.
      *
 	 * @example
 	 * ```php
 	 * //Formato de la query
-     * $query = 'SELECT * FROM Test';
+     * $query = 'SELECT * FROM Test WHERE idTest = ?';
      *
      * //ejecucion
-     * $qbuilder->queryExecute($query, $DBConn);
+     * $qbuilder->queryExecute($query, $DBConn, false, false, [$idTest]);
 	 * ```
 	 *
      */
-    public function queryExecute(string $query, $DBConn, bool $showQuery = false, bool $singleRow = false){
+    public function queryExecute(string $query, $DBConn, bool $showQuery = false, bool $singleRow = false, array $params = []){
 
         /*************** Validaciones ***************/
         // Verifica que la cadena de la consulta no esté vacía o nula
@@ -784,8 +937,8 @@ class QueryBuilder{
             // Prepara la sentencia en el motor de base de datos
             $stmt = $DBConn->prepare($query);
 
-            // Ejecuta la sentencia preparada
-            $stmt->execute();
+            // Ejecuta la sentencia preparada bindeando los valores recibidos (si los hay)
+            $stmt->execute($params);
 
             // Evalúa el tipo de respuesta: fetchAll para consultas de lectura, rowCount para escritura
             $data = $isSelect
@@ -865,6 +1018,7 @@ class QueryBuilder{
         /*************** Generacion Datos ***************/
         $matrixData  = [];
         $matrixWhere = [];
+        $bindings    = [];
 
         // Itera sobre los nombres de archivos para proceder con la eliminación física
         foreach ($arrFiles as $file) {
@@ -887,8 +1041,9 @@ class QueryBuilder{
         // Construye la cláusula WHERE basándose en los identificadores proporcionados
         foreach ($arrWhere as $where) {
             if (!empty($query['Post'][$where])) {
-                // Sanitiza los datos del filtro para la consulta SQL
-                $matrixWhere[] = $where." = '".$this->clearData($query['Post'][$where])."'";
+                // El valor de filtro viaja bindeado, no concatenado
+                $matrixWhere[] = $where." = ?";
+                $bindings[]    = $query['Post'][$where];
             }
         }
 
@@ -903,7 +1058,7 @@ class QueryBuilder{
         /*************** Ejecutar   ***************/
         // Ejecuta la actualización en el servidor de base de datos
         try {
-            $result = $this->queryExecute($ActionSQL, $DBConn);
+            $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el conjunto completo de resultados obtenidos
             if($result['status']){
                 // Estructura estándar de respuesta
@@ -1352,9 +1507,10 @@ class QueryBuilder{
 
         /******************************************/
         // Preparación de variables iniciales
-        $arrData   = $this->CommonData->parseDataCommas($SIS_Data); // Campos a validar (separados por comas)
-        $subWhere  = ''; // Cláusula WHERE base (usada para exclusión en actualizaciones)
-        $errors    = '';
+        $arrData      = $this->CommonData->parseDataCommas($SIS_Data); // Campos a validar (separados por comas)
+        $subWhere     = ''; // Cláusula WHERE base (usada para exclusión en actualizaciones)
+        $subWhereParams = []; // Valores bindeados asociados a $subWhere, en el mismo orden
+        $errors       = '';
 
         /******************************************/
         /**
@@ -1366,9 +1522,10 @@ class QueryBuilder{
             $parts    = [];
             $arrWhere = $this->CommonData->parseDataCommas($SIS_Where);
             foreach ($arrWhere as $field) {
-                // Se agrega la condición: campo != 'valor_actual'
+                // Se agrega la condición: campo != ?
                 if (isset($SIS_Post[$field]) && $SIS_Post[$field] != '') {
-                    $parts[] = $field . " != '" . $this->clearData($SIS_Post[$field]) . "'";
+                    $parts[]          = $field . ' != ?';
+                    $subWhereParams[] = $SIS_Post[$field];
                 }
             }
             $subWhere .= $parts ? implode(' AND ', $parts) : '';
@@ -1382,6 +1539,8 @@ class QueryBuilder{
         foreach ($arrData as $data) {
             $DataInternal  = '';
             $whereInternal = $subWhere;
+            // Valores bindeados propios de esta regla (se combinan con $subWhereParams al ejecutar)
+            $localParams   = [];
 
             /******************************************/
             /**
@@ -1397,9 +1556,10 @@ class QueryBuilder{
                     // Si el campo viene en el POST
                     if (isset($SIS_Post[$field]) && $SIS_Post[$field] != '') {
                         $parts_data[]  = $field;
-                        $parts_where[] = $field . " = '" . $this->clearData($SIS_Post[$field]) . "'";
+                        $parts_where[] = $field . ' = ?';
+                        $localParams[] = $SIS_Post[$field];
 
-                    // Si es una condición directa (ej: "estado=1")
+                    // Si es una condición directa (ej: "estado=1"), viene de config estática, no de $SIS_Post
                     } elseif (strpos($field, "=") || strpos($field, "!=")) {
                         $arrData3      = $this->CommonData->parseDataSymbol($field);
                         $parts_data[]  = $arrData3[0];
@@ -1423,7 +1583,8 @@ class QueryBuilder{
             } else {
                 if (isset($SIS_Post[$data]) && $SIS_Post[$data] != '') {
                     $DataInternal  = $data;
-                    $condicion     = $data . " = '" . $this->clearData($SIS_Post[$data]) . "'";
+                    $condicion     = $data . ' = ?';
+                    $localParams[] = $SIS_Post[$data];
                     $whereInternal = ($whereInternal != '') ? $whereInternal . ' AND ' . $condicion : $condicion;
                 }
             }
@@ -1436,9 +1597,10 @@ class QueryBuilder{
             if($DataInternal != ''){
                 // Se genera la query
                 $query = [
-                    'data'  => $DataInternal,
-                    'table' => $SIS_Table,
-                    'where' => $whereInternal
+                    'data'   => $DataInternal,
+                    'table'  => $SIS_Table,
+                    'where'  => $whereInternal,
+                    'params' => array_merge($subWhereParams, $localParams)
                 ];
 
                 // Llama a queryNRows para obtener el total de coincidencias
@@ -1461,6 +1623,11 @@ class QueryBuilder{
     }
     /******************************************************************************/
     /**
+     * @deprecated No usar como mecanismo de seguridad: addslashes() no equivale a un binding real
+     * y no cubre todos los contextos (numéricos, LIKE, IN, etc.). Todos los métodos de esta clase
+     * que insertan/actualizan/eliminan datos ahora usan parámetros bindeados (PDO) en vez de este
+     * método. Se conserva sin uso interno únicamente por compatibilidad.
+     *
      * Sanitiza y prepara una cadena de texto para su uso seguro en sentencias SQL.
      * * Este método actúa como una capa de limpieza para prevenir ataques de
      * inyección SQL básicos y errores de sintaxis causados por caracteres
@@ -1697,16 +1864,11 @@ class QueryBuilder{
                 // Verifica que el campo exista en el Post y no sea una cadena vacía
                 if(isset($query['Post'][$data]) && $query['Post'][$data] != ''){
                     /**
-                     * Invocación al motor de codificación:
-                     * - Modo: 'encrypt'
+                     * Invocación al motor de seguridad:
                      * - Valor: El dato original enviado por el usuario.
-                     * - Key: Utiliza una constante global de configuración para asegurar la persistencia del cifrado.
+                     * Un hash de alta seguridad para contraseñas utilizando el algoritmo BCRYPT.
                      */
-                    $query['Post'][$data] = $this->Codification->encryptDecrypt(
-                        'encrypt',
-                        $query['Post'][$data],
-                        ConfigToken::ENCODE_KEYS["KEY_1"]
-                    );
+                    $query['Post'][$data] = $this->Passwords->hashCreate($query['Post'][$data]);
                 }
             }
         }
@@ -1717,5 +1879,3 @@ class QueryBuilder{
     }
 
 }
-
-

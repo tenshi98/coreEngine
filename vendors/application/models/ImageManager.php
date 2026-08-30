@@ -5,7 +5,7 @@
 class ImageManager{
 
     public function __construct(){
-        //nada
+        // Nada
     }
 
 	/******************************************************************************/
@@ -144,7 +144,3 @@ class ImageManager{
 	}
 
 }
-
-
-
-

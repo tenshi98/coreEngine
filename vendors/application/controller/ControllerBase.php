@@ -130,12 +130,13 @@ class ControllerBase {
      *        'table'   => 'core_ubicacion_comunas',
      *        'join'    => '',
      *        'where'   => '',
+     *        'params'  => [],
      *        'group'   => '',
      *        'having'  => '',
      *        'order'   => 'Nombre ASC',
      *        'limit'   => ConfigAPP::APP["N_MaxItems"]
      *    ];
-     *    //Ejecuto la query
+     *    // Ejecuto la query
      *    $xParams   = ['query' => $query];
      *    $arrComuna = $this->Base_GetList($xParams);
 	 * ```
@@ -160,7 +161,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se genera la query
+	 *  // Se genera la query
      *  $query = [
      *  'data'    => '
      *      bodegas_listado.Nombre,
@@ -175,12 +176,13 @@ class ControllerBase {
      *      LEFT JOIN core_estados             ON core_estados.idEstado               = bodegas_listado.idEstado
      *      LEFT JOIN core_ubicacion_ciudad    ON core_ubicacion_ciudad.idCiudad      = bodegas_listado.idCiudad
      *      LEFT JOIN core_ubicacion_comunas   ON core_ubicacion_comunas.idComuna     = bodegas_listado.idComuna',
-     *  'where'   => 'bodegas_listado.idBodegas = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+     *  'where'   => 'bodegas_listado.idBodegas = ?',
+     *  'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
      *  'group'   => '',
      *  'having'  => '',
      *  'order'   => ''
      *  ];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $xParams = ['query' => $query];
      *  $rowData = $this->Base_GetByID($xParams);
 	 * ```
@@ -205,17 +207,18 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se genera la query
+	 *  // Se genera la query
      *  $query = [
      *  'data'    => 'idBodegas',
      *  'table'   => 'bodegas_listado',
      *  'join'    => '',
-     *  'where'   => 'idBodegas = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+     *  'where'   => 'idBodegas = ?',
+     *  'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
      *  'group'   => '',
      *  'having'  => '',
      *  'order'   => ''
      *  ];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $xParams = ['query' => $query];
      *  $rowData = $this->Base_GetCountData($xParams);
 	 * ```
@@ -240,7 +243,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se genera la query
+	 *  // Se genera la query
      *  $query = [
      *      'data'      => 'idEstado,Nombre,idCiudad,idComuna,Direccion',
      *      'required'  => 'idEstado,Nombre',
@@ -249,7 +252,7 @@ class ControllerBase {
      *      'table'     => 'bodegas_listado',
      *      'Post'      => $_POST
      *  ];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
      *  $Response = $this->Base_insert($xParams);
 	 * ```
@@ -266,7 +269,7 @@ class ControllerBase {
         $DBConn     = $params['newBDConn'] ?? $this->DBConn;
 
         /********************** Si todo esta ok **********************/
-        //Ejecuto el chequeo
+        // Ejecuto el chequeo
         $checkData = $this->checkData->checkingData($DataCheck);
         if ($checkData['status'] === false) {
             return $checkData;
@@ -279,11 +282,62 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
+     * Inserta múltiples filas en una sola sentencia INSERT, evitando el patrón N+1 de llamar
+     * Base_insert() dentro de un foreach (una consulta por elemento).
+     *
+	 * @example
+	 * ```php
+	 *  // Se genera la query
+     *  $query = [
+     *      'data'      => 'idReserva,idRecurso',
+     *      'required'  => 'idReserva,idRecurso',
+     *      'table'     => 'reservas_listado_recursos',
+     *      'rows'      => [
+     *          ['idReserva' => 10, 'idRecurso' => 3],
+     *          ['idReserva' => 10, 'idRecurso' => 7],
+     *      ],
+     *  ];
+     *  // Ejecuto la query
+     *  $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+     *  $Response = $this->Base_insertMultiple($xParams);
+	 * ```
+	 *
+     */
+    protected function Base_insertMultiple(array &$params){
+
+        /**********************     Valores     **********************/
+        // Extraer parámetros con valores por defecto
+        $DataCheck = (isset($params['DataCheck']) && $params['DataCheck'] != '') ? $params['DataCheck'] : [];
+        $query     = $params['query'] ?? '';
+        $showQuery = $params['showQuery'] ?? false;
+        $DBConn    = $params['newBDConn'] ?? $this->DBConn;
+
+        /********************** Validación fila por fila **********************/
+        if (!empty($DataCheck)) {
+            foreach ($query['rows'] as $row) {
+                // Se entregan los datos a revisar
+                $rowCheck         = $DataCheck;
+                $rowCheck['Post'] = $row;
+                // Ejecuto el chequeo
+                $checkData = $this->checkData->checkingData($rowCheck);
+                if ($checkData['status'] === false) {
+                    return $checkData;
+                }
+            }
+        }
+
+        /**********************  Retorno datos  **********************/
+        //devuelvo resultados
+        return $this->queryBuilder->queryInsertMultiple($query, $DBConn, $showQuery);
+    }
+
+    /************************************************************************************************************/
+    /**
      * Actualiza uno o más registros existentes en la base de datos con soporte para validaciones y archivos.
      *
 	 * @example
 	 * ```php
-	 *  //Se genera la query
+	 *  // Se genera la query
      *  $query = [
      *      'data'      => 'idBodegas,idEstado,Nombre,idCiudad,idComuna,Direccion',
      *      'required'  => 'idEstado,Nombre',
@@ -304,7 +358,7 @@ class ControllerBase {
      *          ],
      *      ]
      *  ];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
      *  $Response = $this->Base_update($xParams);
 	 * ```
@@ -321,7 +375,7 @@ class ControllerBase {
         $DBConn     = $params['newBDConn'] ?? $this->DBConn;
 
         /********************** Si todo esta ok **********************/
-        //Ejecuto el chequeo
+        // Ejecuto el chequeo
         $checkData = $this->checkData->checkingData($DataCheck);
         if ($checkData['status'] === false) {
             return $checkData;
@@ -338,7 +392,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se genera la query
+	 *  // Se genera la query
      *  $query = [
      *      'files'       => 'Direccion_img',
      *      'table'       => 'bodegas_listado',
@@ -346,7 +400,7 @@ class ControllerBase {
      *      'SubCarpeta'  => '',
      *      'Post'        => $dataDelete
      *  ];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $xParams  = ['query' => $query];
      *  $Response = $this->Base_delete($xParams);
 	 * ```
@@ -363,6 +417,98 @@ class ControllerBase {
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
         return $this->queryBuilder->queryDelete($query, $DBConn, $showQuery);
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Inicia una transacción explícita sobre la conexión de base de datos.
+     *
+     * Debe usarse cuando una operación involucra escrituras (Insert/Update/Delete) en más de
+     * una tabla y todas deben aplicarse de forma atómica (todo o nada). Los Base_insert/
+     * Base_update/Base_delete llamados después de este método, sin indicar 'newBDConn',
+     * participan automáticamente de la misma transacción porque reutilizan $this->DBConn.
+     *
+     * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
+     * @return array ['status' => bool, 'error' => string] (error solo presente si status es false)
+     *
+	 * @example
+	 * ```php
+	 * $this->Base_transactionBegin();
+     *
+     * $respReserva = $this->Base_insert($xParamsReserva);
+     * if (!$respReserva['status']) { $this->Base_transactionRollback(); return $respReserva; }
+     *
+     * foreach ($recursos as $recurso) {
+     *     $respRecurso = $this->Base_insert($xParamsRecurso);
+     *     if (!$respRecurso['status']) { $this->Base_transactionRollback(); return $respRecurso; }
+     * }
+     *
+     * $respHistorial = $this->Base_insert($xParamsHistorial);
+     * if (!$respHistorial['status']) { $this->Base_transactionRollback(); return $respHistorial; }
+     *
+     * $this->Base_transactionCommit();
+     * return ['status' => true, 'data' => $respReserva['data']];
+	 * ```
+	 *
+     */
+    protected function Base_transactionBegin(array $params = []){
+
+        /**********************     Valores     **********************/
+        $DBConn = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Ejecutar  **********************/
+        try {
+            $DBConn->beginTransaction();
+            return ['status' => true];
+        } catch (Exception $e) {
+            return ['status' => false, 'error' => 'No se pudo iniciar la transacción: '.$e->getMessage()];
+        }
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Confirma (COMMIT) una transacción previamente iniciada con Base_transactionBegin().
+     *
+     * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
+     * @return array ['status' => bool, 'error' => string] (error solo presente si status es false)
+     */
+    protected function Base_transactionCommit(array $params = []){
+
+        /**********************     Valores     **********************/
+        $DBConn = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Ejecutar  **********************/
+        try {
+            $DBConn->commit();
+            return ['status' => true];
+        } catch (Exception $e) {
+            return ['status' => false, 'error' => 'No se pudo confirmar la transacción: '.$e->getMessage()];
+        }
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Revierte (ROLLBACK) una transacción previamente iniciada con Base_transactionBegin().
+     *
+     * Es seguro llamarla incluso si no hay una transacción activa: en ese caso no hace nada.
+     *
+     * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
+     * @return array ['status' => bool, 'error' => string] (error solo presente si status es false)
+     */
+    protected function Base_transactionRollback(array $params = []){
+
+        /**********************     Valores     **********************/
+        $DBConn = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Ejecutar  **********************/
+        try {
+            if ($DBConn->inTransaction()) {
+                $DBConn->rollBack();
+            }
+            return ['status' => true];
+        } catch (Exception $e) {
+            return ['status' => false, 'error' => 'No se pudo revertir la transacción: '.$e->getMessage()];
+        }
     }
 
     /************************************************************************************************************/
@@ -403,7 +549,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se genera la query
+	 *  // Se genera la query
      *  $query = [
      *      'files'       => 'Direccion_img',
      *      'table'       => 'bodegas_listado',
@@ -411,7 +557,7 @@ class ControllerBase {
      *      'SubCarpeta'  => '',
      *      'Post'        => $dataPut
      *  ];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $xParams  = ['query' => $query];
      *  $Response = $this->Base_delFiles($xParams);
 	 * ```
@@ -448,11 +594,11 @@ class ControllerBase {
      *      'primaryKey' => 'idObservaciones',
      *      'comentario' => 'Creado desde el Instalador',
      *  ];
-     *  //Verifico si existe
+     *  // Verifico si existe
      *  if($arrTables){
      *      //recorro
      *      foreach ($arrTables as $table) {
-     *          //Se genera la query
+     *          // Se genera la query
      *          $xParams  = ['query' => $table];
      *          $this->Base_createTable($xParams);
      *      }
@@ -487,7 +633,7 @@ class ControllerBase {
      *  $arrTableDel[] = ['table' => 'bodegas_movimientos_productos'];
      *  $arrTableDel[] = ['table' => 'bodegas_productos_stocks'];
      *
-     *   //Verifico si existe
+     *   // Verifico si existe
      *   if($arrTableDel){
      *      //recorro
      *      foreach ($arrTableDel as $tblDel) {
@@ -531,7 +677,7 @@ class ControllerBase {
      *  ];
      *  //Se genera el array con datos
      *  $xParams  = ['query' => $query, 'newBDConn' => $newBDConn];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $CreateDB = $this->Base_createDatabase($xParams);
 	 * ```
 	 *
@@ -568,7 +714,7 @@ class ControllerBase {
      *  $newBDConn = Database::getSQLConnection($BD_Data);
      *  //Se genera el array con datos
      *  $xParams  = ['filepath' => $filepath, 'newBDConn' => $newBDConn];
-     *  //Ejecuto la query
+     *  // Ejecuto la query
      *  $ExecuteFileSQL = $this->Base_executeFile($xParams);
 	 * ```
 	 *
@@ -593,23 +739,24 @@ class ControllerBase {
      * hacia diferentes proveedores o protocolos (SMTP, Gmail o Sendinblue) según el valor
      * del parámetro $type.
      *
-     * @param object $f3    Instancia del framework Base (Fat-Free Framework) para acceso a variables de entorno.
-     * @param mixed  $query Estructura de datos que contiene la información del correo (destinatario, cuerpo, asunto).
-     * @param int    $type  Identificador del método de envío: 1 para SMTP, 2 para Gmail, 3 para Sendinblue.
+     * @param object $UserData  Instancia de datos de sesión.
+     * @param object $BASE      Instancia de datos de configuración.
+     * @param mixed  $query     Objeto o arreglo con la información específica del correo a enviar (destinatario, asunto, contenido).
+     * @param int    $type      Identificador del método de envío: 1 para SMTP, 2 para Gmail, 3 para Sendinblue.
      *
      * @return mixed Resultado de la ejecución de la función de envío seleccionada.
      */
-    protected function Base_SelectMail($f3, $query, $type){
+    public function Base_SelectMail($UserData, $BASE, $query, $type){
 
         /********************** Si todo esta ok **********************/
         // Evalúa el parámetro de tipo para determinar el controlador de correo correspondiente
         switch ($type) {
             // Ejecuta el envío a través de una configuración SMTP estándar
-            case 1: $Response = $this->Base_SMTPMail($f3, $query); break;
+            case 1: $Response = $this->Base_SMTPMail($UserData, $BASE, $query); break;
             // Ejecuta el envío utilizando la API o configuración específica de Gmail
-            case 2: $Response = $this->Base_GMail($f3, $query); break;
+            case 2: $Response = $this->Base_GMail($UserData, $BASE, $query); break;
             // Ejecuta el envío a través del servicio externo Sendinblue (Brevo)
-            case 3: $Response = $this->Base_SendingBlue($f3, $query); break;
+            case 3: $Response = $this->Base_SendingBlue($UserData, $BASE, $query); break;
         }
         /**********************  Retorno datos  **********************/
         // Retorna la respuesta obtenida del método de envío invocado
@@ -624,17 +771,15 @@ class ControllerBase {
      * desde la sesión del usuario, prepara una estructura de datos para la plantilla
      * y utiliza la clase MailSender para realizar el envío físico del mensaje.
      *
-     * @param object $f3    Instancia del framework (Fat-Free Framework) que provee acceso a variables globales y de sesión.
-     * @param mixed  $query Objeto o arreglo con la información específica del correo a enviar (destinatario, asunto, contenido).
+     * @param object $UserData  Instancia de datos de sesión.
+     * @param object $BASE      Instancia de datos de configuración.
+     * @param mixed  $query     Objeto o arreglo con la información específica del correo a enviar (destinatario, asunto, contenido).
      *
      * @return mixed Retorna el resultado del envío si es exitoso, o false en caso de fallo.
      */
-    protected function Base_SMTPMail($f3, $query){
+    protected function Base_SMTPMail($UserData, $BASE, $query){
 
         /********************** Si todo esta ok **********************/
-        // Recupera la información del usuario y del sistema almacenada en la sesión actual
-        $UserData = $f3->get('SESSION.DataInfo');
-
         // Construye el arreglo de datos que se inyectarán en la plantilla de correo
         $TemplateData = [
             'Sistema_IMGLogo'   => $UserData['Sistema_IMGLogo'],
@@ -644,7 +789,7 @@ class ControllerBase {
             'Social_Facebook'   => $UserData['Social_Facebook'],
             'Social_Instagram'  => $UserData['Social_Instagram'],
             'Social_Linkedin'   => $UserData['Social_Linkedin'],
-            'baseUrl'           => $f3->get('BASE')
+            'baseUrl'           => $BASE,
         ];
 
         // Inicializa el controlador de envíos de correo
@@ -666,17 +811,15 @@ class ControllerBase {
      * incluye el parámetro 'MainPathUrl' en el conjunto de datos de la plantilla antes de
      * delegar el envío a la clase MailSender mediante el método especializado para Gmail.
      *
-     * @param object $f3    Instancia del framework (Fat-Free Framework) para el acceso a datos globales y de sesión.
-     * @param mixed  $query Información estructurada del mensaje (destinatario, contenido, asunto, etc.).
+     * @param object $UserData  Instancia de datos de sesión.
+     * @param object $BASE      Instancia de datos de configuración.
+     * @param mixed  $query     Objeto o arreglo con la información específica del correo a enviar (destinatario, asunto, contenido).
      *
      * @return mixed Retorna el objeto de respuesta del envío si es exitoso, o false en caso de error o ausencia de resultado.
      */
-    protected function Base_GMail($f3, $query){
+    protected function Base_GMail($UserData, $BASE, $query){
 
         /********************** Si todo esta ok **********************/
-        // Recupera la información del usuario y del sistema almacenada en la sesión actual
-        $UserData = $f3->get('SESSION.DataInfo');
-
         // Construye el arreglo de datos que se inyectarán en la plantilla de correo
         $TemplateData = [
             'Sistema_IMGLogo'   => $UserData['Sistema_IMGLogo'],
@@ -686,7 +829,7 @@ class ControllerBase {
             'Social_Facebook'   => $UserData['Social_Facebook'],
             'Social_Instagram'  => $UserData['Social_Instagram'],
             'Social_Linkedin'   => $UserData['Social_Linkedin'],
-            'baseUrl'           => $f3->get('BASE'),
+            'baseUrl'           => $BASE,
             'MainPathUrl'       => $UserData['MainPathUrl'],
         ];
 
@@ -709,17 +852,15 @@ class ControllerBase {
      * delega la ejecución técnica a la clase MailSender utilizando su método específico
      * para la API de SendingBlue.
      *
-     * @param object $f3    Instancia del framework (Fat-Free Framework) utilizada para acceder a datos de sesión y variables de ruta.
-     * @param mixed  $query Contiene la información lógica del correo (destinatario, asunto, datos dinámicos del cuerpo).
+     * @param object $UserData  Instancia de datos de sesión.
+     * @param object $BASE      Instancia de datos de configuración.
+     * @param mixed  $query     Objeto o arreglo con la información específica del correo a enviar (destinatario, asunto, contenido).
      *
      * @return mixed Retorna el objeto de respuesta del servicio SendingBlue si la operación es exitosa, o false en caso contrario.
      */
-    protected function Base_SendingBlue($f3, $query){
+    protected function Base_SendingBlue($UserData, $BASE, $query){
 
         /********************** Si todo esta ok **********************/
-        // Recupera la información del usuario y del sistema almacenada en la sesión actual
-        $UserData = $f3->get('SESSION.DataInfo');
-
         // Construye el arreglo de datos que se inyectarán en la plantilla de correo
         $TemplateData = [
             'Sistema_IMGLogo'   => $UserData['Sistema_IMGLogo'],
@@ -729,7 +870,7 @@ class ControllerBase {
             'Social_Facebook'   => $UserData['Social_Facebook'],
             'Social_Instagram'  => $UserData['Social_Instagram'],
             'Social_Linkedin'   => $UserData['Social_Linkedin'],
-            'baseUrl'           => $f3->get('BASE')
+            'baseUrl'           => $BASE,
         ];
 
         // Inicializa el controlador de envíos de correo
@@ -751,16 +892,15 @@ class ControllerBase {
      * para verificar la renderización, la estructura del contenido y validar los datos
      * antes de proceder con un envío definitivo a través de un servidor de correo.
      *
-     * @param object $f3    Instancia del framework (Fat-Free Framework) para acceso a datos de sesión y configuración.
-     * @param mixed  $query Parámetros dinámicos y contenido específico que se inyectarán en la plantilla de prueba.
+     * @param object $UserData  Instancia de datos de sesión.
+     * @param object $BASE      Instancia de datos de configuración.
+     * @param mixed  $query     Parámetros dinámicos y contenido específico que se inyectarán en la plantilla de prueba.
      *
      * @return mixed Retorna el contenido procesado de la plantilla o el estado del test si es exitoso; de lo contrario, false.
      */
-    protected function Base_TestMailTemplate($f3, $query){
+    protected function Base_TestMailTemplate($UserData, $BASE, $query){
 
         /********************** Si todo esta ok **********************/
-        // Recupera la información del usuario y del sistema almacenada en la sesión actual
-        $UserData = $f3->get('SESSION.DataInfo');
 
         // Construye el arreglo de datos que se inyectarán en la plantilla de correo
         $TemplateData = [
@@ -771,7 +911,7 @@ class ControllerBase {
             'Social_Facebook'   => $UserData['Social_Facebook'],
             'Social_Instagram'  => $UserData['Social_Instagram'],
             'Social_Linkedin'   => $UserData['Social_Linkedin'],
-            'baseUrl'           => $f3->get('BASE')
+            'baseUrl'           => $BASE,
         ];
 
         // Inicializa el controlador de envíos de correo
@@ -814,65 +954,90 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
-     * Genera dinámicamente cláusulas condicionales de SQL (WHERE) basándose en datos recibidos vía POST.
+     * Construye dinámicamente condiciones SQL para una cláusula WHERE a partir
+     * de parámetros recibidos mediante POST.
      *
-     * Esta función construye fragmentos de consultas SQL filtradas evaluando el tipo de comparación
-     * solicitado (igualdad exacta, coincidencia parcial o rangos). Procesa una lista de campos,
-     * valida su existencia en el array global $_POST y aplica limpieza de datos para prevenir
-     * inyecciones básicas.
+     * La función procesa una lista de campos y genera condiciones según el tipo
+     * de comparación indicado. Los valores recibidos se incorporan mediante
+     * parámetros preparados (?) y se almacenan separadamente en el arreglo
+     * de parámetros de retorno.
      *
-     * @param string $whereInt  La cláusula WHERE inicial o heredada a la que se concatenarán los nuevos filtros.
-     * @param string $WhereData Cadena de texto con los nombres de los campos a filtrar, separados por comas.
-     * @param string $Transx    Alias de la tabla a la que pertenecen los campos en la consulta SQL.
-     * @param int    $Type      Tipo de filtrado: 1 (Igualdad/Integer), 2 (LIKE/String), 3 (BETWEEN/Rangos).
+     * Tipos de filtrado soportados:
+     * - 1: Comparación exacta mediante el operador "=".
+     * - 2: Coincidencia parcial mediante el operador "LIKE".
+     * - 3: Comparación de rangos mediante el operador "BETWEEN".
      *
-     * @return string La sentencia WHERE completa resultante de la combinación de la base inicial y los filtros dinámicos.
+     * Para el tipo 3, cada elemento de $WhereData debe representar la configuración
+     * de un campo y sus respectivos parámetros de inicio y término, de acuerdo
+     * con el formato procesado por parseDataSeparator().
+     *
+     * @param string $whereInt   Cláusula WHERE existente a la que se agregarán
+     *                           las nuevas condiciones.
+     * @param array  $WhereParams Parámetros asociados a la cláusula WHERE inicial.
+     * @param string $WhereData  Lista de campos o configuraciones de campos,
+     *                           separados por comas.
+     * @param string $Transx     Alias utilizado para referenciar los campos
+     *                           dentro de la consulta SQL.
+     * @param int    $Type       Tipo de comparación que se aplicará:
+     *                           1 para igualdad, 2 para LIKE y 3 para BETWEEN.
+     *
+     * @return array Arreglo con dos elementos:
+     *               - where: cláusula WHERE resultante.
+     *               - params: parámetros correspondientes a las condiciones
+     *                         generadas, combinados con los parámetros recibidos.
      */
-    protected function searchWhere($whereInt, $WhereData, $Transx, $Type){
+    protected function searchWhere($whereInt, $WhereParams, $WhereData, $Transx, $Type){
 
         /********************** Si todo esta ok **********************/
-        // Inicializa el contenedor para las partes de la consulta
-        $parts    = [];
-        // Ejecuta la lógica solo si se proporcionaron campos para filtrar
+        // Inicializa los contenedores para las condiciones SQL y sus parámetros.
+        $parts  = [];
+        $params = [];
+
+        // Ejecuta el procesamiento únicamente cuando se proporciona información de campos.
         if($WhereData!=''){
-            // Convierte la cadena de campos separados por comas en un array usable
+            // Convierte la cadena de campos separados por comas en un arreglo.
             $arrWhere = $this->CommonData->parseDataCommas($WhereData); //Separacion por comas
-            // Determina la estrategia de construcción de la query según el tipo de dato o comparación
+            // Determina el tipo de comparación que se utilizará para construir las condiciones SQL.
             switch ($Type) {
                 /***********************************/
-                // Tipo 1: Comparación exacta (habitual para IDs o valores numéricos)
+                // Tipo 1: Comparación exacta mediante el operador "=".
                 case 1:
-                    // Verifica si el campo existe y tiene contenido en la petición POST
+                    // Recorre los campos configurados para el filtro.
                     foreach ($arrWhere as $field) {
-                        // Limpia el dato y construye la igualdad: Tabla.Campo = 'Valor'
+                        // Verifica que el campo tenga un valor no vacío en POST.
                         if (!empty($_POST[$field])) {
-                            $parts[] = $Transx.'.'.$field." = '".$this->clearData($_POST[$field])."'";
+                            // Agrega la condición SQL utilizando un parámetro preparado.
+                            $parts[]  = $Transx.'.'.$field.' = ?';
+                            $params[] = $_POST[$field];
                         }
                     }
                     break;
                 /***********************************/
-                // Tipo 2: Comparación parcial (búsqueda de texto)
+                // Tipo 2: Comparación parcial mediante el operador LIKE.
                 case 2:
-                    //Se recorren los datos separados
+                    // Recorre los campos configurados para la búsqueda.
                     foreach ($arrWhere as $field) {
-                        // Se verifican los datos del post
+                        // Verifica que el campo tenga un valor no vacío en POST.
                         if (!empty($_POST[$field])) {
-                            // Construye la cláusula LIKE con comodines: Tabla.Campo LIKE '%Valor%'
-                            $parts[] = $Transx.'.'.$field." LIKE '%".$this->clearData($_POST[$field])."%'";
+                            // Agrega comodines al valor para realizar una coincidencia parcial.
+                            $parts[]  = $Transx.'.'.$field.' LIKE ?';
+                            $params[] = '%'.$_POST[$field].'%';
                         }
                     }
                     break;
                 /***********************************/
-                // Tipo 3: Comparación de rangos (Between)
+                // Tipo 3: Comparación mediante un rango utilizando BETWEEN.
                 case 3:
-                    //Se recorren los datos separados
+                    // Recorre las configuraciones de campos correspondientes a rangos.
                     foreach ($arrWhere as $field) {
-                        // Descompone la configuración del campo (espera: campo-post_inicio-post_fin)
-                        $arrData = $this->CommonData->parseDataSeparator($field); //Separacion por guiones
-                        // Verifica que ambos límites del rango existan en el POST
-                        if (!empty($_POST[$arrData[1]])&&!empty($_POST[$arrData[2]])) {
-                            // Construye la cláusula: Tabla.Campo BETWEEN 'Inicio' AND 'Fin'
-                            $parts[] = $Transx.'.'.$arrData[0]." BETWEEN '".$_POST[$arrData[1]]."' AND '".$_POST[$arrData[2]]."'";
+                        // Descompone la configuración en campo, parámetro inicial y parámetro final.
+                        $arrData = $this->CommonData->parseDataSeparator($field);
+                        // Verifica que ambos extremos del rango tengan valores en POST.
+                        if (!empty($_POST[$arrData[1]]) && !empty($_POST[$arrData[2]])) {
+                            // Agrega la condición BETWEEN con dos parámetros preparados.
+                            $parts[]  = $Transx.'.'.$arrData[0].' BETWEEN ? AND ?';
+                            $params[] = $_POST[$arrData[1]];
+                            $params[] = $_POST[$arrData[2]];
                         }
                     }
                     break;
@@ -880,13 +1045,90 @@ class ControllerBase {
         }
 
         /**********************  Retorno datos  **********************/
-        // Une todas las partes generadas mediante el operador lógico AND
+        // Combina todas las condiciones generadas utilizando el operador lógico AND.
         $subWhere   = $parts ? implode(' AND ', $parts) : '';
-        // Concatena la consulta interna con los nuevos filtros si existen
+
+        // Agrega las nuevas condiciones a la cláusula WHERE existente cuando corresponde.
         $DataReturn = ($subWhere != '') ? $whereInt.' AND '.$subWhere : $whereInt;
-        // Retorna la cadena final asegurando la integridad de la cláusula según si existe o no un where inicial
-        return ($whereInt != '') ? $DataReturn : $subWhere;
+
+        // Determina si se utiliza la cláusula WHERE existente o únicamente las nuevas condiciones.
+        $finalWhere = ($whereInt != '') ? $DataReturn : $subWhere;
+
+        // Retorna la cláusula WHERE final junto con todos los parámetros asociados.
+        return [
+            'where'  => $finalWhere,
+            'params' => array_merge($WhereParams, $params),
+        ];
     }
+
+    /************************************************************************************************************/
+    /**
+     * Valida rangos de fechas recibidos mediante datos de entrada POST.
+     *
+     * Recibe una configuración de campos separados por comas, obtiene de cada
+     * elemento los nombres de los campos correspondientes a la fecha de inicio
+     * y término, y verifica que ambos valores estén presentes y puedan ser
+     * interpretados como fechas válidas.
+     *
+     * También valida que la fecha de término no sea anterior a la fecha de inicio.
+     * Los mensajes generados durante las validaciones se acumulan y se retornan
+     * como una cadena separada por comas.
+     *
+     * @param string $WhereData Configuración de los campos de fecha separados
+     *                          por comas. Cada elemento debe contener la información
+     *                          necesaria para identificar los campos POST de inicio
+     *                          y término.
+     *
+     * @return string Cadena con los mensajes de validación encontrados. Retorna
+     *               una cadena vacía cuando no se generan errores.
+     *
+     * @throws Exception No se propaga directamente. Las excepciones generadas
+     *                   durante la creación de objetos DateTime son capturadas
+     *                   internamente y transformadas en un mensaje de validación.
+     */
+    protected function searchValidateDates($WhereData){
+
+        /********************** Si todo esta ok **********************/
+        // Ejecuta la lógica solo si se proporcionaron campos para filtrar
+        if(isset($WhereData)&&$WhereData!=''){
+            // Inicializa el contenedor para las partes de la consulta
+            $parts    = [];
+            // Convierte la cadena de campos separados por comas en un array usable
+            $arrWhere = $this->CommonData->parseDataCommas($WhereData); //Separacion por comas
+            //Se recorren los datos separados
+            foreach ($arrWhere as $field) {
+                // Descompone la configuración del campo (espera: campo-post_inicio-post_fin)
+                $arrData = $this->CommonData->parseDataSeparator($field); //Separacion por guiones
+                // Verifica que ambos límites del rango existan en el POST
+                if (isset($_POST[$arrData[1]], $_POST[$arrData[2]])&&!empty($_POST[$arrData[1]])&&!empty($_POST[$arrData[2]])) {
+                    // Compara los datos 'Inicio' AND 'Fin'
+                    try {
+                        $inicio = new DateTime($_POST[$arrData[1]]);
+                        $fin    = new DateTime($_POST[$arrData[2]]);
+
+                        // Registra un error cuando la fecha de término es anterior a la fecha de inicio
+                        if ($fin < $inicio) {
+                            $parts[] = 'La fecha de término no puede ser anterior a la fecha de inicio.';
+                        }
+
+                    } catch (Exception $e) {
+                        // Registra un error cuando alguno de los valores no puede interpretarse como fecha
+                        $parts[] = 'Formato de fecha inválido.';
+                    }
+                }
+            }
+            /**********************  Retorno datos  **********************/
+            // Une todas las partes generadas mediante el una coma
+            $returnData   = $parts ? implode(', ', $parts) : '';
+            // Retorna la respuesta
+            return ($returnData != '') ? $returnData : '';
+
+        }
+
+        // Retorna vacio por defecto
+        return '';
+    }
+
 
     /************************************************************************************************************/
     /**
@@ -938,58 +1180,39 @@ class ControllerBase {
         /**********************    Instancia    **********************/
         // Inicializa el motor de renderizado de vistas
         $view     = new View;
-        // Valida y asegura que la información del usuario sea un arreglo, manejando valores nulos
-        $UserData = is_array($this->UserData ?? null) ? $this->UserData : [];
 
         /**********************  Retorno datos  **********************/
-        // Selecciona el flujo de renderizado según el tipo de sesión (1 por defecto: APP)
-        switch ($UserData['TypeSession'] ?? 1) {
-            /**********************************/
-            // Flujo 1: Renderizado para la aplicación Web convencional
+        // Determina la combinación de plantillas (templates) según el propósito de la vista
+        switch ($TypeView) {
+            // Caso 0: Estructura para usuarios no autenticados (Guest)
+            case 0:
+                echo $view->render('../app/templates/guest-header.php');
+                echo $view->render('../'.$Route);
+                echo $view->render('../app/templates/guest-footer.php');
+                break;
+            // Caso 1: Estructura estándar para usuarios del sistema
             case 1:
-                // Determina la combinación de plantillas (templates) según el propósito de la vista
-                switch ($TypeView) {
-                    // Caso 0: Estructura para usuarios no autenticados (Guest)
-                    case 0:
-                        echo $view->render('../app/templates/guest-header.php');
-                        echo $view->render('../'.$Route);
-                        echo $view->render('../app/templates/guest-footer.php');
-                        break;
-                    // Caso 1: Estructura estándar para usuarios del sistema
-                    case 1:
-                        echo $view->render('../app/templates/user-header.php');
-                        echo $view->render('../'.$Route);
-                        echo $view->render('../app/templates/user-footer.php');
-                        break;
-                    // Caso 2: Carga únicamente el cuerpo (útil para peticiones AJAX o Ventanas Modales)
-                    case 2:
-                        echo $view->render('../'.$Route); // Vista
-                        break;
-                    // Caso 3: Estructura optimizada para impresión de reportes genéricos
-                    case 3:
-                        echo $view->render('../app/templates/user-printer-header.php');
-                        echo $view->render('../'.$Route);
-                        echo $view->render('../app/templates/user-printer-footer.php');
-                        break;
-                    // Caso 4: Estructura específica para documentos mercantiles (facturas, boletas, etc.)
-                    case 4:
-                        echo $view->render('../app/templates/user-printerDocs-header.php');
-                        echo $view->render('../'.$Route);
-                        echo $view->render('../app/templates/user-printerDocs-footer.php');
-                        break;
-
-                }
+                echo $view->render('../app/templates/user-header.php');
+                echo $view->render('../'.$Route);
+                echo $view->render('../app/templates/user-footer.php');
                 break;
-            /**********************************/
-            // Flujo 2: Renderizado específico para respuestas de la API con sesión activa
+            // Caso 2: Carga únicamente el cuerpo (útil para peticiones AJAX o Ventanas Modales)
             case 2:
-                echo $view->render('../app/templates/api-view.php');  // Vista
+                echo $view->render('../'.$Route); // Vista
                 break;
-            /**********************************/
-            // Flujo 3: Renderizado específico para respuestas de la API mediante validación por Token
+            // Caso 3: Estructura optimizada para impresión de reportes genéricos
             case 3:
-                echo $view->render('../app/templates/api-vew.php');  // Vista
+                echo $view->render('../app/templates/user-printer-header.php');
+                echo $view->render('../'.$Route);
+                echo $view->render('../app/templates/user-printer-footer.php');
                 break;
+            // Caso 4: Estructura específica para documentos mercantiles (facturas, boletas, etc.)
+            case 4:
+                echo $view->render('../app/templates/user-printerDocs-header.php');
+                echo $view->render('../'.$Route);
+                echo $view->render('../app/templates/user-printerDocs-footer.php');
+                break;
+
         }
 
     }
@@ -1031,42 +1254,23 @@ class ControllerBase {
         $view     = new View;
 
         /**********************  Retorno datos  **********************/
-        // Evalúa el tipo de sesión para determinar si se entrega HTML o una respuesta de API
-        switch ($UserData['TypeSession']) {
-            /**********************************/
-            // Caso 1: Flujo de visualización para la aplicación Web
+        // Define el nivel de profundidad del renderizado según TypeView
+        switch ($TypeView) {
+            // Caso 1: Renderiza la página de error completa con cabecera y pie de página
             case 1:
-                // Define el nivel de profundidad del renderizado según TypeView
-                switch ($TypeView) {
-                    // Caso 1: Renderiza la página de error completa con cabecera y pie de página
-                    case 1:
-                        echo $view->render('../app/templates/user-header.php'); // Header
-                        echo $view->render('../app/templates/user-error.php');  // Vista
-                        echo $view->render('../app/templates/user-footer.php'); // Footer
-                        break;
-                    // Caso 2: Renderiza únicamente el componente de error (para llamadas parciales)
-                    case 2:
-                        echo $view->render('../app/templates/user-error.php');  // Vista
-                        break;
-                    // Caso 3: Reservado para futuras implementaciones de visualización
-                    case 3:
-                        //otra vista
-                        break;
-
-                }
+                echo $view->render('../app/templates/user-header.php'); // Header
+                echo $view->render('../app/templates/user-error.php');  // Vista
+                echo $view->render('../app/templates/user-footer.php'); // Footer
                 break;
-            /**********************************/
-            // Caso 2: Interfaz de API con sesión persistente
+            // Caso 2: Renderiza únicamente el componente de error (para llamadas parciales)
             case 2:
-                // Retorna un error HTTP 400 mediante el manejador de respuestas de la API
-                Response::error('Error Consulta', 400);
+                echo $view->render('../app/templates/user-error.php');  // Vista
                 break;
-            /**********************************/
-            // Caso 3: Interfaz de API autenticada mediante Token
+            // Caso 3: Reservado para futuras implementaciones de visualización
             case 3:
-                // Retorna un error HTTP 400 siguiendo el protocolo de la API
-                Response::error('Error Consulta', 400);
+                //otra vista
                 break;
+
         }
 
     }
