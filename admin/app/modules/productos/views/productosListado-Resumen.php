@@ -30,36 +30,23 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['idTipoProducto'] ?? '';
-                                $x2  = $data['rowData']['idCategoria'] ?? '';
-                                $x3  = $data['rowData']['Nombre'] ?? '';
-                                $x4  = $data['rowData']['Marca'] ?? '';
-                                $x5  = $data['rowData']['idUniMed'] ?? '';
-                                $x6  = $data['rowData']['Codigo'] ?? '';
-                                $x7  = $data['rowData']['Descripcion'] ?? '';
-                                $x8  = $data['rowData']['StockLimite'] ?? '';
-                                $x9  = $data['rowData']['ValorIngreso'] ?? '';
-                                $x10 = $data['rowData']['ValorEgreso'] ?? '';
-                                $x11 = $data['rowData']['idEstado'] ?? '';
-
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo',           'Name' => 'idTipoProducto',   'Id' => 'Edit_idTipoProducto',    'Value' => $x1,'Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
-                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => $x2,'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => $x3,'Required' => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',          'Name' => 'Marca',            'Id' => 'Edit_Marca',             'Value' => $x4,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Unidad Medida',  'Name' => 'idUniMed',         'Id' => 'Edit_idUniMed',          'Value' => $x5,'Required' => 2,'arrData' => $data['arrUnimed'], 'BASE' => $BASE]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',         'Name' => 'Codigo',           'Id' => 'Edit_Codigo',            'Value' => $x6,'Required' => 1,'Icon' => 'ri-barcode-line']);
-                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => $x7,'Required' => 1]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo',           'Name' => 'idTipoProducto',   'Id' => 'Edit_idTipoProducto',    'Value' => ($data['rowData']['idTipoProducto'] ?? ''), 'Required' => 2,'arrData' => $data['arrTipo'],      'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Categoria',      'Name' => 'idCategoria',      'Id' => 'Edit_idCategoria',       'Value' => ($data['rowData']['idCategoria'] ?? ''),    'Required' => 2,'arrData' => $data['arrCategoria'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => ($data['rowData']['Nombre'] ?? ''),         'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',          'Name' => 'Marca',            'Id' => 'Edit_Marca',             'Value' => ($data['rowData']['Marca'] ?? ''),          'Required' => 1]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Unidad Medida',  'Name' => 'idUniMed',         'Id' => 'Edit_idUniMed',          'Value' => ($data['rowData']['idUniMed'] ?? ''),       'Required' => 2,'arrData' => $data['arrUnimed'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',         'Name' => 'Codigo',           'Id' => 'Edit_Codigo',            'Value' => ($data['rowData']['Codigo'] ?? ''),         'Required' => 1,'Icon' => 'ri-barcode-line']);
+                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => ($data['rowData']['Descripcion'] ?? ''),    'Required' => 1]);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Stock Limite',   'Name' => 'StockLimite',      'Id' => 'Edit_StockLimite',       'Value' => $x8,  'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Valor Ingreso',  'Name' => 'ValorIngreso',     'Id' => 'Edit_ValorIngreso',      'Value' => $x9,  'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Valor Egreso',   'Name' => 'ValorEgreso',      'Id' => 'Edit_ValorEgreso',       'Value' => $x10, 'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Stock Limite',   'Name' => 'StockLimite',      'Id' => 'Edit_StockLimite',       'Value' => ($data['rowData']['StockLimite'] ?? ''),   'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Valor Ingreso',  'Name' => 'ValorIngreso',     'Id' => 'Edit_ValorIngreso',      'Value' => ($data['rowData']['ValorIngreso'] ?? ''),  'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 5,  'Placeholder' => 'Valor Egreso',   'Name' => 'ValorEgreso',      'Id' => 'Edit_ValorEgreso',       'Value' => ($data['rowData']['ValorEgreso'] ?? ''),   'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelect([   'Placeholder' => 'Estado',  'Name'  => 'idEstado', 'Id'  => 'Search_idEstado', 'Value'  => $x11,'Required' => 2,'arrData' => $data['arrEstado']]);
+                                $data['Fnc_FormInputs']->formSelect([   'Placeholder' => 'Estado',  'Name'  => 'idEstado', 'Id'  => 'Search_idEstado', 'Value'  => ($data['rowData']['idEstado'] ?? ''),'Required' => 2,'arrData' => $data['arrEstado']]);
 
 
                                 //datos ocultos
@@ -107,7 +94,7 @@
                 </div>
 
                 <?php
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idProducto']);
                 ?>
 
@@ -229,7 +216,7 @@
         /*********************************************************************/
         /*                            DOCUMENTOS                             */
         /*********************************************************************/
-        //Variables
+        // Variables
         let DocumentosLoad = 0;
         /******************************************/
         function tabDocumentosLoadList() {
@@ -328,7 +315,7 @@
     /*********************************************************************/
     /*                          OBSERVACIONES                            */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ObsLoad = 0;
     /******************************************/
     function tabObsLoadList() {

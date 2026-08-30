@@ -32,15 +32,13 @@
                     <?php
                     //se dibujan los inputs
                     $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',   'Name' => 'Email',    'Value' => '','Required' => 2,'Icon' => 'bx bx-mail-send']);
-                    $data['Fnc_FormInputs']->formNumberSpinner([   'Placeholder' => 'Numero',  'Name' => 'Numero',   'Value' => '','Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
+                    $data['Fnc_FormInputs']->formNumberSpinner([          'Placeholder' => 'Numero',  'Name' => 'Numero',   'Value' => '','Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',     'Name' => 'Rut',      'Value' => '','Required' => 2,'Icon' => 'bi bi-person-circle']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Patente', 'Name' => 'Patente',  'Value' => '','Required' => 2,'Icon' => 'ri-car-fill']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',   'Name' => 'Fecha',    'Value' => '','Required' => 2,'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 10, 'Placeholder' => 'Hora',    'Name' => 'Hora',     'Value' => '','Required' => 2,'Icon' => 'bi bi-clock']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Palabra', 'Name' => 'Palabra',  'Value' => '','Required' => 2]);
 
-                    //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario','Value' => $data['UserData']['UserID'],'Required' => 2]);
                     ?>
                 </div>
                 <div class="modal-footer">

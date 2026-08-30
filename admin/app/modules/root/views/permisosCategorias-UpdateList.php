@@ -19,7 +19,7 @@
         if(is_array($data['arrCategoria'])&&!empty($data['arrCategoria'])){
             //Recorro
             foreach($data['arrCategoria'] as $crud){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPermisosCat']);
                 $Entidad     = addslashes($crud['Nombre']); ?>
                 <tr>
@@ -47,4 +47,3 @@
         <?php } ?>
     </tbody>
 </table>
-

@@ -35,7 +35,7 @@
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Identificador',   'Name' => 'CodIdentificador', 'Value' => '','Required' => 1, 'Icon' => 'ri-barcode-line']);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',         'Value' => 1, 'Required' => 2]); //Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',         'Value' => 1, 'Required' => 2]); // Activo
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'id_Geo',           'Value' => 2, 'Required' => 2]); //Uso Geolocalización - No
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'id_Sensores',      'Value' => 2, 'Required' => 2]); //Uso Sensores - No
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idBackup',         'Value' => 2, 'Required' => 2]); //Backup Tabla relacionada - No

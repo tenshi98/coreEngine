@@ -28,22 +28,19 @@
     <div class="modal-body">
         <?php
         //Se verifican si existen los datos
-        $x1 = $data['rowData']['TipoMovimiento'] ?? '';
-        $x2 = $data['rowData']['Bodega'] ?? '';
-        $x3 = $data['rowData']['ProductoNombre'] ?? '';
-        $x4 = (!empty($data['rowData']['Number']) && $data['rowData']['Number'] != 0)
-            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Number'])
-            : '';
-        $x5 = (!empty($data['rowData']['ValorTotal']) && $data['rowData']['ValorTotal'] != 0)
-            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['ValorTotal'])
-            : '';
+        $x_EditProd_Number = (!empty($data['rowData']['Number']) && $data['rowData']['Number'] != 0)
+                            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Number'])
+                            : '';
+        $x_EditProd_ValorTotal = (!empty($data['rowData']['ValorTotal']) && $data['rowData']['ValorTotal'] != 0)
+                                ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['ValorTotal'])
+                                : '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Tipo Movimiento', 'Name' => 'TipoMovimientoFake', 'Id' => 'TipoMovimientoFake',  'Value' => $x1,'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega',          'Name' => 'BodegaFake',         'Id' => 'BodegaFake',          'Value' => $x2,'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Producto',        'Name' => 'ProductoFake',       'Id' => 'ProductoFake',        'Value' => $x3,'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',        'Name' => 'Number',             'Id' => 'EditProd_Number',     'Value' => $x4,'Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',     'Name' => 'ValorTotal',         'Id' => 'EditProd_ValorTotal', 'Value' => $x5,'Required' => 2,'Icon' => 'bi bi-currency-dollar']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Tipo Movimiento', 'Name' => 'TipoMovimientoFake', 'Id' => 'TipoMovimientoFake',  'Value' => ($data['rowData']['TipoMovimiento'] ?? ''), 'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega',          'Name' => 'BodegaFake',         'Id' => 'BodegaFake',          'Value' => ($data['rowData']['Bodega'] ?? ''),         'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Producto',        'Name' => 'ProductoFake',       'Id' => 'ProductoFake',        'Value' => ($data['rowData']['ProductoNombre'] ?? ''), 'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',        'Name' => 'Number',             'Id' => 'EditProd_Number',     'Value' => $x_EditProd_Number,                         'Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',     'Name' => 'ValorTotal',         'Id' => 'EditProd_ValorTotal', 'Value' => $x_EditProd_ValorTotal,                     'Required' => 2,'Icon' => 'bi bi-currency-dollar']);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idExistencia',   'Value' => $data['rowData']['idExistencia'],  'Required' => 2]);

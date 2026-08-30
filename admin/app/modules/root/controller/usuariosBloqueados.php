@@ -5,7 +5,7 @@
 class usuariosBloqueados extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $DataDate;
@@ -15,7 +15,7 @@ class usuariosBloqueados extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,25 +34,26 @@ class usuariosBloqueados extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Fecha,Hora,DateTime,Email,Password,IP_Client,Agent_Transp',
             'table'   => 'usuarios_checkbrute',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Fecha ASC, Hora ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -92,25 +93,26 @@ class usuariosBloqueados extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Fecha,Hora,DateTime,Email,Password,IP_Client,Agent_Transp',
             'table'   => 'usuarios_checkbrute',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Fecha ASC, Hora ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -152,7 +154,7 @@ class usuariosBloqueados extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'usuarios_checkbrute',
@@ -160,7 +162,7 @@ class usuariosBloqueados extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
             /******************************/

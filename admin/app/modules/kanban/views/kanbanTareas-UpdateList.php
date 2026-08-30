@@ -19,7 +19,7 @@
                                 <?php
                                 // Se verifica si se tiene el permiso para visualizar el dato
                                 if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
-                                    //Variables
+                                    // Variables
                                     $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']);
                                     $level       = $data['UserAccess']['LevelAccess'];
                                     $Entidad     = addslashes($crud['Nombre']); ?>
@@ -42,7 +42,7 @@
                                     if($tarea[0]['idKanbanEstado']==$crud['idKanbanEstado']){
                                         //Verifico si la fecha de cierre es mayor que fecha actual
                                         $col_borde = ($tarea[0]['Fecha'] > $data['Fnc_ServerServer']->fechaActual()) ? 'task-ok' : 'task-problem';
-                                        //Variables
+                                        // Variables
                                         $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas);
                                         $level       = $data['UserAccess']['LevelAccess'];
                                         $Entidad     = addslashes($tarea[0]['Titulo']);

@@ -26,7 +26,7 @@
                     case 2: $Movimiento = $crud['BodegaEgreso']; break;                              //Egreso
                     case 3: $Movimiento = $crud['BodegaEgreso'].' a '.$crud['BodegaIngreso']; break; //Traspaso
                 }
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idMovimiento']);
                 $level       = $data['UserAccess']['LevelAccess'];
                 $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId;

@@ -150,7 +150,7 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            //variables
+                                            // Variables
                                             $vowels = array('&lt;br&gt;', '&lt;br/&gt;');
                                             //recorro
                                             foreach ($data['arrHistorial'] as $task){

@@ -27,11 +27,8 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1  = $data['rowData']['Nombre'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Nombre',  'Id' => 'Edit_Nombre',  'Value' => $x1,'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Nombre',  'Id' => 'Edit_Nombre',  'Value' => ($data['rowData']['Nombre'] ?? ''),'Required' => 2]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipoProducto','Value' => $data['rowData']['idTipoProducto'],'Required' => 2]);

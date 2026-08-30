@@ -5,7 +5,7 @@
 class crudInforme extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $DataDate;
@@ -17,7 +17,7 @@ class crudInforme extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -65,37 +65,47 @@ class crudInforme extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = '';                                            //Datos búsqueda exacta
-        $WhereData_string  = 'Email,Numero,Rut,Patente,Fecha,Hora,Palabra'; //Datos búsqueda relativa
-        $WhereData_between = '';                                            //Datos búsqueda Between
-        $whereInt          = '';                                            //se crea cadena
+        // Variables
+        $WhereData_int     = '';                                            // Datos búsqueda exacta
+        $WhereData_string  = 'Email,Numero,Rut,Patente,Fecha,Hora,Palabra'; // Datos búsqueda relativa
+        $WhereData_between = '';                                            // Datos búsqueda Between
+        $whereInt          = '';                                            // Se crea cadena
+        $whereParams       = [];                                            // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'core_test_crud', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'core_test_crud', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'core_test_crud', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'core_test_crud', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'core_test_crud', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'core_test_crud', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCrud,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
             'table'   => 'core_test_crud',
             'join'    => '',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'Email ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -131,24 +141,25 @@ class crudInforme extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCrud,idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
             'table'   => 'core_test_crud',
             'join'    => '',
-            'where'   => 'idCrud = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCrud = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina

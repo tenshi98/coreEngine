@@ -5,7 +5,7 @@
 class installer extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $FormInputs;
     private $DataValidations;
     private $FunctionsServer;
@@ -38,7 +38,7 @@ class installer extends ControllerBase {
         //Validacion de instalacion
         try {
             // Obtener la configuración
-            $config = ConfigData::MySQL_1;
+            $config = ConfigDataBase::MySQL_1;
 
             // Verificar que la clave exista
             if (array_key_exists('HOSTNAME', $config)) {
@@ -80,7 +80,7 @@ class installer extends ControllerBase {
         //Validacion de instalacion
         try {
             // Obtener la configuración
-            $config = ConfigData::MySQL_1;
+            $config = ConfigDataBase::MySQL_1;
 
             // Verificar que la clave exista
             if (array_key_exists('HOSTNAME', $config)) {
@@ -116,7 +116,7 @@ class installer extends ControllerBase {
         //Validacion de instalacion
         try {
             // Obtener la configuración
-            $config = ConfigData::MySQL_1;
+            $config = ConfigDataBase::MySQL_1;
 
             // Verificar que la clave exista
             if (array_key_exists('HOSTNAME', $config)) {
@@ -152,7 +152,7 @@ class installer extends ControllerBase {
         //Validacion de instalacion
         try {
             // Obtener la configuración
-            $config = ConfigData::MySQL_1;
+            $config = ConfigDataBase::MySQL_1;
 
             // Verificar que la clave exista
             if (array_key_exists('HOSTNAME', $config)) {
@@ -215,7 +215,7 @@ class installer extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /******************************/
-            //Variables
+            // Variables
             $Response = '';
             //Valido datos ingresados por el usuario
             if (empty($_POST['Host'])){           $Response.= '<br> - Host es obligatorio';                   }else{$Host            = trim($_POST['Host']);}
@@ -273,7 +273,7 @@ class installer extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /******************************/
-            //Variables
+            // Variables
             $Response = '';
             //Valido datos ingresados por el usuario
             if (empty($_POST['Host'])){           $Response.= '<br> - Host es obligatorio';                   }else{$Host            = trim($_POST['Host']);}
@@ -330,7 +330,7 @@ class installer extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /******************************/
-            //Variables
+            // Variables
             $Response = '';
             //Valido datos ingresados por el usuario
             if (empty($_POST['Host'])){           $Response.= '<br> - Host es obligatorio';                   }else{$Host            = trim($_POST['Host']);}
@@ -360,7 +360,7 @@ class installer extends ControllerBase {
                 ];
                 //Se genera el array con datos
                 $xParams  = ['query' => $query, 'newBDConn' => $newBDConn];
-                //Ejecuto la query
+                // Ejecuto la query
                 $CreateDB = $this->Base_createDatabase($xParams);
 
                 /******************************/
@@ -386,7 +386,7 @@ class installer extends ControllerBase {
                     $newBDConn = Database::getSQLConnection($BD_Data);
                     //Se genera el array con datos
                     $xParams  = ['filepath' => $filepath, 'newBDConn' => $newBDConn];
-                    //Ejecuto la query
+                    // Ejecuto la query
                     $ExecuteFileSQL = $this->Base_executeFile($xParams);
                     //Si se ejecuta correctamente
                     if ($ExecuteFileSQL['status']) {

@@ -5,7 +5,7 @@
 class cotizacionListado extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -19,7 +19,7 @@ class cotizacionListado extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -51,7 +51,7 @@ class cotizacionListado extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -65,68 +65,72 @@ class cotizacionListado extends ControllerBase {
                 entidades_listado.Nick AS EntidadesNick',
             'table'   => 'cotizacion_listado',
             'join'    => 'LEFT JOIN entidades_listado ON entidades_listado.idEntidad = cotizacion_listado.idEntidad',
-            'where'   => 'cotizacion_listado.idCotizacion != 0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
-            'where'   => 'idEstado=1 AND idTipo=2',
+            'where'   => 'idEstado = ? AND idTipo = ?',
+            'params'  => [1, 2],
             'group'   => '',
             'having'  => '',
             'order'   => 'ApellidoPat ASC,Nombre ASC,RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrEntidades = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idProducto AS ID,Nombre',
             'table'   => 'productos_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idServicio AS ID,Nombre',
             'table'   => 'servicios_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrEntidades['status'] && $arrProductos['status'] && $arrServicios['status']){
 
             /******************************************/
@@ -173,21 +177,28 @@ class cotizacionListado extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idEntidad,idCotizacion';                   //Datos búsqueda exacta
-        $WhereData_string  = '';                                         //Datos búsqueda relativa
-        $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';        //Datos búsqueda Between
-        $whereInt          = '';                                         //se crea cadena
+        // Variables
+        $WhereData_int     = 'idEntidad,idCotizacion';                   // Datos búsqueda exacta
+        $WhereData_string  = '';                                         // Datos búsqueda relativa
+        $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';        // Datos búsqueda Between
+        $whereInt          = '';                                         // Se crea cadena
+        $whereParams       = [];                                         // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'cotizacion_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'cotizacion_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'cotizacion_listado', 3);
-        //Verifico si esta vacio
-        $whereInt2 = $whereInt ? $whereInt . ' AND cotizacion_listado.idCotizacion != 0' : 'cotizacion_listado.idCotizacion != 0';
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'cotizacion_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'cotizacion_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'cotizacion_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -201,20 +212,21 @@ class cotizacionListado extends ControllerBase {
                 entidades_listado.Nick AS EntidadesNick',
             'table'   => 'cotizacion_listado',
             'join'    => 'LEFT JOIN entidades_listado ON entidades_listado.idEntidad = cotizacion_listado.idEntidad',
-            'where'   => $whereInt2,
+            'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -250,7 +262,7 @@ class cotizacionListado extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -271,33 +283,35 @@ class cotizacionListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN entidades_listado  ON entidades_listado.idEntidad  = cotizacion_listado.idEntidad
                 LEFT JOIN usuarios_listado   ON usuarios_listado.idUsuario   = cotizacion_listado.idUsuario',
-            'where'   => 'cotizacion_listado.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Item,Number,ValorTotal',
             'table'   => 'cotizacion_listado_items',
             'join'    => '',
-            'where'   => 'idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrItems = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.Nombre AS ProductoNombre,
@@ -308,18 +322,19 @@ class cotizacionListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN productos_listado     ON productos_listado.idProducto    = cotizacion_listado_productos.idProducto
                 LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed   = productos_listado.idUniMed',
-            'where'   => 'cotizacion_listado_productos.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado_productos.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_productos.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 servicios_listado.Nombre AS ServicioNombre,
@@ -327,20 +342,21 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado_servicios.ValorTotal AS ServicioValor',
             'table'   => 'cotizacion_listado_servicios',
             'join'    => 'LEFT JOIN servicios_listado  ON servicios_listado.idServicio  = cotizacion_listado_servicios.idServicio',
-            'where'   => 'cotizacion_listado_servicios.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado_servicios.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_servicios.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -377,7 +393,7 @@ class cotizacionListado extends ControllerBase {
     //Print
     public function Printer($f3, $params, $Imprimir){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -404,17 +420,18 @@ class cotizacionListado extends ControllerBase {
                 LEFT JOIN entidades_listado       ON entidades_listado.idEntidad      = cotizacion_listado.idEntidad
                 LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad   = entidades_listado.idCiudad
                 LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna  = entidades_listado.idComuna',
-            'where'   => 'cotizacion_listado.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_sistemas.Sistema_Nombre AS Sistema_Nombre,
@@ -428,33 +445,35 @@ class cotizacionListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad    = core_sistemas.Sistema_idCiudad
                 LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna   = core_sistemas.Sistema_idComuna',
-            'where'   => 'core_sistemas.idSistema = "1"',
+            'where'   => 'core_sistemas.idSistema = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $rowSistema = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Item,Number,ValorTotal',
             'table'   => 'cotizacion_listado_items',
             'join'    => '',
-            'where'   => 'idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrItems = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.Nombre AS ProductoNombre,
@@ -465,18 +484,19 @@ class cotizacionListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN productos_listado     ON productos_listado.idProducto   = cotizacion_listado_productos.idProducto
                 LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed  = productos_listado.idUniMed',
-            'where'   => 'cotizacion_listado_productos.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado_productos.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_productos.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 servicios_listado.Nombre AS ServicioNombre,
@@ -484,20 +504,21 @@ class cotizacionListado extends ControllerBase {
                 cotizacion_listado_servicios.ValorTotal AS ServicioValor',
             'table'   => 'cotizacion_listado_servicios',
             'join'    => 'LEFT JOIN servicios_listado  ON servicios_listado.idServicio  = cotizacion_listado_servicios.idServicio',
-            'where'   => 'cotizacion_listado_servicios.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado_servicios.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_servicios.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $rowSistema['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -535,7 +556,7 @@ class cotizacionListado extends ControllerBase {
     //Resumen
     public function Resumen($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -557,35 +578,37 @@ class cotizacionListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN entidades_listado  ON entidades_listado.idEntidad = cotizacion_listado.idEntidad
                 LEFT JOIN usuarios_listado   ON usuarios_listado.idUsuario  = cotizacion_listado.idUsuario',
-            'where'   => 'cotizacion_listado.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
-            'where'   => 'idEstado=1 AND idTipo=2',
+            'where'   => 'idEstado = ? AND idTipo = ?',
+            'params'  => [1, 2],
             'group'   => '',
             'having'  => '',
             'order'   => 'ApellidoPat ASC,Nombre ASC,RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrEntidades = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrEntidades['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -626,7 +649,7 @@ class cotizacionListado extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -647,19 +670,20 @@ class cotizacionListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN entidades_listado  ON entidades_listado.idEntidad   = cotizacion_listado.idEntidad
                 LEFT JOIN usuarios_listado   ON usuarios_listado.idUsuario    = cotizacion_listado.idUsuario',
-            'where'   => 'cotizacion_listado.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -695,8 +719,12 @@ class cotizacionListado extends ControllerBase {
     //Crear
     public function Insert($f3){
 
+        /******************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
         /*******************************************************************/
-        //variables
+        // Variables
         $ndata_1 = isset($_POST['Item_Item']) ? count($_POST['Item_Item']) : 0;
         $ndata_2 = isset($_POST['Producto_idProducto']) ? count($_POST['Producto_idProducto']) : 0;
         $ndata_3 = isset($_POST['Servicio_idServicio']) ? count($_POST['Servicio_idServicio']) : 0;
@@ -711,7 +739,7 @@ class cotizacionListado extends ControllerBase {
         }else{
 
             /******************************/
-            //Variables
+            // Variables
             $x_ValorTotal     = 0;
             $x_TotalItems     = 0;
             $x_TotalProductos = 0;
@@ -750,15 +778,20 @@ class cotizacionListado extends ControllerBase {
             $_POST['TotalItems']      = $x_TotalItems;
             $_POST['TotalProductos']  = $x_TotalProductos;
             $_POST['TotalServicios']  = $x_TotalServicios;
-            //Verifico si existe
+            // Verifico si existe
             if(isset($_POST['Creacion_fecha'])&&$_POST['Creacion_fecha']!=''){
                 $_POST['Creacion_Semana']  = $this->DataDate->fecha2NSemana($_POST['Creacion_fecha']);
                 $_POST['Creacion_mes']     = $this->DataDate->fecha2NMes($_POST['Creacion_fecha']);
                 $_POST['Creacion_ano']     = $this->DataDate->fecha2Ano($_POST['Creacion_fecha']);
             }
 
+            /*******************************************************************/
+            //Se inicia la transacción: la reserva, sus recursos asociados y el historial deben
+            //aplicarse de forma atómica (todo o nada)
+            $this->Base_transactionBegin();
+
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idUsuario,idEntidad,fecha_auto,Creacion_fecha,Creacion_Semana,Creacion_mes,Creacion_ano,Creacion_hora,Observaciones,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios',
                 'required'  => 'idUsuario,idEntidad,fecha_auto,Creacion_fecha',
@@ -767,12 +800,18 @@ class cotizacionListado extends ControllerBase {
                 'table'     => 'cotizacion_listado',
                 'Post'      => $_POST
             ];
-
             //Se genera el chequeo
             $dataCheck_1 = $this->dataCheck_1($_POST);
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_insert($xParams);
+
+            /*******************************************************************/
+            //Si falla la reserva principal, se revierte de inmediato
+            if (!$Response['status']){
+                $this->Base_transactionRollback();
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+            }
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
@@ -784,7 +823,7 @@ class cotizacionListado extends ControllerBase {
                     //recorro los items
                     for($j1 = 0; $j1 < $ndata_1; $j1++){
                         /******************************/
-                        //Se agrega respuesta
+                        // Se agrega respuesta
                         $arrTareas = [
                             'idCotizacion' => $Response['data'],
                             'Item'          => $_POST['Item_Item'][$j1],
@@ -792,7 +831,7 @@ class cotizacionListado extends ControllerBase {
                             'ValorTotal'    => $_POST['Item_ValorTotal'][$j1],
                         ];
                         /******************************/
-                        //Se genera la query
+                        // Se genera la query
                         $query = [
                             'data'      => 'idCotizacion,Item,Number,ValorTotal',
                             'required'  => 'idCotizacion,Item,Number,ValorTotal',
@@ -803,9 +842,15 @@ class cotizacionListado extends ControllerBase {
                         ];
                         //Se genera el chequeo
                         $dataCheck_2 = $this->dataCheck_2($arrTareas);
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
-                        $this->Base_insert($xParams);
+                        $xInsert = $this->Base_insert($xParams);
+
+                        // Si falla la consulta, se revierte de inmediato
+                        if (!$xInsert['status']){
+                            $this->Base_transactionRollback();
+                            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                        }
                     }
                 }
 
@@ -817,7 +862,7 @@ class cotizacionListado extends ControllerBase {
                     //recorro los items
                     for($j1 = 0; $j1 < $ndata_2; $j1++){
                         /******************************/
-                        //Se agrega respuesta
+                        // Se agrega respuesta
                         $arrTareas = [
                             'idCotizacion'   => $Response['data'],
                             'idProducto'      => $_POST['Producto_idProducto'][$j1],
@@ -825,7 +870,7 @@ class cotizacionListado extends ControllerBase {
                             'ValorTotal'      => $_POST['Producto_ValorTotal'][$j1],
                         ];
                         /******************************/
-                        //Se genera la query
+                        // Se genera la query
                         $query = [
                             'data'      => 'idCotizacion,idProducto,Number,ValorTotal',
                             'required'  => 'idCotizacion,idProducto,Number,ValorTotal',
@@ -836,9 +881,15 @@ class cotizacionListado extends ControllerBase {
                         ];
                         //Se genera el chequeo
                         $dataCheck_2 = $this->dataCheck_2($arrTareas);
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
-                        $this->Base_insert($xParams);
+                        $xInsert = $this->Base_insert($xParams);
+
+                        // Si falla la consulta, se revierte de inmediato
+                        if (!$xInsert['status']){
+                            $this->Base_transactionRollback();
+                            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                        }
                     }
                 }
 
@@ -848,7 +899,7 @@ class cotizacionListado extends ControllerBase {
                     //recorro los items
                     for($j1 = 0; $j1 < $ndata_3; $j1++){
                         /******************************/
-                        //Se agrega respuesta
+                        // Se agrega respuesta
                         $arrTareas = [
                             'idCotizacion' => $Response['data'],
                             'idServicio'    => $_POST['Servicio_idServicio'][$j1],
@@ -856,7 +907,7 @@ class cotizacionListado extends ControllerBase {
                             'ValorTotal'    => $_POST['Servicio_ValorTotal'][$j1],
                         ];
                         /******************************/
-                        //Se genera la query
+                        // Se genera la query
                         $query = [
                             'data'      => 'idCotizacion,idServicio,Number,ValorTotal',
                             'required'  => 'idCotizacion,idServicio,Number,ValorTotal',
@@ -867,11 +918,21 @@ class cotizacionListado extends ControllerBase {
                         ];
                         //Se genera el chequeo
                         $dataCheck_2 = $this->dataCheck_2($arrTareas);
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
-                        $this->Base_insert($xParams);
+                        $xInsert = $this->Base_insert($xParams);
+
+                        // Si falla la consulta, se revierte de inmediato
+                        if (!$xInsert['status']){
+                            $this->Base_transactionRollback();
+                            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                        }
                     }
                 }
+
+                /*******************************************************************/
+                //Se confirma la transacción
+                $this->Base_transactionCommit();
 
                 // Si es un ID numérico, encripta y envía con código 200 (OK)
                 $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
@@ -888,12 +949,16 @@ class cotizacionListado extends ControllerBase {
     /******************************************************************************/
     //Editar por put (solo modificar datos)
     //Editar por post (modificar y subir archivos)
-    public function Update(){
+    public function Update($f3){
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /******************************/
-            //Verifico si existe
+            // Usuario creador
+            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+            /******************************/
+            // Verifico si existe
             if(isset($_POST['Creacion_fecha'])&&$_POST['Creacion_fecha']!=''){
                 $_POST['Creacion_Semana']  = $this->DataDate->fecha2NSemana($_POST['Creacion_fecha']);
                 $_POST['Creacion_mes']     = $this->DataDate->fecha2NMes($_POST['Creacion_fecha']);
@@ -901,7 +966,7 @@ class cotizacionListado extends ControllerBase {
             }
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idCotizacion,idUsuario,idEntidad,fecha_auto,Creacion_fecha,Creacion_Semana,Creacion_mes,Creacion_ano,Creacion_hora,Observaciones,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,TotalGuias',
                 'required'  => 'idUsuario,idEntidad,fecha_auto,Creacion_fecha',
@@ -913,7 +978,7 @@ class cotizacionListado extends ControllerBase {
             ];
             //Se genera el chequeo
             $dataCheck_1 = $this->dataCheck_1($_POST);
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -941,7 +1006,7 @@ class cotizacionListado extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'cotizacion_listado',
@@ -949,7 +1014,7 @@ class cotizacionListado extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -964,13 +1029,13 @@ class cotizacionListado extends ControllerBase {
                 $arrTableDel[] = ['files' => '', 'table' => 'cotizacion_listado_servicios'];
 
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrTableDel){
                     //recorro
                     foreach ($arrTableDel as $tblDel) {
-                        //Se genera la query
+                        // Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idCotizacion', 'SubCarpeta' => '', 'Post' => $dataDelete];
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['query' => $query];
                         $this->Base_delete($xParams);
                     }
@@ -1029,24 +1094,25 @@ class cotizacionListado extends ControllerBase {
         }
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => $Data,
             'table'   => 'cotizacion_listado',
             'join'    => '',
-            'where'   => 'idCotizacion = "'.$CotizacionID.'"',
+            'where'   => 'idCotizacion = ?',
+            'params'  => [$CotizacionID],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************/
         //Calculo
         $x_ValorTotal = $rowData['data']['TotalItems'] + $rowData['data']['TotalProductos'] + $rowData['data']['TotalServicios'];
-        //Se agrega respuesta
+        // Se agrega respuesta
         $arrTareas = [
             'idCotizacion'   => $CotizacionID,
             'ValorNeto'       => ($x_ValorTotal/1.19),
@@ -1057,7 +1123,7 @@ class cotizacionListado extends ControllerBase {
             'TotalServicios'  => $rowData['data']['TotalServicios'],
         ];
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idCotizacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios',
             'required'  => 'idCotizacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios',
@@ -1069,7 +1135,7 @@ class cotizacionListado extends ControllerBase {
         ];
         //Se genera el chequeo
         $dataCheck_3 = $this->dataCheck_3($arrTareas);
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query];
         $this->Base_update($xParams);
     }
@@ -1080,7 +1146,7 @@ class cotizacionListado extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -1117,7 +1183,7 @@ class cotizacionListado extends ControllerBase {
 
     //Se validan los datos
     private function dataCheck_2($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -1154,7 +1220,7 @@ class cotizacionListado extends ControllerBase {
 
     //Se validan los datos
     private function dataCheck_3($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

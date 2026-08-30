@@ -5,7 +5,7 @@
 class maquinasListado extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -16,7 +16,7 @@ class maquinasListado extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -36,7 +36,7 @@ class maquinasListado extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 maquinas_listado.idMaquina,
@@ -45,36 +45,38 @@ class maquinasListado extends ControllerBase {
                 core_estados.Color AS EstadoColor',
             'table'   => 'maquinas_listado',
             'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = maquinas_listado.idEstado',
-            'where'   => 'maquinas_listado.idMaquina!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'maquinas_listado.idEstado ASC, maquinas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrEstado['status']){
 
             /******************************************/
@@ -114,21 +116,28 @@ class maquinasListado extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idEstado';  //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre';    //Datos búsqueda relativa
-        $WhereData_between = '';          //Datos búsqueda Between
-        $whereInt          = '';          //se crea cadena
+        // Variables
+        $WhereData_int     = 'idEstado';  // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre';    // Datos búsqueda relativa
+        $WhereData_between = '';          // Datos búsqueda Between
+        $whereInt          = '';          // Se crea cadena
+        $whereParams       = [];          // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'maquinas_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'maquinas_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'maquinas_listado', 3);
-        //Verifico si esta vacio
-        $whereInt2 = $whereInt ? $whereInt . ' AND maquinas_listado.idMaquina!=0' : 'maquinas_listado.idMaquina!=0';
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'maquinas_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'maquinas_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'maquinas_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 maquinas_listado.idMaquina,
@@ -137,20 +146,21 @@ class maquinasListado extends ControllerBase {
                 core_estados.Color AS EstadoColor',
             'table'   => 'maquinas_listado',
             'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = maquinas_listado.idEstado',
-            'where'   => $whereInt2,
+            'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'maquinas_listado.idEstado ASC, maquinas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -188,7 +198,7 @@ class maquinasListado extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 maquinas_listado.idMaquina,
@@ -223,30 +233,32 @@ class maquinasListado extends ControllerBase {
                 LEFT JOIN core_opciones Ops_2    ON Ops_2.idOpciones             = maquinas_listado.id_Sensores
                 LEFT JOIN core_opciones Ops_3    ON Ops_3.idOpciones             = maquinas_listado.idBackup
                 LEFT JOIN core_opciones Ops_4    ON Ops_4.idOpciones             = maquinas_listado.idAlertaTemprana',
-            'where'   => 'maquinas_listado.idMaquina = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'maquinas_listado.idMaquina = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["maquinasListadoVerDocumentos"]==2){
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'Nombre,NombreArchivo,FVencimiento',
                 'table'   => 'maquinas_listado_documentos',
                 'join'    => '',
-                'where'   => 'idMaquina = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+                'where'   => 'idMaquina = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams       = ['query' => $query];
             $arrDocumentos = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
@@ -256,25 +268,26 @@ class maquinasListado extends ControllerBase {
         }
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'FechaCreacion,Observacion',
             'table'   => 'maquinas_listado_observaciones',
             'join'    => '',
-            'where'   => 'idMaquina = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idMaquina = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idObservaciones ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrObservaciones = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrDocumentos['status'] && $arrObservaciones['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -308,7 +321,7 @@ class maquinasListado extends ControllerBase {
     //Resumen
     public function Resumen($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 maquinas_listado.idMaquina,
@@ -344,67 +357,71 @@ class maquinasListado extends ControllerBase {
                 LEFT JOIN core_opciones Ops_2    ON Ops_2.idOpciones             = maquinas_listado.id_Sensores
                 LEFT JOIN core_opciones Ops_3    ON Ops_3.idOpciones             = maquinas_listado.idBackup
                 LEFT JOIN core_opciones Ops_4    ON Ops_4.idOpciones             = maquinas_listado.idAlertaTemprana',
-            'where'   => 'maquinas_listado.idMaquina = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'maquinas_listado.idMaquina = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idOpciones AS ID,Nombre',
             'table'   => 'core_opciones',
             'join'    => '',
-            'where'   => 'idOpciones!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrOpciones = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTab AS ID,Nombre',
             'table'   => 'core_telemetria_tabs',
             'join'    => '',
-            'where'   => 'idTab!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrTabs = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrEstado['status'] && $arrOpciones['status'] && $arrTabs['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -446,7 +463,7 @@ class maquinasListado extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 maquinas_listado.idMaquina,
@@ -481,19 +498,20 @@ class maquinasListado extends ControllerBase {
                 LEFT JOIN core_opciones Ops_2    ON Ops_2.idOpciones             = maquinas_listado.id_Sensores
                 LEFT JOIN core_opciones Ops_3    ON Ops_3.idOpciones             = maquinas_listado.idBackup
                 LEFT JOIN core_opciones Ops_4    ON Ops_4.idOpciones             = maquinas_listado.idAlertaTemprana',
-            'where'   => 'maquinas_listado.idMaquina = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'maquinas_listado.idMaquina = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -533,7 +551,7 @@ class maquinasListado extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idEstado,Nombre,CodIdentificador,Descripcion,Sim_Num_Tel,Sim_Compania,TiempoFueraLinea,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana,AlertaTemprCritica,AlertaTemprNormal',
             'required'  => 'idEstado,Nombre',
@@ -542,7 +560,7 @@ class maquinasListado extends ControllerBase {
             'table'     => 'maquinas_listado',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -570,7 +588,7 @@ class maquinasListado extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idMaquina,idEstado,Nombre,CodIdentificador,Descripcion,Sim_Num_Tel,Sim_Compania,TiempoFueraLinea,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana,AlertaTemprCritica,AlertaTemprNormal',
                 'required'  => 'idEstado,Nombre',
@@ -591,7 +609,7 @@ class maquinasListado extends ControllerBase {
                     ],
                 ]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -619,7 +637,7 @@ class maquinasListado extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'maquinas_listado',
@@ -627,7 +645,7 @@ class maquinasListado extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
             /******************************/
@@ -640,13 +658,13 @@ class maquinasListado extends ControllerBase {
                 $arrTableDel[] = ['files' => '',              'table' => 'maquinas_listado_observaciones'];
 
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrTableDel){
                     //recorro
                     foreach ($arrTableDel as $tblDel) {
-                        //Se genera la query
+                        // Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idMaquina', 'SubCarpeta' => '', 'Post' => $dataDelete];
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['query' => $query];
                         $this->Base_delete($xParams);
                     }
@@ -674,7 +692,7 @@ class maquinasListado extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataPut);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'maquinas_listado',
@@ -682,7 +700,7 @@ class maquinasListado extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataPut
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delFiles($xParams);
             /******************************/
@@ -707,7 +725,7 @@ class maquinasListado extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

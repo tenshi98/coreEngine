@@ -19,7 +19,7 @@
         if(is_array($data['arrItems'])&&!empty($data['arrItems'])){
             //Recorro
             foreach($data['arrItems'] as $crud){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idExistencia']);
                 $Entidad     = addslashes($crud['Item']);  ?>
                 <tr>

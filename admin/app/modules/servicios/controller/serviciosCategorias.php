@@ -5,7 +5,7 @@
 class serviciosCategorias extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class serviciosCategorias extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,25 +34,26 @@ class serviciosCategorias extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCategoria,Nombre',
             'table'   => 'servicios_categorias',
             'join'    => '',
-            'where'   => 'idCategoria!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -91,37 +92,47 @@ class serviciosCategorias extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = '';       //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre'; //Datos búsqueda relativa
-        $WhereData_between = '';       //Datos búsqueda Between
-        $whereInt          = '';       //se crea cadena
+        // Variables
+        $WhereData_int     = '';       // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre'; // Datos búsqueda relativa
+        $WhereData_between = '';       // Datos búsqueda Between
+        $whereInt          = '';       // Se crea cadena
+        $whereParams       = [];       // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'servicios_categorias', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'servicios_categorias', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'servicios_categorias', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'servicios_categorias', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'servicios_categorias', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'servicios_categorias', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCategoria,Nombre',
             'table'   => 'servicios_categorias',
             'join'    => '',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -155,24 +166,25 @@ class serviciosCategorias extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Nombre',
             'table'   => 'servicios_categorias',
             'join'    => '',
-            'where'   => 'idCategoria = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCategoria = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -203,24 +215,25 @@ class serviciosCategorias extends ControllerBase {
     //Edit
     public function GetID($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCategoria,Nombre',
             'table'   => 'servicios_categorias',
             'join'    => '',
-            'where'   => 'idCategoria = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCategoria = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -259,7 +272,7 @@ class serviciosCategorias extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Nombre',
             'required'  => 'Nombre',
@@ -268,7 +281,7 @@ class serviciosCategorias extends ControllerBase {
             'table'     => 'servicios_categorias',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -295,7 +308,7 @@ class serviciosCategorias extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idCategoria,Nombre',
                 'required'  => 'Nombre',
@@ -305,7 +318,7 @@ class serviciosCategorias extends ControllerBase {
                 'where'     => 'idCategoria',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -333,7 +346,7 @@ class serviciosCategorias extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'servicios_categorias',
@@ -341,7 +354,7 @@ class serviciosCategorias extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -367,7 +380,7 @@ class serviciosCategorias extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

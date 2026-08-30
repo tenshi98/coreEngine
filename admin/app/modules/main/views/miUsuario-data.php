@@ -39,37 +39,22 @@
                             <form id="FormData" name="FormData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['Nombre'] ?? '';
-                                $x2  = $data['rowData']['Rut'] ?? '';
-                                $x3  = $data['rowData']['fNacimiento'] ?? '';
-                                $x4  = $data['rowData']['Fono'] ?? '';
-                                $x5  = $data['rowData']['idCiudad'] ?? '';
-                                $x6  = $data['rowData']['idComuna'] ?? '';
-                                $x7  = $data['rowData']['Direccion'] ?? '';
-                                $x8  = $data['rowData']['Social_X'] ?? '';
-                                $x9  = $data['rowData']['Social_Facebook'] ?? '';
-                                $x10 = $data['rowData']['Social_Instagram'] ?? '';
-                                $x11 = $data['rowData']['Social_Linkedin'] ?? '';
-
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',      'Value'  => $x1,'Required'  => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',         'Value'  => $x2,'Required'  => 2,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento', 'Value'  => $x3,'Required'  => 1,'Icon' => 'bi bi-calendar3']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono',                'Name'  => 'Fono',        'Value'  => $x4,'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',    'Value1' => $x5,'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                      'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',    'Value2' => $x6,'Required2' => 1,'arrData2' => $data['arrComuna']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',   'Value'  => $x7,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',      'Value'  => ($data['rowData']['Nombre'] ?? ''),      'Required'  => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',         'Value'  => ($data['rowData']['Rut'] ?? ''),         'Required'  => 2,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento', 'Value'  => ($data['rowData']['fNacimiento'] ?? ''), 'Required'  => 1,'Icon' => 'bi bi-calendar3']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono',                'Name'  => 'Fono',        'Value'  => ($data['rowData']['Fono'] ?? ''),        'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',    'Value1' => ($data['rowData']['idCiudad'] ?? ''),    'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',    'Value2' => ($data['rowData']['idComuna'] ?? ''),    'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',   'Value'  => ($data['rowData']['Direccion'] ?? ''),   'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => $x8, 'Required' => 1, 'Icon' => 'bi bi-x']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => $x9, 'Required' => 1, 'Icon' => 'bi bi-facebook']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => $x10,'Required' => 1, 'Icon' => 'bi bi-instagram']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => $x11,'Required' => 1, 'Icon' => 'bi bi-linkedin']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => ($data['rowData']['Social_X'] ?? ''),         'Required' => 1, 'Icon' => 'bi bi-x']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => ($data['rowData']['Social_Facebook'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-facebook']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => ($data['rowData']['Social_Instagram'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-instagram']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => ($data['rowData']['Social_Linkedin'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
-                                //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario','Value' => $data['UserData']['UserID'],'Required' => 2]);
                                 ?>
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -106,17 +91,11 @@
                             <form id="FormOpciones" name="FormOpciones" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['idMenuPosicion'] ?? '';
-
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Posición Menu: </strong> permite seleccionar si se va a utilizar el menu lateral o el menu superior');
-                                $data['Fnc_FormInputs']->formSelect([ 'Placeholder' => 'Posición Menu', 'Name' => 'idMenuPosicion','Value' => $x1,'Required' => 2,'arrData' => $data['arrPosicion']]);
+                                $data['Fnc_FormInputs']->formSelect([ 'Placeholder' => 'Posición Menu', 'Name' => 'idMenuPosicion','Value' => ($data['rowData']['idMenuPosicion'] ?? ''),'Required' => 2,'arrData' => $data['arrPosicion']]);
 
-                                //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario','Value' => $data['UserData']['UserID'],'Required' => 2]);
                                 ?>
-
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                     <button type="submit" class="btn btn-primary"><i class="bx bx-save"></i> Guardar Cambios</button>
@@ -136,7 +115,6 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 3,'Placeholder' => 'Repetir Nueva Contraseña', 'Name' => 'rePassword',  'Required' => 2,'Icon' => 'bi bi-key']);
 
                                 //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',    'Value' => $data['UserData']['UserID'],  'Required' => 2]);
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'mainPassword', 'Value' => $data['rowData']['password'], 'Required' => 2]);
                                 ?>
 

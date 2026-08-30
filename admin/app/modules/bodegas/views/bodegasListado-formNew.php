@@ -36,7 +36,7 @@
                                                                           'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',   'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion',  'Value'  => '','Required' => 1,'Icon' => 'bi bi-geo-alt-fill']);
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); //Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
 
                     ?>
                 </div>

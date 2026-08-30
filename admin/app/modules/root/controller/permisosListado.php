@@ -5,7 +5,7 @@
 class permisosListado extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $DBConn;
     private $QBuilder;
@@ -18,7 +18,7 @@ class permisosListado extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -40,7 +40,7 @@ class permisosListado extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado.idPermisos,
@@ -59,116 +59,123 @@ class permisosListado extends ControllerBase {
                 LEFT JOIN core_estados                      ON core_estados.idEstado                           = core_permisos_listado.idEstado
                 LEFT JOIN core_permisos_listado_tipo        ON core_permisos_listado_tipo.idTipo               = core_permisos_listado.idTipo
                 LEFT JOIN core_permisos_listado_level_limit ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado.idLevelLimit',
-            'where'   => 'core_permisos_listado.idPermisos!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPermisosCat AS ID,Nombre',
             'table'   => 'core_permisos_categorias',
             'join'    => '',
-            'where'   => 'idPermisosCat!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams        = ['query' => $query];
         $arrPermisosCat = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrEstados = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTipo AS ID,Nombre',
             'table'   => 'core_permisos_listado_tipo',
             'join'    => '',
-            'where'   => 'idTipo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrTipos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idLevelLimit AS ID,Nombre',
             'table'   => 'core_permisos_listado_level_limit',
             'join'    => '',
-            'where'   => 'idLevelLimit!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrLevelLimit = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idMetodo AS ID,Nombre',
             'table'   => 'core_permisos_listado_rutas_metodo',
             'join'    => '',
-            'where'   => 'idMetodo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrMetodo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idLevelLimit AS ID,Objetivo AS Nombre',
             'table'   => 'core_permisos_listado_level_limit',
             'join'    => '',
-            'where'   => 'idLevelLimit!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrObjetivo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrPermisos['status'] && $arrPermisosCat['status'] && $arrEstados['status'] && $arrTipos['status'] && $arrLevelLimit['status'] && $arrMetodo['status'] && $arrObjetivo['status']){
 
             /******************************************/
@@ -214,19 +221,28 @@ class permisosListado extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idPermisosCat,idEstado,idTipo';             //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre,Descripcion,RutaWeb,RutaController'; //Datos búsqueda relativa
-        $WhereData_between = '';                                          //Datos búsqueda Between
-        $whereInt          = '';                                          //se crea cadena
+        // Variables
+        $WhereData_int     = 'idPermisosCat,idEstado,idTipo';             // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre,Descripcion,RutaWeb,RutaController'; // Datos búsqueda relativa
+        $WhereData_between = '';                                          // Datos búsqueda Between
+        $whereInt          = '';                                          // Se crea cadena
+        $whereParams       = [];                                          // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'core_permisos_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'core_permisos_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'core_permisos_listado', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'core_permisos_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'core_permisos_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'core_permisos_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado.idPermisos,
@@ -246,19 +262,20 @@ class permisosListado extends ControllerBase {
                 LEFT JOIN core_permisos_listado_tipo        ON core_permisos_listado_tipo.idTipo               = core_permisos_listado.idTipo
                 LEFT JOIN core_permisos_listado_level_limit ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado.idLevelLimit',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrPermisos['status']){
 
             /******************************************/
@@ -293,7 +310,7 @@ class permisosListado extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado.idEstado,
@@ -312,17 +329,18 @@ class permisosListado extends ControllerBase {
                 LEFT JOIN core_estados                      ON core_estados.idEstado                           = core_permisos_listado.idEstado
                 LEFT JOIN core_permisos_listado_tipo        ON core_permisos_listado_tipo.idTipo               = core_permisos_listado.idTipo
                 LEFT JOIN core_permisos_listado_level_limit ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado.idLevelLimit',
-            'where'   => 'core_permisos_listado.idPermisos = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_listado.idPermisos = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado_rutas.RutaWeb,
@@ -335,20 +353,21 @@ class permisosListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_permisos_listado_rutas_metodo ON core_permisos_listado_rutas_metodo.idMetodo     = core_permisos_listado_rutas.idMetodo
                 LEFT JOIN core_permisos_listado_level_limit  ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado_rutas.idLevelLimit',
-            'where'   => 'core_permisos_listado_rutas.idPermisos = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_listado_rutas.idPermisos = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrRutas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -381,7 +400,7 @@ class permisosListado extends ControllerBase {
     //View
     public function ViewAll($f3, $params){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado_rutas.RutaWeb,
@@ -400,14 +419,14 @@ class permisosListado extends ControllerBase {
             'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrRutas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -438,7 +457,7 @@ class permisosListado extends ControllerBase {
     //Resumen
     public function Resumen($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado.idPermisos,
@@ -461,17 +480,18 @@ class permisosListado extends ControllerBase {
                 LEFT JOIN core_estados                      ON core_estados.idEstado                           = core_permisos_listado.idEstado
                 LEFT JOIN core_permisos_listado_tipo        ON core_permisos_listado_tipo.idTipo               = core_permisos_listado.idTipo
                 LEFT JOIN core_permisos_listado_level_limit ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado.idLevelLimit',
-            'where'   => 'core_permisos_listado.idPermisos = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_listado.idPermisos = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado_rutas.idRutas,
@@ -486,116 +506,123 @@ class permisosListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_permisos_listado_rutas_metodo    ON core_permisos_listado_rutas_metodo.idMetodo     = core_permisos_listado_rutas.idMetodo
                 LEFT JOIN core_permisos_listado_level_limit     ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado_rutas.idLevelLimit',
-            'where'   => 'core_permisos_listado_rutas.idPermisos = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_listado_rutas.idPermisos = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrRutas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPermisosCat AS ID,Nombre',
             'table'   => 'core_permisos_categorias',
             'join'    => '',
-            'where'   => 'idPermisosCat!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams        = ['query' => $query];
         $arrPermisosCat = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrEstados = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTipo AS ID,Nombre',
             'table'   => 'core_permisos_listado_tipo',
             'join'    => '',
-            'where'   => 'idTipo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrTipos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idLevelLimit AS ID,Nombre',
             'table'   => 'core_permisos_listado_level_limit',
             'join'    => '',
-            'where'   => 'idLevelLimit!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrLevelLimit = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idMetodo AS ID,Nombre',
             'table'   => 'core_permisos_listado_rutas_metodo',
             'join'    => '',
-            'where'   => 'idMetodo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrMetodo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idLevelLimit AS ID,Objetivo AS Nombre',
             'table'   => 'core_permisos_listado_level_limit',
             'join'    => '',
-            'where'   => 'idLevelLimit!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrObjetivo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrRutas['status'] && $arrPermisosCat['status'] && $arrEstados['status'] && $arrTipos['status'] && $arrLevelLimit['status'] && $arrMetodo['status'] && $arrObjetivo['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -641,7 +668,7 @@ class permisosListado extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado.Nombre,
@@ -659,17 +686,18 @@ class permisosListado extends ControllerBase {
                 LEFT JOIN core_estados                      ON core_estados.idEstado                           = core_permisos_listado.idEstado
                 LEFT JOIN core_permisos_listado_tipo        ON core_permisos_listado_tipo.idTipo               = core_permisos_listado.idTipo
                 LEFT JOIN core_permisos_listado_level_limit ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado.idLevelLimit',
-            'where'   => 'core_permisos_listado.idPermisos = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_listado.idPermisos = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_listado_rutas.RutaWeb,
@@ -682,20 +710,21 @@ class permisosListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_permisos_listado_rutas_metodo ON core_permisos_listado_rutas_metodo.idMetodo     = core_permisos_listado_rutas.idMetodo
                 LEFT JOIN core_permisos_listado_level_limit  ON core_permisos_listado_level_limit.idLevelLimit  = core_permisos_listado_rutas.idLevelLimit',
-            'where'   => 'core_permisos_listado_rutas.idPermisos = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_listado_rutas.idPermisos = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrRutas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -741,17 +770,23 @@ class permisosListado extends ControllerBase {
             'data'    => 'Carpeta',
             'table'   => 'core_permisos_categorias',
             'join'    => '',
-            'where'   => 'idPermisosCat = "'.$_POST['idPermisosCat'].'"',
+            'where'   => 'idPermisosCat = ?',
+            'params'  => [$_POST['idPermisosCat']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
+        /*******************************************************************/
+        //Se inicia la transacción: la reserva, sus recursos asociados y el historial deben
+        //aplicarse de forma atómica (todo o nada)
+        $this->Base_transactionBegin();
+
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $newPermiso = [
             'idPermisosCat'   => $_POST['idPermisosCat'],                            //Categoria Permiso
             'idEstado'        => $_POST['idEstado'],                                 //Estado - Activo por defecto
@@ -762,9 +797,8 @@ class permisosListado extends ControllerBase {
             'RutaWeb'         => $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'],  //Ruta Web
             'RutaController'  => $_POST['RutaController'],                           //Controlador
         ];
-
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
             'required'  => 'idPermisosCat,idEstado,idTipo,Nombre,idLevelLimit,RutaWeb,RutaController',
@@ -773,9 +807,16 @@ class permisosListado extends ControllerBase {
             'table'     => 'core_permisos_listado',
             'Post'      => $newPermiso
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
+
+        /*******************************************************************/
+        //Si falla la reserva principal, se revierte de inmediato
+        if (!$Response['status']){
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        }
 
         /******************************/
         // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
@@ -784,7 +825,7 @@ class permisosListado extends ControllerBase {
             //Variable vacia
             $arrRutas = [];
             /******************************/
-            //variables
+            // Variables
             $RutaWeb         = $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'];
             $RutaController  = $_POST['RutaController'];
             //Se generan las rutas de forma automatica
@@ -793,7 +834,7 @@ class permisosListado extends ControllerBase {
                 //Crud Normal
                 case 1:
                     /******************************/
-                    //Se agrega respuesta
+                    // Se agrega respuesta
                     $arrRutas = [
                         /************************************************************/
                         /*                        Vistas                            */
@@ -882,7 +923,7 @@ class permisosListado extends ControllerBase {
                 //Crud Resumen
                 case 2:
                     /******************************/
-                    //variables
+                    // Variables
                     $arrRutas = array();
                     $ndata_1  = isset($_POST['Controller']) ? count($_POST['Controller']) : 0;
                     /************************************************************/
@@ -986,7 +1027,7 @@ class permisosListado extends ControllerBase {
                     ];
                     /******************************************************************/
                     /******************************************************************/
-                    //variables
+                    // Variables
                     $SubRutaWeb         = $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'].'/observaciones';
                     $RutaSubController  = $_POST['RutaController'].'Observaciones';
                     /************************************************************/
@@ -1064,7 +1105,7 @@ class permisosListado extends ControllerBase {
                     if(isset($ndata_1)&&$ndata_1!=0){
                         for($j1 = 0; $j1 < $ndata_1; $j1++){
                             /******************************/
-                            //variables
+                            // Variables
                             $SubRutaWeb         = $rowData['data']['Carpeta'].'/'.$_POST['RutaWeb'].'/'.$_POST['SubRuta'][$j1];
                             $RutaSubController  = $_POST['RutaController'].$_POST['Controller'][$j1];
                             /************************************************************/
@@ -1143,7 +1184,7 @@ class permisosListado extends ControllerBase {
                 //Informe
                 case 3:
                     /******************************/
-                    //Se agrega respuesta
+                    // Se agrega respuesta
                     $arrRutas = [
                         /************************************************************/
                         /*                        Vistas                            */
@@ -1192,11 +1233,11 @@ class permisosListado extends ControllerBase {
             }
 
             /******************************/
-            //Verifico si existe
+            // Verifico si existe
             if($arrRutas){
                 //recorro
                 foreach ($arrRutas as $rutas) {
-                    //Se genera la query
+                    // Se genera la query
                     $query = [
                         'data'      => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
                         'required'  => '',
@@ -1204,7 +1245,7 @@ class permisosListado extends ControllerBase {
                         'table'     => 'core_permisos_listado_rutas',
                         'Post'      => $rutas,
                     ];
-                    //Ejecuto la query
+                    // Ejecuto la query
                     $this->QBuilder->queryInsert($query, $this->DBConn, true);
                 }
             }
@@ -1212,6 +1253,11 @@ class permisosListado extends ControllerBase {
             /****************************************/
             //Se actualizan los permisos al crear uno nuevo
             $this->updatePermisos($f3);
+
+            /*******************************************************************/
+            //Se confirma la transacción
+            $this->Base_transactionCommit();
+
             /****************************************/
             // Si es un ID numérico, encripta y envía con código 200 (OK)
             $Data = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
@@ -1234,7 +1280,7 @@ class permisosListado extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
                 'required'  => 'idPermisosCat,idEstado,idTipo,Nombre,idLevelLimit,RutaWeb,RutaController',
@@ -1244,7 +1290,7 @@ class permisosListado extends ControllerBase {
                 'where'     => 'idPermisos',
                 'Post'      => $_POST,
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -1276,7 +1322,7 @@ class permisosListado extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'core_permisos_listado',
@@ -1284,14 +1330,14 @@ class permisosListado extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
             if ($Response['status']){
                 /******************************/
-                //Se genera la query
+                // Se genera la query
                 $query = [
                     'files'       => '',
                     'table'       => 'core_permisos_listado_rutas',
@@ -1299,7 +1345,7 @@ class permisosListado extends ControllerBase {
                     'SubCarpeta'  => '',
                     'Post'        => $dataDelete
                 ];
-                //Ejecuto la query
+                // Ejecuto la query
                 $xParams          = ['query' => $query];
                 $ResponseDelRutas = $this->Base_delete($xParams);
 
@@ -1333,7 +1379,7 @@ class permisosListado extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -1393,13 +1439,14 @@ class permisosListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_permisos_categorias ON core_permisos_categorias.idPermisosCat = core_permisos_listado.idPermisosCat
                 LEFT JOIN core_iconos_colores      ON core_iconos_colores.idColor            = core_permisos_categorias.IdIconColor',
-            'where'   => 'core_permisos_listado.idEstado =1',
+            'where'   => 'core_permisos_listado.idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC, core_permisos_listado.RutaWeb ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrMenu = $this->Base_GetList($xParams);
 
@@ -1414,13 +1461,14 @@ class permisosListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_permisos_listado_rutas        ON core_permisos_listado_rutas.idPermisos      = core_permisos_listado.idPermisos
                 LEFT JOIN core_permisos_listado_rutas_metodo ON core_permisos_listado_rutas_metodo.idMetodo = core_permisos_listado_rutas.idMetodo',
-            'where'   => 'core_permisos_listado.idEstado =1',
+            'where'   => 'core_permisos_listado.idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_permisos_listado_rutas_metodo.Nombre ASC, core_permisos_listado_rutas.RutaWeb ASC, core_permisos_listado_rutas.RutaController ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 

@@ -5,7 +5,7 @@
 class sistemaOpciones extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $WidgetsCommon;
@@ -17,7 +17,7 @@ class sistemaOpciones extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -42,7 +42,7 @@ class sistemaOpciones extends ControllerBase {
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_sistemas.idSistema,
@@ -127,113 +127,120 @@ class sistemaOpciones extends ControllerBase {
                 LEFT JOIN core_config_email      ON core_config_email.idConfigEmail       = core_sistemas.Config_motorEmail
                 LEFT JOIN core_config_map        ON core_config_map.idConfigMap           = core_sistemas.Config_motorMap
                 LEFT JOIN core_ia_provider       ON core_ia_provider.idIAProvider         = core_sistemas.Config_IA_Provider',
-            'where'   => 'core_sistemas.idSistema = "1"',
+            'where'   => 'core_sistemas.idSistema = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
             'table'   => 'core_ubicacion_ciudad',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrCiudad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
             'table'   => 'core_ubicacion_comunas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrComuna = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idConfigEmail AS ID, Nombre',
             'table'   => 'core_config_email',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrConfigEmail = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idConfigMap AS ID, Nombre',
             'table'   => 'core_config_map',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrConfigMap = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTema AS ID,Nombre',
             'table'   => 'core_temas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrTemas = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idIAProvider AS ID,Nombre',
             'table'   => 'core_ia_provider',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrIAProvider = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Variables
+        // Variables
         $MainViewData = [
             'Count_GestionProyectos'      => 0,
             'Count_GestionEntidades'      => 0,
@@ -281,7 +288,7 @@ class sistemaOpciones extends ControllerBase {
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTemas['status'] && $arrConfigEmail['status'] && $arrConfigMap['status'] && $arrIAProvider['status'] && is_array($MainViewData)){
             /******************************************/
             //Datos enviados a la pagina
@@ -329,7 +336,7 @@ class sistemaOpciones extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_sistemas.idSistema,
@@ -414,19 +421,20 @@ class sistemaOpciones extends ControllerBase {
                 LEFT JOIN core_config_email      ON core_config_email.idConfigEmail       = core_sistemas.Config_motorEmail
                 LEFT JOIN core_config_map        ON core_config_map.idConfigMap           = core_sistemas.Config_motorMap
                 LEFT JOIN core_ia_provider       ON core_ia_provider.idIAProvider         = core_sistemas.Config_IA_Provider',
-            'where'   => 'core_sistemas.idSistema = "1"',
+            'where'   => 'core_sistemas.idSistema = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -478,40 +486,42 @@ class sistemaOpciones extends ControllerBase {
                 $Ubicacion =  $_POST['Sistema_Direccion'];
                 //Si existe comuna
                 if(isset($_POST['Sistema_idComuna'])&&$_POST['Sistema_idComuna']!=''){
-                    //Se genera la query
+                    // Se genera la query
                     $query = [
                         'data'    => 'Nombre',
                         'table'   => 'core_ubicacion_comunas',
                         'join'    => '',
-                        'where'   => 'idComuna = "'.$_POST['Sistema_idComuna'].'"',
+                        'where'   => 'idComuna = ?',
+                        'params'  => [$_POST['Sistema_idComuna']],
                         'group'   => '',
                         'having'  => '',
                         'order'   => ''
                     ];
-                    //Ejecuto la query
+                    // Ejecuto la query
                     $xParams = ['query' => $query];
                     $rowData = $this->Base_GetByID($xParams);
-                    //Si hay resultados
+                    // Si hay resultados
                     if($rowData['status']){
                         $Ubicacion .= ', '.$rowData['data']['Nombre'];
                     }
                 }
                 //Si existe ciudad
                 if(isset($_POST['Sistema_idCiudad'])&&$_POST['Sistema_idCiudad']!=''){
-                    //Se genera la query
+                    // Se genera la query
                     $query = [
                         'data'    => 'Nombre',
                         'table'   => 'core_ubicacion_ciudad',
                         'join'    => '',
-                        'where'   => 'idCiudad = "'.$_POST['Sistema_idCiudad'].'"',
+                        'where'   => 'idCiudad = ?',
+                        'params'  => [$_POST['Sistema_idCiudad']],
                         'group'   => '',
                         'having'  => '',
                         'order'   => ''
                     ];
-                    //Ejecuto la query
+                    // Ejecuto la query
                     $xParams = ['query' => $query];
                     $rowData = $this->Base_GetByID($xParams);
-                    //Si hay resultados
+                    // Si hay resultados
                     if($rowData['status']){
                         $Ubicacion .= ', '.$rowData['data']['Nombre'];
                     }
@@ -520,7 +530,7 @@ class sistemaOpciones extends ControllerBase {
                 $Ubicacion .= ', Chile';
                 //Se hace la busqueda de lat y long por su direccion
                 $result = $fncLocation->geocodeAddress($Ubicacion);
-                //Si hay resultados se guarda
+                // Si hay resultados se guarda
                 if ($result) {
                     //Se guarda el ultimo dato
                     $_POST['Latitud']  = $result['lat'];
@@ -529,7 +539,7 @@ class sistemaOpciones extends ControllerBase {
             }
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,Config_IA_Provider,Config_IA_ApiKey,Config_IA_Model,Config_IA_Base_URL,Config_IA_Name,Config_IA_Tone,Config_IA_Uso,Config_IA_UsoCache,usuariosPermisosBodegas,usuariosPermisosMaquinas,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
                 'required'  => 'Sistema_Nombre',
@@ -550,17 +560,20 @@ class sistemaOpciones extends ControllerBase {
                     ],
                 ]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
             if ($Response['status']){
-                /****************************************/
-                //Actualizo los datos de la sesion
-                $userSession = new userSession();
-                $userSession->updateSession($_SESSION['DataInfo']['UserID'], $f3, 1);
+                /******************************/
+                // Se cargan las clases
+                $authenticationService = new AuthenticationService();
+                $sessionService        = new SessionService();
+                $Client                = new FunctionsServerClient();
+                //Se actualiza la sesion del usuario
+                $authenticationService->updateSession($f3, $_SESSION['DataInfo']['UserID'], $sessionService, $Client);
                 /****************************************/
                 // Devuelvo $Response con código 200 (OK)
                 Response::success($Response['data']);
@@ -583,7 +596,7 @@ class sistemaOpciones extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataPut);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Sistema_IMGLogo',
                 'table'       => 'core_sistemas',
@@ -591,7 +604,7 @@ class sistemaOpciones extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataPut
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delFiles($xParams);
             /******************************/
@@ -616,7 +629,7 @@ class sistemaOpciones extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

@@ -42,7 +42,7 @@
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); //Activo
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
         ?>
     </div>
     <div class="modal-footer">

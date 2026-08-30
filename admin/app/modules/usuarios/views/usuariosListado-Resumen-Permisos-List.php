@@ -25,7 +25,7 @@
                     echo ' <tr class="table-secondary"><td colspan="7"><strong>'.$Categoria.'</strong></td></tr>';
                     //se recorren los datos dentro de la categoría
                     foreach ($permisos as $perm){
-                        //Variables
+                        // Variables
                         $check[1] = '';
                         $check[2] = '';
                         $check[3] = '';

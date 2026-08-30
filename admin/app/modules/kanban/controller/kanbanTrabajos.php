@@ -5,7 +5,7 @@
 class kanbanTrabajos extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class kanbanTrabajos extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,7 +34,7 @@ class kanbanTrabajos extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_trabajos.idTrabajo,
@@ -43,36 +43,38 @@ class kanbanTrabajos extends ControllerBase {
                 core_estados.Color AS EstadoColor',
             'table'   => 'kanban_trabajos',
             'join'    => 'LEFT JOIN core_estados   ON core_estados.idEstado = kanban_trabajos.idEstado',
-            'where'   => 'idTrabajo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_trabajos.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrEstado['status']){
 
             /******************************************/
@@ -112,19 +114,28 @@ class kanbanTrabajos extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idEstado';  //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre';    //Datos búsqueda relativa
-        $WhereData_between = '';          //Datos búsqueda Between
-        $whereInt          = '';          //se crea cadena
+        // Variables
+        $WhereData_int     = 'idEstado';  // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre';    // Datos búsqueda relativa
+        $WhereData_between = '';          // Datos búsqueda Between
+        $whereInt          = '';          // Se crea cadena
+        $whereParams       = [];          // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'kanban_trabajos', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'kanban_trabajos', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'kanban_trabajos', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'kanban_trabajos', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'kanban_trabajos', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'kanban_trabajos', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_trabajos.idTrabajo,
@@ -134,19 +145,20 @@ class kanbanTrabajos extends ControllerBase {
             'table'   => 'kanban_trabajos',
             'join'    => 'LEFT JOIN core_estados   ON core_estados.idEstado = kanban_trabajos.idEstado',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_trabajos.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -180,7 +192,7 @@ class kanbanTrabajos extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_trabajos.idTrabajo,
@@ -189,20 +201,21 @@ class kanbanTrabajos extends ControllerBase {
                 core_estados.Color AS EstadoColor',
             'table'   => 'kanban_trabajos',
             'join'    => 'LEFT JOIN core_estados   ON core_estados.idEstado = kanban_trabajos.idEstado',
-            'where'   => 'kanban_trabajos.idTrabajo = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_trabajos.idTrabajo = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_trabajos.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -233,40 +246,42 @@ class kanbanTrabajos extends ControllerBase {
     //Edit
     public function GetID($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTrabajo,Nombre,idEstado',
             'table'   => 'kanban_trabajos',
             'join'    => '',
-            'where'   => 'idTrabajo = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idTrabajo = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrEstado['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -306,7 +321,7 @@ class kanbanTrabajos extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Nombre,idEstado',
             'required'  => 'Nombre,idEstado',
@@ -315,7 +330,7 @@ class kanbanTrabajos extends ControllerBase {
             'table'     => 'kanban_trabajos',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -342,7 +357,7 @@ class kanbanTrabajos extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idTrabajo,Nombre,idEstado',
                 'required'  => 'Nombre,idEstado',
@@ -352,7 +367,7 @@ class kanbanTrabajos extends ControllerBase {
                 'where'     => 'idTrabajo',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -380,7 +395,7 @@ class kanbanTrabajos extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'kanban_trabajos',
@@ -388,7 +403,7 @@ class kanbanTrabajos extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -414,7 +429,7 @@ class kanbanTrabajos extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

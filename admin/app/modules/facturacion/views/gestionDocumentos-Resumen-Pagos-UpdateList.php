@@ -28,7 +28,7 @@
                     <td><?php echo $crud['DocPago'].' '.$crud['N_Doc']; ?></td>
                     <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['MontoPagado'], 2); ?></td>
                     <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){
-                        //Variables
+                        // Variables
                         $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPago']);
                         $Entidad     = addslashes($crud['DocPago'].' '.$crud['N_Doc']); ?>
                         <td>

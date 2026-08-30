@@ -5,7 +5,7 @@
 class coreComponentes extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $WidgetsCommon;
 
@@ -13,7 +13,7 @@ class coreComponentes extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/

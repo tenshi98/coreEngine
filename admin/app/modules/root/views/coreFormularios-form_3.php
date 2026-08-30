@@ -46,7 +46,7 @@
                 $data['Fnc_FormInputs']->formInput(['FormType' => 13,'FormAling' => 3,'FormCol' => 6,'PlaceholderIcon' => 'bi bi-person', 'Placeholder' => 'form_color_picker','Name' => 'form_color_picker','Id' => 'IDInput_3_16','Required' => 2,'Icon' => 'bi bi-pencil']);
 
                 /***********************************/
-                //Variables
+                // Variables
                 $xvalue  = '5';
                 $xvalue2 = '';
                 //input

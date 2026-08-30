@@ -5,7 +5,7 @@
 class entidadesListadoCargas extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -16,7 +16,7 @@ class entidadesListadoCargas extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -36,88 +36,93 @@ class entidadesListadoCargas extends ControllerBase {
     //Crear nuevo
     public function New($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEntidad',
             'table'   => 'entidades_listado',
             'join'    => '',
-            'where'   => 'idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idSexo AS ID,Nombre',
             'table'   => 'core_sexo',
             'join'    => '',
-            'where'   => 'idSexo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrSexo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idParentesco AS ID,Nombre',
             'table'   => 'core_tipos_rrhh_trabajadores_cargas_parentesco',
             'join'    => '',
-            'where'   => 'idParentesco!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrParentesco = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstudios AS ID,Nombre',
             'table'   => 'core_estudios',
             'join'    => '',
-            'where'   => 'idEstudios!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrEstudios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoEstudio AS ID,Nombre',
             'table'   => 'core_estados_estudio',
             'join'    => '',
-            'where'   => 'idEstadoEstudio!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrEstadoEstudio = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrSexo['status'] && $arrParentesco['status'] && $arrEstudios['status'] && $arrEstadoEstudio['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -152,7 +157,7 @@ class entidadesListadoCargas extends ControllerBase {
     //List
     public function UpdateList($f3, $params){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado_cargas.idCargas,
@@ -162,20 +167,21 @@ class entidadesListadoCargas extends ControllerBase {
                 core_tipos_rrhh_trabajadores_cargas_parentesco.Nombre AS Parentesco',
             'table'   => 'entidades_listado_cargas',
             'join'    => 'LEFT JOIN core_tipos_rrhh_trabajadores_cargas_parentesco ON core_tipos_rrhh_trabajadores_cargas_parentesco.idParentesco = entidades_listado_cargas.idParentesco',
-            'where'   => 'entidades_listado_cargas.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'entidades_listado_cargas.idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'entidades_listado_cargas.ApellidoPat ASC, entidades_listado_cargas.ApellidoMat ASC, entidades_listado_cargas.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrCargas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrCargas['status']){
 
             /******************************************/
@@ -207,7 +213,7 @@ class entidadesListadoCargas extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado_cargas.Nombre,
@@ -231,19 +237,20 @@ class entidadesListadoCargas extends ControllerBase {
                 LEFT JOIN core_tipos_rrhh_trabajadores_cargas_parentesco   ON core_tipos_rrhh_trabajadores_cargas_parentesco.idParentesco  = entidades_listado_cargas.idParentesco
                 LEFT JOIN core_estudios                                    ON core_estudios.idEstudios                                     = entidades_listado_cargas.idEstudios
                 LEFT JOIN core_estados_estudio                             ON core_estados_estudio.idEstadoEstudio                         = entidades_listado_cargas.idEstadoEstudio',
-            'where'   => 'entidades_listado_cargas.idCargas = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'entidades_listado_cargas.idCargas = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -275,104 +282,110 @@ class entidadesListadoCargas extends ControllerBase {
     //Edit
     public function GetID($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCargas,idEntidad,Nombre,ApellidoPat,ApellidoMat,idSexo,FNacimiento,idEstado,idParentesco,idEstudios,FechaVigencia,FechaVencimiento',
             'table'   => 'entidades_listado_cargas',
             'join'    => '',
-            'where'   => 'idCargas = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCargas = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idSexo AS ID,Nombre',
             'table'   => 'core_sexo',
             'join'    => '',
-            'where'   => 'idSexo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrSexo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idParentesco AS ID,Nombre',
             'table'   => 'core_tipos_rrhh_trabajadores_cargas_parentesco',
             'join'    => '',
-            'where'   => 'idParentesco!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrParentesco = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstudios AS ID,Nombre',
             'table'   => 'core_estudios',
             'join'    => '',
-            'where'   => 'idEstudios!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrEstudios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoEstudio AS ID,Nombre',
             'table'   => 'core_estados_estudio',
             'join'    => '',
-            'where'   => 'idEstadoEstudio!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrEstadoEstudio = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrSexo['status'] && $arrParentesco['status'] && $arrEstudios['status'] && $arrEstadoEstudio['status'] && $arrEstado['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -417,7 +430,7 @@ class entidadesListadoCargas extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idEntidad,Nombre,ApellidoPat,ApellidoMat,idSexo,FNacimiento,idEstado,idParentesco,idEstudios,idEstadoEstudio,ObsEstudios,FechaVigencia,FechaVencimiento',
             'required'  => 'idEntidad,Nombre,ApellidoPat',
@@ -426,7 +439,7 @@ class entidadesListadoCargas extends ControllerBase {
             'table'     => 'entidades_listado_cargas',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -453,7 +466,7 @@ class entidadesListadoCargas extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idCargas,idEntidad,Nombre,ApellidoPat,ApellidoMat,idSexo,FNacimiento,idEstado,idParentesco,idEstudios,idEstadoEstudio,ObsEstudios,FechaVigencia,FechaVencimiento',
                 'required'  => 'idEntidad,Nombre,ApellidoPat',
@@ -463,7 +476,7 @@ class entidadesListadoCargas extends ControllerBase {
                 'where'     => 'idCargas',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -491,7 +504,7 @@ class entidadesListadoCargas extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'entidades_listado_cargas',
@@ -499,7 +512,7 @@ class entidadesListadoCargas extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -525,7 +538,7 @@ class entidadesListadoCargas extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

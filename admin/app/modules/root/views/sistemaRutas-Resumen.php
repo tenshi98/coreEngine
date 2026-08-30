@@ -25,7 +25,7 @@
                             </thead>
                             <tbody>
                                 <?php
-                                //Variables
+                                // Variables
                                 $arrCompare = array();
                                 //Se parsean los datos
                                 if(is_array($data['arrModules'])&&!empty($data['arrModules'])){
@@ -89,4 +89,3 @@
         </div>
     </div>
 </section>
-

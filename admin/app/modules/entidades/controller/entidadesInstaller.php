@@ -5,14 +5,14 @@
 class entidadesInstaller extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
 
     /******************************************************************************/
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -52,18 +52,18 @@ class entidadesInstaller extends ControllerBase {
     public function InstallModule(){
 
         /******************************************/
-        //Variables
+        // Variables
         $arrTables    = $this->listTables();
         $arrPermisos  = array();
 
         /************************************************/
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrTables){
             //recorro
             foreach ($arrTables as $table) {
                 /******************************/
-                //Se genera la query
+                // Se genera la query
                 $xParams = ['query' => $table];
                 $this->Base_createTable($xParams);
             }
@@ -94,14 +94,14 @@ class entidadesInstaller extends ControllerBase {
         ];
         /************************************************/
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrPermisos){
             //Variable
             $IntCounter = 1;
             //recorro
             foreach ($arrPermisos as $permiso) {
                 /************************************************/
-                //Se genera la query
+                // Se genera la query
                 $query = [
                     'data'      => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
                     'required'  => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
@@ -110,19 +110,19 @@ class entidadesInstaller extends ControllerBase {
                     'table'     => 'core_permisos_listado',
                     'Post'      => $permiso
                 ];
-                //Ejecuto la query
+                // Ejecuto la query
                 $xParams    = ['DataCheck' => '', 'query' => $query];
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
                 $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrRutas){
                     //recorro
                     foreach ($arrRutas as $rutas) {
                         /******************************/
-                        //Se genera la query
+                        // Se genera la query
                         $query = [
                             'data'      => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
                             'required'  => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
@@ -131,8 +131,8 @@ class entidadesInstaller extends ControllerBase {
                             'table'     => 'core_permisos_listado_rutas',
                             'Post'      => $rutas
                         ];
-                        //Ejecuto la query
-                        //Ejecuto la query
+                        // Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
                         $this->Base_insert($xParams);
                     }
@@ -159,18 +159,19 @@ class entidadesInstaller extends ControllerBase {
         /*******************************************************/
         /*             SE CONSULTAN LOS PERMISOS               */
         /*******************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPermisos',
             'table'   => 'core_permisos_listado',
             'join'    => '',
             'where'   => 'RutaController IN ('.$RutaController.')',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idPermisos ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 
@@ -189,7 +190,7 @@ class entidadesInstaller extends ControllerBase {
         $arrPermDel[] = 'DELETE FROM `core_permisos_listado_rutas` WHERE Controller IN ('.$RutaController.')';
 
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrPermDel){
             //recorro
             foreach ($arrPermDel as $sql) {
@@ -211,7 +212,7 @@ class entidadesInstaller extends ControllerBase {
         $arrTableDel[] = ['table' => 'entidades_sectores'];
 
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrTableDel){
             //recorro
             foreach ($arrTableDel as $tblDel) {
@@ -236,17 +237,18 @@ class entidadesInstaller extends ControllerBase {
         $RutaController  = $this->RutaController();
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idRutas',
             'table'   => 'core_permisos_listado_rutas',
             'join'    => '',
             'where'   => 'Controller IN ('.$RutaController.')',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $nData   = $this->Base_GetCountData($xParams);
 
@@ -260,11 +262,11 @@ class entidadesInstaller extends ControllerBase {
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
-        //Variables
+        // Variables
         $arrRutas  = array();
 
         /******************************************/
-        //Variables
+        // Variables
         switch ($Type) {
             /******************************************/
             case 1:
@@ -349,7 +351,7 @@ class entidadesInstaller extends ControllerBase {
     public function listTables(){
 
         /******************************************/
-        //Variables
+        // Variables
         $arrTables    = array();
 
         /*******************************************************/
@@ -357,7 +359,7 @@ class entidadesInstaller extends ControllerBase {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'entidades_listado',
-            'data'       => '`idEntidad` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`idSector` int(10) unsigned NULL DEFAULT NULL,`idSexo` int(10) unsigned NULL DEFAULT NULL,`idTipo` int(10) unsigned NOT NULL,`idTipoEntidad` int(10) unsigned NOT NULL,`password` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RazonSocial` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Nick` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Web` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Giro` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalNombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalRut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalEmail` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_X` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Facebook` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Instagram` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Linkedin` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`Latitud` double DEFAULT NULL,`Longitud` double DEFAULT NULL',
+            'data'       => '`idEntidad` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`idSector` int(10) unsigned NULL DEFAULT NULL,`idSexo` int(10) unsigned NULL DEFAULT NULL,`idTipo` int(10) unsigned NOT NULL,`idTipoEntidad` int(10) unsigned NOT NULL,`password` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RazonSocial` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Nick` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Web` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Giro` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalNombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalRut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalEmail` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_X` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Facebook` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Instagram` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Linkedin` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`Latitud` double DEFAULT NULL,`Longitud` double DEFAULT NULL',
             'primaryKey' => 'idEntidad',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -415,7 +417,7 @@ class entidadesInstaller extends ControllerBase {
         ';
 
         /******************************************/
-        //Variables
+        // Variables
         $arrTables = $this->listTables();
         $dataSQL   = new FunctionsDataSQL();
         $Data     .= $dataSQL->minifyArrayTables($arrTables);

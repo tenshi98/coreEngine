@@ -5,7 +5,7 @@
 class informeCotizacion extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -16,7 +16,7 @@ class informeCotizacion extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -36,18 +36,19 @@ class informeCotizacion extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'ApellidoPat ASC,Nombre ASC,RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrEntidades = $this->Base_GetList($xParams);
 
@@ -79,19 +80,28 @@ class informeCotizacion extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idEntidad';                          //Datos búsqueda exacta
-        $WhereData_string  = '';                                   //Datos búsqueda relativa
-        $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';  //Datos búsqueda Between
-        $whereInt          = '';                                   //se crea cadena
+        // Variables
+        $WhereData_int     = 'idEntidad';                          // Datos búsqueda exacta
+        $WhereData_string  = '';                                   // Datos búsqueda relativa
+        $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';  // Datos búsqueda Between
+        $whereInt          = '';                                   // Se crea cadena
+        $whereParams       = [];                                   // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'cotizacion_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'cotizacion_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'cotizacion_listado', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'cotizacion_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'cotizacion_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'cotizacion_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado.idCotizacion,
@@ -105,19 +115,20 @@ class informeCotizacion extends ControllerBase {
             'table'   => 'cotizacion_listado',
             'join'    => 'LEFT JOIN entidades_listado ON entidades_listado.idEntidad = cotizacion_listado.idEntidad',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado.Creacion_fecha DESC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/

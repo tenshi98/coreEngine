@@ -5,7 +5,7 @@
 class tercerosEntidadesListado extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -17,7 +17,7 @@ class tercerosEntidadesListado extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -38,7 +38,7 @@ class tercerosEntidadesListado extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado.idEntidad,
@@ -57,116 +57,123 @@ class tercerosEntidadesListado extends ControllerBase {
                 LEFT JOIN core_estados         ON core_estados.idEstado               = entidades_listado.idEstado
                 LEFT JOIN entidades_sectores   ON entidades_sectores.idSector         = entidades_listado.idSector
                 LEFT JOIN core_tipos_entidades ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
-            'where'   => 'entidades_listado.idTipo=2',
+            'where'   => 'entidades_listado.idTipo = ?',
+            'params'  => [2],
             'group'   => '',
             'having'  => '',
             'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idSector AS ID,Nombre',
             'table'   => 'entidades_sectores',
             'join'    => '',
-            'where'   => 'idSector!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrSector = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idSexo AS ID,Nombre',
             'table'   => 'core_sexo',
             'join'    => '',
-            'where'   => 'idSexo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrSexo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTipoEntidad AS ID,Nombre',
             'table'   => 'core_tipos_entidades',
             'join'    => '',
-            'where'   => 'idTipoEntidad!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams        = ['query' => $query];
         $arrTipoEntidad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
             'table'   => 'core_ubicacion_ciudad',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrCiudad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
             'table'   => 'core_ubicacion_comunas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrComuna = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrTipoEntidad['status'] && $arrSexo['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrSector['status'] && $arrEstado['status']){
 
             /******************************************/
@@ -211,21 +218,31 @@ class tercerosEntidadesListado extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna,FNacimiento';  //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Email';              //Datos búsqueda relativa
-        $WhereData_between = '';                                                                             //Datos búsqueda Between
-        $whereInt          = '';                                                                             //se crea cadena
+        // Variables
+        $WhereData_int     = 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna,FNacimiento';  // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Email';              // Datos búsqueda relativa
+        $WhereData_between = '';                                                                             // Datos búsqueda Between
+        $whereInt          = '';                                                                             // Se crea cadena
+        $whereParams       = [];                                                                             // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'entidades_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'entidades_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'entidades_listado', 3);
-        //Verifico si esta vacio
-        $whereInt2 = $whereInt ? $whereInt . ' AND entidades_listado.idTipo=2' : 'entidades_listado.idTipo=2';
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'entidades_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'entidades_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'entidades_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        // Verifico si esta vacio
+        $whereInt   .= ($whereInt ? ' AND ' : '') . 'entidades_listado.idTipo = ?';
+        $whereParams = array_merge($whereParams, [2]);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado.idEntidad,
@@ -244,20 +261,21 @@ class tercerosEntidadesListado extends ControllerBase {
                 LEFT JOIN core_estados         ON core_estados.idEstado               = entidades_listado.idEstado
                 LEFT JOIN entidades_sectores   ON entidades_sectores.idSector         = entidades_listado.idSector
                 LEFT JOIN core_tipos_entidades ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
-            'where'   => $whereInt2,
+            'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -295,7 +313,7 @@ class tercerosEntidadesListado extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado.Nombre,
@@ -312,19 +330,20 @@ class tercerosEntidadesListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_sexo                ON core_sexo.idSexo                    = entidades_listado.idSexo
                 LEFT JOIN core_tipos_entidades     ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
-            'where'   => 'entidades_listado.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'entidades_listado.idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["entidadesListadoUsoPlanes"]==2){
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => '
                     terceros_entidades_listado_planes.idPlan,
@@ -337,13 +356,14 @@ class tercerosEntidadesListado extends ControllerBase {
                 'join'    => '
                     LEFT JOIN servicios_listado  ON servicios_listado.idServicio  = terceros_entidades_listado_planes.idServicio
                     LEFT JOIN core_estados       ON core_estados.idEstado         = terceros_entidades_listado_planes.idEstado',
-                'where'   => 'terceros_entidades_listado_planes.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+                'where'   => 'terceros_entidades_listado_planes.idEntidad = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'terceros_entidades_listado_planes.Fecha DESC, servicios_listado.Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams   = ['query' => $query];
             $arrPlanes = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
@@ -355,7 +375,7 @@ class tercerosEntidadesListado extends ControllerBase {
         /*******************************************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["entidadesListadoUsoUsuarios"]==2){
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => '
                     terceros_entidades_listado_usuarios.email,
@@ -365,13 +385,14 @@ class tercerosEntidadesListado extends ControllerBase {
                     core_estados.Color AS EstadoColor',
                 'table'   => 'terceros_entidades_listado_usuarios',
                 'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = terceros_entidades_listado_usuarios.idEstado',
-                'where'   => 'terceros_entidades_listado_usuarios.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+                'where'   => 'terceros_entidades_listado_usuarios.idEntidad = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'terceros_entidades_listado_usuarios.email ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams     = ['query' => $query];
             $arrUsuarios = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
@@ -383,7 +404,7 @@ class tercerosEntidadesListado extends ControllerBase {
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrPlanes['status'] && $arrUsuarios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -418,7 +439,7 @@ class tercerosEntidadesListado extends ControllerBase {
     //Resumen
     public function Resumen($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado.idEntidad,
@@ -436,19 +457,20 @@ class tercerosEntidadesListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_sexo                ON core_sexo.idSexo                    = entidades_listado.idSexo
                 LEFT JOIN core_tipos_entidades     ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
-            'where'   => 'entidades_listado.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'entidades_listado.idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -488,7 +510,7 @@ class tercerosEntidadesListado extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 entidades_listado.idEntidad,
@@ -506,19 +528,20 @@ class tercerosEntidadesListado extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_sexo                ON core_sexo.idSexo                    = entidades_listado.idSexo
                 LEFT JOIN core_tipos_entidades     ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
-            'where'   => 'entidades_listado.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'entidades_listado.idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -562,7 +585,7 @@ class tercerosEntidadesListado extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso',
                 'required'  => 'idEstado,idTipo,idTipoEntidad',
@@ -583,7 +606,7 @@ class tercerosEntidadesListado extends ControllerBase {
                     ],
                 ]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -609,7 +632,7 @@ class tercerosEntidadesListado extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

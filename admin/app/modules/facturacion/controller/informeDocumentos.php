@@ -4,7 +4,7 @@
 /*******************************************************************************************************************/
 class informeDocumentos extends ControllerBase {
 
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class informeDocumentos extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -35,66 +35,70 @@ class informeDocumentos extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
             'table'   => 'entidades_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'ApellidoPat ASC,Nombre ASC,RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrEntidades = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idDocumentos AS ID,Nombre',
             'table'   => 'core_documentos_mercantiles',
             'join'    => '',
-            'where'   => 'idDocumentos!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrDocumentos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoPago AS ID,Nombre',
             'table'   => 'core_estados_pago',
             'join'    => '',
-            'where'   => 'idEstadoPago!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrEstadoPago = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTipo AS ID,Nombre',
             'table'   => 'core_facturacion_tipo',
             'join'    => '',
-            'where'   => 'idTipo!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrTipoMov = $this->Base_GetList($xParams);
 
@@ -129,19 +133,28 @@ class informeDocumentos extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idDocumentos,idEntidad,idEstadoPago,idTipo';  //Datos búsqueda exacta
-        $WhereData_string  = 'N_Doc';                                       //Datos búsqueda relativa
-        $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';           //Datos búsqueda Between
-        $whereInt          = '';                                            //se crea cadena
+        // Variables
+        $WhereData_int     = 'idDocumentos,idEntidad,idEstadoPago,idTipo';  // Datos búsqueda exacta
+        $WhereData_string  = 'N_Doc';                                       // Datos búsqueda relativa
+        $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';           // Datos búsqueda Between
+        $whereInt          = '';                                            // Se crea cadena
+        $whereParams       = [];                                            // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'facturacion_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'facturacion_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'facturacion_listado', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'facturacion_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'facturacion_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'facturacion_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 facturacion_listado.idFacturacion,
@@ -165,19 +178,20 @@ class informeDocumentos extends ControllerBase {
                 LEFT JOIN core_estados_pago             ON core_estados_pago.idEstadoPago             = facturacion_listado.idEstadoPago
                 LEFT JOIN core_facturacion_tipo         ON core_facturacion_tipo.idTipo               = facturacion_listado.idTipo',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'facturacion_listado.Creacion_fecha DESC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/

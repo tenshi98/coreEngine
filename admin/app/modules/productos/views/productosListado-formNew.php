@@ -38,7 +38,7 @@
                     $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Unidad Medida',   'Name' => 'idUniMed',        'Value' => '','Required' => 2,'arrData' => $data['arrUnimed'],    'BASE' => $BASE, 'selectProperties' => 'data-dropdown-parent="#newFormModal"']);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); //Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
 
                     ?>
 

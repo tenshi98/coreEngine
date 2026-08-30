@@ -48,20 +48,14 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1 = $data['rowData']['Nombre'] ?? '';
-                                $x2 = $data['rowData']['CodIdentificador'] ?? '';
-                                $x3 = $data['rowData']['Descripcion'] ?? '';
-                                $x4 = $data['rowData']['idEstado'] ?? '';
-
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => $x1,'Required' => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Identificador',  'Name' => 'CodIdentificador', 'Id' => 'Edit_CodIdentificador',  'Value' => $x2,'Required' => 1,'Icon' => 'ri-barcode-line']);
-                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => $x3,'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',         'Name' => 'Nombre',           'Id' => 'Edit_Nombre',            'Value' => ($data['rowData']['Nombre'] ?? ''),           'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Identificador',  'Name' => 'CodIdentificador', 'Id' => 'Edit_CodIdentificador',  'Value' => ($data['rowData']['CodIdentificador'] ?? ''), 'Required' => 1,'Icon' => 'ri-barcode-line']);
+                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',    'Name' => 'Descripcion',      'Id' => 'Edit_Descripcion',       'Value' => ($data['rowData']['Descripcion'] ?? ''),      'Required' => 1]);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelect([   'Placeholder' => 'Estado',  'Name' => 'idEstado', 'Id' => 'Edit_idEstado', 'Value' => $x4,'Required' => 2,'arrData' => $data['arrEstado']]);
+                                $data['Fnc_FormInputs']->formSelect([   'Placeholder' => 'Estado',  'Name' => 'idEstado', 'Id' => 'Edit_idEstado', 'Value' => ($data['rowData']['idEstado'] ?? ''),'Required' => 2,'arrData' => $data['arrEstado']]);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina','Value' => $data['rowData']['idMaquina'],'Required' => 2]);
@@ -108,7 +102,7 @@
                 </div>
 
                 <?php
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
                 ?>
 
@@ -284,7 +278,7 @@
         /*********************************************************************/
         /*                            DOCUMENTOS                             */
         /*********************************************************************/
-        //Variables
+        // Variables
         let DocumentosLoad = 0;
         /******************************************/
         function tabDocumentosLoadList() {
@@ -383,7 +377,7 @@
     /*********************************************************************/
     /*                          OBSERVACIONES                            */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ObsLoad = 0;
     /******************************************/
     function tabObsLoadList() {
@@ -483,7 +477,7 @@
         /*********************************************************************/
         /*                            COMPONENTES                            */
         /*********************************************************************/
-        //Variables
+        // Variables
         let ComponentesLoad = 0;
         /******************************************/
         function tabComponentesLoadList() {
@@ -619,7 +613,7 @@
             /*********************************************************************/
             /*                             SENSORES                              */
             /*********************************************************************/
-            //Variables
+            // Variables
             let SensoresLoad = 0;
             /******************************************/
             function tabSensoresLoadList() {
@@ -717,7 +711,7 @@
             /*********************************************************************/
             /*                              ALARMAS                              */
             /*********************************************************************/
-            //Variables
+            // Variables
             let AlarmasLoad = 0;
             /******************************************/
             function tabAlarmasLoadList() {

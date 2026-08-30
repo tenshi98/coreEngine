@@ -5,7 +5,7 @@
 class gestionDocumentosWidgets extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $CommonData;
     private $DataNumbers;
     private $DataDate;
@@ -14,7 +14,7 @@ class gestionDocumentosWidgets extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -32,7 +32,7 @@ class gestionDocumentosWidgets extends ControllerBase {
     //Instalacion del modulo completo
     public function loadWidgets(){
 
-        //Variables
+        // Variables
         $Data['Menu_Name']   = 'Gestión Documentos Mercantiles';
         $Data['Menu_Value']  = [
             'Compras'  => '../app/modules/facturacion/views/main-doc-mercantiles.php',
@@ -54,7 +54,7 @@ class gestionDocumentosWidgets extends ControllerBase {
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /*******************************************************************/
-        //Variables
+        // Variables
         $MainViewData = [
             'Count_DocMercantiles' => 0,
             'Data_ComprasTotal'    => '',
@@ -92,12 +92,13 @@ class gestionDocumentosWidgets extends ControllerBase {
 	                SUM( MontoPagado ) AS MontoPagado',
                 'table'   => 'facturacion_listado',
                 'join'    => '',
-                'where'   => 'idTipo = "1" AND idEstadoPago = "1"',
+                'where'   => 'idTipo = ? AND idEstadoPago = ?',
+                'params'  => [1, 1],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams                           = ['query' => $query];
             $TempData                          = $this->Base_GetByID($xParams);
             $MainViewData['Data_ComprasTotal'] = $TempData['data'];
@@ -116,13 +117,14 @@ class gestionDocumentosWidgets extends ControllerBase {
                     entidades_listado.Nick AS EntidadesNick',
                 'table'   => 'facturacion_listado',
                 'join'    => 'LEFT JOIN entidades_listado ON entidades_listado.idEntidad = facturacion_listado.idEntidad',
-                'where'   => 'facturacion_listado.idTipo = "1" AND facturacion_listado.idEstadoPago = "1"',
+                'where'   => 'facturacion_listado.idTipo = ? AND facturacion_listado.idEstadoPago = ?',
+                'params'  => [1, 1],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
                 'limit'   => 9
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams                             = ['query' => $query];
             $TempData                            = $this->Base_GetList($xParams);
             $MainViewData['Data_ComprasListado'] = $TempData['data'];
@@ -135,12 +137,13 @@ class gestionDocumentosWidgets extends ControllerBase {
 	                SUM( MontoPagado ) AS MontoPagado',
                 'table'   => 'facturacion_listado',
                 'join'    => '',
-                'where'   => 'idTipo = "2" AND idEstadoPago = "1"',
+                'where'   => 'idTipo = ? AND idEstadoPago = ?',
+                'params'  => [2, 1],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams                          = ['query' => $query];
             $TempData                         = $this->Base_GetByID($xParams);
             $MainViewData['Data_VentasTotal'] = $TempData['data'];
@@ -164,13 +167,14 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'join'    => '
                     LEFT JOIN entidades_listado             ON entidades_listado.idEntidad                = facturacion_listado.idEntidad
                     LEFT JOIN core_documentos_mercantiles   ON core_documentos_mercantiles.idDocumentos   = facturacion_listado.idDocumentos',
-                'where'   => 'facturacion_listado.idTipo = "2" AND facturacion_listado.idEstadoPago = "1"',
+                'where'   => 'facturacion_listado.idTipo = ? AND facturacion_listado.idEstadoPago = ?',
+                'params'  => [2, 1],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
                 'limit'   => 9
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams                            = ['query' => $query];
             $TempData                           = $this->Base_GetList($xParams);
             $MainViewData['Data_VentasListado'] = $TempData['data'];

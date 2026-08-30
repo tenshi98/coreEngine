@@ -5,7 +5,7 @@
 class bodegasMovimiento extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -18,7 +18,7 @@ class bodegasMovimiento extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -73,7 +73,7 @@ class bodegasMovimiento extends ControllerBase {
         }
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 bodegas_movimientos.idMovimiento,
@@ -86,13 +86,14 @@ class bodegasMovimiento extends ControllerBase {
             'join'    => '
                 LEFT JOIN bodegas_listado BodIngreso  ON BodIngreso.idBodegas  = bodegas_movimientos.idBodegasIngreso
                 LEFT JOIN bodegas_listado BodEgreso   ON BodEgreso.idBodegas   = bodegas_movimientos.idBodegasEgreso',
-            'where'   => 'bodegas_movimientos.idEstadoIngreso = "'.$idTipoIngreso.'"',
+            'where'   => 'bodegas_movimientos.idEstadoIngreso = ?',
+            'params'  => [$idTipoIngreso],
             'group'   => '',
             'having'  => '',
             'order'   => 'bodegas_movimientos.Creacion_fecha DESC, bodegas_movimientos.Creacion_hora DESC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
@@ -101,64 +102,69 @@ class bodegasMovimiento extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
-            $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
-            $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+            $X_join   = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
+            $X_params = [1, $arrUserData['UserID']];
         //Si se permite junto con la creacion de tareas
         }else{
-            $X_join  = '';
-            $X_where = 'bodegas_listado.idEstado=1';
+            $X_join   = '';
+            $X_where  = 'bodegas_listado.idEstado = ?';
+            $X_params = [1];
         }
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'bodegas_listado.idBodegas AS ID, bodegas_listado.Nombre',
             'table'   => 'bodegas_listado',
             'join'    => $X_join,
             'where'   => $X_where,
+            'params'  => $X_params,
             'group'   => '',
             'having'  => '',
             'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrBodegas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idProducto AS ID,Nombre',
             'table'   => 'productos_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idDocumentos AS ID,Nombre',
             'table'   => 'core_documentos_mercantiles',
             'join'    => '',
-            'where'   => 'idDocumentos!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrDocumentos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrDocumentos['status']){
 
             /******************************************/
@@ -213,27 +219,40 @@ class bodegasMovimiento extends ControllerBase {
         }
 
         /*******************************************************************/
-        //Variables
-        $WhereData_bod_int     = 'idMovimiento,idBodegasIngreso,idBodegasEgreso';   //Datos búsqueda exacta
-        $WhereData_bod_string  = '';                                                //Datos búsqueda relativa
-        $WhereData_bod_between = 'Creacion_fecha-F_Inicio-F_Termino';               //Datos búsqueda Between
-        $WhereData_fac_int     = 'idDocumentos,idFacturacion';                      //Datos búsqueda exacta
-        $WhereData_fac_string  = 'N_Doc';                                           //Datos búsqueda relativa
-        $WhereData_fac_between = '';                                                //Datos búsqueda Between
-        $whereInt              = '';                                                    //se crea cadena
+        // Variables
+        $WhereData_bod_int     = 'idMovimiento,idBodegasIngreso,idBodegasEgreso';   // Datos búsqueda exacta
+        $WhereData_bod_string  = '';                                                // Datos búsqueda relativa
+        $WhereData_bod_between = 'Creacion_fecha-F_Inicio-F_Termino';               // Datos búsqueda Between
+        $WhereData_fac_int     = 'idDocumentos,idFacturacion';                      // Datos búsqueda exacta
+        $WhereData_fac_string  = 'N_Doc';                                           // Datos búsqueda relativa
+        $WhereData_fac_between = '';                                                // Datos búsqueda Between
+        $whereInt              = '';                                                // Se crea cadena
+        $whereParams           = [];                                                // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_bod_int, 'bodegas_movimientos', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_bod_string, 'bodegas_movimientos', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_bod_between, 'bodegas_movimientos', 3);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_fac_int, 'facturacion_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_fac_string, 'facturacion_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_fac_between, 'facturacion_listado', 3);
-        //Verifico si esta vacio
-        $whereInt2 = $whereInt ? $whereInt . ' AND bodegas_movimientos.idEstadoIngreso = "'.$idTipoIngreso.'"' : 'bodegas_movimientos.idEstadoIngreso = "'.$idTipoIngreso.'"';
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_bod_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_bod_int, 'bodegas_movimientos', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_bod_string, 'bodegas_movimientos', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_bod_between, 'bodegas_movimientos', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_fac_int, 'facturacion_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_fac_string, 'facturacion_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_fac_between, 'facturacion_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        // Verifico si esta vacio
+        $whereInt   .= ($whereInt ? ' AND ' : '') . 'bodegas_movimientos.idEstadoIngreso = ?';
+        $whereParams = array_merge($whereParams, [$idTipoIngreso]);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 bodegas_movimientos.idMovimiento,
@@ -247,20 +266,21 @@ class bodegasMovimiento extends ControllerBase {
                 LEFT JOIN bodegas_listado BodIngreso  ON BodIngreso.idBodegas                = bodegas_movimientos.idBodegasIngreso
                 LEFT JOIN bodegas_listado BodEgreso   ON BodEgreso.idBodegas                 = bodegas_movimientos.idBodegasEgreso
                 LEFT JOIN facturacion_listado         ON facturacion_listado.idFacturacion   = bodegas_movimientos.idFacturacion',
-            'where'   => $whereInt2,
+            'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'bodegas_movimientos.Creacion_fecha DESC, bodegas_movimientos.Creacion_hora DESC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -338,22 +358,23 @@ class bodegasMovimiento extends ControllerBase {
         }
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => $DataQuery,
             'table'   => 'bodegas_movimientos',
             'join'    => $DataJoin,
-            'where'   => 'bodegas_movimientos.idMovimiento = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'bodegas_movimientos.idMovimiento = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_estados_ingreso.Nombre AS TipoMovimiento,
@@ -367,20 +388,21 @@ class bodegasMovimiento extends ControllerBase {
                 LEFT JOIN bodegas_listado       ON bodegas_listado.idBodegas             = bodegas_movimientos_productos.idBodegas
                 LEFT JOIN productos_listado     ON productos_listado.idProducto          = bodegas_movimientos_productos.idProducto
                 LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed         = productos_listado.idUniMed',
-            'where'   => 'bodegas_movimientos_productos.idMovimiento = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'bodegas_movimientos_productos.idMovimiento = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'bodegas_movimientos_productos.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrProductos['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -460,24 +482,25 @@ class bodegasMovimiento extends ControllerBase {
         }
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => $DataQuery,
             'table'   => 'bodegas_movimientos',
             'join'    => $DataJoin,
-            'where'   => 'bodegas_movimientos.idMovimiento = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'bodegas_movimientos.idMovimiento = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -559,24 +582,25 @@ class bodegasMovimiento extends ControllerBase {
         }
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => $DataQuery,
             'table'   => 'bodegas_movimientos',
             'join'    => $DataJoin,
-            'where'   => 'bodegas_movimientos.idMovimiento = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'bodegas_movimientos.idMovimiento = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -609,7 +633,11 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     /******************************************************************************/
     //Crear
-    public function Insert(){
+    public function Insert($f3){
+
+        /******************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
         /*******************************************************************/
         // Conteo de productos
@@ -643,15 +671,20 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     //Editar por put (solo modificar datos)
     //Editar por post (modificar y subir archivos)
-    public function Update(){
+    public function Update($f3){
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            /******************************/
+            // Usuario creador
+            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
             /******************************/
             //Se genera el chequeo
             $DataCheck = $this->dataCheck_1($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idMovimiento,idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,Creacion_fecha,Creacion_hora,Observaciones,fecha_auto,idUsuario,idFacturacion',
                 'required'  => 'idEstadoIngreso,Creacion_fecha,Creacion_hora,fecha_auto',
@@ -661,7 +694,7 @@ class bodegasMovimiento extends ControllerBase {
                 'where'     => 'idMovimiento',
                 'Post'      => $_POST,
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -689,7 +722,7 @@ class bodegasMovimiento extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'bodegas_movimientos',
@@ -697,7 +730,7 @@ class bodegasMovimiento extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -710,13 +743,13 @@ class bodegasMovimiento extends ControllerBase {
                 $arrTableDel[] = ['files' => '', 'table' => 'bodegas_movimientos_productos'];
 
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrTableDel){
                     //recorro
                     foreach ($arrTableDel as $tblDel) {
-                        //Se genera la query
+                        // Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idMovimiento', 'SubCarpeta' => '', 'Post' => $dataDelete];
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['query' => $query];
                         $this->Base_delete($xParams);
                     }
@@ -744,11 +777,16 @@ class bodegasMovimiento extends ControllerBase {
     public function createMov($PostData){
 
         /*******************************************************************/
-        //variables
+        // Variables
         $ndata_1 = isset($PostData['idProducto']) ? count($PostData['idProducto']) : 0;
 
+        /*******************************************************************/
+        //Se inicia la transacción: la reserva, sus recursos asociados y el historial deben
+        //aplicarse de forma atómica (todo o nada)
+        $this->Base_transactionBegin();
+
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,Creacion_fecha,Creacion_hora,Observaciones,fecha_auto,idUsuario,idFacturacion',
             'required'  => 'idEstadoIngreso,Creacion_fecha,Creacion_hora,fecha_auto,idUsuario',
@@ -759,9 +797,16 @@ class bodegasMovimiento extends ControllerBase {
         ];
         //Se genera el chequeo
         $DataCheck_1 = $this->dataCheck_1($PostData);
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck_1, 'query' => $query];
         $Response = $this->Base_insert($xParams);
+
+        /*******************************************************************/
+        //Si falla la reserva principal, se revierte de inmediato
+        if (!$Response['status']){
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        }
 
         /******************************/
         //si es la respuesta esperada
@@ -770,49 +815,58 @@ class bodegasMovimiento extends ControllerBase {
             /*******************************************************/
             //Variable
             $chainx_1      = '';
-            $chainx_2      = '0';
+            $ElementsIDs   = [0];
             $arrProdStock  = array();
             //Recorro los productos ingresados
             if(isset($ndata_1)&&$ndata_1!=0){
                 for($j1 = 0; $j1 < $ndata_1; $j1++){
-                    //se obtiene el producto
-                    $chainx_2 .= ','.$PostData['idProducto'][$j1];
+                    //se obtiene el producto (bindeado, no concatenado)
+                    $ElementsIDs[] = (int)$PostData['idProducto'][$j1];
                     //Se verifica movimiento
                     switch ($PostData['idEstadoIngreso']) {
                         /**************************************************************************************/
                         //Ingreso
                         case 1:
-                            $chainx_1 .= ',Cantidad_idBodegas_'.$PostData['idBodegasIngreso'].' AS Cantidad_1';
+                            $chainx_1 .= ',Cantidad_idBodegas_'.(int)$PostData['idBodegasIngreso'].' AS Cantidad_1';
                             break;
                         /**************************************************************************************/
                         //Egreso
                         case 2:
-                            $chainx_1 .= ',Cantidad_idBodegas_'.$PostData['idBodegasEgreso'].' AS Cantidad_1';
+                            $chainx_1 .= ',Cantidad_idBodegas_'.(int)$PostData['idBodegasEgreso'].' AS Cantidad_1';
                             break;
                         /**************************************************************************************/
                         //Traspaso
                         case 3:
-                            $chainx_1 .= ',Cantidad_idBodegas_'.$PostData['idBodegasIngreso'].' AS Cantidad_1';
-                            $chainx_1 .= ',Cantidad_idBodegas_'.$PostData['idBodegasEgreso'].' AS Cantidad_2';
+                            $chainx_1 .= ',Cantidad_idBodegas_'.(int)$PostData['idBodegasIngreso'].' AS Cantidad_1';
+                            $chainx_1 .= ',Cantidad_idBodegas_'.(int)$PostData['idBodegasEgreso'].' AS Cantidad_2';
                             break;
                     }
                 }
             }
+            // Genera un '?' por cada id de producto
+            $placeholders = implode(',', array_fill(0, count($ElementsIDs), '?'));
             /******************************/
             //Se consultan los stocks
             $query = [
                 'data'    => 'idStocks,idProducto'.$chainx_1,
                 'table'   => 'bodegas_productos_stocks',
                 'join'    => '',
-                'where'   => 'idProducto IN ('.$chainx_2.')',
+                'where'   => 'idProducto IN ('.$placeholders.')',
+                'params'  => $ElementsIDs,
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'idProducto ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams   = ['query' => $query];
             $arrStocks = $this->Base_GetList($xParams);
+
+            // Si falla la consulta, se revierte de inmediato
+            if (!$arrStocks['status']){
+                $this->Base_transactionRollback();
+                Response::error('Error al operar con la Base de Datos', 500, $arrStocks['error']);
+            }
 
             /******************************/
             //Recorro solo si hay datos
@@ -837,7 +891,7 @@ class bodegasMovimiento extends ControllerBase {
                         //Ingreso
                         case 1:
                             /******************************/
-                            //Se agrega respuesta
+                            // Se agrega respuesta
                             $arrTareas = [
                                 'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => $PostData['idEstadoIngreso'],
@@ -846,7 +900,7 @@ class bodegasMovimiento extends ControllerBase {
                                 'Number'          => $PostData['Number'][$j1],
                             ];
                             /******************************/
-                            //Se genera la query
+                            // Se genera la query
                             $query = [
                                 'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                                 'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
@@ -857,21 +911,28 @@ class bodegasMovimiento extends ControllerBase {
                             ];
                             //Se genera el chequeo
                             $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            //Ejecuto la query
+                            // Ejecuto la query
                             $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_insert($xParams);
+                            $xInsert = $this->Base_insert($xParams);
+
+                            // Si falla la consulta, se revierte de inmediato
+                            if (!$xInsert['status']){
+                                $this->Base_transactionRollback();
+                                Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                            }
+
                             /******************************/
                             //Se Actualizan los stocks
                             //verifico si existe el dato en el stock
                             if(isset($arrProdStock[$PostData['idProducto'][$j1]]['idStocks'])&&$arrProdStock[$PostData['idProducto'][$j1]]['idStocks']!=''){
                                 /******************************/
-                                //Se agrega respuesta
+                                // Se agrega respuesta
                                 $arrTareas = [
                                     'idStocks'                                          => $arrProdStock[$PostData['idProducto'][$j1]]['idStocks'],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasIngreso'] => ($arrProdStock[$PostData['idProducto'][$j1]]['Cantidad_1'] + $PostData['Number'][$j1]),
                                 ];
                                 /******************************/
-                                //Se genera la query
+                                // Se genera la query
                                 $query = [
                                     'data'      => 'idStocks,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'],
                                     'required'  => 'idStocks,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'],
@@ -883,19 +944,24 @@ class bodegasMovimiento extends ControllerBase {
                                 ];
                                 //Se genera el chequeo
                                 $DataCheck_3 = $this->DataCheck_3($arrTareas);
-                                //Ejecuto la query
+                                // Ejecuto la query
                                 $xParams = ['DataCheck' => $DataCheck_3, 'query' => $query];
-                                $this->Base_update($xParams);
+                                $xUpdate = $this->Base_update($xParams);
 
+                                // Si falla la consulta, se revierte de inmediato
+                                if (!$xUpdate['status']){
+                                    $this->Base_transactionRollback();
+                                    Response::error('Error al operar con la Base de Datos', 500, $xUpdate['error']);
+                                }
                             }else{
                                 /******************************/
-                                //Se agrega respuesta
+                                // Se agrega respuesta
                                 $arrTareas = [
                                     'idProducto'                                        => $PostData['idProducto'][$j1],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasIngreso'] => $PostData['Number'][$j1],
                                 ];
                                 /******************************/
-                                //Se genera la query
+                                // Se genera la query
                                 $query = [
                                     'data'      => 'idProducto,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'],
                                     'required'  => 'idProducto,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'],
@@ -906,9 +972,15 @@ class bodegasMovimiento extends ControllerBase {
                                 ];
                                 //Se genera el chequeo
                                 $DataCheck_3 = $this->DataCheck_3($arrTareas);
-                                //Ejecuto la query
+                                // Ejecuto la query
                                 $xParams = ['DataCheck' => $DataCheck_3, 'query' => $query];
-                                $this->Base_insert($xParams);
+                                $xInsert = $this->Base_insert($xParams);
+
+                                // Si falla la consulta, se revierte de inmediato
+                                if (!$xInsert['status']){
+                                    $this->Base_transactionRollback();
+                                    Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                                }
                             }
                             break;
                         /**************************************************************************************/
@@ -916,7 +988,7 @@ class bodegasMovimiento extends ControllerBase {
                         //Egreso
                         case 2:
                             /******************************/
-                            //Se agrega respuesta
+                            // Se agrega respuesta
                             $arrTareas = [
                                 'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => $PostData['idEstadoIngreso'],
@@ -925,7 +997,7 @@ class bodegasMovimiento extends ControllerBase {
                                 'Number'          => $PostData['Number'][$j1],
                             ];
                             /******************************/
-                            //Se genera la query
+                            // Se genera la query
                             $query = [
                                 'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                                 'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
@@ -936,21 +1008,27 @@ class bodegasMovimiento extends ControllerBase {
                             ];
                             //Se genera el chequeo
                             $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            //Ejecuto la query
+                            // Ejecuto la query
                             $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_insert($xParams);
+                            $xInsert = $this->Base_insert($xParams);
+
+                            // Si falla la consulta, se revierte de inmediato
+                            if (!$xInsert['status']){
+                                $this->Base_transactionRollback();
+                                Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                            }
                             /******************************/
                             //Se Actualizan los stocks
                             //verifico si existe el dato en el stock
                             if(isset($arrProdStock[$PostData['idProducto'][$j1]]['idStocks'])&&$arrProdStock[$PostData['idProducto'][$j1]]['idStocks']!=''){
                                 /******************************/
-                                //Se agrega respuesta
+                                // Se agrega respuesta
                                 $arrTareas = [
                                     'idStocks'                                         => $arrProdStock[$PostData['idProducto'][$j1]]['idStocks'],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasEgreso'] => ($arrProdStock[$PostData['idProducto'][$j1]]['Cantidad_1'] - $PostData['Number'][$j1]),
                                 ];
                                 /******************************/
-                                //Se genera la query
+                                // Se genera la query
                                 $query = [
                                     'data'      => 'idStocks,Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
                                     'required'  => 'idStocks,Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
@@ -962,18 +1040,24 @@ class bodegasMovimiento extends ControllerBase {
                                 ];
                                 //Se genera el chequeo
                                 $DataCheck_3 = $this->DataCheck_3($arrTareas);
-                                //Ejecuto la query
+                                // Ejecuto la query
                                 $xParams = ['DataCheck' => $DataCheck_3, 'query' => $query];
-                                $this->Base_update($xParams);
+                                $xUpdate = $this->Base_update($xParams);
+
+                                // Si falla la consulta, se revierte de inmediato
+                                if (!$xUpdate['status']){
+                                    $this->Base_transactionRollback();
+                                    Response::error('Error al operar con la Base de Datos', 500, $xUpdate['error']);
+                                }
                             }else{
                                 /******************************/
-                                //Se agrega respuesta
+                                // Se agrega respuesta
                                 $arrTareas = [
                                     'idProducto'                                       => $PostData['idProducto'][$j1],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasEgreso'] => (0 - $PostData['Number'][$j1]),
                                 ];
                                 /******************************/
-                                //Se genera la query
+                                // Se genera la query
                                 $query = [
                                     'data'      => 'idProducto,Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
                                     'required'  => 'idProducto,Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
@@ -984,9 +1068,15 @@ class bodegasMovimiento extends ControllerBase {
                                 ];
                                 //Se genera el chequeo
                                 $DataCheck_3 = $this->DataCheck_3($arrTareas);
-                                //Ejecuto la query
+                                // Ejecuto la query
                                 $xParams = ['DataCheck' => $DataCheck_3, 'query' => $query];
-                                $this->Base_insert($xParams);
+                                $xInsert = $this->Base_insert($xParams);
+
+                                // Si falla la consulta, se revierte de inmediato
+                                if (!$xInsert['status']){
+                                    $this->Base_transactionRollback();
+                                    Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                                }
                             }
                             break;
                         /**************************************************************************************/
@@ -994,7 +1084,7 @@ class bodegasMovimiento extends ControllerBase {
                         //Traspaso
                         case 3:
                             /******************************/
-                            //Se agrega respuesta
+                            // Se agrega respuesta
                             $arrTareas = [
                                 'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => 2,
@@ -1003,7 +1093,7 @@ class bodegasMovimiento extends ControllerBase {
                                 'Number'          => $PostData['Number'][$j1],
                             ];
                             /******************************/
-                            //Se genera la query
+                            // Se genera la query
                             $query = [
                                 'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                                 'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
@@ -1014,12 +1104,18 @@ class bodegasMovimiento extends ControllerBase {
                             ];
                             //Se genera el chequeo
                             $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            //Ejecuto la query
+                            // Ejecuto la query
                             $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_insert($xParams);
+                            $xInsert = $this->Base_insert($xParams);
+
+                            // Si falla la consulta, se revierte de inmediato
+                            if (!$xInsert['status']){
+                                $this->Base_transactionRollback();
+                                Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                            }
                             /************************************************************/
                             /************************************************************/
-                            //Se agrega respuesta
+                            // Se agrega respuesta
                             $arrTareas = [
                                 'idMovimiento'    => $Response['data'],
                                 'idEstadoIngreso' => 1,
@@ -1028,7 +1124,7 @@ class bodegasMovimiento extends ControllerBase {
                                 'Number'          => $PostData['Number'][$j1],
                             ];
                             /******************************/
-                            //Se genera la query
+                            // Se genera la query
                             $query = [
                                 'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                                 'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
@@ -1039,22 +1135,28 @@ class bodegasMovimiento extends ControllerBase {
                             ];
                             //Se genera el chequeo
                             $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            //Ejecuto la query
+                            // Ejecuto la query
                             $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_insert($xParams);
+                            $xInsert = $this->Base_insert($xParams);
+
+                            // Si falla la consulta, se revierte de inmediato
+                            if (!$xInsert['status']){
+                                $this->Base_transactionRollback();
+                                Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                            }
                             /******************************/
                             //Se Actualizan los stocks
                             //verifico si existe el dato en el stock
                             if(isset($arrProdStock[$PostData['idProducto'][$j1]]['idStocks'])&&$arrProdStock[$PostData['idProducto'][$j1]]['idStocks']!=''){
                                 /******************************/
-                                //Se agrega respuesta
+                                // Se agrega respuesta
                                 $arrTareas = [
                                     'idStocks'                                          => $arrProdStock[$PostData['idProducto'][$j1]]['idStocks'],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasIngreso'] => ($arrProdStock[$PostData['idProducto'][$j1]]['Cantidad_1'] + $PostData['Number'][$j1]),
                                     'Cantidad_idBodegas_'.$PostData['idBodegasEgreso']  => ($arrProdStock[$PostData['idProducto'][$j1]]['Cantidad_2'] - $PostData['Number'][$j1]),
                                 ];
                                 /******************************/
-                                //Se genera la query
+                                // Se genera la query
                                 $query = [
                                     'data'      => 'idStocks,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'].',Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
                                     'required'  => 'idStocks,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'].',Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
@@ -1066,19 +1168,25 @@ class bodegasMovimiento extends ControllerBase {
                                 ];
                                 //Se genera el chequeo
                                 $DataCheck_3 = $this->DataCheck_3($arrTareas);
-                                //Ejecuto la query
+                                // Ejecuto la query
                                 $xParams = ['DataCheck' => $DataCheck_3, 'query' => $query];
-                                $this->Base_update($xParams);
+                                $xUpdate = $this->Base_update($xParams);
+
+                                // Si falla la consulta, se revierte de inmediato
+                                if (!$xUpdate['status']){
+                                    $this->Base_transactionRollback();
+                                    Response::error('Error al operar con la Base de Datos', 500, $xUpdate['error']);
+                                }
                             }else{
                                 /******************************/
-                                //Se agrega respuesta
+                                // Se agrega respuesta
                                 $arrTareas = [
                                     'idProducto'                                        => $PostData['idProducto'][$j1],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasIngreso'] => $PostData['Number'][$j1],
                                     'Cantidad_idBodegas_'.$PostData['idBodegasEgreso']  => (0 - $PostData['Number'][$j1]),
                                 ];
                                 /******************************/
-                                //Se genera la query
+                                // Se genera la query
                                 $query = [
                                     'data'      => 'idProducto,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'].',Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
                                     'required'  => 'idProducto,Cantidad_idBodegas_'.$PostData['idBodegasIngreso'].',Cantidad_idBodegas_'.$PostData['idBodegasEgreso'],
@@ -1089,15 +1197,25 @@ class bodegasMovimiento extends ControllerBase {
                                 ];
                                 //Se genera el chequeo
                                 $DataCheck_3 = $this->DataCheck_3($arrTareas);
-                                //Ejecuto la query
+                                // Ejecuto la query
                                 $xParams = ['DataCheck' => $DataCheck_3, 'query' => $query];
-                                $this->Base_insert($xParams);
+                                $xInsert = $this->Base_insert($xParams);
+
+                                // Si falla la consulta, se revierte de inmediato
+                                if (!$xInsert['status']){
+                                    $this->Base_transactionRollback();
+                                    Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+                                }
                             }
                             break;
                     }
                 }
             }
         }
+
+        /*******************************************************************/
+        //Se confirma la transacción
+        $this->Base_transactionCommit();
 
         /******************************/
         // Devuelvo siempre el resultado
@@ -1111,7 +1229,7 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -1149,7 +1267,7 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_2($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -1187,7 +1305,7 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_3($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

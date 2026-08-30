@@ -35,7 +35,7 @@
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',     'Name'  => 'Nombre',      'Value'  => '','Required' => 2]);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); //Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
 
                     ?>
                 </div>

@@ -5,19 +5,18 @@
 class miUsuario extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $DataDate;
     private $DataNumbers;
     private $WidgetsCommon;
-    private $userSession;
 
     /******************************************************************************/
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -26,7 +25,6 @@ class miUsuario extends ControllerBase {
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->userSession    = new userSession();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -39,21 +37,19 @@ class miUsuario extends ControllerBase {
     public function login($f3){
 
         /******************************/
-        //Se cargan los datos de la sesion
-        $Response = $this->userSession->login($f3, $_POST, 1);
+        // Se llama la clase
+        $authenticationService = new AuthenticationService();
+        // Se autentica al usuario y se cargan los datos de sesión
+        $Response = $authenticationService->authenticate($f3, $_POST);
 
         /******************************************/
-        //Si el acceso es correcto
+        // Si el acceso es correcto
         if($Response['code']==200){
-            //Se genera la cookie con tiempo de expiracion de 1 dia
-            setcookie('Sesion_tk_'.date("Y-m-d"),$f3->get('SESSION.TokenUser'),time() + (86400));
-            //imprimo resultados
+            // Se informa el resultado
             Response::success($Response['message']);
-        //Si da otro error
-        }else{
-            //imprimo resultados
-            Response::error($Response['message'], $Response['code'], $Response['message']);
         }
+        // Se informa el error de autenticación
+        Response::error($Response['message'], $Response['code'], $Response['message']);
 
     }
 
@@ -62,8 +58,10 @@ class miUsuario extends ControllerBase {
     public function forgot($f3){
 
         /******************************/
-        //Se cargan los datos de la sesion
-        $Response = $this->userSession->forgot($f3, $_POST);
+        // Se llama la clase
+        $authenticationService = new AuthenticationService();
+        // Se autentica al usuario y se actualizan los datos
+        $Response = $authenticationService->recoverPassword($f3, $_POST);
 
         /******************************************/
         //imprimo resultados
@@ -76,17 +74,14 @@ class miUsuario extends ControllerBase {
     public function logout($f3){
 
         /******************************/
-        //Se cargan los datos de la sesion
-        $Response = $this->userSession->logout($f3, $_POST);
+        // Se llama la clase
+        $authenticationService = new AuthenticationService();
+        // Se eliminan los datos de sesion (sesion y coockies)
+        $Response = $authenticationService->closeSession($f3);
 
         /******************************************/
         //Si es correcto
         if($Response['code']==200){
-            //Se limpian las cookies
-            setcookie('Sesion_tk_'.date("Y-m-d"),'',time()-1);
-            // También es recomendable unset($_COOKIE['']) para borrar la cookie de la superglobal $_COOKIE
-            unset($_COOKIE['Sesion_tk_'.date("Y-m-d")]);
-            unset($_COOKIE['']);
             //Se redirige al index
             $f3->reroute('/');
             //imprimo resultados
@@ -106,7 +101,7 @@ class miUsuario extends ControllerBase {
     //Ver Datos
     public function view($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 usuarios_listado.idUsuario,
@@ -140,67 +135,71 @@ class miUsuario extends ControllerBase {
                 LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad     = usuarios_listado.idCiudad
                 LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna    = usuarios_listado.idComuna
                 LEFT JOIN core_posicion_menu      ON core_posicion_menu.idMenuPosicion  = usuarios_listado.idMenuPosicion',
-            'where'   => 'usuarios_listado.idUsuario = "'.$f3->get('SESSION.DataInfo.UserID').'"',
+            'where'   => 'usuarios_listado.idUsuario = ?',
+            'params'  => [$f3->get('SESSION.DataInfo.UserID')],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
             'table'   => 'core_ubicacion_ciudad',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrCiudad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
             'table'   => 'core_ubicacion_comunas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrComuna = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idMenuPosicion AS ID,Nombre',
             'table'   => 'core_posicion_menu',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPosicion = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrPosicion['status']){
 
             /******************************************/
@@ -245,7 +244,7 @@ class miUsuario extends ControllerBase {
     //Ver Datos
     public function FRG_UpdateData($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 usuarios_listado.email,
@@ -272,19 +271,20 @@ class miUsuario extends ControllerBase {
                 LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad     = usuarios_listado.idCiudad
                 LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna    = usuarios_listado.idComuna
                 LEFT JOIN core_posicion_menu      ON core_posicion_menu.idMenuPosicion  = usuarios_listado.idMenuPosicion',
-            'where'   => 'usuarios_listado.idUsuario = "'.$f3->get('SESSION.DataInfo.UserID').'"',
+            'where'   => 'usuarios_listado.idUsuario = ?',
+            'params'  => [$f3->get('SESSION.DataInfo.UserID')],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre DESC'
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
 
             /******************************************/
@@ -318,7 +318,7 @@ class miUsuario extends ControllerBase {
     //Ver Datos
     public function FRG_UpdateCard($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 usuarios_listado.Nombre,
@@ -330,19 +330,20 @@ class miUsuario extends ControllerBase {
                 core_tipos_usuario.Nombre AS TipoUsuario',
             'table'   => 'usuarios_listado',
             'join'    => 'LEFT JOIN core_tipos_usuario ON core_tipos_usuario.idTipoUsuario = usuarios_listado.idTipoUsuario',
-            'where'   => 'usuarios_listado.idUsuario = "'.$f3->get('SESSION.DataInfo.UserID').'"',
+            'where'   => 'usuarios_listado.idUsuario = ?',
+            'params'  => [$f3->get('SESSION.DataInfo.UserID')],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre DESC'
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -376,12 +377,17 @@ class miUsuario extends ControllerBase {
     public function update($f3){
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            /******************************/
+            // Usuario creador
+            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
             /******************************/
             //Se genera el chequeo
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
                 'required'  => 'Nombre,Rut,email',
@@ -402,14 +408,19 @@ class miUsuario extends ControllerBase {
                     ],
                 ]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
             if ($Response['status']){
+                /******************************/
+                // Se cargan las clases
+                $authenticationService = new AuthenticationService();
+                $sessionService        = new SessionService();
+                $Client                = new FunctionsServerClient();
                 //Se actualiza la sesion del usuario
-                $this->userSession->updateSession($_POST['idUsuario'], $f3, 1);
+                $authenticationService->updateSession($f3, $_POST['idUsuario'], $sessionService, $Client);
                 // Devuelvo $Response con código 200 (OK)
                 Response::success($Response['data']);
             } else {
@@ -431,7 +442,7 @@ class miUsuario extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataPut);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'usuarios_listado',
@@ -439,14 +450,19 @@ class miUsuario extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataPut
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delFiles($xParams);
             /******************************/
             // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
             if ($Response['status']){
+                /******************************/
+                // Se cargan las clases
+                $authenticationService = new AuthenticationService();
+                $sessionService        = new SessionService();
+                $Client                = new FunctionsServerClient();
                 //Se actualiza la sesion del usuario
-                $this->userSession->updateSession($dataPut['idUsuario'], $f3, 1);
+                $authenticationService->updateSession($f3, $dataPut['idUsuario'], $sessionService, $Client);
                 // Devuelvo $Response con código 200 (OK)
                 Response::success($Response['data']);
             } else {
@@ -466,9 +482,9 @@ class miUsuario extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
-            'emptyData'                 => 'mainPassword,oldPassword,password,rePassword',
+            'emptyData'                 => '',
             'encode'                    => 'oldPassword',
             'ValidarEmail'              => 'email',
             'ValidarNumero'             => '',

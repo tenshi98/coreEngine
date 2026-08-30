@@ -5,7 +5,7 @@
 class testeos extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Server;
@@ -21,7 +21,7 @@ class testeos extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -134,7 +134,7 @@ class testeos extends ControllerBase {
         /*******************************************************************/
         /*                          Insertar Datos                         */
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
             'required'  => 'Email,Numero',
@@ -142,7 +142,7 @@ class testeos extends ControllerBase {
             'table'     => 'core_test',
             'Post'      => $Post_1,
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['DataCheck' => $DataCheck1, 'query' => $query];
         $Base_insert = $this->Base_insert($xParams);
         /******************************/
@@ -151,7 +151,7 @@ class testeos extends ControllerBase {
         $test->expect(!empty($Base_insert),'Base_insert()->Normal Ha devuelto datos');
         $test->expect(is_string($Base_insert),'Base_insert()->Normal Los datos obtenidos son del tipo '.gettype($Base_insert),$Base_insert);
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
             'required'  => 'Email,Numero',
@@ -159,7 +159,7 @@ class testeos extends ControllerBase {
             'table'     => 'core_test',
             'Post'      => $Post_1,
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['DataCheck' => $DataCheck1, 'query' => $query];
         $Base_insert = $this->Base_insert($xParams);
         /******************************/
@@ -168,7 +168,7 @@ class testeos extends ControllerBase {
         $test->expect(!empty($Base_insert),'Base_insert()->Verificar Repetidos Ha devuelto datos');
         $test->expect(is_array($Base_insert),'Base_insert()->Verificar Repetidos Los datos obtenidos son del tipo '.gettype($Base_insert),$Base_insert);
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
             'required'  => 'Email,Numero',
@@ -176,7 +176,7 @@ class testeos extends ControllerBase {
             'table'     => 'core_test',
             'Post'      => $Post_1,
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['DataCheck' => $DataCheck2, 'query' => $query];
         $Base_insert = $this->Base_insert($xParams);
         /******************************/
@@ -189,7 +189,7 @@ class testeos extends ControllerBase {
         /*******************************************************************/
         /*                          Actualizar Datos                       */
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Email,Numero',
             'required'  => 'Email,Numero',
@@ -198,7 +198,7 @@ class testeos extends ControllerBase {
             'where'     => 'idTest',
             'Post'      => $Post_2,
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['DataCheck' => $DataCheck1, 'query' => $query];
         $Base_update = $this->Base_update($xParams);
         /******************************/
@@ -210,18 +210,19 @@ class testeos extends ControllerBase {
         /*******************************************************************/
         /*                          Listar Datos                           */
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Email,Numero,Fecha,Hora,Palabra',
             'table'   => 'core_test',
             'join'    => '',
-            'where'   => 'idTest!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Email ASC',
             'limit'   => '5'
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $Base_GetList = $this->Base_GetList($xParams);
         /******************************/
@@ -234,17 +235,18 @@ class testeos extends ControllerBase {
         /*******************************************************************/
         /*                           Ver Datos                             */
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'   => 'Email,Numero,Fecha,Hora,Palabra',
             'table'  => 'core_test',
             'join'   => '',
-            'where'  => 'idTest = 1',
+            'where'  => 'idTest = ?',
+            'params'  => [1],
             'group'  => '',
             'having' => '',
             'order'  => 'Email ASC'
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $Base_GetByID = $this->Base_GetByID($xParams);
         /******************************/
@@ -257,7 +259,7 @@ class testeos extends ControllerBase {
         /*******************************************************************/
         /*                         Eliminar Datos                          */
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'files'       => '',
             'table'       => 'core_test',
@@ -265,7 +267,7 @@ class testeos extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $Post_3
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $Base_delete = $this->Base_delete($xParams);
         /******************************/
@@ -689,11 +691,11 @@ class testeos extends ControllerBase {
 
         /**********  FunctionsSecurityCodification  **********/
         //--------------------- simpleEncode ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["", "passkey"],                                        'string',  '("", "passkey"           -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["php recipe", "passkey"],                              'string',  '("php recipe", "passkey" -> Devuelve lEKK57naUY4---VQ==)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["", "passkey"],                                        'string',  '("", "passkey"     -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["hola", "passkey"],                                    'string',  '("hola", "passkey" -> Devuelve gI2QeJf3n5pQZmZhb2JhcgcvzQ==)');
         //--------------------- simpleDecode ---------------------
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["", "passkey"],                                        'string',  '("", "passkey"                 -> Devuelve Sin datos ingresados)');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["lEKK57naUY4/VQ==", "passkey"],                        'string',  '("lEKK57naUY4/VQ==", "passkey" -> Devuelve php recipe)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["", "passkey"],                                        'string',  '("", "passkey"                             -> Devuelve Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["gI2QeJf3n5pQZmZhb2JhcgcvzQ==", "passkey"],            'string',  '("gI2QeJf3n5pQZmZhb2JhcgcvzQ==", "passkey" -> Devuelve hola)');
         //--------------------- generateServerSpecificHash ---------------------
         $this->runTest($test, 'FunctionsSecurityCodification',    'generateServerSpecificHash',  [],                                                     'string',  '("" -> Devuelve 49960de5880e8c687434170f6476605b8fe4aeb9a28632c7995cf3ba831d9763)');
         //--------------------- encryptDecrypt ---------------------
@@ -962,7 +964,7 @@ class testeos extends ControllerBase {
     //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     public function testMailTemplate($f3, $params){
         /******************************/
-        //Se agrega respuesta
+        // Se agrega respuesta
         $Post = [
             'Asunto'  => 'Cambio de contraseña',
             'Hacia'   => 'asd@asd.cl',
@@ -970,15 +972,19 @@ class testeos extends ControllerBase {
         ];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Asunto,Hacia,Mensaje',
             'template'  => $params['id'],
             'Post'      => $Post,
         ];
 
+        // Recupera la información del usuario y del sistema almacenada en la sesión actual
+        $UserData = $f3->get('SESSION.DataInfo');
+        $BASE     = $f3->get('BASE');
+
         /******************************/
-        $MailTemplate = $this->Base_TestMailTemplate($f3, $query);
+        $MailTemplate = $this->Base_TestMailTemplate($UserData, $BASE, $query);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -1036,42 +1042,51 @@ class testeos extends ControllerBase {
     //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     public function send_SMTPMail($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Asunto,Hacia,Mensaje',
             'template'  => 1,
             'Post'      => $_POST,
         ];
-        //Ejecuto la query
-        echo $this->Base_SMTPMail($f3, $query);
+        // Recupera la información del usuario y del sistema almacenada en la sesión actual
+        $UserData = $f3->get('SESSION.DataInfo');
+        $BASE     = $f3->get('BASE');
+        // Ejecuto la query
+        echo $this->Base_SMTPMail($UserData, $BASE, $query);
     }
 
     /******************************************************************************/
     //Envio de correo por Gmail (solo un correo, con uno o varios receptores)
     public function send_GMail($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Asunto,Hacia,Mensaje',
             'template'  => 1,
             'Post'      => $_POST,
         ];
-        //Ejecuto la query
-        echo $this->Base_GMail($f3, $query);
+        // Recupera la información del usuario y del sistema almacenada en la sesión actual
+        $UserData = $f3->get('SESSION.DataInfo');
+        $BASE     = $f3->get('BASE');
+        // Ejecuto la query
+        echo $this->Base_GMail($UserData, $BASE, $query);
     }
 
     /******************************************************************************/
     //Envio de correo por Sending Blue
     public function send_SendingBlue($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'De_correo,De_nombre,Hacia_correo,Hacia_nombre,Asunto,Mensaje',
             'template'  => 1,
             'Post'      => $_POST,
         ];
-        //Ejecuto la query
-        echo $this->Base_SendingBlue($f3, $query);
+        // Recupera la información del usuario y del sistema almacenada en la sesión actual
+        $UserData = $f3->get('SESSION.DataInfo');
+        $BASE     = $f3->get('BASE');
+        // Ejecuto la query
+        echo $this->Base_SendingBlue($UserData, $BASE, $query);
 
     }
 
@@ -1119,7 +1134,7 @@ class testeos extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             /*******************************************************************/
-            //variables
+            // Variables
             $Pregunta = isset($_POST['mensaje']) ? $_POST['mensaje'] : 0;
 
             //generacion de errores

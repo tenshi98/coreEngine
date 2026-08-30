@@ -5,7 +5,7 @@
 class productosListado extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -16,7 +16,7 @@ class productosListado extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -36,7 +36,7 @@ class productosListado extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.idProducto,
@@ -50,84 +50,89 @@ class productosListado extends ControllerBase {
                 LEFT JOIN core_estados           ON core_estados.idEstado               = productos_listado.idEstado
                 LEFT JOIN productos_tipos        ON productos_tipos.idTipoProducto      = productos_listado.idTipoProducto
                 LEFT JOIN productos_categorias   ON productos_categorias.idCategoria    = productos_listado.idCategoria',
-            'where'   => 'productos_listado.idProducto!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'productos_listado.idEstado ASC, productos_tipos.Nombre ASC, productos_categorias.Nombre ASC, productos_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTipoProducto AS ID,Nombre',
             'table'   => 'productos_tipos',
             'join'    => '',
-            'where'   => 'idTipoProducto!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrTipo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCategoria AS ID,Nombre',
             'table'   => 'productos_categorias',
             'join'    => '',
-            'where'   => 'idCategoria!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrCategoria = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idUniMed AS ID,Nombre',
             'table'   => 'core_unidades_medida',
             'join'    => '',
-            'where'   => 'idUniMed!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrUnimed = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrEstado['status'] && $arrTipo['status'] && $arrCategoria['status'] && $arrUnimed['status']){
 
             /******************************************/
@@ -170,21 +175,28 @@ class productosListado extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idEstado,idTipoProducto,idCategoria,idUniMed';  //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre,Marca,Codigo';                           //Datos búsqueda relativa
-        $WhereData_between = '';                                              //Datos búsqueda Between
-        $whereInt          = '';                                              //se crea cadena
+        // Variables
+        $WhereData_int     = 'idEstado,idTipoProducto,idCategoria,idUniMed';  // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre,Marca,Codigo';                           // Datos búsqueda relativa
+        $WhereData_between = '';                                              // Datos búsqueda Between
+        $whereInt          = '';                                              // Se crea cadena
+        $whereParams       = [];                                              // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'productos_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'productos_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'productos_listado', 3);
-        //Verifico si esta vacio
-        $whereInt2 = $whereInt ? $whereInt . ' AND productos_listado.idProducto!=0' : 'productos_listado.idProducto!=0';
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'productos_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'productos_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'productos_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.idProducto,
@@ -198,20 +210,21 @@ class productosListado extends ControllerBase {
                 LEFT JOIN core_estados           ON core_estados.idEstado               = productos_listado.idEstado
                 LEFT JOIN productos_tipos        ON productos_tipos.idTipoProducto      = productos_listado.idTipoProducto
                 LEFT JOIN productos_categorias   ON productos_categorias.idCategoria    = productos_listado.idCategoria',
-            'where'   => $whereInt2,
+            'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'productos_listado.idEstado ASC, productos_tipos.Nombre ASC, productos_categorias.Nombre ASC, productos_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -249,7 +262,7 @@ class productosListado extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.idProducto,
@@ -273,30 +286,32 @@ class productosListado extends ControllerBase {
                 LEFT JOIN productos_tipos        ON productos_tipos.idTipoProducto      = productos_listado.idTipoProducto
                 LEFT JOIN productos_categorias   ON productos_categorias.idCategoria    = productos_listado.idCategoria
                 LEFT JOIN core_unidades_medida   ON core_unidades_medida.idUniMed       = productos_listado.idUniMed',
-            'where'   => 'productos_listado.idProducto = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'productos_listado.idProducto = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["productosListadoVerDocumentos"]==2){
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'Nombre,NombreArchivo,FVencimiento',
                 'table'   => 'productos_listado_documentos',
                 'join'    => '',
-                'where'   => 'idProducto = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+                'where'   => 'idProducto = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams       = ['query' => $query];
             $arrDocumentos = $this->Base_GetList($xParams);
         //Si se permite junto con la creacion de tareas
@@ -306,25 +321,26 @@ class productosListado extends ControllerBase {
         }
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'FechaCreacion,Observacion',
             'table'   => 'productos_listado_observaciones',
             'join'    => '',
-            'where'   => 'idProducto = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idProducto = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idObservaciones ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrObservaciones = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrDocumentos['status'] && $arrObservaciones['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -358,7 +374,7 @@ class productosListado extends ControllerBase {
     //Resumen
     public function Resumen($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.idProducto,
@@ -386,83 +402,88 @@ class productosListado extends ControllerBase {
                 LEFT JOIN productos_tipos        ON productos_tipos.idTipoProducto      = productos_listado.idTipoProducto
                 LEFT JOIN productos_categorias   ON productos_categorias.idCategoria    = productos_listado.idCategoria
                 LEFT JOIN core_unidades_medida   ON core_unidades_medida.idUniMed       = productos_listado.idUniMed',
-            'where'   => 'productos_listado.idProducto = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'productos_listado.idProducto = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idTipoProducto AS ID,Nombre',
             'table'   => 'productos_tipos',
             'join'    => '',
-            'where'   => 'idTipoProducto!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $arrTipo = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCategoria AS ID,Nombre',
             'table'   => 'productos_categorias',
             'join'    => '',
-            'where'   => 'idCategoria!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrCategoria = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idUniMed AS ID,Nombre',
             'table'   => 'core_unidades_medida',
             'join'    => '',
-            'where'   => 'idUniMed!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrUnimed = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrEstado['status'] && $arrTipo['status'] && $arrCategoria['status'] && $arrUnimed['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -505,7 +526,7 @@ class productosListado extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 productos_listado.idProducto,
@@ -529,19 +550,20 @@ class productosListado extends ControllerBase {
                 LEFT JOIN productos_tipos        ON productos_tipos.idTipoProducto      = productos_listado.idTipoProducto
                 LEFT JOIN productos_categorias   ON productos_categorias.idCategoria    = productos_listado.idCategoria
                 LEFT JOIN core_unidades_medida   ON core_unidades_medida.idUniMed       = productos_listado.idUniMed',
-            'where'   => 'productos_listado.idProducto = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'productos_listado.idProducto = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -581,7 +603,7 @@ class productosListado extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idEstado,idTipoProducto,idCategoria,idUniMed,Nombre,Marca,StockLimite,ValorIngreso,ValorEgreso,Descripcion,Codigo',
             'required'  => 'idEstado,idTipoProducto,idCategoria,idUniMed,Nombre',
@@ -590,7 +612,7 @@ class productosListado extends ControllerBase {
             'table'     => 'productos_listado',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -618,7 +640,7 @@ class productosListado extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idProducto,idEstado,idTipoProducto,idCategoria,idUniMed,Nombre,Marca,StockLimite,ValorIngreso,ValorEgreso,Descripcion,Codigo',
                 'required'  => 'idEstado,idTipoProducto,idCategoria,idUniMed,Nombre',
@@ -639,7 +661,7 @@ class productosListado extends ControllerBase {
                     ],
                 ]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -667,7 +689,7 @@ class productosListado extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'productos_listado',
@@ -675,7 +697,7 @@ class productosListado extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
             /******************************/
@@ -688,13 +710,13 @@ class productosListado extends ControllerBase {
                 $arrTableDel[] = ['files' => '',              'table' => 'productos_listado_observaciones'];
 
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrTableDel){
                     //recorro
                     foreach ($arrTableDel as $tblDel) {
-                        //Se genera la query
+                        // Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idProducto', 'SubCarpeta' => '', 'Post' => $dataDelete];
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['query' => $query];
                         $this->Base_delete($xParams);
                     }
@@ -722,7 +744,7 @@ class productosListado extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataPut);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'productos_listado',
@@ -730,7 +752,7 @@ class productosListado extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataPut
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delFiles($xParams);
             /******************************/
@@ -755,7 +777,7 @@ class productosListado extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

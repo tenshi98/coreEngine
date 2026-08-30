@@ -31,79 +31,48 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x0  = $data['rowData']['idTipo'] ?? '';
-                                $x1  = $data['rowData']['idTipoEntidad'] ?? '';
-                                $x2  = $data['rowData']['Nombre'] ?? '';
-                                $x3  = $data['rowData']['ApellidoPat'] ?? '';
-                                $x4  = $data['rowData']['ApellidoMat'] ?? '';
-                                $x5  = $data['rowData']['Nick'] ?? '';
-                                $x6  = $data['rowData']['idSexo'] ?? '';
-                                $x7  = $data['rowData']['FNacimiento'] ?? '';
-                                $x8  = $data['rowData']['RazonSocial'] ?? '';
-                                $x9  = $data['rowData']['Web'] ?? '';
-                                $x10  = $data['rowData']['Giro'] ?? '';
-                                $x11  = $data['rowData']['idCiudad'] ?? '';
-                                $x12  = $data['rowData']['idComuna'] ?? '';
-                                $x13  = $data['rowData']['Direccion'] ?? '';
-                                $x14  = $data['rowData']['idSector'] ?? '';
-                                $x15  = $data['rowData']['Email'] ?? '';
-                                $x16  = $data['rowData']['Rut'] ?? '';
-                                $x17  = $data['rowData']['Fono1'] ?? '';
-                                $x18  = $data['rowData']['Fono2'] ?? '';
-                                $x19  = $data['rowData']['RepLegalNombre'] ?? '';
-                                $x20  = $data['rowData']['RepLegalRut'] ?? '';
-                                $x21  = $data['rowData']['RepLegalEmail'] ?? '';
-                                $x22  = $data['rowData']['RepLegalFono1'] ?? '';
-                                $x23  = $data['rowData']['RepLegalFono2'] ?? '';
-                                $x24  = $data['rowData']['Social_X'] ?? '';
-                                $x25  = $data['rowData']['Social_Facebook'] ?? '';
-                                $x26  = $data['rowData']['Social_Instagram'] ?? '';
-                                $x27  = $data['rowData']['Social_Linkedin'] ?? '';
-                                $x28  = $data['rowData']['idEstado'] ?? '';
-
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Básicos', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo',              'Name'  => 'idTipo',         'Id' => 'Edit_idTipo',         'Value'  => $x0,'Required' => 2,'arrData' => $data['arrTipo']]);
-                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo Entidad',      'Name'  => 'idTipoEntidad',  'Id' => 'Edit_idTipoEntidad',  'Value'  => $x1,'Required' => 2,'arrData' => $data['arrTipoEntidad']]);
+                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo',              'Name'  => 'idTipo',         'Id' => 'Edit_idTipo',         'Value'  => ($data['rowData']['idTipo'] ?? ''),        'Required' => 2,'arrData' => $data['arrTipo']]);
+                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo Entidad',      'Name'  => 'idTipoEntidad',  'Id' => 'Edit_idTipoEntidad',  'Value'  => ($data['rowData']['idTipoEntidad'] ?? ''), 'Required' => 2,'arrData' => $data['arrTipoEntidad']]);
                                 //Persona natural
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name'  => 'Nombre',        'Id' => 'Edit_Nombre',         'Value' => $x2,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Apellido Paterno',  'Name'  => 'ApellidoPat',   'Id' => 'Edit_ApellidoPat',    'Value' => $x3,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Apellido Materno',  'Name'  => 'ApellidoMat',   'Id' => 'Edit_ApellidoMat',    'Value' => $x4,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nick',              'Name'  => 'Nick',          'Id' => 'Edit_Nick',           'Value' => $x5,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Sexo',              'Name'  => 'idSexo',        'Id' => 'Edit_idSexo',         'Value' => $x6,'Required' => 1,'arrData' => $data['arrSexo']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Nacimiento',  'Name'  => 'FNacimiento',   'Id' => 'Edit_FNacimiento',    'Value' => $x7,'Required' => 1,'Icon' => 'bi bi-calendar3']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name'  => 'Nombre',        'Id' => 'Edit_Nombre',         'Value' => ($data['rowData']['Nombre'] ?? ''),      'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Apellido Paterno',  'Name'  => 'ApellidoPat',   'Id' => 'Edit_ApellidoPat',    'Value' => ($data['rowData']['ApellidoPat'] ?? ''), 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Apellido Materno',  'Name'  => 'ApellidoMat',   'Id' => 'Edit_ApellidoMat',    'Value' => ($data['rowData']['ApellidoMat'] ?? ''), 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nick',              'Name'  => 'Nick',          'Id' => 'Edit_Nick',           'Value' => ($data['rowData']['Nick'] ?? ''),        'Required' => 1]);
+                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Sexo',              'Name'  => 'idSexo',        'Id' => 'Edit_idSexo',         'Value' => ($data['rowData']['idSexo'] ?? ''),      'Required' => 1,'arrData' => $data['arrSexo']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Nacimiento',  'Name'  => 'FNacimiento',   'Id' => 'Edit_FNacimiento',    'Value' => ($data['rowData']['FNacimiento'] ?? ''), 'Required' => 1,'Icon' => 'bi bi-calendar3']);
                                 //empresas
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Razón Social',      'Name'  => 'RazonSocial',    'Id' => 'Edit_RazonSocial',   'Value' => $x8, 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',               'Name'  => 'Web',            'Id' => 'Edit_Web',           'Value' => $x9, 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Giro',              'Name'  => 'Giro',           'Id' => 'Edit_Giro',          'Value' => $x10,'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Razón Social',      'Name'  => 'RazonSocial',    'Id' => 'Edit_RazonSocial',   'Value' => ($data['rowData']['RazonSocial'] ?? ''), 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',               'Name'  => 'Web',            'Id' => 'Edit_Web',           'Value' => ($data['rowData']['Web'] ?? ''),         'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Giro',              'Name'  => 'Giro',           'Id' => 'Edit_Giro',          'Value' => ($data['rowData']['Giro'] ?? ''),        'Required' => 1]);
                                 //Comun
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Comunes', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',      'Id1' => 'Edit_idCiudad',    'Value1' => $x11,'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                      'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',      'Id2' => 'Edit_idComuna',    'Value2' => $x12,'Required2' => 1,'arrData2' => $data['arrComuna']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion',     'Id'  => 'Edit_Direccion',   'Value'  => $x13,'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
-                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Sector',     'Name'  => 'idSector',      'Id'  => 'Edit_idSector',    'Value'  => $x14,'Required'  => 1,'arrData' => $data['arrSector'], 'BASE' => $BASE]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',      'Name'  => 'Email',         'Id'  => 'Edit_Email',       'Value'  => $x15,'Required'  => 1,'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',        'Name'  => 'Rut',           'Id'  => 'Edit_Rut',         'Value'  => $x16,'Required'  => 1,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Celular',    'Name'  => 'Fono1',         'Id'  => 'Edit_Fono1',       'Value'  => $x17,'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Teléfono',   'Name'  => 'Fono2',         'Id'  => 'Edit_Fono2',       'Value'  => $x18,'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',     'Name1' => 'idCiudad',      'Id1' => 'Edit_idCiudad',    'Value1' => ($data['rowData']['idCiudad'] ?? ''),  'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',     'Name2' => 'idComuna',      'Id2' => 'Edit_idComuna',    'Value2' => ($data['rowData']['idComuna'] ?? ''),  'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',  'Name'  => 'Direccion',     'Id'  => 'Edit_Direccion',   'Value'  => ($data['rowData']['Direccion'] ?? ''), 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Sector',     'Name'  => 'idSector',      'Id'  => 'Edit_idSector',    'Value'  => ($data['rowData']['idSector'] ?? ''),  'Required'  => 1,'arrData' => $data['arrSector'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',      'Name'  => 'Email',         'Id'  => 'Edit_Email',       'Value'  => ($data['rowData']['Email'] ?? ''),     'Required'  => 1,'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',        'Name'  => 'Rut',           'Id'  => 'Edit_Rut',         'Value'  => ($data['rowData']['Rut'] ?? ''),       'Required'  => 1,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Celular',    'Name'  => 'Fono1',         'Id'  => 'Edit_Fono1',       'Value'  => ($data['rowData']['Fono1'] ?? ''),     'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Teléfono',   'Name'  => 'Fono2',         'Id'  => 'Edit_Fono2',       'Value'  => ($data['rowData']['Fono2'] ?? ''),     'Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Representante Legal', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',    'Name' => 'RepLegalNombre',   'Id' => 'Edit_RepLegalNombre',   'Value' => $x19,'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',       'Name' => 'RepLegalRut',      'Id' => 'Edit_RepLegalRut',      'Value' => $x20,'Required' => 1,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',     'Name' => 'RepLegalEmail',    'Id' => 'Edit_RepLegalEmail',    'Value' => $x21,'Required' => 1,'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',    'Name' => 'RepLegalNombre',   'Id' => 'Edit_RepLegalNombre',   'Value' => ($data['rowData']['RepLegalNombre'] ?? ''), 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',       'Name' => 'RepLegalRut',      'Id' => 'Edit_RepLegalRut',      'Value' => ($data['rowData']['RepLegalRut'] ?? ''),    'Required' => 1,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',     'Name' => 'RepLegalEmail',    'Id' => 'Edit_RepLegalEmail',    'Value' => ($data['rowData']['RepLegalEmail'] ?? ''),  'Required' => 1,'Icon' => 'bx bx-mail-send']);
                                 $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',   'Name' => 'RepLegalFono1',    'Id' => 'Edit_RepLegalFono1',    'Value' => $x22,'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Teléfono',  'Name' => 'RepLegalFono2',    'Id' => 'Edit_RepLegalFono2',    'Value' => $x23,'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',   'Name' => 'RepLegalFono1',    'Id' => 'Edit_RepLegalFono1',    'Value' => ($data['rowData']['RepLegalFono1'] ?? ''), 'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Teléfono',  'Name' => 'RepLegalFono2',    'Id' => 'Edit_RepLegalFono2',    'Value' => ($data['rowData']['RepLegalFono2'] ?? ''), 'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => $x24, 'Required' => 1, 'Icon' => 'bi bi-x']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',   'Id' => 'Edit_Social_Facebook',  'Value' => $x25, 'Required' => 1, 'Icon' => 'bi bi-facebook']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram',  'Id' => 'Edit_Social_Instagram', 'Value' => $x26, 'Required' => 1, 'Icon' => 'bi bi-instagram']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => $x27, 'Required' => 1, 'Icon' => 'bi bi-linkedin']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => ($data['rowData']['Social_X'] ?? ''),         'Required' => 1, 'Icon' => 'bi bi-x']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',   'Id' => 'Edit_Social_Facebook',  'Value' => ($data['rowData']['Social_Facebook'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-facebook']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram',  'Id' => 'Edit_Social_Instagram', 'Value' => ($data['rowData']['Social_Instagram'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-instagram']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => ($data['rowData']['Social_Linkedin'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelect([  'Placeholder' => 'Estado',  'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => $x28,'Required' => 2,'arrData' => $data['arrEstado']]);
+                                $data['Fnc_FormInputs']->formSelect([  'Placeholder' => 'Estado',  'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => ($data['rowData']['idEstado'] ?? ''), 'Required' => 2,'arrData' => $data['arrEstado']]);
                                 //permite la modificacion de la contraseña en caso de ser utilizada
                                 if($data['UserData']["entidadesListadoUsoPassword"]==2){
                                     $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
@@ -128,7 +97,7 @@
 
                 <?php
                 /****************************************************/
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
                 //Se obtiene el nombre o la razón social
                 switch ($data['rowData']['idTipoEntidad']) {
@@ -241,17 +210,13 @@
                                     <div class="d-flex justify-content-center">
                                         <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                             <?php
-                                            //Se verifican si existen los datos
-                                            $x1  = $data['rowData']['Latitud'] ?? '';
-                                            $x2  = $data['rowData']['Longitud'] ?? '';
-
                                             //se dibujan los inputs
                                             echo '<div class="row">';
                                                 echo '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-geo-alt', 'Placeholder' => 'Latitud',  'Name' => 'Latitud',  'Id' => 'Edit_Latitud',  'Value' => $x1, 'Required' => 2]);
+                                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-geo-alt', 'Placeholder' => 'Latitud',  'Name' => 'Latitud',  'Id' => 'Edit_Latitud',  'Value' => ($data['rowData']['idTipoEntidad'] ?? ''), 'Required' => 2]);
                                                 echo '</div>';
                                                 echo '<div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-geo-alt', 'Placeholder' => 'Longitud', 'Name' => 'Longitud', 'Id' => 'Edit_Longitud', 'Value' => $x2, 'Required' => 2]);
+                                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,'FormAling' => 4,'FormCol' => 12,'PlaceholderIcon' => 'bi bi-geo-alt', 'Placeholder' => 'Longitud', 'Name' => 'Longitud', 'Id' => 'Edit_Longitud', 'Value' => ($data['rowData']['Nombre'] ?? ''), 'Required' => 2]);
                                                 echo '</div>';
                                             echo '</div>';
 
@@ -557,7 +522,7 @@
         /*********************************************************************/
         /*                             CARGAS                                */
         /*********************************************************************/
-        //Variables
+        // Variables
         let CargasLoad = 0;
         /******************************************/
         function tabCargasLoadList() {
@@ -658,7 +623,7 @@
         /*********************************************************************/
         /*                             CONTACTOS                             */
         /*********************************************************************/
-        //Variables
+        // Variables
         let ContactosLoad = 0;
         /******************************************/
         function tabContactosLoadList() {
@@ -759,7 +724,7 @@
         /*********************************************************************/
         /*                            DOCUMENTOS                             */
         /*********************************************************************/
-        //Variables
+        // Variables
         let DocumentosLoad = 0;
         /******************************************/
         function tabDocumentosLoadList() {
@@ -858,7 +823,7 @@
     /*********************************************************************/
     /*                          OBSERVACIONES                            */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ObsLoad = 0;
     /******************************************/
     function tabObsLoadList() {

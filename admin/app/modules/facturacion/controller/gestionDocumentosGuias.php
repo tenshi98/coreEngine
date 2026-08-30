@@ -5,7 +5,7 @@
 class gestionDocumentosGuias extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -16,7 +16,7 @@ class gestionDocumentosGuias extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -51,40 +51,42 @@ class gestionDocumentosGuias extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idFacturacion,idEntidad',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idFacturacion AS ID, CONCAT("Guia Despacho ", IFNULL(N_Doc, CONCAT("nRef ", idFacturacion)), IFNULL(CONCAT(" Fecha ", Creacion_fecha), "")) AS Nombre',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idDocumentos=3 AND idEstadoPago=1 AND idEntidad='.$rowData['idEntidad'],
+            'where'   => 'idDocumentos = ? AND idEstadoPago = ? AND idEntidad = ?',
+            'params'  => [3, 1, $rowData['idEntidad']],
             'group'   => '',
             'having'  => '',
             'order'   => 'idFacturacion ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrGuias = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrGuias['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -113,6 +115,7 @@ class gestionDocumentosGuias extends ControllerBase {
             $this->showError(2, $f3, $result);
         }
     }
+
     /******************************************************************************/
     //List
     public function UpdateList($f3, $params, $idTipo){
@@ -121,22 +124,23 @@ class gestionDocumentosGuias extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoPago',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 facturacion_listado_guias.idExistencia,
@@ -149,20 +153,21 @@ class gestionDocumentosGuias extends ControllerBase {
             'join'    => '
                 LEFT JOIN facturacion_listado          ON facturacion_listado.idFacturacion         = facturacion_listado_guias.idFacturacionRel
                 LEFT JOIN core_documentos_mercantiles  ON core_documentos_mercantiles.idDocumentos  = facturacion_listado.idDocumentos',
-            'where'   => 'facturacion_listado_guias.idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'facturacion_listado_guias.idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'facturacion_listado_guias.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrGuias = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrGuias['status']){
 
             /******************************************/
@@ -202,7 +207,7 @@ class gestionDocumentosGuias extends ControllerBase {
     public function Insert(){
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idFacturacion,idFacturacionRel',
             'required'  => 'idFacturacion,idFacturacionRel',
@@ -213,7 +218,7 @@ class gestionDocumentosGuias extends ControllerBase {
         ];
         //Se genera el chequeo
         $dataCheck_1 = $this->dataCheck_1($_POST);
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -245,22 +250,23 @@ class gestionDocumentosGuias extends ControllerBase {
             parse_str(file_get_contents("php://input"),$dataDelete);
 
             /******************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'idFacturacion,idFacturacionRel',
                 'table'   => 'facturacion_listado_guias',
                 'join'    => '',
-                'where'   => 'idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"',
+                'where'   => 'idExistencia = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams        = ['query' => $query];
             $rowFacturacion = $this->Base_GetByID($xParams);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'facturacion_listado_guias',
@@ -268,7 +274,7 @@ class gestionDocumentosGuias extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -298,7 +304,7 @@ class gestionDocumentosGuias extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -335,7 +341,7 @@ class gestionDocumentosGuias extends ControllerBase {
 
     //Se validan los datos
     private function dataCheck_2($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -374,7 +380,7 @@ class gestionDocumentosGuias extends ControllerBase {
     //Se actualizan los montos
     private function updateFact($PostData, $EstadoPagoID){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 facturacion_listado.idFacturacion,
@@ -384,19 +390,20 @@ class gestionDocumentosGuias extends ControllerBase {
                 (SELECT SUM(facturacion_listado.ValorTotal) FROM facturacion_listado_guias LEFT JOIN facturacion_listado ON facturacion_listado.idFacturacion = facturacion_listado_guias.idFacturacionRel WHERE facturacion_listado_guias.idFacturacion='.$_POST['idFacturacion'].') AS TotalGuia',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$PostData['idFacturacion'].'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$PostData['idFacturacion']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************/
         //Calculo
         $x_ValorTotal = $rowData['data']['TotalItem'] + $rowData['data']['TotalProducto'] + $rowData['data']['TotalServicio'] + $rowData['data']['TotalGuia'];
-        //Se agrega respuesta
+        // Se agrega respuesta
         $arrTareas = [
             'idFacturacion'   => $PostData['idFacturacion'],
             'ValorNeto'       => ($x_ValorTotal/1.19),
@@ -408,7 +415,7 @@ class gestionDocumentosGuias extends ControllerBase {
             'TotalGuias'      => $rowData['data']['TotalGuia'],
         ];
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idFacturacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,TotalGuias',
             'required'  => 'idFacturacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,TotalGuias',
@@ -420,7 +427,7 @@ class gestionDocumentosGuias extends ControllerBase {
         ];
         //Se genera el chequeo
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
         $this->Base_update($xParams);
 
@@ -431,7 +438,7 @@ class gestionDocumentosGuias extends ControllerBase {
             'idEstadoPago'  => $EstadoPagoID,
         ];
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idFacturacion,idEstadoPago',
             'required'  => 'idFacturacion,idEstadoPago',
@@ -443,7 +450,7 @@ class gestionDocumentosGuias extends ControllerBase {
         ];
         //Se genera el chequeo
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
         $this->Base_update($xParams);
 

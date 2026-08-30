@@ -30,7 +30,7 @@
                     <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ProductoCantidad'], 2).' '.$crud['UnidadMedida']; ?></td>
                     <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['ProductoValor'], 2); ?></td>
                     <?php if(isset($data['rowData']['idEstadoPago'])&&$data['rowData']['idEstadoPago']==1){
-                        //Variables
+                        // Variables
                         $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idExistencia']);
                         $Entidad     = addslashes($crud['ProductoNombre']); ?>
                         <td>

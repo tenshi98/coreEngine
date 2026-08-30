@@ -20,7 +20,7 @@
         if(is_array($data['arrPlanes'])&&!empty($data['arrPlanes'])){
             //Recorro
             foreach($data['arrPlanes'] as $crud){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPlan']);
                 $Entidad     = addslashes($crud['Servicio']);
                 $level       = $data['UserAccess']['LevelAccess']; ?>

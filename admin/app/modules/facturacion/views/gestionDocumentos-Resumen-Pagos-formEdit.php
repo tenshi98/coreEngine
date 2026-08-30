@@ -28,20 +28,16 @@
     <div class="modal-body">
         <?php
         //Se verifican si existen los datos
-        $x1 = $data['rowData']['idDocumentoPago'] ?? '';
-        $x2 = $data['rowData']['N_Doc'] ?? '';
-        $x3 = (!empty($data['rowData']['MontoPagado']) && $data['rowData']['MontoPagado'] != 0)
-            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['MontoPagado'])
-            : '';
-        $x4 = $data['rowData']['UsuarioPago'] ?? '';
-        $x5 = $data['rowData']['FechaPago'] ?? '';
+        $x_EditPago_MontoPagado = (!empty($data['rowData']['MontoPagado']) && $data['rowData']['MontoPagado'] != 0)
+                                ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['MontoPagado'])
+                                : '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Documento Pago',    'Name' => 'idDocumentoPago',   'Id' => 'EditPago_idDocumentoPago',  'Value' => $x1, 'Required' => 2, 'arrData' => $data['arrDocumentoPago']]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Numero Documento',  'Name' => 'N_Doc',             'Id' => 'EditPago_N_Doc',            'Value' => $x2, 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Monto Pagado',      'Name' => 'MontoPagado',       'Id' => 'EditPago_MontoPagado',      'Value' => $x3, 'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Usuario Pago',      'Name' => 'UsuarioPagoFake',   'Id' => 'UsuarioPagoFake',           'Value' => $x4, 'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Fecha Pago',        'Name' => 'FechaPagoFake',     'Id' => 'FechaPagoFake',             'Value' => $x5, 'Required' => 3]);
+        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Documento Pago',    'Name' => 'idDocumentoPago',   'Id' => 'EditPago_idDocumentoPago',  'Value' => ($data['rowData']['idDocumentoPago'] ?? ''), 'Required' => 2, 'arrData' => $data['arrDocumentoPago']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Numero Documento',  'Name' => 'N_Doc',             'Id' => 'EditPago_N_Doc',            'Value' => ($data['rowData']['N_Doc'] ?? ''),           'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Monto Pagado',      'Name' => 'MontoPagado',       'Id' => 'EditPago_MontoPagado',      'Value' => $x_EditPago_MontoPagado,                     'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Usuario Pago',      'Name' => 'UsuarioPagoFake',   'Id' => 'UsuarioPagoFake',           'Value' => ($data['rowData']['UsuarioPago'] ?? ''),     'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Fecha Pago',        'Name' => 'FechaPagoFake',     'Id' => 'FechaPagoFake',             'Value' => ($data['rowData']['FechaPago'] ?? ''),       'Required' => 3]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idPago',        'Value' => $data['rowData']['idPago'],        'Required' => 2]);

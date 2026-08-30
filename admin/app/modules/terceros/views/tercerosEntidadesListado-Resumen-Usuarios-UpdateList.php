@@ -20,7 +20,7 @@
         if(is_array($data['arrUsuarios'])&&!empty($data['arrUsuarios'])){
             //Recorro
             foreach($data['arrUsuarios'] as $crud){
-                //Variables
+                // Variables
                 $idEntidad   = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idEntidad']);
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idUsuario']);
                 $Entidad     = addslashes($crud['email']); ?>

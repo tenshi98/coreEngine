@@ -28,7 +28,7 @@
                     <strong>'.$module['Nombre'].'</strong><br>
                     '.$module['Descripcion'];
                     /******************************************/
-                    //Verifico si existe
+                    // Verifico si existe
                     if(isset($module['Dependencias'])&&is_array($module['Dependencias'])){
                         //Se recorren las dependencias
                         foreach ($module['Dependencias'] as $mod){

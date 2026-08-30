@@ -27,17 +27,11 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1  = $data['rowData']['Nombre'] ?? '';
-        $x2  = $data['rowData']['idColor'] ?? '';
-        $x3  = $data['rowData']['idPrioridad'] ?? '';
-        $x4  = $data['rowData']['idCierre'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre Tablero',               'Name' => 'Nombre',      'Id' => 'EditEstado_Nombre',      'Value' => $x1, 'Required' => 2]);
-        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Color Icono',                  'Name' => 'idColor',     'Id' => 'EditEstado_idColor',     'Value' => $x2, 'Required' => 2,'arrData' => $data['arrColores']]);
-        $data['Fnc_FormInputs']->formSelectnAuto([          'Placeholder' => 'Prioridad',                    'Name' => 'idPrioridad', 'Id' => 'EditEstado_idPrioridad', 'Value' => $x3, 'Required' => 2,'ValorInicio' => 1,'ValorFin' => 25]);
-        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => '¿Permite Cierre de la Tarea?', 'Name' => 'idCierre',    'Id' => 'EditEstado_idCierre',    'Value' => $x4, 'Required' => 2,'arrData' => $data['arrCierre']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre Tablero',               'Name' => 'Nombre',      'Id' => 'EditEstado_Nombre',      'Value' => ($data['rowData']['Nombre'] ?? ''),      'Required' => 2]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Color Icono',                  'Name' => 'idColor',     'Id' => 'EditEstado_idColor',     'Value' => ($data['rowData']['idColor'] ?? ''),     'Required' => 2,'arrData' => $data['arrColores']]);
+        $data['Fnc_FormInputs']->formSelectnAuto([            'Placeholder' => 'Prioridad',                    'Name' => 'idPrioridad', 'Id' => 'EditEstado_idPrioridad', 'Value' => ($data['rowData']['idPrioridad'] ?? ''), 'Required' => 2,'ValorInicio' => 1,'ValorFin' => 25]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => '¿Permite Cierre de la Tarea?', 'Name' => 'idCierre',    'Id' => 'EditEstado_idCierre',    'Value' => ($data['rowData']['idCierre'] ?? ''),    'Required' => 2,'arrData' => $data['arrCierre']]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanbanEstado','Value' => $data['rowData']['idKanbanEstado'],'Required' => 2]);

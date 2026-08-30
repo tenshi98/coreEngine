@@ -5,14 +5,14 @@
 class sistemaRutas extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
 
     /******************************************************************************/
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -35,11 +35,11 @@ class sistemaRutas extends ControllerBase {
 		$sistemaInstalacion = new sistemaInstalacion();
         $array              = $sistemaInstalacion->arrayModInstall();
         /******************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($array){
             //recorro
             foreach ($array as $data) {
-                //Se genera la query
+                // Se genera la query
                 $ListDataModule = method_exists($data, 'ListDataModule');
                 //si el metodo existe
                 if($ListDataModule===true){
@@ -55,25 +55,26 @@ class sistemaRutas extends ControllerBase {
         $arrModules = array_filter($arrModules);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
             'table'   => 'core_permisos_listado_rutas',
             'join'    => '',
-            'where'   => 'idRutas!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idRutas ASC',
             'limit'   => 9999
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrRutas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if(is_array($arrModules) && $arrRutas['status']){
             /******************************************/
             //Datos enviados a la pagina

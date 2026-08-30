@@ -5,7 +5,7 @@
 class gestionDocumentosItems extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class gestionDocumentosItems extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -52,24 +52,25 @@ class gestionDocumentosItems extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idFacturacion',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -105,40 +106,42 @@ class gestionDocumentosItems extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoPago',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idExistencia,Item,Number,ValorTotal',
             'table'   => 'facturacion_listado_items',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrItems = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrItems['status']){
 
             /******************************************/
@@ -177,24 +180,25 @@ class gestionDocumentosItems extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idExistencia,idFacturacion,Item,Number,ValorTotal',
             'table'   => 'facturacion_listado_items',
             'join'    => '',
-            'where'   => 'idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idExistencia = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -235,7 +239,7 @@ class gestionDocumentosItems extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idFacturacion,Item,Number,ValorTotal',
             'required'  => 'idFacturacion,Item,ValorTotal',
@@ -244,7 +248,7 @@ class gestionDocumentosItems extends ControllerBase {
             'table'     => 'facturacion_listado_items',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -276,7 +280,7 @@ class gestionDocumentosItems extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idExistencia,idFacturacion,Item,Number,ValorTotal',
                 'required'  => 'idFacturacion,Item,ValorTotal',
@@ -286,7 +290,7 @@ class gestionDocumentosItems extends ControllerBase {
                 'where'     => 'idExistencia',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -322,22 +326,23 @@ class gestionDocumentosItems extends ControllerBase {
             parse_str(file_get_contents("php://input"),$dataDelete);
 
             /******************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'idFacturacion',
                 'table'   => 'facturacion_listado_items',
                 'join'    => '',
-                'where'   => 'idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"',
+                'where'   => 'idExistencia = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams        = ['query' => $query];
             $rowFacturacion = $this->Base_GetByID($xParams);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'facturacion_listado_items',
@@ -345,7 +350,7 @@ class gestionDocumentosItems extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -376,7 +381,7 @@ class gestionDocumentosItems extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

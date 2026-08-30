@@ -5,7 +5,7 @@
 class cotizacionListadoServicios extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class cotizacionListadoServicios extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,40 +34,42 @@ class cotizacionListadoServicios extends ControllerBase {
     //Crear nuevo
     public function New($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCotizacion',
             'table'   => 'cotizacion_listado',
             'join'    => '',
-            'where'   => 'idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idServicio AS ID,Nombre',
             'table'   => 'servicios_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -99,22 +101,23 @@ class cotizacionListadoServicios extends ControllerBase {
     //List
     public function UpdateList($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoPago',
             'table'   => 'cotizacion_listado',
             'join'    => '',
-            'where'   => 'idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 cotizacion_listado_servicios.idExistencia,
@@ -123,20 +126,21 @@ class cotizacionListadoServicios extends ControllerBase {
                 cotizacion_listado_servicios.ValorTotal AS ServicioValor',
             'table'   => 'cotizacion_listado_servicios',
             'join'    => 'LEFT JOIN servicios_listado  ON servicios_listado.idServicio  = cotizacion_listado_servicios.idServicio',
-            'where'   => 'cotizacion_listado_servicios.idCotizacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'cotizacion_listado_servicios.idCotizacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_servicios.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrServicios['status']){
 
             /******************************************/
@@ -170,40 +174,42 @@ class cotizacionListadoServicios extends ControllerBase {
     //Edit
     public function GetID($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idExistencia,idCotizacion,idServicio,Number,ValorTotal',
             'table'   => 'cotizacion_listado_servicios',
             'join'    => '',
-            'where'   => 'idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idExistencia = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idServicio AS ID,Nombre',
             'table'   => 'servicios_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -245,7 +251,7 @@ class cotizacionListadoServicios extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idCotizacion,idServicio,Number,ValorTotal',
             'required'  => 'idCotizacion,idServicio,ValorTotal',
@@ -254,7 +260,7 @@ class cotizacionListadoServicios extends ControllerBase {
             'table'     => 'cotizacion_listado_servicios',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -287,7 +293,7 @@ class cotizacionListadoServicios extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idExistencia,idCotizacion,idServicio,Number,ValorTotal',
                 'required'  => 'idCotizacion,idServicio,ValorTotal',
@@ -297,7 +303,7 @@ class cotizacionListadoServicios extends ControllerBase {
                 'where'     => 'idExistencia',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -333,22 +339,23 @@ class cotizacionListadoServicios extends ControllerBase {
             parse_str(file_get_contents("php://input"),$dataDelete);
 
             /******************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'idCotizacion',
                 'table'   => 'cotizacion_listado_servicios',
                 'join'    => '',
-                'where'   => 'idExistencia = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']).'"',
+                'where'   => 'idExistencia = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams        = ['query' => $query];
             $rowFacturacion = $this->Base_GetByID($xParams);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'cotizacion_listado_servicios',
@@ -356,7 +363,7 @@ class cotizacionListadoServicios extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -387,7 +394,7 @@ class cotizacionListadoServicios extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

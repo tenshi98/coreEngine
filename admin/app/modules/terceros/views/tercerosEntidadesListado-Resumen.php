@@ -29,7 +29,7 @@
                 </div>
 
                 <?php
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
                 //Se obtiene el nombre o la razón social
                 switch ($data['rowData']['idTipoEntidad']) {
@@ -137,7 +137,7 @@
         /*********************************************************************/
         /*                             PLANES                                */
         /*********************************************************************/
-        //Variables
+        // Variables
         let PlanesLoad = 0;
         /******************************************/
         function tabPlanesLoadList() {
@@ -238,7 +238,7 @@
         /*********************************************************************/
         /*                              USUARIOS                             */
         /*********************************************************************/
-        //Variables
+        // Variables
         let UsuariosLoad = 0;
         /******************************************/
         function tabUsuariosLoadList() {
@@ -367,7 +367,7 @@
         /*********************************************************************/
         /*                            MAQUINAS                               */
         /*********************************************************************/
-        //Variables
+        // Variables
         let MaquinasLoad = 0;
         /******************************************/
         function tabMaquinasLoadList() {

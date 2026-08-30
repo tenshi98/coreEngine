@@ -28,23 +28,14 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['Email'] ?? '';
-                                $x2  = $data['rowData']['Numero'] ?? '';
-                                $x3  = $data['rowData']['Rut'] ?? '';
-                                $x4  = $data['rowData']['Patente'] ?? '';
-                                $x5  = $data['rowData']['Fecha'] ?? '';
-                                $x6  = $data['rowData']['Hora'] ?? '';
-                                $x7  = $data['rowData']['Palabra'] ?? '';
-
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',   'Name' => 'Email',    'Id' => 'Edit_Email',    'Value' => $x1,'Required' => 2,'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formNumberSpinner([   'Placeholder' => 'Numero',  'Name' => 'Numero',   'Id' => 'Edit_Numero',   'Value' => $x2,'Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',     'Name' => 'Rut',      'Id' => 'Edit_Rut',      'Value' => $x3,'Required' => 2,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Patente', 'Name' => 'Patente',  'Id' => 'Edit_Patente',  'Value' => $x4,'Required' => 2,'Icon' => 'ri-car-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',   'Name' => 'Fecha',    'Id' => 'Edit_Fecha',    'Value' => $x5,'Required' => 2,'Icon' => 'bi bi-calendar3']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 10, 'Placeholder' => 'Hora',    'Name' => 'Hora',     'Id' => 'Edit_Hora',     'Value' => $x6,'Required' => 2,'Icon' => 'bi bi-clock']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Palabra', 'Name' => 'Palabra',  'Id' => 'Edit_Palabra',  'Value' => $x7,'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',   'Name' => 'Email',    'Id' => 'Edit_Email',    'Value' => ($data['rowData']['Email'] ?? ''),   'Required' => 2,'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formNumberSpinner([          'Placeholder' => 'Numero',  'Name' => 'Numero',   'Id' => 'Edit_Numero',   'Value' => ($data['rowData']['Numero'] ?? ''),  'Required' => 2,'Min' => 1,'Max' => 20,'Step' => 1,'Ndecimal' => 0]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',     'Name' => 'Rut',      'Id' => 'Edit_Rut',      'Value' => ($data['rowData']['Rut'] ?? ''),     'Required' => 2,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Patente', 'Name' => 'Patente',  'Id' => 'Edit_Patente',  'Value' => ($data['rowData']['Patente'] ?? ''), 'Required' => 2,'Icon' => 'ri-car-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',   'Name' => 'Fecha',    'Id' => 'Edit_Fecha',    'Value' => ($data['rowData']['Fecha'] ?? ''),   'Required' => 2,'Icon' => 'bi bi-calendar3']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 10, 'Placeholder' => 'Hora',    'Name' => 'Hora',     'Id' => 'Edit_Hora',     'Value' => ($data['rowData']['Hora'] ?? ''),    'Required' => 2,'Icon' => 'bi bi-clock']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Palabra', 'Name' => 'Palabra',  'Id' => 'Edit_Palabra',  'Value' => ($data['rowData']['Palabra'] ?? ''), 'Required' => 2]);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCrud','Value' => $data['rowData']['idCrud'],'Required' => 2]);
@@ -294,7 +285,7 @@
     /*                          OBSERVACIONES                            */
     /*********************************************************************/
     /******************************************/
-    //Variables
+    // Variables
     let ObsLoad = 0;
     /******************************************/
     function tabObsLoadList() {

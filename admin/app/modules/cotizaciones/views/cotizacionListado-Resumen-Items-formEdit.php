@@ -28,18 +28,17 @@
     <div class="modal-body">
         <?php
         //Se verifican si existen los datos
-        $x1 = $data['rowData']['Item'] ?? '';
-        $x2 = (!empty($data['rowData']['Number']) && $data['rowData']['Number'] != 0)
-            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Number'])
-            : '';
-        $x3 = (!empty($data['rowData']['ValorTotal']) && $data['rowData']['ValorTotal'] != 0)
-            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['ValorTotal'])
-            : '';
+        $x_EditItem_Number = (!empty($data['rowData']['Number']) && $data['rowData']['Number'] != 0)
+                            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Number'])
+                            : '';
+        $x_EditItem_ValorTotal = (!empty($data['rowData']['ValorTotal']) && $data['rowData']['ValorTotal'] != 0)
+                                ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['ValorTotal'])
+                                : '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Item',         'Name' => 'Item',        'Id' => 'EditItem_Item',        'Value' => $x1, 'Required' => 2]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',     'Name' => 'Number',      'Id' => 'EditItem_Number',      'Value' => $x2, 'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',  'Name' => 'ValorTotal',  'Id' => 'EditItem_ValorTotal',  'Value' => $x3, 'Required' => 2,'Icon' => 'bi bi-currency-dollar']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Item',         'Name' => 'Item',        'Id' => 'EditItem_Item',        'Value' => ($data['rowData']['Item'] ?? ''), 'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',     'Name' => 'Number',      'Id' => 'EditItem_Number',      'Value' => $x_EditItem_Number,               'Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Valor Total',  'Name' => 'ValorTotal',  'Id' => 'EditItem_ValorTotal',  'Value' => $x_EditItem_ValorTotal,           'Required' => 2,'Icon' => 'bi bi-currency-dollar']);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idExistencia',  'Value' => $data['rowData']['idExistencia'],  'Required' => 2]);

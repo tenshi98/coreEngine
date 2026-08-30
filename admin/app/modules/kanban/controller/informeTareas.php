@@ -5,7 +5,7 @@
 class informeTareas extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -17,7 +17,7 @@ class informeTareas extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -38,34 +38,36 @@ class informeTareas extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPrioridad AS ID,Nombre',
             'table'   => 'core_prioridades',
             'join'    => '',
-            'where'   => 'idPrioridad!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idPrioridad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrPrioridad = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoCierre AS ID,Nombre',
             'table'   => 'core_estados_cierre',
             'join'    => '',
-            'where'   => 'idEstadoCierre!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idEstadoCierre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams         = ['query' => $query];
         $arrEstadoCierre = $this->Base_GetList($xParams);
 
@@ -98,19 +100,28 @@ class informeTareas extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'idPrioridad,Fecha,idEstadoCierre';  //Datos búsqueda exacta
-        $WhereData_string  = 'Titulo';                            //Datos búsqueda relativa
-        $WhereData_between = '';                                  //Datos búsqueda Between
-        $whereInt          = '';                                  //se crea cadena
+        // Variables
+        $WhereData_int     = 'idPrioridad,Fecha,idEstadoCierre';  // Datos búsqueda exacta
+        $WhereData_string  = 'Titulo';                            // Datos búsqueda relativa
+        $WhereData_between = '';                                  // Datos búsqueda Between
+        $whereInt          = '';                                  // Se crea cadena
+        $whereParams       = [];                                  // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'kanban_tareas', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'kanban_tareas', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'kanban_tareas', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'kanban_tareas', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'kanban_tareas', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'kanban_tareas', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas.idKanban AS ID,
@@ -132,19 +143,20 @@ class informeTareas extends ControllerBase {
                 LEFT JOIN kanban_estados               ON kanban_estados.idKanbanEstado        = kanban_tareas.idKanbanEstado
                 LEFT JOIN core_estados_colores         ON core_estados_colores.idColor         = kanban_estados.idColor',
             'where'   => $whereInt,
+            'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_tareas.idKanbanEstado ASC, kanban_tareas.Fecha ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrTareas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrTareas['status']){
 
             //Se agrupan los menus
@@ -182,7 +194,7 @@ class informeTareas extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas.idKanban,
@@ -202,17 +214,18 @@ class informeTareas extends ControllerBase {
                 LEFT JOIN kanban_estados          ON kanban_estados.idKanbanEstado        = kanban_tareas.idKanbanEstado
                 LEFT JOIN core_estados_cierre     ON core_estados_cierre.idEstadoCierre   = kanban_tareas.idEstadoCierre
                 LEFT JOIN core_estados_colores    ON core_estados_colores.idColor         = kanban_estados.idColor',
-            'where'   => 'kanban_tareas.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas_tareas.idTareas,
@@ -225,18 +238,19 @@ class informeTareas extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_estados_trabajos  ON core_estados_trabajos.idEstadoTrabajo = kanban_tareas_tareas.idEstadoTrabajo
                 LEFT JOIN kanban_trabajos        ON kanban_trabajos.idTrabajo             = kanban_tareas_tareas.idTrabajo',
-            'where'   => 'kanban_tareas_tareas.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas_tareas.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_tareas_tareas.Tarea ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrTareas = $this->Base_GetList($xParams);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas_participantes.idParticipantes,
@@ -244,18 +258,19 @@ class informeTareas extends ControllerBase {
                 usuarios_listado.Direccion_img AS UsuarioImg',
             'table'   => 'kanban_tareas_participantes',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_participantes.idUsuario',
-            'where'   => 'kanban_tareas_participantes.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas_participantes.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrParticipantes = $this->Base_GetList($xParams);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas_historial.Descripcion,
@@ -265,20 +280,21 @@ class informeTareas extends ControllerBase {
                 usuarios_listado.Direccion_img AS UsuarioImg',
             'table'   => 'kanban_tareas_historial',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_historial.idUsuario',
-            'where'   => 'kanban_tareas_historial.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas_historial.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrHistorial = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status'] && $arrHistorial['status']){
 
             /******************************************/
@@ -315,7 +331,7 @@ class informeTareas extends ControllerBase {
     //View
     public function Print($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas.idKanban,
@@ -335,17 +351,18 @@ class informeTareas extends ControllerBase {
                 LEFT JOIN kanban_estados          ON kanban_estados.idKanbanEstado         = kanban_tareas.idKanbanEstado
                 LEFT JOIN core_estados_cierre     ON core_estados_cierre.idEstadoCierre    = kanban_tareas.idEstadoCierre
                 LEFT JOIN core_estados_colores    ON core_estados_colores.idColor          = kanban_estados.idColor',
-            'where'   => 'kanban_tareas.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas_tareas.idTareas,
@@ -358,18 +375,19 @@ class informeTareas extends ControllerBase {
             'join'    => '
                 LEFT JOIN core_estados_trabajos  ON core_estados_trabajos.idEstadoTrabajo = kanban_tareas_tareas.idEstadoTrabajo
                 LEFT JOIN kanban_trabajos        ON kanban_trabajos.idTrabajo             = kanban_tareas_tareas.idTrabajo',
-            'where'   => 'kanban_tareas_tareas.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas_tareas.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_tareas_tareas.Tarea ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrTareas = $this->Base_GetList($xParams);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 kanban_tareas_participantes.idParticipantes,
@@ -377,20 +395,21 @@ class informeTareas extends ControllerBase {
                 usuarios_listado.Direccion_img AS UsuarioImg',
             'table'   => 'kanban_tareas_participantes',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_participantes.idUsuario',
-            'where'   => 'kanban_tareas_participantes.idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'kanban_tareas_participantes.idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrParticipantes = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
 
             /******************************************/

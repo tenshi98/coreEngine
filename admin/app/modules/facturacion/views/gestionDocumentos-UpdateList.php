@@ -32,7 +32,7 @@
                             ? ' ('.$crud['EntidadesNick'].')'
                             : '';
 
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']);
                 $level       = $data['UserAccess']['LevelAccess'];
                 $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId;

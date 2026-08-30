@@ -5,7 +5,7 @@
 class permisosCategorias extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class permisosCategorias extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,47 +34,30 @@ class permisosCategorias extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-                core_permisos_categorias.idPermisosCat,
-                core_permisos_categorias.Nombre,
-                core_permisos_categorias.Icon,
-                core_permisos_categorias.Descripcion,
-                core_permisos_categorias.Carpeta,
-                core_iconos_colores.Nombre AS IconColor',
-            'table'   => 'core_permisos_categorias',
-            'join'    => 'LEFT JOIN core_iconos_colores ON core_iconos_colores.idColor = core_permisos_categorias.IdIconColor',
-            'where'   => 'core_permisos_categorias.idPermisosCat!=0',
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'core_permisos_categorias.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        //Ejecuto la query
-        $xParams      = ['query' => $query];
-        $arrCategoria = $this->Base_GetList($xParams);
+        // Se genera la query
+        $arrCategoria = $this->getDataList('core_permisos_categorias.idPermisosCat!=0');
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idColor AS ID,Nombre',
             'table'   => 'core_iconos_colores',
             'join'    => '',
-            'where'   => 'idColor!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrColores = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrCategoria['status'] && $arrColores['status']){
 
             /******************************************/
@@ -114,59 +97,51 @@ class permisosCategorias extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = 'IdIconColor';          //Datos búsqueda exacta
-        $WhereData_string  = 'Nombre,Icon,Carpeta';  //Datos búsqueda relativa
-        $WhereData_between = '';                     //Datos búsqueda Between
-        $whereInt          = '';                     //se crea cadena
+        // Variables
+        $WhereData_int     = 'IdIconColor';          // Datos búsqueda exacta
+        $WhereData_string  = 'Nombre,Icon,Carpeta';  // Datos búsqueda relativa
+        $WhereData_between = '';                     // Datos búsqueda Between
+        $whereInt          = '';                     // Se crea cadena
+        $whereParams       = [];                     // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'core_permisos_categorias', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'core_permisos_categorias', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'core_permisos_categorias', 3);
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'core_permisos_categorias', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'core_permisos_categorias', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'core_permisos_categorias', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
 
         /******************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-                core_permisos_categorias.idPermisosCat,
-                core_permisos_categorias.Nombre,
-                core_permisos_categorias.Icon,
-                core_permisos_categorias.Descripcion,
-                core_permisos_categorias.Carpeta,
-                core_iconos_colores.Nombre AS IconColor',
-            'table'   => 'core_permisos_categorias',
-            'join'    => 'LEFT JOIN core_iconos_colores ON core_iconos_colores.idColor = core_permisos_categorias.IdIconColor',
-            'where'   => $whereInt,
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'core_permisos_categorias.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        //Ejecuto la query
-        $xParams      = ['query' => $query];
-        $arrCategoria = $this->Base_GetList($xParams);
+        // Se genera la query
+        $arrCategoria = $this->getDataList($whereInt, $whereParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idColor AS ID,Nombre',
             'table'   => 'core_iconos_colores',
             'join'    => '',
-            'where'   => 'idColor!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrColores = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrCategoria['status'] && $arrColores['status']){
 
             /******************************************/
@@ -201,7 +176,7 @@ class permisosCategorias extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_permisos_categorias.idPermisosCat,
@@ -212,19 +187,20 @@ class permisosCategorias extends ControllerBase {
                 core_iconos_colores.Nombre AS IconColor',
             'table'   => 'core_permisos_categorias',
             'join'    => 'LEFT JOIN core_iconos_colores ON core_iconos_colores.idColor = core_permisos_categorias.IdIconColor',
-            'where'   => 'core_permisos_categorias.idPermisosCat = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'core_permisos_categorias.idPermisosCat = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -255,40 +231,42 @@ class permisosCategorias extends ControllerBase {
     //Edit
     public function GetID($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPermisosCat,Nombre,Icon,IdIconColor,Descripcion,Carpeta',
             'table'   => 'core_permisos_categorias',
             'join'    => '',
-            'where'   => 'idPermisosCat = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idPermisosCat = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idColor AS ID,Nombre',
             'table'   => 'core_iconos_colores',
             'join'    => '',
-            'where'   => 'idColor!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams    = ['query' => $query];
         $arrColores = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrColores['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -317,6 +295,36 @@ class permisosCategorias extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                            CONSULTAS INTERNAS                              */
+    /******************************************************************************/
+    /******************************************************************************/
+    //Se obtiene la lista
+    private function getDataList($filter, $params = []){
+        // Se genera la query
+        $query = [
+            'data'    => '
+                core_permisos_categorias.idPermisosCat,
+                core_permisos_categorias.Nombre,
+                core_permisos_categorias.Icon,
+                core_permisos_categorias.Descripcion,
+                core_permisos_categorias.Carpeta,
+                core_iconos_colores.Nombre AS IconColor',
+            'table'   => 'core_permisos_categorias',
+            'join'    => 'LEFT JOIN core_iconos_colores ON core_iconos_colores.idColor = core_permisos_categorias.IdIconColor',
+            'where'   => $filter,
+            'params'  => $params,
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'core_permisos_categorias.Nombre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Ejecuto la query
+        $xParams      = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+    }
+
+    /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
     /******************************************************************************/
@@ -328,7 +336,7 @@ class permisosCategorias extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'Nombre,Icon,IdIconColor,Descripcion,Carpeta',
             'required'  => 'Nombre,Icon,IdIconColor,Carpeta',
@@ -337,7 +345,7 @@ class permisosCategorias extends ControllerBase {
             'table'     => 'core_permisos_categorias',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -364,7 +372,7 @@ class permisosCategorias extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idPermisosCat,Nombre,Icon,IdIconColor,Descripcion,Carpeta',
                 'required'  => 'Nombre,Icon,IdIconColor,Carpeta',
@@ -374,7 +382,7 @@ class permisosCategorias extends ControllerBase {
                 'where'     => 'idPermisosCat',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -402,7 +410,7 @@ class permisosCategorias extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'core_permisos_categorias',
@@ -410,7 +418,7 @@ class permisosCategorias extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -436,7 +444,7 @@ class permisosCategorias extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

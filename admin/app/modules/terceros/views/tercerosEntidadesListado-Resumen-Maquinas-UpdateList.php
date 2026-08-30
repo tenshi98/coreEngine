@@ -19,7 +19,7 @@
         if(is_array($data['arrMaq'])&&!empty($data['arrMaq'])){
             //Recorro
             foreach($data['arrMaq'] as $crud){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idMaq']);
                 $Entidad     = addslashes($crud['Maquina']);
                 $level       = $data['UserAccess']['LevelAccess']; ?>

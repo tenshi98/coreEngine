@@ -5,7 +5,7 @@
 class bodegasWidgets extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $CommonData;
     private $DataNumbers;
     private $DataDate;
@@ -14,7 +14,7 @@ class bodegasWidgets extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -32,7 +32,7 @@ class bodegasWidgets extends ControllerBase {
     //Instalacion del modulo completo
     public function loadWidgets(){
 
-        //Variables
+        // Variables
         $Data['Menu_Name']   = 'Gestión Bodegas y Productos';
         $Data['Menu_Value']  = [
             'Stock Productos'   => '../app/modules/bodegas/views/main-bodega-stock.php',
@@ -53,7 +53,7 @@ class bodegasWidgets extends ControllerBase {
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /*******************************************************************/
-        //Variables
+        // Variables
         $MainViewData = [
             'Count_Bodegas'   => 0,
             'Data_arrBodegas' => '',
@@ -86,24 +86,27 @@ class bodegasWidgets extends ControllerBase {
             // Se verifica si se tiene el permiso para visualizar el dato
             if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
                 $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
-                $X_where = 'bodegas_listado.idEstado = 1 AND bodegas_listado_permisos_usuarios.idUsuario = '.$arrUserData['UserID'];
+                $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
+                $X_params = [1, $arrUserData['UserID']];
             //Si se permite junto con la creacion de tareas
             }else{
-                $X_join  = '';
-                $X_where = 'bodegas_listado.idEstado=1';
+                $X_join   = '';
+                $X_where  = 'bodegas_listado.idEstado = ?';
+                $X_params = [1];
             }
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'bodegas_listado.idBodegas, bodegas_listado.Nombre',
                 'table'   => 'bodegas_listado',
                 'join'    => $X_join,
                 'where'   => $X_where,
+                'params'  => $X_params,
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'bodegas_listado.Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams                         = ['query' => $query];
             $TempData                        = $this->Base_GetList($xParams);
             $MainViewData['Data_arrBodegas'] = $TempData['data'];
@@ -115,7 +118,7 @@ class bodegasWidgets extends ControllerBase {
             }
 
             /*******************************************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => '
                     bodegas_productos_stocks.idProducto,
@@ -128,12 +131,13 @@ class bodegasWidgets extends ControllerBase {
                     LEFT JOIN productos_listado     ON productos_listado.idProducto    = bodegas_productos_stocks.idProducto
                     LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed   = productos_listado.idUniMed',
                 'where'   => '',
+                'params'  => [],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'productos_listado.Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams                        = ['query' => $query];
             $TempData                       = $this->Base_GetList($xParams);
             $MainViewData['Data_arrStocks'] = $TempData['data'];

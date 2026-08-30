@@ -21,7 +21,7 @@
         if(is_array($data['arrTareas'])&&!empty($data['arrTareas'])){
             //Recorro
             foreach ($data['arrTareas'] as $Tareas=>$tarea){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas);
                 $level       = $data['UserAccess']['LevelAccess'];
                 $Entidad     = addslashes($tarea[0]['Titulo']); ?>

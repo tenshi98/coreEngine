@@ -5,7 +5,7 @@
 class coreFormularios extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $DBConn;
     private $QBuilder;
@@ -15,7 +15,7 @@ class coreFormularios extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,37 +34,41 @@ class coreFormularios extends ControllerBase {
     //pantalla principal
     public function Formularios($f3){
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
             'table'   => 'core_ubicacion_ciudad',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
-        $arrCiudad = $this->QBuilder->queryArray($query, $this->DBConn);
+        // Ejecuto la query
+        $xParams   = ['query' => $query];
+        $arrCiudad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
             'table'   => 'core_ubicacion_comunas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
-        $arrComuna = $this->QBuilder->queryArray($query, $this->DBConn);
+        // Ejecuto la query
+        $xParams   = ['query' => $query];
+        $arrComuna = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 core_ubicacion_comunas.idComuna AS ID1,
@@ -74,13 +78,15 @@ class coreFormularios extends ControllerBase {
             'table'   => 'core_ubicacion_comunas',
             'join'    => 'LEFT JOIN core_ubicacion_ciudad ON core_ubicacion_ciudad.idCiudad = core_ubicacion_comunas.idCiudad',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'core_ubicacion_ciudad.Nombre ASC, core_ubicacion_comunas.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
-        $arrGroup = $this->QBuilder->queryArray($query, $this->DBConn);
+        // Ejecuto la query
+        $xParams  = ['query' => $query];
+        $arrGroup = $this->Base_GetList($xParams);
 
         /******************************************/
         //Datos enviados a la pagina

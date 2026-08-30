@@ -26,36 +26,30 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['BodegaIngreso'] ?? '';
-                                $x2  = $data['rowData']['BodegaEgreso'] ?? '';
-                                $x3  = $data['rowData']['Creacion_fecha'] ?? '';
-                                $x4  = $data['rowData']['Observaciones'] ?? '';
-
                                 //se dibujan los inputs
                                 //Se verifica movimiento
                                 switch ($data['rowData']['idEstadoIngreso']) {
                                     /************************************/
                                     //Ingreso
                                     case 1:
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Ingreso',    'Name' => 'BodegaFake',    'Id' => 'BodegaFake',       'Value' => $x1,'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Ingreso',    'Name' => 'BodegaFake',    'Id' => 'BodegaFake',       'Value' => ($data['rowData']['BodegaIngreso'] ?? ''),'Required' => 3]);
                                         break;
                                     /************************************/
                                     //Egreso
                                     case 2:
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Egreso',    'Name' => 'BodegaFake',    'Id' => 'BodegaFake',       'Value' => $x2,'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Egreso',    'Name' => 'BodegaFake',    'Id' => 'BodegaFake',       'Value' => ($data['rowData']['BodegaEgreso'] ?? ''),'Required' => 3]);
                                         break;
                                     /************************************/
                                     //Traspaso
                                     case 3:
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Egreso',    'Name' => 'BodegaFake1',    'Id' => 'BodegaFake1',       'Value' => $x2,'Required' => 3]);
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Ingreso',   'Name' => 'BodegaFake2',    'Id' => 'BodegaFake2',       'Value' => $x1,'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Egreso',    'Name' => 'BodegaFake1',    'Id' => 'BodegaFake1',       'Value' => ($data['rowData']['BodegaEgreso'] ?? ''),  'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega Ingreso',   'Name' => 'BodegaFake2',    'Id' => 'BodegaFake2',       'Value' => ($data['rowData']['BodegaIngreso'] ?? ''), 'Required' => 3]);
                                         break;
                                 }
 
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Movimiento',  'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => $x3,'Required' => 2, 'Icon' => 'bi bi-calendar3']);
-                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',        'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => $x4,'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Movimiento',  'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => ($data['rowData']['Creacion_fecha'] ?? ''), 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
+                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',        'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => ($data['rowData']['Observaciones'] ?? ''),  'Required' => 1]);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMovimiento','Value' => $data['rowData']['idMovimiento'],'Required' => 2]);
@@ -144,7 +138,7 @@
     /*********************************************************************/
     /*                            PRODUCTOS                              */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ProdLoad = 0;
     /******************************************/
     function tabProdLoadList() {

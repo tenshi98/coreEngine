@@ -70,7 +70,7 @@ $RandName = 'rand_'.rand(1, 999999);
                     </div>
                     <?php
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado','Value' => 1,'Required' => 2]); //Activo por defecto
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado','Value' => 1,'Required' => 2]); // Activo por defecto
                     ?>
                 </div>
                 <div class="modal-footer">

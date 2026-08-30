@@ -22,10 +22,10 @@
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
             //Recorro
             foreach($data['arrList'] as $crud){
-                //Variables
+                // Variables
                 $encryptedEmail = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['Email']);
                 $EntidadEmail   = addslashes($crud['Email']);
-                //Variables
+                // Variables
                 $encryptedIP = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['IP_Client']);
                 $EntidadIP   = addslashes($crud['IP_Client']); ?>
                 <tr>

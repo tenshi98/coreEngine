@@ -13,7 +13,7 @@
             <form id="form6" name="form6" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
                 <?php
                 /***********************************/
-                //Variables
+                // Variables
                 $xvalue = '1,1,1,1,1,1,1,2,1,1,1,1,2,1,1';
                 //input
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs checkbox', 'Clase' => 'box-title text-color-red-dark']);
@@ -26,7 +26,7 @@
                 $data['Fnc_FormInputs']->formCheckboxActive(['Placeholder' => 'formCheckboxActive','Name' => 'formCheckboxActive','Id' => 'IDInput_6_7','Value' => $xvalue,'Required' => 2,'Color' => 6,'arrData' => $data['arrCiudad']]);
 
                 /***********************************/
-                //Variables
+                // Variables
                 $xvalue = '1,1,1,1,1,1,1,2,1,1,1,1,1,1,1';
                 //input
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs Radio', 'Clase' => 'box-title text-color-red-dark']);
@@ -39,7 +39,7 @@
                 $data['Fnc_FormInputs']->formRadioActive(['Placeholder' => 'formRadioActive','Name' => 'formRadioActive','Id' => 'IDInput_6_14','Value' => $xvalue,'Required' => 2,'Color' => 6,'arrData' => $data['arrCiudad']]);
 
                 /***********************************/
-                //Variables
+                // Variables
                 $xvalue = '1,1,1,1,1,1,1,2,1,1,1,1,2,1,1';
                 //input
                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Inputs switch', 'Clase' => 'box-title text-color-red-dark']);

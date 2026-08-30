@@ -23,7 +23,7 @@
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
             //Recorro
             foreach($data['arrList'] as $crud){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCrud']);
                 $level       = $data['UserAccess']['LevelAccess'];
                 $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId;

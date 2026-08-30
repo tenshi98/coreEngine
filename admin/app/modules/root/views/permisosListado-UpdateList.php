@@ -32,7 +32,7 @@
                 echo '<tr class="table-secondary"><td colspan="7"><strong>'.$Categoria.'</strong></td></tr>';
                 //se recorren los datos dentro de la categoría
                 foreach ($permisos as $perm){
-                    //Variables
+                    // Variables
                     $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $perm['idPermisos']);
                     $Entidad     = addslashes($perm['Nombre']); ?>
                     <tr>

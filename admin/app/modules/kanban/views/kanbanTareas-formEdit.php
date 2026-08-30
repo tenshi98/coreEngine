@@ -27,33 +27,25 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1  = $data['rowData']['idPrioridad'] ?? '';
-        $x2  = $data['rowData']['Fecha'] ?? '';
-        $x3  = $data['rowData']['Titulo'] ?? '';
-        $x4  = $data['rowData']['Descripcion'] ?? '';
-        $x5  = $data['rowData']['idEstadoCierre'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Prioridad',     'Name' => 'idPrioridad',  'Id' => 'EditTarea_idPrioridad',  'Value' => $x1, 'Required' => 2,'arrData' => $data['arrPrioridad']]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Termino', 'Name' => 'Fecha',        'Id' => 'EditTarea_Fecha',        'Value' => $x2, 'Required' => 2,'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Titulo',        'Name' => 'Titulo',       'Id' => 'EditTarea_Titulo',       'Value' => $x3, 'Required' => 2]);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',   'Name' => 'Descripcion',  'Id' => 'EditTarea_Descripcion',  'Value' => $x4, 'Required' => 2]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Prioridad',     'Name' => 'idPrioridad',  'Id' => 'EditTarea_idPrioridad',  'Value' => ($data['rowData']['idPrioridad'] ?? ''), 'Required' => 2,'arrData' => $data['arrPrioridad']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Termino', 'Name' => 'Fecha',        'Id' => 'EditTarea_Fecha',        'Value' => ($data['rowData']['Fecha'] ?? ''),       'Required' => 2,'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Titulo',        'Name' => 'Titulo',       'Id' => 'EditTarea_Titulo',       'Value' => ($data['rowData']['Titulo'] ?? ''),      'Required' => 2]);
+        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Descripcion',   'Name' => 'Descripcion',  'Id' => 'EditTarea_Descripcion',  'Value' => ($data['rowData']['Descripcion'] ?? ''), 'Required' => 2]);
         /*******************************************************************/
         //Verifico si permite el cierre
         if($data['rowData']['idCierre']==1){
-            $data['Fnc_FormInputs']->formSelect(['Placeholder' => 'Estado Cierre', 'Name' => 'idEstadoCierre', 'Id' => 'EditTarea_idEstadoCierre', 'Value' => $x5, 'Required' => 2,'arrData' => $data['arrEstadoCierre']]);
-            $data['Fnc_FormInputs']->formInputHidden([                            'Name' => 'Old_idEstadoCierre',                                 'Value' => $x5, 'Required' => 2]);
+            $data['Fnc_FormInputs']->formSelect(['Placeholder' => 'Estado Cierre', 'Name' => 'idEstadoCierre', 'Id' => 'EditTarea_idEstadoCierre', 'Value' => ($data['rowData']['idEstadoCierre'] ?? ''), 'Required' => 2,'arrData' => $data['arrEstadoCierre']]);
+            $data['Fnc_FormInputs']->formInputHidden([                            'Name' => 'Old_idEstadoCierre',                                 'Value' => ($data['rowData']['idEstadoCierre'] ?? ''),  'Required' => 2]);
         }
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario', 'Value' => $data['UserData']['UserID'],'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',  'Value' => $data['rowData']['idKanban'],'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',  'Value' => $data['rowData']['idKanban'], 'Required' => 2]);
         //Datos antiguos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idPrioridad',  'Value' => $x1,                                      'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Fecha',        'Value' => $x2,                                      'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Titulo',       'Value' => $x3,                                      'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Descripcion',  'Value' => $x4,                                      'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idPrioridad',  'Value' => ($data['rowData']['idPrioridad'] ?? ''),  'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Fecha',        'Value' => ($data['rowData']['Fecha'] ?? ''),        'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Titulo',       'Value' => ($data['rowData']['Titulo'] ?? ''),       'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Descripcion',  'Value' => ($data['rowData']['Descripcion'] ?? ''),  'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual',     'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',      'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);
         ?>

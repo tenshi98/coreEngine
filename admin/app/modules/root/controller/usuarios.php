@@ -5,7 +5,7 @@
 class usuarios extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $DataDate;
@@ -17,7 +17,7 @@ class usuarios extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -38,63 +38,47 @@ class usuarios extends ControllerBase {
     //Listar Todo
     public function listAll($f3){
         /*******************************************************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-                usuarios_listado.idUsuario,
-                usuarios_listado.email,
-                usuarios_listado.Nombre,
-                usuarios_listado.Ultimo_acceso,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor',
-            'table'   => 'usuarios_listado',
-            'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = usuarios_listado.idEstado',
-            'where'   => 'usuarios_listado.idTipoUsuario=1',
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'usuarios_listado.email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        //Ejecuto la query
-        $xParams = ['query' => $query];
-        $arrList = $this->Base_GetList($xParams);
+        // Se genera la query
+        $arrList = $this->getDataList('usuarios_listado.idTipoUsuario=1');
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
             'table'   => 'core_ubicacion_ciudad',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrCiudad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
             'table'   => 'core_ubicacion_comunas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrComuna = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status'] && $arrCiudad['status'] && $arrComuna['status']){
 
             /******************************************/
@@ -136,45 +120,37 @@ class usuarios extends ControllerBase {
     //List
     public function UpdateList($f3){
         /*******************************************************************/
-        //Variables
-        $WhereData_int     = '';             //Datos búsqueda exacta
-        $WhereData_string  = 'email,Nombre'; //Datos búsqueda relativa
-        $WhereData_between = '';             //Datos búsqueda Between
-        $whereInt          = '';             //se crea cadena
+        // Variables
+        $WhereData_int     = '';             // Datos búsqueda exacta
+        $WhereData_string  = 'email,Nombre'; // Datos búsqueda relativa
+        $WhereData_between = '';             // Datos búsqueda Between
+        $whereInt          = '';             // Se crea cadena
+        $whereParams       = [];             // Valores bindeados asociados a $whereInt
         /******************************************/
-        //agrego variable busqueda
-        $whereInt = $this->searchWhere($whereInt, $WhereData_int, 'usuarios_listado', 1);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_string, 'usuarios_listado', 2);
-        $whereInt = $this->searchWhere($whereInt, $WhereData_between, 'usuarios_listado', 3);
-        //Verifico si esta vacio
-        $whereInt2 = $whereInt ? $whereInt . ' AND usuarios_listado.idTipoUsuario!=1' : 'usuarios_listado.idTipoUsuario!=1';
+        // Se validan las fechas
+        $RespDataBetween = $this->searchValidateDates($WhereData_between);
+        if($RespDataBetween!=''){
+            Response::error($RespDataBetween, 500);
+        }
+        // Agrego variable busqueda
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'usuarios_listado', 1);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_string, 'usuarios_listado', 2);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'usuarios_listado', 3);
+        $whereInt = $r['where']; $whereParams = $r['params'];
+        // Verifico si esta vacio
+        $whereInt   .= ($whereInt ? ' AND ' : '') . 'usuarios_listado.idTipoUsuario != ?';
+        $whereParams = array_merge($whereParams, [1]);
 
         /******************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-                usuarios_listado.idUsuario,
-                usuarios_listado.email,
-                usuarios_listado.Nombre,
-                usuarios_listado.Ultimo_acceso,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor',
-            'table'   => 'usuarios_listado',
-            'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = usuarios_listado.idEstado',
-            'where'   => $whereInt2,
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'usuarios_listado.email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        //Ejecuto la query
-        $xParams = ['query' => $query];
-        $arrList = $this->Base_GetList($xParams);
+        // Se genera la query
+        $arrList = $this->getDataList($whereInt, $whereParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrList['status']){
 
             /******************************************/
@@ -209,63 +185,30 @@ class usuarios extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-                usuarios_listado.email,
-                usuarios_listado.Nombre,
-                usuarios_listado.Rut,
-                usuarios_listado.fNacimiento,
-                usuarios_listado.Fono,
-                usuarios_listado.Direccion,
-                usuarios_listado.Direccion_img,
-                usuarios_listado.Social_X,
-                usuarios_listado.Social_Facebook,
-                usuarios_listado.Social_Instagram,
-                usuarios_listado.Social_Linkedin,
-
-                core_tipos_usuario.Nombre AS TipoUsuario,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor,
-                core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna,
-                core_posicion_menu.Nombre AS MenuPosicion',
-            'table'   => 'usuarios_listado',
-            'join'    => '
-                LEFT JOIN core_tipos_usuario      ON core_tipos_usuario.idTipoUsuario   = usuarios_listado.idTipoUsuario
-                LEFT JOIN core_estados            ON core_estados.idEstado              = usuarios_listado.idEstado
-                LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad     = usuarios_listado.idCiudad
-                LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna    = usuarios_listado.idComuna
-                LEFT JOIN core_posicion_menu      ON core_posicion_menu.idMenuPosicion  = usuarios_listado.idMenuPosicion',
-            'where'   => 'usuarios_listado.idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        //Ejecuto la query
-        $xParams = ['query' => $query];
-        $rowData = $this->Base_GetByID($xParams);
+        // Se genera la query
+        $rowData = $this->getDataDetail($this->Codification->encryptDecrypt('decrypt', $params['id']));
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'Observacion',
             'table'   => 'usuarios_listado_observaciones',
             'join'    => '',
-            'where'   => 'idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idUsuario = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idObservaciones ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrObservaciones = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrObservaciones['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -299,117 +242,81 @@ class usuarios extends ControllerBase {
     //Resumen
     public function Resumen($f3, $params){
         /******************************************/
-        //Se genera la query
-        $query = [
-            'data'    => '
-                usuarios_listado.idUsuario,
-                usuarios_listado.idTipoUsuario,
-                usuarios_listado.idEstado,
-                usuarios_listado.email,
-                usuarios_listado.Nombre,
-                usuarios_listado.Rut,
-                usuarios_listado.fNacimiento,
-                usuarios_listado.Fono,
-                usuarios_listado.idCiudad,
-                usuarios_listado.idComuna,
-                usuarios_listado.Direccion,
-                usuarios_listado.Direccion_img,
-                usuarios_listado.Social_X,
-                usuarios_listado.Social_Facebook,
-                usuarios_listado.Social_Instagram,
-                usuarios_listado.Social_Linkedin,
-                usuarios_listado.idMenuPosicion,
-
-                core_tipos_usuario.Nombre AS TipoUsuario,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor,
-                core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna,
-                core_posicion_menu.Nombre AS MenuPosicion',
-            'table'   => 'usuarios_listado',
-            'join'    => '
-                LEFT JOIN core_tipos_usuario      ON core_tipos_usuario.idTipoUsuario   = usuarios_listado.idTipoUsuario
-                LEFT JOIN core_estados            ON core_estados.idEstado              = usuarios_listado.idEstado
-                LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad     = usuarios_listado.idCiudad
-                LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna    = usuarios_listado.idComuna
-                LEFT JOIN core_posicion_menu      ON core_posicion_menu.idMenuPosicion  = usuarios_listado.idMenuPosicion',
-            'where'   => 'usuarios_listado.idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        //Ejecuto la query
-        $xParams = ['query' => $query];
-        $rowData = $this->Base_GetByID($xParams);
+        // Se genera la query
+        $rowData = $this->getDataDetail($this->Codification->encryptDecrypt('decrypt', $params['id']));
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idObservaciones,Observacion',
             'table'   => 'usuarios_listado_observaciones',
             'join'    => '',
-            'where'   => 'idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idUsuario = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idObservaciones ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrObservaciones = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
             'table'   => 'core_ubicacion_ciudad',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrCiudad = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
             'table'   => 'core_ubicacion_comunas',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrComuna = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrObservaciones['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrEstado['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -453,7 +360,93 @@ class usuarios extends ControllerBase {
     //Resumen-Update
     public function ResumenUpdate($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
+        $rowData = $this->getDataDetail($this->Codification->encryptDecrypt('decrypt', $params['id']));
+
+        /*******************************************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'Observacion',
+            'table'   => 'usuarios_listado_observaciones',
+            'join'    => '',
+            'where'   => 'idUsuario = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'idObservaciones ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Ejecuto la query
+        $xParams          = ['query' => $query];
+        $arrObservaciones = $this->Base_GetList($xParams);
+
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if($rowData['status'] && $arrObservaciones['status']){
+            /******************************************/
+            //Datos enviados a la pagina
+            $f3->data = [
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_DataDate'         => $this->DataDate,
+                'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                /*=========== Datos Consultados ===========*/
+                'rowData'          => $rowData['data'],
+                'arrObservaciones' => $arrObservaciones['data'],
+            ];
+
+            /******************************************/
+            //Se instancia la vista
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Update.php');
+        /*******************************************************************/
+        //si no hay resultados
+        } else {
+            //Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$arrObservaciones]);
+            //Muestra los errores
+            $this->showError(2, $f3, $result);
+        }
+    }
+
+    /******************************************************************************/
+    /*                            CONSULTAS INTERNAS                              */
+    /******************************************************************************/
+    /******************************************************************************/
+    //Se obtiene la lista
+    private function getDataList($filter, $params = []){
+        // Se genera la query
+        $query = [
+            'data'    => '
+                usuarios_listado.idUsuario,
+                usuarios_listado.email,
+                usuarios_listado.Nombre,
+                usuarios_listado.Ultimo_acceso,
+                core_estados.Nombre AS Estado,
+                core_estados.Color AS EstadoColor',
+            'table'   => 'usuarios_listado',
+            'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = usuarios_listado.idEstado',
+            'where'   => $filter,
+            'params'  => $params,
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'usuarios_listado.email ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Ejecuto la query
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+    }
+
+    /******************************************************************************/
+    //Se obtienen los detalles
+    private function getDataDetail($ID){
+        // Se genera la query
         $query = [
             'data'    => '
                 usuarios_listado.idUsuario,
@@ -487,62 +480,16 @@ class usuarios extends ControllerBase {
                 LEFT JOIN core_ubicacion_ciudad   ON core_ubicacion_ciudad.idCiudad     = usuarios_listado.idCiudad
                 LEFT JOIN core_ubicacion_comunas  ON core_ubicacion_comunas.idComuna    = usuarios_listado.idComuna
                 LEFT JOIN core_posicion_menu      ON core_posicion_menu.idMenuPosicion  = usuarios_listado.idMenuPosicion',
-            'where'   => 'usuarios_listado.idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'usuarios_listado.idUsuario = ?',
+            'params'  => [$ID],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
-        $rowData = $this->Base_GetByID($xParams);
-
-        /*******************************************************************/
-        //Se genera la query
-        $query = [
-            'data'    => 'Observacion',
-            'table'   => 'usuarios_listado_observaciones',
-            'join'    => '',
-            'where'   => 'idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'idObservaciones ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        //Ejecuto la query
-        $xParams          = ['query' => $query];
-        $arrObservaciones = $this->Base_GetList($xParams);
-
-        /*******************************************************************/
-        /*                         Imprimir Datos                          */
-        /*******************************************************************/
-        //Si hay resultados
-        if($rowData['status'] && $arrObservaciones['status']){
-            /******************************************/
-            //Datos enviados a la pagina
-            $f3->data = [
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*===========   Funcionalidad   ===========*/
-                'Fnc_DataDate'         => $this->DataDate,
-                'Fnc_DataNumbers'      => $this->DataNumbers,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData['data'],
-                'arrObservaciones' => $arrObservaciones['data'],
-            ];
-
-            /******************************************/
-            //Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Update.php');
-        /*******************************************************************/
-        //si no hay resultados
-        } else {
-            //Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData,$arrObservaciones]);
-            //Muestra los errores
-            $this->showError(2, $f3, $result);
-        }
+        //Se retornan los datos
+        return $this->Base_GetByID($xParams);
     }
 
     /******************************************************************************/
@@ -557,7 +504,7 @@ class usuarios extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
             'required'  => 'password,idTipoUsuario,idEstado,email,Nombre,idMenuPosicion',
@@ -566,7 +513,7 @@ class usuarios extends ControllerBase {
             'table'     => 'usuarios_listado',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -594,7 +541,7 @@ class usuarios extends ControllerBase {
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idUsuario,password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
                 'required'  => 'password,idTipoUsuario,idEstado,email,Nombre,idMenuPosicion',
@@ -615,7 +562,7 @@ class usuarios extends ControllerBase {
                     ],
                 ]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -643,7 +590,7 @@ class usuarios extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'usuarios_listado',
@@ -651,7 +598,7 @@ class usuarios extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
             /******************************/
@@ -663,13 +610,13 @@ class usuarios extends ControllerBase {
                 $arrTableDel[] = ['files' => '', 'table' => 'usuarios_listado_observaciones'];
 
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrTableDel){
                     //recorro
                     foreach ($arrTableDel as $tblDel) {
-                        //Se genera la query
+                        // Se genera la query
                         $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idUsuario', 'SubCarpeta' => '', 'Post' => $dataDelete];
-                        //Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['query' => $query];
                         $this->Base_delete($xParams);
                     }
@@ -697,7 +644,7 @@ class usuarios extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataPut);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => 'Direccion_img',
                 'table'       => 'usuarios_listado',
@@ -705,7 +652,7 @@ class usuarios extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataPut
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delFiles($xParams);
             /******************************/
@@ -730,7 +677,7 @@ class usuarios extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

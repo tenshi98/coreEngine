@@ -5,7 +5,7 @@
 class kanbanTareasParticipantes extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -15,7 +15,7 @@ class kanbanTareasParticipantes extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -34,64 +34,71 @@ class kanbanTareasParticipantes extends ControllerBase {
     //NewData
     public function NewData($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idKanban,Titulo',
             'table'   => 'kanban_tareas',
             'join'    => '',
-            'where'   => 'idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idUsuario',
             'table'   => 'kanban_tareas_participantes',
             'join'    => '',
-            'where'   => 'idKanban = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idKanban = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'idUsuario ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams       = ['query' => $query];
         $arrExistentes = $this->Base_GetList($xParams);
 
         /******************************/
-        //Se crea cadena
-        $xWhere = 'idTipoUsuario != 1 AND idEstado = 1';
-        //Se verifica si hay datos
-        if ($arrExistentes['status'] && !empty($arrExistentes['data'])) {
-            $xWhere .= ' AND idUsuario NOT IN (' . implode(',', array_column($arrExistentes['data'], 'idUsuario')) . ')';
+        // Se filtran los ya existentes
+        $ElementsIDs = [0];
+        if ($arrExistentes['status']) {
+            // Obtiene los identificadores de las campañas existentes y los agrega
+            // a la lista de valores.
+            $ElementsIDs = array_merge($ElementsIDs, array_column($arrExistentes['data'], 'idUsuario'));
         }
+        // Se generan los placeholders necesarios para vincular posteriormente
+        // cada identificador mediante parámetros preparados.
+        $placeholders = implode(',', array_fill(0, count($ElementsIDs), '?'));
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idUsuario AS ID,Nombre',
             'table'   => 'usuarios_listado',
             'join'    => '',
-            'where'   => $xWhere,
+            'where'   => 'idTipoUsuario != ? AND idEstado = ? AND idUsuario NOT IN ('.$placeholders.')',
+            'params'  => array_merge([1, 1], $ElementsIDs),
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrUsuarios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrUsuarios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -126,9 +133,14 @@ class kanbanTareasParticipantes extends ControllerBase {
     /******************************************************************************/
     /******************************************************************************/
     //Crear
-    public function Insert(){
+    public function Insert($f3){
+
+        /******************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
         /*******************************************************************/
-        //variables
+        // Variables
         $ndata_2 = isset($_POST['idParticipante']) ? count($_POST['idParticipante']) : 0;
         //generacion de errores
         if($ndata_2==0) {
@@ -139,13 +151,13 @@ class kanbanTareasParticipantes extends ControllerBase {
             if(isset($ndata_2)&&$ndata_2!=0){
                 for($j2 = 0; $j2 < $ndata_2; $j2++){
                     /******************************/
-                    //Se agrega respuesta
+                    // Se agrega respuesta
                     $arrParticipantes = [
                         'idKanban'  => $_POST['idKanban'],            //idKanban
                         'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
                     ];
                     /******************************/
-                    //Se genera la query
+                    // Se genera la query
                     $query = [
                         'data'      => 'idKanban,idUsuario',
                         'required'  => 'idKanban,idUsuario',
@@ -156,7 +168,7 @@ class kanbanTareasParticipantes extends ControllerBase {
                     ];
                     //Se genera el chequeo
                     $dataCheck_1 = $this->dataCheck_1($arrParticipantes);
-                    //Ejecuto la query
+                    // Ejecuto la query
                     $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
                     $this->Base_insert($xParams);
                 }
@@ -171,7 +183,7 @@ class kanbanTareasParticipantes extends ControllerBase {
                 'Hora'        => $_POST['Hora_Actual'],          //Hora actual
             ];
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
                 'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
@@ -182,7 +194,7 @@ class kanbanTareasParticipantes extends ControllerBase {
             ];
             //Se genera el chequeo
             $dataCheck_2 = $this->dataCheck_2($arrTareas);
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
             $this->Base_insert($xParams);
 
@@ -202,22 +214,23 @@ class kanbanTareasParticipantes extends ControllerBase {
             parse_str(file_get_contents("php://input"),$dataDelete);
 
             /******************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'usuarios_listado.Nombre',
                 'table'   => 'kanban_tareas_participantes',
                 'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario  = kanban_tareas_participantes.idUsuario',
-                'where'   => 'kanban_tareas_participantes.idParticipantes = "'.$this->Codification->encryptDecrypt('decrypt',$dataDelete['idParticipantes']).'"',
+                'where'   => 'kanban_tareas_participantes.idParticipantes = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idParticipantes'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams = ['query' => $query];
             $rowData = $this->Base_GetByID($xParams);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'kanban_tareas_participantes',
@@ -225,7 +238,7 @@ class kanbanTareasParticipantes extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -242,7 +255,7 @@ class kanbanTareasParticipantes extends ControllerBase {
                     'Hora'        => $dataDelete['Hora_Actual'],                                                  //Hora actual
                 ];
                 /******************************/
-                //Se genera la query
+                // Se genera la query
                 $query = [
                     'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
                     'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
@@ -253,7 +266,7 @@ class kanbanTareasParticipantes extends ControllerBase {
                 ];
                 //Se genera el chequeo
                 $dataCheck_2 = $this->dataCheck_2($arrTareas);
-                //Ejecuto la query
+                // Ejecuto la query
                 $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
                 $this->Base_insert($xParams);
                 /******************************/
@@ -276,7 +289,7 @@ class kanbanTareasParticipantes extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -313,7 +326,7 @@ class kanbanTareasParticipantes extends ControllerBase {
 
     //Se validan los datos
     private function dataCheck_2($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

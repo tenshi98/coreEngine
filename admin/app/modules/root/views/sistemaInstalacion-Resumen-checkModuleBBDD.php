@@ -37,7 +37,7 @@
             </thead>
             <tbody>
                 <?php
-                //Variables
+                // Variables
                 $arrCompare = array();
                 $Contador   = 1;
                 //Se parsean los datos
@@ -55,7 +55,7 @@
                 if(is_array($data['arrRutas'])&&!empty($data['arrRutas'])){
                     //Recorro
                     foreach($data['arrRutas'] as $crud){
-                        //Verifico si existe
+                        // Verifico si existe
                         $estado = isset($arrCompare[$crud['RutaWeb']][$crud['RutaController']]['RutaController']) ? '<span class="badge-sp1 badge-sp1-bg-success">Encontrado</span>' : '<span class="badge-sp1 badge-sp1-bg-danger">No Encontrado</span>';
                         //Imprimo
                         echo '
@@ -84,4 +84,3 @@ if($data['UserData']["sistemaModalCloseBTN"]==2){
 }else{
     echo '<style>.modal-body {max-height: 80vh;}</style>';
 } ?>
-

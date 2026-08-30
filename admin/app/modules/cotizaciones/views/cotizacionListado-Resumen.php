@@ -28,15 +28,10 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x3 = $data['rowData']['idEntidad'] ?? '';
-                                $x4 = $data['rowData']['Creacion_fecha'] ?? '';
-                                $x5 = $data['rowData']['Observaciones'] ?? '';
-
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',               'Name' => 'idEntidad',       'Id' => 'Edit_idEntidad',       'Value' => $x3, 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Cotización',   'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => $x4, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
-                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',         'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => $x5, 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',               'Name' => 'idEntidad',       'Id' => 'Edit_idEntidad',       'Value' => ($data['rowData']['idEntidad'] ?? ''),      'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Cotización',   'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => ($data['rowData']['Creacion_fecha'] ?? ''), 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
+                                $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',         'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => ($data['rowData']['Observaciones'] ?? ''),  'Required' => 1]);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCotizacion','Value' => $data['rowData']['idCotizacion'],'Required' => 2]);
@@ -51,7 +46,7 @@
                 </div>
 
                 <?php
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']);
                 ?>
 
@@ -147,7 +142,7 @@
     /*********************************************************************/
     /*                              ITEMS                                */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ItemLoad = 0;
     /******************************************/
     function tabItemLoadList() {
@@ -231,7 +226,7 @@
     /*********************************************************************/
     /*                            PRODUCTOS                              */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ProdLoad = 0;
     /******************************************/
     function tabProdLoadList() {
@@ -315,7 +310,7 @@
     /*********************************************************************/
     /*                            SERVICIOS                              */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ServLoad = 0;
     /******************************************/
     function tabServLoadList() {

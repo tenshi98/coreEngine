@@ -5,7 +5,7 @@
 class gestionDocumentosPagos extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -17,7 +17,7 @@ class gestionDocumentosPagos extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -55,40 +55,42 @@ class gestionDocumentosPagos extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idFacturacion',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idDocumentoPago AS ID,Nombre',
             'table'   => 'core_documentos_pago',
             'join'    => '',
-            'where'   => 'idDocumentoPago!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrDocumentoPago = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrDocumentoPago['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -118,6 +120,7 @@ class gestionDocumentosPagos extends ControllerBase {
             $this->showError(2, $f3, $result);
         }
     }
+
     /******************************************************************************/
     //List
     public function UpdateList($f3, $params, $idTipo){
@@ -126,22 +129,23 @@ class gestionDocumentosPagos extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstadoPago',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 facturacion_listado_pagos.idPago,
@@ -154,20 +158,21 @@ class gestionDocumentosPagos extends ControllerBase {
             'join'    => '
                 LEFT JOIN usuarios_listado     ON usuarios_listado.idUsuario            = facturacion_listado_pagos.idUsuario
                 LEFT JOIN core_documentos_pago ON core_documentos_pago.idDocumentoPago  = facturacion_listado_pagos.idDocumentoPago',
-            'where'   => 'facturacion_listado_pagos.idFacturacion = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'facturacion_listado_pagos.idFacturacion = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'facturacion_listado_pagos.idPago ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['query' => $query];
         $arrPagos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrPagos['status']){
 
             /******************************************/
@@ -207,7 +212,7 @@ class gestionDocumentosPagos extends ControllerBase {
         $tsrxName = $this->tsrxName($idTipo);
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 facturacion_listado_pagos.idPago,
@@ -219,35 +224,37 @@ class gestionDocumentosPagos extends ControllerBase {
                 usuarios_listado.Nombre AS UsuarioPago',
             'table'   => 'facturacion_listado_pagos',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = facturacion_listado_pagos.idUsuario',
-            'where'   => 'facturacion_listado_pagos.idPago = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'facturacion_listado_pagos.idPago = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idDocumentoPago AS ID,Nombre',
             'table'   => 'core_documentos_pago',
             'join'    => '',
-            'where'   => 'idDocumentoPago!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams          = ['query' => $query];
         $arrDocumentoPago = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrDocumentoPago['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -283,7 +290,12 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     /******************************************************************************/
     //Crear
-    public function Insert(){
+    public function Insert($f3){
+
+        /******************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
         //Envio los datos recibidos
         $resultado = $this->insertPago($_POST);
         //Imprimo la respuesta
@@ -293,12 +305,16 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     //Editar por put (solo modificar datos)
     //Editar por post (modificar y subir archivos)
-    public function Update(){
+    public function Update($f3){
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+            /******************************/
+            // Usuario creador
+            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
             /*******************************************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => '
                 facturacion_listado.idFacturacion,
@@ -306,12 +322,13 @@ class gestionDocumentosPagos extends ControllerBase {
                 (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$_POST['idFacturacion'].' AND idPago!='.$_POST['idPago'].') AS MontoPagado',
                 'table'   => 'facturacion_listado',
                 'join'    => '',
-                'where'   => 'idFacturacion = "'.$_POST['idFacturacion'].'"',
+                'where'   => 'idFacturacion = ?',
+                'params'  => [$_POST['idFacturacion']],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams = ['query' => $query];
             $rowData = $this->Base_GetByID($xParams);
 
@@ -321,7 +338,7 @@ class gestionDocumentosPagos extends ControllerBase {
                 Response::error('Ha ingresado un monto superior al valor total del documento', 500);
             }else{
                 /******************************/
-                //Se genera la query
+                // Se genera la query
                 $query = [
                     'data'      => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
                     'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
@@ -333,7 +350,7 @@ class gestionDocumentosPagos extends ControllerBase {
                 ];
                 //Se genera el chequeo
                 $dataCheck_1 = $this->dataCheck_1($_POST);
-                //Ejecuto la query
+                // Ejecuto la query
                 $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
                 $Response = $this->Base_update($xParams);
 
@@ -369,22 +386,23 @@ class gestionDocumentosPagos extends ControllerBase {
             parse_str(file_get_contents("php://input"),$dataDelete);
 
             /******************************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'    => 'idFacturacion',
                 'table'   => 'facturacion_listado_pagos',
                 'join'    => '',
-                'where'   => 'idPago = "'.$this->Codification->encryptDecrypt('decrypt', $dataDelete['idPago']).'"',
+                'where'   => 'idPago = ?',
+                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idPago'])],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams        = ['query' => $query];
             $rowFacturacion = $this->Base_GetByID($xParams);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'facturacion_listado_pagos',
@@ -392,7 +410,7 @@ class gestionDocumentosPagos extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -424,7 +442,7 @@ class gestionDocumentosPagos extends ControllerBase {
     public function updateFact($FacturacionID){
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
             facturacion_listado.idFacturacion,
@@ -432,12 +450,13 @@ class gestionDocumentosPagos extends ControllerBase {
             (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$FacturacionID.') AS MontoPagado',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$FacturacionID.'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$FacturacionID],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
@@ -448,14 +467,14 @@ class gestionDocumentosPagos extends ControllerBase {
         }else{
             $idEstadoPago = 1; //No Pagado
         }
-        //Se agrega respuesta
+        // Se agrega respuesta
         $arrTareas = [
             'idFacturacion'   => $rowData['data']['idFacturacion'],
             'idEstadoPago'    => $idEstadoPago,
             'MontoPagado'     => $rowData['data']['MontoPagado'],
         ];
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idFacturacion,idEstadoPago,MontoPagado',
             'required'  => 'idFacturacion,idEstadoPago,MontoPagado',
@@ -467,7 +486,7 @@ class gestionDocumentosPagos extends ControllerBase {
         ];
         //Se genera el chequeo
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
         $this->Base_update($xParams);
 
@@ -477,7 +496,7 @@ class gestionDocumentosPagos extends ControllerBase {
     //Se genera el pago
     public function insertPago($Data){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
             facturacion_listado.idFacturacion,
@@ -485,12 +504,13 @@ class gestionDocumentosPagos extends ControllerBase {
             (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$Data['idFacturacion'].') AS MontoPagado',
             'table'   => 'facturacion_listado',
             'join'    => '',
-            'where'   => 'idFacturacion = "'.$Data['idFacturacion'].'"',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$Data['idFacturacion']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
@@ -500,7 +520,7 @@ class gestionDocumentosPagos extends ControllerBase {
             return ['status' => 500, 'Response' => 'Ha ingresado un monto superior al valor total del documento'];
         }else{
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
                 'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
@@ -511,7 +531,7 @@ class gestionDocumentosPagos extends ControllerBase {
             ];
             //Se genera el chequeo
             $dataCheck_1 = $this->dataCheck_1($Data);
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_insert($xParams);
 
@@ -539,7 +559,7 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',
@@ -576,7 +596,7 @@ class gestionDocumentosPagos extends ControllerBase {
 
     //Se validan los datos
     private function dataCheck_2($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

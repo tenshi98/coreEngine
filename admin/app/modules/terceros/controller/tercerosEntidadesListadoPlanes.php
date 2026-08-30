@@ -5,7 +5,7 @@
 class tercerosEntidadesListadoPlanes extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -17,7 +17,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -38,40 +38,42 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     //Crear nuevo
     public function New($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEntidad',
             'table'   => 'entidades_listado',
             'join'    => '',
-            'where'   => 'idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idServicio AS ID,Nombre',
             'table'   => 'servicios_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrServicios['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -103,7 +105,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     //List
     public function UpdateList($f3, $params){
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 terceros_entidades_listado_planes.idPlan,
@@ -116,20 +118,21 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
             'join'    => '
                 LEFT JOIN servicios_listado  ON servicios_listado.idServicio  = terceros_entidades_listado_planes.idServicio
                 LEFT JOIN core_estados       ON core_estados.idEstado         = terceros_entidades_listado_planes.idEstado',
-            'where'   => 'terceros_entidades_listado_planes.idEntidad = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'terceros_entidades_listado_planes.idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'terceros_entidades_listado_planes.Fecha DESC, servicios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrPlanes = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($arrPlanes['status']){
 
             /******************************************/
@@ -163,7 +166,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     //View
     public function View($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 terceros_entidades_listado_planes.Fecha,
@@ -176,19 +179,20 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
             'join'    => '
                 LEFT JOIN servicios_listado  ON servicios_listado.idServicio  = terceros_entidades_listado_planes.idServicio
                 LEFT JOIN core_estados       ON core_estados.idEstado         = terceros_entidades_listado_planes.idEstado',
-            'where'   => 'terceros_entidades_listado_planes.idPlan = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'terceros_entidades_listado_planes.idPlan = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -221,56 +225,59 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     //Edit
     public function GetID($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPlan,idEntidad,idServicio,idEstado,Fecha,Monto,Observacion',
             'table'   => 'terceros_entidades_listado_planes',
             'join'    => '',
-            'where'   => 'idPlan = "'.$this->Codification->encryptDecrypt('decrypt', $params['id']).'"',
+            'where'   => 'idPlan = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idServicio AS ID,Nombre',
             'table'   => 'servicios_listado',
             'join'    => '',
-            'where'   => 'idEstado=1',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams      = ['query' => $query];
         $arrServicios = $this->Base_GetList($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
             'table'   => 'core_estados',
             'join'    => '',
-            'where'   => 'idEstado!=0',
+            'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams   = ['query' => $query];
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrServicios['status'] && $arrEstado['status']){
             /******************************************/
             //Datos enviados a la pagina
@@ -306,14 +313,18 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     /******************************************************************************/
     /******************************************************************************/
     //Crear
-    public function Insert(){
+    public function Insert($f3){
+
+        /******************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
         /******************************/
         //Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
         /******************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'      => 'idEntidad,idServicio,idEstado,idUsuario,Fecha,Monto,Observacion',
             'required'  => 'idEntidad,idServicio,idEstado,idUsuario,Monto',
@@ -322,7 +333,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
             'table'     => 'terceros_entidades_listado_planes',
             'Post'      => $_POST
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         $Response = $this->Base_insert($xParams);
 
@@ -341,15 +352,20 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     /******************************************************************************/
     //Editar por put (solo modificar datos)
     //Editar por post (modificar y subir archivos)
-    public function Update(){
+    public function Update($f3){
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            /******************************/
+            // Usuario creador
+            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
             /******************************/
             //Se genera el chequeo
             $DataCheck = $this->dataCheck($_POST);
 
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'data'      => 'idPlan,idEntidad,idServicio,idEstado,idUsuario,Fecha,Monto,Observacion',
                 'required'  => 'idEntidad,idServicio,idEstado,idUsuario,Monto',
@@ -359,7 +375,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
                 'where'     => 'idPlan',
                 'Post'      => $_POST
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
@@ -387,7 +403,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
             //Se parsean los datos
             parse_str(file_get_contents("php://input"),$dataDelete);
             /******************************/
-            //Se genera la query
+            // Se genera la query
             $query = [
                 'files'       => '',
                 'table'       => 'terceros_entidades_listado_planes',
@@ -395,7 +411,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
                 'SubCarpeta'  => '',
                 'Post'        => $dataDelete
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
@@ -421,7 +437,7 @@ class tercerosEntidadesListadoPlanes extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

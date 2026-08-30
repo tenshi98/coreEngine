@@ -38,19 +38,12 @@
                                     /*****************************/
                                     //No pagado
                                     case 1:
-                                        //Se verifican si existen los datos
-                                        $x1 = $data['rowData']['idDocumentos'] ?? '';
-                                        $x2 = $data['rowData']['N_Doc'] ?? '';
-                                        $x3 = $data['rowData']['idEntidad'] ?? '';
-                                        $x4 = $data['rowData']['Creacion_fecha'] ?? '';
-                                        $x5 = $data['rowData']['Observaciones'] ?? '';
-
                                         //se dibujan los inputs
-                                        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil', 'Name' => 'idDocumentos',    'Id' => 'Edit_idDocumentos',    'Value' => $x1, 'Required' => 2, 'arrData' => $data['arrDocumentos']]);
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'Edit_N_Doc',           'Value' => $x2, 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
-                                        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'Edit_idEntidad',       'Value' => $x3, 'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => $x4, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
-                                        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => $x5, 'Required' => 1]);
+                                        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil', 'Name' => 'idDocumentos',    'Id' => 'Edit_idDocumentos',    'Value' => ($data['rowData']['idDocumentos'] ?? ''),   'Required' => 2, 'arrData' => $data['arrDocumentos']]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'Edit_N_Doc',           'Value' => ($data['rowData']['N_Doc'] ?? ''),          'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+                                        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'Edit_idEntidad',       'Value' => ($data['rowData']['idEntidad'] ?? ''),      'Required' => 2, 'arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fecha',  'Id' => 'Edit_Creacion_fecha',  'Value' => ($data['rowData']['Creacion_fecha'] ?? ''), 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
+                                        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => ($data['rowData']['Observaciones'] ?? ''),  'Required' => 1]);
 
                                         break;
                                     /*****************************/
@@ -68,19 +61,12 @@
                                                     ? ' ('.$data['rowData']['EntidadesNick'].')'
                                                     : '';
 
-                                        //Se verifican si existen los datos
-                                        $x1 = $data['rowData']['Documento'] ?? '';
-                                        $x2 = $data['rowData']['N_Doc'] ?? '';
-                                        $x3 = $Entidad ?? '';
-                                        $x4 = $data['rowData']['Creacion_fecha'] ?? '';
-                                        $x5 = $data['rowData']['Observaciones'] ?? '';
-
                                         //se dibujan los inputs
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Documento Mercantil', 'Name' => 'DocumentoFake',      'Id' => 'DocumentoFake',        'Value' => $x1,'Required' => 3]);
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Numero Documento',    'Name' => 'N_DocFake',          'Id' => 'N_DocFake',            'Value' => $x2,'Required' => 3]);
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Entidad',             'Name' => 'EntidadFake',        'Id' => 'EntidadFake',          'Value' => $x3,'Required' => 3]);
-                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fechaFake', 'Id' => 'Creacion_fechaFake',   'Value' => $x4,'Required' => 3]);
-                                        $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',      'Id' => 'Edit_Observaciones',   'Value' => $x5, 'Required' => 1]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Documento Mercantil', 'Name' => 'DocumentoFake',      'Id' => 'DocumentoFake',        'Value' => ($data['rowData']['Documento'] ?? ''),      'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Numero Documento',    'Name' => 'N_DocFake',          'Id' => 'N_DocFake',            'Value' => ($data['rowData']['N_Doc'] ?? ''),          'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Entidad',             'Name' => 'EntidadFake',        'Id' => 'EntidadFake',          'Value' => ($Entidad ?? ''),                           'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fechaFake', 'Id' => 'Creacion_fechaFake',   'Value' => ($data['rowData']['Creacion_fecha'] ?? ''), 'Required' => 3]);
+                                        $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',      'Id' => 'Edit_Observaciones',   'Value' => ($data['rowData']['Observaciones'] ?? ''),  'Required' => 1]);
 
                                         break;
 
@@ -99,7 +85,7 @@
                 </div>
 
                 <?php
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']);
                 ?>
 
@@ -235,7 +221,7 @@
     /*********************************************************************/
     /*                              ITEMS                                */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ItemLoad = 0;
     /******************************************/
     function tabItemLoadList() {
@@ -319,7 +305,7 @@
     /*********************************************************************/
     /*                            PRODUCTOS                              */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ProdLoad = 0;
     /******************************************/
     function tabProdLoadList() {
@@ -403,7 +389,7 @@
     /*********************************************************************/
     /*                            SERVICIOS                              */
     /*********************************************************************/
-    //Variables
+    // Variables
     let ServLoad = 0;
     /******************************************/
     function tabServLoadList() {
@@ -489,7 +475,7 @@
         /*********************************************************************/
         /*                        GUIAS DE DESPACHO                          */
         /*********************************************************************/
-        //Variables
+        // Variables
         let GuiaLoad = 0;
         /******************************************/
         function tabGuiaLoadList() {
@@ -561,7 +547,7 @@
         /*********************************************************************/
         /*                              PAGOS                                */
         /*********************************************************************/
-        //Variables
+        // Variables
         let PagoLoad = 0;
         /******************************************/
         function tabPagoLoadList() {

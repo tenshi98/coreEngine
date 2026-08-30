@@ -5,7 +5,7 @@
 class example extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $DBConn;
     private $QBuilder;
 
@@ -13,7 +13,7 @@ class example extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -55,7 +55,7 @@ class example extends ControllerBase {
 
         /************************************************/
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrQuery){
             //recorro
             foreach ($arrQuery as $query) {

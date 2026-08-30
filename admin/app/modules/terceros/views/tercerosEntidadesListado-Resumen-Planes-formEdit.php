@@ -28,20 +28,16 @@
     <div class="modal-body">
         <?php
         //Se verifican si existen los datos
-        $x1  = $data['rowData']['idServicio'] ?? '';
-        $x2  = $data['rowData']['Fecha'] ?? '';
-        $x3 = (!empty($data['rowData']['Monto']) && $data['rowData']['Monto'] != 0)
-            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Monto'])
-            : '';
-        $x4  = $data['rowData']['Observacion'] ?? '';
-        $x5  = $data['rowData']['idEstado'] ?? '';
+        $x_EditPlanes_Monto = (!empty($data['rowData']['Monto']) && $data['rowData']['Monto'] != 0)
+                            ? $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Monto'])
+                            : '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Servicio',    'Name' => 'idServicio',   'Id' => 'EditPlanes_idServicio',  'Value' => $x1, 'Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'EditPlanes_Fecha',       'Value' => $x2, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 6,  'Placeholder' => 'Monto',       'Name' => 'Monto',        'Id' => 'EditPlanes_Monto',       'Value' => $x3, 'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'EditPlanes_Observacion', 'Value' => $x4, 'Required' => 1]);
-        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',      'Name' => 'idEstado',     'Id' => 'EditPlanes_idEstado',    'Value' => $x5, 'Required' => 2,'arrData' => $data['arrEstado']]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Servicio',    'Name' => 'idServicio',   'Id' => 'EditPlanes_idServicio',  'Value' => ($data['rowData']['idServicio'] ?? ''),  'Required' => 2,'arrData' => $data['arrServicios'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'EditPlanes_Fecha',       'Value' => ($data['rowData']['Fecha'] ?? ''),       'Required' => 2, 'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 6,  'Placeholder' => 'Monto',       'Name' => 'Monto',        'Id' => 'EditPlanes_Monto',       'Value' => $x_EditPlanes_Monto,                     'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
+        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'EditPlanes_Observacion', 'Value' => ($data['rowData']['Observacion'] ?? ''), 'Required' => 1]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',      'Name' => 'idEstado',     'Id' => 'EditPlanes_idEstado',    'Value' => ($data['rowData']['idEstado'] ?? ''),    'Required' => 2,'arrData' => $data['arrEstado']]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idPlan','Value' => $data['rowData']['idPlan'],'Required' => 2]);

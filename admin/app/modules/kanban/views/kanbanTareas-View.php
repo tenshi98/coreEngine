@@ -32,7 +32,7 @@
                     <div class="kanban-header">
                         <div class="row gutters">
                             <?php
-                            //Variables
+                            // Variables
                             $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']);
                             ?>
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -101,7 +101,7 @@
                                             //Se verifica si se permite usar tareas especificas
                                             if($data['UserData']["KanbanTareasUsoTareas"]==2){ ?>
                                                 <?php foreach ($data['arrTareas'] as $task){
-                                                    //Variables
+                                                    // Variables
                                                     $encryptedTareas = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idTareas']);
                                                     ?>
                                                     <tr>
@@ -118,7 +118,7 @@
                                                 <?php } ?>
                                             <?php }else{ ?>
                                                 <?php foreach ($data['arrTareas'] as $task){
-                                                    //Variables
+                                                    // Variables
                                                     $encryptedTareas = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idTareas']); ?>
                                                     <tr>
                                                         <td><?php echo $task['Tarea']?></td>
@@ -195,7 +195,7 @@
                                         </thead>
                                         <tbody>
                                             <?php
-                                            //variables
+                                            // Variables
                                             $vowels = array('&lt;br&gt;', '&lt;br/&gt;');
                                             //recorro
                                             foreach ($data['arrHistorial'] as $task){

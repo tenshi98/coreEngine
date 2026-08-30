@@ -26,7 +26,7 @@
                 echo '<tr class="table-secondary"><td colspan="6"><strong>'.$Controller.'</strong></td></tr>';
                 //se recorren los datos dentro de la categoría
                 foreach ($permisos as $ruta){
-                    //Variables
+                    // Variables
                     $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $ruta['idRutas']); ?>
                     <tr>
                         <td><?php echo $ruta['Metodo']; ?></td>

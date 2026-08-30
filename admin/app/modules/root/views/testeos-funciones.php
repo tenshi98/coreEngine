@@ -45,7 +45,7 @@
                                     $resultado = $data['Fnc_DataText']->dividirTexto($result['text'], 'aaa');
                                     //si hay efectivamente datos en ambos lados
                                     if(isset($resultado['derecha'])&&$resultado['derecha']!=''){
-                                        //Variables
+                                        // Variables
                                         $col_left   = $resultado['izquierda'];
                                         $resultado2 = $data['Fnc_DataText']->dividirTexto($resultado['derecha'], ' -&gt; ');
                                         $col_right  = ltrim($resultado2['izquierda'], '(');
@@ -69,7 +69,7 @@
                                         echo '<p class="text-center fw-bold '.$x_color.'" '.$x_title.'>'.$x_text.'</p>';
                                     //Solo datos en un lado
                                     }else{
-                                        //Variables
+                                        // Variables
                                         $resultado2 = $data['Fnc_DataText']->dividirTexto($resultado['izquierda'], ' -&gt; ');
                                         $col_right  = ltrim($resultado2['izquierda'], '(');
                                         //Se crea boton

@@ -30,44 +30,28 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['email'] ?? '';
-                                $x2  = $data['rowData']['Nombre'] ?? '';
-                                $x3  = $data['rowData']['Rut'] ?? '';
-                                $x4  = $data['rowData']['fNacimiento'] ?? '';
-                                $x5  = $data['rowData']['Fono'] ?? '';
-                                $x6  = $data['rowData']['idCiudad'] ?? '';
-                                $x7  = $data['rowData']['idComuna'] ?? '';
-                                $x8  = $data['rowData']['Direccion'] ?? '';
-                                $x9  = $data['rowData']['idTipoUsuario'] ?? '';
-                                $x10 = $data['rowData']['idEstado'] ?? '';
-                                $x11 = $data['rowData']['Social_X'] ?? '';
-                                $x12 = $data['rowData']['Social_Facebook'] ?? '';
-                                $x13 = $data['rowData']['Social_Instagram'] ?? '';
-                                $x14 = $data['rowData']['Social_Linkedin'] ?? '';
-
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Personales', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',               'Name'  => 'email',        'Id'  => 'Edit_email',       'Value'  => $x1,  'Required'  => 2, 'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',       'Id'  => 'Edit_Nombre',      'Value'  => $x2,  'Required'  => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',          'Id'  => 'Edit_Rut',         'Value'  => $x3,  'Required'  => 1, 'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento',  'Id'  => 'Edit_fNacimiento', 'Value'  => $x4,  'Required'  => 1, 'Icon' => 'bi bi-calendar3']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono',                'Name'  => 'Fono',         'Id'  => 'Edit_Fono',        'Value'  => $x5,  'Required'  => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',     'Id1' => 'Edit_idCiudad',    'Value1' => $x6,  'Required1' => 1, 'arrData1' => $data['arrCiudad'],
-                                                                                      'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',     'Id2' => 'Edit_idComuna',    'Value2' => $x7,  'Required2' => 1, 'arrData2' => $data['arrComuna']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',    'Id'  => 'Edit_Direccion',   'Value'  => $x8,  'Required'  => 1, 'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',               'Name'  => 'email',        'Id'  => 'Edit_email',       'Value'  => ($data['rowData']['email'] ?? ''),        'Required'  => 2, 'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',              'Name'  => 'Nombre',       'Id'  => 'Edit_Nombre',      'Value'  => ($data['rowData']['Nombre'] ?? ''),       'Required'  => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',                 'Name'  => 'Rut',          'Id'  => 'Edit_Rut',         'Value'  => ($data['rowData']['Rut'] ?? ''),          'Required'  => 1, 'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder'  => 'Fecha de Nacimiento', 'Name'  => 'fNacimiento',  'Id'  => 'Edit_fNacimiento', 'Value'  => ($data['rowData']['fNacimiento'] ?? ''),  'Required'  => 1, 'Icon' => 'bi bi-calendar3']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono',                'Name'  => 'Fono',         'Id'  => 'Edit_Fono',        'Value'  => ($data['rowData']['Fono'] ?? ''),         'Required'  => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',              'Name1' => 'idCiudad',     'Id1' => 'Edit_idCiudad',    'Value1' => ($data['rowData']['idCiudad'] ?? ''),     'Required1' => 1, 'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',              'Name2' => 'idComuna',     'Id2' => 'Edit_idComuna',    'Value2' => ($data['rowData']['idComuna'] ?? ''),     'Required2' => 1, 'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',    'Id'  => 'Edit_Direccion',   'Value'  => ($data['rowData']['Direccion'] ?? ''),    'Required'  => 1, 'Icon' => 'bi bi-geo-alt-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'Edit_idTipoUsuario',  'Value' => $x9, 'Required' => 2,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'Edit_idTipoUsuario',  'Value' => ($data['rowData']['idTipoUsuario'] ?? ''), 'Required' => 2,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => $x11, 'Required' => 1, 'Icon' => 'bi bi-x']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',   'Id' => 'Edit_Social_Facebook',  'Value' => $x12, 'Required' => 1, 'Icon' => 'bi bi-facebook']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram',  'Id' => 'Edit_Social_Instagram', 'Value' => $x13, 'Required' => 1, 'Icon' => 'bi bi-instagram']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => $x14, 'Required' => 1, 'Icon' => 'bi bi-linkedin']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => ($data['rowData']['Social_X'] ?? ''),         'Required' => 1, 'Icon' => 'bi bi-x']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',   'Id' => 'Edit_Social_Facebook',  'Value' => ($data['rowData']['Social_Facebook'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-facebook']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram',  'Id' => 'Edit_Social_Instagram', 'Value' => ($data['rowData']['Social_Instagram'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-instagram']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => ($data['rowData']['Social_Linkedin'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => $x10,  'Required' => 2,'arrData' => $data['arrEstado']]);
+                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => ($data['rowData']['idEstado'] ?? ''),  'Required' => 2,'arrData' => $data['arrEstado']]);
                                 $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'Edit_password',  'Value'  => '',    'Required' => 1,'Icon' => 'bi bi-key']);
 
@@ -256,7 +240,7 @@
     /*                          OBSERVACIONES                            */
     /*********************************************************************/
     /******************************************/
-    //Variables
+    // Variables
     let ObsLoad = 0;
     /******************************************/
     function tabObsLoadList() {

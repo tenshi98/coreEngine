@@ -5,7 +5,7 @@
 class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -14,7 +14,7 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -32,22 +32,23 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
     //List
     public function UpdateList($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idUsuario,idEntidad,Nombre',
             'table'   => 'terceros_entidades_listado_usuarios',
             'join'    => '',
-            'where'   => 'idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['idUsuario']).'"',
+            'where'   => 'idUsuario = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['idUsuario'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 terceros_entidades_listado_maquinas.idMaq,
@@ -56,20 +57,21 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                 (SELECT COUNT(idPermiso) FROM terceros_entidades_listado_usuarios_maq WHERE idMaquina = ID AND idUsuario = '.$this->Codification->encryptDecrypt('decrypt', $params['idUsuario']).' LIMIT 1) AS IsActivo',
             'table'   => 'terceros_entidades_listado_maquinas',
             'join'    => 'LEFT JOIN maquinas_listado ON maquinas_listado.idMaquina = terceros_entidades_listado_maquinas.idMaquina',
-            'where'   => 'terceros_entidades_listado_maquinas.idEntidad='.$this->Codification->encryptDecrypt('decrypt', $params['idEntidad']),
+            'where'   => 'terceros_entidades_listado_maquinas.idEntidad = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['idEntidad'])],
             'group'   => '',
             'having'  => '',
             'order'   => 'maquinas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrPermisos['status']){
 
             /******************************************/
@@ -105,9 +107,13 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
     /******************************************************************************/
     //Editar por put (solo modificar datos)
     //Editar por post (modificar y subir archivos)
-    public function Update(){
+    public function Update($f3){
         //Verificacion metodo POST
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            /******************************/
+            // Usuario creador
+            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
             /*******************************************************************/
             //Se traen los permisos
@@ -118,45 +124,47 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                     (SELECT COUNT(idPermiso) FROM terceros_entidades_listado_usuarios_maq WHERE idMaquina = ID AND idUsuario = '.$_POST['idUsuario'].' LIMIT 1) AS IsActivo',
                 'table'   => 'terceros_entidades_listado_maquinas',
                 'join'    => '',
-                'where'   => 'idEntidad='.$_POST['idEntidad'],
+                'where'   => 'idEntidad = ?',
+                'params'  => [$_POST['idEntidad']],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'idMaq ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams     = ['query' => $query];
             $arrPermisos = $this->Base_GetList($xParams);
 
             /*******************************************************************/
             // Si hay datos
             if ($arrPermisos['status']){
-                //Recorro los permisos
+                // Se acumulan las filas a insertar para evitar un INSERT por cada recurso nuevo (N+1)
+                $rowsPermisosNuevos = [];
+                // Recorro los permisos
                 foreach ($arrPermisos['data'] as $permisos){
-                    //Se verifica si esta marcado
+                    // Se verifica si esta marcado
                     switch ($_POST['switch_'.$permisos['idMaq']]) {
                         /*******************************************************************/
-                        //Inactivo
+                        // Inactivo
                         case 1:
-                            //Se verifica si permiso existe
+                            // Se verifica si permiso existe
                             switch ($permisos['IsActivo']) {
                                 /*******************************************************************/
-                                //No existe permiso previo
+                                // No existe permiso previo
                                 case 0:
-                                    //nada
+                                    // Nada
                                     break;
                                 /*******************************************************************/
-                                //Si hay al menos un permiso
+                                // Si hay al menos un permiso
                                 default:
                                     /******************************/
-                                    //Se borran los datos
+                                    // Se borran los datos
                                     $Post = [
                                         'idUsuario' => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
                                         'idMaquina' => $this->Codification->encryptDecrypt('encrypt',$permisos['idMaq']),
                                     ];
-
                                     /******************************/
-                                    //Se genera la query
+                                    // Se genera la query
                                     $query = [
                                         'files'       => '',
                                         'table'       => 'terceros_entidades_listado_usuarios_maq',
@@ -164,49 +172,49 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                                         'SubCarpeta'  => '',
                                         'Post'        => $Post
                                     ];
-                                    //Ejecuto la query
+                                    // Ejecuto la query
                                     $xParams = ['query' => $query];
                                     $this->Base_delete($xParams);
-
                                     break;
                             }
                             break;
                         /*******************************************************************/
-                        //Activo
+                        // Activo
                         case 2:
-                            //Verifico si existe
+                            // Verifico si existe
                             switch ($permisos['IsActivo']) {
                                 /*******************************************************************/
-                                //Si no hay permisos se crea
+                                // Si no hay permisos se crea
                                 case 0:
                                     /******************************/
-                                    //Se borran los datos
-                                    $Post = [
-                                        'idUsuario'   => $_POST['idUsuario'],
-                                        'idMaquina'   => $permisos['idMaq'],
+                                    // Se acumula la fila para insertarla junto con el resto de recursos nuevos
+                                    $rowsPermisosNuevos[]    = [
+                                        'idUsuario'  => $_POST['idUsuario'],
+                                        'idMaquina'  => $permisos['idMaq'],
                                     ];
-
-                                    /******************************/
-                                    //Se genera la query
-                                    $query = [
-                                        'data'      => 'idUsuario,idMaquina',
-                                        'required'  => 'idUsuario,idMaquina',
-                                        'unique'    => '',
-                                        'encode'    => '',
-                                        'table'     => 'terceros_entidades_listado_usuarios_maq',
-                                        'Post'      => $Post
-                                    ];
-                                    //Se genera el chequeo
-                                    $dataCheck_1 = $this->dataCheck_1($Post);
-                                    //Ejecuto la query
-                                    $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
-                                    $this->Base_insert($xParams);
                                     break;
-
                             }
                             break;
                     }
                 }
+
+                /******************************/
+                // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
+                if ($rowsPermisosNuevos){
+                    //Se genera el chequeo
+                    $DataCheck = $this->dataCheck_1('');
+                    // Se genera la query
+                    $query = [
+                        'data'      => 'idUsuario,idMaquina',
+                        'required'  => 'idUsuario,idMaquina',
+                        'table'     => 'terceros_entidades_listado_usuarios_maq',
+                        'rows'      => $rowsPermisosNuevos
+                    ];
+                    // Ejecuto la query
+                    $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                    $this->Base_insertMultiple($xParams);
+                }
+
             }
 
             /******************************/
@@ -224,7 +232,7 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

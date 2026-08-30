@@ -27,15 +27,10 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1 = $data['rowData']['Nombre'] ?? '';
-        $x2 = $data['rowData']['FVencimiento'] ?? '';
-        $x3 = $data['rowData']['Observacion'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name' => 'Nombre',        'Id' => 'EditDocumentos_Nombre',         'Value' => $x1,'Required' => 2]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Vencimiento', 'Name' => 'FVencimiento',  'Id' => 'EditDocumentos_FVencimiento',   'Value' => $x2,'Required' => 2,'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',       'Name' => 'Observacion',   'Id' => 'EditDocumentos_Observacion',    'Value' => $x3,'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name' => 'Nombre',        'Id' => 'EditDocumentos_Nombre',         'Value' => ($data['rowData']['Nombre'] ?? ''),       'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Vencimiento', 'Name' => 'FVencimiento',  'Id' => 'EditDocumentos_FVencimiento',   'Value' => ($data['rowData']['FVencimiento'] ?? ''), 'Required' => 2,'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',       'Name' => 'Observacion',   'Id' => 'EditDocumentos_Observacion',    'Value' => ($data['rowData']['Observacion'] ?? ''),  'Required' => 1]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idDocumentos','Value' => $data['rowData']['idDocumentos'],'Required' => 2]);

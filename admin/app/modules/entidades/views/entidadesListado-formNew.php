@@ -54,7 +54,7 @@
                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,   'Placeholder'  => 'Teléfono',   'Name'  => 'Fono2',      'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1,      'Required' => 2]); //Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1,      'Required' => 2]); // Activo
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password', 'Value' => '1234', 'Required' => 2]); //password por defecto
 
                     ?>

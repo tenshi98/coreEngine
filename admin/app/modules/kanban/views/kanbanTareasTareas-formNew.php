@@ -31,7 +31,6 @@ $RandName = 'rand_'.rand(1, 999999);
     <div class="modal-body">
         <?php
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario', 'Value' => $data['UserData']['UserID'],   'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',  'Value' => $data['rowData']['idKanban'],  'Required' => 2]);
         //Datos antiguos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual', 'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);

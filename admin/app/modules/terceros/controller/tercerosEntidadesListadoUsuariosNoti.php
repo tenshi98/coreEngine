@@ -5,7 +5,7 @@
 class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -14,7 +14,7 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -32,22 +32,23 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
     //List
     public function UpdateList($f3, $params){
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idUsuario,idEntidad,Nombre',
             'table'   => 'terceros_entidades_listado_usuarios',
             'join'    => '',
-            'where'   => 'idUsuario = "'.$this->Codification->encryptDecrypt('decrypt', $params['idUsuario']).'"',
+            'where'   => 'idUsuario = ?',
+            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['idUsuario'])],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => '
                 idTipoNoti,
@@ -57,19 +58,20 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
             'table'   => 'core_telemetria_tipo_noti',
             'join'    => '',
             'where'   => '',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
-        //Si hay resultados
+        // Si hay resultados
         if($rowData['status'] && $arrPermisos['status']){
 
             /******************************************/
@@ -119,44 +121,46 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
                 'table'   => 'core_telemetria_tipo_noti',
                 'join'    => '',
                 'where'   => '',
+                'params'  => [],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            //Ejecuto la query
+            // Ejecuto la query
             $xParams     = ['query' => $query];
             $arrPermisos = $this->Base_GetList($xParams);
 
             /*******************************************************************/
             // Si hay datos
             if ($arrPermisos['status']){
-                //Recorro los permisos
+                // Se acumulan las filas a insertar para evitar un INSERT por cada recurso nuevo (N+1)
+                $rowsPermisosNuevos = [];
+                // Recorro los permisos
                 foreach ($arrPermisos['data'] as $permisos){
-                    //Se verifica si esta marcado
+                    // Se verifica si esta marcado
                     switch ($_POST['switch_'.$permisos['idTipoNoti']]) {
                         /*******************************************************************/
-                        //Inactivo
+                        // Inactivo
                         case 1:
-                            //Se verifica si permiso existe
+                            // Se verifica si permiso existe
                             switch ($permisos['IsActivo']) {
                                 /*******************************************************************/
-                                //No existe permiso previo
+                                // No existe permiso previo
                                 case 0:
-                                    //nada
+                                    // Nada
                                     break;
                                 /*******************************************************************/
-                                //Si hay al menos un permiso
+                                // Si hay al menos un permiso
                                 default:
                                     /******************************/
-                                    //Se borran los datos
+                                    // Se borran los datos
                                     $Post = [
                                         'idUsuario'  => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
                                         'idTipoNoti' => $this->Codification->encryptDecrypt('encrypt',$permisos['idTipoNoti']),
                                     ];
-
                                     /******************************/
-                                    //Se genera la query
+                                    // Se genera la query
                                     $query = [
                                         'files'       => '',
                                         'table'       => 'terceros_entidades_listado_usuarios_noti',
@@ -164,48 +168,47 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
                                         'SubCarpeta'  => '',
                                         'Post'        => $Post
                                     ];
-                                    //Ejecuto la query
+                                    // Ejecuto la query
                                     $xParams = ['query' => $query];
                                     $this->Base_delete($xParams);
-
                                     break;
                             }
                             break;
                         /*******************************************************************/
-                        //Activo
+                        // Activo
                         case 2:
-                            //Verifico si existe
+                            // Verifico si existe
                             switch ($permisos['IsActivo']) {
                                 /*******************************************************************/
-                                //Si no hay permisos se crea
+                                // Si no hay permisos se crea
                                 case 0:
                                     /******************************/
-                                    //Se borran los datos
-                                    $Post = [
+                                    // Se acumula la fila para insertarla junto con el resto de recursos nuevos
+                                    $rowsPermisosNuevos[]    = [
                                         'idUsuario'   => $_POST['idUsuario'],
                                         'idTipoNoti'  => $permisos['idTipoNoti'],
                                     ];
-
-                                    /******************************/
-                                    //Se genera la query
-                                    $query = [
-                                        'data'      => 'idUsuario,idTipoNoti',
-                                        'required'  => 'idUsuario,idTipoNoti',
-                                        'unique'    => '',
-                                        'encode'    => '',
-                                        'table'     => 'terceros_entidades_listado_usuarios_noti',
-                                        'Post'      => $Post
-                                    ];
-                                    //Se genera el chequeo
-                                    $dataCheck_1 = $this->dataCheck_1($Post);
-                                    //Ejecuto la query
-                                    $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
-                                    $this->Base_insert($xParams);
                                     break;
-
                             }
                             break;
                     }
+                }
+
+                /******************************/
+                // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
+                if ($rowsPermisosNuevos){
+                    //Se genera el chequeo
+                    $DataCheck = $this->dataCheck_1('');
+                    // Se genera la query
+                    $query = [
+                        'data'      => 'idUsuario,idTipoNoti',
+                        'required'  => 'idUsuario,idTipoNoti',
+                        'table'     => 'terceros_entidades_listado_usuarios_noti',
+                        'rows'      => $rowsPermisosNuevos
+                    ];
+                    // Ejecuto la query
+                    $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                    $this->Base_insertMultiple($xParams);
                 }
             }
 
@@ -224,7 +227,7 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
     /******************************************************************************/
     //Se validan los datos
     private function dataCheck_1($POST){
-        //Variables
+        // Variables
         $DataChecking = [
             'emptyData'                 => '',
             'encode'                    => '',

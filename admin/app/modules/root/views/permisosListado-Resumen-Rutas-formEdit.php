@@ -27,21 +27,13 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1  = $data['rowData']['idMetodo'] ?? '';
-        $x2  = $data['rowData']['RutaWeb'] ?? '';
-        $x3  = $data['rowData']['Controller'] ?? '';
-        $x4  = $data['rowData']['RutaController'] ?? '';
-        $x5  = $data['rowData']['Descripcion'] ?? '';
-        $x6  = $data['rowData']['idLevelLimit'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Metodo',             'Name' => 'idMetodo',       'Id' => 'Edit_idMetodo',       'Value' => $x1, 'Required' => 2,'arrData' => $data['arrMetodo']]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Ruta Web',           'Name' => 'RutaWeb',        'Id' => 'Edit_RutaWeb',        'Value' => $x2, 'Required' => 2,'Icon' => 'bi bi-puzzle']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Controlador',        'Name' => 'Controller',     'Id' => 'Edit_Controller',     'Value' => $x3, 'Required' => 2,'Icon' => 'bi bi-share-fill']);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Ruta Controlador',   'Name' => 'RutaController', 'Id' => 'Edit_RutaController', 'Value' => $x4, 'Required' => 2,'Icon' => 'bi bi-share-fill']);
-        $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Descripcion',        'Name' => 'Descripcion',    'Id' => 'Edit_Descripcion',    'Value' => $x5, 'Required' => 2]);
-        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Objetivo',           'Name' => 'idLevelLimit',   'Id' => 'Edit_idLevelLimit',   'Value' => $x6, 'Required' => 2,'arrData' => $data['arrLevelLimit']]);
+        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Metodo',             'Name' => 'idMetodo',       'Id' => 'Edit_idMetodo',       'Value' => ($data['rowData']['idMetodo'] ?? ''),       'Required' => 2,'arrData' => $data['arrMetodo']]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Ruta Web',           'Name' => 'RutaWeb',        'Id' => 'Edit_RutaWeb',        'Value' => ($data['rowData']['RutaWeb'] ?? ''),        'Required' => 2,'Icon' => 'bi bi-puzzle']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Controlador',        'Name' => 'Controller',     'Id' => 'Edit_Controller',     'Value' => ($data['rowData']['Controller'] ?? ''),     'Required' => 2,'Icon' => 'bi bi-share-fill']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Ruta Controlador',   'Name' => 'RutaController', 'Id' => 'Edit_RutaController', 'Value' => ($data['rowData']['RutaController'] ?? ''), 'Required' => 2,'Icon' => 'bi bi-share-fill']);
+        $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Descripcion',        'Name' => 'Descripcion',    'Id' => 'Edit_Descripcion',    'Value' => ($data['rowData']['Descripcion'] ?? ''),    'Required' => 2]);
+        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Objetivo',           'Name' => 'idLevelLimit',   'Id' => 'Edit_idLevelLimit',   'Value' => ($data['rowData']['idLevelLimit'] ?? ''),   'Required' => 2,'arrData' => $data['arrLevelLimit']]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idRutas','Value' => $data['rowData']['idRutas'],'Required' => 2]);

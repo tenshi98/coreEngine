@@ -27,17 +27,11 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1 = $data['rowData']['idMaquina'] ?? '';
-        $x2 = $data['rowData']['Fecha'] ?? '';
-        $x3 = $data['rowData']['Observacion'] ?? '';
-        $x4 = $data['rowData']['idEstado'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Maquina',     'Name' => 'idMaquina',    'Id' => 'EditMaquinas_idMaquina',   'Value' => $x1, 'Required' => 2,'arrData' => $data['arrMaquinas'],   'BASE' => $BASE]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'EditMaquinas_Fecha',       'Value' => $x2, 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'EditMaquinas_Observacion', 'Value' => $x3, 'Required' => 1]);
-        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',      'Name' => 'idEstado',     'Id' => 'EditMaquinas_idEstado',    'Value' => $x4, 'Required' => 2,'arrData' => $data['arrEstado']]);
+        $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Maquina',     'Name' => 'idMaquina',    'Id' => 'EditMaquinas_idMaquina',   'Value' => ($data['rowData']['idMaquina'] ?? ''),   'Required' => 2,'arrData' => $data['arrMaquinas'],   'BASE' => $BASE]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha',       'Name' => 'Fecha',        'Id' => 'EditMaquinas_Fecha',       'Value' => ($data['rowData']['Fecha'] ?? ''),       'Required' => 2, 'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion', 'Name' => 'Observacion',  'Id' => 'EditMaquinas_Observacion', 'Value' => ($data['rowData']['Observacion'] ?? ''), 'Required' => 1]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',      'Name' => 'idEstado',     'Id' => 'EditMaquinas_idEstado',    'Value' => ($data['rowData']['idEstado'] ?? ''),    'Required' => 2,'arrData' => $data['arrEstado']]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaq','Value' => $data['rowData']['idMaq'],'Required' => 2]);

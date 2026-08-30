@@ -5,14 +5,14 @@
 class productosInstaller extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $controllerName;
 
     /******************************************************************************/
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_ADMIN);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_ADMIN);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -52,18 +52,18 @@ class productosInstaller extends ControllerBase {
     public function InstallModule(){
 
         /******************************************/
-        //Variables
+        // Variables
         $arrTables    = $this->listTables();
         $arrPermisos  = array();
 
         /************************************************/
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrTables){
             //recorro
             foreach ($arrTables as $table) {
                 /******************************/
-                //Se genera la query
+                // Se genera la query
                 $xParams = ['query' => $table];
                 $this->Base_createTable($xParams);
             }
@@ -104,14 +104,14 @@ class productosInstaller extends ControllerBase {
         ];
         /************************************************/
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrPermisos){
             //Variable
             $IntCounter = 1;
             //recorro
             foreach ($arrPermisos as $permiso) {
                 /************************************************/
-                //Se genera la query
+                // Se genera la query
                 $query = [
                     'data'      => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
                     'required'  => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
@@ -120,19 +120,19 @@ class productosInstaller extends ControllerBase {
                     'table'     => 'core_permisos_listado',
                     'Post'      => $permiso
                 ];
-                //Ejecuto la query
+                // Ejecuto la query
                 $xParams    = ['DataCheck' => '', 'query' => $query];
                 $permisosID = $this->Base_insert($xParams);
                 /************************************************/
                 //Listar las rutas
                 $arrRutas = $this->listRouteModule($IntCounter, $permisosID['data']);
                 /************************************************/
-                //Verifico si existe
+                // Verifico si existe
                 if($arrRutas){
                     //recorro
                     foreach ($arrRutas as $rutas) {
                         /******************************/
-                        //Se genera la query
+                        // Se genera la query
                         $query = [
                             'data'      => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
                             'required'  => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
@@ -141,8 +141,8 @@ class productosInstaller extends ControllerBase {
                             'table'     => 'core_permisos_listado_rutas',
                             'Post'      => $rutas
                         ];
-                        //Ejecuto la query
-                        //Ejecuto la query
+                        // Ejecuto la query
+                        // Ejecuto la query
                         $xParams = ['DataCheck' => '', 'query' => $query, 'novalidate' => true];
                         $this->Base_insert($xParams);
                     }
@@ -169,18 +169,19 @@ class productosInstaller extends ControllerBase {
         /*******************************************************/
         /*             SE CONSULTAN LOS PERMISOS               */
         /*******************************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idPermisos',
             'table'   => 'core_permisos_listado',
             'join'    => '',
             'where'   => 'RutaController IN ('.$RutaController.')',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => 'idPermisos ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams     = ['query' => $query];
         $arrPermisos = $this->Base_GetList($xParams);
 
@@ -199,7 +200,7 @@ class productosInstaller extends ControllerBase {
         $arrPermDel[] = 'DELETE FROM `core_permisos_listado_rutas` WHERE Controller IN ('.$RutaController.')';
 
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrPermDel){
             //recorro
             foreach ($arrPermDel as $sql) {
@@ -220,7 +221,7 @@ class productosInstaller extends ControllerBase {
         $arrTableDel[] = ['table' => 'productos_listado_observaciones'];
 
         /************************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($arrTableDel){
             //recorro
             foreach ($arrTableDel as $tblDel) {
@@ -245,17 +246,18 @@ class productosInstaller extends ControllerBase {
         $RutaController  = $this->RutaController();
 
         /******************************************/
-        //Se genera la query
+        // Se genera la query
         $query = [
             'data'    => 'idRutas',
             'table'   => 'core_permisos_listado_rutas',
             'join'    => '',
             'where'   => 'Controller IN ('.$RutaController.')',
+            'params'  => [],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        //Ejecuto la query
+        // Ejecuto la query
         $xParams = ['query' => $query];
         $nData   = $this->Base_GetCountData($xParams);
 
@@ -269,11 +271,11 @@ class productosInstaller extends ControllerBase {
     public function listRouteModule($Type, $permisosID){
 
         /******************************************/
-        //Variables
+        // Variables
         $arrRutas  = array();
 
         /******************************************/
-        //Variables
+        // Variables
         switch ($Type) {
             /******************************************/
             case 1:
@@ -355,7 +357,7 @@ class productosInstaller extends ControllerBase {
     public function listTables(){
 
         /******************************************/
-        //Variables
+        // Variables
         $arrTables    = array();
 
         /*******************************************************/
@@ -407,7 +409,7 @@ class productosInstaller extends ControllerBase {
         ';
 
         /******************************************/
-        //Variables
+        // Variables
         $arrTables = $this->listTables();
         $dataSQL   = new FunctionsDataSQL();
         $Data     .= $dataSQL->minifyArrayTables($arrTables);

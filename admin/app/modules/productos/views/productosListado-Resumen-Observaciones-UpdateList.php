@@ -18,7 +18,7 @@
         if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
             //Recorro
             foreach($data['arrObservaciones'] as $crud){
-                //Variables
+                // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idObservaciones']); ?>
                 <tr>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>

@@ -27,13 +27,9 @@
     </div>
     <div class="modal-body">
         <?php
-        //Se verifican si existen los datos
-        $x1  = $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion']) ?? '';
-        $x2  = $data['rowData']['Observacion'] ?? '';
-
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Fecha Creacion', 'Name' => 'FechaCreacionFake',  'Id' => 'FechaCreacionFake',    'Value' => $x1,'Required' => 3]);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',    'Name' => 'Observacion',        'Id' => 'EditObs_Observacion',  'Value' => $x2,'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Fecha Creacion', 'Name' => 'FechaCreacionFake',  'Id' => 'FechaCreacionFake',    'Value' => ($data['rowData']['FechaCreacion'] ? $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion']) : ''), 'Required' => 3]);
+        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',    'Name' => 'Observacion',        'Id' => 'EditObs_Observacion',  'Value' => ($data['rowData']['Observacion'] ?? ''),                                                                            'Required' => 2]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idObservaciones','Value' => $data['rowData']['idObservaciones'],'Required' => 2]);

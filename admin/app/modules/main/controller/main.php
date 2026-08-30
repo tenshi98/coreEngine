@@ -5,7 +5,7 @@
 class main extends ControllerBase {
 
     /******************************************************************************/
-    //Variables
+    // Variables
     private $ServerServer;
     private $DataDate;
 
@@ -13,7 +13,7 @@ class main extends ControllerBase {
     //Constructor
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigData::MySQL_1);
+        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
@@ -36,7 +36,8 @@ class main extends ControllerBase {
             'data'   => 'Sistema_idTema',
             'table'  => 'core_sistemas',
             'join'   => '',
-            'where'  => 'idSistema = "1"',
+            'where'  => 'idSistema = ?',
+            'params'  => [1],
             'group'  => '',
             'having' => '',
             'order'  => ''
@@ -100,11 +101,11 @@ class main extends ControllerBase {
         //Arreglo con los controladores con widgets, considerar que desde aqui se ordenan
         $array = $this->arrayWidgetViews();
         /******************************************/
-        //Verifico si existe
+        // Verifico si existe
         if($array){
             //recorro
             foreach ($array as $data) {
-                //Se genera la query
+                // Se genera la query
                 $loadWidgets = method_exists($data, 'loadWidgets');
                 //si el metodo existe
                 if($loadWidgets===true){
@@ -118,7 +119,7 @@ class main extends ControllerBase {
 
         //Se recorren los permisos y se validan
         foreach ($menuCounters as $section => $names) {
-            //Verifico si existen datos del menu
+            // Verifico si existen datos del menu
             if (!empty($arrMenu[$section])) {
                 //Recorro el menu
                 foreach ($arrMenu[$section] as $asd) {
@@ -165,6 +166,7 @@ class main extends ControllerBase {
             "gestionDocumentosWidgets",
             "bodegasWidgets",
             "gestionCampanasWidgets",
+            "reservasWidgets",
         );
 
         //devuelvo

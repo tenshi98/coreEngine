@@ -26,25 +26,15 @@
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-10 col-lg-9 col-xl-8 col-xxl-6">
                                 <?php
-                                //Se verifican si existen los datos
-                                $x1  = $data['rowData']['idPermisosCat'] ?? '';
-                                $x2  = $data['rowData']['idEstado'] ?? '';
-                                $x3  = $data['rowData']['idTipo'] ?? '';
-                                $x4  = $data['rowData']['Nombre'] ?? '';
-                                $x5  = $data['rowData']['Descripcion'] ?? '';
-                                $x6  = $data['rowData']['idLevelLimit'] ?? '';
-                                $x7  = $data['rowData']['RutaWeb'] ?? '';
-                                $x8  = $data['rowData']['RutaController'] ?? '';
-
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Categoria Permiso',  'Name' => 'idPermisosCat',  'Id' => 'Edit_idPermisosCat',  'Value' => $x1, 'Required' => 2,'arrData' => $data['arrPermisosCat']]);
-                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Estado',             'Name' => 'idEstado',       'Id' => 'Edit_idEstado',       'Value' => $x2, 'Required' => 2,'arrData' => $data['arrEstados']]);
-                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Tipo',               'Name' => 'idTipo',         'Id' => 'Edit_idTipo',         'Value' => $x3, 'Required' => 2,'arrData' => $data['arrTipos']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Nombre',             'Name' => 'Nombre',         'Id' => 'Edit_Nombre',         'Value' => $x4, 'Required' => 2]);
-                                $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Descripcion',        'Name' => 'Descripcion',    'Id' => 'Edit_Descripcion',    'Value' => $x5, 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Nivel Acceso',       'Name' => 'idLevelLimit',   'Id' => 'Edit_idLevelLimit',   'Value' => $x6, 'Required' => 2,'arrData' => $data['arrLevelLimit']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Ruta Web',           'Name' => 'RutaWeb',        'Id' => 'Edit_RutaWeb',        'Value' => $x7, 'Required' => 2,'Icon' => 'bi bi-puzzle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Controlador',        'Name' => 'RutaController', 'Id' => 'Edit_RutaController', 'Value' => $x8, 'Required' => 2,'Icon' => 'bi bi-share-fill']);
+                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Categoria Permiso',  'Name' => 'idPermisosCat',  'Id' => 'Edit_idPermisosCat',  'Value' => ($data['rowData']['idPermisosCat'] ?? ''),  'Required' => 2,'arrData' => $data['arrPermisosCat']]);
+                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Estado',             'Name' => 'idEstado',       'Id' => 'Edit_idEstado',       'Value' => ($data['rowData']['idEstado'] ?? ''),       'Required' => 2,'arrData' => $data['arrEstados']]);
+                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Tipo',               'Name' => 'idTipo',         'Id' => 'Edit_idTipo',         'Value' => ($data['rowData']['idTipo'] ?? ''),         'Required' => 2,'arrData' => $data['arrTipos']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Nombre',             'Name' => 'Nombre',         'Id' => 'Edit_Nombre',         'Value' => ($data['rowData']['Nombre'] ?? ''),         'Required' => 2]);
+                                $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Descripcion',        'Name' => 'Descripcion',    'Id' => 'Edit_Descripcion',    'Value' => ($data['rowData']['Descripcion'] ?? ''),    'Required' => 1]);
+                                $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Nivel Acceso',       'Name' => 'idLevelLimit',   'Id' => 'Edit_idLevelLimit',   'Value' => ($data['rowData']['idLevelLimit'] ?? ''),   'Required' => 2,'arrData' => $data['arrLevelLimit']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Ruta Web',           'Name' => 'RutaWeb',        'Id' => 'Edit_RutaWeb',        'Value' => ($data['rowData']['RutaWeb'] ?? ''),        'Required' => 2,'Icon' => 'bi bi-puzzle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Controlador',        'Name' => 'RutaController', 'Id' => 'Edit_RutaController', 'Value' => ($data['rowData']['RutaController'] ?? ''), 'Required' => 2,'Icon' => 'bi bi-share-fill']);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idPermisos','Value' => $data['rowData']['idPermisos'],'Required' => 2]);
