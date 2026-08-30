@@ -37,19 +37,20 @@ class UIFormInputs {
 	/*******************************************************************************************************************/
 	/****************************************************************************************/
 	//Crea el input en base a los datos
-	private function checkInputGen($placeholder,$name, $ID, $tipo, $type, $valor, $check, $requerido){
+	private function checkInputGen($placeholder,$name, $ID, $tipo, $type, $valor, $check, $requerido, $requerido_div){
 
 		/******************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath('../app/templates/Forms/formCheckInputGen_1.php');
-		$this->TemplateRender->assign('tipo',        $tipo);
-		$this->TemplateRender->assign('requerido',   $requerido);
-		$this->TemplateRender->assign('check',       $check);
-		$this->TemplateRender->assign('name',        $name);
-		$this->TemplateRender->assign('type',        $type);
-		$this->TemplateRender->assign('valor',       $valor);
-		$this->TemplateRender->assign('ID',          $ID);
-		$this->TemplateRender->assign('placeholder', $placeholder);
+		$this->TemplateRender->assign('tipo',          $tipo);
+		$this->TemplateRender->assign('requerido_div', $requerido_div);
+		$this->TemplateRender->assign('requerido',     $requerido);
+		$this->TemplateRender->assign('check',         $check);
+		$this->TemplateRender->assign('name',          $name);
+		$this->TemplateRender->assign('type',          $type);
+		$this->TemplateRender->assign('valor',         $valor);
+		$this->TemplateRender->assign('ID',            $ID);
+		$this->TemplateRender->assign('placeholder',   $placeholder);
 
 		/******************************************/
 		//devuelvo
@@ -60,7 +61,7 @@ class UIFormInputs {
 	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
 		/******************************************/
-		//Variables vacias
+		// Variables vacias
 		$Options = '';
 
 		/******************************************/
@@ -117,7 +118,7 @@ class UIFormInputs {
 	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
 		/******************************************/
-		//Variables vacias
+		// Variables vacias
 		$Options = '';
 
 		/******************************************/
@@ -201,7 +202,7 @@ class UIFormInputs {
 		}
 
 		/*******************************************/
-		//Variables
+		// Variables
 		$SelectOptions  = '<option value="">Seleccione una Opción</option>';
 		/******************************************/
 		//Se agregan datos
@@ -563,7 +564,7 @@ class UIFormInputs {
 		if($errorn==0){
 
             /******************************************/
-			//Variables vacias
+			// Variables vacias
 			$ExtraClass = $ExtraClassGroup = $ExtraCode  = $input_1 = $input_2 = $input_3 = '';
 
             /******************************************/
@@ -983,7 +984,7 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Variables vacias
+			// Variables vacias
 			$input_1 = $input_2 = $input_3 = '';
 
 			/******************************************/
@@ -1127,9 +1128,10 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
-				case 1:$requerido = '';                     break;//Si el dato no es requerido
-				case 2:$requerido = 'required="required"';  break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';             break;//Si el dato esta desactivado
+				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
+				case 2:  $requerido = 'required="required"'; $requerido_div = 'required';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';            $requerido_div = '';          break;//Si el dato esta desactivado
+				default: $requerido = '';                    $requerido_div = '';          break;
 			}
 
 			/******************************************/
@@ -1150,7 +1152,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Se genera input
-			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'checkbox', $valor, $check, $requerido);
+			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
 
 			/******************************************/
 			//Se agregan datos
@@ -1244,9 +1246,10 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
-				case 1:$requerido = '';          break;//Si el dato no es requerido
-				case 2:$requerido = '';          break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';  break;//Si el dato esta desactivado
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
 			/******************************************/
@@ -1269,7 +1272,7 @@ class UIFormInputs {
 				$valor = '2';
 				/******************************************/
 				//generacion del input
-				$formInput .= $this->checkInputGen($select['Nombre'],$name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo, 'checkbox', $valor, $check, $requerido);
+				$formInput .= $this->checkInputGen($select['Nombre'],$name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
 				//sumo
 				$y++;
 			}
@@ -1371,9 +1374,10 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
-				case 1:$requerido = '';          break;//Si el dato no es requerido
-				case 2:$requerido = '';          break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';  break;//Si el dato esta desactivado
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
 			/******************************************/
@@ -1394,7 +1398,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Se genera input
-			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'radio', $valor, $check, $requerido);
+			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
 
 			/******************************************/
 			//Se agregan datos
@@ -1488,9 +1492,10 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
-				case 1:$requerido = '';          break;//Si el dato no es requerido
-				case 2:$requerido = '';          break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';  break;//Si el dato esta desactivado
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
 			/******************************************/
@@ -1513,7 +1518,7 @@ class UIFormInputs {
 				$valor = '2';
 				/******************************************/
 				//generacion del input
-				$formInput .= $this->checkInputGen($select['Nombre'],$name, $nameID.'_'.$select['ID'], $tipo, 'radio', $valor, $check, $requerido);
+				$formInput .= $this->checkInputGen($select['Nombre'],$name, $nameID.'_'.$select['ID'], $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
 				//sumo
 				$y++;
 			}
@@ -1615,9 +1620,10 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
-				case 1:$requerido = '';                     break;//Si el dato no es requerido
-				case 2:$requerido = 'required="required"';  break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';             break;//Si el dato esta desactivado
+				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
+				case 2:  $requerido = 'required="required"'; $requerido_div = 'required';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';            $requerido_div = '';          break;//Si el dato esta desactivado
+				default: $requerido = '';                    $requerido_div = '';          break;
 			}
 
 			/******************************************/
@@ -1642,7 +1648,7 @@ class UIFormInputs {
 
 			/******************************************/
 			//Se genera input
-			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo.' form-switch', 'checkbox', $valor, $check, $requerido);
+			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
 
 			/******************************************/
 			//Se agregan datos
@@ -1735,9 +1741,10 @@ class UIFormInputs {
 			/******************************************/
 			//Valido si es requerido
 			switch ($required) {
-				case 1:$requerido = '';          break;//Si el dato no es requerido
-				case 2:$requerido = '';          break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';  break;//Si el dato esta desactivado
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
 			/******************************************/
@@ -1760,7 +1767,7 @@ class UIFormInputs {
 				$valor = '2';
 				/******************************************/
 				//generacion del input
-				$formInput .= $this->checkInputGen($select['Nombre'], $name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo.' form-switch', 'checkbox', $valor, $check, $requerido);
+				$formInput .= $this->checkInputGen($select['Nombre'], $name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
 				//sumo
 				$y++;
 			}
@@ -3138,7 +3145,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formSelectCountry_5.php'; break; //Floating Labels Form
 			}
 			/*******************************************/
-			//Variables
+			// Variables
 			$selectedx = 'selected="selected"';
 			$Options   = '';
 			//Recorro
@@ -3280,7 +3287,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formSelectNAuto_5.php'; break; //Floating Labels Form
 			}
 			/*******************************************/
-			//Variables
+			// Variables
 			$selectedx = 'selected="selected"';
 			$Options   = '';
 			//Recorro
@@ -3634,7 +3641,7 @@ class UIFormInputs {
 		if($errorn==0){
 
 			/******************************************/
-			//Variables vacias
+			// Variables vacias
 			$input_1 = $input_2 = $input_3 = '';
 
 			/******************************************/
@@ -3729,7 +3736,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 			/******************************************/
-			//Variables vacias
+			// Variables vacias
 			$dataDetails = '';
 			//Recorro
 			foreach ( $arrData as $select ) {$dataDetails .= '<details><summary>'.$select['ID'].'</summary><p>'.$this->DataText->tituloMenu($select['Nombre']).'</p></details>';}
