@@ -271,6 +271,158 @@ class FunctionsCommonData {
 		return $real;
 	}
 
+	/******************************************************************************/
+	/**
+	 * Genera una versión más clara de un color hexadecimal aumentando
+	 * su componente de luminosidad en el espacio de color HSL.
+	 *
+	 * La función acepta colores en formato hexadecimal completo (#RRGGBB)
+	 * o abreviado (#RGB). El color se convierte de HEX a RGB, posteriormente
+	 * a HSL, se incrementa la luminosidad según el factor indicado y finalmente
+	 * se convierte nuevamente a RGB y formato hexadecimal.
+	 *
+	 * @param string $hex    Código de color hexadecimal de entrada.
+	 * @param float  $factor Factor de incremento de luminosidad. Por defecto 0.35.
+	 *
+	 * @return string Código de color hexadecimal correspondiente al color aclarado.
+	 */
+	public function colorMasClaro(string $hex, float $factor = 0.35): string {
+		// Eliminar #
+		$hex = ltrim($hex, '#');
+
+		// Soportar formato corto #RGB
+		if (strlen($hex) === 3) {
+			$hex = $hex[0] . $hex[0]
+				. $hex[1] . $hex[1]
+				. $hex[2] . $hex[2];
+		}
+
+		// Convertir HEX a RGB
+		$r = hexdec(substr($hex, 0, 2)) / 255;
+		$g = hexdec(substr($hex, 2, 2)) / 255;
+		$b = hexdec(substr($hex, 4, 2)) / 255;
+
+		// RGB -> HSL
+		$max = max($r, $g, $b);
+		$min = min($r, $g, $b);
+
+		$h = 0;
+		$s = 0;
+		$l = ($max + $min) / 2;
+
+		// Calcular saturación y tono cuando el color no es acromático
+		if ($max !== $min) {
+			$d = $max - $min;
+
+			$s = ($l > 0.5)
+				? $d / (2 - $max - $min)
+				: $d / ($max + $min);
+
+			// Determinar el componente dominante para calcular el tono
+			switch ($max) {
+				case $r: $h = (($g - $b) / $d) + ($g < $b ? 6 : 0); break;
+				case $g: $h = (($b - $r) / $d) + 2; break;
+				case $b: $h = (($r - $g) / $d) + 4; break;
+			}
+
+			$h /= 6;
+		}
+
+		// Aumentar luminosidad
+		$l = min(1, $l + $factor);
+
+		// HSL -> RGB
+		if ($s == 0) {
+			$r = $g = $b = $l;
+		} else {
+			$q = $l < 0.5
+				? $l * (1 + $s)
+				: $l + $s - ($l * $s);
+
+			$p = 2 * $l - $q;
+
+			// Convierte un componente de tono HSL a su correspondiente valor RGB
+			$hue2rgb = function ($p, $q, $t) {
+				if ($t < 0) $t += 1;
+				if ($t > 1) $t -= 1;
+				if ($t < 1 / 6) return $p + ($q - $p) * 6 * $t;
+				if ($t < 1 / 2) return $q;
+				if ($t < 2 / 3) return $p + ($q - $p) * (2 / 3 - $t) * 6;
+				return $p;
+			};
+
+			$r = $hue2rgb($p, $q, $h + 1 / 3);
+			$g = $hue2rgb($p, $q, $h);
+			$b = $hue2rgb($p, $q, $h - 1 / 3);
+		}
+
+		// Convertir los componentes RGB normalizados nuevamente a hexadecimal
+		return sprintf(
+			'#%02X%02X%02X',
+			round($r * 255),
+			round($g * 255),
+			round($b * 255)
+		);
+	}
+
+	/******************************************************************************/
+	/**
+	 * Agrupa y contabiliza los elementos de un listado según los campos indicados.
+	 *
+	 * Para cada campo recibido, recorre el listado y contabiliza la cantidad
+	 * de registros que poseen cada valor. Los valores inexistentes o vacíos
+	 * son agrupados bajo la etiqueta "Sin información".
+	 *
+	 * El resultado de cada campo se transforma al formato nombre/cantidad.
+	 * Finalmente, se incorpora la cantidad total de elementos procesados.
+	 *
+	 * @param array $arrList       Listado de elementos que serán agrupados y contabilizados.
+	 * @param array $dataRequired  Lista de campos utilizados para realizar las agrupaciones.
+	 *
+	 * @return array Arreglo con las estadísticas agrupadas para cada campo y la
+	 *               cantidad total de elementos procesados en "totalElementos".
+	 */
+	public function agruparYContar(array $arrList, array $dataRequired): array {
+		$estadisticas = [];
+
+		// Procesa cada campo solicitado para generar sus estadísticas correspondientes
+		foreach ($dataRequired as $campo) {
+			$estadisticas[$campo] = [];
+
+			// Recorre los elementos y acumula la cantidad correspondiente a cada valor
+			foreach ($arrList as $solicitud) {
+
+				// Obtiene el valor del campo o utiliza un valor predeterminado si no existe
+				$valor = $solicitud[$campo] ?? 'Sin información';
+
+				// Considera los valores vacíos como información no disponible
+				if ($valor === '') {
+					$valor = 'Sin información';
+				}
+
+				// Inicializa el contador cuando el valor aún no ha sido registrado
+				if (!isset($estadisticas[$campo][$valor])) {
+					$estadisticas[$campo][$valor] = 0;
+				}
+
+				$estadisticas[$campo][$valor]++;
+			}
+
+			// Convertir a formato nombre/cantidad
+			$estadisticas[$campo] = array_map(
+				fn($nombre, $cantidad) => [
+					'nombre'   => $nombre,
+					'cantidad' => $cantidad
+				],
+				array_keys($estadisticas[$campo]),
+				array_values($estadisticas[$campo])
+			);
+		}
+
+		// Registra la cantidad total de elementos procesados
+		$estadisticas['totalElementos'] = count($arrList);
+
+		return $estadisticas;
+	}
 
 }
-
