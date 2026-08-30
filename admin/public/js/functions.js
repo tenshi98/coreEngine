@@ -201,7 +201,7 @@ function SendDataErrors(Options, jqXHR, textStatus, errorThrown) {
         //si hay datos
         } else if (jsonData.data) {
             // data es un string u otro valor
-            message = jsonData.message
+            message = jsonData.message && jsonData.message != jsonData.data
                 ? `${jsonData.message}<br>${jsonData.data}`
                 : jsonData.data;
         //si no lo es solo se muestra
