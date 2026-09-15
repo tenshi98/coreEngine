@@ -269,7 +269,7 @@ mysql -u root -p -e "GRANT ALL ON core_engine.* TO 'tu_usuario'@'localhost';"
 | Dato | Descripción |
 |-----------|-------------|
 | URL Demo | [democoreengine.digitalcreations.cl](https://democoreengine.digitalcreations.cl/) |
-| Usuario | demo1@testmail.com |
+| Usuario | demo1@example.com |
 | Contraseña | 1234 |
 
 ## 📝 Notas Adicionales
