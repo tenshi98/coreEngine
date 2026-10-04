@@ -11,8 +11,8 @@
             <?php
             $Options = [
                 'BASE'             => $BASE,
-                'rootPaht'         => $data['UserData']['MainPathUrl'],
-                'Route'            => '',
+                'rootPath'         => $data['UserData']['MainPathUrl'],
+                'Route'            => 'fileExplorer',
                 'ValidarTipo'      => '',
                 'levelPermission'  => $data['UserAccess']['LevelAccess'],
             ];
@@ -22,5 +22,3 @@
 
     </div>
 </section>
-
-
