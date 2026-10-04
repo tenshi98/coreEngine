@@ -24,15 +24,15 @@
                         </thead>
                         <tbody>
                             <?php
-                            //Verifico si hay datos
+                            // Verifico si hay datos
                             if(is_array($data['MainViewData']['Data_ComprasListado'])){
                                 foreach($data['MainViewData']['Data_ComprasListado'] as $datos){
-                                    //Se obtiene el nombre o la razón social
+                                    // Se obtiene el nombre o la razón social
                                     $Entidad  = '';
                                     $Entidad .= !empty($datos['EntidadesNick'])
                                                 ? $datos['EntidadesNick'].'<br>'
                                                 : '';
-                                    //Se obtiene el nombre o la razón social
+                                    // Se obtiene el nombre o la razón social
                                     switch ($datos['idTipoEntidad']) {
                                         case 1: $Entidad .= $datos['EntidadesApellido'].', '.$datos['EntidadesNombre']; break; //Persona Natural
                                         case 2: $Entidad .= $datos['EntidadesRazonSocial']; break;                             //Empresas
@@ -77,15 +77,15 @@
                         </thead>
                         <tbody>
                             <?php
-                            //Verifico si hay datos
+                            // Verifico si hay datos
                             if(is_array($data['MainViewData']['Data_VentasListado'])){
                                 foreach($data['MainViewData']['Data_VentasListado'] as $datos){
-                                    //Se obtiene el nombre o la razón social
+                                    // Se obtiene el nombre o la razón social
                                     $Entidad  = '';
                                     $Entidad .= !empty($datos['EntidadesNick'])
                                                 ? $datos['EntidadesNick'].' | '
                                                 : '';
-                                    //Se obtiene el nombre o la razón social
+                                    // Se obtiene el nombre o la razón social
                                     switch ($datos['idTipoEntidad']) {
                                         case 1: $Entidad .= $datos['EntidadesApellido'].', '.$datos['EntidadesNombre']; break; //Persona Natural
                                         case 2: $Entidad .= $datos['EntidadesRazonSocial']; break;                             //Empresas

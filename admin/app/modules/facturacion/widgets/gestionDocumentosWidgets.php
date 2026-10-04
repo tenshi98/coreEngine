@@ -4,14 +4,16 @@
 /*******************************************************************************************************************/
 class gestionDocumentosWidgets extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $CommonData;
     private $DataNumbers;
     private $DataDate;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -28,32 +30,35 @@ class gestionDocumentosWidgets extends ControllerBase {
     /******************************************************************************/
     /*                                 EJECUCION                                  */
     /******************************************************************************/
-    /******************************************************************************/
-    //Instalacion del modulo completo
+    /*******************************************************************/
+    // Carga del Widget
+    /*******************************************************************/
     public function loadWidgets(){
 
         // Variables
         $Data['Menu_Name']   = 'Gestión Documentos Mercantiles';
         $Data['Menu_Value']  = [
-            'Compras'  => '../app/modules/facturacion/views/main-doc-mercantiles.php',
-            'Ventas'   => '../app/modules/facturacion/views/main-doc-mercantiles.php',
+            'Compras'  => '../app/modules/facturacion/widgets/widgets-doc-mercantiles.php',
+            'Ventas'   => '../app/modules/facturacion/widgets/widgets-doc-mercantiles.php',
         ];
 
-        //Devuelvo
+        // Retorno los datos
         return $Data;
     }
 
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Actualizacion campañas
+    /*******************************************************************/
+    // Actualizacion campañas
+    /*******************************************************************/
     public function pagosPendientes($f3, $params){
-        /*******************************************************************/
-        //Se llaman los datos
+
+        /************************************/
+        // Se llaman los datos
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
-        /*******************************************************************/
+        /************************************/
         // Variables
         $MainViewData = [
             'Count_DocMercantiles' => 0,
@@ -62,14 +67,14 @@ class gestionDocumentosWidgets extends ControllerBase {
             'Data_VentasTotal'     => '',
             'Data_VentasListado'   => '',
         ];
-        //Se asignan datos a buscar
+        // Se asignan datos a buscar
         $menuCounters = [
             'Gestión Documentos Mercantiles' => [
                 'Compras'  => 'Count_DocMercantiles',
                 'Ventas'   => 'Count_DocMercantiles',
             ],
         ];
-        //Se recorren los permisos y se validan
+        // Se recorren los permisos y se validan
         foreach ($menuCounters as $section => $names) {
             if (!empty($arrMenu[$section])) {
                 foreach ($arrMenu[$section] as $asd) {
@@ -80,11 +85,10 @@ class gestionDocumentosWidgets extends ControllerBase {
             }
         }
 
-        /*******************************************************************/
-        //Se hacen las consultas
-        /******************************************/
+        /************************************/
+        // Se hacen las consultas
         if($MainViewData['Count_DocMercantiles']!=0){
-            /******************************************/
+            /************************************/
             //Total Compras
             $query = [
                 'data'    => '
@@ -98,13 +102,14 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'having'  => '',
                 'order'   => ''
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams                           = ['query' => $query];
+            // Ejecuto la query
             $TempData                          = $this->Base_GetByID($xParams);
             $MainViewData['Data_ComprasTotal'] = $TempData['data'];
 
-            /******************************************/
-            //Listado Compras
+            /************************************/
+            // Listado Compras
             $query = [
                 'data'    => '
                     facturacion_listado.ValorTotal,
@@ -124,12 +129,13 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
                 'limit'   => 9
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams                             = ['query' => $query];
+            // Ejecuto la query
             $TempData                            = $this->Base_GetList($xParams);
             $MainViewData['Data_ComprasListado'] = $TempData['data'];
 
-            /******************************************/
+            /************************************/
             //Total Compras
             $query = [
                 'data'    => '
@@ -143,13 +149,14 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'having'  => '',
                 'order'   => ''
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams                          = ['query' => $query];
+            // Ejecuto la query
             $TempData                         = $this->Base_GetByID($xParams);
             $MainViewData['Data_VentasTotal'] = $TempData['data'];
 
-            /******************************************/
-            //Listado Ventas
+            /************************************/
+            // Listado Ventas
             $query = [
                 'data'    => '
                     facturacion_listado.N_Doc,
@@ -174,14 +181,15 @@ class gestionDocumentosWidgets extends ControllerBase {
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
                 'limit'   => 9
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams                            = ['query' => $query];
+            // Ejecuto la query
             $TempData                           = $this->Base_GetList($xParams);
             $MainViewData['Data_VentasListado'] = $TempData['data'];
         }
 
-        /******************************************/
-        //Datos enviados a la pagina
+        /************************************/
+        // Datos enviados a la pagina
         $f3->data = [
             /*===========  Datos del usuario ===========*/
             'UserData'      => $this->getUserData($f3),
@@ -193,9 +201,9 @@ class gestionDocumentosWidgets extends ControllerBase {
             'MainViewData'    => $MainViewData,
         ];
 
-        /******************************************/
-        //Se instancia la vista
-        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/main-doc-mercantiles-update.php');
+        /************************************/
+        // Se instancia la vista
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/widgets-doc-mercantiles-update.php');
     }
 
 }

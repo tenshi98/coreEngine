@@ -5,9 +5,9 @@
 
 ?>
 <?php
-//Verifico si hay datos
+// Verifico si hay datos
 if(!empty($data['MainViewData']['Data_arrBodegas'])&&is_array($data['MainViewData']['Data_arrBodegas'])){
-    //Recorro
+    // Recorro
     foreach($data['MainViewData']['Data_arrBodegas'] as $bod){ ?>
         <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
             <div class="card">
@@ -28,9 +28,9 @@ if(!empty($data['MainViewData']['Data_arrBodegas'])&&is_array($data['MainViewDat
                             </thead>
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['MainViewData']['Data_arrStocks'])&&!empty($data['MainViewData']['Data_arrStocks'])){
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['MainViewData']['Data_arrStocks'] as $stock){
                                         //Se imprimen solo los productos con bajo stocks
                                         if(isset($stock['Cantidad_idBodegas_'.$bod['idBodegas']], $stock['ProductoStock'])&&$stock['Cantidad_idBodegas_'.$bod['idBodegas']]<=$stock['ProductoStock']){

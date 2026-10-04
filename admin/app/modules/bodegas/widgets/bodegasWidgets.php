@@ -4,14 +4,16 @@
 /*******************************************************************************************************************/
 class bodegasWidgets extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $CommonData;
     private $DataNumbers;
     private $DataDate;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -28,44 +30,47 @@ class bodegasWidgets extends ControllerBase {
     /******************************************************************************/
     /*                                 EJECUCION                                  */
     /******************************************************************************/
-    /******************************************************************************/
-    //Instalacion del modulo completo
+    /*******************************************************************/
+    // Carga del Widget
+    /*******************************************************************/
     public function loadWidgets(){
 
         // Variables
         $Data['Menu_Name']   = 'Gestión Bodegas y Productos';
         $Data['Menu_Value']  = [
-            'Stock Productos'   => '../app/modules/bodegas/views/main-bodega-stock.php',
+            'Stock Productos'   => '../app/modules/bodegas/widgets/widgets-stock.php',
         ];
 
-        //Devuelvo
+        // Retorno los datos
         return $Data;
     }
 
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Actualizacion campañas
+    /*******************************************************************/
+    // Actualizacion bodegas
+    /*******************************************************************/
     public function stocksProductos($f3, $params){
-        /*******************************************************************/
-        //Se llaman los datos
+
+        /************************************/
+        // Se llaman los datos
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
-        /*******************************************************************/
+        /************************************/
         // Variables
         $MainViewData = [
             'Count_Bodegas'   => 0,
             'Data_arrBodegas' => '',
             'Data_arrStocks'  => '',
         ];
-        //Se asignan datos a buscar
+        // Se asignan datos a buscar
         $menuCounters = [
             'Gestión Bodegas y Productos' => [
                 'Stock Productos'   => 'Count_Bodegas',
             ],
         ];
-        //Se recorren los permisos y se validan
+        // Se recorren los permisos y se validan
         foreach ($menuCounters as $section => $names) {
             if (!empty($arrMenu[$section])) {
                 foreach ($arrMenu[$section] as $asd) {
@@ -76,24 +81,24 @@ class bodegasWidgets extends ControllerBase {
             }
         }
 
-        /*******************************************************************/
-        //Se hacen las consultas
-        /******************************************/
+        /************************************/
+        // Se hacen las consultas
         if($MainViewData['Count_Bodegas']!=0){
-            /*******************************************************************/
-            //Se instancia
+            /************************************/
+            // Se instancia
             $arrUserData = $this->getUserData($f3);
             // Se verifica si se tiene el permiso para visualizar el dato
             if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
                 $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
                 $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
                 $X_params = [1, $arrUserData['UserID']];
-            //Si se permite junto con la creacion de tareas
+            // Si se permite junto con la creacion de tareas
             }else{
                 $X_join   = '';
                 $X_where  = 'bodegas_listado.idEstado = ?';
                 $X_params = [1];
             }
+            /************************************/
             // Se genera la query
             $query = [
                 'data'    => 'bodegas_listado.idBodegas, bodegas_listado.Nombre',
@@ -106,18 +111,19 @@ class bodegasWidgets extends ControllerBase {
                 'order'   => 'bodegas_listado.Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams                         = ['query' => $query];
+            // Ejecuto la query
             $TempData                        = $this->Base_GetList($xParams);
             $MainViewData['Data_arrBodegas'] = $TempData['data'];
 
-            //Se genera la consulta
+            // Se genera la consulta
             $ActionSQL = '';
             foreach ($MainViewData['Data_arrBodegas'] as $bod) {
                 $ActionSQL .= ',Cantidad_idBodegas_'.$bod['idBodegas'];
             }
 
-            /*******************************************************************/
+            /************************************/
             // Se genera la query
             $query = [
                 'data'    => '
@@ -137,15 +143,16 @@ class bodegasWidgets extends ControllerBase {
                 'order'   => 'productos_listado.Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams                        = ['query' => $query];
+            // Ejecuto la query
             $TempData                       = $this->Base_GetList($xParams);
             $MainViewData['Data_arrStocks'] = $TempData['data'];
 
         }
 
-        /******************************************/
-        //Datos enviados a la pagina
+        /************************************/
+        // Datos enviados a la pagina
         $f3->data = [
             /*===========  Datos del usuario ===========*/
             'UserData'      => $this->getUserData($f3),
@@ -157,8 +164,8 @@ class bodegasWidgets extends ControllerBase {
             'MainViewData'    => $MainViewData,
         ];
 
-        //Se instancia la vista
-        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/main-bodega-stock-update.php');
+        // Se instancia la vista
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/widgets-stock-update.php');
     }
 
 }
