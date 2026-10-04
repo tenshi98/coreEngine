@@ -10,6 +10,10 @@
         <meta name="author"      content="">
         <meta name="keywords"    content="">
 
+        <!-- Seguridad: token CSRF (se usa en las peticiones AJAX y en los formularios) -->
+        <meta name="csrf-token" content="<?php echo htmlspecialchars($CSRF_TOKEN ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <script>window.CSRF_TOKEN = <?php echo json_encode($CSRF_TOKEN ?? '', JSON_UNESCAPED_UNICODE); ?>;</script>
+
         <!-- Favicons -->
         <link rel="icon"             type="image/png"                    href="<?php echo $BASE.'/img/favicon/mifavicon.png'; ?>">
         <link rel="shortcut icon"    type="image/x-icon"                 href="<?php echo $BASE.'/img/favicon/mifavicon.png'; ?>">
