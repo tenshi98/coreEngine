@@ -11,7 +11,7 @@
               <i class="ri-copyright-line"></i>
             </a>
             <span class="company text-muted">
-              <?php $CompanyName  = !empty($data['UserData']['Sistema_Nombre']) ? $data['UserData']['Sistema_Nombre'] : 'Nombre Compañia'; ?>
+              <?php $CompanyName  = !empty($data['UserData']['Sistema_Nombre']) ? htmlspecialchars($data['UserData']['Sistema_Nombre'], ENT_QUOTES, 'UTF-8') : 'Nombre Compañia'; ?>
               <strong><span><?php echo $CompanyName; ?></span></strong>. Todos los derechos reservados
             </span>
             <div class="credits">
@@ -20,10 +20,10 @@
           </div>
 
           <ul class="social-links nav col-md-4 justify-content-end list-unstyled d-flex">
-            <?php if($data['UserData']['Social_X']!=''){ ?>          <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_X']; ?>"         class="twitter text-muted"><i class="bi bi-twitter"></i></a></li><?php } ?>
-            <?php if($data['UserData']['Social_Facebook']!=''){ ?>   <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_Facebook']; ?>"  class="facebook text-muted"><i class="bi bi-facebook"></i></a></li><?php } ?>
-            <?php if($data['UserData']['Social_Instagram']!=''){ ?>  <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_Instagram']; ?>" class="instagram text-muted"><i class="bi bi-instagram"></i></a></li><?php } ?>
-            <?php if($data['UserData']['Social_Linkedin']!=''){ ?>   <li><a target="_blank" rel="noopener noreferrer" href="<?php echo $data['UserData']['Social_Linkedin']; ?>"  class="linkedin text-muted"><i class="bi bi-linkedin"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_X']!=''){ ?>          <li><a target="_blank" rel="noopener noreferrer" href="<?php echo htmlspecialchars($data['UserData']['Social_X'], ENT_QUOTES, 'UTF-8'); ?>"         class="twitter text-muted"><i class="bi bi-twitter"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_Facebook']!=''){ ?>   <li><a target="_blank" rel="noopener noreferrer" href="<?php echo htmlspecialchars($data['UserData']['Social_Facebook'], ENT_QUOTES, 'UTF-8'); ?>"  class="facebook text-muted"><i class="bi bi-facebook"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_Instagram']!=''){ ?>  <li><a target="_blank" rel="noopener noreferrer" href="<?php echo htmlspecialchars($data['UserData']['Social_Instagram'], ENT_QUOTES, 'UTF-8'); ?>" class="instagram text-muted"><i class="bi bi-instagram"></i></a></li><?php } ?>
+            <?php if($data['UserData']['Social_Linkedin']!=''){ ?>   <li><a target="_blank" rel="noopener noreferrer" href="<?php echo htmlspecialchars($data['UserData']['Social_Linkedin'], ENT_QUOTES, 'UTF-8'); ?>"  class="linkedin text-muted"><i class="bi bi-linkedin"></i></a></li><?php } ?>
           </ul>
         </footer>
       </div>
@@ -31,53 +31,7 @@
 
     <div id="PDloader"></div>
 
-    <div class="modal fade" id="viewModal-xl" tabindex="-1">
-      <div class="modal-dialog modal-xl">
-        <div class="modal-content" id="modalContent-xl">
-
-        </div>
-      </div>
-    </div>
-
-    <div class="modal fade" id="viewModal-lg" tabindex="-1">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content" id="modalContent-lg">
-
-        </div>
-      </div>
-    </div>
-
-    <div id="PopupModalSmall" class="PopupModal-overlay">
-      <div class="PopupModal PopupModal-sm" id="popupModalContent-sm">
-
-      </div>
-    </div>
-
-    <div id="PopupModalMedium" class="PopupModal-overlay">
-      <div class="PopupModal PopupModal-md" id="popupModalContent-md">
-
-      </div>
-    </div>
-
-    <div id="PopupModalLarge" class="PopupModal-overlay">
-      <div class="PopupModal PopupModal-lg" id="popupModalContent-lg">
-
-      </div>
-    </div>
-
-    <div id="PopupModalXL" class="PopupModal-overlay">
-      <div class="PopupModal PopupModal-xl" id="popupModalContent-xl">
-
-      </div>
-    </div>
-
-    <div id="PopupModalFullscreen" class="PopupModal-overlay">
-      <div class="PopupModal PopupModal-fullscreen" id="popupModalContent-fullscreen">
-
-      </div>
-    </div>
-
-
+    <?php require_once('user-footer-modal.php'); ?>
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
@@ -115,7 +69,6 @@
       document.querySelectorAll("[data-popover]").forEach(el=> new Popover(el))
       document.addEventListener("click",()=>{Popover.closeAll()})
     </script>
-
 
   </body>
 

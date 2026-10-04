@@ -10,147 +10,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="format-detection" content="telephone=no">
     <meta name="x-apple-disable-message-reformatting">
-    <title><?php echo $title; ?></title>
+    <title><?php echo htmlspecialchars($title, ENT_QUOTES, 'UTF-8'); ?></title>
     <style>
-      body {
-        margin: 0;
-        padding: 0;
-        width: 100% !important;
-      }
-
-      a {
-        color: inherit;
-      }
-
-      a[x-apple-data-detectors] {
-        color: inherit !important;
-        text-decoration: none !important;
-      }
-
-      img {
-        border: 0;
-        outline: none;
-        line-height: 100%;
-        text-decoration: none;
-        -ms-interpolation-mode: bicubic;
-      }
-
-
-      table,
-      tr,
-      td {
-        border-collapse: collapse;
-      }
-
-      table.template-container {
-        width: 600px;
-        margin: 0 auto;
-      }
-
-      body,
-      td,
-      th,
-      p,
-      div,
-      li,
-      a,
-      span {
-        -webkit-text-size-adjust: 100%;
-        -ms-text-size-adjust: 100%;
-      }
-
-      p:first-of-type {
-        margin-top: 0 !important;
-      }
-
-      .gmail-fix {
-        display: none !important;
-      }
-
-      .sm-right {
-        text-align: right;
-        margin-left: auto;
-      }
-
-      .sm-center {
-        text-align: center;
-      }
-
-      .sm-padding-left-30 {
-        padding-left: 30px;
-      }
-
-      .sm-padding-right-20 {
-        padding-right: 20px;
-      }
-
-      .post-col-left {
-        padding-right: 10px;
-      }
-
-      .post-col-right {
-        padding-left: 10px;
-      }
-
-      .sm-col-25 {
-        width: 25%;
-      }
-
-      .sm-col-33 {
-        width: 33%;
-      }
-
-      .sm-col-50 {
-        width: 50%;
-      }
+      body {margin: 0;padding: 0;width: 100% !important;}
+      a {color: inherit;}
+      a[x-apple-data-detectors] {color: inherit !important;text-decoration: none !important;}
+      img {border: 0;outline: none;line-height: 100%;text-decoration: none;-ms-interpolation-mode: bicubic;}
+      table,tr,td {border-collapse: collapse;}
+      table.template-container {width: 600px;margin: 0 auto;}
+      body,td,th,p,div,li,a,span {-webkit-text-size-adjust: 100%;-ms-text-size-adjust: 100%;}
+      p:first-of-type {margin-top: 0 !important;}
+      .gmail-fix {display: none !important;}
+      .sm-right {text-align: right;margin-left: auto;}
+      .sm-center {text-align: center;}
+      .sm-padding-left-30 {padding-left: 30px;}
+      .sm-padding-right-20 {padding-right: 20px;}
+      .post-col-left {padding-right: 10px;}
+      .post-col-right {padding-left: 10px;}
+      .sm-col-25 {width: 25%;}
+      .sm-col-33 {width: 33%;}
+      .sm-col-50 {width: 50%;}
 
       @media screen and (max-width:620px) {
-        table.template-container {
-          width: 320px !important;
-          margin: 0 auto;
-          white-space: normal;
-        }
-
-        .xs-col {
-          width: 100% !important;
-        }
-
-        .xs-spacing {
-          margin: 10px 0 !important;
-        }
-
-        .xs-mb-10 {
-          margin-bottom: 10px;
-        }
-
-        .xs-mb-20 {
-          margin-bottom: 20px;
-        }
-
-        .xs-center {
-          text-align: center;
-        }
-
-        .xs-table-center {
-          text-align: center;
-          margin: 0 auto;
-        }
-
-        .sm-padding-left-30 {
-          padding-left: 0;
-        }
-
-        .sm-padding-right-20 {
-          padding-right: 0;
-        }
-
-        .post-col-left {
-          padding-right: 0;
-        }
-
-        .post-col-right {
-          padding-left: 0;
-        }
+        table.template-container {width: 320px !important;margin: 0 auto;white-space: normal;}
+        .xs-col {width: 100% !important;}
+        .xs-spacing {margin: 10px 0 !important;}
+        .xs-mb-10 {margin-bottom: 10px;}
+        .xs-mb-20 {margin-bottom: 20px;}
+        .xs-center {text-align: center;}
+        .xs-table-center {text-align: center;margin: 0 auto;}
+        .sm-padding-left-30 {padding-left: 0;}
+        .sm-padding-right-20 {padding-right: 0;}
+        .post-col-left {padding-right: 0;}
+        .post-col-right {padding-left: 0;}
       }
     </style>
     <!--[if gte mso 9]>
@@ -201,13 +93,13 @@
                                     <tbody>
                                       <tr>
                                         <td align="" class="">
-                                          <a href="<?php echo $baseUrl; ?>">
+                                          <a href="<?php echo htmlspecialchars($baseUrl, ENT_QUOTES, 'UTF-8'); ?>">
                                             <!--[if gte mso 9]>
-																																	<img src="<?php echo $CompanyLogo; ?>" width="110" height="25" alt="Logo de la compañia">
+																																	<img src="<?php echo htmlspecialchars($CompanyLogo, ENT_QUOTES, 'UTF-8'); ?>" width="110" height="25" alt="Logo de la compañia">
 																																		<![endif]-->
                                             <!--[if !gte mso 9]>
 																																		<!-->
-                                            <img width="110" src="<?php echo $CompanyLogo; ?>" alt="Logo de la compañia" style="vertical-align: top; max-width: 100%; width: 110px;">
+                                            <img width="110" src="<?php echo htmlspecialchars($CompanyLogo, ENT_QUOTES, 'UTF-8'); ?>" alt="Logo de la compañia" style="vertical-align: top; max-width: 100%; width: 110px;">
                                             <!--
 																																			<![endif]-->
                                           </a>
@@ -253,11 +145,11 @@
                                         <td align="left">
                                           <p style="color: rgb(0, 0, 0); font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
                                             <strong>
-                                              <span style="font-size: 24px;"><?php echo $Asunto; ?></span>
+                                              <span style="font-size: 24px;"><?php echo htmlspecialchars($Asunto, ENT_QUOTES, 'UTF-8'); ?></span>
                                             </strong>
                                           </p>
                                           <p style="color: rgb(0, 0, 0); font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
-                                            <span style="color: rgb(170, 170, 170);"><?php echo $Mensaje; ?></span>
+                                            <span style="color: rgb(170, 170, 170);"><?php echo htmlspecialchars($Mensaje, ENT_QUOTES, 'UTF-8'); ?></span>
                                           </p>
                                           <!--[if gte mso 12]>
 																															<p style="font-size: 0px; line-height: 0px; mso-line-height-rule:exactly;">&nbsp;</p>
@@ -292,7 +184,7 @@
                                         <td align="center">
                                           <table cellpadding="0" cellspacing="0" border="0" role="presentation" class="wrapper">
                                             <tbody>
-                                              <tr><?php echo $Social_icon; ?></tr>
+                                              <tr><?php echo htmlspecialchars($Social_icon, ENT_QUOTES, 'UTF-8'); ?></tr>
                                             </tbody>
                                           </table>
                                         </td>
@@ -311,9 +203,9 @@
                                       <tr>
                                         <td align="center">
                                           <p style="color: rgb(255, 255, 255); font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
-                                            <span style="font-size: 14px; color: rgb(170, 170, 170)"><?php echo $Sistema_Direccion; ?><br>
+                                            <span style="font-size: 14px; color: rgb(170, 170, 170)"><?php echo htmlspecialchars($Sistema_Direccion, ENT_QUOTES, 'UTF-8'); ?><br>
                                               <u>
-                                                <a href="mailto:<?php echo $Sistema_Email; ?>" style="color: rgb(170, 170, 170);" draggable="false"><?php echo $Sistema_Email; ?></a>
+                                                <a href="mailto:<?php echo htmlspecialchars($Sistema_Email, ENT_QUOTES, 'UTF-8'); ?>" style="color: rgb(170, 170, 170);" draggable="false"><?php echo htmlspecialchars($Sistema_Email, ENT_QUOTES, 'UTF-8'); ?></a>
                                               </u>
                                             </span>
                                           </p>

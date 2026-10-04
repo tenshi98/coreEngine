@@ -1,18 +1,18 @@
 <li class="nav-item dropdown pe-3">
     <?php
     $UserIMG = !empty($data['UserData']['UserIMG'])
-        ? $data['UserData']['MainPathUrl'].$data['UserData']['UserIMG']
+        ? htmlspecialchars($data['UserData']['MainPathUrl'].$data['UserData']['UserIMG'], ENT_QUOTES, 'UTF-8')
         : $BASE.'/img/profile-img.jpg';
     ?>
     <a class="nav-link nav-profile d-flex align-items-center pe-0" href="#" data-bs-toggle="dropdown">
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="rounded-circle">
-        <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo $data['UserData']['UserName']; ?></span>
+        <span class="d-none d-md-block dropdown-toggle ps-2"><?php echo htmlspecialchars($data['UserData']['UserName'], ENT_QUOTES, 'UTF-8'); ?></span>
     </a>
 
     <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow profile">
         <li class="dropdown-header">
-            <h6><?php echo $data['UserData']['UserName']; ?></h6>
-            <span><?php echo $data['UserData']['UserPosition']; ?></span>
+            <h6><?php echo htmlspecialchars($data['UserData']['UserName'], ENT_QUOTES, 'UTF-8'); ?></h6>
+            <span><?php echo htmlspecialchars($data['UserData']['UserPosition'], ENT_QUOTES, 'UTF-8'); ?></span>
         </li>
         <li><hr class="dropdown-divider"></li>
         <li><a class="dropdown-item d-flex align-items-center" href="<?php echo $BASE.'/perfil'; ?>"><i class="bi bi-person"></i><span>Ver mi Perfil</span></a></li>

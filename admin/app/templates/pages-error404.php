@@ -5,10 +5,10 @@
         <meta charset="utf-8">
         <meta name="viewport"   content="width=device-width, initial-scale=1">
 
-        <title><?php echo $data['PageTitle']; ?></title>
-        <meta name="description" content="<?php echo $data['PageDescription']; ?>">
-        <meta name="author"      content="<?php echo $data['PageAuthor']; ?>">
-        <meta name="keywords"    content="<?php echo $data['PageKeywords']; ?>">
+        <title><?php echo htmlspecialchars($data['PageTitle'], ENT_QUOTES, 'UTF-8'); ?></title>
+        <meta name="description" content="<?php echo htmlspecialchars($data['PageDescription'], ENT_QUOTES, 'UTF-8'); ?>">
+        <meta name="author"      content="<?php echo htmlspecialchars($data['PageAuthor'], ENT_QUOTES, 'UTF-8'); ?>">
+        <meta name="keywords"    content="<?php echo htmlspecialchars($data['PageKeywords'], ENT_QUOTES, 'UTF-8'); ?>">
 
         <!-- Favicons -->
         <link rel="icon"             type="image/png"                    href="<?php echo $BASE.'/img/favicon/mifavicon.png'; ?>">

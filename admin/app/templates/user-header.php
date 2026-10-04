@@ -5,11 +5,15 @@
         <meta charset="utf-8">
         <meta name="viewport"   content="width=device-width, initial-scale=1">
 
-        <title><?php echo $data['PageTitle']; ?></title>
-        <meta name="description" content="<?php echo $data['PageDescription']; ?>">
-        <meta name="author"      content="<?php echo $data['PageAuthor']; ?>">
-        <meta name="keywords"    content="<?php echo $data['PageKeywords']; ?>">
+        <title><?php echo htmlspecialchars($data['PageTitle'], ENT_QUOTES, 'UTF-8'); ?></title>
+        <meta name="description" content="<?php echo htmlspecialchars($data['PageDescription'], ENT_QUOTES, 'UTF-8'); ?>">
+        <meta name="author"      content="<?php echo htmlspecialchars($data['PageAuthor'], ENT_QUOTES, 'UTF-8'); ?>">
+        <meta name="keywords"    content="<?php echo htmlspecialchars($data['PageKeywords'], ENT_QUOTES, 'UTF-8'); ?>">
         <meta name="robots"      content="nofollow, noindex" />
+
+        <!-- Seguridad: token CSRF (se usa en las peticiones AJAX y en los formularios) -->
+        <meta name="csrf-token" content="<?php echo htmlspecialchars($CSRF_TOKEN ?? '', ENT_QUOTES, 'UTF-8'); ?>">
+        <script>window.CSRF_TOKEN = <?php echo json_encode($CSRF_TOKEN ?? '', JSON_UNESCAPED_UNICODE); ?>;</script>
 
         <!-- Favicons -->
         <link rel="icon"             type="image/png"                    href="<?php echo $BASE.'/img/favicon/mifavicon.png'; ?>">
@@ -145,12 +149,12 @@
                     <?php
                     /********************************/
                     $CompanyLogo  = !empty($data['UserData']['Sistema_IMGLogo'])
-                                    ? $data['UserData']['MainPathUrl'].$data['UserData']['Sistema_IMGLogo']
+                                    ? htmlspecialchars($data['UserData']['MainPathUrl'].$data['UserData']['Sistema_IMGLogo'], ENT_QUOTES, 'UTF-8')
                                     : $BASE.'/img/logo.png';
 
                     /********************************/
                     $CompanyName  = !empty($data['UserData']['Sistema_Nombre'])
-                                    ? $data['UserData']['Sistema_Nombre']
+                                    ? htmlspecialchars($data['UserData']['Sistema_Nombre'], ENT_QUOTES, 'UTF-8')
                                     : 'Nombre Compañia';
 
                     ?>
@@ -200,6 +204,6 @@
             <div class="pagetitle" data-aos="fade-up" data-aos-offset="500" data-aos-duration="500">
                 <div class="btn-group btn-breadcrumb">
                     <?php echo '<a href="'.$BASE.'/principal" class="btn btn-dark"><i class="glyphicon glyphicon-home"></i></a>'; ?>
-                    <a href="#" class="btn btn-secondary"><?php echo $data['PageTitle']; ?></a>
+                    <a href="#" class="btn btn-secondary"><?php echo htmlspecialchars($data['PageTitle'], ENT_QUOTES, 'UTF-8'); ?></a>
                 </div>
             </div>
