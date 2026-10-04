@@ -12,10 +12,8 @@ class testeos extends ControllerBase {
     private $Server;
     private $Notifications;
     private $DataNumbers;
-    private $ServerIA;
     private $DataText;
     private $ServerClient;
-    private $ServerWeb;
 
 
     /*******************************************************************/
@@ -32,10 +30,8 @@ class testeos extends ControllerBase {
 		$this->Server         = new FunctionsServerServer();
 		$this->Notifications  = new FunctionsServerSocial();
 		$this->DataNumbers    = new FunctionsDataNumbers();
-		$this->ServerIA       = new FunctionsServerIA();
 		$this->DataText       = new FunctionsDataText();
 		$this->ServerClient   = new FunctionsServerClient();
-		$this->ServerWeb      = new FunctionsServerWeb();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -868,7 +864,7 @@ class testeos extends ControllerBase {
         //--------------------- simpleEncode ---------------------
         // NOTA: el metodo retorna array ['success'=>bool, 'data'/'error'=>...].
         $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["", "passkey"],                                        'array',  '("", "passkey"     -> Devuelve {"success":false,"error":"Sin datos ingresados"})');
-        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["hola", "passkey"],                                    'array',  '("hola", "passkey" -> Devuelve {"success":true,"data":"1OZnyHJgPFYCsgzp7wJ48JVkm5w="})');
+        $this->runTest($test, 'FunctionsSecurityCodification',    'simpleEncode',                ["hola", "passkey"],                                    'array',  '("hola", "passkey" -> Devuelve {"success":true,"data":"<cadena Base64 URL-safe>"})');
         //--------------------- simpleDecode ---------------------
         $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                ["", "passkey"],                                        'array',  '("", "passkey"                   -> Devuelve {"success":false,"error":"Sin datos ingresados"})');
         $this->runTest($test, 'FunctionsSecurityCodification',    'simpleDecode',                [$Test_SimpleEncode['data'], "passkey"],                'array',  '(simpleEncode("hola"), "passkey" -> Devuelve {"success":true,"data":"hola"})');
@@ -882,8 +878,8 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsSecurityCodification',    'encryptDecrypt',              ['decrypt', $Test_EncryptDecrypt['data']],              'array',  '(encryptDecrypt("encrypt",5008) -> Devuelve {"success":true,"data":"5008"})');
 
         /**********  FunctionsSecurityPasswords  **********/
-        // NOTA: generarPassword() y caracteresRandom() retornan array ['success'=>bool, 'data'/'error'=>...];
-        // tokenBin2Hex() y hashCreate() retornan string; hashVerify() retorna bool.
+        // NOTA: generarPassword(), caracteresRandom(), tokenBin2Hex() y hashCreate() retornan
+        // array ['success'=>bool, 'data'/'error'=>...]; hashVerify() retorna bool.
         //--------------------- generarPassword ---------------------
         $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      ['20','alfanumerico'],         'array',  '("","alfanumerico"   -> Devuelve array con password por defecto (longitud invalida) en "data")');
         $this->runTest($test, 'FunctionsSecurityPasswords', 'generarPassword',      [10,''],                     'array',  '("10",""             -> Devuelve array de error por tipo invalido)');
@@ -896,12 +892,12 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsSecurityPasswords', 'caracteresRandom',     [16, 'a', 'a', 'a'],         'array',  '(16, "a", "a", "a"      -> Devuelve array de error por lecturaAmigable invalida)');
         $this->runTest($test, 'FunctionsSecurityPasswords', 'caracteresRandom',     [16, true, false, false],    'array',  '(16, true, false, false -> Devuelve array con la cadena aleatoria en "data")');
         //--------------------- tokenBin2Hex ---------------------
-        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         [''],                        'string',  '(""  -> Devuelve Sin datos ingresados en longitud)');
-        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         ['a'],                       'string',  '("a" -> Devuelve El dato ingresado en longitud no es un numero (a))');
-        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         [25],                        'string',  '(25  -> Devuelve un token hexadecimal)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         [''],                        'array',  '(""  -> Devuelve {"success":false,"error":"Sin datos ingresados en longitud"})');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         ['a'],                       'array',  '("a" -> Devuelve {"success":false,"error":"El dato ingresado en longitud no es un numero (a)"})');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex',         [25],                        'array',  '(25  -> Devuelve {"success":true,"data":"<token hexadecimal>"})');
         //--------------------- hashCreate ---------------------
-        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashCreate',           [''],                        'string',  '(""        -> Devuelve Sin datos ingresados en Texto)');
-        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashCreate',           ['palabra'],                 'string',  '("palabra" -> Devuelve el hash BCRYPT)');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashCreate',           [''],                        'array',  '(""        -> Devuelve {"success":false,"error":"Sin datos ingresados en Texto"})');
+        $this->runTest($test, 'FunctionsSecurityPasswords', 'hashCreate',           ['palabra'],                 'array',  '("palabra" -> Devuelve {"success":true,"data":"<hash BCRYPT>"})');
         //--------------------- hashVerify ---------------------
         $this->runTest($test, 'FunctionsSecurityPasswords', 'hashVerify',           ['', ''],                                                                     'bool',    '("",""                  -> Devuelve false)');
         $this->runTest($test, 'FunctionsSecurityPasswords', 'hashVerify',           ['palabra', '$2y$12$pd1.kBABacsBwq8YXNDieuqNELrjJiq68kXCFtHoaj7IwqljDLdj6'],  'bool',    '("palabra","$2y$12$..." -> Devuelve true)');
@@ -1269,33 +1265,6 @@ class testeos extends ControllerBase {
         $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/testeos-MailTemplate.php');
     }
 
-    /*******************************************************************/
-    // Vista de IA
-    /*******************************************************************/
-    public function IA_View($f3){
-        /*******************************************************************/
-        /*                         Imprimir Datos                          */
-        /*******************************************************************/
-        //Datos enviados a la pagina
-        $f3->data = [
-            /*=========== Datos de la Pagina ===========*/
-            'PageTitle'       => 'Testeos Inteligencia Artificial',
-            'PageDescription' => 'Testeos Inteligencia Artificial.',
-            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
-            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-            'TableTitle'      => 'Testeos Inteligencia Artificial',
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_FormInputs'   => $this->FormInputs,
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $this->getUserData($f3),
-            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-        ];
-
-        /************************************/
-        // Se instancia la vista
-        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/testeos-IA_Chat.php');
-    }
-
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
@@ -1392,54 +1361,6 @@ class testeos extends ControllerBase {
         /***************************************/
         // Devuelvo true con código 200 (OK)
         Response::success($Result['success']);
-
-    }
-
-    /*******************************************************************/
-    // Envio de correo por Sending Blue
-    /*******************************************************************/
-    public function IA_Response($f3){
-
-        /************************************/
-        // Validación del método HTTP
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Response::error('Error en el Request Method', 405);
-        }
-
-        /************************************/
-        // Variables
-        $Pregunta = isset($_POST['mensaje']) ? $_POST['mensaje'] : 0;
-
-        /************************************/
-        // Generacion de errores
-        if($Pregunta==0) {
-            Response::error('No hay productos ingresados', 500);
-        }else{
-            //La API
-            $api_key = "";
-            //El cuerpo
-            $data = [
-                'model'    => 'gpt-3.5-turbo',
-                'messages' => [],
-            ];
-            $data['messages'][] = ['role' => 'system', 'content' => 'Actua como un experto '];
-            $data['messages'][] = ['role' => 'user',   'content' => $Pregunta];
-
-            /************************************/
-            $response  = $this->ServerIA->senDataIA($api_key, $data);
-
-            //Se consigue la respuesta
-            if($response['success']===true){
-                //Se decodifica la respuesta
-                $decoded_response = json_decode($response['data'], true);
-                //Se muestra el resultado
-                if (isset($decoded_response['choices'][0]['message']['content'])) {
-                    Response::success($decoded_response['choices'][0]['message']['content']);
-                }
-            }else{
-                Response::error($response['error'], 500, $Response['error'] ?? '');
-            }
-        }
 
     }
 
