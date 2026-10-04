@@ -8,7 +8,7 @@
     <thead>
         <tr>
             <th scope="col">Servicio</th>
-            <th scope="col">Fecha Ingreso</th>
+            <th scope="col" style="width: 100px;">Fecha Ingreso</th>
             <th scope="col">Monto Servicio</th>
             <th scope="col">Estado</th>
             <th scope="col" style="width: 10px;">Acciones</th>
@@ -16,9 +16,9 @@
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrPlanes'])&&!empty($data['arrPlanes'])){
-            //Recorro
+            // Recorro los datos
             foreach($data['arrPlanes'] as $crud){
                 // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPlan']);
@@ -33,9 +33,9 @@
                         <div class="btn-group" role="group">
                             <?php
                             //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="tabPlanesView(\''.$encryptedId.'\')"                              class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 2) {echo '<button type="button" onclick="tabPlanesEdit(\''.$encryptedId.'\')"                              class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>';}
-                            if ($level >= 4) {echo '<button type="button" onclick="tabPlanesDel(\''.$encryptedId.'\', \''.addslashes($Entidad).'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
+                            if ($level >= 1) {echo '<button type="button" onclick="tabPlanesView(\''.$encryptedId['data'].'\')"                              class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
+                            if ($level >= 2) {echo '<button type="button" onclick="tabPlanesEdit(\''.$encryptedId['data'].'\')"                              class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>';}
+                            if ($level >= 4) {echo '<button type="button" onclick="tabPlanesDel(\''.$encryptedId['data'].'\', \''.addslashes($Entidad).'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
                             ?>
                         </div>
                     </td>

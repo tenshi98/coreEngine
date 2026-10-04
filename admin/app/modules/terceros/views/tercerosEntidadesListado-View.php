@@ -22,7 +22,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -44,19 +44,19 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['arrPlanes'])&&!empty($data['arrPlanes'])){
-                                        //Recorro
+                                        // Recorro
                                         foreach($data['arrPlanes'] as $crud){ ?>
                                             <tr>
                                                 <td><?php echo $crud['Servicio']; ?></td>
-                                                <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Fecha']); ?></td>
+                                                <td style="width: 100px;"><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Fecha']); ?></td>
                                                 <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['Monto'], 0); ?></td>
                                                 <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
                                             </tr>
                                         <?php } ?>
                                     <?php }else{
-                                        echo '<tr><td colspan="4">No se encontraron entradas</td></tr>';
+                                        echo '<tr><td>No se encontraron entradas</td></tr>';
                                     } ?>
                                 </tbody>
                             </table>
@@ -75,19 +75,19 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['arrUsuarios'])&&!empty($data['arrUsuarios'])){
-                                        //Recorro
+                                        // Recorro
                                         foreach($data['arrUsuarios'] as $crud){ ?>
                                             <tr>
                                                 <td><?php echo $crud['email']; ?></td>
                                                 <td><?php echo $crud['Nombre']; ?></td>
-                                                <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Ultimo_acceso']); ?></td>
+                                                <td style="width: 100px;"><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Ultimo_acceso']); ?></td>
                                                 <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
                                             </tr>
                                         <?php } ?>
                                     <?php }else{
-                                        echo '<tr><td colspan="4">No se encontraron entradas</td></tr>';
+                                        echo '<tr><td>No se encontraron entradas</td></tr>';
                                     } ?>
                                 </tbody>
                             </table>

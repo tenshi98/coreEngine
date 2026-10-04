@@ -22,7 +22,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -87,9 +87,9 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['MainViewData']['Data_Maquinas'])&&!empty($data['MainViewData']['Data_Maquinas'])){
-                                        //Recorro
+                                        // Recorro
                                         foreach($data['MainViewData']['Data_Maquinas'] as $crud){
                                             echo '<tr><td>'.$crud['Maquina'].'</td></tr>';
                                         }
@@ -115,9 +115,9 @@
                                 <table class="table table-sm table-hover">
                                     <tbody>
                                         <?php
-                                        //Verifico si hay datos
+                                        // Verifico si hay datos
                                         if(is_array($data['MainViewData']['Data_Noti'])&&!empty($data['MainViewData']['Data_Noti'])){
-                                            //Recorro
+                                            // Recorro
                                             foreach($data['MainViewData']['Data_Noti'] as $crud){
                                                 echo '<tr><td>'.$crud['Notificacion'].'</td></tr>';
                                             }

@@ -3,7 +3,10 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
 ?>
+
 <form id="FormNewUsuario" name="FormNewUsuario" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
         <?php
@@ -23,7 +26,7 @@
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
@@ -36,9 +39,9 @@
         $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Tipo de Usuario',     'Name' => 'idTipoUsuario', 'Id' => 'NewUsuario_idTipoUsuario',  'Value' => '',  'Required' => 2,  'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password',       'Value' => '1234', 'Required' => 2]);//password por defecto
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',       'Value' => 1,      'Required' => 2]);//Usuario Activo
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad', 'Value' => $data['rowData']['idEntidad'],  'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password',  'Value' => '1234',                         'Required' => 2]);//password por defecto
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',  'Value' => 1,                              'Required' => 2]);//Usuario Activo
         ?>
     </div>
     <div class="modal-footer">
@@ -53,7 +56,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewUsuario").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -75,7 +78,7 @@
             let Informacion = $("#FormNewUsuario").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#tabUsuariosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuarios/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>', refreshTbl:'true'}
+                    {Div:'#tabUsuariosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/usuarios/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
                 closeModal:'#viewModal-lg',

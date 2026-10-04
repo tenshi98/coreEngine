@@ -9,16 +9,16 @@
         <tr>
             <th scope="col">Email</th>
             <th scope="col">Nombre</th>
-            <th scope="col">Ultimo Acceso</th>
+            <th scope="col" style="width: 100px;">Ultimo Acceso</th>
             <th scope="col">Estado</th>
             <th scope="col" style="width: 10px;">Acciones</th>
         </tr>
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrUsuarios'])&&!empty($data['arrUsuarios'])){
-            //Recorro
+            // Recorro los datos
             foreach($data['arrUsuarios'] as $crud){
                 // Variables
                 $idEntidad   = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idEntidad']);
@@ -31,17 +31,17 @@
                     <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
                     <td>
                         <div class="btn-group" role="group">
-                            <button type="button" onclick="tabUsuariosView('<?php echo $encryptedId; ?>')"                                    class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
-                            <button type="button" onclick="tabUsuariosEdit('<?php echo $encryptedId; ?>')"                                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
+                            <button type="button" onclick="tabUsuariosView('<?php echo $encryptedId['data']; ?>')"                                    class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
+                            <button type="button" onclick="tabUsuariosEdit('<?php echo $encryptedId['data']; ?>')"                                    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
                             <?php
                             //Si existen permisos a las maquinas
                             if(isset($data['MainViewData']['Count_Maquinas'])&&$data['MainViewData']['Count_Maquinas']!=0){
-                                echo '<button type="button" onclick="tabUsuariosEditMaq(\''.$idEntidad.'\', \''.$encryptedId.'\')"    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Permisos Máquinas"><i class="bi bi-gear-fill"></i></button>';
+                                echo '<button type="button" onclick="tabUsuariosEditMaq(\''.$idEntidad['data'].'\', \''.$encryptedId['data'].'\')"    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Permisos Máquinas"><i class="bi bi-gear-fill"></i></button>';
                                 if($data['UserData']["maquinasListadoNotificaciones"]==2){
-                                    echo '<button type="button" onclick="tabUsuariosEditNoti(\''.$idEntidad.'\', \''.$encryptedId.'\')"    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Notificaciones"><i class="bi bi-whatsapp"></i></button>';
+                                    echo '<button type="button" onclick="tabUsuariosEditNoti(\''.$idEntidad['data'].'\', \''.$encryptedId['data'].'\')"    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Notificaciones"><i class="bi bi-whatsapp"></i></button>';
                                 }
                             } ?>
-                            <button type="button" onclick="tabUsuariosDel( '<?php echo $encryptedId; ?>', '<?php echo $Entidad; ?>')"         class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
+                            <button type="button" onclick="tabUsuariosDel( '<?php echo $encryptedId['data']; ?>', '<?php echo $Entidad; ?>')"         class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
                         </div>
                     </td>
                 </tr>

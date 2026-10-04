@@ -16,16 +16,16 @@
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
-            //Recorro
+            // Recorro los datos
             foreach($data['arrList'] as $crud){
-                //Se obtiene el nombre o la razón social
+                // Se obtiene el nombre o la razón social
                 $Entidad  = '';
                 $Entidad .= !empty($crud['Nick'])
                             ? '<strong>'.$crud['Nick'].'</strong> | '
                             : '';
-                //Se obtiene el nombre o la razón social
+                // Se obtiene el nombre o la razón social
                 switch ($crud['idTipoEntidad']) {
                     case 1: $Entidad .= $crud['ApellidoPat'].' '.$crud['ApellidoMat'].', '.$crud['Nombre']; break; //Persona Natural
                     case 2: $Entidad .= $crud['RazonSocial']; break;                                               //Empresas
@@ -34,7 +34,7 @@
                 // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idEntidad']);
                 $level       = $data['UserAccess']['LevelAccess'];
-                $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId; ?>
+                $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId['data']; ?>
                 <tr>
                     <td><?php echo $crud['TipoEntidad']; ?></td>
                     <td><?php echo $Entidad; ?></td>
@@ -44,8 +44,8 @@
                         <div class="btn-group" role="group">
                             <?php
                             //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId.'\')"                              class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 2) {echo '<a href="'.$route.'"                                                                                 class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>';}
+                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId['data'].'\')"  class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
+                            if ($level >= 2) {echo '<a href="'.$route.'"                                                             class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>';}
                             ?>
                         </div>
                     </td>

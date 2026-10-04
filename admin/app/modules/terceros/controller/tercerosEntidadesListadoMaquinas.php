@@ -4,8 +4,9 @@
 /*******************************************************************************************************************/
 class tercerosEntidadesListadoMaquinas extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -13,8 +14,9 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -34,26 +36,36 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear nuevo
+    /*******************************************************************/
+    // Crear nuevo
+    /*******************************************************************/
     public function New($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($EntidadID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEntidad',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEntidad = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$EntidadID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMaquina',
@@ -66,14 +78,15 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'order'   => 'idMaquina ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrMaq  = $this->Base_GetList($xParams);
 
 
         // Se filtran los ya existentes
         $ElementsIDs = [0];
-        if ($arrMaq['status']) {
+        if ($arrMaq['status'] === true) {
             // Obtiene los identificadores de las campañas existentes y los agrega
             // a la lista de valores.
             $ElementsIDs = array_merge($ElementsIDs, array_column($arrMaq['data'], 'idMaquina'));
@@ -82,7 +95,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         // cada identificador mediante parámetros preparados.
         $placeholders = implode(',', array_fill(0, count($ElementsIDs), '?'));
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMaquina AS ID,Nombre',
@@ -95,8 +108,9 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams     = ['query' => $query];
+        // Ejecuto la query
         $arrMaquinas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -104,8 +118,8 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrMaquinas['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -118,22 +132,32 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'arrMaquinas'    => $arrMaquinas['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Maquinas-formNew.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrMaquinas]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
-    /******************************************************************************/
-    //List
+
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3, $params){
-        /*******************************************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($EntidadID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -147,24 +171,25 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 LEFT JOIN maquinas_listado  ON maquinas_listado.idMaquina  = terceros_entidades_listado_maquinas.idMaquina
                 LEFT JOIN core_estados      ON core_estados.idEstado       = terceros_entidades_listado_maquinas.idEstado',
             'where'   => 'terceros_entidades_listado_maquinas.idEntidad = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$EntidadID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'terceros_entidades_listado_maquinas.Fecha DESC, maquinas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrMaq  = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrMaq['status']){
+        if ($arrMaq['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -177,23 +202,32 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'arrMaq' => $arrMaq['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Maquinas-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrMaq]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //View
+    /*******************************************************************/
+    // View
+    /*******************************************************************/
     public function View($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $MaqID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($MaqID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -207,22 +241,23 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 LEFT JOIN maquinas_listado  ON maquinas_listado.idMaquina  = terceros_entidades_listado_maquinas.idMaquina
                 LEFT JOIN core_estados      ON core_estados.idEstado       = terceros_entidades_listado_maquinas.idEstado',
             'where'   => 'terceros_entidades_listado_maquinas.idMaq = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$MaqID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -235,39 +270,49 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'rowData'       => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Maquinas-View.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $MaqID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($MaqID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMaq,idEntidad,idMaquina,idEstado,Fecha,Observacion',
             'table'   => 'terceros_entidades_listado_maquinas',
             'join'    => '',
             'where'   => 'idMaq = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$MaqID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMaquina',
@@ -280,13 +325,14 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'order'   => 'idMaquina ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrMaq  = $this->Base_GetList($xParams);
 
         // Se filtran los ya existentes
         $ElementsIDs = [0];
-        if ($arrMaq['status']) {
+        if ($arrMaq['status'] === true) {
             // Obtiene los identificadores de las campañas existentes y los agrega
             // a la lista de valores.
             $ElementsIDs = array_merge($ElementsIDs, array_column($arrMaq['data'], 'idMaquina'));
@@ -295,7 +341,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         // cada identificador mediante parámetros preparados.
         $placeholders = implode(',', array_fill(0, count($ElementsIDs), '?'));
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMaquina AS ID,Nombre',
@@ -308,11 +354,12 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams     = ['query' => $query];
+        // Ejecuto la query
         $arrMaquinas = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
@@ -325,8 +372,9 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -334,8 +382,8 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrMaquinas['status'] && $arrEstado['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -350,15 +398,15 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
                 'arrEstado'        => $arrEstado['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Maquinas-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrMaquinas,$arrEstado]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -366,15 +414,16 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
     public function Insert(){
 
-        /******************************/
-        //Se genera el chequeo
+        /************************************/
+        // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idEntidad,idMaquina,idEstado,idUsuario,Fecha,Observacion',
@@ -384,104 +433,114 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'table'     => 'terceros_entidades_listado_maquinas',
             'Post'      => $_POST
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
-        /******************************/
-        // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if ($Response['status']){
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-        } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
 
-            /******************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idMaq,idEntidad,idMaquina,idEstado,idUsuario,Fecha,Observacion',
-                'required'  => 'idEntidad,idMaquina,idEstado,idUsuario',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'terceros_entidades_listado_maquinas',
-                'where'     => 'idMaq',
-                'Post'      => $_POST
-            ];
-            // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idMaq,idEntidad,idMaquina,idEstado,idUsuario,Fecha,Observacion',
+            'required'  => 'idMaq,idEntidad,idMaquina,idEstado,idUsuario',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'terceros_entidades_listado_maquinas',
+            'where'     => 'idMaq',
+            'Post'      => $_POST
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'terceros_entidades_listado_maquinas',
-                'where'       => 'idMaq',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'terceros_entidades_listado_maquinas',
+            'where'       => 'idMaq',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -514,7 +573,7 @@ class tercerosEntidadesListadoMaquinas extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
