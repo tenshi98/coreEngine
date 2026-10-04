@@ -15,8 +15,8 @@ class FunctionsSecurityCodification {
      * * Permite el uso de una llave personalizada (passkey). Si no se proporciona, utiliza
      * una llave interna predefinida. Genera un IV aleatorio en cada llamada y lo antepone
      * al ciphertext (el IV no es secreto, pero nunca debe reutilizarse con la misma llave).
-     * El resultado se sanitiza para ser seguro en URLs reemplazando caracteres conflictivos
-     * ('+' por '_' y '/' por '---').
+     * El resultado se sanitiza para ser seguro en URLs aplicando Base64 URL-safe (RFC 4648):
+     * '+' -> '-' y '/' -> '_', sin relleno '='.
      *
      * @param string $simple_string Texto original que se desea codificar.
      * @param string $passkey (Opcional) Llave de cifrado personalizada.
@@ -54,8 +54,9 @@ class FunctionsSecurityCodification {
         // El IV no es secreto: se antepone al ciphertext para poder recuperarlo al decodificar
         $encryption = base64_encode($encryption_iv . $ciphertext_raw);
 
-        // Sanitización para transporte (URL friendly)
-        $encryption = str_replace(['+', '/'], ['_', '---'], $encryption);
+        // Sanitización para transporte (URL friendly) con Base64 URL-safe estándar (RFC 4648):
+        // '+' -> '-' y '/' -> '_', eliminando el relleno '=' final.
+        $encryption = rtrim(strtr($encryption, '+/', '-_'), '=');
 
         /********************** Retorno datos  **********************/
         return ['success' => true, 'data' => $encryption];
@@ -64,9 +65,9 @@ class FunctionsSecurityCodification {
     /************************************************************************************************************/
     /**
      * Decodifica un texto previamente cifrado con el método simpleEncode.
-     * * Revierte la sanitización de caracteres, extrae el IV que viaja al inicio de los
-     * datos y aplica el proceso inverso de AES-128-CTR utilizando la misma llave con la
-     * que fue cifrado.
+     * * Revierte la sanitización Base64 URL-safe (RFC 4648), extrae el IV que viaja al inicio
+     * de los datos y aplica el proceso inverso de AES-128-CTR utilizando la misma llave con
+     * la que fue cifrado.
      *
      * @param string $string Texto codificado que se desea recuperar.
      * @param string $passkey (Opcional) Llave de cifrado utilizada originalmente.
@@ -85,8 +86,10 @@ class FunctionsSecurityCodification {
         if ($string==''){ return ['success' => false, 'error' => 'Sin datos ingresados'];}
 
         /********************** Si todo esta ok **********************/
-        // Reversión de la sanitización (restaura caracteres originales de Base64)
-        $simple_string = str_replace(['_', '---', ' '], ['+', '/', '+'], $string);
+        // Reversión de la sanitización Base64 URL-safe (RFC 4648): '-' -> '+' y '_' -> '/'
+        $base64  = strtr($string, '-_', '+/');
+        // Restaura el relleno '=' eliminado durante la codificación
+        $base64 .= str_repeat('=', (4 - strlen($base64) % 4) % 4);
 
         // Configuración de la llave de descifrado
         if (!isset($passkey) || empty($passkey)) {
@@ -101,7 +104,7 @@ class FunctionsSecurityCodification {
         $iv_length = openssl_cipher_iv_length($ciphering);
 
         // El IV viaja concatenado al inicio de los datos, se separa del ciphertext
-        $raw            = base64_decode($simple_string);
+        $raw            = base64_decode($base64);
         $decryption_iv  = substr($raw, 0, $iv_length);
         $ciphertext_raw = substr($raw, $iv_length);
 
@@ -208,8 +211,21 @@ class FunctionsSecurityCodification {
 
             // El IV viaja concatenado al inicio de los datos, se separa del ciphertext
             $raw            = base64_decode($base64);
-            $iv             = substr($raw, 0, $iv_length);
-            $ciphertext_raw = substr($raw, $iv_length);
+            $iv             = substr((string)$raw, 0, $iv_length);
+            $ciphertext_raw = substr((string)$raw, $iv_length);
+
+            // Valido el material criptografico ANTES de llamar a openssl.
+            // Un IV incompleto hace que openssl_decrypt() emita un warning
+            // ("IV passed is only N bytes long, cipher expects an IV of precisely
+            // 16 bytes"). Como Fat-Free Framework instala un set_error_handler
+            // global que convierte cualquier warning en HTTP 500 + die(), ese
+            // warning abortaba la peticion completa (incluido el sistema de
+            // testeos). Un dato corrupto u obfuscado debe devolverse como error
+            // de negocio, nunca como warning de PHP.
+            if($raw === false || strlen($iv) !== $iv_length || $ciphertext_raw === ''){
+                return ['success' => false, 'error' => 'Registro encriptado invalido'];
+            }
+
             $output         = openssl_decrypt($ciphertext_raw, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
             // Verifico
             if ($output === false) { return ['success' => false, 'error' => 'No se pudo desencriptar']; }

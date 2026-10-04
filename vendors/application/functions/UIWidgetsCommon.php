@@ -1669,6 +1669,17 @@ class UIWidgetsCommon {
 		$ValidarTipo        = (isset($Options['ValidarTipo'])&&$Options['ValidarTipo']!='')         ? $Options['ValidarTipo']     : 'all';
 		$levelPermission    = (isset($Options['levelPermission'])&&$Options['levelPermission']!='') ? $Options['levelPermission'] : 4;
 
+		/************************************************************************************************************/
+		// Ámbito de autorización: identifica el módulo que implementa esta vista para que el endpoint
+		// valide la concesión de sesión (ScopeAccess). Se sanea con la misma regla que
+		// ScopeAccess::normalizeScope(). El nivel NO viaja en la petición: solo se transporta el ámbito.
+		/************************************************************************************************************/
+		$AccessScope        = (isset($Options['AccessScope'])&&$Options['AccessScope']!='') ? $Options['AccessScope'] : '';
+		$AccessScope        = preg_replace('/[^a-zA-Z0-9_\-]/', '', (string)$AccessScope);
+		// Sin ámbito válido el endpoint denegaría (fail-closed); aquí se evita además pintar botones inútiles
+		$escrituraPermitida = ($AccessScope !== '') && ((int)$levelPermission >= 2);
+		$borradoPermitido   = ($AccessScope !== '') && ((int)$levelPermission >= 3);
+
 		/********************** Si todo esta ok **********************/
 		$widget  = '
 			<div class="file-explorer">
@@ -1680,7 +1691,7 @@ class UIWidgetsCommon {
 						<button class="btn btn-sm btn-outline-secondary" onclick="setView(\'list\')"><i class="bi bi-card-list"></i></button>
 					</div>';
 
-					if($levelPermission>=2){
+					if($escrituraPermitida){
 						$widget  .= '
 						<div class="btn-group">
 							<button class="btn btn-sm btn-outline-primary"     onclick="document.getElementById(\'fileInput\').click()"><i class="bi bi-upload"></i> Subir Archivo</button>
@@ -1710,7 +1721,7 @@ class UIWidgetsCommon {
 								<th scope="col">Nombre</th>
 								<th scope="col">Tamaño</th>
 								<th scope="col">Fecha</th>';
-								if($levelPermission>=3){$widget  .= '<th scope="col">Acciones</th>';}
+								if($borradoPermitido){$widget  .= '<th scope="col">Acciones</th>';}
 								$widget  .= '
 							</tr>
 						</thead>
@@ -1932,8 +1943,15 @@ class UIWidgetsCommon {
 					 * ===============================
 					 * Obtiene listado de archivos/carpetas en formato JSON
 					 */
-					const res = await fetch(`'.$BASE.'/core/fileExplorer/updateList/'.$Route.'/'.$ValidarTipo.'/${finalPath}`);
+					const res = await fetch(`'.$BASE.'/core/fileExplorer/updateList/'.$Route.'/'.$ValidarTipo.'/${finalPath}/'.$AccessScope.'`);
 					let files = await res.json();
+
+					// Guarda de autorización: el endpoint responde 403 con un objeto de error cuando
+					// el usuario no tiene concesión de nivel "ver" para este ámbito. Sin esta guarda
+					// el .filter() de abajo iteraría un objeto y rompería el render del explorador.
+					if (!Array.isArray(files)) {
+						throw new Error(files && files.message ? files.message : "Sin acceso al explorador de archivos");
+					}
 
 					/**
 					 * Guarda la ruta actual (estado global)
@@ -2186,7 +2204,7 @@ class UIWidgetsCommon {
 							<td>${getIcon(file)} ${file.name}</td>
 							<td>${file.size ? formatSize(file.size) : "-"}</td>
 							<td>${file.date}</td>';
-							if($levelPermission>=3){
+							if($borradoPermitido){
 								$widget .= '
 								<td>
 									<button class="btn btn-sm btn-outline-danger"
@@ -2531,7 +2549,7 @@ class UIWidgetsCommon {
 
 				';
 
-				if($levelPermission>=2){
+				if($escrituraPermitida){
 					$widget  .= '
 					async function createNewFolder() {
 						// Lanzamos el diálogo de SweetAlert2
@@ -2559,12 +2577,14 @@ class UIWidgetsCommon {
 						// Preparamos los datos
 						const formData = new FormData();
 						formData.append("SubRoute", "'.$SubRoute.'");
+						formData.append("AccessScope", "'.$AccessScope.'");
 						formData.append("path", currentPath);
 						formData.append("name", folderName.trim());
 
 						try {
 							const res = await fetch(`'.$BASE.'/core/fileExplorer/createFolder`, {
 								method: "POST",
+								headers: { "X-CSRF-Token": (window.CSRF_TOKEN || "") },
 								body: formData
 							});
 							const result = await res.json();
@@ -2581,7 +2601,7 @@ class UIWidgetsCommon {
 						}
 					}';
 				}
-				if($levelPermission>=3){
+				if($borradoPermitido){
 					$widget  .= '
 					function deleteFolder(folderName) {
 
@@ -2604,10 +2624,12 @@ class UIWidgetsCommon {
 							const formData = new FormData();
 							formData.append("SubRoute", "'.$SubRoute.'");
 							formData.append("path", currentPath);
+							formData.append("AccessScope", ".$AccessScope.");
 							formData.append("name", folderName);
 
 							fetch(`'.$BASE.'/core/fileExplorer/deleteFolder`, {
 								method: "POST",
+								headers: { "X-CSRF-Token": (window.CSRF_TOKEN || "") },
 								body: formData
 							})
 							.then(res => res.json())
@@ -2653,7 +2675,7 @@ class UIWidgetsCommon {
 						});
 					}';
 				}
-				if($levelPermission>=2){
+				if($escrituraPermitida){
 					$widget  .= '
 					async function uploadFile(input) {
 						if (input.files.length === 0) return;
@@ -2661,6 +2683,7 @@ class UIWidgetsCommon {
 						const file = input.files[0];
 						const formData = new FormData();
 						formData.append("SubRoute", "'.$SubRoute.'");
+						formData.append("AccessScope", "'.$AccessScope.'");
 						formData.append("file", file);
 						formData.append("path", currentPath);
 
@@ -2673,6 +2696,7 @@ class UIWidgetsCommon {
 
 							const res = await fetch(`'.$BASE.'/core/fileExplorer/uploadFile`, {
 								method: "POST",
+								headers: { "X-CSRF-Token": (window.CSRF_TOKEN || "") },
 								body: formData
 							});
 
@@ -2705,7 +2729,7 @@ class UIWidgetsCommon {
 						}
 					}';
 				}
-				if($levelPermission>=3){
+				if($borradoPermitido){
 					$widget  .= '
 					function deleteFile(fileName) {
 
@@ -2728,10 +2752,12 @@ class UIWidgetsCommon {
 							const formData = new FormData();
 							formData.append("SubRoute", "'.$SubRoute.'");
 							formData.append("path", currentPath);
+							formData.append("AccessScope", ".$AccessScope.");
 							formData.append("name", fileName);
 
 							fetch(`'.$BASE.'/core/fileExplorer/deleteFile`, {
 								method: "POST",
+								headers: { "X-CSRF-Token": (window.CSRF_TOKEN || "") },
 								body: formData
 							})
 							.then(res => res.json())

@@ -174,7 +174,7 @@ class FunctionsSecurityPasswords {
      *
      * @param int $longitud Longitud total de la cadena hexadecimal resultante.
      *
-     * @return string Token en formato hexadecimal.
+     * @return array Token en formato hexadecimal dentro de la clave 'data', o el error en 'error'.
 	 *
 	 * @example
 	 * ```php
@@ -182,13 +182,13 @@ class FunctionsSecurityPasswords {
 	 * ```
 	 *
      */
-    public function tokenBin2Hex($longitud): string {
+    public function tokenBin2Hex($longitud): array {
 
         /********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateInteger($longitud, 'longitud');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
-		if ($dataVal !== true) { return $dataVal; }
+		if ($dataVal !== true) { return ['success' => false, 'error' => $dataVal]; }
 
         /********************** Si todo esta ok **********************/
         // Calcula la cantidad de bytes necesarios (cada byte produce 2 caracteres hexadecimales)
@@ -196,7 +196,7 @@ class FunctionsSecurityPasswords {
 
         /********************** Retorno datos  **********************/
         // Genera bytes aleatorios y los convierte a representación hexadecimal
-        return bin2hex(openssl_random_pseudo_bytes($bytesNeeded));
+        return ['success' => true, 'data' => bin2hex(openssl_random_pseudo_bytes($bytesNeeded))];
 
     }
 
@@ -208,7 +208,7 @@ class FunctionsSecurityPasswords {
      *
      * @param string $Texto La contraseña o cadena en texto plano a procesar.
      *
-     * @return string El hash generado listo para ser almacenado en la base de datos.
+     * @return array El hash generado en la clave 'data' (o el error en 'error'), listo para almacenar.
 	 *
 	 * @example
 	 * ```php
@@ -216,21 +216,27 @@ class FunctionsSecurityPasswords {
 	 * ```
 	 *
      */
-    public static function hashCreate($Texto, $costo = 12): string {
+    public static function hashCreate($Texto, $costo = 12): array {
 
         /********************** Validaciones   **********************/
         // Se verifica si esta vacio
         if ($Texto === null || trim((string)$Texto) === '') {
-            return 'Sin datos ingresados en Texto';
+            return ['success' => false, 'error' => 'Sin datos ingresados en Texto'];
         }
 
         /********************** Si todo esta ok **********************/
         // 'cost' define el número de iteraciones del algoritmo (2^n).
         $options = ['cost' => $costo];
 
-        /********************** Retorno datos  **********************/
         // password_hash maneja automáticamente la generación de la sal (salt)
-        return password_hash($Texto, PASSWORD_BCRYPT, $options);
+        $hash = password_hash($Texto, PASSWORD_BCRYPT, $options);
+        // password_hash retorna False si el algoritmo o el costo no son válidos
+        if ($hash === false) {
+            return ['success' => false, 'error' => 'No se pudo generar el hash'];
+        }
+
+        /********************** Retorno datos  **********************/
+        return ['success' => true, 'data' => $hash];
 
     }
 

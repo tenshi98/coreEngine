@@ -698,7 +698,6 @@ class UIWidgetsViews {
 		//Se delega en el retrato comun agregando el borde
 		$this->_imgPortrait($BASE, $MainPathUrl, $Image, 'square-border-3');
 	}
-
     /************************************************************************************************************/
 	/**
 	 * Imprime el retrato del usuario con esquinas redondeadas (sin borde).
@@ -719,6 +718,7 @@ class UIWidgetsViews {
 		//Se delega en el retrato comun sin el borde
 		$this->_imgPortrait($BASE, $MainPathUrl, $Image);
 	}
+
 	/************************************************************************************************************/
 	/**
 	 * Normaliza y valida la configuracion comun de los titulos (tittle_v2, tittle_v3 y tittle_v4).
@@ -1092,6 +1092,91 @@ class UIWidgetsViews {
 			echo $alerts;
 		}
 
+	}
+
+	/************************************************************************************************************/
+	/**
+	 * Genera una tabla HTML estilizada con Bootstrap a partir de un arreglo de datos.
+	 *
+	 * Este método construye dinámicamente un componente visual compuesto por:
+	 * - Un contenedor tipo "card"
+	 * - Un encabezado con título y botón de exportación a Excel
+	 * - Una tabla responsive con encabezados y filas generadas desde los datos
+	 *
+	 * Características principales:
+	 * - Si el arreglo está vacío, retorna un mensaje de advertencia
+	 * - Genera un ID único para la tabla (utilizado para exportación)
+	 * - Usa las claves del primer elemento como encabezados de la tabla
+	 * - Escapa los valores para prevenir inyección HTML
+	 *
+	 * @param array $data Arreglo de datos donde cada elemento representa una fila asociativa
+	 *                    (clave => valor). Todas las filas deben compartir las mismas claves.
+	 *
+	 * @return string HTML completo del componente Bootstrap con la tabla generada
+	 *
+	 * @throws \Exception No lanza excepciones explícitas; depende de la estructura del arreglo de entrada
+	 */
+	public function arrayToBootstrapTable(array $data) {
+		// Valida si el arreglo de datos está vacío
+		if (empty($data)) {
+			return '<div class="alert alert-warning">No hay datos disponibles</div>';
+		}
+
+		// Genera un identificador único para la tabla
+		$tableId  = 'table_' . uniqid();
+
+		// Genera un nombre de archivo basado en fecha y hora para exportación
+		$fileName = 'detalle_' . date('Ymd_His');
+
+		// Obtiene los encabezados a partir de las claves del primer elemento del arreglo
+		$headers = array_keys(reset($data));
+
+		// Inicializa el contenedor principal tipo card
+		$html  = '<div class="card card-custom mb-3 shadow-sm">';
+
+		// Construye el encabezado del card con título y botón de exportación
+		$html .= '<div class="card-header d-flex justify-content-between align-items-center">';
+		$html .= '<span>Tabla de datos</span>';
+		$html .= '<button type="button" class="btn btn-sm btn-success" onclick="exportTableToExcel(\'' . $tableId . '\', \'' . $fileName . '\')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>';
+		$html .= '</div>';
+
+		// Inicia el contenedor responsive para la tabla
+		$html .= '<div class="table-responsive">';
+
+		// Abre la tabla con el ID generado
+		$html .= '<table id="' . $tableId . '" class="table table-borderless mb-0">';
+
+		// Construye la sección THEAD con los encabezados
+		$html .= '<thead class="table-light"><tr>';
+		foreach ($headers as $header) {
+			// Aplica formato al encabezado y escapa el contenido
+			$html .= '<th scope="col">' . htmlspecialchars(ucfirst($header)) . '</th>';
+		}
+		$html .= '</tr></thead>';
+
+		// Construye la sección TBODY con los datos
+		$html .= '<tbody>';
+		foreach ($data as $row) {
+			$html .= '<tr>';
+
+			// Recorre cada encabezado para mantener consistencia en columnas
+			foreach ($headers as $header) {
+				// Obtiene el valor correspondiente o asigna vacío si no existe
+				$value = isset($row[$header]) ? $row[$header] : '';
+
+				// Escapa el valor antes de insertarlo en la celda
+				$html .= '<td>' . htmlspecialchars($value) . '</td>';
+			}
+
+			$html .= '</tr>';
+		}
+		$html .= '</tbody>';
+
+		// Cierra la tabla y los contenedores
+		$html .= '</table></div></div>';
+
+		// Retorna el HTML generado
+		return $html;
 	}
 
 	/*******************************************************************************************************************/
@@ -1657,5 +1742,4 @@ class UIWidgetsViews {
 		return $arrColorClass[$idColor] ?? '';
 
 	}
-
 }

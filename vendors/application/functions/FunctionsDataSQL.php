@@ -37,18 +37,13 @@ class FunctionsDataSQL {
         $params = compact('host', 'username', 'password', 'port', 'charset', 'type');
 
         /**********************  Validaciones   **********************/
-        foreach ($params as $name => $value) {
-            if ($value === '' || $value === null) {
-                return [
-                    'status'  => 'missing_param',
-                    'success' => false,
-                    'message' => "No hay datos en \$$name"
-                ];
-            }
+        // Validación de existencia de todos los parámetros obligatorios
+        if (($missing = $this->assertRequiredParams($params)) !== null) {
+            return $missing;
         }
 
         // Validación de rango de puerto TCP estándar
-        if (!is_numeric($port) || (int)$port <= 0 || (int)$port > 65535) {
+        if (!$this->validatePort($port)) {
             return [
                 'status'  => 'invalid_port',
                 'success' => false,
@@ -65,12 +60,30 @@ class FunctionsDataSQL {
             ];
         }
 
+        // Validación de formato de host (hostname, IPv4 o IPv6) para evitar inyección en el DSN
+        if (!$this->validateHost($host)) {
+            return [
+                'status'  => 'invalid_host',
+                'success' => false,
+                'message' => 'El host no tiene un formato válido'
+            ];
+        }
+
+        // Validación de charset contra la lista de permitidos para evitar inyección en el DSN
+        if (!$this->validateCharset($charset)) {
+            return [
+                'status'  => 'invalid_charset',
+                'success' => false,
+                'message' => 'El charset ingresado no está permitido'
+            ];
+        }
+
         /********************** Si todo esta ok **********************/
         try {
 
-            // Intento de instanciación de conexión SQL
+            // Intento de instanciación de conexión SQL (DSN construido con parámetros ya validados)
             $DBConn = new DB\SQL(
-                'mysql:host=' . $host . ';port=' . (int)$port . ';charset=' . $charset,
+                $this->buildDsn($host, (int)$port, $charset),
                 $username,
                 $password,
                 [\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;']
@@ -116,8 +129,12 @@ class FunctionsDataSQL {
             // Validación específica para usuarios con privilegios operativos básicos
             if ($type === 'basic') {
 
-                // Cambio manual al contexto de la base de datos 'mysql'
-                $DBConn->exec("USE `mysql` || SELECT 1;");
+                // Cambio de contexto a la base de datos 'mysql' (explícito, sin trucos SQL ambiguos)
+                try {
+                    $DBConn->exec("USE `mysql`");
+                } catch (\Exception $e) {
+                    // Si no es posible cambiar de contexto se continúa: las pruebas usan tablas temporales
+                }
 
                 // Generación de nombre único para tabla temporal
                 $testTable = '__test_perm_' . preg_replace('/[^a-f0-9]/', '', uniqid('', true));
@@ -228,24 +245,37 @@ class FunctionsDataSQL {
     public function validateDatabase($host, $username, $password, $port, $charset, $dbName): array {
 
         /**********************  Validaciones   **********************/
-        // Validación de campos obligatorios
-        if ($host === null || trim((string)$host) === '') {
-            return ['success' => false, 'message' => 'No hay datos en $host'];
+        // Validación de existencia de todos los parámetros obligatorios
+        $params = compact('host', 'username', 'password', 'port', 'charset', 'dbName');
+        if (($missing = $this->assertRequiredParams($params)) !== null) {
+            return $missing;
         }
-        if ($username === null || trim((string)$username) === '') {
-            return ['success' => false, 'message' => 'No hay datos en $username'];
+
+        // Validación de rango de puerto TCP estándar (misma regla que validateCredentials)
+        if (!$this->validatePort($port)) {
+            return [
+                'status'  => 'invalid_port',
+                'success' => false,
+                'message' => 'El puerto debe ser un número entre 1 y 65535'
+            ];
         }
-        if ($password === null || trim((string)$password) === '') {
-            return ['success' => false, 'message' => 'No hay datos en $password'];
+
+        // Validación de formato de host (hostname, IPv4 o IPv6) para evitar inyección en el DSN
+        if (!$this->validateHost($host)) {
+            return [
+                'status'  => 'invalid_host',
+                'success' => false,
+                'message' => 'El host no tiene un formato válido'
+            ];
         }
-        if ($port === null || trim((string)$port) === '') {
-            return ['success' => false, 'message' => 'No hay datos en $port'];
-        }
-        if ($charset === null || trim((string)$charset) === '') {
-            return ['success' => false, 'message' => 'No hay datos en $charset'];
-        }
-        if ($dbName === null || trim((string)$dbName) === '') {
-            return ['success' => false, 'message' => 'No hay datos en $dbName'];
+
+        // Validación de charset contra la lista de permitidos para evitar inyección en el DSN
+        if (!$this->validateCharset($charset)) {
+            return [
+                'status'  => 'invalid_charset',
+                'success' => false,
+                'message' => 'El charset ingresado no está permitido'
+            ];
         }
 
         // Control de longitud según estándares de identificadores de motores SQL
@@ -286,7 +316,7 @@ class FunctionsDataSQL {
 
             // Establecimiento de conexión para consulta remota
             $DBConn = new DB\SQL(
-                'mysql:host='.$host.';port='.$port.';charset='.$charset,
+                $this->buildDsn($host, (int)$port, $charset),
                 $username,
                 $password,
                 array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
@@ -440,8 +470,8 @@ class FunctionsDataSQL {
         // de C subyacentes a PHP/MySQL y se usa para evadir filtros de texto.
         // Ejemplo de ataque: "SELECT *\0 FROM users-- "
         // =========================================================================
-        if (str_contains($query, "\0")) {
-            return $fail('Query contiene caracteres nulos');
+        if (($err = $this->checkNullBytes($query)) !== null) {
+            return $fail($err);
         }
 
         // =========================================================================
@@ -449,8 +479,8 @@ class FunctionsDataSQL {
         // Previene DoS por queries gigantes que disparen backtracking catastrófico
         // en los regex posteriores (ReDoS) o saturen memoria.
         // =========================================================================
-        if (strlen($query) > $maxLength) {
-            return $fail("Query excede el límite de {$maxLength} caracteres");
+        if (($err = $this->checkMaxLength($query, $maxLength)) !== null) {
+            return $fail($err);
         }
 
         // =========================================================================
@@ -465,11 +495,7 @@ class FunctionsDataSQL {
         //   d) rtrim ';'         — el punto y coma final es ruido para la
         //      detección de múltiples sentencias.
         // =========================================================================
-        $query = trim($query);
-        $query = preg_replace('/(--[^\n]*$)|(#[^\n]*$)/m', '', $query); // comentarios de línea
-        $query = preg_replace('/\/\*.*?\*\//s', '', $query);             // comentarios de bloque
-        $query = preg_replace('/\s+/', ' ', $query);                     // colapsar whitespace
-        $query = rtrim($query, '; ');
+        $query = $this->normalizeQuery($query);
 
         if ($query === '') {
             return $fail('Query vacía');
@@ -497,16 +523,7 @@ class FunctionsDataSQL {
         //   \"  dentro de "..."
         //   \`  dentro de `...`
         // =========================================================================
-        $literals  = [];
-        $sanitized = preg_replace_callback(
-            "/'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`/",
-            function (array $m) use (&$literals): string {
-                $placeholder           = '__STR_' . count($literals) . '__';
-                $literals[$placeholder] = $m[0];
-                return $placeholder;
-            },
-            $query
-        );
+        $sanitized = $this->extractSqlLiterals($query);
 
         // =========================================================================
         // [5] MÚLTIPLES SENTENCIAS
@@ -514,8 +531,8 @@ class FunctionsDataSQL {
         // Se analiza sobre $sanitized para que un ';' dentro de un literal
         // ('val;ue') no dispare un falso positivo.
         // =========================================================================
-        if ($single && preg_match('/;.+\S/', $sanitized)) {
-            return $fail('Múltiples sentencias no permitidas');
+        if (($err = $this->checkMultipleStatements($sanitized, $single)) !== null) {
+            return $fail($err);
         }
 
         // =========================================================================
@@ -523,11 +540,10 @@ class FunctionsDataSQL {
         // Solo acepta los verbos SQL reconocidos al inicio de la query.
         // Cualquier otra cosa (o query vacía post-normalización) es inválida.
         // =========================================================================
-        $knownTypes = 'SELECT|INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE';
-        if (!preg_match('/^(' . $knownTypes . ')\b/i', $sanitized, $match)) {
+        $type = $this->detectQueryType($sanitized);
+        if ($type === null) {
             return $fail('Tipo de query no reconocido');
         }
-        $type = strtoupper($match[1]);
 
         // =========================================================================
         // [7] LISTA DENY GLOBAL
@@ -535,8 +551,8 @@ class FunctionsDataSQL {
         // absoluta independiente del modo activo.
         // Ejemplo: ['DROP', 'TRUNCATE'] bloqueará esos tipos siempre.
         // =========================================================================
-        if (!empty($deny) && in_array($type, $deny, true)) {
-            return $fail("Tipo '$type' está en la lista de denegación", $type);
+        if (($err = $this->checkDenyList($type, $deny)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -555,13 +571,13 @@ class FunctionsDataSQL {
         // =========================================================================
 
         // 8a — Timing/blind
-        if (preg_match('/\b(SLEEP|BENCHMARK|WAIT\s+FOR\s+DELAY|PG_SLEEP)\s*\(/i', $sanitized)) {
-            return $fail('Query contiene funciones de timing prohibidas', $type);
+        if (($err = $this->checkTimingFunctions($sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // 8b — Encoding/ofuscación
-        if (preg_match('/\b(CHAR|HEX|UNHEX|ASCII|ORD|CONV|BIN)\s*\(/i', $sanitized)) {
-            return $fail('Query contiene funciones de encoding/ofuscación prohibidas', $type);
+        if (($err = $this->checkEncodingFunctions($sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -573,16 +589,8 @@ class FunctionsDataSQL {
         //      de la query sanitizada (no solo como tipo principal).
         //      Esto bloquea, p.ej., un SELECT que contenga DROP en una subquery.
         // =========================================================================
-        if ($mode === 'strict') {
-            if (!in_array($type, $allowed, true)) {
-                return $fail("Tipo '$type' no permitido en modo strict", $type);
-            }
-
-            foreach ($deny as $kw) {
-                if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $sanitized)) {
-                    return $fail("Keyword '$kw' no permitida en modo strict", $type);
-                }
-            }
+        if (($err = $this->checkStrictMode($mode, $type, $allowed, $deny, $sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -599,34 +607,8 @@ class FunctionsDataSQL {
         // Control C — SELECT con operaciones destructivas fuera de subqueries:
         //   Cubre inyecciones directas en el cuerpo del SELECT.
         // =========================================================================
-        if ($mode === 'safe') {
-            // A — keywords destructivas (lista ampliada)
-            $dangerKeywords = [
-                'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER',
-                'TRUNCATE', 'REPLACE', 'CREATE', 'RENAME', 'LOCK',
-            ];
-
-            $found = array_values(array_filter(
-                $dangerKeywords,
-                fn(string $kw): bool => (bool) preg_match('/\b' . $kw . '\b/i', $sanitized)
-            ));
-
-            if (count($found) > 1) {
-                return $fail(
-                    'Query mezcla múltiples operaciones peligrosas: ' . implode(', ', $found),
-                    $type
-                );
-            }
-
-            // B — Operación destructiva dentro de subquery IN/EXISTS/ANY/ALL
-            if (preg_match('/\b(?:IN|EXISTS|ANY|ALL)\s*\(.*\b(?:DELETE|UPDATE|DROP|INSERT)\b/is', $sanitized)) {
-                return $fail('Subquery contiene operación destructiva', $type);
-            }
-
-            // C — SELECT cuyo cuerpo contiene verbos destructivos
-            if ($type === 'SELECT' && preg_match('/\b(UPDATE|DELETE|INSERT|DROP)\b/i', $sanitized)) {
-                return $fail('SELECT contiene operaciones peligrosas', $type);
-            }
+        if (($err = $this->checkSafeMode($mode, $type, $sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -644,27 +626,8 @@ class FunctionsDataSQL {
         //   globalmente en [8], se repite aquí como documentación explícita
         //   del contrato del modo paranoid).
         // =========================================================================
-        if ($mode === 'paranoid') {
-            // A — Solo SELECT
-            if ($type !== 'SELECT') {
-                return $fail("Modo paranoid solo permite SELECT, se recibió '$type'", $type);
-            }
-
-            // B — Sin subqueries
-            if (preg_match('/\(.*\bSELECT\b/i', $sanitized)) {
-                return $fail('Modo paranoid no permite subqueries', $type);
-            }
-
-            // C — Sin UNION, JOIN (cualquier variante), INTO
-            $forbiddenClauses = implode('|', [
-                'UNION',
-                'INNER\s+JOIN', 'LEFT\s+JOIN', 'RIGHT\s+JOIN',
-                'FULL\s+JOIN',  'CROSS\s+JOIN', 'JOIN',
-                'INTO',
-            ]);
-            if (preg_match('/\b(?:' . $forbiddenClauses . ')\b/i', $sanitized)) {
-                return $fail('Modo paranoid no permite UNION, JOIN ni INTO', $type);
-            }
+        if (($err = $this->checkParanoidMode($mode, $type, $sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -673,8 +636,8 @@ class FunctionsDataSQL {
         // (p.ej. "SELECT 1", "SELECT version()").
         // Se evalúa sobre $sanitized para ignorar 'FROM' dentro de literales.
         // =========================================================================
-        if ($type === 'SELECT' && !preg_match('/\bFROM\b/i', $sanitized)) {
-            return $fail('SELECT sin FROM (posible query inválida)', $type);
+        if (($err = $this->checkSelectWithoutFrom($type, $sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -692,29 +655,8 @@ class FunctionsDataSQL {
         //   E) IS NOT NULL incondicional   : OR id IS NOT NULL (siempre true si hay filas)
         // =========================================================================
 
-        // A — OR/AND con número igual a sí mismo: OR 1=1, AND 2=2
-        if (preg_match('/\b(?:OR|AND)\b\s*[\'"]?\d+[\'"]?\s*=\s*[\'"]?\d+[\'"]?/i', $sanitized)) {
-            return $fail('Posible inyección SQL: condición numérica tautológica', $type);
-        }
-
-        // B — OR/AND con mismo identificador ambos lados: OR x=x
-        if (preg_match('/\b(?:OR|AND)\b\s*(\w+)\s*=\s*\1\b/i', $sanitized)) {
-            return $fail('Posible inyección SQL: condición tautológica (OR x=x)', $type);
-        }
-
-        // C — OR/AND con booleano literal: OR true, OR false
-        if (preg_match('/\b(?:OR|AND)\b\s*\b(?:true|false)\b/i', $sanitized)) {
-            return $fail('Posible inyección SQL: condición booleana literal', $type);
-        }
-
-        // D — OR/AND con comparación numérica obvia: OR 2>1, OR 1<2
-        if (preg_match('/\b(?:OR|AND)\b\s*\d+\s*[><]\s*\d+/i', $sanitized)) {
-            return $fail('Posible inyección SQL: comparación numérica siempre verdadera', $type);
-        }
-
-        // E — OR/AND <columna> IS NOT NULL (sospechoso en contexto de inyección)
-        if (preg_match('/\b(?:OR|AND)\b\s*\w+\s+IS\s+NOT\s+NULL/i', $sanitized)) {
-            return $fail('Posible inyección SQL: condición IS NOT NULL sospechosa', $type);
+        if (($err = $this->checkTautologies($sanitized)) !== null) {
+            return $fail($err, $type);
         }
 
         // =========================================================================
@@ -727,17 +669,8 @@ class FunctionsDataSQL {
         // Para queries con múltiples tablas (JOIN, subqueries) se recomienda
         // usar esto solo en modo paranoid donde JOIN/subqueries ya están bloqueados.
         // =========================================================================
-        if (!empty($tables)) {
-            if (!preg_match('/\bFROM\s+(\w+)/i', $sanitized, $tableMatch)) {
-                return $fail('No se pudo determinar la tabla de destino', $type);
-            }
-
-            $targetTable = strtolower($tableMatch[1]);
-            $allowedTables = array_map('strtolower', $tables);
-
-            if (!in_array($targetTable, $allowedTables, true)) {
-                return $fail("Tabla '$targetTable' no está en la whitelist de tablas permitidas", $type);
-            }
+        if (($err = $this->checkTableWhitelist($type, $sanitized, $tables)) !== null) {
+            return $fail($err, $type);
         }
         // =========================================================================
         // [13] BLACKLIST DE TABLAS SENSIBLES (control contextual)
@@ -754,130 +687,11 @@ class FunctionsDataSQL {
         //   'blacklist_tables'  => ['users'],
         //   'sensitive_columns' => ['password', 'passwd', 'token']
         // =========================================================================
-        if (!empty($blacklistTables)) {
-
-            $lowerQuery = strtolower($sanitized);
-            $blacklistTables = array_map('strtolower', $blacklistTables);
-
-            // ---------------------------------------------------------------------
-            // A — Detectar tablas involucradas (FROM + JOIN)
-            // ---------------------------------------------------------------------
-            preg_match_all('/\b(?:from|join)\s+(\w+)/i', $lowerQuery, $matches);
-            $usedTables = array_map('strtolower', $matches[1] ?? []);
-
-            $intersectTables = array_intersect($usedTables, $blacklistTables);
-
-            if (!empty($intersectTables)) {
-
-                // -----------------------------------------------------------------
-                // B — Bloquear modificaciones directas
-                // -----------------------------------------------------------------
-                if (in_array($type, ['UPDATE', 'DELETE', 'INSERT', 'REPLACE'], true)) {
-
-                    // Detectar tabla objetivo principal
-                    if (preg_match('/\b(?:update|into)\s+(\w+)/i', $lowerQuery, $mainTableMatch)) {
-                        $mainTable = strtolower($mainTableMatch[1]);
-
-                        if (in_array($mainTable, $blacklistTables, true)) {
-                            return $fail("Modificación directa a tabla sensible '$mainTable' no permitida", $type);
-                        }
-                    }
-                }
-
-                // -----------------------------------------------------------------
-                // C — SELECT directo sin JOIN (acceso completo)
-                // -----------------------------------------------------------------
-                if ($type === 'SELECT') {
-
-                    $hasJoin = preg_match('/\bjoin\b/i', $lowerQuery);
-
-                    if (!$hasJoin) {
-                        return $fail(
-                            'Acceso directo a tabla sensible no permitido (use JOIN controlado)',
-                            $type
-                        );
-                    }
-
-                    // -----------------------------------------------------------------
-                    // D — Detección avanzada de columnas sensibles (soporte alias real)
-                    // -----------------------------------------------------------------
-
-                    // -------------------------------------------------------------
-                    // 1. Construir mapa alias → tabla
-                    //    Soporta:
-                    //      FROM users u
-                    //      FROM users AS u
-                    //      JOIN users u2
-                    // -------------------------------------------------------------
-                    $aliasMap = [];
-
-                    // FROM + JOIN con alias
-                    preg_match_all(
-                        '/\b(from|join)\s+(\w+)(?:\s+as)?\s+(\w+)/i',
-                        $lowerQuery,
-                        $aliasMatches,
-                        PREG_SET_ORDER
-                    );
-
-                    foreach ($aliasMatches as $m) {
-                        $table = strtolower($m[2]);
-                        $alias = strtolower($m[3]);
-                        $aliasMap[$alias] = $table;
-                    }
-
-                    // También incluir tablas sin alias (alias implícito = nombre tabla)
-                    foreach ($usedTables as $tbl) {
-                        $aliasMap[$tbl] = $tbl;
-                    }
-
-                    // -------------------------------------------------------------
-                    // 2. Detectar acceso a columnas con alias (u.password)
-                    // -------------------------------------------------------------
-                    foreach ($aliasMap as $alias => $table) {
-
-                        // Solo validar tablas sensibles
-                        if (!in_array($table, $blacklistTables, true)) {
-                            continue;
-                        }
-
-                        foreach ($sensitiveColumns as $col) {
-
-                            // Detecta:
-                            //   u.password
-                            //   users.password
-                            if (preg_match('/\b' . preg_quote($alias, '/') . '\.' . preg_quote($col, '/') . '\b/i', $lowerQuery)) {
-                                return $fail(
-                                    "Acceso a columna sensible '{$table}.{$col}' mediante alias '{$alias}' no permitido",
-                                    $type
-                                );
-                            }
-                        }
-
-                        // ---------------------------------------------------------
-                        // 3. Detectar SELECT alias.* (ej: u.*)
-                        // ---------------------------------------------------------
-                        if (preg_match('/\b' . preg_quote($alias, '/') . '\.\*/i', $lowerQuery)) {
-                            return $fail(
-                                "Acceso wildcard '{$alias}.*' a tabla sensible '{$table}' no permitido",
-                                $type
-                            );
-                        }
-                    }
-
-                    // -------------------------------------------------------------
-                    // 4. Fallback (por si no usan alias)
-                    // -------------------------------------------------------------
-                    foreach ($sensitiveColumns as $col) {
-                        if (preg_match('/\b' . preg_quote(strtolower($col), '/') . '\b/i', $lowerQuery)) {
-                            return $fail(
-                                "Acceso a columna sensible '$col' no permitido",
-                                $type
-                            );
-                        }
-                    }
-                }
-            }
+        if (($err = $this->checkSensitiveTables($type, $sanitized, $blacklistTables, $sensitiveColumns)) !== null) {
+            return $fail($err, $type);
         }
+
+                    
 
         // =========================================================================
         // Query válida
@@ -1085,193 +899,414 @@ class FunctionsDataSQL {
         return implode("\n", $result);
     }
 
+    /*******************************************************************************************************************/
+    /*                                                                                                                 */
+    /*                                              Metodos Internos                                                   */
+    /*                                                                                                                 */
+    /*******************************************************************************************************************/
+    // Charsets permitidos para la construcción del DSN (evita inyección de parámetros).
+    private const ALLOWED_CHARSETS = [
+        'armscii8', 'ascii', 'big5', 'binary', 'cp1250', 'cp1251', 'cp1256', 'cp1257',
+        'cp850', 'cp852', 'cp866', 'cp932', 'dec8', 'eucjpms', 'euckr', 'gb18030',
+        'gb2312', 'gbk', 'geostd8', 'greek', 'hebrew', 'hp8', 'keybcs2', 'koi8r',
+        'koi8u', 'latin1', 'latin2', 'latin5', 'latin7', 'macce', 'macroman', 'sjis',
+        'swe7', 'tis620', 'ucs2', 'ujis', 'utf16', 'utf16le', 'utf32', 'utf8',
+        'utf8mb3', 'utf8mb4',
+    ];
+
+    /************************************************************************************************************/
     /**
-     * Genera una tabla HTML estilizada con Bootstrap a partir de un arreglo de datos.
+     * Verifica que todos los parámetros obligatorios tengan valor (no nulo ni vacío).
+     * * Unifica la validación de parámetros usada por validateCredentials y validateDatabase.
      *
-     * Este método construye dinámicamente un componente visual compuesto por:
-     * - Un contenedor tipo "card"
-     * - Un encabezado con título y botón de exportación a Excel
-     * - Una tabla responsive con encabezados y filas generadas desde los datos
+     * @param array $params Pares nombre => valor a verificar.
      *
-     * Características principales:
-     * - Si el arreglo está vacío, retorna un mensaje de advertencia
-     * - Genera un ID único para la tabla (utilizado para exportación)
-     * - Usa las claves del primer elemento como encabezados de la tabla
-     * - Escapa los valores para prevenir inyección HTML
-     *
-     * @param array $data Arreglo de datos donde cada elemento representa una fila asociativa
-     *                    (clave => valor). Todas las filas deben compartir las mismas claves.
-     *
-     * @return string HTML completo del componente Bootstrap con la tabla generada
-     *
-     * @throws \Exception No lanza excepciones explícitas; depende de la estructura del arreglo de entrada
+     * @return array|null Array de error ('missing_param') si falta algún parámetro, o null si todos están presentes.
      */
-    public function arrayToBootstrapTable(array $data) {
-        // Valida si el arreglo de datos está vacío
-        if (empty($data)) {
-            return '<div class="alert alert-warning">No hay datos disponibles</div>';
-        }
-
-        // Genera un identificador único para la tabla
-        $tableId  = 'table_' . uniqid();
-
-        // Genera un nombre de archivo basado en fecha y hora para exportación
-        $fileName = 'detalle_' . date('Ymd_His');
-
-        // Obtiene los encabezados a partir de las claves del primer elemento del arreglo
-        $headers = array_keys(reset($data));
-
-        // Inicializa el contenedor principal tipo card
-        $html  = '<div class="card card-custom mb-3 shadow-sm">';
-
-        // Construye el encabezado del card con título y botón de exportación
-        $html .= '<div class="card-header d-flex justify-content-between align-items-center">';
-        $html .= '<span>Tabla de datos</span>';
-        $html .= '<button type="button" class="btn btn-sm btn-success" onclick="exportTableToExcel(\'' . $tableId . '\', \'' . $fileName . '\')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>';
-        $html .= '</div>';
-
-        // Inicia el contenedor responsive para la tabla
-        $html .= '<div class="table-responsive">';
-
-        // Abre la tabla con el ID generado
-        $html .= '<table id="' . $tableId . '" class="table table-borderless mb-0">';
-
-        // Construye la sección THEAD con los encabezados
-        $html .= '<thead class="table-light"><tr>';
-        foreach ($headers as $header) {
-            // Aplica formato al encabezado y escapa el contenido
-            $html .= '<th scope="col">' . htmlspecialchars(ucfirst($header)) . '</th>';
-        }
-        $html .= '</tr></thead>';
-
-        // Construye la sección TBODY con los datos
-        $html .= '<tbody>';
-        foreach ($data as $row) {
-            $html .= '<tr>';
-
-            // Recorre cada encabezado para mantener consistencia en columnas
-            foreach ($headers as $header) {
-                // Obtiene el valor correspondiente o asigna vacío si no existe
-                $value = isset($row[$header]) ? $row[$header] : '';
-
-                // Escapa el valor antes de insertarlo en la celda
-                $html .= '<td>' . htmlspecialchars($value) . '</td>';
+    private function assertRequiredParams(array $params): ?array {
+        foreach ($params as $name => $value) {
+            if ($value === null || $value === '' || (is_string($value) && trim($value) === '')) {
+                return [
+                    'status'  => 'missing_param',
+                    'success' => false,
+                    'message' => "No hay datos en \$$name"
+                ];
             }
-
-            $html .= '</tr>';
         }
-        $html .= '</tbody>';
-
-        // Cierra la tabla y los contenedores
-        $html .= '</table></div></div>';
-
-        // Retorna el HTML generado
-        return $html;
+        return null;
     }
 
+    /************************************************************************************************************/
     /**
-     * Genera un componente HTML que renderiza un gráfico utilizando la librería ApexCharts.
+     * Valida que el puerto sea un entero dentro del rango TCP válido (1-65535).
      *
-     * Este método construye dinámicamente:
-     * - Un contenedor tipo "card" con título
-     * - Un elemento DIV donde se renderizará el gráfico
-     * - Un script autoejecutable que inicializa el gráfico de forma asíncrona
+     * @param string|int $port Puerto de conexión.
      *
-     * Características principales:
-     * - Soporta distintos tipos de gráfico (bar, line, pie, etc.)
-     * - Maneja carga asíncrona de la librería ApexCharts mediante reintentos
-     * - Convierte los datos de entrada a formato JSON seguro para JavaScript
-     * - Extrae etiquetas y valores desde un arreglo estructurado
-     *
-     * Estructura esperada de $data:
-     * [
-     *   ['label' => 'Categoría 1', 'value' => 10],
-     *   ['label' => 'Categoría 2', 'value' => 20]
-     * ]
-     *
-     * @param array  $data   Arreglo de datos con claves 'label' y 'value'
-     * @param string $type   Tipo de gráfico compatible con ApexCharts (por defecto 'bar')
-     * @param string $title  Título del gráfico
-     * @param int    $height Altura del gráfico en píxeles
-     *
-     * @return string HTML + JavaScript necesario para renderizar el gráfico
-     *
-     * @throws \Exception No lanza excepciones explícitas; depende de la estructura de entrada y del entorno cliente
+     * @return bool True si el puerto es válido.
      */
-    public function generateApexChart($data, $type = 'bar', $title = 'Gráfico', $height = 350) {
+    private function validatePort($port): bool {
+        return is_numeric($port) && (int)$port >= 1 && (int)$port <= 65535;
+    }
 
-        // Valida si existen datos para graficar
-        if (empty($data)) {
-            return '<div class="alert alert-warning">No hay datos para graficar</div>';
+    /************************************************************************************************************/
+    /**
+     * Valida el formato del host (hostname/FQDN, IPv4 o IPv6).
+     * * Bloquea caracteres que permitirían alterar el DSN (por ejemplo ';', '=', espacios).
+     *
+     * @param string $host Host de conexión.
+     *
+     * @return bool True si el host tiene un formato aceptable.
+     */
+    private function validateHost($host): bool {
+        // IPv4 o IPv6
+        if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
+            return true;
+        }
+        // Hostname/FQDN (RFC 1123). Se admite '_' por compatibilidad con nombres internos de contenedores.
+        return (bool) preg_match(
+            '/^(?=.{1,253}$)[a-zA-Z0-9_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?(?:\.[a-zA-Z0-9_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?)*$/',
+            (string)$host
+        );
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Valida el charset contra la lista de permitidos (ALLOWED_CHARSETS).
+     *
+     * @param string $charset Juego de caracteres de la conexión.
+     *
+     * @return bool True si el charset está permitido.
+     */
+    private function validateCharset($charset): bool {
+        return in_array(strtolower(trim((string)$charset)), self::ALLOWED_CHARSETS, true);
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Construye el DSN de conexión MySQL a partir de parámetros ya validados.
+     * * Centraliza la construcción para reutilizarla en validateCredentials y validateDatabase.
+     *
+     * @param string $host Host validado.
+     * @param int    $port Puerto validado (casteado a entero).
+     * @param string $charset Charset validado.
+     *
+     * @return string DSN listo para PDO/DB\SQL.
+     */
+    private function buildDsn(string $host, int $port, string $charset): string {
+        return 'mysql:host=' . $host . ';port=' . $port . ';charset=' . $charset;
+    }
+
+    /*******************************************************************************************************************/
+    /*                                                                                                                 */
+    /*                                        Capas privadas de validateSQL                                            */
+    /*                                                                                                                 */
+    /*******************************************************************************************************************/
+    /** [1] Detecta null bytes (\0) usados para truncar el análisis o evadir filtros de texto. */
+    private function checkNullBytes(string $query): ?string {
+        return str_contains($query, "\0") ? 'Query contiene caracteres nulos' : null;
+    }
+
+    /** [2] Verifica que la query no exceda la longitud máxima (evita ReDoS/DoS). */
+    private function checkMaxLength(string $query, int $maxLength): ?string {
+        return strlen($query) > $maxLength ? "Query excede el límite de {$maxLength} caracteres" : null;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [3] Normaliza la query: trim, elimina comentarios de línea y bloque, colapsa
+     * espacios y elimina el ';' final.
+     */
+    private function normalizeQuery(string $query): string {
+        $query = trim($query);
+        $query = preg_replace('/(--[^\n]*$)|(#[^\n]*$)/m', '', $query); // comentarios de línea
+        $query = preg_replace('/\/\*.*?\*\//s', '', $query);             // comentarios de bloque
+        $query = preg_replace('/\s+/', ' ', $query);                     // colapsar whitespace
+        return rtrim($query, '; ');
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [4] Reemplaza cada literal string ('...', "...", `...`) por un placeholder
+     * neutral __STR_N__ para que los regex de seguridad no analicen su contenido.
+     */
+    private function extractSqlLiterals(string $query): string {
+        $literals  = [];
+        $sanitized = preg_replace_callback(
+            "/'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`/",
+            function (array $m) use (&$literals): string {
+                $placeholder           = '__STR_' . count($literals) . '__';
+                $literals[$placeholder] = $m[0];
+                return $placeholder;
+            },
+            $query
+        );
+        return $sanitized;
+    }
+
+    /** [5] Bloquea múltiples sentencias separadas por ';' cuando $single es true. */
+    private function checkMultipleStatements(string $sanitized, bool $single): ?string {
+        if ($single && preg_match('/;.+\S/', $sanitized)) {
+            return 'Múltiples sentencias no permitidas';
+        }
+        return null;
+    }
+
+    /** [6] Detecta el verbo SQL inicial. Retorna el tipo en mayúsculas o null si no se reconoce. */
+    private function detectQueryType(string $sanitized): ?string {
+        $knownTypes = 'SELECT|INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE';
+        if (!preg_match('/^(' . $knownTypes . ')\b/i', $sanitized, $match)) {
+            return null;
+        }
+        return strtoupper($match[1]);
+    }
+
+    /** [7] Lista deny global (independiente del modo). */
+    private function checkDenyList(string $type, array $deny): ?string {
+        if (!empty($deny) && in_array($type, $deny, true)) {
+            return "Tipo '$type' está en la lista de denegación";
+        }
+        return null;
+    }
+
+    /** [8a] Detecta funciones de timing/blind SQLi (SLEEP, BENCHMARK, etc.). */
+    private function checkTimingFunctions(string $sanitized): ?string {
+        if (preg_match('/\b(SLEEP|BENCHMARK|WAIT\s+FOR\s+DELAY|PG_SLEEP)\s*\(/i', $sanitized)) {
+            return 'Query contiene funciones de timing prohibidas';
+        }
+        return null;
+    }
+
+    /** [8b] Detecta funciones de encoding/ofuscación (CHAR, HEX, UNHEX, etc.). */
+    private function checkEncodingFunctions(string $sanitized): ?string {
+        if (preg_match('/\b(CHAR|HEX|UNHEX|ASCII|ORD|CONV|BIN)\s*\(/i', $sanitized)) {
+            return 'Query contiene funciones de encoding/ofuscación prohibidas';
+        }
+        return null;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [9a] Modo strict: el tipo debe estar en $allowed y ninguna keyword de $deny
+     * puede aparecer en cualquier posición de la query.
+     */
+    private function checkStrictMode(string $mode, string $type, array $allowed, array $deny, string $sanitized): ?string {
+        if ($mode !== 'strict') {
+            return null;
+        }
+        if (!in_array($type, $allowed, true)) {
+            return "Tipo '$type' no permitido en modo strict";
+        }
+        foreach ($deny as $kw) {
+            if (preg_match('/\b' . preg_quote($kw, '/') . '\b/i', $sanitized)) {
+                return "Keyword '$kw' no permitida en modo strict";
+            }
+        }
+        return null;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [9b] Modo safe: sin mezcla de operaciones destructivas, sin subqueries
+     * destructivas y sin verbos peligrosos en el cuerpo de un SELECT.
+     */
+    private function checkSafeMode(string $mode, string $type, string $sanitized): ?string {
+        if ($mode !== 'safe') {
+            return null;
+        }
+        // A — keywords destructivas (lista ampliada)
+        $dangerKeywords = [
+            'INSERT', 'UPDATE', 'DELETE', 'DROP', 'ALTER',
+            'TRUNCATE', 'REPLACE', 'CREATE', 'RENAME', 'LOCK',
+        ];
+        $found = array_values(array_filter(
+            $dangerKeywords,
+            fn(string $kw): bool => (bool) preg_match('/\b' . $kw . '\b/i', $sanitized)
+        ));
+        if (count($found) > 1) {
+            return 'Query mezcla múltiples operaciones peligrosas: ' . implode(', ', $found);
+        }
+        // B — Operación destructiva dentro de subquery IN/EXISTS/ANY/ALL
+        if (preg_match('/\b(?:IN|EXISTS|ANY|ALL)\s*\(.*\b(?:DELETE|UPDATE|DROP|INSERT)\b/is', $sanitized)) {
+            return 'Subquery contiene operación destructiva';
+        }
+        // C — SELECT cuyo cuerpo contiene verbos destructivos
+        if ($type === 'SELECT' && preg_match('/\b(UPDATE|DELETE|INSERT|DROP)\b/i', $sanitized)) {
+            return 'SELECT contiene operaciones peligrosas';
+        }
+        return null;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [9c] Modo paranoid: solo SELECT plano, sin subqueries, UNION, JOIN ni INTO.
+     */
+    private function checkParanoidMode(string $mode, string $type, string $sanitized): ?string {
+        if ($mode !== 'paranoid') {
+            return null;
+        }
+        // A — Solo SELECT
+        if ($type !== 'SELECT') {
+            return "Modo paranoid solo permite SELECT, se recibió '$type'";
+        }
+        // B — Sin subqueries
+        if (preg_match('/\(.*\bSELECT\b/i', $sanitized)) {
+            return 'Modo paranoid no permite subqueries';
+        }
+        // C — Sin UNION, JOIN (cualquier variante), INTO
+        $forbiddenClauses = implode('|', [
+            'UNION',
+            'INNER\s+JOIN', 'LEFT\s+JOIN', 'RIGHT\s+JOIN',
+            'FULL\s+JOIN',  'CROSS\s+JOIN', 'JOIN',
+            'INTO',
+        ]);
+        if (preg_match('/\b(?:' . $forbiddenClauses . ')\b/i', $sanitized)) {
+            return 'Modo paranoid no permite UNION, JOIN ni INTO';
+        }
+        return null;
+    }
+
+    /** [10] Un SELECT sin FROM es inválido (sospechoso). */
+    private function checkSelectWithoutFrom(string $type, string $sanitized): ?string {
+        if ($type === 'SELECT' && !preg_match('/\bFROM\b/i', $sanitized)) {
+            return 'SELECT sin FROM (posible query inválida)';
+        }
+        return null;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [11] Tautologías anti OR 1=1 y variantes (numérica, identificadores,
+     * booleana, comparación numérica e IS NOT NULL).
+     */
+    private function checkTautologies(string $sanitized): ?string {
+        // A — OR/AND con número igual a sí mismo: OR 1=1, AND 2=2
+        if (preg_match('/\b(?:OR|AND)\b\s*[\'"]?\d+[\'"]?\s*=\s*[\'"]?\d+[\'"]?/i', $sanitized)) {
+            return 'Posible inyección SQL: condición numérica tautológica';
+        }
+        // B — OR/AND con mismo identificador ambos lados: OR x=x
+        if (preg_match('/\b(?:OR|AND)\b\s*(\w+)\s*=\s*\1\b/i', $sanitized)) {
+            return 'Posible inyección SQL: condición tautológica (OR x=x)';
+        }
+        // C — OR/AND con booleano literal: OR true, OR false
+        if (preg_match('/\b(?:OR|AND)\b\s*\b(?:true|false)\b/i', $sanitized)) {
+            return 'Posible inyección SQL: condición booleana literal';
+        }
+        // D — OR/AND con comparación numérica obvia: OR 2>1, OR 1<2
+        if (preg_match('/\b(?:OR|AND)\b\s*\d+\s*[><]\s*\d+/i', $sanitized)) {
+            return 'Posible inyección SQL: comparación numérica siempre verdadera';
+        }
+        // E — OR/AND <columna> IS NOT NULL (sospechoso en contexto de inyección)
+        if (preg_match('/\b(?:OR|AND)\b\s*\w+\s+IS\s+NOT\s+NULL/i', $sanitized)) {
+            return 'Posible inyección SQL: condición IS NOT NULL sospechosa';
+        }
+        return null;
+    }
+
+    /** [12] Whitelist de tablas: la primera tabla del FROM debe estar permitida. */
+    private function checkTableWhitelist(string $type, string $sanitized, array $tables): ?string {
+        if (empty($tables)) {
+            return null;
+        }
+        if (!preg_match('/\bFROM\s+(\w+)/i', $sanitized, $tableMatch)) {
+            return 'No se pudo determinar la tabla de destino';
+        }
+        $targetTable   = strtolower($tableMatch[1]);
+        $allowedTables = array_map('strtolower', $tables);
+        if (!in_array($targetTable, $allowedTables, true)) {
+            return "Tabla '$targetTable' no está en la whitelist de tablas permitidas";
+        }
+        return null;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * [13] Blacklist de tablas sensibles y columnas sensibles (control contextual):
+     * bloquea modificaciones directas, SELECT directo sin JOIN y acceso a columnas
+     * sensibles (con o sin alias), permitiendo JOIN controlado.
+     */
+    private function checkSensitiveTables(string $type, string $sanitized, array $blacklistTables, array $sensitiveColumns): ?string {
+        if (empty($blacklistTables)) {
+            return null;
         }
 
-        // Genera un ID único para el contenedor del gráfico
-        $chartId = 'chart_' . uniqid();
+        $lowerQuery      = strtolower($sanitized);
+        $blacklistTables = array_map('strtolower', $blacklistTables);
 
-        // Inicializa arreglos para categorías (eje X) y valores (serie de datos)
-        $categories = [];
-        $values = [];
+        // A — Detectar tablas involucradas (FROM + JOIN)
+        preg_match_all('/\b(?:from|join)\s+(\w+)/i', $lowerQuery, $matches);
+        $usedTables = array_map('strtolower', $matches[1] ?? []);
 
-        // Recorre los datos para separar etiquetas y valores
-        foreach ($data as $row) {
-            $categories[] = $row['label'] ?? '';
-            $values[]     = $row['value'] ?? 0;
+        $intersectTables = array_intersect($usedTables, $blacklistTables);
+
+        if (empty($intersectTables)) {
+            return null;
         }
 
-        // Convierte los arreglos a formato JSON para uso en JavaScript
-        $categoriesJson = json_encode($categories);
-        $valuesJson     = json_encode($values);
-
-        // Construye el HTML y script necesario para renderizar el gráfico
-        $html = '
-        <div class="card mb-3 shadow-sm">
-            <div class="card-body">
-                <h6 class="card-title">'.htmlspecialchars($title).'</h6>
-                <div id="'.$chartId.'"></div>
-            </div>
-        </div>
-
-        <script>
-        (function() {
-            // Función encargada de renderizar el gráfico
-            function renderChart() {
-                // Verifica si la librería ApexCharts está disponible
-                if (typeof ApexCharts === "undefined") {
-                    // Reintenta luego de un breve intervalo si aún no está cargada
-                    return setTimeout(renderChart, 100);
+        // B — Bloquear modificaciones directas
+        if (in_array($type, ['UPDATE', 'DELETE', 'INSERT', 'REPLACE'], true)) {
+            if (preg_match('/\b(?:update|into)\s+(\w+)/i', $lowerQuery, $mainTableMatch)) {
+                $mainTable = strtolower($mainTableMatch[1]);
+                if (in_array($mainTable, $blacklistTables, true)) {
+                    return "Modificación directa a tabla sensible '$mainTable' no permitida";
                 }
+            }
+        }
 
-                // Configuración del gráfico
-                var options = {
-                    chart: {
-                        type: "'.$type.'",
-                        height: '.$height.'
-                    },
-                    series: [{
-                        name: "Valores",
-                        data: '.$valuesJson.'
-                    }],
-                    xaxis: {
-                        categories: '.$categoriesJson.'
-                    },
-                    title: {
-                        text: "'.addslashes($title).'"
-                    }
-                };
-
-                // Inicializa el gráfico en el contenedor correspondiente
-                var chart = new ApexCharts(document.querySelector("#'.$chartId.'"), options);
-                chart.render();
+        // C — SELECT directo sin JOIN (acceso completo)
+        if ($type === 'SELECT') {
+            $hasJoin = preg_match('/\bjoin\b/i', $lowerQuery);
+            if (!$hasJoin) {
+                return 'Acceso directo a tabla sensible no permitido (use JOIN controlado)';
             }
 
-            // Ejecuta la función inmediatamente para soportar inserciones dinámicas
-            renderChart();
-        })();
-        </script>
-        ';
+            // D — Detección avanzada de columnas sensibles (soporte alias real)
+            $aliasMap = [];
 
-        // Retorna el HTML completo con el gráfico
-        return $html;
+            // FROM + JOIN con alias
+            preg_match_all(
+                '/\b(from|join)\s+(\w+)(?:\s+as)?\s+(\w+)/i',
+                $lowerQuery,
+                $aliasMatches,
+                PREG_SET_ORDER
+            );
+            foreach ($aliasMatches as $m) {
+                $table = strtolower($m[2]);
+                $alias = strtolower($m[3]);
+                $aliasMap[$alias] = $table;
+            }
+
+            // También incluir tablas sin alias (alias implícito = nombre tabla)
+            foreach ($usedTables as $tbl) {
+                $aliasMap[$tbl] = $tbl;
+            }
+
+            // 2. Detectar acceso a columnas con alias (u.password)
+            foreach ($aliasMap as $alias => $table) {
+                // Solo validar tablas sensibles
+                if (!in_array($table, $blacklistTables, true)) {
+                    continue;
+                }
+                foreach ($sensitiveColumns as $col) {
+                    // Detecta: u.password / users.password
+                    if (preg_match('/\b' . preg_quote($alias, '/') . '\.' . preg_quote($col, '/') . '\b/i', $lowerQuery)) {
+                        return "Acceso a columna sensible '{$table}.{$col}' mediante alias '{$alias}' no permitido";
+                    }
+                }
+                // 3. Detectar SELECT alias.* (ej: u.*)
+                if (preg_match('/\b' . preg_quote($alias, '/') . '\.\*/i', $lowerQuery)) {
+                    return "Acceso wildcard '{$alias}.*' a tabla sensible '{$table}' no permitido";
+                }
+            }
+
+            // 4. Fallback (por si no usan alias)
+            foreach ($sensitiveColumns as $col) {
+                if (preg_match('/\b' . preg_quote(strtolower($col), '/') . '\b/i', $lowerQuery)) {
+                    return "Acceso a columna sensible '$col' no permitido";
+                }
+            }
+        }
+
+        return null;
     }
 
 
