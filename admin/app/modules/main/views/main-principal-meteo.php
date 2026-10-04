@@ -15,4 +15,3 @@
     $data['Fnc_WidgetsCommon']->widget_meteo($Options);
     ?>
 </div>
-

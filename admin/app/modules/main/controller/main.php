@@ -4,13 +4,15 @@
 /*******************************************************************************************************************/
 class main extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $ServerServer;
     private $DataDate;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -26,11 +28,12 @@ class main extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Vista - Login
+    /*******************************************************************/
+    // Vista - Login
+    /*******************************************************************/
     public function login($f3){
 
-        /******************************************/
+        /************************************/
         //Se cargan los datos de la plataforma
         $query = [
             'data'   => 'Sistema_idTema',
@@ -44,10 +47,11 @@ class main extends ControllerBase {
         ];
         //Verifico si hay un dato
         $xParams     = ['query' => $query];
+        // Ejecuto la query
         $rowOpciones = $this->Base_GetByID($xParams);
 
-        /******************************************/
-        //Datos enviados a la pagina
+        /************************************/
+        // Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
             'PageTitle'       => 'Iniciar Sesión',
@@ -59,8 +63,8 @@ class main extends ControllerBase {
 
         ];
 
-        /******************************************/
-        //Se instancia la vista
+        /************************************/
+        // Se instancia la vista
         $view     = new View;
         echo $view->render('../app/templates/guest-header.php');
         echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-login.php');
@@ -68,8 +72,9 @@ class main extends ControllerBase {
 
     }
 
-    /******************************************************************************/
-    //Recuperar Contraseña
+    /*******************************************************************/
+    // Recuperar Contraseña
+    /*******************************************************************/
     public function error404($f3){
 
         //Datos enviados a la pagina
@@ -81,30 +86,33 @@ class main extends ControllerBase {
             'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
         ];
 
-        //Se instancia la vista
+        // Se instancia la vista
         $view = new View;
         echo $view->render('../app/templates/pages-error404.php'); // Header
     }
 
-    /******************************************************************************/
-    //pantalla principal
+    /*******************************************************************/
+    // pantalla principal
+    /*******************************************************************/
     public function principal($f3){
-        /*******************************************************************/
-        //Se llaman los datos
+
+        /************************************/
+        // Se llaman los datos
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
-        /******************************************/
-        //Variable vacia
+        /************************************/
+        // Variable vacia
         $MainViewData = [];
         $menuCounters = [];
 
         //Arreglo con los controladores con widgets, considerar que desde aqui se ordenan
         $array = $this->arrayWidgetViews();
-        /******************************************/
+        /************************************/
         // Verifico si existe
         if($array){
-            //recorro
+            // Recorro los datos
             foreach ($array as $data) {
+                /************************************/
                 // Se genera la query
                 $loadWidgets = method_exists($data, 'loadWidgets');
                 //si el metodo existe
@@ -117,11 +125,11 @@ class main extends ControllerBase {
             }
         }
 
-        //Se recorren los permisos y se validan
+        // Se recorren los permisos y se validan
         foreach ($menuCounters as $section => $names) {
             // Verifico si existen datos del menu
             if (!empty($arrMenu[$section])) {
-                //Recorro el menu
+                // Recorro el menu
                 foreach ($arrMenu[$section] as $asd) {
                     if (isset($names[$asd['Nombre']])) {
                         $MainViewData[] = $names[$asd['Nombre']]; //Se guardan las URL
@@ -133,8 +141,8 @@ class main extends ControllerBase {
         //Se filtran para obtener datos unicos
         $MainViewData = array_values(array_unique($MainViewData));
 
-        /******************************************/
-        //Datos enviados a la pagina
+        /************************************/
+        // Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
             'PageTitle'       => 'Principal',
@@ -151,25 +159,43 @@ class main extends ControllerBase {
             'MainViewData'    => $MainViewData,
         ];
 
-        /******************************************/
-        //Se instancia la vista
+        /************************************/
+        // Se instancia la vista
         $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
     }
 
-    /******************************************************************************/
-    //Se listan los controladores
+    /*******************************************************************/
+    // Se listan los controladores
+    /*******************************************************************/
     public function arrayWidgetViews(){
 
         /*******************************************************/
-        //Rutas
-        $array = array(
-            "gestionDocumentosWidgets",
-            "bodegasWidgets",
-            "gestionCampanasWidgets",
-            "reservasWidgets",
-        );
+        // Variable vacia
+        $array = array();
 
-        //devuelvo
+        /*******************************************************/
+        // Carpeta raiz de los modulos
+        $modulesPath = __DIR__ . '/../../';
+
+        /*******************************************************/
+        // Se escanean los archivos *Widgets.php de cada modulo
+        $files = glob($modulesPath . '*/widgets/*Widgets.php');
+
+        /*******************************************************/
+        // Recorro los archivos encontrados
+        foreach ($files as $file) {
+            /************************************/
+            // Nombre de la clase (igual al nombre del archivo)
+            $class = basename($file, '.php');
+
+            /************************************/
+            // Se valida que la clase exista (autoload) y tenga el metodo loadWidgets
+            if (class_exists($class) && method_exists($class, 'loadWidgets')) {
+                $array[] = $class;
+            }
+        }
+
+        // Retorno los datos
         return $array;
     }
 

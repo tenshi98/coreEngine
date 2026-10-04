@@ -88,7 +88,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#LoginForm").submit(function(e) {
         // Si ya se está ejecutando, salimos
         if (ejecutandoForm.valor) return;
@@ -109,7 +109,7 @@
         };
         SendDataForms(Metodo, Direccion, Informacion, Options);
     });
-    /******************************************/
+    /************************************/
     $("#RecoverForm").submit(function(e) {
         // Si ya se está ejecutando, salimos
         if (ejecutandoForm.valor) return;

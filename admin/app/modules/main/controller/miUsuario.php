@@ -4,16 +4,18 @@
 /*******************************************************************************************************************/
 class miUsuario extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $DataDate;
     private $DataNumbers;
     private $WidgetsCommon;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -32,17 +34,18 @@ class miUsuario extends ControllerBase {
     /******************************************************************************/
     /*                                 SESIONES                                   */
     /******************************************************************************/
-    /******************************************************************************/
-    //Login
+    /*******************************************************************/
+    // Login
+    /*******************************************************************/
     public function login($f3){
 
-        /******************************/
+        /************************************/
         // Se llama la clase
         $authenticationService = new AuthenticationService();
         // Se autentica al usuario y se cargan los datos de sesión
         $Response = $authenticationService->authenticate($f3, $_POST);
 
-        /******************************************/
+        /************************************/
         // Si el acceso es correcto
         if($Response['code']==200){
             // Se informa el resultado
@@ -53,33 +56,35 @@ class miUsuario extends ControllerBase {
 
     }
 
-    /******************************************************************************/
-    //Recuperar contraseña
+    /*******************************************************************/
+    // Recuperar contraseña
+    /*******************************************************************/
     public function forgot($f3){
 
-        /******************************/
+        /************************************/
         // Se llama la clase
         $authenticationService = new AuthenticationService();
         // Se autentica al usuario y se actualizan los datos
         $Response = $authenticationService->recoverPassword($f3, $_POST);
 
-        /******************************************/
+        /************************************/
         //imprimo resultados
         Response::error($Response['message'], $Response['code'], $Response['message']);
 
     }
 
-    /******************************************************************************/
-    //cierra sesion
+    /*******************************************************************/
+    // Cierra sesion
+    /*******************************************************************/
     public function logout($f3){
 
-        /******************************/
+        /************************************/
         // Se llama la clase
         $authenticationService = new AuthenticationService();
         // Se eliminan los datos de sesion (sesion y coockies)
         $Response = $authenticationService->closeSession($f3);
 
-        /******************************************/
+        /************************************/
         //Si es correcto
         if($Response['code']==200){
             //Se redirige al index
@@ -97,10 +102,12 @@ class miUsuario extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Ver Datos
+    /*******************************************************************/
+    // Ver Datos
+    /*******************************************************************/
     public function view($f3){
-        /******************************/
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -141,11 +148,12 @@ class miUsuario extends ControllerBase {
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
@@ -158,11 +166,12 @@ class miUsuario extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrCiudad = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
@@ -175,11 +184,12 @@ class miUsuario extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrComuna = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMenuPosicion AS ID,Nombre',
@@ -192,8 +202,9 @@ class miUsuario extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams     = ['query' => $query];
+        // Ejecuto la query
         $arrPosicion = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -202,8 +213,8 @@ class miUsuario extends ControllerBase {
         // Si hay resultados
         if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrPosicion['status']){
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'PageTitle'       => 'Perfil',
@@ -225,25 +236,27 @@ class miUsuario extends ControllerBase {
                 'arrPosicion'     => $arrPosicion['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data.php');
 
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrPosicion]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(1, $f3, $result);
         }
 
     }
 
-    /******************************************************************************/
-    //Ver Datos
+    /*******************************************************************/
+    // Ver Datos
+    /*******************************************************************/
     public function FRG_UpdateData($f3){
-        /******************************/
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -277,18 +290,19 @@ class miUsuario extends ControllerBase {
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre DESC'
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
+        if ($rowData['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -301,23 +315,25 @@ class miUsuario extends ControllerBase {
                 'rowData'         => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data-UpdateData.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Ver Datos
+    /*******************************************************************/
+    // Ver Datos
+    /*******************************************************************/
     public function FRG_UpdateCard($f3){
-        /******************************/
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -336,17 +352,18 @@ class miUsuario extends ControllerBase {
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre DESC'
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -355,15 +372,15 @@ class miUsuario extends ControllerBase {
                 'rowData' => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data-UpdateCard.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -371,121 +388,172 @@ class miUsuario extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function update($f3){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            /******************************/
-            // Usuario creador
-            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
+        /************************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
-            /******************************/
+        //Verifico si esta haciendo un cambio de contraseña
+        if(isset($_POST['oldPassword'], $_POST['rePassword'])&&$_POST['oldPassword']!=''&&$_POST['rePassword']!=''){
+            /************************************/
             // Se genera la query
             $query = [
-                'data'      => 'password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
-                'required'  => 'Nombre,Rut,email',
-                'unique'    => '',
-                'encode'    => 'password',
-                'table'     => 'usuarios_listado',
-                'where'     => 'idUsuario',
-                'Post'      => $_POST,
-                'files'     => [
-                    [
-                        'Identificador' => 'Direccion_img',
-                        'SubCarpeta'    => '',
-                        'NombreArchivo' => '',
-                        'SufijoArchivo' => 'Perfil_',
-                        'ValidarTipo'   => 'image',
-                        'ValidarPeso'   => 10,
-                        'Base64'        => true
-                    ],
-                ]
+                'data'    => 'password',
+                'table'   => 'usuarios_listado',
+                'join'    => '',
+                'where'   => 'idUsuario = ?',
+                'params'  => [$f3->get('SESSION.DataInfo.UserID')],
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'Nombre DESC'
             ];
+            // Preparo los datos
+            $xParams = ['query' => $query];
             // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                /******************************/
-                // Se cargan las clases
-                $authenticationService = new AuthenticationService();
-                $sessionService        = new SessionService();
-                $Client                = new FunctionsServerClient();
-                //Se actualiza la sesion del usuario
-                $authenticationService->updateSession($f3, $_POST['idUsuario'], $sessionService, $Client);
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+            $rowData = $this->Base_GetByID($xParams);
+
+            /************************************/
+            // Se verifica que la consulta haya devuelto el usuario
+            if(!$rowData['status'] || empty($rowData['data']) || !isset($rowData['data']['password'])){
+                Response::error('No fue posible verificar la contraseña actual', 500);
             }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+
+            /************************************/
+            // Se verifica que se ingrese la password correcta
+            // Se instancia la clase
+            $SecurityPasswords = new FunctionsSecurityPasswords();
+            // Se verifica la contraseña
+            $checkPassword = $SecurityPasswords->hashVerify($_POST['oldPassword'], $rowData['data']['password']);
+            if($checkPassword!=true){
+                Response::error('Error al ingresar las contraseñas', 500);
+            }
+            /************************************/
+            // Se verifica que la nueva password y la repeticion sean iguales
+            if($_POST['password']!=$_POST['rePassword']){
+                Response::error('Las contraseñas no coinciden', 500);
+            }
+
         }
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idUsuario,password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
+            'required'  => 'idUsuario,idTipoUsuario,idEstado,email,Nombre,idMenuPosicion',
+            'unique'    => '',
+            'encode'    => 'password',
+            'table'     => 'usuarios_listado',
+            'where'     => 'idUsuario',
+            'Post'      => $_POST,
+            'files'     => [
+                [
+                    'Identificador' => 'Direccion_img',
+                    'SubCarpeta'    => '',
+                    'NombreArchivo' => '',
+                    'SufijoArchivo' => 'UsuarioIMG_',
+                    'ValidarTipo'   => 'image',
+                    'ValidarPeso'   => 10,
+                    'Base64'        => true
+                ],
+            ]
+        ];
+        // Preparo los datos
+        $xParams        = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $ResponseSesion = $this->Base_update($xParams);
+        /************************************/
+        // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
+        if ($ResponseSesion['status'] === true) {
+            /************************************/
+            // Se cargan las clases
+            $authenticationService = new AuthenticationService();
+            $sessionService        = new SessionService();
+            $Client                = new FunctionsServerClient();
+            //Se actualiza la sesion del usuario
+            $authenticationService->updateSession($f3, $_POST['idUsuario'], $sessionService, $Client);
+            // Devuelvo $Response con código 200 (OK)
+            Response::success($ResponseSesion['data']);
+        } else {
+            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
+            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseSesion['error']);
+        }
+
     }
 
-    /******************************************************************************/
-    //Permite eliminar archivos
+    /*******************************************************************/
+    // Borrar archivos
+    /*******************************************************************/
     public function delFiles($f3){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataPut);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => 'Direccion_img',
-                'table'       => 'usuarios_listado',
-                'where'       => 'idUsuario',
-                'SubCarpeta'  => '',
-                'Post'        => $dataPut
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delFiles($xParams);
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                /******************************/
-                // Se cargan las clases
-                $authenticationService = new AuthenticationService();
-                $sessionService        = new SessionService();
-                $Client                = new FunctionsServerClient();
-                //Se actualiza la sesion del usuario
-                $authenticationService->updateSession($f3, $dataPut['idUsuario'], $sessionService, $Client);
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataPut);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => 'Direccion_img',
+            'table'       => 'usuarios_listado',
+            'where'       => 'idUsuario',
+            'SubCarpeta'  => '',
+            'Post'        => $dataPut
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delFiles($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se cargan las clases
+        $authenticationService = new AuthenticationService();
+        $sessionService        = new SessionService();
+        $Client                = new FunctionsServerClient();
+        //Se actualiza la sesion del usuario
+        $authenticationService->updateSession($f3, $dataPut['idUsuario'], $sessionService, $Client);
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
             'emptyData'                 => '',
-            'encode'                    => 'oldPassword',
+            'encode'                    => '',
             'ValidarEmail'              => 'email',
             'ValidarNumero'             => '',
             'ValidarEntero'             => '',
@@ -501,7 +569,7 @@ class miUsuario extends ControllerBase {
             'ValidarPalabrasCensuradas' => 'Nombre,Direccion',
             'ValidarEspaciosVacios'     => 'email,mainPassword,oldPassword,password,rePassword,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'email',
-            'ValidarCoincidencias'      => 'mainPassword-oldPassword,password-rePassword',
+            'ValidarCoincidencias'      => '',
             'ValidarDominioEmail'       => 'email',
             'ValidarPasswordSegura'     => '',
             'ValidarFechaRango'         => 'fNacimiento',
@@ -513,7 +581,7 @@ class miUsuario extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 

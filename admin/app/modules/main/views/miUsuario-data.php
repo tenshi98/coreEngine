@@ -80,7 +80,16 @@
                             <?php }else{ ?>
                                 <div class="d-flex justify-content-center pt-3">
                                     <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-6 col-xxl-5">
-                                        <?php $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Direccion_img','URL' => $BASE.'/perfil/update','ExtraData' => '"idUsuario": '.$data["UserData"]["UserID"].',"Nombre": "'.$data['rowData']['Nombre'].'"']); ?>
+                                        <?php
+                                        // Se construye el dato
+                                        $ExtraData  = '"idUsuario": '.$data["UserData"]["UserID"];
+                                        $ExtraData .= ',"idTipoUsuario": '.$data['rowData']['idTipoUsuario'];
+                                        $ExtraData .= ',"idEstado": '.$data['rowData']['idEstado'];
+                                        $ExtraData .= ',"email": "'.$data['rowData']['email'].'"';
+                                        $ExtraData .= ',"Nombre": "'.$data['rowData']['Nombre'].'"';
+                                        $ExtraData .= ',"idMenuPosicion": '.$data['rowData']['idMenuPosicion'];
+                                        // Se imprime el dato
+                                        $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Direccion_img','URL' => $BASE.'/perfil/update','ExtraData' => '"idUsuario": '.$data["UserData"]["UserID"].',"Nombre": "'.$data['rowData']['Nombre'].'"']); ?>
                                     </div>
                                 </div>
                             <?php } ?>
@@ -138,7 +147,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -173,7 +182,7 @@
         }
     });
 
-    /******************************************/
+    /************************************/
     $("#FormPassword").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -203,7 +212,7 @@
         }
     });
 
-    /******************************************/
+    /************************************/
     $("#FormOpciones").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -233,7 +242,7 @@
         }
     });
 
-    /******************************************/
+    /************************************/
     function delIMG(File) {
         Swal.fire({
             title: "Borrar Imagen",
