@@ -1,0 +1,88 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCrud']);
+?>
+
+<form id="FormNewObservacion" name="FormNewObservacion" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+    <div class="modal-header">
+        <?php
+        switch ($data['UserData']["sistemaModalSubtitle"]) {
+            case 1:
+                echo '
+                <h5 class="modal-title">
+                    <i class="bi bi-file-earmark"></i> Crear Nuevo
+                </h5>';
+                break;
+            case 2:
+                echo '
+                <h5 class="modal-title modal-subtitle">
+                    <div class="icon"><i class="bi bi-file-earmark"></i></div>
+                    Crear Nuevo<br>
+                    <small>Permite crear un nuevo elemento</small>
+                </h5>';
+                break;
+        } ?>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
+    </div>
+    <div class="modal-body">
+        <?php
+        //se dibujan los inputs
+        $data['Fnc_FormInputs']->formTextarea(['Placeholder' => 'Observacion','Name' => 'Observacion', 'Id' => 'NewObs_Observacion','Value' => '','Required' => 2]);
+
+        //datos ocultos
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCrud',        'Value' => $data['rowData']['idCrud'],                'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion', 'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
+        ?>
+    </div>
+    <div class="modal-footer">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bx bi-x-circle"></i> Cerrar</button>
+            <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    /*********************************************************************/
+    /*                      EJECUCION DE LA LOGICA                       */
+    /*********************************************************************/
+    /************************************/
+    $("#FormNewObservacion").submit(function(e) {
+        //Se validan los datos de los formularios
+        var validatorResult = validator.checkAll(this);
+        //verifico el resultado
+        if(validatorResult.valid===false){
+            return !!validatorResult.valid;
+        }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
+            e.preventDefault();
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Metodo      = 'POST';
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones'; ?>';
+            let Informacion = $("#FormNewObservacion").serialize();
+            const Options     = {
+                UpdateDiv : [
+                    {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
+                ],
+                showNoti:'Dato Creado Correctamente',
+                closeModal:'#viewModal-lg',
+                ClearForm:'FormNewObservacion',
+                closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
+            };
+            //Se envian los datos al formulario
+            SendDataForms(Metodo, Direccion, Informacion, Options);
+        }
+    });
+
+</script>

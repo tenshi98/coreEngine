@@ -1,0 +1,87 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
+<form id="FormEditData" name="FormEditData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+    <div class="modal-header">
+        <?php
+        switch ($data['UserData']["sistemaModalSubtitle"]) {
+            case 1:
+                echo '
+                <h5 class="modal-title">
+                    <i class="bi bi-pencil-square"></i> Editar Información
+                </h5>';
+                break;
+            case 2:
+                echo '
+                <h5 class="modal-title modal-subtitle">
+                    <div class="icon"><i class="bi bi-pencil-square"></i></div>
+                    Editar Información<br>
+                    <small>Permite editar un elemento existente</small>
+                </h5>';
+                break;
+        } ?>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
+    </div>
+    <div class="modal-body">
+        <?php
+        //se dibujan los inputs
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Nombre',              'Name' => 'Nombre',      'Id' => 'Edit_Nombre',       'Value' => ($data['rowData']['Nombre'] ?? ''),      'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Icono',               'Name' => 'Icon',        'Id' => 'Edit_Icon',         'Value' => ($data['rowData']['Icon'] ?? ''),        'Required' => 2]);
+        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Color Icono',         'Name' => 'IdIconColor', 'Id' => 'Edit_IdIconColor',  'Value' => ($data['rowData']['IdIconColor'] ?? ''), 'Required' => 2,'arrData' => $data['arrColores']]);
+        $data['Fnc_FormInputs']->formTextarea([              'Placeholder' => 'Descripcion',         'Name' => 'Descripcion', 'Id' => 'Edit_Descripcion',  'Value' => ($data['rowData']['Descripcion'] ?? ''), 'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Carpeta Contenedora', 'Name' => 'Carpeta',     'Id' => 'Edit_Carpeta',      'Value' => ($data['rowData']['Carpeta'] ?? ''),     'Required' => 2]);
+
+        //datos ocultos
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idPermisosCat','Value' => $data['rowData']['idPermisosCat'],'Required' => 2]);
+        ?>
+    </div>
+    <div class="modal-footer">
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bx bi-x-circle"></i> Cerrar</button>
+            <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
+        </div>
+    </div>
+</form>
+
+<script>
+    /*********************************************************************/
+    /*                      EJECUCION DE LA LOGICA                       */
+    /*********************************************************************/
+    /************************************/
+    $("#FormEditData").submit(function(e) {
+        //Se validan los datos de los formularios
+        var validatorResult = validator.checkAll(this);
+        //verifico el resultado
+        if(validatorResult.valid===false){
+            return !!validatorResult.valid;
+        }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
+            e.preventDefault();
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Metodo      = 'POST';
+            let Direccion   = '<?php echo $BASE.'/Core/permisos/categorias/update'; ?>';
+            let Informacion = $("#FormEditData").serialize();
+            const Options     = {
+                UpdateDiv : [
+                    {Div:'#X_datatable', fromData:'<?php echo $BASE.'/Core/permisos/categorias/updateList'; ?>', refreshTbl:'true'}
+                ],
+                showNoti:'Datos Editados Correctamente',
+                closeModal:'#viewModal-lg',
+                closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
+            };
+            //Se envian los datos al formulario
+            SendDataForms(Metodo, Direccion, Informacion, Options);
+        }
+    });
+
+</script>
