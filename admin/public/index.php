@@ -37,11 +37,11 @@ require_once __DIR__ . '/../../vendors/application/security/AuditLogger.php';
 /**********************************************************************************************************************************/
 /**********************   Componentes   **********************/
 // Se cargan componentes de la plataforma
-$Autoload = '../../vendors/application/controller/;'; //Controladores
-$Autoload.= ' ../../vendors/application/models/;';    //Modelos
-$Autoload.= ' ../../vendors/application/utils/;';     //Utilidades
-$Autoload.= ' ../../vendors/application/functions/;'; //Funciones
-$Autoload.= ' ../app/helpers/;';                      //Helpers
+$Autoload = '../../vendors/application/controller/;'; // Controladores
+$Autoload.= ' ../../vendors/application/models/;';    // Modelos
+$Autoload.= ' ../../vendors/application/utils/;';     // Utilidades
+$Autoload.= ' ../../vendors/application/functions/;'; // Funciones
+$Autoload.= ' ../app/helpers/;';                      // Helpers
 
 /**********************     Modulos     **********************/
 // Se listan las carpetas con los modulos
@@ -55,7 +55,11 @@ foreach ($arrDirectory as $x_Directory) {
     $x_List = array_diff(scandir($x_Directory), ['.', '..', '.htaccess']);
     //se agregan las rutas
     foreach ($x_List as $list) {
-        $Autoload .= ' ' . $x_Directory . '/' . $list . '/controller/;';
+        $Autoload .= ' ' . $x_Directory . '/' . $list . '/controller/;'; // Controladores del modulo
+        $Autoload .= ' ' . $x_Directory . '/' . $list . '/installer/;';  // Instalador del modulo
+        $Autoload .= ' ' . $x_Directory . '/' . $list . '/testing/;';    // Pruebas del modulo
+        $Autoload .= ' ' . $x_Directory . '/' . $list . '/widgets/;';    // Widgets del modulo
+        $Autoload .= ' ' . $x_Directory . '/' . $list . '/functions/;';  // Funciones internas del modulo
     }
 }
 
