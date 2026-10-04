@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMovimiento']);
 ?>
 <form id="FormEditMovimiento" name="FormEditMovimiento" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
@@ -23,7 +25,7 @@
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
@@ -44,7 +46,7 @@
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstadoIngreso', 'Value' => $data['rowData']['idEstadoIngreso'], 'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idBodegas',       'Value' => $data['rowData']['idBodegas'],       'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idProducto',      'Value' => $data['rowData']['idProducto'],      'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'NumberOld',       'Value' => $data['rowData']['Number'],          'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'NumberOld',       'Value' => $x_EditProd_Number,                  'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -59,7 +61,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditMovimiento").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -81,7 +83,7 @@
             let Informacion = $("#FormEditMovimiento").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#tabProdDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/productos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMovimiento']); ?>', refreshTbl:'true'}
+                    {Div:'#tabProdDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/productos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
                 closeModal:'#viewModal-lg',

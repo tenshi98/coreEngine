@@ -7,8 +7,8 @@
 <table class="table table-sm table-hover datatable">
     <thead>
         <tr>
-            <th scope="col">#</th>
-            <th scope="col">Fecha</th>
+            <th scope="col" style="width: 100px;">#</th>
+            <th scope="col" style="width: 200px;">Fecha</th>
             <th scope="col">Bodegas</th>
             <th scope="col">Observacion</th>
             <th scope="col" style="width: 10px;">Acciones</th>
@@ -16,11 +16,11 @@
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrList'])&&!empty($data['arrList'])){
-            //Recorro
+            // Recorro los datos
             foreach($data['arrList'] as $crud){
-                //Se verifica movimiento
+                // Se verifica movimiento
                 switch ($data['idTipoIngreso']) {
                     case 1: $Movimiento = $crud['BodegaIngreso']; break;                             //Ingreso
                     case 2: $Movimiento = $crud['BodegaEgreso']; break;                              //Egreso
@@ -29,10 +29,10 @@
                 // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idMovimiento']);
                 $level       = $data['UserAccess']['LevelAccess'];
-                $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId;
+                $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId['data'];
                 $Entidad     = addslashes($Movimiento); ?>
                 <tr>
-                    <td><?php echo 'nRef '.$crud['idMovimiento']; ?></td>
+                    <td><?php echo 'nRef #'.$crud['idMovimiento']; ?></td>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']).'|'.$crud['Creacion_hora']; ?></td>
                     <td><?php echo $Movimiento; ?></td>
                     <td><?php echo $crud['Observaciones']; ?></td>
@@ -40,9 +40,9 @@
                         <div class="btn-group" role="group">
                             <?php
                             //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId.'\')"                  class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 2) {echo '<a href="'.$route.'"                                                                     class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>';}
-                            if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId.'\', \''.$Entidad.'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
+                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId['data'].'\')"                  class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
+                            if ($level >= 2) {echo '<a href="'.$route.'"                                                                             class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>';}
+                            if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId['data'].'\', \''.$Entidad.'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
                             ?>
                         </div>
                     </td>

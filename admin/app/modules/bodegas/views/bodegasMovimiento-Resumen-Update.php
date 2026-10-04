@@ -2,7 +2,6 @@
 /** @var string $BASE */  // Variable global para datos de F3
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
-
 ?>
 <div class="row">
     <div class="col-xs-12 col-sm-12 col-md-5 col-lg-4 col-xl-3 col-xxl-2">
@@ -24,6 +23,7 @@
         /*****************************************/
         //datos
         $arrData1 = [
+            ['Icon' => '','Titulo' => 'nRef',             'Texto' => '#'.$data['rowData']['idMovimiento']],
             ['Icon' => '','Titulo' => 'Creador',          'Texto' => $data['rowData']['UsuarioNombre']],
             ['Icon' => '','Titulo' => 'Tipo Movimiento',  'Texto' => $data['rowData']['TipoMovimiento']],
             ['Icon' => '','Titulo' => 'Fecha',            'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha'])],
@@ -40,15 +40,18 @@
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso y Verifico si existe
         if($data['UserData']["gestionDocumentosUsoBodega"]==2&&isset($data['rowData']['idFacturacion'])&&$data['rowData']['idFacturacion']!=0){
 
+            // Se obtiene el ID
+            $DataIDFact = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']);
+
             //Verifico el tipo de movimiento
             switch ($data['rowData']['idTipo']) {
                 case 1:$rRoute = 'gestionDocumentos/compras/listado'; break;//Compra
                 case 2:$rRoute = 'gestionDocumentos/ventas/listado'; break; //Venta
             }
             //texto
-            $Texto = $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']).'
+            $Texto = $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef #'.$data['rowData']['idFacturacion']).'
                 <div class="btn-group" role="group">
-                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']).'" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
+                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$DataIDFact['data'].'" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
                 </div>';
 
             $arrData2 = [

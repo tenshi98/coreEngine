@@ -22,7 +22,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
 
@@ -37,8 +37,9 @@
                             if($data['UserData']["gestionDocumentosUsoBodega"]==2){
                                 echo '<th scope="col">Documento</th>';
                             } ?>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Hora</th>
+                            <th scope="col">Doc Mov</th>
+                            <th scope="col" style="width: 100px;">Fecha</th>
+                            <th scope="col" style="width: 100px;">Hora</th>
                             <th scope="col">Tipo Movimiento</th>
                             <th scope="col">Ingreso</th>
                             <th scope="col">Egreso</th>
@@ -46,10 +47,13 @@
                     </thead>
                     <tbody>
                         <?php
-                        //Verifico si hay datos
+                        // Verifico si hay datos
                         if(is_array($data['arrStocks'])&&!empty($data['arrStocks'])){
-                            //Recorro
-                            foreach($data['arrStocks'] as $crud){ ?>
+                            // Recorro
+                            foreach($data['arrStocks'] as $crud){
+                                // Se obtiene el ID
+                                $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']);
+                                ?>
                                 <tr>
                                     <?php
                                     //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
@@ -62,15 +66,16 @@
                                             }
                                             echo '
                                             <td>
-                                                '.$crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacion']).'
+                                                '.$crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef #'.$crud['idFacturacion']).'
                                                 <div class="btn-group" role="group">
-                                                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idFacturacion']).'" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
+                                                    <a target="new" href="'.$BASE.'/'.$rRoute.'/noPrint/'.$DataID['data'].'" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
                                                 </div>
                                             </td>';
                                         }else{
                                             echo'<td>'.$crud['Observaciones'].'</td>';
                                         }
                                     } ?>
+                                    <td><?php echo 'nRef #'.$crud['idMovimiento']; ?></td>
                                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
                                     <td><?php echo $crud['Creacion_hora']; ?></td>
                                     <td><?php echo $crud['TipoMov']; ?></td>
@@ -95,7 +100,10 @@
                                 </tr>
                             <?php } ?>
                         <?php }else{
-                            echo '<tr><td colspan="5">No se encontraron entradas</td></tr>';
+                            //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
+                            $ncols = ($data['UserData']["gestionDocumentosUsoBodega"]==2) ? 6 : 5;
+                            // Imprime
+                            echo '<tr><td colspan="'.$ncols.'">No se encontraron entradas</td></tr>';
                         } ?>
                     </tbody>
                 </table>

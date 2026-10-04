@@ -4,15 +4,17 @@
 /*******************************************************************************************************************/
 class bodegasMovimientoProductos extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
     private $DataNumbers;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -30,16 +32,17 @@ class bodegasMovimientoProductos extends ControllerBase {
     /******************************************************************************/
     /*                                  RUTAS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Listar Todo
+    /*******************************************************************/
+    // Listar
+    /*******************************************************************/
     public function New_1($f3, $params){$this->New($f3, $params, 1);}
     public function New_2($f3, $params){$this->New($f3, $params, 2);}
     public function New_3($f3, $params){$this->New($f3, $params, 3);}
-    //Listar Todo
+    // Listar Todo
     public function UpdateList_1($f3, $params){$this->UpdateList($f3, $params, 1);}
     public function UpdateList_2($f3, $params){$this->UpdateList($f3, $params, 2);}
     public function UpdateList_3($f3, $params){$this->UpdateList($f3, $params, 3);}
-    //Listar Todo
+    // Listar Todo
     public function GetID_1($f3, $params){$this->GetID($f3, $params, 1);}
     public function GetID_2($f3, $params){$this->GetID($f3, $params, 2);}
     public function GetID_3($f3, $params){$this->GetID($f3, $params, 3);}
@@ -47,47 +50,59 @@ class bodegasMovimientoProductos extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear nuevo
+    /*******************************************************************/
+    // Crear nuevo
+    /*******************************************************************/
     public function New($f3, $params, $idTipoIngreso){
-        /******************************************/
-        //Se verifica movimiento
+
+        /************************************/
+        // Se obtiene el ID
+        $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($MovimientoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
+        // Se verifica movimiento
         switch ($idTipoIngreso) {
             case 1: $tsrxName = 'bodegasMovimientoIngreso';  break;//Ingreso
             case 2: $tsrxName = 'bodegasMovimientoEgreso';   break;//Egreso
             case 3: $tsrxName = 'bodegasMovimientoTraspaso'; break;//Traspaso
         }
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idMovimiento,idBodegasIngreso,idBodegasEgreso',
             'table'   => 'bodegas_movimientos',
             'join'    => '',
             'where'   => 'idMovimiento = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$MovimientoID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
-        //Se instancia
+        /************************************/
+        // Se instancia
         $arrUserData = $this->getUserData($f3);
+
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
             $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
             $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
             $X_params = [1, $arrUserData['UserID']];
-        //Si se permite junto con la creacion de tareas
+        // Si se permite junto con la creacion de tareas
         }else{
             $X_join   = '';
             $X_where  = 'bodegas_listado.idEstado = ?';
             $X_params = [1];
         }
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'bodegas_listado.idBodegas AS ID, bodegas_listado.Nombre',
@@ -100,11 +115,12 @@ class bodegasMovimientoProductos extends ControllerBase {
             'order'   => 'bodegas_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams    = ['query' => $query];
+        // Ejecuto la query
         $arrBodegas = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idProducto AS ID,Nombre',
@@ -117,11 +133,12 @@ class bodegasMovimientoProductos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrProductos = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstadoIngreso AS ID,Nombre',
@@ -134,8 +151,9 @@ class bodegasMovimientoProductos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams    = ['query' => $query];
+        // Ejecuto la query
         $arrTipoMov = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -143,8 +161,8 @@ class bodegasMovimientoProductos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrTipoMov['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -160,30 +178,40 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'idTipoIngreso'   => $idTipoIngreso,
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-formNew.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrBodegas,$arrProductos,$arrTipoMov]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
-    /******************************************************************************/
-    //List
+
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3, $params, $idTipoIngreso){
-        /******************************************/
-        //Se verifica movimiento
+
+        /************************************/
+        // Se obtiene el ID
+        $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($MovimientoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
+        // Se verifica movimiento
         switch ($idTipoIngreso) {
             case 1: $tsrxName = 'bodegasMovimientoIngreso';  break;//Ingreso
             case 2: $tsrxName = 'bodegasMovimientoEgreso';   break;//Egreso
             case 3: $tsrxName = 'bodegasMovimientoTraspaso'; break;//Traspaso
         }
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -200,24 +228,25 @@ class bodegasMovimientoProductos extends ControllerBase {
                 LEFT JOIN productos_listado     ON productos_listado.idProducto          = bodegas_movimientos_productos.idProducto
                 LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed         = productos_listado.idUniMed',
             'where'   => 'bodegas_movimientos_productos.idMovimiento = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$MovimientoID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'bodegas_movimientos_productos.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrProductos['status']){
+        if ($arrProductos['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -230,31 +259,40 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'idTipoIngreso'   => $idTipoIngreso,
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrProductos]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params, $idTipoIngreso){
-        /******************************************/
-        //Se verifica movimiento
+
+        /************************************/
+        // Se obtiene el ID
+        $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
+        // Se verifica movimiento
         switch ($idTipoIngreso) {
             case 1: $tsrxName = 'bodegasMovimientoIngreso';  break;//Ingreso
             case 2: $tsrxName = 'bodegasMovimientoEgreso';   break;//Egreso
             case 3: $tsrxName = 'bodegasMovimientoTraspaso'; break;//Traspaso
         }
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -273,22 +311,23 @@ class bodegasMovimientoProductos extends ControllerBase {
                 LEFT JOIN bodegas_listado       ON bodegas_listado.idBodegas             = bodegas_movimientos_productos.idBodegas
                 LEFT JOIN productos_listado     ON productos_listado.idProducto          = bodegas_movimientos_productos.idProducto',
             'where'   => 'bodegas_movimientos_productos.idExistencia = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$ExistenciaID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -301,15 +340,15 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'rowData'       => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -317,403 +356,674 @@ class bodegasMovimientoProductos extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
+    /*******************************************************************/
+    // Crear producto asociado a un movimiento.
+    /*******************************************************************/
+    public function Insert(): void {
+
+        /************************************/
+        // Se llama al movimiento de materiales
+        $Response = $this->insertMov($_POST);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if($Response['code'] != 200){
+            Response::error($Response['message'], $Response['code'], $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se envía respuesta con código 200 (OK)
+        Response::success($Response['data']['data']);
+
+    }
+
+    /*******************************************************************/
+    // Editar producto asociado a un movimiento.
+    /*******************************************************************/
+    public function Update(): void {
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Se llama al movimiento de materiales
+        $Response = $this->updateMov($_POST);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if($Response['code'] != 200){
+            Response::error($Response['message'], $Response['code'], $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se envía respuesta con código 200 (OK)
+        Response::success($Response['data']['data']);
+
+    }
+
+    /*******************************************************************/
+    // Elimina un producto del movimiento y revierte su stock.
+    /*******************************************************************/
+    public function Delete(): void {
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents('php://input'), $dataDelete);
+
+        /************************************/
+        // Se llama al movimiento de materiales
+        $Response = $this->deleteMov($dataDelete);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if($Response['code'] != 200){
+            Response::error($Response['message'], $Response['code'], $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se envía respuesta con código 200 (OK)
+        Response::success($Response['data']['data']);
+
+    }
+
     /******************************************************************************/
-    //Crear
-    public function Insert(){
+    /*                             EJECUCION OTROS                                */
+    /******************************************************************************/
+    /*******************************************************************/
+    // Crear producto asociado a un movimiento.
+    /*******************************************************************/
+    public function insertMov($PostData, $NewDBConn = null): array {
 
-        /******************************/
-        // Se genera la query
-        $query = [
-            'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
-            'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
-            'unique'    => '',
-            'encode'    => '',
-            'table'     => 'bodegas_movimientos_productos',
-            'Post'      => $_POST
-        ];
-        //Se genera el chequeo
-        $DataCheck_1 = $this->dataCheck_1($_POST);
-        // Ejecuto la query
-        $xParams  = ['DataCheck' => $DataCheck_1, 'query' => $query];
-        $Response = $this->Base_insert($xParams);
+        /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $NewDBConn ?? $this->getDBConn();
 
-        /******************************/
-        // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if ($Response['status']){
+        /*******************************************************************/
+        // Valores
+        /*******************************************************************/
+        $idMovimiento    = (int)($PostData['idMovimiento'] ?? 0);
+        $idEstadoIngreso = (int)($PostData['idEstadoIngreso'] ?? 0);
+        $idBodega        = (int)($PostData['idBodegas'] ?? 0);
+        $idProducto      = (int)($PostData['idProducto'] ?? 0);
+        $cantidad        = (float)($PostData['Number'] ?? 0);
 
-            /******************************/
+        /*******************************************************************/
+        // Validaciones
+        /*******************************************************************/
+        if ($idMovimiento <= 0) {                         return ['code' => 400, 'message' => 'Movimiento inválido'];}
+        if (!in_array($idEstadoIngreso, [1, 2], true)) {  return ['code' => 400, 'message' => 'Tipo de movimiento inválido'];}
+        if ($idBodega <= 0) {                             return ['code' => 400, 'message' => 'Debe indicar una bodega válida'];}
+        if ($idProducto <= 0) {                           return ['code' => 400, 'message' => 'Producto inválido'];}
+        if ($cantidad <= 0) {                             return ['code' => 400, 'message' => 'La cantidad debe ser mayor que cero'];}
+
+        /************************************/
+        // Se inicia la transacción solo si corresponde
+        if($NewDBConn === null){
+            $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Ejecucion
+        try {
+
+            /*******************************************************************/
+            // Insertar producto del movimiento
+            /*******************************************************************/
+            // Se crean los datos
+            $arrTareas = [
+                'idMovimiento'    => $idMovimiento,
+                'idEstadoIngreso' => $idEstadoIngreso,
+                'idBodegas'       => $idBodega,
+                'idProducto'      => $idProducto,
+                'Number'          => $cantidad
+            ];
+            /************************************/
+            // Se genera la query
+            $query = [
+                'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+                'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+                'unique'    => '',
+                'encode'    => '',
+                'table'     => 'bodegas_movimientos_productos',
+                'Post'      => $arrTareas
+            ];
+            /************************************/
+            // Se genera el chequeo
+            $DataCheck = $this->dataCheck_1($arrTareas);
+            // Preparo los datos
+            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query, 'newBDConn' => $DBConn];
+            // Ejecuto la query
+            $Response = $this->Base_insert($xParams);
+
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            }
+
+            /*******************************************************************/
+            // Obtener stock actual
+            /*******************************************************************/
+            // Variable
+            $campoStock = 'Cantidad_idBodegas_' . $idBodega;
             //Se consultan los stocks
             $query = [
-                'data'    => 'idStocks,idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'].' AS Cantidad',
+                'data'    => 'idStocks,idProducto,' . $campoStock . ' AS Cantidad',
                 'table'   => 'bodegas_productos_stocks',
                 'join'    => '',
                 'where'   => 'idProducto = ?',
-                'params'  => [$_POST['idProducto']],
+                'params'  => [$idProducto],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'idProducto ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
+            // Preparo los datos
+            $xParams   = ['query' => $query, 'newBDConn' => $DBConn];
             // Ejecuto la query
-            $xParams   = ['query' => $query];
             $arrStocks = $this->Base_GetList($xParams);
 
-            /******************************/
-            //Recorro solo si hay datos
-            if ($arrStocks['status']){
-                foreach ($arrStocks['data'] as $crud){
-                    $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
-                    $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
-                }
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($arrStocks['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al consultar el stock', 'error' => $arrStocks['error']];
             }
 
-            /******************************/
-            //Se verifica movimiento
-            switch ($_POST['idEstadoIngreso']) {
-                /**************************************************************************************/
-                /**************************************************************************************/
-                //Ingreso
-                case 1:
-                    /******************************/
-                    //Se Actualizan los stocks
-                    //verifico si existe el dato en el stock
-                    if(isset($arrProdStock[$_POST['idProducto']]['idStocks'])&&$arrProdStock[$_POST['idProducto']]['idStocks']!=''){
-                        /******************************/
-                        // Se agrega respuesta
-                        $arrTareas = [
-                            'idStocks'                                => $arrProdStock[$_POST['idProducto']]['idStocks'],
-                            'Cantidad_idBodegas_'.$_POST['idBodegas'] => ($arrProdStock[$_POST['idProducto']]['Cantidad'] + $_POST['Number']),
-                        ];
-                        /******************************/
-                        // Se genera la query
-                        $query = [
-                            'data'      => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'required'  => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'unique'    => '',
-                            'encode'    => '',
-                            'table'     => 'bodegas_productos_stocks',
-                            'where'     => 'idStocks',
-                            'Post'      => $arrTareas
-                        ];
-                        //Se genera el chequeo
-                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                        // Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                        $this->Base_update($xParams);
-                    }else{
-                        /******************************/
-                        // Se agrega respuesta
-                        $arrTareas = [
-                            'idProducto'                              => $_POST['idProducto'],
-                            'Cantidad_idBodegas_'.$_POST['idBodegas'] => $_POST['Number'],
-                        ];
-                        /******************************/
-                        // Se genera la query
-                        $query = [
-                            'data'      => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'required'  => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'unique'    => '',
-                            'encode'    => '',
-                            'table'     => 'bodegas_productos_stocks',
-                            'Post'      => $arrTareas
-                        ];
-                        //Se genera el chequeo
-                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                        // Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                        $this->Base_insert($xParams);
+            /*******************************************************************/
+            // Preparar stock
+            /*******************************************************************/
+            $idStocks     = null;
+            $stockActual  = 0;
 
-                    }
-                    break;
-                /**************************************************************************************/
-                /**************************************************************************************/
-                //Egreso
-                case 2:
-                    /******************************/
-                    //Se Actualizan los stocks
-                    //verifico si existe el dato en el stock
-                    if(isset($arrProdStock[$_POST['idProducto']]['idStocks'])&&$arrProdStock[$_POST['idProducto']]['idStocks']!=''){
-                        /******************************/
-                        // Se agrega respuesta
-                        $arrTareas = [
-                            'idStocks'                                => $arrProdStock[$_POST['idProducto']]['idStocks'],
-                            'Cantidad_idBodegas_'.$_POST['idBodegas'] => ($arrProdStock[$_POST['idProducto']]['Cantidad'] - $_POST['Number']),
-                        ];
-                        /******************************/
-                        // Se genera la query
-                        $query = [
-                            'data'      => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'required'  => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'unique'    => '',
-                            'encode'    => '',
-                            'table'     => 'bodegas_productos_stocks',
-                            'where'     => 'idStocks',
-                            'Post'      => $arrTareas
-                        ];
-                        //Se genera el chequeo
-                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                        // Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                        $this->Base_update($xParams);
-                    }else{
-                        /******************************/
-                        // Se agrega respuesta
-                        $arrTareas = [
-                            'idProducto'                              => $_POST['idProducto'],
-                            'Cantidad_idBodegas_'.$_POST['idBodegas'] => (0 - $_POST['Number']),
-                        ];
-                        /******************************/
-                        // Se genera la query
-                        $query = [
-                            'data'      => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'required'  => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                            'unique'    => '',
-                            'encode'    => '',
-                            'table'     => 'bodegas_productos_stocks',
-                            'Post'      => $arrTareas
-                        ];
-                        //Se genera el chequeo
-                        $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                        // Ejecuto la query
-                        $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                        $this->Base_insert($xParams);
-                    }
-                    break;
+            if (!empty($arrStocks['data'])) {
+                $stock       = $arrStocks['data'][0];
+                $idStocks    = $stock['idStocks'] ?? null;
+                $stockActual = (float)($stock['Cantidad'] ?? 0);
             }
 
-            /******************************/
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-        } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+            /*******************************************************************/
+            // Calcular nuevo stock
+            /*******************************************************************/
+            $nuevoStock = match ($idEstadoIngreso) {
+                1 => $stockActual + $cantidad,
+                2 => $stockActual - $cantidad,
+                default => 0
+            };
+
+            /*******************************************************************/
+            // Validar stock para egreso
+            /*******************************************************************/
+            if ($idEstadoIngreso === 2 && $nuevoStock < 0) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'Stock insuficiente para el producto ' . $idProducto];
+            }
+
+            /*******************************************************************/
+            // Actualizar / crear stock
+            /*******************************************************************/
+            $bodegasMovimiento = new bodegasMovimiento();
+            $guardarStock      = $bodegasMovimiento->guardarStock($idStocks, $idProducto, $idBodega, $nuevoStock, $DBConn);
+            if($guardarStock['code'] != 200){
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return $guardarStock;
+            }
+
+            /************************************/
+            // Confirmar transacción solo si corresponde
+            if($NewDBConn === null){
+                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+            }
+
+            /************************************/
+            // Retorno los datos
+            return ['code' => 200, 'data' => $Response];
+
+        } catch (\Throwable $e) {
+
+            /************************************/
+            // Se revierte toda la operación ante cualquier error
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage()];
+
         }
-
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
-    public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
+    /*******************************************************************/
+    // Editar producto asociado a un movimiento.
+    /*******************************************************************/
+    public function updateMov($PostData, $NewDBConn = null): array {
+
+        /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $NewDBConn ?? $this->getDBConn();
+
+        /*******************************************************************/
+        // Valores
+        /*******************************************************************/
+        $idExistencia     = (int)($PostData['idExistencia'] ?? 0);
+        $idMovimiento     = (int)($PostData['idMovimiento'] ?? 0);
+        $idEstadoIngreso  = (int)($PostData['idEstadoIngreso'] ?? 0);
+        $idBodega         = (int)($PostData['idBodegas'] ?? 0);
+        $idProducto       = (int)($PostData['idProducto'] ?? 0);
+        $cantidadNueva    = (float)($PostData['Number'] ?? 0);
+        $cantidadAnterior = (float)($PostData['NumberOld'] ?? 0);
+
+        /*******************************************************************/
+        // Validaciones
+        /*******************************************************************/
+        if ($idExistencia <= 0) {                         return ['code' => 400, 'message' => 'Registro inválido'];}
+        if ($idMovimiento <= 0) {                         return ['code' => 400, 'message' => 'Movimiento inválido'];}
+        if (!in_array($idEstadoIngreso, [1, 2], true)) {  return ['code' => 400, 'message' => 'Tipo de movimiento inválido'];}
+        if ($idBodega <= 0) {                             return ['code' => 400, 'message' => 'Debe indicar una bodega válida'];}
+        if ($idProducto <= 0) {                           return ['code' => 400, 'message' => 'Producto inválido'];}
+        if ($cantidadNueva <= 0) {                        return ['code' => 400, 'message' => 'La cantidad debe ser mayor que cero'];}
+        if ($cantidadAnterior < 0) {                      return ['code' => 400, 'message' => 'La cantidad anterior no es válida'];}
+
+        /*******************************************************************/
+        // Calcular diferencia
+        /*******************************************************************/
+        $diferencia = $cantidadNueva - $cantidadAnterior;
+
+        /************************************/
+        // Se inicia la transacción solo si corresponde
+        if($NewDBConn === null){
+            $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Ejecucion
+        try {
+
+            /*******************************************************************/
+            // Actualizar detalle del movimiento
+            /*******************************************************************/
+            // Se crean los datos
+            $arrTareas = [
+                'idExistencia'    => $idExistencia,
+                'idMovimiento'    => $idMovimiento,
+                'idEstadoIngreso' => $idEstadoIngreso,
+                'idBodegas'       => $idBodega,
+                'idProducto'      => $idProducto,
+                'Number'          => $cantidadNueva
+            ];
+            /************************************/
             // Se genera la query
             $query = [
                 'data'      => 'idExistencia,idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
-                'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+                'required'  => 'idExistencia,idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                 'unique'    => '',
                 'encode'    => '',
                 'table'     => 'bodegas_movimientos_productos',
                 'where'     => 'idExistencia',
-                'Post'      => $_POST
+                'Post'      => $arrTareas
             ];
-            //Se genera el chequeo
-            $DataCheck_1 = $this->DataCheck_1($_POST);
+            /************************************/
+            // Se genera el chequeo
+            $DataCheck = $this->DataCheck_1($arrTareas);
+            // Preparo los datos
+            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query, 'newBDConn' => $DBConn];
             // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck_1, 'query' => $query];
             $Response = $this->Base_update($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-
-                /******************************/
-                //Se consultan los stocks
-                $query = [
-                    'data'    => 'idStocks,idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'].' AS Cantidad',
-                    'table'   => 'bodegas_productos_stocks',
-                    'join'    => '',
-                    'where'   => 'idProducto = ?',
-                    'params'  => [$_POST['idProducto']],
-                    'group'   => '',
-                    'having'  => '',
-                    'order'   => 'idProducto ASC',
-                    'limit'   => ConfigAPP::APP["N_MaxItems"]
-                ];
-                // Ejecuto la query
-                $xParams   = ['query' => $query];
-                $arrStocks = $this->Base_GetList($xParams);
-
-                /******************************/
-                //Recorro solo si hay datos
-                if ($arrStocks['status']){
-                    foreach ($arrStocks['data'] as $crud){
-                        $arrProdStock[$crud['idProducto']]['idStocks'] = $crud['idStocks'];
-                        $arrProdStock[$crud['idProducto']]['Cantidad'] = $crud['Cantidad'];
-                    }
-                }
-
-                /******************************/
-                //Se verifica movimiento
-                switch ($_POST['idEstadoIngreso']) {
-                    /**************************************************************************************/
-                    /**************************************************************************************/
-                    //Ingreso
-                    case 1:
-                        /******************************/
-                        //Se Actualizan los stocks
-                        //verifico si existe el dato en el stock
-                        if(isset($arrProdStock[$_POST['idProducto']]['idStocks'])&&$arrProdStock[$_POST['idProducto']]['idStocks']!=''){
-                            /******************************/
-                            // Se agrega respuesta
-                            $arrTareas = [
-                                'idStocks'                                => $arrProdStock[$_POST['idProducto']]['idStocks'],
-                                'Cantidad_idBodegas_'.$_POST['idBodegas'] => ($arrProdStock[$_POST['idProducto']]['Cantidad'] + ($_POST['Number'] - $_POST['NumberOld'])),
-                            ];
-                            /******************************/
-                            // Se genera la query
-                            $query = [
-                                'data'      => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'required'  => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'unique'    => '',
-                                'encode'    => '',
-                                'table'     => 'bodegas_productos_stocks',
-                                'where'     => 'idStocks',
-                                'Post'      => $arrTareas
-                            ];
-                            //Se genera el chequeo
-                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            // Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_update($xParams);
-                        }else{
-                            /******************************/
-                            // Se agrega respuesta
-                            $arrTareas = [
-                                'idProducto'                              => $_POST['idProducto'],
-                                'Cantidad_idBodegas_'.$_POST['idBodegas'] => ($_POST['Number'] - $_POST['NumberOld']),
-                            ];
-                            /******************************/
-                            // Se genera la query
-                            $query = [
-                                'data'      => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'required'  => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'unique'    => '',
-                                'encode'    => '',
-                                'table'     => 'bodegas_productos_stocks',
-                                'Post'      => $arrTareas
-                            ];
-                            //Se genera el chequeo
-                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            // Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_insert($xParams);
-
-                        }
-                        break;
-                    /**************************************************************************************/
-                    /**************************************************************************************/
-                    //Egreso
-                    case 2:
-                        /******************************/
-                        //Se Actualizan los stocks
-                        //verifico si existe el dato en el stock
-                        if(isset($arrProdStock[$_POST['idProducto']]['idStocks'])&&$arrProdStock[$_POST['idProducto']]['idStocks']!=''){
-                            /******************************/
-                            // Se agrega respuesta
-                            $arrTareas = [
-                                'idStocks'                                => $arrProdStock[$_POST['idProducto']]['idStocks'],
-                                'Cantidad_idBodegas_'.$_POST['idBodegas'] => ($arrProdStock[$_POST['idProducto']]['Cantidad'] - ($_POST['Number'] - $_POST['NumberOld'])),
-                            ];
-                            /******************************/
-                            // Se genera la query
-                            $query = [
-                                'data'      => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'required'  => 'idStocks,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'unique'    => '',
-                                'encode'    => '',
-                                'table'     => 'bodegas_productos_stocks',
-                                'where'     => 'idStocks',
-                                'Post'      => $arrTareas
-                            ];
-                            //Se genera el chequeo
-                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            // Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_update($xParams);
-                        }else{
-                            /******************************/
-                            // Se agrega respuesta
-                            $arrTareas = [
-                                'idProducto'                              => $_POST['idProducto'],
-                                'Cantidad_idBodegas_'.$_POST['idBodegas'] => (0 - ($_POST['Number'] - $_POST['NumberOld'])),
-                            ];
-                            /******************************/
-                            // Se genera la query
-                            $query = [
-                                'data'      => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'required'  => 'idProducto,Cantidad_idBodegas_'.$_POST['idBodegas'],
-                                'unique'    => '',
-                                'encode'    => '',
-                                'table'     => 'bodegas_productos_stocks',
-                                'Post'      => $arrTareas
-                            ];
-                            //Se genera el chequeo
-                            $DataCheck_2 = $this->DataCheck_2($arrTareas);
-                            // Ejecuto la query
-                            $xParams = ['DataCheck' => $DataCheck_2, 'query' => $query];
-                            $this->Base_insert($xParams);
-                        }
-                        break;
-                }
-
-                /******************************/
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
             }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+
+            /*******************************************************************/
+            // Si no cambió la cantidad, no es necesario modificar stock
+            /*******************************************************************/
+            if ($diferencia == 0) {
+                // Retorno los datos
+                return ['code' => 200, 'data' => $Response];
+            }
+
+            /*******************************************************************/
+            // Obtener stock actual
+            /*******************************************************************/
+            // Variable
+            $campoStock = 'Cantidad_idBodegas_' . $idBodega;
+            // Se consultan los stocks
+            $query = [
+                'data'    => 'idStocks,idProducto,' . $campoStock . ' AS Cantidad',
+                'table'   => 'bodegas_productos_stocks',
+                'join'    => '',
+                'where'   => 'idProducto = ?',
+                'params'  => [$idProducto],
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'idProducto ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            // Preparo los datos
+            $xParams   = ['query' => $query, 'newBDConn' => $DBConn];
+            // Ejecuto la query
+            $arrStocks = $this->Base_GetList($xParams);
+
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($arrStocks['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al consultar el stock', 'error' => $arrStocks['error']];
+            }
+
+            /*******************************************************************/
+            // Preparar stock
+            /*******************************************************************/
+            $idStocks    = null;
+            $stockActual = 0;
+
+            if (!empty($arrStocks['data'])) {
+                $stock       = $arrStocks['data'][0];
+                $idStocks    = $stock['idStocks'] ?? null;
+                $stockActual = (float)($stock['Cantidad'] ?? 0);
+            }
+
+            /*******************************************************************/
+            // Calcular nuevo stock
+            /*******************************************************************/
+            $nuevoStock = match ($idEstadoIngreso) {
+                1 => $stockActual + $diferencia,
+                2 => $stockActual - $diferencia,
+                default => 0
+            };
+
+            /*******************************************************************/
+            // Validar stock
+            /*******************************************************************/
+            if ($idEstadoIngreso === 2 && $nuevoStock < 0) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'Stock insuficiente para modificar el producto ' . $idProducto];
+            }
+
+            /*******************************************************************/
+            // Actualizar stock
+            /*******************************************************************/
+            $bodegasMovimiento = new bodegasMovimiento();
+            $guardarStock      = $bodegasMovimiento->guardarStock($idStocks, $idProducto, $idBodega, $nuevoStock, $DBConn);
+            if($guardarStock['code'] != 200){
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return $guardarStock;
+            }
+
+            /************************************/
+            // Confirmar transacción solo si corresponde
+            if($NewDBConn === null){
+                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+            }
+
+            /************************************/
+            // Retorno los datos
+            return ['code' => 200, 'data' => $Response];
+
+        } catch (\Throwable $e) {
+
+            /************************************/
+            // Se revierte toda la operación ante cualquier error
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage()];
+
         }
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
-    public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-            /******************************/
+    /*******************************************************************/
+    // Elimina un producto del movimiento y revierte su stock.
+    /*******************************************************************/
+    public function deleteMov($PostData, $NewDBConn = null): array {
+
+        /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $NewDBConn ?? $this->getDBConn();
+
+        /************************************/
+        // Se obtiene el ID real del movimiento
+        $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $PostData['idExistencia']);
+        if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
+            return ['code' => 400, 'message' => 'Registro inválido'];
+        }
+
+        /************************************/
+        // Se inicia la transacción solo si corresponde
+        if($NewDBConn === null){
+            $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Ejecucion
+        try {
+
+            /*******************************************************************/
+            // Obtener información del producto antes de eliminarlo
+            /*******************************************************************/
+            // Consulta
+            $query = [
+                'data' => 'idExistencia, idMovimiento, idEstadoIngreso, idBodegas, idProducto, Number',
+                'table'  => 'bodegas_movimientos_productos',
+                'join'   => '',
+                'where'  => 'idExistencia = ?',
+                'params' => [$ExistenciaID['data']],
+                'group'  => '',
+                'having' => '',
+                'order'  => '',
+                'limit'  => 1
+            ];
+            // Preparo los datos
+            $xParams      = ['query' => $query, 'newBDConn' => $DBConn];
+            // Ejecuto la query
+            $arrProducto = $this->Base_GetList($xParams);
+
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($arrProducto['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al consultar el producto del movimiento', 'error' => $arrProducto['error']];
+            }
+            if (empty($arrProducto['data'])) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 404, 'message' => 'No existe el producto indicado'];
+            }
+
+            $producto = $arrProducto['data'][0];
+
+            /*******************************************************************/
+            // Normalizar datos
+            /*******************************************************************/
+            $idMovimiento    = (int)$producto['idMovimiento'];
+            $idEstadoIngreso = (int)$producto['idEstadoIngreso'];
+            $idBodega        = (int)$producto['idBodegas'];
+            $idProducto      = (int)$producto['idProducto'];
+            $cantidad        = (float)$producto['Number'];
+
+            /*******************************************************************/
+            // Validar producto
+            /*******************************************************************/
+            if ($idProducto <= 0 || $cantidad <= 0) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'Los datos del producto no son válidos'];
+            }
+
+            if (!in_array($idEstadoIngreso, [1, 2], true)) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'Estado de movimiento no válido: ' . $idEstadoIngreso];
+            }
+
+            if ($idBodega <= 0) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'La bodega del movimiento no es válida'];
+            }
+
+            /*******************************************************************/
+            // Obtener stock actual
+            /*******************************************************************/
+            // Variables
+            $campoStock = 'Cantidad_idBodegas_' . $idBodega;
+            // Consulta
+            $query = [
+                'data'    => 'idStocks,idProducto,' . $campoStock . ' AS Cantidad',
+                'table'   => 'bodegas_productos_stocks',
+                'join'    => '',
+                'where'   => 'idProducto = ?',
+                'params'  => [$idProducto],
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'idProducto ASC',
+                'limit'   => 1
+            ];
+            // Preparo los datos
+            $xParams   = ['query' => $query, 'newBDConn' => $DBConn];
+            // Ejecuto la query
+            $arrStocks = $this->Base_GetList($xParams);
+
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($arrStocks['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al consultar el stock', 'error' => $arrStocks['error']];
+            }
+
+            /*******************************************************************/
+            // El stock debe existir para poder revertir el movimiento
+            /*******************************************************************/
+            if (empty($arrStocks['data'])) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'No existe stock para el producto: ' . $idProducto];
+            }
+
+            $stock       = $arrStocks['data'][0];
+            $idStocks    = $stock['idStocks'] ?? null;
+            $stockActual = (float)($stock['Cantidad'] ?? 0);
+
+            if (empty($idStocks)) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 400, 'message' => 'No existe un registro de stock para el producto: ' . $idProducto];
+            }
+
+            /*******************************************************************/
+            // Revertir stock
+            /*******************************************************************/
+
+            switch ($idEstadoIngreso) {
+
+                /***************************************************************/
+                // INGRESO
+                // El movimiento había sumado stock.
+                // Al eliminarlo debemos restarlo.
+                /***************************************************************/
+
+                case 1:
+
+                    $nuevoStock = $stockActual - $cantidad;
+
+                    if ($nuevoStock < 0) {
+                        $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                        return ['code' => 400, 'message' => 'No es posible eliminar el movimiento porque el stock resultante sería negativo para el producto ' . $idProducto];
+                    }
+
+                    $arrTareas = [
+                        'idStocks'   => $idStocks,
+                        $campoStock  => $nuevoStock
+                    ];
+
+                    $bodegasMovimiento = new bodegasMovimiento();
+                    $actualizarStock   = $bodegasMovimiento->actualizarStock($arrTareas, $campoStock, $DBConn);
+                    if($actualizarStock['code'] != 200){
+                        $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                        return $actualizarStock;
+                    }
+
+                    break;
+
+                /***************************************************************/
+                // EGRESO
+                // El movimiento había restado stock.
+                // Al eliminarlo debemos devolverlo.
+                /***************************************************************/
+
+                case 2:
+
+                    $nuevoStock = $stockActual + $cantidad;
+
+                    $arrTareas = [
+                        'idStocks'  => $idStocks,
+                        $campoStock => $nuevoStock
+                    ];
+
+                    $bodegasMovimiento = new bodegasMovimiento();
+                    $actualizarStock   = $bodegasMovimiento->actualizarStock($arrTareas, $campoStock, $DBConn);
+                    if($actualizarStock['code'] != 200){
+                        $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                        return $actualizarStock;
+                    }
+
+                    break;
+            }
+
+            /*******************************************************************/
+            // Eliminar producto del movimiento
+            /*******************************************************************/
+
+            /************************************/
             // Se genera la query
             $query = [
-                'files'       => '',
-                'table'       => 'bodegas_movimientos_productos',
-                'where'       => 'idExistencia',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
+                'files'      => '',
+                'table'      => 'bodegas_movimientos_productos',
+                'where'      => 'idExistencia',
+                'SubCarpeta' => '',
+                'Post'       => $PostData
             ];
+            // Preparo los datos
+            $xParams  = ['query' => $query, 'newBDConn' => $DBConn];
             // Ejecuto la query
-            $xParams  = ['query' => $query];
             $Response = $this->Base_delete($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al eliminar el producto del movimiento', 'error' => $Response['error']];
             }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+
+            /************************************/
+            // Confirmar transacción solo si corresponde
+            if($NewDBConn === null){
+                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+            }
+
+            /************************************/
+            // Retorno los datos
+            return ['code' => 200, 'data' => $Response];
+
+        } catch (\Throwable $e) {
+
+            /************************************/
+            // Se revierte toda la operación ante cualquier error
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage()];
+
         }
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
@@ -746,44 +1056,7 @@ class bodegasMovimientoProductos extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
-        return $DataChecking;
-    }
-    /******************************************************************************/
-    //Se validan los datos
-    private function dataCheck_2($POST){
-        // Variables
-        $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idStocks,idProducto',
-            'ValidarEntero'             => 'idStocks,idProducto',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
-        ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 

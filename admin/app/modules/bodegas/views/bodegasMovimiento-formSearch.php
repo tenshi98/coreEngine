@@ -15,7 +15,7 @@
                     <?php
                     //Se dibujan inputs
                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,'Placeholder' => 'Numeros Referencia', 'Name' => 'idMovimiento', 'Id' => 'Search_idMovimiento','Value' => '','Required' => 1,'Icon' => 'bi bi-sort-numeric-down']);
-                    //Se verifica movimiento
+                    // Se verifica movimiento
                     switch ($data['idTipoIngreso']) {
                         /************************************/
                         //Ingreso
@@ -41,7 +41,7 @@
 
                     //se dibujan los inputs
                     $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil',           'Name' => 'idDocumentos',    'Id' => 'Search_idDocumentos',    'Value' => '', 'Required' => 1, 'arrData' => $data['arrDocumentos']]);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',              'Name' => 'N_Doc',           'Id' => 'Search_N_Doc',           'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Numero Documento',              'Name' => 'N_Doc',           'Id' => 'Search_N_Doc',           'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Referencia Documento',   'Name' => 'idFacturacion',   'Id' => 'Search_idFacturacion',   'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
 
                     ?>
@@ -60,7 +60,7 @@
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormSearchData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);

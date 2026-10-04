@@ -22,7 +22,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -50,9 +50,9 @@
                             </thead>
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrProductos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['TipoMovimiento']; ?></td>

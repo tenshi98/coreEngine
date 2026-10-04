@@ -22,7 +22,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -42,17 +42,17 @@
                         <table class="table table-sm table-hover">
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
-                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
-                                            <td><?php echo $crud['Observacion']; ?></td>
+                                            <td style="width: 100px;"><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
+                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?></td>
                                         </tr>
                                     <?php } ?>
                                 <?php }else{
-                                    echo '<tr><td colspan="2">No se encontraron entradas</td></tr>';
+                                    echo '<tr><td>No se encontraron entradas</td></tr>';
                                 } ?>
                             </tbody>
                         </table>

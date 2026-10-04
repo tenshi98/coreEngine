@@ -4,8 +4,9 @@
 /*******************************************************************************************************************/
 class bodegasListadoObservaciones extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -13,8 +14,9 @@ class bodegasListadoObservaciones extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -34,32 +36,42 @@ class bodegasListadoObservaciones extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear nuevo
+    /*******************************************************************/
+    // Crear nuevo
+    /*******************************************************************/
     public function New($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($BodegasID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idBodegas',
             'table'   => 'bodegas_listado',
             'join'    => '',
             'where'   => 'idBodegas = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$BodegasID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -72,47 +84,61 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'rowData'          => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-formNew.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //List
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3, $params){
-        /*******************************************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($BodegasID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'    => 'idObservaciones,Observacion,FechaCreacion',
+            'data'    => '
+                bodegas_listado_observaciones.idObservaciones,
+                bodegas_listado_observaciones.Observacion,
+                bodegas_listado_observaciones.FechaCreacion,
+                usuarios_listado.Nombre AS Usuario',
             'table'   => 'bodegas_listado_observaciones',
-            'join'    => '',
-            'where'   => 'idBodegas = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = bodegas_listado_observaciones.idUsuario',
+            'where'   => 'bodegas_listado_observaciones.idBodegas = ?',
+            'params'  => [$BodegasID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'idObservaciones ASC',
+            'order'   => 'bodegas_listado_observaciones.idObservaciones ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams          = ['query' => $query];
+        // Ejecuto la query
         $arrObservaciones = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrObservaciones['status']){
+        if ($arrObservaciones['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -124,45 +150,58 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'arrObservaciones' => $arrObservaciones['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrObservaciones]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //View
+    /*******************************************************************/
+    // View
+    /*******************************************************************/
     public function View($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $ObservacionesID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($ObservacionesID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'    => 'Observacion,FechaCreacion',
+            'data'    => '
+                bodegas_listado_observaciones.Observacion,
+                bodegas_listado_observaciones.FechaCreacion,
+                usuarios_listado.Nombre AS Usuario',
             'table'   => 'bodegas_listado_observaciones',
-            'join'    => '',
-            'where'   => 'idObservaciones = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = bodegas_listado_observaciones.idUsuario',
+            'where'   => 'bodegas_listado_observaciones.idObservaciones = ?',
+            'params'  => [$ObservacionesID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -174,45 +213,55 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'rowData'       => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-View.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $ObservacionesID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($ObservacionesID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idObservaciones,idBodegas,Observacion,FechaCreacion',
             'table'   => 'bodegas_listado_observaciones',
             'join'    => '',
             'where'   => 'idObservaciones = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$ObservacionesID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -221,19 +270,20 @@ class bodegasListadoObservaciones extends ControllerBase {
                 'Fnc_FormInputs'    => $this->FormInputs,
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_DataDate'      => $this->DataDate,
+                'Fnc_ServerServer'  => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -241,122 +291,141 @@ class bodegasListadoObservaciones extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
-    public function Insert(){
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
+    public function Insert($f3){
 
-        /******************************/
-        //Se genera el chequeo
+        /************************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+        /************************************/
+        // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idBodegas,Observacion,FechaCreacion',
-            'required'  => 'idBodegas,Observacion,FechaCreacion',
+            'data'      => 'idUsuario,idBodegas,Observacion,FechaCreacion',
+            'required'  => 'idUsuario,idBodegas,Observacion,FechaCreacion',
             'unique'    => '',
             'encode'    => '',
             'table'     => 'bodegas_listado_observaciones',
             'Post'      => $_POST
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
-        /******************************/
-        // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if ($Response['status']){
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-        } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
-    public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    public function Update($f3){
 
-            /******************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idObservaciones,idBodegas,Observacion',
-                'required'  => 'idBodegas,Observacion',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'bodegas_listado_observaciones',
-                'where'     => 'idObservaciones',
-                'Post'      => $_POST
-            ];
-            // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idObservaciones,idUsuario,idBodegas,Observacion,FechaCreacion',
+            'required'  => 'idObservaciones,idUsuario,idBodegas,Observacion,FechaCreacion',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'bodegas_listado_observaciones',
+            'where'     => 'idObservaciones',
+            'Post'      => $_POST
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'bodegas_listado_observaciones',
-                'where'       => 'idObservaciones',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'bodegas_listado_observaciones',
+            'where'       => 'idObservaciones',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -389,7 +458,7 @@ class bodegasListadoObservaciones extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
