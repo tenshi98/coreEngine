@@ -33,6 +33,22 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
+     * Obtiene la conexión activa a la base de datos.
+     *
+     * Retorna la instancia de conexión almacenada en la propiedad DBConn
+     * de la clase.
+     *
+     * @return mixed Conexión utilizada para interactuar con la base de datos.
+     */
+    protected function getDBConn(){
+
+        // Retorna la conexión almacenada en la propiedad de la clase.
+        return $this->DBConn;
+
+    }
+
+    /************************************************************************************************************/
+    /**
      * Obtiene los datos del usuario almacenados en sesión.
      *
      * Este método implementa un patrón de carga perezosa (lazy loading),
@@ -161,7 +177,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *  'data'    => '
      *      bodegas_listado.Nombre,
@@ -207,7 +223,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *  'data'    => 'idBodegas',
      *  'table'   => 'bodegas_listado',
@@ -243,7 +259,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *      'data'      => 'idEstado,Nombre,idCiudad,idComuna,Direccion',
      *      'required'  => 'idEstado,Nombre',
@@ -287,7 +303,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *      'data'      => 'idReserva,idRecurso',
      *      'required'  => 'idReserva,idRecurso',
@@ -337,7 +353,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *      'data'      => 'idBodegas,idEstado,Nombre,idCiudad,idComuna,Direccion',
      *      'required'  => 'idEstado,Nombre',
@@ -392,7 +408,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *      'files'       => 'Direccion_img',
      *      'table'       => 'bodegas_listado',
@@ -436,15 +452,15 @@ class ControllerBase {
 	 * $this->Base_transactionBegin();
      *
      * $respReserva = $this->Base_insert($xParamsReserva);
-     * if (!$respReserva['status']) { $this->Base_transactionRollback(); return $respReserva; }
+     * if ($respReserva['status'] === false) { $this->Base_transactionRollback(); return $respReserva; }
      *
      * foreach ($recursos as $recurso) {
      *     $respRecurso = $this->Base_insert($xParamsRecurso);
-     *     if (!$respRecurso['status']) { $this->Base_transactionRollback(); return $respRecurso; }
+     *     if ($respRecurso['status'] === false) { $this->Base_transactionRollback(); return $respRecurso; }
      * }
      *
      * $respHistorial = $this->Base_insert($xParamsHistorial);
-     * if (!$respHistorial['status']) { $this->Base_transactionRollback(); return $respHistorial; }
+     * if ($respHistorial['status'] === false) { $this->Base_transactionRollback(); return $respHistorial; }
      *
      * $this->Base_transactionCommit();
      * return ['status' => true, 'data' => $respReserva['data']];
@@ -513,6 +529,23 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
+     * Si ya hay una transacción activa (ej. llamada desde Update() de partidas),
+     * no abrimos una nueva ni hacemos commit/rollback propio: el llamador controla el ciclo..
+     *
+     * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
+     * @return void true - false
+     */
+    protected function Base_inTransaction(array $params = []){
+
+        /**********************     Valores     **********************/
+        $DBConn = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Ejecutar  **********************/
+        return $DBConn->inTransaction();
+    }
+
+    /************************************************************************************************************/
+    /**
      * Ejecuta una sentencia SQL directamente en la base de datos.
      *
      * @param string $params['query'] Sentencia SQL completa a ejecutar.
@@ -549,7 +582,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  // Se genera la query
+	 *  // === Se genera la query ===
      *  $query = [
      *      'files'       => 'Direccion_img',
      *      'table'       => 'bodegas_listado',
@@ -569,10 +602,11 @@ class ControllerBase {
         // Extraer parámetros con valores por defecto
         $query     = $params['query'] ?? '';
         $DBConn    = $params['newBDConn'] ?? $this->DBConn;
+        $showQuery = $params['showQuery'] ?? false;
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
-        return $this->queryBuilder->delFiles($query, $DBConn);
+        return $this->queryBuilder->delFiles($query, $DBConn, $showQuery);
     }
 
     /************************************************************************************************************/
@@ -596,7 +630,7 @@ class ControllerBase {
      *  ];
      *  // Verifico si existe
      *  if($arrTables){
-     *      //recorro
+     *      // Recorro
      *      foreach ($arrTables as $table) {
      *          // Se genera la query
      *          $xParams  = ['query' => $table];
@@ -625,7 +659,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se listan las tablas
+	 *  // Se listan las tablas
      *  $arrTableDel  = array();
      *  $arrTableDel[] = ['table' => 'bodegas_listado'];
      *  $arrTableDel[] = ['table' => 'bodegas_listado_observaciones'];
@@ -634,10 +668,10 @@ class ControllerBase {
      *  $arrTableDel[] = ['table' => 'bodegas_productos_stocks'];
      *
      *   // Verifico si existe
-     *   if($arrTableDel){
-     *      //recorro
+     *   if (!empty($arrTableDel)) {
+     *      // Recorro
      *      foreach ($arrTableDel as $tblDel) {
-     *          //Se ejecuta la query
+     *          // Se ejecuta la query
      *          $xParams  = ['query' => $tblDel];
      *          $this->Base_dropTable($xParams);
      *      }
@@ -664,7 +698,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se generan los datos de conexión
+	 *  // Se generan los datos de conexión
      *  $query = [
      *      'dbName' => $DBName,
      *  ];
@@ -701,7 +735,7 @@ class ControllerBase {
      *
 	 * @example
 	 * ```php
-	 *  //Se generan los datos de conexión
+	 *  // Se generan los datos de conexión
      *  $BD_Data = [
      *      'HOSTNAME' => $Host,
      *      'USERNAME' => $Admin_Usuario,
@@ -1129,7 +1163,6 @@ class ControllerBase {
         return '';
     }
 
-
     /************************************************************************************************************/
     /**
      * Realiza la limpieza y saneamiento de una cadena de texto para prevenir ataques básicos y errores de formato.
@@ -1325,6 +1358,78 @@ class ControllerBase {
         ];
 
     }
+
+    /************************************************************************************************************/
+    /**
+     * Genera un nombre único para un archivo.
+     *
+     * El nombre está compuesto opcionalmente por un nombre específico,
+     * seguido de la fecha y hora actual y una cadena hexadecimal generada
+     * mediante bytes aleatorios criptográficamente seguros.
+     *
+     * Formato con nombre:
+     * nombre_YYYYMMDDHHMMSS_random
+     *
+     * Formato sin nombre:
+     * YYYYMMDDHHMMSS_random
+     *
+     * Ejemplo con nombre:
+     * documento_20260919203745_a7f3c91d8e4b2a6f
+     *
+     * Ejemplo sin nombre:
+     * 20260919203745_a7f3c91d8e4b2a6f
+     *
+     * @param string|null $nombre Nombre específico opcional para anteponer al archivo.
+     *
+     * @return string Nombre generado para el archivo.
+     */
+    protected function generarNombreArchivo(?string $nombre = null): string {
+        $nombreArchivo = date('YmdHis') . '_' . bin2hex(random_bytes(8));
+
+        if ($nombre !== null && $nombre !== '') {
+            $nombreArchivo = $nombre . '_' . $nombreArchivo;
+        }
+
+        return $nombreArchivo;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Valida el resultado obtenido al descifrar un identificador o un valor de texto.
+     *
+     * El resultado se considera válido cuando:
+     * - El campo `success` existe y tiene el valor booleano true.
+     * - El campo `data` está definido.
+     * - El tipo solicitado corresponde a uno de los tipos soportados.
+     * - Para el tipo `id`, el valor de `data` es numérico y mayor que cero.
+     * - Para el tipo `text`, el valor de `data` es una cadena no vacía después
+     *   de eliminar los espacios en blanco de sus extremos.
+     *
+     * Los tipos no soportados se consideran inválidos.
+     *
+     * @param array  $DataID Resultado obtenido del proceso de descifrado, incluyendo
+     *                        los campos `success` y `data`.
+     * @param string &$type  Tipo de dato que se utilizará para validar el valor
+     *                        descifrado. Los tipos soportados son `id` y `text`.
+     *
+     * @return bool Retorna true cuando el valor descifrado cumple las validaciones
+     *              correspondientes al tipo indicado; en caso contrario, retorna false.
+     */
+    protected function isValidDecrypted(array $DataID, string $type): bool {
+
+        // Verifica que el descifrado haya sido exitoso y que exista el dato resultante.
+        if (($DataID['success'] ?? false) !== true || !isset($DataID['data'])) {
+            return false;
+        }
+
+        // Valida el dato según el tipo solicitado.
+        switch ($type) {
+            case 'id':   return is_numeric($DataID['data']) && (int)$DataID['data'] > 0;    // Identificador numérico.
+            case 'text': return is_string($DataID['data']) && trim($DataID['data']) !== ''; // Texto no vacío.
+            default:     return false;                                                      // Tipo no soportado.
+        }
+    }
+
 
 
 
