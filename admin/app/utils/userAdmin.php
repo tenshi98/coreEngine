@@ -61,8 +61,6 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Pruebas
     $f3->route('GET  /Core/testeos/controladores',            'testeos->controladores');  //Pruebas al controlador base
     $f3->route('GET  /Core/testeos/funciones',                'testeos->funciones');      //Pruebas a las funciones
-    $f3->route('GET  /Core/testeos/inteligenciaArtificial',   'testeos->IA_View');        //Prueba del chat GPT
-    $f3->route('POST /Core/testeos/inteligenciaArtificial',   'testeos->IA_Response');    //Respuesta del chat GPT
     //Envios de datos
     $f3->route('GET /Core/testeos/send_SMTPMail',            'testeos->SMTPMail');                 //Envio de correo por SMTP (solo un correo, con uno o varios receptores)
     $f3->route('GET /Core/testeos/send_GMail',               'testeos->GMail');                    //Envio de correo por Gmail (solo un correo, con uno o varios receptores)
@@ -216,6 +214,14 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     $f3->route('PUT /Core/plataforma/instalacion/installModule',               'sistemaInstalacion->installModule');     //Instalacion de modulos
     $f3->route('PUT /Core/plataforma/instalacion/uninstallModule',             'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
     $f3->route('GET /Core/plataforma/rutas/listado',                           'sistemaRutas->Resumen');                 // Listar las rutas disponibles
+    /*************************************************************/
+    /*                   Sistema de Testeos                      */
+    /*************************************************************/
+    //Vistas
+    $f3->route('GET /Core/plataforma/testeos/resumen',                         'sistemaTesteos->Resumen');               // Listar pruebas de los modulos instalados
+    //Acciones
+    $f3->route('POST /Core/plataforma/testeos/executeTest',                    'sistemaTesteos->executeTest');           // Ejecucion individual de una prueba
+    $f3->route('POST /Core/plataforma/testeos/executeAllTests',                'sistemaTesteos->executeAllTests');       // Ejecucion de todas las pruebas de un modulo
 
 
 }
