@@ -192,6 +192,9 @@ El driver preserva automáticamente la estructura de subcarpetas definida en
 ### Local
 - La carpeta `upload/` no debe contener `.php` ejecutable (añadir `.htaccess` con `php_flag engine off`).
 - Verificar que el servidor web no sirva archivos `.env`, `.htpasswd`, etc.
+- `FileManager` bloquea **en la subida real** los nombres de `EXCLUDED_NAMES` (`.htaccess`, `.env`, `config.php`, …), cualquier archivo oculto (nombre que comienza por `.`) y toda extensión de `BLOCKED_EXTENSIONS` (incl. `htaccess`/`htpasswd`), tanto en `validateFiles()` como en `saveFileViaDriver()`.
+- La extensión final del archivo almacenado **no se toma del cliente**: en las subidas multipart (`handleNormalUpload`) se valida el MIME real contra la lista blanca por categoría y se **sustituye la extensión** por la derivada del MIME (`resolveExtensionFromMime`), igual que en el flujo Base64. Esto neutraliza variantes como `pht`, `php7`, `phps` o `shtml`.
+- **Ningún driver borra la base con una ruta vacía.** `deleteDirectory('')` (o una ruta compuesta solo por `/`) se rechaza en los 4 drivers antes de tocar el sistema de archivos o la API remota: en Local habría borrado `upload/` completo de forma recursiva y en S3/GCS el bucket entero. Es una defensa en profundidad: aunque un llamador futuro omitiera la validación de `FileManager::deleteFolder()`, el driver no ejecutaría el borrado.
 
 ---
 

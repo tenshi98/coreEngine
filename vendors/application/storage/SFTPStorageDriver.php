@@ -170,6 +170,15 @@ class SFTPStorageDriver implements StorageDriverInterface
     /** {@inheritdoc} */
     public function deleteDirectory(string $dirPath): array
     {
+        /*──────────────────────────────────────────────────────────────────────*/
+        // Defensa en profundidad: una ruta vacía resuelve a la ruta BASE del
+        // servidor remoto y el borrado recursivo destruiría todo el contenido.
+        // FileManager ya lo rechaza, pero el driver no debe depender de esa capa.
+        /*──────────────────────────────────────────────────────────────────────*/
+        if (trim($dirPath, '/') === '') {
+            return ['success' => false, 'message' => 'No se permite eliminar la carpeta raíz'];
+        }
+
         $full = $this->buildPath($dirPath);
 
         // Si no existe, se considera exitoso (idempotente)

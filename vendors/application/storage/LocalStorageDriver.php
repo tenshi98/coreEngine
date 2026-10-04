@@ -127,6 +127,16 @@ class LocalStorageDriver implements StorageDriverInterface
     /** {@inheritdoc} */
     public function deleteDirectory(string $dirPath): array
     {
+        /*──────────────────────────────────────────────────────────────────────*/
+        // Defensa en profundidad: una ruta vacía (o solo con barras) apunta a la
+        // CARPETA BASE completa del driver. Borrarla eliminaría TODO el
+        // almacenamiento, por lo que se rechaza a este nivel aunque la capa
+        // superior (FileManager) ya lo valide.
+        /*──────────────────────────────────────────────────────────────────────*/
+        if (trim($dirPath, '/') === '') {
+            return ['success' => false, 'message' => 'No se permite eliminar la carpeta raíz'];
+        }
+
         $full = $this->baseDir . ltrim($dirPath, '/');
 
         // Si la carpeta no existe se considera operación exitosa (idempotente)

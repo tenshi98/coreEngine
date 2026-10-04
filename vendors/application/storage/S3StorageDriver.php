@@ -238,6 +238,15 @@ class S3StorageDriver implements StorageDriverInterface
     /** {@inheritdoc} */
     public function deleteDirectory(string $dirPath): array
     {
+        /*──────────────────────────────────────────────────────────────────────*/
+        // Defensa en profundidad: una ruta vacía construye el prefijo GLOBAL y
+        // borraría el bucket completo. FileManager ya lo rechaza, pero el driver
+        // no debe depender de esa capa superior.
+        /*──────────────────────────────────────────────────────────────────────*/
+        if (trim($dirPath, '/') === '') {
+            return ['success' => false, 'message' => 'No se permite eliminar la carpeta raíz'];
+        }
+
         $prefix = $this->buildKey($dirPath);
         if (!str_ends_with($prefix, '/')) {
             $prefix .= '/';
