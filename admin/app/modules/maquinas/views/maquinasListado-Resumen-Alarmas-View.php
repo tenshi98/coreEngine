@@ -22,19 +22,22 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" data-modal-close="PopupModalLarge"></button>
 </div>
 <div class="modal-body">
 
     <?php
     $arrData = [
-        ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'FVencimiento', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FVencimiento'])],
-        ['Icon' => '','Titulo' => 'Observación',  'Texto' => $data['rowData']['Observacion']],
+        ['Icon' => '','Titulo' => 'Nombre',            'Texto' => $data['rowData']['Nombre']],
+        ['Icon' => '','Titulo' => 'Fecha Vencimiento', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FVencimiento'])],
+        ['Icon' => '','Titulo' => 'Observación',       'Texto' => $data['rowData']['Observacion']],
     ];
+    echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
     $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
 
-    $data['Fnc_WidgetsCommon']->previewDocs($data['UserData']['MainPathUrl'], '', $data['rowData']['NombreArchivo']);
+    echo '<h5 class="box-title text-color-red-dark">Previsualización</h5>';
+    $data['Fnc_WidgetsCommon']->previewDocs($BASE, 'upload', $data['rowData']['NombreArchivo']);
+
     ?>
 
 </div>

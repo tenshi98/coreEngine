@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
 
@@ -95,23 +97,24 @@
                     <?php }else{ ?>
                         <div class="d-flex justify-content-center pt-3">
                             <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-6 col-xxl-5">
-                                <?php $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Direccion_img','URL' => $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update','ExtraData' => '"idMaquina": '.$data['rowData']['idMaquina']]);?>
+                                <?php
+                                // Se construye el dato
+                                $ExtraData  = '"idMaquina": '.$data['rowData']['idMaquina'];
+                                $ExtraData .= ',"idEstado": '.$data['rowData']['idEstado'];
+                                $ExtraData .= ',"Nombre": "'.$data['rowData']['Nombre'].'"';
+                                // Se imprime el dato
+                                $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Direccion_img','URL' => $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update','ExtraData' => $ExtraData]);?>
                             </div>
                         </div>
                     <?php } ?>
                 </div>
-
-                <?php
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
-                ?>
 
                 <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Documentos de <?php echo $data['rowData']['Nombre']; ?>
-                                <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                <button type="button" class="btn btn-success"  onclick="tabDocumentosNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                             </div>
                         </h5>
                         <div class="clearfix"></div>
@@ -125,7 +128,7 @@
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
-                            <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                            <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
@@ -139,7 +142,7 @@
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Componentes de <?php echo $data['rowData']['Nombre']; ?>
-                                <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                             </div>
                         </h5>
                         <div class="clearfix"></div>
@@ -164,7 +167,7 @@
                             <h5 class="text-color-red-dark">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                     Sensores de <?php echo $data['rowData']['Nombre']; ?>
-                                    <button type="button" class="btn btn-success"  onclick="tabSensoresNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                    <button type="button" class="btn btn-success"  onclick="tabSensoresNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                                 </div>
                             </h5>
                             <div class="clearfix"></div>
@@ -177,7 +180,7 @@
                             <h5 class="text-color-red-dark">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                     Alarmas Personalizadas de <?php echo $data['rowData']['Nombre']; ?>
-                                    <button type="button" class="btn btn-success"  onclick="tabAlarmasNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                    <button type="button" class="btn btn-success"  onclick="tabAlarmasNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                                 </div>
                             </h5>
                             <div class="clearfix"></div>
@@ -204,7 +207,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -226,7 +229,7 @@
             let Informacion = $("#FormEditData").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>'},
+                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$DataID['data']; ?>'},
                 ],
                 showNoti:'Datos Editados Correctamente',
                 triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
@@ -241,7 +244,7 @@
     /*********************************************************************/
     /*                             IMAGENES                              */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function delIMG(File) {
         Swal.fire({
             title: "Borrar Imagen",
@@ -265,7 +268,7 @@
                     "Direccion_img": File
                 };
                 const Options     = {
-                    Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>',
+                    Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$DataID['data']; ?>',
                     closeObject:'#PDloader',
                 };
                 //Se envian los datos al formulario
@@ -280,7 +283,7 @@
         /*********************************************************************/
         // Variables
         let DocumentosLoad = 0;
-        /******************************************/
+        /************************************/
         function tabDocumentosLoadList() {
             //Comparo
             if(DocumentosLoad===0){
@@ -288,7 +291,7 @@
                 $('#PDloader').show();
                 //Ejecuto
                 let Div       = '#tabDocumentosDataTable';
-                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>';
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$DataID['data']; ?>';
                 const Options = {
                     closeObject:'#PDloader',
                     refreshTables:'true',
@@ -299,7 +302,7 @@
                 DocumentosLoad = 1;
             }
         }
-        /******************************************/
+        /************************************/
         function tabDocumentosNew(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -313,7 +316,7 @@
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function tabDocumentosView(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -327,7 +330,7 @@
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function tabDocumentosEdit(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -341,7 +344,7 @@
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function tabDocumentosDel(ID, Dato) {
             Swal.fire({
                 title: "Borrar Dato",
@@ -363,7 +366,7 @@
                     let Informacion = {"idDocumentos": ID};
                     const Options     = {
                         UpdateDiv : [
-                            {Div:'#tabDocumentosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>', refreshTbl:'true'}
+                            {Div:'#tabDocumentosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                         ],
                         showNoti:'Dato Borrado Correctamente',
                         closeObject:'#PDloader',
@@ -379,7 +382,7 @@
     /*********************************************************************/
     // Variables
     let ObsLoad = 0;
-    /******************************************/
+    /************************************/
     function tabObsLoadList() {
         //Comparo
         if(ObsLoad===0){
@@ -387,7 +390,7 @@
             $('#PDloader').show();
             //Ejecuto
             let Div       = '#tabObsDataTable';
-            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>';
+            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$DataID['data']; ?>';
             const Options = {
                 closeObject:'#PDloader',
                 refreshTables:'true',
@@ -398,7 +401,7 @@
             ObsLoad = 1;
         }
     }
-    /******************************************/
+    /************************************/
     function tabObsNew(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -412,7 +415,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabObsView(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -426,7 +429,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabObsEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -440,7 +443,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabObsDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -462,7 +465,7 @@
                 let Informacion = {"idObservaciones": ID};
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>', refreshTbl:'true'}
+                        {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                     ],
                     showNoti:'Dato Borrado Correctamente',
                     closeObject:'#PDloader',
@@ -479,7 +482,7 @@
         /*********************************************************************/
         // Variables
         let ComponentesLoad = 0;
-        /******************************************/
+        /************************************/
         function tabComponentesLoadList() {
             //Comparo
             if(ComponentesLoad===0){
@@ -487,7 +490,7 @@
                 $('#PDloader').show();
                 //Ejecuto
                 let Div       = '#tabComponentesDataTable';
-                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>';
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/updateList/'.$DataID['data']; ?>';
                 const Options = {
                     closeObject:'#PDloader',
                     refreshTables:'true',
@@ -498,7 +501,7 @@
                 ComponentesLoad = 1;
             }
         }
-        /******************************************/
+        /************************************/
         function tabComponentesNew(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -512,7 +515,7 @@
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function tabComponentesView(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -526,7 +529,7 @@
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function tabComponentesEdit(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -540,7 +543,7 @@
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function tabComponentesDel(ID, Dato) {
             Swal.fire({
                 title: "Borrar Dato",
@@ -562,7 +565,7 @@
                     let Informacion = {"idComponentes": ID};
                     const Options     = {
                         UpdateDiv : [
-                            {Div:'#tabComponentesDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>', refreshTbl:'true'}
+                            {Div:'#tabComponentesDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                         ],
                         showNoti:'Dato Borrado Correctamente',
                         closeObject:'#PDloader',
@@ -598,7 +601,7 @@
                 let Informacion = $("#FormEditConfiguracion").serialize();
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>'},
+                        {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$DataID['data']; ?>'},
                     ],
                     showNoti:'Datos Editados Correctamente',
                     triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
@@ -615,7 +618,7 @@
             /*********************************************************************/
             // Variables
             let SensoresLoad = 0;
-            /******************************************/
+            /************************************/
             function tabSensoresLoadList() {
                 //Comparo
                 if(SensoresLoad===0){
@@ -623,7 +626,7 @@
                     $('#PDloader').show();
                     //Ejecuto
                     let Div       = '#tabSensoresDataTable';
-                    let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>';
+                    let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$DataID['data']; ?>';
                     const Options = {
                         closeObject:'#PDloader',
                         refreshTables:'true',
@@ -634,7 +637,7 @@
                     SensoresLoad = 1;
                 }
             }
-            /******************************************/
+            /************************************/
             function tabSensoresNew(ID) {
                 //Cargo el loader
                 $('#PDloader').show();
@@ -648,7 +651,7 @@
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
-            /******************************************/
+            /************************************/
             function tabSensoresView(ID) {
                 //Cargo el loader
                 $('#PDloader').show();
@@ -662,7 +665,7 @@
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
-            /******************************************/
+            /************************************/
             function tabSensoresEdit(ID) {
                 //Cargo el loader
                 $('#PDloader').show();
@@ -676,7 +679,7 @@
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
-            /******************************************/
+            /************************************/
             function tabSensoresDel(ID, Dato) {
                 Swal.fire({
                     title: "Borrar Dato",
@@ -698,7 +701,7 @@
                         let Informacion = {"idSensores": ID};
                         const Options     = {
                             UpdateDiv : [
-                                {Div:'#tabSensoresDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>', refreshTbl:'true'}
+                                {Div:'#tabSensoresDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                             ],
                             showNoti:'Dato Borrado Correctamente',
                             closeObject:'#PDloader',
@@ -713,7 +716,7 @@
             /*********************************************************************/
             // Variables
             let AlarmasLoad = 0;
-            /******************************************/
+            /************************************/
             function tabAlarmasLoadList() {
                 //Comparo
                 if(AlarmasLoad===0){
@@ -721,7 +724,7 @@
                     $('#PDloader').show();
                     //Ejecuto
                     let Div       = '#tabAlarmasDataTable';
-                    let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>';
+                    let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$DataID['data']; ?>';
                     const Options = {
                         closeObject:'#PDloader',
                         refreshTables:'true',
@@ -732,7 +735,7 @@
                     AlarmasLoad = 1;
                 }
             }
-            /******************************************/
+            /************************************/
             function tabAlarmasNew(ID) {
                 //Cargo el loader
                 $('#PDloader').show();
@@ -746,7 +749,7 @@
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
-            /******************************************/
+            /************************************/
             function tabAlarmasView(ID) {
                 //Cargo el loader
                 $('#PDloader').show();
@@ -760,7 +763,7 @@
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
-            /******************************************/
+            /************************************/
             function tabAlarmasEdit(ID) {
                 //Cargo el loader
                 $('#PDloader').show();
@@ -774,7 +777,7 @@
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
-            /******************************************/
+            /************************************/
             function tabAlarmasDel(ID, Dato) {
                 Swal.fire({
                     title: "Borrar Dato",
@@ -796,7 +799,7 @@
                         let Informacion = {"idAlarmas": ID};
                         const Options     = {
                             UpdateDiv : [
-                                {Div:'#tabAlarmasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']); ?>', refreshTbl:'true'}
+                                {Div:'#tabAlarmasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                             ],
                             showNoti:'Dato Borrado Correctamente',
                             closeObject:'#PDloader',
