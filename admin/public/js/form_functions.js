@@ -279,8 +279,3 @@ function soloRut(e){
 		return false;
 	}
 }
-/*******************************************************************************/
-//normalizar la URL sin romper el protocolo
-function normalizarURL(url) {
-	return url.replace(/([^:]\/)\/+/g, '$1');
-}
