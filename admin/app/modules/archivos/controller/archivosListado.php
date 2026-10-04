@@ -2,7 +2,7 @@
 /*******************************************************************************************************************/
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
-class archivosListado extends ControllerBase {
+class archivosListado extends ControllerFiles {
 
     /*******************************************************************/
     // Variables
@@ -13,14 +13,10 @@ class archivosListado extends ControllerBase {
     // Constructor
     /*******************************************************************/
     public function __construct(){
-        /*=========== Se instancian los datos ===========*/
-        $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
-        $queryBuilder  = new QueryBuilder();
-        $checkData     = new CheckData();
         /*================== Instancias =================*/
         $this->controllerName = 'archivosListado';
         /*========== Datos para la clase padre ==========*/
-        parent::__construct($DB_conn_1, $queryBuilder, $checkData);
+        parent::__construct();
     }
 
     /******************************************************************************/
@@ -30,6 +26,14 @@ class archivosListado extends ControllerBase {
     // Listar
     /*******************************************************************/
     public function listAll($f3){
+
+        /************************************/
+        // Se concede el nivel de acceso para este módulo (ámbito 'archivosListado').
+        // Es el punto de ORIGEN de la autorización: aquí es donde se conoce el nivel real
+        // del usuario. Los endpoints genéricos /core/fileExplorer/* solo validan esta
+        // concesión (ScopeAccess::check) y nunca confían en un nivel enviado por el cliente.
+        /************************************/
+        ScopeAccess::grant($f3, $this->controllerName, $this->getArrLevel($f3, $this->controllerName)['LevelAccess'] ?? 0);
 
         //Datos enviados a la pagina
         $f3->data = [
