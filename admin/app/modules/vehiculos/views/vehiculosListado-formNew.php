@@ -1,0 +1,92 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
+<div class="modal fade" id="newFormModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form id="FormNewData" name="FormNewData" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+                <div class="modal-header">
+                    <?php
+                    switch ($data['UserData']["sistemaModalSubtitle"]) {
+                        case 1:
+                            echo '
+                            <h5 class="modal-title">
+                                <i class="bi bi-file-earmark"></i> Crear Nuevo
+                            </h5>';
+                            break;
+                        case 2:
+                            echo '
+                            <h5 class="modal-title modal-subtitle">
+                                <div class="icon"><i class="bi bi-file-earmark"></i></div>
+                                Crear Nuevo<br>
+                                <small>Permite crear un nuevo elemento</small>
+                            </h5>';
+                            break;
+                    } ?>
+                    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
+                </div>
+                <div class="modal-body">
+                    <?php
+                    //se dibujan los inputs
+                    $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo',        'Name' => 'idTipo',       'Value' => '','Required' => 2,'arrData' => $data['arrTipo']]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',      'Name' => 'Nombre',       'Value' => '','Required' => 2]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',       'Name' => 'Marca',        'Value' => '','Required' => 1]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Modelo',      'Name' => 'Modelo',       'Value' => '','Required' => 1]);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Patente',     'Name' => 'Patente',      'Value' => '','Required' => 1]);
+                    $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo Carga',  'Name' => 'idTipoCarga',  'Value' => '','Required' => 1,'arrData' => $data['arrTipoCarga']]);
+
+                    //datos ocultos
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
+
+                    ?>
+                </div>
+                <div class="modal-footer">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
+                        <button type="button" class="btn btn-danger" data-bs-dismiss="modal"><i class="bx bi-x-circle"></i> Cerrar</button>
+                        <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    /*********************************************************************/
+    /*                      EJECUCION DE LA LOGICA                       */
+    /*********************************************************************/
+    /************************************/
+    $("#FormNewData").submit(function(e) {
+        //Se validan los datos de los formularios
+        var validatorResult = validator.checkAll(this);
+        //verifico el resultado
+        if(validatorResult.valid===false){
+            return !!validatorResult.valid;
+        }else{
+            // Si ya se está ejecutando, salimos
+            if (ejecutandoForm.valor) return;
+            //Cambio los valores
+            ejecutandoForm.valor = true;
+            //Ejecucion normal
+            e.preventDefault();
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Metodo      = 'POST';
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess']; ?>';
+            let Informacion = $("#FormNewData").serialize();
+            const Options     = {
+                DestinoFrom:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'; ?>',
+                ClearForm:'FormNewData',
+                closeObject:'#PDloader',
+                changeValForm: ejecutandoForm,
+            };
+            //Se envian los datos al formulario
+            SendDataForms(Metodo, Direccion, Informacion, Options);
+        }
+    });
+
+</script>
