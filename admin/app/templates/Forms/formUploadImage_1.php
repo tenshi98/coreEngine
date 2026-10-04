@@ -8,7 +8,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Seleccionar Zona</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
             </div>
             <div class="modal-body" style="min-height: 410px;">
                 <div id="<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Preview"></div>
@@ -22,7 +22,7 @@
 </div>
 
 <script>
-    /******************************************/
+    /************************************/
     $(document).ready(function(){
         //medidas de la imagen
         $image_crop = $("#<?php echo htmlspecialchars($name, ENT_QUOTES, 'UTF-8'); ?>Preview").croppie({

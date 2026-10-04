@@ -126,7 +126,7 @@
         <?php } ?>
 
         <script>
-            /******************************************/
+            /************************************/
             //Estancia del validacion formularios
             var validator = new FormValidator();
             //Se declara variable para evitar datos duplicados
@@ -203,4 +203,3 @@
                     <a href="#" class="btn btn-secondary"><?php echo $data['PageTitle']; ?></a>
                 </div>
             </div>
-

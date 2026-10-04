@@ -8,11 +8,11 @@
     </li>
 
     <?php
-    //Verifico si hay datos
+    // Verifico si hay datos
     if(is_array($_SESSION['arrMenu'])){
-      //Variable
+      // Variable
       $x_var = 0;
-      //Recorro
+      // Recorro
       foreach ($_SESSION['arrMenu'] as $Categoria=>$permisos){
         //var
         $x_var++;

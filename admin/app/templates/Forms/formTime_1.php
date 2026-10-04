@@ -13,6 +13,7 @@
     $("#<?php echo htmlspecialchars($nameID, ENT_QUOTES, 'UTF-8'); ?>").clockpicker({
         placement: "<?php echo htmlspecialchars($x_pos, ENT_QUOTES, 'UTF-8'); ?>",
         align: "left",
-        donetext: "Listo"
+        donetext: "Aceptar",
+        autoclose: true,
     });
 </script>

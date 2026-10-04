@@ -47,6 +47,38 @@
       </div>
     </div>
 
+    <div id="PopupModalSmall" class="PopupModal-overlay">
+      <div class="PopupModal PopupModal-sm" id="popupModalContent-sm">
+
+      </div>
+    </div>
+
+    <div id="PopupModalMedium" class="PopupModal-overlay">
+      <div class="PopupModal PopupModal-md" id="popupModalContent-md">
+
+      </div>
+    </div>
+
+    <div id="PopupModalLarge" class="PopupModal-overlay">
+      <div class="PopupModal PopupModal-lg" id="popupModalContent-lg">
+
+      </div>
+    </div>
+
+    <div id="PopupModalXL" class="PopupModal-overlay">
+      <div class="PopupModal PopupModal-xl" id="popupModalContent-xl">
+
+      </div>
+    </div>
+
+    <div id="PopupModalFullscreen" class="PopupModal-overlay">
+      <div class="PopupModal PopupModal-fullscreen" id="popupModalContent-fullscreen">
+
+      </div>
+    </div>
+
+
+
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
     <!-- Vendor JS Files -->
@@ -70,7 +102,7 @@
 
     <!-- Archivos de la Plataforma -->
     <script type="text/javascript" src="<?php echo $BASE.'/js/main.js'; ?>"></script>
-    <script type="text/javascript" src="<?php echo $BASE.'/js/functions.js'; ?>"></script>
+    <script type="text/javascript" src="<?php echo $BASE.'/js/functions_v2.js'; ?>"></script>
 
     <!-- Upload And Crop Image -->
     <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/upload_and_crop_image/croppie.css'; ?>">

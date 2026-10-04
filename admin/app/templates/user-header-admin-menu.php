@@ -95,18 +95,19 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             </ul>
             <ul>
                 <li class="dropdown-tittle">Widgets</li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/box'; ?>">           <i class="bi bi-puzzle text-color-red"></i> Box</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Time Line</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/dividers'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Divider</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/codeVisor'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Visor de Codigo</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/meteo'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget meteorologico</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/feed'; ?>">          <i class="bi bi-puzzle text-color-red"></i> Feed de noticias</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/radio'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget radio</a></li>
-                <li><a href="<?php echo $BASE.'/Core/Widgets/fileExplorer'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Widget fileExplorer</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/box'; ?>">              <i class="bi bi-puzzle text-color-red"></i> Box</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Time Line</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/dividers'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Divider</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/components'; ?>">       <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/codeVisor'; ?>">        <i class="bi bi-puzzle text-color-red"></i> Visor de Codigo</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/meteo'; ?>">            <i class="bi bi-puzzle text-color-red"></i> Widget meteorologico</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/feed'; ?>">             <i class="bi bi-puzzle text-color-red"></i> Feed de noticias</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/radio'; ?>">            <i class="bi bi-puzzle text-color-red"></i> Widget radio</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/fileExplorer'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Widget fileExplorer</a></li>
+                <li><a href="<?php echo $BASE.'/Core/Widgets/viewsComponents'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Componentes para Vistas</a></li>
                 <li class="divider"></li>
             </ul>
         </li>

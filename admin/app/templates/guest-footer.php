@@ -23,7 +23,7 @@
 
         <!-- Archivos de la Plataforma -->
         <script type="text/javascript" src="<?php echo $BASE.'/js/main.js?get='.time(); ?>"></script>
-        <script type="text/javascript" src="<?php echo $BASE.'/js/functions.js?get='.time(); ?>"></script>
+        <script type="text/javascript" src="<?php echo $BASE.'/js/functions_v2.js?get='.time(); ?>"></script>
 
         <!-- Upload And Crop Image -->
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/vendor/upload_and_crop_image/croppie.css'; ?>">

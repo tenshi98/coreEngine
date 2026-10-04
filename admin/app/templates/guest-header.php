@@ -117,7 +117,7 @@
         <link rel="stylesheet" type="text/css" href="<?php echo $BASE.'/css/extra_buttons.css?get='.time(); ?>">
 
         <script>
-            /******************************************/
+            /************************************/
             //Estancia del validacion formularios
             var validator = new FormValidator();
             //Se declara variable para evitar datos duplicados
@@ -127,4 +127,3 @@
     </head>
 
     <body>
-

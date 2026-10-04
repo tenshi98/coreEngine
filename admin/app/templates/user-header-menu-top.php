@@ -3,13 +3,13 @@
 <ul class="dropdown-menu dropdown-menu-large dropdown-menu-large-arrow row">
 
     <?php
-    //Verifico si hay datos
+    // Verifico si hay datos
     if(is_array($_SESSION['arrMenu'])){
         // Variables iniciales
         $Colmn      = 9;
         $arrMenu    = '<li class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-4">';
         $countMenu  = 0;
-        //Recorro
+        // Recorro
         foreach ($_SESSION['arrMenu'] as $Categoria=>$permisos){
             // Variables
             $countMenu = 0;
