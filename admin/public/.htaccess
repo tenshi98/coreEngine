@@ -36,7 +36,14 @@
     ErrorDocument 405 /405.php
     ErrorDocument 500 /500.php
     ErrorDocument 503 /503.php
-    RewriteCond %{REQUEST_METHOD} ^(HEAD|TRACE|DELETE|TRACK|DEBUG) [NC]
+    #### Metodos NO permitidos: solo los que son vector de ataque clasico.
+    #### DELETE NO se bloquea a proposito: la plataforma lo usa como verbo de API en las
+    #### vistas (SendDataForms('DELETE', ...) -> Controladores Base_delete). Incluirlo aqui
+    #### devolveria un 403 de Apache en lugar de la respuesta JSON de la aplicacion.
+    #### NOTA: por el [L] de "RewriteRule .* index.php [L,QSA]" (y del [L] de la regla
+    #### siguiente) esta seccion es codigo muerto para las rutas enrutadas: se conserva
+    #### como capa de defensa en profundidad si ese orden de reglas llegara a cambiar.
+    RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK|DEBUG) [NC]
     RewriteRule ^(.*)$ - [F]
     RewriteCond %{REQUEST_URI} (wp-config\.php|config\.php|bb-config\.php|timthumb\.php|phpthumb\.php|thumb\.php|thumbs\.php|debug\.log) [NC,OR]
     RewriteCond %{REQUEST_URI} \.(htaccess|htpasswd|errordocs|logs|po|mo|ini|inc)$ [NC,OR]
@@ -95,9 +102,15 @@
     <FilesMatch ".(ico|gif|jpg|jpeg|png|flv|pdf)$">
         Header set Cache-Control "max-age=29030400"
     </FilesMatch>
-    # WEEK
+    #### WEEK -> 1 HOUR con revalidacion obligatoria.
+    #### Antes era "max-age=604800" (7 dias) sin must-revalidate: eso permitia que un JS
+    #### desactualizado siguiera sirviendo en los navegadores hasta una semana. Fue
+    #### justamente lo que provoco el fallo de CSRF (419): functions_v2.js con la
+    #### inyeccion del token llego tarde al navegador y la peticion salia sin token.
+    #### Mitigacion a nivel servidor; la solucion definitiva es cache-buster (?get=) en
+    #### las plantillas que cargan el JS (ver user-footer.php / user-header.php).
     <FilesMatch ".(js|css|swf)$">
-        Header set Cache-Control "max-age=604800"
+        Header set Cache-Control "max-age=3600, must-revalidate"
     </FilesMatch>
     # 45 MIN
     <FilesMatch ".(html|htm|txt)$">
