@@ -15,6 +15,9 @@
                 'Route'            => 'fileExplorer',
                 'ValidarTipo'      => '',
                 'levelPermission'  => $data['UserAccess']['LevelAccess'],
+                // Ámbito de autorización: el endpoint valida la concesión que este módulo
+                // registró en sesión al renderizar la vista (ver archivosListado.php)
+                'AccessScope'      => 'archivosListado',
             ];
             $data['Fnc_WidgetsCommon']->widget_fileExplorer($Options);
             ?>

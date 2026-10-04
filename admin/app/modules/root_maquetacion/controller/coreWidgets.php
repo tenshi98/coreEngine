@@ -277,6 +277,14 @@ class coreWidgets extends ControllerBase {
     // Explorador de archivos
     /*******************************************************************/
     public function fileExplorer($f3){
+
+        /************************************/
+        // Se concede el nivel de acceso para esta vista (ámbito 'coreWidgets').
+        // Mismo criterio que archivosListado: el origen conoce el nivel real del usuario
+        // y lo registra en sesión; los endpoints /core/fileExplorer/* solo lo validan.
+        /************************************/
+        $scope = ScopeAccess::grant($f3, 'coreWidgets', $this->getArrLevel($f3, $this->controllerName)['LevelAccess'] ?? 0);
+
         //Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
@@ -289,6 +297,8 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            /*=========== Ámbito concedido ===========*/
+            'AccessScope'   => $scope,
         ];
 
         /************************************/

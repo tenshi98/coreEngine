@@ -14,7 +14,10 @@
                 'rootPath'         => $data['UserData']['MainPathUrl'],
                 'Route'            => 'fileExplorer',
                 'ValidarTipo'      => '',
-                'levelPermission'  => '',
+                'levelPermission'  => $data['UserAccess']['LevelAccess'],
+                // Ámbito de autorización: el endpoint valida la concesión que este módulo
+                // registró en sesión al renderizar la vista (ver coreWidgets.php)
+                'AccessScope'      => 'coreWidgets',
             ];
             $data['Fnc_WidgetsCommon']->widget_fileExplorer($Options);
             ?>
