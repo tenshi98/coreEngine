@@ -26,7 +26,7 @@
                     /********************************/
                     // leaFlet maps
                     case 2:
-                        //variable para los marcadores
+                        // Variable para los marcadores
                         $arrMarkers = [
                             [
                                 $data['rowData']['Latitud'],

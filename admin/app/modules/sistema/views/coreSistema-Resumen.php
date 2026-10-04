@@ -31,24 +31,24 @@
                                 <?php
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos Basicos', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',    'Name'  => 'Sistema_Nombre',    'Value'  => $data['rowData']['Sistema_Nombre'] ?? '',    'Required'  => 2]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',     'Name'  => 'Sistema_Email',     'Value'  => $data['rowData']['Sistema_Email'] ?? '',     'Required'  => 1,'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',       'Name'  => 'Sistema_Rut',       'Value'  => $data['rowData']['Sistema_Rut'] ?? '',       'Required'  => 1,'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',    'Name1' => 'Sistema_idCiudad',  'Value1' => $data['rowData']['Sistema_idCiudad'] ?? '',  'Required1' => 1,'arrData1' => $data['arrCiudad'],
-                                                                                      'Placeholder2' => 'Comuna',    'Name2' => 'Sistema_idComuna',  'Value2' => $data['rowData']['Sistema_idComuna'] ?? '',  'Required2' => 1,'arrData2' => $data['arrComuna']]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección', 'Name'  => 'Sistema_Direccion', 'Value'  => $data['rowData']['Sistema_Direccion'] ?? '', 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Nombre',    'Name'  => 'Sistema_Nombre',    'Value'  => ($data['rowData']['Sistema_Nombre'] ?? ''),    'Required'  => 2]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder'  => 'Email',     'Name'  => 'Sistema_Email',     'Value'  => ($data['rowData']['Sistema_Email'] ?? ''),     'Required'  => 1,'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder'  => 'Rut',       'Name'  => 'Sistema_Rut',       'Value'  => ($data['rowData']['Sistema_Rut'] ?? ''),       'Required'  => 1,'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Ciudad',    'Name1' => 'Sistema_idCiudad',  'Value1' => ($data['rowData']['Sistema_idCiudad'] ?? ''),  'Required1' => 1,'arrData1' => $data['arrCiudad'],
+                                                                                      'Placeholder2' => 'Comuna',    'Name2' => 'Sistema_idComuna',  'Value2' => ($data['rowData']['Sistema_idComuna'] ?? ''),  'Required2' => 1,'arrData2' => $data['arrComuna']]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección', 'Name'  => 'Sistema_Direccion', 'Value'  => ($data['rowData']['Sistema_Direccion'] ?? ''), 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
                                 //Se condiciona el uso de Whatsapp
                                 if($data['UserData']["sistemaUsoWhatsapp"]==2){
                                     $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => $data['rowData']['Sistema_NotiWhatsapp'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => ($data['rowData']['Sistema_NotiWhatsapp'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
                                 }
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4, 'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => $data['rowData']['Social_X'] ?? '',         'Required' => 1, 'Icon' => 'bi bi-x']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => $data['rowData']['Social_Facebook'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-facebook']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => $data['rowData']['Social_Instagram'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-instagram']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => $data['rowData']['Social_Linkedin'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',         'Value' => ($data['rowData']['Social_X'] ?? ''),         'Required' => 1, 'Icon' => 'bi bi-x']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Facebook',    'Name' => 'Social_Facebook',  'Value' => ($data['rowData']['Social_Facebook'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-facebook']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => ($data['rowData']['Social_Instagram'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-instagram']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => ($data['rowData']['Social_Linkedin'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
@@ -70,15 +70,17 @@
                                 <?php
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos de Contacto', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Contacto_Nombre',   'Value' => $data['rowData']['Contacto_Nombre'] ?? '', 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'Contacto_Fono1',    'Value' => $data['rowData']['Contacto_Fono1'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 2', 'Name' => 'Contacto_Fono2',    'Value' => $data['rowData']['Contacto_Fono2'] ?? '',  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fax',    'Name' => 'Contacto_Fax',      'Value' => $data['rowData']['Contacto_Fax'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'Contacto_Email',    'Value' => $data['rowData']['Contacto_Email'] ?? '',  'Required' => 1, 'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',    'Name' => 'Contacto_Web',      'Value' => $data['rowData']['Contacto_Web'] ?? '',    'Required' => 1, 'Icon' => 'ri-edge-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'Contacto_Nombre',   'Value' => ($data['rowData']['Contacto_Nombre'] ?? ''), 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'Contacto_Fono1',    'Value' => ($data['rowData']['Contacto_Fono1'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 2', 'Name' => 'Contacto_Fono2',    'Value' => ($data['rowData']['Contacto_Fono2'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fax',    'Name' => 'Contacto_Fax',      'Value' => ($data['rowData']['Contacto_Fax'] ?? ''),    'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'Contacto_Email',    'Value' => ($data['rowData']['Contacto_Email'] ?? ''),  'Required' => 1, 'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Web',    'Name' => 'Contacto_Web',      'Value' => ($data['rowData']['Contacto_Web'] ?? ''),    'Required' => 1, 'Icon' => 'ri-edge-fill']);
 
                                 //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema',      'Value' => $data['rowData']['idSistema'],      'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Sistema_Nombre', 'Value' => $data['rowData']['Sistema_Nombre'], 'Required' => 2]);
+
                                 ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                     <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
@@ -97,13 +99,14 @@
                                 <?php
                                 //se dibujan los inputs
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Datos del Representante', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'RepresentanteNombre',  'Value' => $data['rowData']['RepresentanteNombre'] ?? '', 'Required' => 1]);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',    'Name' => 'RepresentanteRut',     'Value' => $data['rowData']['RepresentanteRut'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-person-circle']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'RepresentanteFono',    'Value' => $data['rowData']['RepresentanteFono'] ?? '',   'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'RepresentanteEmail',   'Value' => $data['rowData']['RepresentanteEmail'] ?? '',  'Required' => 1, 'Icon' => 'bx bx-mail-send']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre', 'Name' => 'RepresentanteNombre',  'Value' => ($data['rowData']['RepresentanteNombre'] ?? ''), 'Required' => 1]);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',    'Name' => 'RepresentanteRut',     'Value' => ($data['rowData']['RepresentanteRut'] ?? ''),    'Required' => 1, 'Icon' => 'bi bi-person-circle']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Fono 1', 'Name' => 'RepresentanteFono',    'Value' => ($data['rowData']['RepresentanteFono'] ?? ''),   'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',  'Name' => 'RepresentanteEmail',   'Value' => ($data['rowData']['RepresentanteEmail'] ?? ''),  'Required' => 1, 'Icon' => 'bx bx-mail-send']);
 
                                 //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema',      'Value' => $data['rowData']['idSistema'],      'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Sistema_Nombre', 'Value' => $data['rowData']['Sistema_Nombre'], 'Required' => 2]);
                                 ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                     <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
@@ -124,25 +127,25 @@
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'APIS', 'Clase' => 'box-title text-color-red-dark']);
                                 //Se condiciona el motor de mapas
                                 switch ($data['UserData']["Config_motorMap"]) {
-                                    case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => $data['rowData']['Config_API_GoogleMaps'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
+                                    case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => ($data['rowData']['Config_API_GoogleMaps'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
                                 }
                                 //Se condiciona el uso de Whatsapp
                                 if($data['UserData']["sistemaUsoWhatsapp"]==2){
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => $data['rowData']['Config_WhatsappToken'] ?? '',      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => $data['rowData']['Config_WhatsappInstanceId'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => ($data['rowData']['Config_WhatsappToken'] ?? ''),      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => ($data['rowData']['Config_WhatsappInstanceId'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                 }
                                 //Se condiciona el uso de IA
                                 if($data['UserData']["Config_IA_Uso"]==2){
                                     $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Uso de IA', 'Clase' => 'box-title text-color-red-dark']);
-                                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Provider',     'Name' => 'Config_IA_Provider',   'Value' => $data['rowData']['Config_IA_Provider'] ?? '', 'Required' => 1, 'arrData'  => $data['arrIAProvider'], 'BASE' => $BASE]);
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Key',      'Name' => 'Config_IA_ApiKey',     'Value' => $data['rowData']['Config_IA_ApiKey'] ?? '',   'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Model',    'Name' => 'Config_IA_Model',      'Value' => $data['rowData']['Config_IA_Model'] ?? '',    'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Base URL', 'Name' => 'Config_IA_Base_URL',   'Value' => $data['rowData']['Config_IA_Base_URL'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre IA',    'Name' => 'Config_IA_Name',       'Value' => $data['rowData']['Config_IA_Name'] ?? '',     'Required' => 1, 'Icon' => 'bi bi-puzzle']);
-                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Tono IA',      'Name' => 'Config_IA_Tone',       'Value' => $data['rowData']['Config_IA_Tone'] ?? '',     'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Provider',     'Name' => 'Config_IA_Provider',   'Value' => ($data['rowData']['Config_IA_Provider'] ?? ''), 'Required' => 1, 'arrData'  => $data['arrIAProvider'], 'BASE' => $BASE]);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Key',      'Name' => 'Config_IA_ApiKey',     'Value' => ($data['rowData']['Config_IA_ApiKey'] ?? ''),   'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Model',    'Name' => 'Config_IA_Model',      'Value' => ($data['rowData']['Config_IA_Model'] ?? ''),    'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Base URL', 'Name' => 'Config_IA_Base_URL',   'Value' => ($data['rowData']['Config_IA_Base_URL'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre IA',    'Name' => 'Config_IA_Name',       'Value' => ($data['rowData']['Config_IA_Name'] ?? ''),     'Required' => 1, 'Icon' => 'bi bi-puzzle']);
+                                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Tono IA',      'Name' => 'Config_IA_Tone',       'Value' => ($data['rowData']['Config_IA_Tone'] ?? ''),     'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                     $Title = 'Uso Memoria Cache IA';
                                     $Info  = 'Uso de memoria de cache en la Inteligencia Artificial (solo Gemini)';
-                                    $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_UsoCache',  'Value' => $data['rowData']['Config_IA_UsoCache'] ?? '',  'Required' => 1,'Color' => 3]);
+                                    $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_UsoCache',  'Value' => ($data['rowData']['Config_IA_UsoCache'] ?? ''),  'Required' => 1,'Color' => 3]);
                                 }
                                 /*********************************************/
                                 // Datos de configuracion
@@ -150,34 +153,35 @@
                                 /********************************/
                                 $Title = 'Mostrar Widget Meteorologico';
                                 $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
-                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Meteo',  'Value' => $data['rowData']['Config_Principal_Meteo'] ?? '',  'Required' => 1,'Color' => 3]);
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Meteo',  'Value' => ($data['rowData']['Config_Principal_Meteo'] ?? ''),  'Required' => 1,'Color' => 3]);
                                 /********************************/
                                 $Title = 'Mostrar Widget Radio';
                                 $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
-                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Radio',  'Value' => $data['rowData']['Config_Principal_Radio'] ?? '',  'Required' => 1,'Color' => 3]);
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Radio',  'Value' => ($data['rowData']['Config_Principal_Radio'] ?? ''),  'Required' => 1,'Color' => 3]);
                                 /********************************/
                                 $Title = 'Mostrar Widget Feed';
                                 $Info  = 'Permite la opcion de mostrar el widget en la pantalla principal';
-                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Feed',  'Value' => $data['rowData']['Config_Principal_Feed'] ?? '',  'Required' => 1,'Color' => 3]);
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_Feed',  'Value' => ($data['rowData']['Config_Principal_Feed'] ?? ''),  'Required' => 1,'Color' => 3]);
                                 /********************************/
                                 $Title = 'URL Feed';
                                 $Info  = 'La URL con el feed de noticias, si no existe se ocupa la opcion por defecto';
-                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'FormCol' => 12,  'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_FeedURL',  'Value' => $data['rowData']['Config_Principal_FeedURL'] ?? '', 'Required' => 1, 'Icon' => 'bi bi-globe']);
+                                $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'FormCol' => 12,  'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_Principal_FeedURL',  'Value' => ($data['rowData']['Config_Principal_FeedURL'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-globe']);
                                 /********************************/
                                 $Title = 'Configuracion Uso IA';
                                 $Info  = 'Permite la configuracion de la IA en las transacciones que hace uso de esta';
-                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_Uso',  'Value' => $data['rowData']['Config_IA_Uso'] ?? '',  'Required' => 1,'Color' => 3]);
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'Config_IA_Uso',  'Value' => ($data['rowData']['Config_IA_Uso'] ?? ''),  'Required' => 1,'Color' => 3]);
                                 /********************************/
                                 $Title = 'Uso Permisos Bodegas';
                                 $Info  = 'Permite el uso de permisos de acceso a las bodegas';
-                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosBodegas',  'Value' => $data['rowData']['usuariosPermisosBodegas'] ?? '',  'Required' => 1,'Color' => 3]);
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosBodegas',  'Value' => ($data['rowData']['usuariosPermisosBodegas'] ?? ''),  'Required' => 1,'Color' => 3]);
                                 /********************************/
                                 $Title = 'Uso Permisos Maquinas';
                                 $Info  = 'Permite el uso de permisos de acceso a las maquinas';
-                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosMaquinas',  'Value' => $data['rowData']['usuariosPermisosMaquinas'] ?? '',  'Required' => 1,'Color' => 3]);
+                                $data['Fnc_FormInputs']->formSwitch(['FormCol' => 12,'Placeholder' => $Title, 'DataInfo' => $Info, 'Name' => 'usuariosPermisosMaquinas',  'Value' => ($data['rowData']['usuariosPermisosMaquinas'] ?? ''),  'Required' => 1,'Color' => 3]);
 
                                 //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema','Value' => $data['rowData']['idSistema'],'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idSistema',      'Value' => $data['rowData']['idSistema'],      'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Sistema_Nombre', 'Value' => $data['rowData']['Sistema_Nombre'], 'Required' => 2]);
                                 ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                     <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
@@ -214,7 +218,12 @@
                     <?php }else{ ?>
                         <div class="d-flex justify-content-center pt-3">
                             <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-6 col-xxl-5">
-                                <?php $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Sistema_IMGLogo','URL' => $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update','ExtraData' => '"idSistema": '.$data['rowData']['idSistema']]);?>
+                                <?php
+                                // Se construye el dato
+                                $ExtraData  = '"idSistema": '.$data['rowData']['idSistema'];
+                                $ExtraData .= ',"Sistema_Nombre": "'.$data['rowData']['Sistema_Nombre'].'"';
+                                // Se imprime el dato
+                                $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Sistema_IMGLogo','URL' => $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update','ExtraData' => $ExtraData]);?>
                             </div>
                         </div>
                     <?php } ?>
@@ -230,7 +239,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditData_1").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -263,7 +272,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     $("#FormEditData_2").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -296,7 +305,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     $("#FormEditData_3").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -329,7 +338,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     $("#FormEditData_4").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -362,7 +371,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     function delIMG(File) {
         Swal.fire({
             title: "Borrar Imagen",
@@ -394,7 +403,7 @@
             }
         });
     }
-    /******************************************/
+    /************************************/
     //Oculto
     document.addEventListener("DOMContentLoaded", function () {
 

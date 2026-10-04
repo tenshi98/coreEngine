@@ -4,8 +4,9 @@
 /*******************************************************************************************************************/
 class coreSistema extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $WidgetsCommon;
@@ -13,8 +14,9 @@ class coreSistema extends ControllerBase {
     private $DataNumbers;
     private $Codification;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -34,14 +36,16 @@ class coreSistema extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Resumen
+    /*******************************************************************/
+    // Resumen
+    /*******************************************************************/
     public function Resumen($f3){
-        /******************************************/
+
+        /************************************/
         // Se genera la query
         $rowData = $this->getDataDetail();
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
@@ -54,11 +58,12 @@ class coreSistema extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrCiudad = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
@@ -71,11 +76,12 @@ class coreSistema extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrComuna = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idIAProvider AS ID,Nombre',
@@ -88,8 +94,9 @@ class coreSistema extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['query' => $query];
+        // Ejecuto la query
         $arrIAProvider = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -97,8 +104,8 @@ class coreSistema extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrIAProvider['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'PageTitle'        => 'Configuracion Plataforma',
@@ -122,23 +129,25 @@ class coreSistema extends ControllerBase {
                 'arrIAProvider'    => $arrIAProvider['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrIAProvider]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(1, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Resumen-Update
+    /*******************************************************************/
+    // Resumen Actualizar
+    /*******************************************************************/
     public function ResumenUpdate($f3){
-        /******************************************/
+
+        /************************************/
         // Se genera la query
         $rowData = $this->getDataDetail();
 
@@ -146,9 +155,9 @@ class coreSistema extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -162,15 +171,15 @@ class coreSistema extends ControllerBase {
                 'rowData'          => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Update.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -178,9 +187,12 @@ class coreSistema extends ControllerBase {
     /******************************************************************************/
     /*                            CONSULTAS INTERNAS                              */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se obtienen los detalles
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
     private function getDataDetail(){
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -248,7 +260,7 @@ class coreSistema extends ControllerBase {
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
         //Se retornan los datos
         return $this->Base_GetByID($xParams);
@@ -257,159 +269,173 @@ class coreSistema extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
 
-            /******************************/
-            //Si hay datos
-            if(isset($_POST['Sistema_Direccion'])&&$_POST['Sistema_Direccion']!=''){
-                //Se instancia
-                $fncLocation = new FunctionsLocation;
-                //Se obtiene la direccion
-                $Ubicacion = $_POST['Sistema_Direccion'];
-                //Si existe comuna
-                if(isset($_POST['Sistema_idComuna'])&&$_POST['Sistema_idComuna']!=''){
-                    // Se genera la query
-                    $query = [
-                        'data'    => 'Nombre',
-                        'table'   => 'core_ubicacion_comunas',
-                        'join'    => '',
-                        'where'   => 'idComuna = ?',
-                        'params'  => [$_POST['Sistema_idComuna']],
-                        'group'   => '',
-                        'having'  => '',
-                        'order'   => ''
-                    ];
-                    // Ejecuto la query
-                    $xParams = ['query' => $query];
-                    $rowData = $this->Base_GetByID($xParams);
-                    // Si hay resultados
-                    if($rowData['status']){
-                        $Ubicacion .= ', '.$rowData['data']['Nombre'];
-                    }
-                }
-                //Si existe ciudad
-                if(isset($_POST['Sistema_idCiudad'])&&$_POST['Sistema_idCiudad']!=''){
-                    // Se genera la query
-                    $query = [
-                        'data'    => 'Nombre',
-                        'table'   => 'core_ubicacion_ciudad',
-                        'join'    => '',
-                        'where'   => 'idCiudad = ?',
-                        'params'  => [$_POST['Sistema_idCiudad']],
-                        'group'   => '',
-                        'having'  => '',
-                        'order'   => ''
-                    ];
-                    // Ejecuto la query
-                    $xParams = ['query' => $query];
-                    $rowData = $this->Base_GetByID($xParams);
-                    // Si hay resultados
-                    if($rowData['status']){
-                        $Ubicacion .= ', '.$rowData['data']['Nombre'];
-                    }
-                }
-                //Pais
-                $Ubicacion .= ', Chile';
-                //Se hace la busqueda de lat y long por su direccion
-                $result = $fncLocation->geocodeAddress($Ubicacion);
-                // Si hay resultados se guarda
-                if ($result) {
-                    //Se guarda el ultimo dato
-                    $_POST['Latitud']  = $result['lat'];
-                    $_POST['Longitud'] = $result['lon'];
-                }
-            }
-
-            /******************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,Config_IA_Provider,Config_IA_ApiKey,Config_IA_Model,Config_IA_Base_URL,Config_IA_Name,Config_IA_Tone,Config_IA_Uso,Config_IA_UsoCache,usuariosPermisosBodegas,usuariosPermisosMaquinas,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
-                'required'  => 'Sistema_Nombre',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'core_sistemas',
-                'where'     => 'idSistema',
-                'Post'      => $_POST,
-                'files'     => [
-                    [
-                        'Identificador' => 'Sistema_IMGLogo',
-                        'SubCarpeta'    => '',
-                        'NombreArchivo' => '',
-                        'SufijoArchivo' => 'LogoSis_',
-                        'ValidarTipo'   => 'image',
-                        'ValidarPeso'   => 10,
-                        'Base64'        => true
-                    ],
-                ]
-            ];
-            // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        //Si hay datos
+        if(isset($_POST['Sistema_Direccion'])&&$_POST['Sistema_Direccion']!=''){
+            //Se obtiene la direccion
+            $Ubicacion = $_POST['Sistema_Direccion'];
+            //Si existe comuna
+            if(isset($_POST['Sistema_idComuna'])&&$_POST['Sistema_idComuna']!=''){
+                /************************************/
+                // Se genera la query
+                $query = [
+                    'data'    => 'Nombre',
+                    'table'   => 'core_ubicacion_comunas',
+                    'join'    => '',
+                    'where'   => 'idComuna = ?',
+                    'params'  => [$_POST['Sistema_idComuna']],
+                    'group'   => '',
+                    'having'  => '',
+                    'order'   => ''
+                ];
+                // Preparo los datos
+                $xParams = ['query' => $query];
+                // Ejecuto la query
+                $rowData = $this->Base_GetByID($xParams);
+                // Si hay resultados
+                if ($rowData['status'] === true) {
+                    $Ubicacion .= ', '.$rowData['data']['Nombre'];
+                }
+            }
+            //Si existe ciudad
+            if(isset($_POST['Sistema_idCiudad'])&&$_POST['Sistema_idCiudad']!=''){
+                /************************************/
+                // Se genera la query
+                $query = [
+                    'data'    => 'Nombre',
+                    'table'   => 'core_ubicacion_ciudad',
+                    'join'    => '',
+                    'where'   => 'idCiudad = ?',
+                    'params'  => [$_POST['Sistema_idCiudad']],
+                    'group'   => '',
+                    'having'  => '',
+                    'order'   => ''
+                ];
+                // Preparo los datos
+                $xParams = ['query' => $query];
+                // Ejecuto la query
+                $rowData = $this->Base_GetByID($xParams);
+                // Si hay resultados
+                if ($rowData['status'] === true) {
+                    $Ubicacion .= ', '.$rowData['data']['Nombre'];
+                }
+            }
+            //Pais
+            $Ubicacion .= ', Chile';
+            // Se instancia
+            $fncLocation = new FunctionsLocation;
+            //Se hace la busqueda de lat y long por su direccion
+            $result = $fncLocation->geocodeAddress($Ubicacion);
+            // Si hay resultados se guarda
+            if ($result) {
+                //Se guarda el ultimo dato
+                $_POST['Latitud']  = $result['lat'];
+                $_POST['Longitud'] = $result['lon'];
+            }
+        }
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idSistema,Sistema_Nombre,Sistema_Email,Sistema_Rut,Sistema_idCiudad,Sistema_idComuna,Sistema_Direccion,Sistema_idTema,Sistema_NotiWhatsapp,Contacto_Nombre,Contacto_Fono1,Contacto_Fono2,Contacto_Fax,Contacto_Email,Contacto_Web,RepresentanteNombre,RepresentanteRut,RepresentanteFono,RepresentanteEmail,Config_API_GoogleMaps,Config_WhatsappToken,Config_WhatsappInstanceId,KanbanTareasUsoTareas,KanbanTareasAdminTabIndepend,entidadesListadoVerCargas,entidadesListadoVerContactos,entidadesListadoVerDocumentos,productosListadoVerDocumentos,serviciosListadoVerDocumentos,entidadesListadoUsoPassword,gestionDocumentosUsoBodega,entidadesListadoUsoPlanes,entidadesListadoUsoUsuarios,maquinasListadoVerDocumentos,maquinasListadoComponentes,maquinasListadoTelemetria,maquinasListadoBackups,sistemaModalSubtitle,sistemaModalCloseBTN,entidadesListadoUsoMaquinas,maquinasListadoNotificaciones,sistemaUsoWhatsapp,Config_motorEmail,Config_motorMap,Latitud,Longitud,Config_Principal_Meteo,Config_Principal_Radio,Config_Principal_Feed,Config_Principal_FeedURL,Config_IA_Provider,Config_IA_ApiKey,Config_IA_Model,Config_IA_Base_URL,Config_IA_Name,Config_IA_Tone,Config_IA_Uso,Config_IA_UsoCache,usuariosPermisosBodegas,usuariosPermisosMaquinas,idOpcionesGen_39,idOpcionesGen_40,Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
+            'required'  => 'idSistema,Sistema_Nombre',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'core_sistemas',
+            'where'     => 'idSistema',
+            'Post'      => $_POST,
+            'files'     => [
+                [
+                    'Identificador' => 'Sistema_IMGLogo',
+                    'SubCarpeta'    => '',
+                    'NombreArchivo' => '',
+                    'SufijoArchivo' => 'LogoSis_',
+                    'ValidarTipo'   => 'image',
+                    'ValidarPeso'   => 10,
+                    'Base64'        => true
+                ],
+            ]
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Permite eliminar archivos
+    /*******************************************************************/
+    // Borrar archivos
+    /*******************************************************************/
     public function delFiles(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataPut);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => 'Sistema_IMGLogo',
-                'table'       => 'core_sistemas',
-                'where'       => 'idSistema',
-                'SubCarpeta'  => '',
-                'Post'        => $dataPut
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delFiles($xParams);
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataPut);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => 'Sistema_IMGLogo',
+            'table'       => 'core_sistemas',
+            'where'       => 'idSistema',
+            'SubCarpeta'  => '',
+            'Post'        => $dataPut
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delFiles($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -442,7 +468,7 @@ class coreSistema extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
