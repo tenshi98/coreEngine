@@ -83,8 +83,9 @@ class bodegasInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -103,6 +104,25 @@ class bodegasInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -371,6 +391,32 @@ class bodegasInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE bodegas_listado ADD INDEX idx_bodegas_estado (idEstado),ADD INDEX idx_bodegas_ciudad (idCiudad),ADD INDEX idx_bodegas_comuna (idComuna);',
+            'optimization' => 'ALTER TABLE bodegas_listado_observaciones ADD INDEX idx_bodegas_obs_bodega (idBodegas),ADD INDEX idx_bodegas_obs_usuario (idUsuario),ADD INDEX idx_bodegas_obs_bodega_fecha (idBodegas, FechaCreacion);',
+            'optimization' => 'ALTER TABLE bodegas_listado_permisos_usuarios ADD UNIQUE INDEX uk_bodegas_permiso_usuario (idUsuario, idBodegas),ADD INDEX idx_bodegas_permiso_bodega (idBodegas);',
+            'optimization' => 'ALTER TABLE bodegas_movimientos ADD INDEX idx_mov_estado_ingreso (idEstadoIngreso),ADD INDEX idx_mov_bodega_ingreso (idBodegasIngreso),ADD INDEX idx_mov_bodega_egreso (idBodegasEgreso),ADD INDEX idx_mov_usuario (idUsuario),ADD INDEX idx_mov_facturacion (idFacturacion),ADD INDEX idx_mov_fecha_auto (fecha_auto),ADD INDEX idx_mov_creacion_fecha (Creacion_fecha),ADD INDEX idx_mov_bodega_fecha (idBodegasIngreso, Creacion_fecha),ADD INDEX idx_mov_estado_fecha (idEstadoIngreso, Creacion_fecha);',
+            'optimization' => 'ALTER TABLE bodegas_movimientos_productos ADD INDEX idx_movprod_movimiento (idMovimiento),ADD INDEX idx_movprod_producto (idProducto),ADD INDEX idx_movprod_bodega (idBodegas),ADD INDEX idx_movprod_estado (idEstadoIngreso),ADD INDEX idx_movprod_bodega_producto (idBodegas, idProducto),ADD INDEX idx_movprod_producto_bodega (idProducto, idBodegas);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 

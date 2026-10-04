@@ -97,8 +97,9 @@ class gestionDocumentosInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -117,6 +118,25 @@ class gestionDocumentosInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -373,6 +393,33 @@ class gestionDocumentosInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE facturacion_listado ADD INDEX idx_facturacion_usuario (idUsuario),ADD INDEX idx_facturacion_tipo (idTipo),ADD INDEX idx_facturacion_entidad (idEntidad),ADD INDEX idx_facturacion_fecha (Creacion_fecha),ADD INDEX idx_facturacion_documento (idDocumentos),ADD INDEX idx_facturacion_estado_pago (idEstadoPago);',
+            'optimization' => 'ALTER TABLE facturacion_listado_productos ADD INDEX idx_flp_facturacion (idFacturacion),ADD INDEX idx_flp_producto (idProducto),ADD INDEX idx_flp_bodega (idBodegas),ADD INDEX idx_flp_estado_bodega (idEstadoIngreso, idBodegas),ADD INDEX idx_flp_facturacion_producto (idFacturacion, idProducto);',
+            'optimization' => 'ALTER TABLE facturacion_listado_servicios ADD INDEX idx_fls_facturacion (idFacturacion),ADD INDEX idx_fls_servicio (idServicio),ADD INDEX idx_fls_facturacion_servicio (idFacturacion, idServicio);',
+            'optimization' => 'ALTER TABLE facturacion_listado_items ADD INDEX idx_fli_facturacion (idFacturacion);',
+            'optimization' => 'ALTER TABLE facturacion_listado_guias ADD INDEX idx_flg_facturacion (idFacturacion),ADD INDEX idx_flg_relacion (idFacturacionRel),ADD INDEX idx_flg_facturacion_relacion (idFacturacion, idFacturacionRel);',
+            'optimization' => 'ALTER TABLE facturacion_listado_pagos ADD INDEX idx_flp_facturacion (idFacturacion),ADD INDEX idx_flp_usuario (idUsuario),ADD INDEX idx_flp_fecha (FechaPago),ADD INDEX idx_flp_documento (idDocumentoPago),ADD INDEX idx_flg_facturacion_pago (idFacturacion, FechaPago);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 

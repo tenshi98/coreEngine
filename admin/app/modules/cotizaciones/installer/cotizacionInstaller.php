@@ -97,8 +97,9 @@ class cotizacionInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -117,6 +118,25 @@ class cotizacionInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -297,6 +317,31 @@ class cotizacionInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE cotizacion_listado ADD INDEX idx_cotizacion_usuario (idUsuario),ADD INDEX idx_cotizacion_entidad (idEntidad),ADD INDEX idx_cotizacion_fecha (Creacion_fecha),ADD INDEX idx_cotizacion_fecha_auto (fecha_auto),ADD INDEX idx_cotizacion_entidad_fecha (idEntidad, Creacion_fecha),ADD INDEX idx_cotizacion_usuario_fecha (idUsuario, Creacion_fecha);',
+            'optimization' => 'ALTER TABLE cotizacion_listado_items ADD INDEX idx_cotizacion_items_cotizacion (idCotizacion);',
+            'optimization' => 'ALTER TABLE cotizacion_listado_productos ADD INDEX idx_cotizacion_productos_cotizacion (idCotizacion),ADD INDEX idx_cotizacion_productos_producto (idProducto),ADD INDEX idx_cotizacion_productos_cotizacion_producto (idCotizacion, idProducto);',
+            'optimization' => 'ALTER TABLE cotizacion_listado_servicios ADD INDEX idx_cotizacion_servicios_cotizacion (idCotizacion),ADD INDEX idx_cotizacion_servicios_servicio (idServicio),ADD INDEX idx_cotizacion_servicios_cotizacion_servicio (idCotizacion, idServicio);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 

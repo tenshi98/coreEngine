@@ -76,8 +76,9 @@ class kanbanTareasInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -96,6 +97,25 @@ class kanbanTareasInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -325,6 +345,33 @@ class kanbanTareasInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE kanban_estados ADD INDEX idx_kanban_estados_color (idColor),ADD INDEX idx_kanban_estados_prioridad (idPrioridad),ADD INDEX idx_kanban_estados_cierre (idCierre);',
+            'optimization' => 'ALTER TABLE kanban_tareas ADD INDEX idx_kanban_tareas_estado (idKanbanEstado),ADD INDEX idx_kanban_tareas_cierre (idEstadoCierre),ADD INDEX idx_kanban_tareas_prioridad (idPrioridad),ADD INDEX idx_kanban_tareas_usuario (idUsuario),ADD INDEX idx_kanban_tareas_fecha (Fecha),ADD INDEX idx_kanban_tareas_fecha_creacion (FechaCreacion),ADD INDEX idx_kanban_tareas_estado_usuario (idKanbanEstado, idUsuario),ADD INDEX idx_kanban_tareas_estado_fecha (idKanbanEstado, Fecha);',
+            'optimization' => 'ALTER TABLE kanban_tareas_historial ADD INDEX idx_kanban_historial_kanban (idKanban),ADD INDEX idx_kanban_historial_usuario (idUsuario),ADD INDEX idx_kanban_historial_fecha (Fecha),ADD INDEX idx_kanban_historial_kanban_fecha (idKanban, Fecha);',
+            'optimization' => 'ALTER TABLE kanban_tareas_participantes ADD INDEX idx_kanban_participantes_kanban (idKanban),ADD INDEX idx_kanban_participantes_usuario (idUsuario),ADD UNIQUE INDEX uk_kanban_participante (idKanban, idUsuario);',
+            'optimization' => 'ALTER TABLE kanban_tareas_tareas ADD INDEX idx_kanban_tareas_tareas_kanban (idKanban),ADD INDEX idx_kanban_tareas_tareas_estado (idEstadoTrabajo),ADD INDEX idx_kanban_tareas_tareas_trabajo (idTrabajo),ADD INDEX idx_kanban_tareas_tareas_kanban_estado (idKanban, idEstadoTrabajo),ADD INDEX idx_kanban_tareas_tareas_kanban_trabajo (idKanban, idTrabajo);',
+            'optimization' => 'ALTER TABLE kanban_trabajos ADD INDEX idx_kanban_trabajos_estado (idEstado);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 

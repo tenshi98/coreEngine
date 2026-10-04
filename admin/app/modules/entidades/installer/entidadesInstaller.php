@@ -64,8 +64,9 @@ class entidadesInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -84,6 +85,25 @@ class entidadesInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -293,6 +313,33 @@ class entidadesInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE entidades_listado ADD INDEX idx_entidades_estado (idEstado),ADD INDEX idx_entidades_sector (idSector),ADD INDEX idx_entidades_sexo (idSexo),ADD INDEX idx_entidades_tipo (idTipo),ADD INDEX idx_entidades_tipo_entidad (idTipoEntidad),ADD INDEX idx_entidades_ciudad (idCiudad),ADD INDEX idx_entidades_comuna (idComuna),ADD INDEX idx_entidades_rut (Rut),ADD INDEX idx_entidades_email (Email),ADD INDEX idx_entidades_nick (Nick),ADD INDEX idx_entidades_nombre (Nombre),ADD INDEX idx_entidades_ultimo_acceso (Ultimo_acceso),ADD INDEX idx_entidades_estado_tipo (idEstado, idTipo),ADD INDEX idx_entidades_estado_tipo_entidad (idEstado, idTipo, idTipoEntidad);',
+            'optimization' => 'ALTER TABLE entidades_listado_cargas ADD INDEX idx_cargas_entidad (idEntidad),ADD INDEX idx_cargas_estado (idEstado),ADD INDEX idx_cargas_sexo (idSexo),ADD INDEX idx_cargas_parentesco (idParentesco),ADD INDEX idx_cargas_estudios (idEstudios),ADD INDEX idx_cargas_estado_estudio (idEstadoEstudio),ADD INDEX idx_cargas_vigencia (FechaVigencia),ADD INDEX idx_cargas_vencimiento (FechaVencimiento),ADD INDEX idx_cargas_entidad_estado (idEntidad, idEstado);',
+            'optimization' => 'ALTER TABLE entidades_listado_contactos ADD INDEX idx_contactos_entidad (idEntidad),ADD INDEX idx_contactos_email (Email),ADD INDEX idx_contactos_rut (Rut),ADD INDEX idx_contactos_ciudad (idCiudad),ADD INDEX idx_contactos_comuna (idComuna),ADD INDEX idx_contactos_tipo (idTipoContacto),ADD INDEX idx_contactos_estado (idEstado),ADD INDEX idx_contactos_entidad_estado (idEntidad, idEstado),ADD INDEX idx_contactos_entidad_tipo (idEntidad, idTipoContacto);',
+            'optimization' => 'ALTER TABLE entidades_listado_documentos ADD INDEX idx_documentos_entidad (idEntidad),ADD INDEX idx_documentos_vencimiento (FVencimiento),ADD INDEX idx_documentos_entidad_vencimiento (idEntidad, FVencimiento);',
+            'optimization' => 'ALTER TABLE entidades_listado_observaciones ADD INDEX idx_observaciones_entidad (idEntidad),ADD INDEX idx_observaciones_usuario (idUsuario),ADD INDEX idx_observaciones_fecha (FechaCreacion),ADD INDEX idx_observaciones_entidad_fecha (idEntidad, FechaCreacion);',
+            'optimization' => 'ALTER TABLE entidades_sectores ADD INDEX idx_sectores_nombre (Nombre);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 

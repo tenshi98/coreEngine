@@ -64,8 +64,9 @@ class maquinasInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -84,6 +85,25 @@ class maquinasInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -264,6 +284,31 @@ class maquinasInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE maquinas_listado ADD INDEX idx_maquina_estado (idEstado),ADD INDEX idx_maquina_tab (idTab),ADD INDEX idx_maquina_geo (id_Geo),ADD INDEX idx_maquina_sensores (id_Sensores);',
+            'optimization' => 'ALTER TABLE maquinas_listado_observaciones ADD INDEX idx_mlo_maquina (idMaquina),ADD INDEX idx_mlo_usuario (idUsuario),ADD INDEX idx_mlo_fecha (FechaCreacion);',
+            'optimization' => 'ALTER TABLE maquinas_listado_documentos ADD INDEX idx_mld_maquina (idMaquina),ADD INDEX idx_mld_vencimiento (FVencimiento);',
+            'optimization' => 'ALTER TABLE maquinas_listado_permisos_usuarios ADD INDEX idx_mld_usuario (idUsuario),ADD INDEX idx_mld_maquina (idMaquina);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 

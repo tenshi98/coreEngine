@@ -64,8 +64,9 @@ class vehiculosInstaller extends ControllerInstaller {
 
         /************************************/
         // Variables
-        $arrTables    = $this->listTables();
-        $arrPermisos  = array();
+        $arrTables        = $this->listTables();
+        $arrOptimizations = $this->optimizeTables();
+        $arrPermisos      = array();
 
         /************************************/
         // Verifico si existe
@@ -84,6 +85,25 @@ class vehiculosInstaller extends ControllerInstaller {
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Verifico si existe
+        if($arrOptimizations){
+            // Recorro los datos
+            foreach ($arrOptimizations as $opt) {
+                /************************************/
+                // Preparo los datos
+                $xParams      = ['query' => $opt['optimization']];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
@@ -238,6 +258,30 @@ class vehiculosInstaller extends ControllerInstaller {
         /************************************/
         // Retorno True por defecto
         return $arrTables;
+
+    }
+
+    /*******************************************************************/
+    // Optimizaciones de las tablas
+    /*******************************************************************/
+    public function optimizeTables(){
+
+        /************************************/
+        // Variables
+        $arrOptimizations = array();
+
+        /*******************************************************/
+        /*            SE GENERAN LAS OPTIMIZACIONES            */
+        /*******************************************************/
+        $arrOptimizations[] = [
+            'optimization' => 'ALTER TABLE vehiculos_listado ADD INDEX idx_vehiculo_estado (idEstado),ADD INDEX idx_vehiculo_tipo (idTipo),ADD INDEX idx_vehiculo_tipo_carga (idTipoCarga);',
+            'optimization' => 'ALTER TABLE vehiculos_listado_documentos ADD INDEX idx_eld_vehiculo (idVehiculo),ADD INDEX idx_eld_vencimiento (FechaVencimiento);',
+            'optimization' => 'ALTER TABLE vehiculos_listado_observaciones ADD INDEX idx_elo_vehiculo (idVehiculo),ADD INDEX idx_elo_usuario (idUsuario),ADD INDEX idx_elo_fecha (FechaCreacion);',
+        ];
+
+        /************************************/
+        // Retorno True por defecto
+        return $arrOptimizations;
 
     }
 
