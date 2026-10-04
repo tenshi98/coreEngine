@@ -49,7 +49,7 @@
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormSearchData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -80,7 +80,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     //Oculto
     document.getElementById('div_Search_Nombre').style.display       = 'none';
     document.getElementById('div_Search_ApellidoPat').style.display  = 'none';

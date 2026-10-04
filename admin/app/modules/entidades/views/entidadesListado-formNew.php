@@ -26,7 +26,7 @@
                             </h5>';
                             break;
                     } ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
                 </div>
                 <div class="modal-body">
                     <?php
@@ -74,7 +74,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -104,7 +104,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     //Oculto
     document.getElementById('div_Nombre').style.display       = 'none';
     document.getElementById('div_ApellidoPat').style.display  = 'none';
@@ -115,7 +115,34 @@
 
     /**********************************************************************/
     //cargo
+    document.getElementById("idTipo").onchange        = function() {cngFnc_idTipo()}
     document.getElementById("idTipoEntidad").onchange = function() {cngFnc_idTipoEntidad()}
+    /************************************/
+    //Ejecutar logica
+    function cngFnc_idTipo() {
+        //obtengo los valores
+        let idTipo = $("#idTipo").val();
+        //selecciono
+        if (idTipo != "") {
+            //selecciono
+            switch (idTipo) {
+                // Trabajadores
+                case '3':
+                    seleccionarOpcionYBloquear('idTipoEntidad', 1, 0);
+                    break;
+
+
+                //el resto
+                default:
+                    reestablecerSelect('idTipoEntidad');
+                    break;
+            }
+        //si el select esta vacio
+        }else{
+            reestablecerSelect('idTipoEntidad');
+        }
+    }
+    /************************************/
     //Ejecutar logica
     function cngFnc_idTipoEntidad() {
         //obtengo los valores

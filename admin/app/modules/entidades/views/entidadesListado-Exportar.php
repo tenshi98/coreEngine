@@ -52,11 +52,11 @@
                             </thead>
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrList'] as $crud){
-                                        //Se obtiene el nombre o la razón social
+                                        // Se obtiene el nombre o la razón social
                                         switch ($crud['idTipoEntidad']) {
                                             case 1: $Entidad = $crud['ApellidoPat'].' '.$crud['ApellidoMat'].', '.$crud['Nombre']; break; //Persona Natural
                                             case 2: $Entidad = $crud['RazonSocial']; break;                                               //Empresas

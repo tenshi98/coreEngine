@@ -22,12 +22,14 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100 active" id="view_tab_1" data-bs-toggle="tab" data-bs-target="#tab_id_1" type="button" role="tab" aria-controls="tab_id_1" aria-selected="true"><i class="bi bi-card-list"></i> Datos Básicos</button></li>
-        <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>     <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_2" data-bs-toggle="tab" data-bs-target="#tab_id_2" type="button" role="tab" aria-controls="tab_id_2" aria-selected="false" tabindex="-1"><i class="bi bi-person"></i> Cargas</button></li><?php } ?>
+        <?php if($data['UserData']["entidadesListadoVerCargas"]==2 && $data['rowData']['idTipo'] == 3){ ?>
+            <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_2" data-bs-toggle="tab" data-bs-target="#tab_id_2" type="button" role="tab" aria-controls="tab_id_2" aria-selected="false" tabindex="-1"><i class="bi bi-person"></i> Cargas</button></li>
+        <?php } ?>
         <?php if($data['UserData']["entidadesListadoVerContactos"]==2){ ?>  <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_3" data-bs-toggle="tab" data-bs-target="#tab_id_3" type="button" role="tab" aria-controls="tab_id_3" aria-selected="false" tabindex="-1"><i class="bi bi-book"></i> Contactos</button></li><?php } ?>
         <?php if($data['UserData']["entidadesListadoVerDocumentos"]==2){ ?> <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_4" data-bs-toggle="tab" data-bs-target="#tab_id_4" type="button" role="tab" aria-controls="tab_id_4" aria-selected="false" tabindex="-1"><i class="bi bi-file-text"></i> Documentos</button></li><?php } ?>
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_5" data-bs-toggle="tab" data-bs-target="#tab_id_5" type="button" role="tab" aria-controls="tab_id_5" aria-selected="false" tabindex="-1"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
@@ -36,7 +38,7 @@
         <div class="tab-pane fade active show" id="tab_id_1" role="tabpanel" aria-labelledby="view_tab_1">
             <?php require_once('entidadesListado-Resumen-Update.php'); ?>
         </div>
-        <?php if($data['UserData']["entidadesListadoVerCargas"]==2){ ?>
+        <?php if($data['UserData']["entidadesListadoVerCargas"]==2 && $data['rowData']['idTipo'] == 3){ ?>
             <div class="tab-pane fade" id="tab_id_2" role="tabpanel" aria-labelledby="view_tab_2">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -46,9 +48,9 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['arrCargas'])&&!empty($data['arrCargas'])){
-                                        //Recorro
+                                        // Recorro
                                         foreach($data['arrCargas'] as $crud){ ?>
                                             <tr>
                                                 <td><?php echo $crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']; ?></td>
@@ -56,7 +58,7 @@
                                             </tr>
                                         <?php } ?>
                                     <?php }else{
-                                        echo '<tr><td colspan="2">No se encontraron entradas</td></tr>';
+                                        echo '<tr><td>No se encontraron entradas</td></tr>';
                                     } ?>
                                 </tbody>
                             </table>
@@ -75,9 +77,9 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['arrContactos'])&&!empty($data['arrContactos'])){
-                                        //Recorro
+                                        // Recorro
                                         foreach($data['arrContactos'] as $crud){ ?>
                                             <tr>
                                                 <td><?php echo $crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']; ?></td>
@@ -87,7 +89,7 @@
                                             </tr>
                                         <?php } ?>
                                     <?php }else{
-                                        echo '<tr><td colspan="4">No se encontraron entradas</td></tr>';
+                                        echo '<tr><td>No se encontraron entradas</td></tr>';
                                     } ?>
                                 </tbody>
                             </table>
@@ -106,18 +108,23 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['arrDocumentos'])&&!empty($data['arrDocumentos'])){
-                                        //Recorro
-                                        foreach($data['arrDocumentos'] as $crud){ ?>
+                                        // Recorro
+                                        foreach($data['arrDocumentos'] as $crud){
+                                            $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idDocumentos']);?>
                                             <tr>
                                                 <td><?php echo $crud['Nombre']; ?></td>
                                                 <td><?php echo $crud['FVencimiento']; ?></td>
-                                                <td><?php echo $crud['NombreArchivo']; ?></td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" onclick="viewDocumentosView('<?php echo $encryptedId['data']; ?>')"  class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Archivo</button>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         <?php } ?>
                                     <?php }else{
-                                        echo '<tr><td colspan="3">No se encontraron entradas</td></tr>';
+                                        echo '<tr><td>No se encontraron entradas</td></tr>';
                                     } ?>
                                 </tbody>
                             </table>
@@ -135,17 +142,17 @@
                         <table class="table table-sm table-hover">
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
-                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
-                                            <td><?php echo $crud['Observacion']; ?></td>
+                                            <td style="width: 100px;"><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
+                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?></td>
                                         </tr>
                                     <?php } ?>
                                 <?php }else{
-                                    echo '<tr><td colspan="2">No se encontraron entradas</td></tr>';
+                                    echo '<tr><td>No se encontraron entradas</td></tr>';
                                 } ?>
                             </tbody>
                         </table>
@@ -166,3 +173,21 @@ if($data['UserData']["sistemaModalCloseBTN"]==2){
 }else{
     echo '<style>.modal-body {max-height: 80vh;}</style>';
 } ?>
+
+<script>
+    /************************************/
+    function viewDocumentosView(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#popupModalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/view/'; ?>'+ID;
+        const Options = {
+            closeObject:'#PDloader',
+            callFNC:'openPopupModal',
+            callFNCData:'PopupModalLarge',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+</script>

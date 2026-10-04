@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
 ?>
 <form id="FormNewContacto" name="FormNewContacto" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
@@ -23,7 +25,7 @@
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
@@ -40,11 +42,14 @@
                                                               'Placeholder2' => 'Comuna',            'Name2' => 'idComuna',        'Id2'=> 'NewContacto_idComuna',        'Value2' => '','Required2' => 1,'arrData2' => $data['arrComuna']]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',         'Name'  => 'Direccion',       'Id' => 'NewContacto_Direccion',       'Value'  => '','Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
         $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Tipo Contacto',     'Name'  => 'idTipoContacto',  'Id' => 'NewContacto_idTipoContacto',  'Value'  => '','Required'  => 2,'arrData' => $data['arrTipoContacto'], 'BASE' => $BASE]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Cargo',             'Name'  => 'Cargo',           'Id' => 'NewContacto_Cargo',           'Value'  => '','Required'  => 1]);
+        //Verifico el tipo de usuario
+        if($data['rowData']['idTipo'] !=3 ){
+            $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Cargo', 'Name'  => 'Cargo', 'Id' => 'NewContacto_Cargo', 'Value'  => '','Required'  => 1]);
+        }
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'], 'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1,                             'Required' => 2]); // Activo
         ?>
     </div>
     <div class="modal-footer">
@@ -59,7 +64,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewContacto").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -81,7 +86,7 @@
             let Informacion = $("#FormNewContacto").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#tabContactosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/contactos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']); ?>', refreshTbl:'true'}
+                    {Div:'#tabContactosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/contactos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
                 closeModal:'#viewModal-lg',

@@ -22,24 +22,31 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
 
     <?php
-    $arrData = [
+    $arrData1 = [
         ['Icon' => '','Titulo' => 'Nombre',                 'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']],
         ['Icon' => '','Titulo' => 'Fecha Nacimiento',       'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FNacimiento'])],
         ['Icon' => '','Titulo' => 'Sexo',                   'Texto' => $data['rowData']['Sexo']],
         ['Icon' => '','Titulo' => 'Parentesco',             'Texto' => $data['rowData']['Parentesco']],
+        ['Icon' => '','Titulo' => 'Estado',                 'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+    ];
+    $arrData2 = [
         ['Icon' => '','Titulo' => 'Estudios',               'Texto' => $data['rowData']['Estudios']],
         ['Icon' => '','Titulo' => 'Estado Estudio',         'Texto' => $data['rowData']['EstadoEstudio']],
         ['Icon' => '','Titulo' => 'Observaciones Estudio',  'Texto' => $data['rowData']['ObsEstudios']],
         ['Icon' => '','Titulo' => 'Fecha Vigencia',         'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVigencia'])],
         ['Icon' => '','Titulo' => 'Fecha Vencimiento',      'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVencimiento'])],
-        ['Icon' => '','Titulo' => 'Estado',                 'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
     ];
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    // Imprimo resultados
+    echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
+    $data['Fnc_WidgetsCommon']->responsiveTable($arrData1, 8);
+    echo '<h5 class="box-title text-color-red-dark">Datos Académicos</h5>';
+    $data['Fnc_WidgetsCommon']->responsiveTable($arrData2, 8);
+
     ?>
 
 </div>

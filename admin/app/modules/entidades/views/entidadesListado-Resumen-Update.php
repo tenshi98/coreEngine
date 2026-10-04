@@ -14,7 +14,7 @@
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100 mb-2">
 
-        <?php if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'){
+        <?php if(isset($data['rowData']['Latitud'], $data['rowData']['Longitud'], $data['rowData']['Direccion'])&&$data['rowData']['Latitud']!='0'&&$data['rowData']['Longitud']!='0'&&$data['rowData']['Direccion']!=''){
             echo '<div class="square-rounded-2 square-border-3 w-100">';
                 // Valido segun mapa
                 switch ($data['UserData']['Config_motorMap']) {
@@ -26,7 +26,7 @@
                     /********************************/
                     // leaFlet maps
                     case 2:
-                        //variable para los marcadores
+                        // Variable para los marcadores
                         $arrMarkers = [
                             [
                                 $data['rowData']['Latitud'],

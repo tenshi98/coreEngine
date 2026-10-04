@@ -4,16 +4,18 @@
 /*******************************************************************************************************************/
 class entidadesListadoContactos extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
     private $WidgetsCommon;
     private $DataNumbers;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -32,26 +34,36 @@ class entidadesListadoContactos extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear nuevo
+    /*******************************************************************/
+    // Crear nuevo
+    /*******************************************************************/
     public function New($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($EntidadID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'    => 'idEntidad',
+            'data'    => 'idEntidad, idTipo',
             'table'   => 'entidades_listado',
             'join'    => '',
             'where'   => 'idEntidad = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$EntidadID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
@@ -64,11 +76,12 @@ class entidadesListadoContactos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrCiudad = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
@@ -81,25 +94,33 @@ class entidadesListadoContactos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrComuna = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
+        // Filtro por el tipo de entidad
+        $tipo = 2;
+        if ($rowData['status'] === true) {
+            //filtro para los trabajadores
+            $tipo = ($rowData['data']['idTipo'] == 3) ? 1 : 2;
+        }
         // Se genera la query
         $query = [
             'data'    => 'idTipoContacto AS ID,Nombre',
             'table'   => 'core_tipos_contactos',
             'join'    => '',
-            'where'   => '',
-            'params'  => [],
+            'where'   => 'idTipo = ?',
+            'params'  => [$tipo],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams         = ['query' => $query];
+        // Ejecuto la query
         $arrTipoContacto = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -107,8 +128,8 @@ class entidadesListadoContactos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTipoContacto['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -123,46 +144,65 @@ class entidadesListadoContactos extends ControllerBase {
                 'arrTipoContacto'  => $arrTipoContacto['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Contactos-formNew.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrTipoContacto]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
-    /******************************************************************************/
-    //List
+
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3, $params){
-        /*******************************************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($EntidadID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'    => 'idContacto,Nombre,ApellidoPat,ApellidoMat,Email,Fono1,Fono2',
+            'data'    => '
+                entidades_listado_contactos.idContacto,
+                entidades_listado_contactos.Nombre,
+                entidades_listado_contactos.ApellidoPat,
+                entidades_listado_contactos.ApellidoMat,
+                entidades_listado_contactos.Email,
+                entidades_listado_contactos.Fono1,
+                entidades_listado_contactos.Fono2,
+                core_tipos_contactos.Nombre AS TipoContacto',
             'table'   => 'entidades_listado_contactos',
-            'join'    => '',
-            'where'   => 'idEntidad = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'join'    => 'LEFT JOIN core_tipos_contactos    ON core_tipos_contactos.idTipoContacto  = entidades_listado_contactos.idTipoContacto',
+            'where'   => 'entidades_listado_contactos.idEntidad = ?',
+            'params'  => [$EntidadID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'ApellidoPat ASC, ApellidoMat ASC, Nombre ASC',
+            'order'   => 'entidades_listado_contactos.ApellidoPat ASC, entidades_listado_contactos.ApellidoMat ASC, entidades_listado_contactos.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrContactos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrContactos['status']){
+        if ($arrContactos['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -174,23 +214,32 @@ class entidadesListadoContactos extends ControllerBase {
                 'arrContactos' => $arrContactos['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Contactos-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrContactos]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //View
+    /*******************************************************************/
+    // View
+    /*******************************************************************/
     public function View($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $ContactoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($ContactoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -216,22 +265,23 @@ class entidadesListadoContactos extends ControllerBase {
                 LEFT JOIN core_tipos_contactos    ON core_tipos_contactos.idTipoContacto  = entidades_listado_contactos.idTipoContacto
                 LEFT JOIN core_estados            ON core_estados.idEstado                = entidades_listado_contactos.idEstado',
             'where'   => 'entidades_listado_contactos.idContacto = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$ContactoID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+        if ($rowData['status'] === true) {
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -243,39 +293,65 @@ class entidadesListadoContactos extends ControllerBase {
                 'rowData'       => $rowData['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Contactos-View.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $ContactoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($ContactoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'    => 'idContacto,idEntidad,Nombre,ApellidoPat,ApellidoMat,Email,Rut,Fono1,Fono2,idCiudad,idComuna,Direccion,idTipoContacto,Cargo,idEstado',
+            'data'    => '
+                entidades_listado_contactos.idContacto,
+                entidades_listado_contactos.idEntidad,
+                entidades_listado_contactos.Nombre,
+                entidades_listado_contactos.ApellidoPat,
+                entidades_listado_contactos.ApellidoMat,
+                entidades_listado_contactos.Email,
+                entidades_listado_contactos.Rut,
+                entidades_listado_contactos.Fono1,
+                entidades_listado_contactos.Fono2,
+                entidades_listado_contactos.idCiudad,
+                entidades_listado_contactos.idComuna,
+                entidades_listado_contactos.Direccion,
+                entidades_listado_contactos.idTipoContacto,
+                entidades_listado_contactos.Cargo,
+                entidades_listado_contactos.idEstado,
+                entidades_listado.idTipo',
             'table'   => 'entidades_listado_contactos',
-            'join'    => '',
+            'join'    => 'LEFT JOIN entidades_listado   ON entidades_listado.idEntidad = entidades_listado_contactos.idEntidad',
             'where'   => 'idContacto = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$ContactoID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idCiudad AS ID,Nombre',
@@ -288,11 +364,12 @@ class entidadesListadoContactos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrCiudad = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
@@ -305,28 +382,36 @@ class entidadesListadoContactos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrComuna = $this->Base_GetList($xParams);
 
-        /******************************/
+        /************************************/
+        // Filtro por el tipo de entidad
+        $tipo = 2;
+        if ($rowData['status'] === true) {
+            //filtro para los trabajadores
+            $tipo = ($rowData['data']['idTipo'] == 3) ? 1 : 2;
+        }
         // Se genera la query
         $query = [
             'data'    => 'idTipoContacto AS ID,Nombre',
             'table'   => 'core_tipos_contactos',
             'join'    => '',
-            'where'   => '',
-            'params'  => [],
+            'where'   => 'idTipo = ?',
+            'params'  => [$tipo],
             'group'   => '',
             'having'  => '',
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams         = ['query' => $query];
+        // Ejecuto la query
         $arrTipoContacto = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstado AS ID,Nombre',
@@ -339,8 +424,9 @@ class entidadesListadoContactos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrEstado = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -348,8 +434,8 @@ class entidadesListadoContactos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTipoContacto['status'] && $arrEstado['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -365,15 +451,15 @@ class entidadesListadoContactos extends ControllerBase {
                 'arrEstado'       => $arrEstado['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Contactos-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrCiudad,$arrComuna,$arrTipoContacto,$arrEstado]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -381,15 +467,16 @@ class entidadesListadoContactos extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
     public function Insert(){
 
-        /******************************/
-        //Se genera el chequeo
+        /************************************/
+        // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idEntidad,Nombre,ApellidoPat,ApellidoMat,Email,Rut,Fono1,Fono2,idCiudad,idComuna,Direccion,idTipoContacto,Cargo,idEstado',
@@ -399,104 +486,114 @@ class entidadesListadoContactos extends ControllerBase {
             'table'     => 'entidades_listado_contactos',
             'Post'      => $_POST
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
-        /******************************/
-        // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if ($Response['status']){
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-        } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
 
-            /******************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idContacto,idEntidad,Nombre,ApellidoPat,ApellidoMat,Email,Rut,Fono1,Fono2,idCiudad,idComuna,Direccion,idTipoContacto,Cargo,idEstado',
-                'required'  => 'idEntidad,Nombre,ApellidoPat',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'entidades_listado_contactos',
-                'where'     => 'idContacto',
-                'Post'      => $_POST
-            ];
-            // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idContacto,idEntidad,Nombre,ApellidoPat,ApellidoMat,Email,Rut,Fono1,Fono2,idCiudad,idComuna,Direccion,idTipoContacto,Cargo,idEstado',
+            'required'  => 'idContacto,idEntidad,Nombre,ApellidoPat',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'entidades_listado_contactos',
+            'where'     => 'idContacto',
+            'Post'      => $_POST
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'entidades_listado_contactos',
-                'where'       => 'idContacto',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'entidades_listado_contactos',
+            'where'       => 'idContacto',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -529,7 +626,7 @@ class entidadesListadoContactos extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
