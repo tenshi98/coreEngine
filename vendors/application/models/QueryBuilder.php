@@ -16,6 +16,13 @@ class QueryBuilder{
 	private $CommonData;
     private $Passwords;
 
+    /** Charsets y collations permitidos (whitelist). */
+    private const CHARSETS = [
+        'utf8mb4' => ['utf8mb4_unicode_ci', 'utf8mb4_general_ci', 'utf8mb4_unicode_520_ci', 'utf8mb4_0900_ai_ci'],
+        'utf8'    => ['utf8_unicode_ci', 'utf8_general_ci'],
+        'latin1'  => ['latin1_swedish_ci', 'latin1_general_ci', 'latin1_spanish_ci'],
+    ];
+
 	/******************************************************************************/
 	//Instancias
 	public function __construct() {
@@ -151,21 +158,21 @@ class QueryBuilder{
         // Valores a bindear contra los placeholders (?) opcionales dentro de 'where'/'join'/etc.
         $Params    = $query['params'] ?? [];
 
-        /*************** Ejecutar   ***************/
-        // Retorna la cadena SQL si se ha solicitado el modo de depuración/visualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $Params, $query['table']);
         }
 
         // Intento de ejecución de la consulta contra el motor de base de datos
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, true, $Params);
             // Obtiene el primer índice del conjunto de resultados si es válido, de lo contrario false
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -194,10 +201,21 @@ class QueryBuilder{
      * número de registros resultantes, garantizando la compatibilidad con consultas
      * que utilicen agrupamientos o selecciones complejas.
      *
-     * @param array $query Arreglo asociativo con las partes de la consulta (data, table, join, where, etc.).
+     * IMPORTANTE:
+     * - Las claves 'limit' y 'order' de $query se IGNORAN de forma intencional: un COUNT sobre
+     *   un subconjunto paginado devolvería un total deformado (p. ej. 'limit' => 60 satura el
+     *   conteo en 60 y un umbral mayor nunca se alcanzaría). Si se necesita contar respetando
+     *   un tope, debe usarse queryArray() y contar el resultado.
+     * - Cuando se usa 'group'/'having', el total corresponde al número de grupos resultantes,
+     *   no al número de filas de la tabla.
+     *
+     * @param array $query Arreglo asociativo con las partes de la consulta (data, table, join, where,
+     *                     group, having). Las claves 'limit' y 'order' son ignoradas.
      * @param mixed $DBConn Recurso o instancia de conexión a la base de datos.
      * @param bool $showQuery Si es true, retorna el string de la consulta SQL de conteo en lugar de ejecutarla.
-     * @return array Retorna un arreglo con los resultados.
+     * @return array Retorna un arreglo con los resultados:
+     *               ['status' => true,  'data' => int]  -> Total de coincidencias.
+     *               ['status' => false, 'error' => string, 'data' => string, 'table' => string] -> Fallo.
      *
 	 * @example
 	 * ```php
@@ -208,8 +226,8 @@ class QueryBuilder{
      *   'join'   => '',                    -> Ver opciones de los join
      *   'where'  => 'data1 = 1',           -> Ver modos alternativos where
      *   'group'  => '',                    -> Ver agrupaciones
-     *   'having' => '',
-     *   'order'  => 'data1 DESC'
+     *   'having' => ''
+     *   // 'order' y 'limit' se ignoran en el conteo (no aportan a un COUNT)
      * ];
      *
      * //ejecucion
@@ -226,6 +244,8 @@ class QueryBuilder{
         if(!isset($query['data']) || $query['data']==''){   return ['status' => false, 'error' => 'Query Error: No hay datos en $data',  'data' => [], 'table' => $query['table']];}
 
         /*************** Generacion Query ***************/
+        // El conteo no debe heredar LIMIT/ORDER: deforman el total y no aportan a un COUNT
+        unset($query['limit'], $query['order']);
         // Genera la sentencia SQL base mediante el método interno createQuery
         $BaseSQL   = $this->createQuery($query);
         // Encapsula la consulta base en una subconsulta para realizar el conteo total de registros
@@ -233,21 +253,21 @@ class QueryBuilder{
         // Valores a bindear contra los placeholders (?) opcionales dentro de 'where'/'join'/etc.
         $Params    = $query['params'] ?? [];
 
-        /*************** Ejecutar   ***************/
-        // Retorna la sentencia SQL de conteo si se solicita la visualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $Params, $query['table']);
         }
 
         // Bloque de ejecución con manejo de excepciones
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, true, $Params);
             // Obtiene el valor numérico de la columna virtual '_total' convertido a entero
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => (int)$result['data']['_total']
+                    'data'    => is_array($result['data']) ? (int)$result['data']['_total'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -315,10 +335,10 @@ class QueryBuilder{
         // Valores a bindear contra los placeholders (?) opcionales dentro de 'where'/'join'/etc.
         $Params    = $query['params'] ?? [];
 
-        /*************** Ejecutar   ***************/
-        // Retorna la cadena de texto de la consulta si se activó el parámetro de visualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $Params, $query['table']);
         }
 
         // Intento de ejecución de la consulta
@@ -326,11 +346,11 @@ class QueryBuilder{
             // Ejecuta la sentencia a través del método de conexión de bajo nivel
             $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $Params);
             // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -434,7 +454,7 @@ class QueryBuilder{
 
         // Filtra los datos del Post que coinciden con las columnas definidas en 'data'
         foreach ($arrData as $data) {
-            if (!empty($Post[$data])) {
+            if (isset($Post[$data]) && $Post[$data] !== '') {
                 $matrixColumn[] = $data;
                 // El valor nunca se concatena al SQL: viaja como parámetro bindeado
                 $matrixValue[]  = '?';
@@ -445,21 +465,27 @@ class QueryBuilder{
         $DataColumn = $matrixColumn ? implode(', ', $matrixColumn) : '';
         $DataValue  = $matrixValue ? implode(', ', $matrixValue) : '';
 
+        /*************** Validaciones ***************/
+        // en queryInsert, antes de ensamblar:
+        if ($DataColumn === '' && $DatosNombres === '') {
+            return ['status' => false, 'error' => 'Query Error: No hay datos para insertar', 'data' => [], 'table' => $query['table']];
+        }
+
         /*************** Generacion Query ***************/
         // Ensambla la sentencia INSERT final incluyendo los fragmentos de archivos procesados
         $ActionSQL = 'INSERT INTO '.$query['table'].' ('.$DataColumn.$DatosNombres.') VALUES ('.$DataValue.$DatosArchivos.')';
 
-        /*************** Ejecutar   ***************/
-        // Retorna el texto de la consulta si se activó el modo de visualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $bindings, $query['table']);
         }
 
         // Ejecución de la sentencia dentro de un bloque de control de excepciones
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el ID autogenerado del nuevo registro
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
@@ -567,21 +593,21 @@ class QueryBuilder{
         // Ensambla la sentencia INSERT multi-fila final
         $ActionSQL = 'INSERT INTO '.$query['table'].' ('.implode(', ', $arrData).') VALUES '.implode(', ', $matrixRows);
 
-        /*************** Ejecutar   ***************/
-        // Retorna el texto de la consulta si se activó el modo de visualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $bindings, $query['table']);
         }
 
         // Ejecución de la sentencia dentro de un bloque de control de excepciones
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -691,7 +717,7 @@ class QueryBuilder{
 
         // Construye los pares columna=? para la cláusula SET
         foreach ($arrData as $data) {
-            if (!empty($Post[$data])) {
+            if (isset($Post[$data]) && $Post[$data] !== '') {
                 $matrixData[]    = "`".$data."` = ?";
                 $bindingsData[]  = $novalidate ? $Post[$data] : trim($Post[$data]);
             }
@@ -699,7 +725,7 @@ class QueryBuilder{
 
         // Construye las condiciones para la cláusula WHERE unidas por AND
         foreach ($arrWhere as $where) {
-            if (!empty($Post[$where])) {
+            if (isset($Post[$where]) && $Post[$where] !== '') {
                 $matrixWhere[]    = $where." = ?";
                 $bindingsWhere[]  = $novalidate ? $Post[$where] : trim($Post[$where]);
             }
@@ -710,25 +736,31 @@ class QueryBuilder{
         $DataWhere  = $matrixWhere ? implode(' AND ', $matrixWhere) : '';
         $bindings   = array_merge($bindingsData, $bindingsWhere);
 
+        /*************** Validaciones ***************/
+        // en queryUpdate, antes de ensamblar:
+        if ($DataColumn === '' && $FilesData === '') {
+            return ['status' => false, 'error' => 'Query Error: No hay datos para actualizar', 'data' => [], 'table' => $query['table']];
+        }
+
         /*************** Generacion Query ***************/
         // Ensambla la sentencia UPDATE completa
         $ActionSQL = 'UPDATE '.$query['table'].' SET '.$DataColumn.$FilesData.' WHERE '.$DataWhere;
 
-        /*************** Ejecutar   ***************/
-        // Retorna el SQL generado si se solicita el modo de depuración
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $bindings, $query['table']);
         }
 
         // Ejecución de la transacción
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -785,96 +817,98 @@ class QueryBuilder{
         // Valida que se haya especificado la tabla de destino
         if(!isset($query['table']) || $query['table']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $table', 'data' => []];}
         // Valida que se haya definido el campo de condición para la eliminación
-        if(!isset($query['where']) || $query['where']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $where', 'data' => [], 'table' => $query['table']];}
+        if(!isset($query['where']) || $query['where']==''){ return ['status' => false, 'error' => 'Query Error: $where no definido para la eliminación', 'data' => [], 'table' => $query['table']];}
 
         // Verifica que los valores necesarios para el WHERE estén presentes en los datos recibidos (Post)
         $dataVal  = $this->validateRequired($query['where'], $query['Post']);
         if ($dataVal['status'] !== true) {return ['status' => false, 'error' => $dataVal['error'], 'data' => [], 'table' => $query['table']];}
 
-        /*************** Datos    ***************/
+        /***************   Datos    ***************/
         // Fracciona los campos del WHERE en un arreglo indexado
         $arrWhere = $this->CommonData->parseDataCommas($query['where']);
-
-        /******************************************/
-        // Lógica para la eliminación de archivos físicos antes de borrar el registro de la BD
-        if(isset($query['files'])&&$query['files']!=''){
-
-            $matrixColumn = [];
-            $bindingsFile = [];
-            // Construye la condición de búsqueda para localizar las rutas de archivos en la BD
-            foreach ($arrWhere as $where) {
-                if (!empty($query['Post'][$where])) {
-                    // Desencripta el identificador recibido; el valor viaja bindeado, no concatenado
-                    $matrixColumn[] = $where." = ?";
-                    $bindingsFile[] = $this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]);
-                }
-            }
-            $DataColumn = $matrixColumn ? implode(', ', $matrixColumn) : '';
-
-            // Prepara una sub-consulta para obtener los nombres de archivos actuales del registro
-            $queryRow = [
-                'data'   => $query['files'],
-                'table'  => $query['table'],
-                'join'   => '',
-                'where'  => $DataColumn,
-                'group'  => '',
-                'having' => '',
-                'order'  => '',
-                'params' => $bindingsFile
-            ];
-            // Recupera la fila con la información de los archivos
-            $result = $this->queryRow($queryRow, $DBConn);
-
-            // Invoca al gestor de archivos para borrar los recursos del almacenamiento físico
-            $delFile  = $this->FileManager->deleteFilesMassive($query['files'], $query['SubCarpeta'], $result);
-            if ($delFile !== true) {return ['status' => false, 'error' => $delFile, 'data' => [], 'table' => $query['table']];}
-        }
 
         /*************** Generacion Datos ***************/
         $matrixWhere = [];
         $bindings    = [];
         // Reconstruye la cláusula WHERE final para la sentencia DELETE
         foreach ($arrWhere as $where) {
-            if (!empty($query['Post'][$where])) {
+            if (isset($query['Post'][$where]) && $query['Post'][$where] !== '') {
+                // Se obtiene el Valor
+                $DataID = $this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]);
+                // Verifico si hay datos
+                if (!$this->isValidDecryptedId($DataID)) {
+                    return ['status' => false, 'error' => 'Query Error: Identificador inválido en $where (descifrado no válido)', 'data' => [], 'table' => $query['table']];
+                }
                 // Desencripta el valor de condición; viaja bindeado, no concatenado
                 $matrixWhere[] = $where." = ?";
-                $bindings[]    = $this->Codification->encryptDecrypt('decrypt', $query['Post'][$where]);
+                $bindings[]    = $DataID['data'];
             }
         }
         // Une las condiciones con el operador lógico AND
         $DataWhere = $matrixWhere ? implode(' AND ', $matrixWhere) : '';
 
+        /*************** Validaciones ***************/
+        // tras el foreach del WHERE, antes de ensamblar el DELETE:
+        if (empty($DataWhere) || $DataWhere === '') {
+            return ['status' => false, 'error' => 'Query Error: No hay identificadores válidos en $where para eliminar', 'data' => [], 'table' => $query['table']];
+        }
+
+        /*************** Datos archivos ***************/
+        // Lee las rutas ANTES de borrar el registro (todavía sin tocar el disco)
+        $rowFiles = [];
+        if (isset($query['files']) && $query['files'] != '') {
+            $queryRow = [
+                'data'   => $query['files'],
+                'table'  => $query['table'],
+                'join'   => '',
+                'where'  => $DataWhere,
+                'group'  => '',
+                'having' => '',
+                'order'  => '',
+                'params' => $bindings
+            ];
+            $resultFiles = $this->queryRow($queryRow, $DBConn);
+            if ($resultFiles['status'] !== true) { return ['status' => false, 'error' => $resultFiles['error'], 'data' => [], 'table' => $query['table']]; }
+            $rowFiles = $resultFiles['data'];
+        }
+
         /*************** Generacion Query ***************/
         // Ensambla la sentencia DELETE FROM
         $ActionSQL = 'DELETE FROM '.$query['table'].' WHERE '.$DataWhere;
 
-        /*************** Ejecutar   ***************/
-        // Retorna la cadena SQL si se ha solicitado el modo de visualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, $bindings, $query['table']);
         }
 
+        /*************** Ejecutar   ***************/
         // Ejecución de la eliminación en la base de datos
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
-            // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
-                // Estructura estándar de respuesta
-                $response = [
-                    'status'  => true,
-                    'data'    => $result['data']
-                ];
-            }else{
-                // Estructura estándar de respuesta
-                $response = [
-                    'status'  => false,
-                    'error'   => $result['error'],
-                    'data'    => $result['internal_error'],
-                    'table'   => $query['table'],
+
+            // Si la BD falló, se retorna el error tal cual
+            if (($result['status'] ?? false) !== true) {
+                return [
+                    'status' => false,
+                    'error'  => $result['error'],
+                    'data'   => $result['internal_error'],
+                    'table'  => $query['table'],
                 ];
             }
-            // Retorna los datos
-            return $response;
+
+            // Éxito: recién ahora se borran los archivos del disco (solo si había rutas)
+            if (!empty($rowFiles)) {
+                $delFile = $this->FileManager->deleteFilesMassive($query['files'], $query['SubCarpeta'], $rowFiles);
+                if ($delFile !== true) { error_log('queryDelete: no se pudieron borrar los archivos de '.$query['table']); }
+            }
+
+            // Respuesta estándar de éxito (con 'files' => '' o sin archivos también llega aquí)
+            return [
+                'status' => true,
+                'data'   => is_array($result['data']) ? $result['data'] : []
+            ];
+
         } catch (Exception $e) {
             // Se listan los errores
             $Error = $this->logError($ActionSQL, $e);
@@ -920,19 +954,20 @@ class QueryBuilder{
             ];
         }
 
-        /*************** Ejecutar   ***************/
-        // Retorna el texto de la consulta si se activó el modo de previsualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
             return [
-                'status' => true,
+                'status' => false,
                 'query'  => $query
             ];
         }
 
+        /*************** Ejecutar   ***************/
         // Intento de ejecución de la sentencia mediante sentencias preparadas
         try {
             // Determina si la consulta requiere el retorno de datos (SELECT) mediante expresiones regulares
-            $isSelect = (bool) preg_match('/^\s*(SELECT|SHOW|DESCRIBE|EXPLAIN)\s/i', $query);
+            $isSelect = (bool) preg_match('/^\s*(WITH|SELECT|SHOW|DESCRIBE|EXPLAIN)\s/i', $query);
 
             // Prepara la sentencia en el motor de base de datos
             $stmt = $DBConn->prepare($query);
@@ -976,9 +1011,25 @@ class QueryBuilder{
      * del registro a un valor vacío (''). Utiliza FileManager para la eliminación física
      * y ejecuta una sentencia UPDATE para reflejar los cambios en la BD.
      *
+     * ORDEN DE OPERACIONES:
+     * 1. Arma y valida el UPDATE (columnas a limpiar y condiciones del WHERE).
+     * 2. Ejecuta el UPDATE.
+     * 3. Solo si el UPDATE fue exitoso, borra los archivos del disco. Si un borrado físico
+     *    falla, queda un archivo huérfano y el fallo se registra en el log (la BD ya quedó
+     *    consistente, por lo que el huérfano es inocuo).
+     *
+     * FORMATO DEL POST:
+     * - Los valores de 'where' se bindean tal como llegan: NO se desencriptan, porque este
+     *   método espera los IDs planos (a diferencia de queryDelete, que recibe el token cifrado).
+     * - Los valores de 'files' corresponden al nombre del archivo almacenado en la BD.
+     *
      * @param array $query Configuración de la operación (files, table, where, SubCarpeta, Post).
      * @param mixed $DBConn Instancia de conexión a la base de datos.
-     * @return array Retorna un arreglo con los resultados.
+     * @param bool $showQuery Si es true, retorna el string del UPDATE sin ejecutarlo y SIN
+     *                        borrar los archivos físicos (modo dry-run seguro).
+     * @return array Retorna un arreglo con los resultados:
+     *               ['status' => true,  'data' => array] -> Filas afectadas devueltas por el driver.
+     *               ['status' => false, 'error' => string, 'data' => string, 'table' => string] -> Fallo.
      *
 	 * @example
 	 * ```php
@@ -993,10 +1044,13 @@ class QueryBuilder{
      *
      * //ejecucion
      * $qbuilder->delFiles($query, $DBConn);
+     *
+     * //modo dry-run (retorna el SQL, no ejecuta el UPDATE ni borra archivos)
+     * $qbuilder->delFiles($query, $DBConn, true);
 	 * ```
 	 *
      */
-    public function delFiles(array $query, $DBConn){
+    public function delFiles(array $query, $DBConn, bool $showQuery = false){
 
         /*************** Validaciones ***************/
         // Valida la existencia de los parámetros críticos para identificar columnas y tablas
@@ -1004,18 +1058,19 @@ class QueryBuilder{
         // Valida que se haya definido el listado de archivos a eliminar
         if(!isset($query['files']) || $query['files']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $files', 'data' => [], 'table' => $query['table']];}
         // Valida que se haya definido el campo de condición para la eliminación
-        if(!isset($query['where']) || $query['where']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $where', 'data' => [], 'table' => $query['table']];}
+        if(!isset($query['where']) || $query['where']==''){ return ['status' => false, 'error' => 'Query Error: $where no definido para limpiar archivos', 'data' => [], 'table' => $query['table']];}
 
         // Verifica que los campos definidos en el 'where' estén presentes en el arreglo 'Post'
         $dataVal  = $this->validateRequired($query['where'], $query['Post']);
         if ($dataVal['status'] !== true) {return ['status' => false, 'error' => $dataVal['error'], 'data' => [], 'table' => $query['table']];}
 
-        /*************** Datos    ***************/
+        /***************    Datos    ***************/
         // Convierte las cadenas de texto separadas por comas en arreglos indexados
         $arrWhere   = $this->CommonData->parseDataCommas($query['where']);
         $arrFiles   = $this->CommonData->parseDataCommas($query['files']);
 
         /*************** Generacion Datos ***************/
+        // Arma las columnas SIN borrar nada
         $matrixData  = [];
         $matrixWhere = [];
         $bindings    = [];
@@ -1023,16 +1078,7 @@ class QueryBuilder{
         // Itera sobre los nombres de archivos para proceder con la eliminación física
         foreach ($arrFiles as $file) {
             // Verifica que el valor del archivo (ruta/nombre) exista en el Post
-            if (!empty($query['Post'][$file])) {
-                /******************************************/
-                // Solicita al gestor de archivos la eliminación del recurso en el disco
-                $delFile  = $this->FileManager->deleteFile($query['Post'][$file], $query['SubCarpeta']);
-                /******************************************/
-                // Si falla la eliminación física, interrumpe el proceso y retorna el error
-                if($delFile !== true){
-                    return ['status' => false, 'error' => $delFile, 'data' => [], 'table' => $query['table']];
-                }
-
+            if (isset($query['Post'][$file])  && $query['Post'][$file]  !== '') {
                 // Si el archivo se borró correctamente, prepara la columna para ser limpiada en la BD
                 $matrixData[] = $file." = ''";
             }
@@ -1040,9 +1086,10 @@ class QueryBuilder{
 
         // Construye la cláusula WHERE basándose en los identificadores proporcionados
         foreach ($arrWhere as $where) {
-            if (!empty($query['Post'][$where])) {
+            if (isset($query['Post'][$where]) && $query['Post'][$where] !== '') {
                 // El valor de filtro viaja bindeado, no concatenado
                 $matrixWhere[] = $where." = ?";
+                // Los valores no son desencriptados ya que éstos no vienen encriptados
                 $bindings[]    = $query['Post'][$where];
             }
         }
@@ -1051,20 +1098,50 @@ class QueryBuilder{
         $DataColumn = $matrixData ? implode(', ', $matrixData) : '';
         $DataWhere  = $matrixWhere ? implode(' AND ', $matrixWhere) : '';
 
+        /*************** Validaciones ***************/
+        // Valida que se haya procesado al menos un archivo para limpiar en la BD
+        if (empty($DataColumn) || $DataColumn === '') {
+            return ['status' => false, 'error' => 'Query Error: No hay archivos válidos en $files para limpiar', 'data' => [], 'table' => $query['table']];
+        }
+        // Valida que exista al menos una condición válida para el UPDATE
+        if (empty($DataWhere) || $DataWhere === '') {
+            return ['status' => false, 'error' => 'Query Error: No hay identificadores válidos en $where para limpiar archivos', 'data' => [], 'table' => $query['table']];
+        }
+
         /*************** Generacion Query ***************/
         // Crea la sentencia UPDATE para establecer las columnas de archivos como cadenas vacías
         $ActionSQL = 'UPDATE '.$query['table'].' SET '.$DataColumn.' WHERE '.$DataWhere;
+
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
+        if ($showQuery) {
+            return $this->showQuery($ActionSQL, $bindings, $query['table']);
+        }
 
         /*************** Ejecutar   ***************/
         // Ejecuta la actualización en el servidor de base de datos
         try {
             $result = $this->queryExecute($ActionSQL, $DBConn, false, false, $bindings);
             // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
+            if (($result['status'] ?? false) === true) {
+                // Itera sobre los nombres de archivos para proceder con la eliminación física
+                foreach ($arrFiles as $file) {
+                    // Verifica que el valor del archivo (ruta/nombre) exista en el Post
+                    if (isset($query['Post'][$file])  && $query['Post'][$file]  !== '') {
+                        /************************************/
+                        // Solicita al gestor de archivos la eliminación del recurso en el disco
+                        $delFile  = $this->FileManager->deleteFile($query['Post'][$file], $query['SubCarpeta']);
+                        /************************************/
+                        // Si falla la eliminación física, interrumpe el proceso y retorna el error
+                        if($delFile !== true){
+                            error_log('delFiles: no se pudo borrar '.$query['Post'][$file]);
+                        }
+                    }
+                }
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -1125,13 +1202,20 @@ class QueryBuilder{
         if(!isset($query['primaryKey']) || $query['primaryKey']==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $primaryKey', 'data' => [], 'table' => $query['table']];}
 
         /*************** Generacion Query ***************/
-        // Construcción de la sentencia DDL (Data Definition Language) con parámetros fijos de motor y codificación
-        $ActionSQL = 'CREATE TABLE `'.$query['table'].'` ('.$query['data'].', PRIMARY KEY (`'.$query['primaryKey'].'`) USING BTREE) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci COMMENT = \''.$query['comentario'].'\' ROW_FORMAT = DYNAMIC;';
+        // Identificadores: solo alfanumérico + guion bajo
+        if (!preg_match('/^[A-Za-z0-9_]{1,64}$/', $query['table'])) {              return ['status' => false, 'error' => 'Query Error: Nombre de tabla inválido', 'data' => [], 'table' => $query['table']]; }
+        if (!preg_match('/^[A-Za-z0-9_]{1,64}$/', (string)$query['primaryKey'])) { return ['status' => false, 'error' => 'Query Error: primaryKey inválido',      'data' => [], 'table' => $query['table']]; }
 
-        /*************** Ejecutar   ***************/
-        // Retorna el string de la consulta si se solicita previsualización
+        // Comentario: se escapa la comilla simple antes de inyectarlo en el DDL
+        $comentario = str_replace("'", "''", (string)($query['comentario'] ?? ''));
+
+        // Construcción de la sentencia DDL (Data Definition Language) con parámetros fijos de motor y codificación
+        $ActionSQL = 'CREATE TABLE `'.$query['table'].'` ('.$query['data'].', PRIMARY KEY (`'.$query['primaryKey'].'`) USING BTREE) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci COMMENT = \''.$comentario.'\' ROW_FORMAT = DYNAMIC;';
+
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, [], $query['table']);
         }
 
         // Intento de creación de la tabla
@@ -1139,11 +1223,11 @@ class QueryBuilder{
             // Ejecuta la sentencia a través del driver de conexión
             $result = $this->queryExecute($ActionSQL, $DBConn);
             // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -1199,10 +1283,10 @@ class QueryBuilder{
         // Construye la sentencia DDL. Se incluyen backticks para proteger nombres de tabla con caracteres especiales o reservados
         $ActionSQL = 'DROP TABLE IF EXISTS `'.$query['table'].'`;';
 
-        /*************** Ejecutar   ***************/
-        // Retorna la cadena de la consulta si se solicita el modo de previsualización
+        /***************   Mostrar Query   ***************/
+        // Retorna la sentencia SQL
         if ($showQuery) {
-            return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+            return $this->showQuery($ActionSQL, [], $query['table']);
         }
 
         // Intento de ejecución de la eliminación de la estructura
@@ -1210,11 +1294,11 @@ class QueryBuilder{
             // Ejecuta la sentencia mediante el método central de ejecución
             $result = $this->queryExecute($ActionSQL, $DBConn);
             // Obtiene el conjunto completo de resultados obtenidos
-            if($result['status']){
+            if($result['status'] === true){
                 // Estructura estándar de respuesta
                 $response = [
                     'status'  => true,
-                    'data'    => $result['data']
+                    'data'    => is_array($result['data']) ? $result['data'] : []
                 ];
             }else{
                 // Estructura estándar de respuesta
@@ -1285,6 +1369,13 @@ class QueryBuilder{
         $BD_port      = $DBConn['PORT'] ?? 3306;
         $BD_charset   = $DBConn['CHARSET'] ?? 'utf8mb4';
 
+        // charset/collation: whitelist (no se concatenan a ciegas en DDL)
+        if (!isset(self::CHARSETS[$charset]) || !in_array($collation, self::CHARSETS[$charset], true)) {  return ['status' => false, 'error' => 'Query Error: charset/collation no permitidos', 'data' => []];}
+        // Host/Port/Charset del DSN: validados antes de construir la cadena de conexión
+        if (!preg_match('/^[A-Za-z0-9._:-]{1,255}$/', (string)$BD_host)) {                  return ['status' => false, 'error' => 'Query Error: Host inválido', 'data' => []]; }
+        if (!ctype_digit((string)$BD_port) || (int)$BD_port < 1 || (int)$BD_port > 65535) { return ['status' => false, 'error' => 'Query Error: Port inválido', 'data' => []]; }
+        if (!isset(self::CHARSETS[$BD_charset])) {                                          return ['status' => false, 'error' => 'Query Error: Charset de conexión inválido', 'data' => []]; }
+
         /*************** Ejecutar   ***************/
         try {
 
@@ -1294,7 +1385,7 @@ class QueryBuilder{
                 'mysql:host='.$BD_host.';port='.$BD_port.';charset='.$BD_charset,
                 $BD_username,
                 $BD_password,
-                array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
+                array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES '.$BD_charset)
             );
 
             /*************** Generacion Query ***************/
@@ -1306,21 +1397,21 @@ class QueryBuilder{
                 $collation
             );
 
-            /*************** Ejecutar   ***************/
-            // Retorna la cadena de la consulta si se solicita el modo de previsualización
+            /***************   Mostrar Query   ***************/
+            // Retorna la sentencia SQL
             if ($showQuery) {
-                return ['status' => false, 'error' => '', 'data' => $ActionSQL, 'table' => $query['table']];
+                return $this->showQuery($ActionSQL, [], '');
             }
 
             // Ejecución interna de la sentencia SQL
             try {
                 $result = $this->queryExecute($ActionSQL, $NewDBConn);
                 // Obtiene el conjunto completo de resultados obtenidos
-                if($result['status']){
+                if($result['status'] === true){
                     // Estructura estándar de respuesta
                     $response = [
                         'status'  => true,
-                        'data'    => $result['data']
+                        'data'    => is_array($result['data']) ? $result['data'] : []
                     ];
                 }else{
                     // Estructura estándar de respuesta
@@ -1362,22 +1453,17 @@ class QueryBuilder{
 
     /******************************************************************************/
     /**
-     * Procesa y ejecuta el contenido de un archivo SQL externo en la base de datos.
-     * * Este método lee un archivo físico, elimina comentarios de tipo línea (-- ) y de bloque (/* *\/),
-     * fragmenta el contenido en sentencias individuales utilizando el punto y coma (;) como
-     * delimitador y ejecuta cada instrucción de forma secuencial.
+     * Procesa y ejecuta el contenido de un archivo SQL externo.
+     * ...
+     * LIMITACIONES:
+     * - El contenido se divide por ';', por lo que NO soporta bloques de procedimientos/triggers
+     *   que requieran DELIMITER, ni ';' dentro de literales. Para esos casos, usar un archivo
+     *   por sentencia.
+     * - La ejecución es parcial: se detiene y retorna el error en la primera sentencia que falle.
      *
      * @param string $filepath Ruta física completa hacia el archivo .sql.
      * @param mixed $DBConn Instancia de conexión a la base de datos.
-     * @return array Retorna un arreglo con los resultados.
-     * @throws Exception Si el archivo no es accesible o la sintaxis SQL es inválida.
-     *
-	 * @example
-	 * ```php
-	 * //ejecucion
-     * $qbuilder->executeFile($filepath, $DBConn);
-	 * ```
-	 *
+     * @return array ['status'=>bool, 'error'=>string, 'data'=>array, 'executed'=>int]
      */
     public function executeFile(string $filepath, $DBConn){
 
@@ -1399,9 +1485,9 @@ class QueryBuilder{
 
             /*************** Limpieza de SQL ***************/
             // Elimina comentarios de una sola línea (estilo --) mediante expresiones regulares
-            $sql = preg_replace('/--.*$/m', '', $sql);
+            $sql = preg_replace('/^[ \t]*--.*$/m', '', $sql);
             // Elimina comentarios multilínea o de bloque (estilo /* */)
-            $sql = preg_replace('/\/\*.*?\*\//s', '', $sql);
+            $sql = preg_replace('/^[ \t]*\/\*.*?\*\/[ \t]*$/ms', '', $sql);
 
             /*************** Segmentación ***************/
             // Divide el script en un arreglo de consultas individuales usando el punto y coma como separador
@@ -1415,16 +1501,20 @@ class QueryBuilder{
 
             /*************** Procesamiento ***************/
             // Itera sobre el conjunto de consultas validadas
+            $executed = 0;
             foreach ($queries as $query) {
-                // Ejecuta cada instrucción de forma independiente a través del método central queryExecute
-                if (!empty(trim($query))) {
-                    $this->queryExecute($query, $DBConn);
+                $r = $this->queryExecute($query, $DBConn);
+                if (($r['status'] ?? false) !== true) {
+                    // No se filtra el SQL al cliente: solo al log
+                    error_log('executeFile: fallo en sentencia #'.$executed.' de '.$filepath.' :: '.($r['internal_error'] ?? ''));
+                    return ['status' => false, 'error' => $r['error'] ?? 'Query Error: fallo al procesar el archivo SQL', 'data' => [], 'table' => basename($filepath)];
                 }
+                $executed++;
             }
 
             // Retorna true indicando que el script finalizó sin errores críticos
-            return ['status' => true, 'query' => $query, 'data' => []];
-        } catch (PDOException $e) {
+            return ['status' => true, 'query' => '', 'data' => [], 'executed' => $executed];
+        } catch (\Throwable $e) {
             // Se listan los errores
             $Error = $this->logError('', $e, $filepath);
             // Registra el fallo y retorna la información del error procesada
@@ -1473,9 +1563,9 @@ class QueryBuilder{
             // Regla de validación:
             // 1. isset($SIS_Post[$field]): El campo debe existir en el arreglo.
             // 2. empty($SIS_Post[$field]): El valor no debe ser nulo, falso, cadena vacía o 0.
-            if(isset($SIS_Post[$field]) && empty($SIS_Post[$field])){
+            if (!isset($SIS_Post[$field]) || trim((string)$SIS_Post[$field]) === '') {
                 // Si el campo existe pero su valor es considerado "vacío" por PHP
-                $errors .= $field.' es obligatorio';
+                $errors .= '<strong>'.$field . '</strong> es obligatorio<br>';
             }
         }
 
@@ -1505,14 +1595,14 @@ class QueryBuilder{
      */
     private function validateUnique(string $SIS_Data, string $SIS_Table, array $SIS_Post, string $SIS_Where, $DBConn): bool|array{
 
-        /******************************************/
+        /************************************/
         // Preparación de variables iniciales
-        $arrData      = $this->CommonData->parseDataCommas($SIS_Data); // Campos a validar (separados por comas)
-        $subWhere     = ''; // Cláusula WHERE base (usada para exclusión en actualizaciones)
+        $arrData        = $this->CommonData->parseDataCommas($SIS_Data); // Campos a validar (separados por comas)
+        $subWhere       = ''; // Cláusula WHERE base (usada para exclusión en actualizaciones)
         $subWhereParams = []; // Valores bindeados asociados a $subWhere, en el mismo orden
-        $errors       = '';
+        $errors         = []; // Array para acumular los errores
 
-        /******************************************/
+        /************************************/
         /**
          * Lógica de Exclusión para UPDATE
          * Si se proporciona $SIS_Where, significa que estamos editando un registro.
@@ -1531,7 +1621,7 @@ class QueryBuilder{
             $subWhere .= $parts ? implode(' AND ', $parts) : '';
         }
 
-        /******************************************/
+        /************************************/
         /**
          * Procesamiento de Reglas de Unicidad
          * Recorre cada regla definida en $SIS_Data.
@@ -1542,7 +1632,7 @@ class QueryBuilder{
             // Valores bindeados propios de esta regla (se combinan con $subWhereParams al ejecutar)
             $localParams   = [];
 
-            /******************************************/
+            /************************************/
             /**
              * CASO A: Validación Compuesta (Subgrupos con "-")
              * Ejemplo: "sucursal-codigo" verifica que la combinación de ambos sea única.
@@ -1575,7 +1665,7 @@ class QueryBuilder{
                     $whereInternal = ($whereInternal != '') ? $whereInternal . ' AND ' . $x_where : $x_where;
                 }
 
-            /******************************************/
+            /************************************/
             /**
              * CASO B: Validación Simple
              * Ejemplo: "email" verifica que el correo no esté registrado.
@@ -1589,12 +1679,13 @@ class QueryBuilder{
                 }
             }
 
-            /******************************************/
+            /************************************/
             /**
              * Ejecución de la Verificación
              * Si se construyó una consulta válida, se cuenta cuántos registros coinciden.
              */
             if($DataInternal != ''){
+                /************************************/
                 // Se genera la query
                 $query = [
                     'data'   => $DataInternal,
@@ -1608,7 +1699,7 @@ class QueryBuilder{
 
                 // Si el conteo es mayor a 0, existe una colisión de datos
                 if ($ndata['status'] && $ndata['data'] > 0){
-                    $errors .= 'Los datos que intenta ingresar ya existen en el Sistema';
+                    $errors[] = ["message" => 'Los datos que intenta ingresar ya existen en el Sistema'];
                 }
 
             }
@@ -1801,9 +1892,9 @@ class QueryBuilder{
                 : $this->FileManager->validateFiles($_FILES, $query['files']);
 
             // Si la validación falla, retorna el error para detener la operación principal (Insert/Update)
-            if ($dataFiles['success'] !== true) {
-                $result['success'] = $dataFiles['success'];
-                $result['error']   = $dataFiles['message'];
+            if (!isset($dataFiles['success']) || $dataFiles['success'] !== true) {
+                $result['success'] = false;
+                $result['error']   = $dataFiles['message'] ?? 'Error al validar los archivos';
                 return $result;
             }
 
@@ -1812,6 +1903,15 @@ class QueryBuilder{
             $newFileName = $isUpdate
                 ? $this->FileManager->uploadFile($_FILES, $query['files'], $query['Post'])
                 : $this->FileManager->uploadFile($_FILES, $query['files']);
+
+            // Si algún archivo falló realmente al subirse (no simplemente ausente),
+            // se detiene la operación principal (Insert/Update) para no guardar el
+            // registro como si el archivo se hubiese subido correctamente.
+            if (($newFileName['success'] ?? false) !== true) {
+                $result['success'] = false;
+                $result['error']   = $newFileName['message'] ?? 'Error al subir los archivos';
+                return $result;
+            }
 
             /*************** Formateo de Resultados ***************/
             // Distribuye los fragmentos SQL según el tipo de consulta
@@ -1877,5 +1977,99 @@ class QueryBuilder{
         // Retorna el arreglo POST modificado (o el original si no hubo campos a cifrar)
         return $query['Post'];
     }
+    /******************************************************************************/
+    /**
+     * Reconstruye una consulta SQL reemplazando los placeholders (?)
+     * por los parámetros proporcionados.
+     *
+     * IMPORTANTE:
+     * Esta función es para visualización/debug/log.
+     * No debe utilizarse para ejecutar la consulta SQL.
+     *
+     * @param string $sql    Consulta SQL con placeholders (?).
+     * @param array  $params Parámetros ordenados de la consulta.
+     *
+     * @return string Consulta SQL reconstruida.
+     */
+    private function reconstruirQuery(string $sql, array $params): string {
+
+        // Divide por placeholders reales y une alternando SQL/valor (soporta '?' dentro de los valores)
+        $parts = explode('?', $sql);
+        $out   = $parts[0];
+        foreach ($params as $i => $param) {
+            if ($param === null)                            { $value = 'NULL'; }
+            elseif (is_bool($param))                        { $value = $param ? '1' : '0'; }
+            elseif (is_int($param) || is_float($param))     { $value = (string) $param; }
+            else                                            { $value = "'" . str_replace("'", "''", (string) $param) . "'"; }
+            $out  .= $value . ($parts[$i + 1] ?? '');
+        }
+        return $out;
+
+    }
+    /******************************************************************************/
+    /**
+     * Reconstruye y retorna una consulta SQL junto con información de la tabla.
+     *
+     * El método utiliza reconstruirQuery() para generar la representación de la
+     * consulta SQL a partir de la sentencia y sus parámetros recibidos. El
+     * resultado se devuelve con un estado false, sin mensaje de error y con la
+     * tabla asociada.
+     *
+     * @param string $SQL    Consulta SQL que será reconstruida.
+     * @param array  $Params Parámetros utilizados para reconstruir la consulta.
+     * @param string $Table  Nombre de la tabla asociada a la consulta.
+     *
+     * @return array Resultado con el estado, error, consulta reconstruida y tabla.
+     */
+    private function showQuery(string $SQL, array $Params, string $Table){
+
+        /*************** Ejecutar   ***************/
+        // Retorna la cadena SQL si se ha solicitado el modo de depuración/visualización
+        return ['status' => false, 'error' => '', 'data' => $this->reconstruirQuery($SQL, $Params), 'table' => $Table];
+
+    }
+    /******************************************************************************/
+    /**
+     * Valida el resultado obtenido al descifrar un identificador o un valor de texto.
+     *
+     * El resultado se considera válido cuando:
+     * - El campo `success` existe y tiene el valor booleano true.
+     * - El campo `data` está definido.
+     * - El valor de `data` es un identificador numérico positivo o un texto no vacío.
+     *
+     * Para valores numéricos, se valida que el valor sea numérico y que su conversión
+     * a entero sea mayor que cero.
+     *
+     * Para valores de texto, se valida que el valor sea una cadena y que, después de
+     * eliminar los espacios en blanco de sus extremos, no quede vacía.
+     *
+     * @param array $DataID Resultado obtenido del proceso de descifrado, incluyendo
+     *                       los campos `success` y `data`.
+     *
+     * @return bool Retorna true cuando el valor descifrado corresponde a un número
+     *              entero positivo o a un texto no vacío; en caso contrario, retorna false.
+     */
+    private function isValidDecryptedId(array $DataID): bool {
+
+        // Verifica que el descifrado haya sido exitoso y que exista el dato resultante.
+        if (($DataID['success'] ?? false) !== true || !isset($DataID['data'])) {
+            return false;
+        }
+
+        $data = $DataID['data'];
+
+        // Número entero positivo.
+        if (is_numeric($data) && (int) $data > 0) {
+            return true;
+        }
+
+        // Texto no vacío.
+        if (is_string($data) && trim($data) !== '') {
+            return true;
+        }
+
+        return false;
+    }
+
 
 }

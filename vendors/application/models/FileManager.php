@@ -275,7 +275,7 @@ class FileManager {
 
         // Si no se definieron reglas de archivos, se asume validación exitosa por defecto
         if (empty($arrArchivos)) {
-            return ['success' => true, 'data' => true];
+            return ['success' => true, 'message' => true];
         }
 
         // Acumulador de incidentes encontrados durante la validación
@@ -345,9 +345,11 @@ class FileManager {
         }
 
         // Retorno final: si el arreglo de errores está vacío, la validación es exitosa
+        // Se normaliza siempre a ['success' => bool, 'message' => string] para que los
+        // llamadores (QueryBuilder::processFiles, etc.) puedan confiar en esta forma.
         return empty($errors)
-            ? ['success' => true,  'message' => true]
-            : $errors;
+            ? ['success' => true, 'message' => true]
+            : ['success' => false, 'message' => implode('; ', array_column($errors, 'message'))];
     }
 
     /******************************************************************************************/
@@ -367,12 +369,16 @@ class FileManager {
     public function uploadFile(array $SIS_FILES, array $arrArchivos, array $PostData = []): array {
 
         // Variables
+        // 'errors' acumula fallas reales de cada archivo; un campo simplemente
+        // ausente (no enviado, ej: Update parcial que no reemplaza ese archivo)
+        // NO se agrega aquí, para no bloquear el resto de campos ya subidos.
         $Data = [
             'Nombres'  => '',
             'Archivos' => '',
             'Update'   => '',
             'success'  => false,
             'message'  => '',
+            'errors'   => [],
         ];
 
         // Itera sobre la configuración para decidir el método de subida
@@ -387,6 +393,18 @@ class FileManager {
                 $this->handleNormalUpload($archivo, $SIS_FILES, $Data);
             }
         }
+
+        // El resultado final depende de si algún archivo tuvo una falla real,
+        // no del orden en que se procesaron (evita que un archivo exitoso
+        // enmascare la falla real de otro procesado antes).
+        if (!empty($Data['errors'])) {
+            $Data['success'] = false;
+            $Data['message'] = implode('; ', $Data['errors']);
+        } else {
+            $Data['success'] = true;
+            $Data['message'] = $Data['message'] !== '' ? $Data['message'] : 'Archivo(s) subido(s) correctamente';
+        }
+        unset($Data['errors']);
 
         // Retorno de datos
         return $Data;
@@ -690,10 +708,10 @@ class FileManager {
         // Obtiene el identificador único del archivo (clave en el POST)
         $id = $archivo['Identificador'];
 
-        // Si no existe el dato en el POST, no se procesa
+        // Si no existe el dato en el POST, el campo simplemente no fue enviado
+        // (ej: Update parcial que no reemplaza este archivo) — se omite sin
+        // registrar error, para no bloquear otros archivos de la misma operación.
         if (empty($PostData[$id])) {
-            $Data['success'] = false;
-            $Data['message'] = 'No hay archivo';
             return;
         }
 
@@ -701,8 +719,7 @@ class FileManager {
         // Factor 1.37 agrega margen adicional sobre el 1.33 teórico
         $maxBase64Bytes = ($archivo['ValidarPeso'] ?? 10) * 1048576 * 1.37;
         if (strlen($PostData[$id]) > $maxBase64Bytes) {
-            $Data['success'] = false;
-            $Data['message'] = 'Archivo excede el tamaño permitido';
+            $Data['errors'][] = $id . ': archivo excede el tamaño permitido';
             return;
         }
 
@@ -714,8 +731,7 @@ class FileManager {
         // Si la decodificación falla, se detiene el proceso
         $dIMG = base64_decode($rawBase64, true);
         if ($dIMG === false) {
-            $Data['success'] = false;
-            $Data['message'] = 'El contenido Base64 no es válido';
+            $Data['errors'][] = $id . ': el contenido Base64 no es válido';
             return;
         }
 
@@ -725,16 +741,14 @@ class FileManager {
         // Verificar si esta dentro de los Mime permitidos
         $allowed  = $this->buildAllowedMimes($archivo['ValidarTipo'] ?? 'image');
         if (!in_array($realMime, $allowed, true)) {
-            $Data['success'] = false;
-            $Data['message'] = 'Tipo de archivo no permitido';
+            $Data['errors'][] = $id . ': tipo de archivo no permitido';
             return;
         }
 
         // Resolver extensión desde el MIME real detectado (no desde el cliente)
         $ext = $this->resolveExtensionFromMime($realMime);
         if ($ext === null) {
-            $Data['success'] = false;
-            $Data['message'] = 'No se pudo determinar la extensión del archivo';
+            $Data['errors'][] = $id . ': no se pudo determinar la extensión del archivo';
             return;
         }
 
@@ -769,11 +783,11 @@ class FileManager {
         // Obtiene el identificador único del archivo (clave en $_FILES)
         $id = $archivo['Identificador'];
 
-        // Verifica si el archivo fue enviado correctamente
-        // Si no existe el nombre del archivo, se detiene el proceso
+        // Verifica si el archivo fue enviado correctamente.
+        // Si no existe el nombre del archivo, el campo simplemente no fue enviado
+        // (ej: Update parcial que no reemplaza este archivo) — se omite sin
+        // registrar error, para no bloquear otros archivos de la misma operación.
         if (empty($SIS_FILES[$id]['name'])) {
-            $Data['success'] = false;
-            $Data['message'] = 'No hay archivo';
             return;
         }
 
@@ -817,8 +831,7 @@ class FileManager {
 
         // Evita sobrescribir archivos existentes en el servidor
         if ($this->storage->exists($fullRelative)) {
-            $Data['success'] = false;
-            $Data['message'] = 'El archivo que intenta subir ya existe';
+            $Data['errors'][] = $id . ': el archivo que intenta subir ya existe';
             return;
         }
 
@@ -827,17 +840,18 @@ class FileManager {
         $dirResult = $this->storage->createDirectory(ltrim($rutaRelativa, '/'));
         // No bloqueamos si el dir ya existía (success=false + "ya existe" es OK)
         if ($dirResult['success'] === false && !str_contains($dirResult['message'], 'ya existe')) {
-            $Data['success'] = false;
-            $Data['message'] = 'El directorio donde intenta subir el archivo no existe';
+            $Data['errors'][] = $id . ': el directorio donde intenta subir el archivo no existe';
             return;
         }
 
         // Sube el archivo vía driver
         $saved = $this->storage->upload($contenido, $fullRelative, $isBase64);
 
-        // Registrar resultado en $Data si se guardó correctamente
+        // Registrar resultado en $Data
         if ($saved) {
             $this->appendToData($Data, $id, $nombreArchivo);
+        } else {
+            $Data['errors'][] = $id . ': no se pudo guardar el archivo "' . $nombreArchivo . '"';
         }
     }
 
@@ -1071,9 +1085,8 @@ class FileManager {
         // Ejemplo: ",imagen = 'file1.png',documento = 'file2.pdf'"
         $Data['Update']   .= ',' . $id . " = '" . $NombreArchivo . "'";
 
-        // Construye una respuesta en caso de ser necesario
-        $Data['success']   = true;
-        $Data['message']   = 'Archivo subido correctamente';
+        // 'success'/'message' finales se resuelven en uploadFile() en base a 'errors',
+        // una vez procesados todos los archivos de la operación.
 
     }
 
@@ -1216,7 +1229,11 @@ class FileManager {
         /*************** 1. Desencriptación de Base ***************/
         // Recupera la ruta base que el backend definió como punto de partida.
         $decryptedBase = $fnc_Codification->encryptDecrypt('decrypt', $Data['route']);
-        $safeBase      = $this->sanitizePath($decryptedBase);
+        // ruta base inválida: el método ya devuelve string y su llamador trata la ruta vacía
+        if (($decryptedBase['success'] ?? false) !== true || !isset($decryptedBase['data']) || $decryptedBase['data'] === false) {
+            return '';
+        }
+        $safeBase      = $this->sanitizePath($decryptedBase['data']);
 
         /*************** 2. Procesamiento de Subruta ***************/
         /**

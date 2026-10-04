@@ -214,12 +214,12 @@ class MailSender{
      */
     private function validateMail($query){
 
-        /******************************************/
+        /************************************/
         // Verificaciones de integridad básica
         if(!isset($query['data']) || $query['data']==''){         return false; }
         if(!isset($query['template']) || $query['template']==''){ return false; }
 
-        /******************************************/
+        /************************************/
         // Preparación de campos requeridos
         $arrData = $this->CommonData->parseDataCommas($query['data']);
         $errors  = [];
@@ -247,7 +247,7 @@ class MailSender{
      */
     private function sendMail($TemplateData, $ConfigMail, $query){
 
-        /******************************************/
+        /************************************/
         // Extracción y desanitización de variables (asegura visualización de caracteres especiales)
         $ServerURL    = $ConfigMail['ServerURL'];
         $ServerPort   = $ConfigMail['ServerPort'];
@@ -258,7 +258,7 @@ class MailSender{
         $Hacia        = $this->DataText->desanitizarTexto($query['Post']['Hacia']);
         $Asunto       = $this->DataText->desanitizarTexto($query['Post']['Asunto']);
 
-        /******************************************/
+        /************************************/
         // Inicialización del objeto SMTP con los parámetros del servidor
         $smtp = new SMTP ( $ServerURL, $ServerPort, $ServerSecure, $UserEmail, $UserPass );
 
@@ -296,7 +296,7 @@ class MailSender{
     private function templateEmail($TemplateData, $Template, $Data){
 
     try {
-            /******************************************/
+            /************************************/
             // Selección de lógica según el tipo de plantilla (switch)
             switch ($Template) {
 
@@ -351,4 +351,3 @@ class MailSender{
     }
 
 }
-

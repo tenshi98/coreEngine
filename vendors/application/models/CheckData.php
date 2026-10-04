@@ -201,12 +201,14 @@ class CheckData{
             $encodeFields = $this->CommonData->parseDataCommas($config['encode']);
             foreach ($encodeFields as $field) {
                 if (!empty($postData[$field])) {
-                    // Sobrescribe el valor original por el valor cifrado usando una llave segura
-                    $config['Post'][$field] = $this->Codification->encryptDecrypt(
+                    // Se cifra usando una llave segura
+                    $DataID = $this->Codification->encryptDecrypt(
                         'encrypt',
                         $postData[$field],
                         ConfigToken::ENCODE_KEYS["KEY_1"]
                     );
+                    // Sobrescribe el valor original por el valor cifrado usando una llave segura
+                    $config['Post'][$field] = $DataID['data'];
                 }
             }
         }
