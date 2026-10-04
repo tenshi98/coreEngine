@@ -68,11 +68,9 @@ class FileManager {
         ],
         'pdf' => [
             'application/pdf',
-            'application/octet-stream',
             'application/x-real',
             'application/vnd.adobe.xfdf',
             'application/vnd.fdf',
-            'binary/octet-stream',
             'application/epub+zip',
         ],
         'image' => [
@@ -102,7 +100,6 @@ class FileManager {
             'application/x-gzip',
             'application/x-gtar',
             'application/x-tgz',
-            'application/octet-stream',
             'application/x-bzip',
             'application/x-bzip2',
         ],
@@ -144,7 +141,8 @@ class FileManager {
         'sh', 'bash', 'zsh', 'bat', 'cmd', 'ps1',              // Shell / ejecución
         'exe', 'bin', 'run',                                   // Binarios / ejecutables
         'sql', 'bak', 'old', 'backup', 'dump',                 // Backups / dumps
-        'cgi', 'pl', 'py', 'rb', 'jsp', 'asp', 'aspx'          // Otros potencialmente peligrosos
+        'cgi', 'pl', 'py', 'rb', 'jsp', 'asp', 'aspx',         // Otros potencialmente peligrosos
+        'htaccess', 'htpasswd'                                 // Configuración Apache (defensa en profundidad)
     ];
 
     /******************************************************************************************/
@@ -186,6 +184,7 @@ class FileManager {
 
         // ── PDF y documentos ──────────────────────────────────────────────────────
         'application/pdf'                                                           => 'pdf',
+        'application/x-real'                                                        => 'pdf',   // Alias legacy agrupado en la categoría pdf (evita fallo al derivar extensión desde MIME)
         'application/vnd.adobe.xfdf'                                                => 'xfdf',  // XML Forms Data Format (Adobe Acrobat)
         'application/vnd.fdf'                                                       => 'fdf',   // Forms Data Format (Adobe Acrobat)
         'application/epub+zip'                                                      => 'epub',  // Libro electrónico
@@ -225,6 +224,7 @@ class FileManager {
         'video/mpeg'                                                                => 'mpeg',  // Puede ser .mpeg o .mpg — se usa la forma larga por convención
         'video/ogg'                                                                 => 'ogv',   // Ogg Video (distinto de audio/ogg → .oga)
         'video/webm'                                                                => 'webm',
+        'application/mp4'                                                           => 'mp4',   // Alias no estándar de video/mp4 (evita fallo al derivar extensión desde MIME)
         'video/mp4'                                                                 => 'mp4',
 
         // ── Audio ─────────────────────────────────────────────────────────────────
@@ -316,6 +316,13 @@ class FileManager {
                 continue;
             }
 
+            // 3b. Bloquea nombres sensibles/excluidos (.htaccess, .env, config.php, …)
+            //     y cualquier archivo oculto (nombre que comienza con punto).
+            if ($this->hasExcludedName($SIS_FILES[$id]['name'])) {
+                $errors[] = ['success' => false, 'message' => 'Nombre de archivo no permitido por seguridad'];
+                continue;
+            }
+
             // 4. Validación de Tipo MIME Real:
             // No confía en la extensión; inspecciona los bytes del archivo temporal (tmp_name)
             $allowedMimes = $this->buildAllowedMimes($archivo['ValidarTipo']);
@@ -335,8 +342,10 @@ class FileManager {
             }
 
             // 6. Verificación de Duplicados en Almacenamiento:
-            // Utiliza la abstracción de 'storage' para consultar si el nombre ya existe en el destino
-            $nombreArchivo = $this->buildFileName($archivo, $SIS_FILES[$id]['name']);
+            // Utiliza la abstracción de 'storage' para consultar si el nombre ya existe en el destino.
+            // Se usa la extensión derivada del MIME real para que coincida con el nombre final
+            // que handleNormalUpload() escribirá (evita falsos negativos por extensión del cliente).
+            $nombreArchivo = $this->buildFileName($archivo, $SIS_FILES[$id]['name'], $this->resolveExtensionFromMime($realMime));
             $rutaRelativa  = $this->buildRelativePath($archivo) . $nombreArchivo;
 
             if ($this->storage->exists($rutaRelativa)) {
@@ -510,6 +519,7 @@ class FileManager {
      * Medidas implementadas:
      * - Validación de existencia de parámetros (path y name)
      * - Sanitización de path y nombre
+     * - Rechazo de nombres que la sanitización reduce a cadena vacía ("..", ".", "!!!")
      * - Normalización de rutas (evita doble / o separadores inválidos)
      * - Prevención de Path Traversal
      * - Validación de permisos de escritura
@@ -532,6 +542,19 @@ class FileManager {
             return ['success' => false, 'message' => 'Nombre no definido'];
         }
 
+        // Sanitiza el nombre de la carpeta para evitar caracteres ilegales en sistemas de archivos
+        $folderName = $this->sanitizeFolderName($PostData['name']);
+
+        /*******************************************************************/
+        // SEGURIDAD CRÍTICA: si el nombre se reduce a cadena vacía ("..", ".",
+        // "!!!") no se creará ninguna carpeta: sin este bloqueo la ruta
+        // resultante apuntaría a la SubRoute/path y el driver la crearía
+        // (o la reportaría como existente) en lugar de una carpeta nueva.
+        /*******************************************************************/
+        if ($folderName === '') {
+            return ['success' => false, 'message' => 'Nombre de carpeta inválido'];
+        }
+
         // Construcción segura de la ruta jerárquica
         $subRoute     = isset($PostData['SubRoute']) ? trim($this->sanitizePath($PostData['SubRoute']), '/') : '';
         $relativePath = $subRoute !== '' ? $subRoute . '/' : '';
@@ -539,8 +562,8 @@ class FileManager {
             ? trim($this->sanitizePath($PostData['path']), '/') . '/'
             : '';
 
-        // Sanitiza el nombre de la carpeta para evitar caracteres ilegales en sistemas de archivos
-        $relativePath .= $this->sanitizeFolderName($PostData['name']);
+        // Nombre de la carpeta (ya validado arriba)
+        $relativePath .= $folderName;
 
         // Normaliza posibles dobles slashes (extra seguridad)
         $relativePath = preg_replace('#/+#', '/', $relativePath);
@@ -557,6 +580,7 @@ class FileManager {
      * Medidas de seguridad aplicadas:
      * - Validación de parámetros de entrada (path y name obligatorios)
      * - Sanitización de la ruta para prevenir Path Traversal
+     * - Rechazo de nombres que la sanitización reduce a cadena vacía ("..", ".", "!!!")
      * - Bloqueo de eliminación de la carpeta raíz de uploads
      * - Validación de que la ruta resultante no quede vacía
      *
@@ -576,23 +600,42 @@ class FileManager {
             return ['success' => false, 'message' => 'Nombre de carpeta no definido'];
         }
 
-        // Ensamblado de la ruta absoluta relativa al driver
-        $subRoute     = isset($PostData['SubRoute']) ? trim($this->sanitizePath($PostData['SubRoute']), '/') : '';
-        $relativePath = $subRoute !== '' ? $subRoute . '/' : '';
-        $relativePath .= isset($PostData['path'])
-            ? trim($this->sanitizePath($PostData['path']), '/') . '/'
+        // Ensamblado de la ruta padre (SubRoute + path), ya saneada y sin separadores colgantes
+        $subRoute   = isset($PostData['SubRoute']) ? trim($this->sanitizePath($PostData['SubRoute']), '/') : '';
+        $parentPath = $subRoute !== '' ? $subRoute : '';
+        $parentPath .= isset($PostData['path'])
+            ? ($parentPath !== '' ? '/' : '') . trim($this->sanitizePath($PostData['path']), '/')
             : '';
+        $parentPath = trim(preg_replace('#/+#', '/', $parentPath), '/');
 
         // Sanitiza el nombre de la carpeta para evitar caracteres ilegales en sistemas de archivos
-        $relativePath .= $this->sanitizeFolderName($PostData['name']);
+        $folderName = $this->sanitizeFolderName($PostData['name']);
+
+        /*******************************************************************/
+        // SEGURIDAD CRÍTICA: un nombre que la sanitización reduce a cadena
+        // vacía ("..", ".", "!!!") NO identifica ninguna carpeta. Concatenarlo
+        // dejaría la ruta apuntando a la SubRoute/path completa que envía el
+        // cliente y el driver la borraría con TODO su contenido, por eso la
+        // operación se rechaza siempre, exista o no una subruta de por medio.
+        /*******************************************************************/
+        if ($folderName === '') {
+            return [
+                'success' => false,
+                'message' => $parentPath === ''
+                    ? 'No se permite eliminar la carpeta raíz'
+                    : 'Nombre de carpeta inválido',
+            ];
+        }
+
+        // Ruta final: la carpeta a eliminar es SIEMPRE hija directa de la ruta padre
+        $relativePath = $parentPath !== '' ? $parentPath . '/' . $folderName : $folderName;
 
         // Elimina dobles slashes y espacios residuales
         $relativePath = trim(preg_replace('#/+#', '/', $relativePath), '/');
 
         /*******************************************************************/
         // SEGURIDAD CRÍTICA: impedir eliminación de la raíz
-        // Una ruta vacía o de un solo nivel sin subruta controlada
-        // apuntaría a la carpeta base completa del driver → bloqueado
+        // Una ruta vacía apuntaría a la carpeta base completa del driver → bloqueado
         /*******************************************************************/
         if ($relativePath === '') {
             return ['success' => false, 'message' => 'No se permite eliminar la carpeta raíz'];
@@ -637,12 +680,20 @@ class FileManager {
      * de un directorio sea una cadena simple y segura, sin posibilidad de inyectar
      * subdirectorios o comandos.
      *
+     * * Decodifica la URL antes de filtrar (igual que sanitizePath) para que un
+     * nombre codificado no evade el filtro: "%2e%2e" se normaliza a ".." y termina
+     * descartado, en lugar de convertirse en un nombre válido "2e2e".
+     *
      * @param string $name Nombre de carpeta propuesto por el usuario.
      * @return string Nombre de carpeta sanitizado (alfanumérico, guion y guion bajo).
      */
     public function sanitizeFolderName(string $name): string {
-        // Elimina absolutamente todo lo que no sea una letra, número, guion o guion bajo
-        return preg_replace('/[^a-zA-Z0-9_\-]/', '', $name);
+
+        // 1. Decodifica la URL para neutralizar nombres codificados (%2e%2e → "..")
+        $decoded = rawurldecode($name);
+
+        // 2. Elimina absolutamente todo lo que no sea una letra, número, guion o guion bajo
+        return preg_replace('/[^a-zA-Z0-9_\-]/', '', $decoded);
     }
 
     /******************************************************************************************/
@@ -791,11 +842,31 @@ class FileManager {
             return;
         }
 
-        // Construye el nombre final del archivo:
-        // - Usa una función personalizada (puede incluir prefijos, timestamps, etc.)
-        // - Luego sanitiza para evitar caracteres peligrosos o inválidos
+        // Verifica el MIME real del contenido (no confía en el header del cliente ni en la
+        // extensión): inspecciona los bytes del archivo temporal con finfo.
+        $realMime = $this->getRealMimeType($SIS_FILES[$id]['tmp_name']);
+
+        // Lista blanca por categoría: el MIME debe pertenecer a las categorías permitidas.
+        // Mismo criterio que el flujo Base64 (handleBase64Upload).
+        $allowed = $this->buildAllowedMimes($archivo['ValidarTipo'] ?? 'image');
+        if (!in_array($realMime, $allowed, true)) {
+            $Data['errors'][] = $id . ': tipo de archivo no permitido';
+            return;
+        }
+
+        // Deriva SIEMPRE la extensión final desde el MIME real detectado, igual que el flujo
+        // Base64. Así se ignoran variantes peligrosas no contempladas en la lista negra
+        // (pht, php7, phps, shtml…) y cualquier extensión arbitraria enviada por el cliente.
+        $mimeExt = $this->resolveExtensionFromMime($realMime);
+        if ($mimeExt === null) {
+            $Data['errors'][] = $id . ': no se pudo determinar la extensión del archivo';
+            return;
+        }
+
+        // Construye el nombre final del archivo reemplazando la extensión enviada por el
+        // cliente con la derivada del MIME real; luego sanitiza caracteres peligrosos/inválidos.
         $nombreArchivo = $this->sanitizeFileName(
-            $this->buildFileName($archivo, $SIS_FILES[$id]['name'])
+            $this->buildFileName($archivo, $SIS_FILES[$id]['name'], $mimeExt)
         );
 
         // Construye la ruta donde se almacenará el archivo
@@ -825,6 +896,15 @@ class FileManager {
      * @param string   $id            Identificador del archivo (clave en $Data)
      */
     private function saveFileViaDriver(string $rutaRelativa, string $nombreArchivo, string $contenido, bool   $isBase64, array  &$Data, string $id): void {
+
+        // Verificación de seguridad de última línea: rechaza en la subida real los
+        // nombres excluidos (.htaccess, .env, config.php, …) y cualquier archivo oculto
+        // (nombre que comienza con punto), aunque validateFiles() los haya omitido.
+        // Cubre tanto subidas multipart (handleNormalUpload) como Base64 (handleBase64Upload).
+        if ($this->hasExcludedName($nombreArchivo)) {
+            $Data['errors'][] = $id . ': nombre de archivo no permitido por seguridad';
+            return;
+        }
 
         // Evita sobrescribir archivos existentes en el servidor
         $fullRelative = ltrim($rutaRelativa . $nombreArchivo, '/');
@@ -860,35 +940,53 @@ class FileManager {
      * Construye el nombre final del archivo según la configuración definida.
      *
      * Reglas:
-     * - Si existe 'NombreArchivo', se usa como nombre base y se respeta la extensión original.
+     * - Si existe 'NombreArchivo', se usa como nombre base.
      * - Si existe 'SufijoArchivo', se antepone al nombre original.
      * - Si no hay configuración, se mantiene el nombre original.
+     * - La extensión se toma del MIME real ($mimeExt) cuando se provee (recomendado y usado
+     *   por handleNormalUpload/handleBase64Upload); en caso contrario, se conserva la del
+     *   nombre original para retrocompatibilidad con llamadas internas.
      *
-     * @param array  $archivo      Configuración del archivo (NombreArchivo, SufijoArchivo, etc.)
-     * @param string $originalName Nombre original del archivo subido (incluye extensión)
+     * @param array       $archivo      Configuración del archivo (NombreArchivo, SufijoArchivo, etc.)
+     * @param string      $originalName Nombre original del archivo subido (incluye extensión)
+     * @param string|null $mimeExt      Extensión derivada del MIME real (sin punto) o null si no aplica
      *
      * @return string Nombre final del archivo
      */
-    private function buildFileName(array $archivo, string $originalName): string {
+    private function buildFileName(array $archivo, string $originalName, ?string $mimeExt = null): string {
+
+        // Extensión enviada por el cliente (NO confiable: pht, php7, phps, shtml…)
+        $clientExt = pathinfo($originalName, PATHINFO_EXTENSION);
+
+        // Nombre original sin su extensión (base sobre la que se sustituye la extensión)
+        $base = $clientExt !== ''
+            ? substr($originalName, 0, -(strlen($clientExt) + 1))
+            : $originalName;
+
+        // Extensión efectiva:
+        // - Si se deriva del MIME real, se prioriza (extensión confiable).
+        // - Si no, se conserva la del cliente (retrocompatibilidad).
+        $forced = $mimeExt !== null && $mimeExt !== '';
+        $ext    = $forced ? $mimeExt : $clientExt;
 
         // Caso 1: Se define un nombre fijo para el archivo
-        // - Se mantiene la extensión original del archivo subido
         if (!empty($archivo['NombreArchivo'])) {
-            $ext = pathinfo($originalName, PATHINFO_EXTENSION);
             return $ext !== ''
                 ? $archivo['NombreArchivo'] . '.' . $ext
                 : $archivo['NombreArchivo'];
         }
 
         // Caso 2: Se define un sufijo/prefijo para el archivo
-        // - Se antepone al nombre original completo
         if (!empty($archivo['SufijoArchivo'])) {
-            return $archivo['SufijoArchivo'] . $originalName;
+            return $forced
+                ? $archivo['SufijoArchivo'] . $base . ($ext !== '' ? '.' . $ext : '')
+                : $archivo['SufijoArchivo'] . $originalName;
         }
 
         // Caso 3: No hay configuración adicional
-        // - Se devuelve el nombre original tal cual
-        return $originalName;
+        return $forced
+            ? $base . ($ext !== '' ? '.' . $ext : '')
+            : $originalName;
 
     }
 
@@ -983,6 +1081,34 @@ class FileManager {
         // Verifica si la extensión está en la lista de extensiones prohibidas
         // strict = true evita comparaciones débiles (ej: "0" == 0)
         return in_array($ext, self::BLOCKED_EXTENSIONS, true);
+
+    }
+
+    /******************************************************************************************/
+    /**
+     * Verifica si el nombre del archivo corresponde a un nombre sensible/excluido.
+     *
+     * Aplica en la subida real las mismas políticas que el explorador (EXCLUDED_NAMES),
+     * y además bloquea cualquier nombre que comience con punto (archivos ocultos como
+     * .htaccess, .env, .git, etc.) para evitar sobrescribir configuraciones del servidor.
+     *
+     * @param string $filename Nombre del archivo (puede incluir ruta; solo se evalúa el basename)
+     *
+     * @return bool TRUE si el nombre está excluido o es oculto, FALSE en caso contrario
+     */
+    private function hasExcludedName(string $filename): bool {
+
+        // Normaliza: solo el nombre base, sin ruta y en minúsculas (comparación segura)
+        $name = strtolower(basename(trim($filename)));
+
+        // Bloquea archivos ocultos o de configuración que comienzan con punto (.htaccess, .env, …)
+        if (str_starts_with($name, '.')) { return true; }
+
+        // Bloquea nombres sensibles definidos en EXCLUDED_NAMES (comparación insensible a mayúsculas)
+        static $blocklist = null;
+        $blocklist ??= array_map('strtolower', self::EXCLUDED_NAMES);
+
+        return in_array($name, $blocklist, true);
 
     }
 

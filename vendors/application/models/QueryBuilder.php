@@ -1967,8 +1967,12 @@ class QueryBuilder{
                      * Invocación al motor de seguridad:
                      * - Valor: El dato original enviado por el usuario.
                      * Un hash de alta seguridad para contraseñas utilizando el algoritmo BCRYPT.
+                     * hashCreate() retorna array ['success'=>bool, 'data'/'error'=>...].
                      */
-                    $query['Post'][$data] = $this->Passwords->hashCreate($query['Post'][$data]);
+                    $hashData = $this->Passwords->hashCreate($query['Post'][$data]);
+                    // Solo se reemplaza el valor si el hash se generó correctamente; ante un fallo
+                    // se descarta el campo para no almacenar el mensaje de error como si fuera el hash.
+                    $query['Post'][$data] = ($hashData['success'] === true) ? $hashData['data'] : '';
                 }
             }
         }
