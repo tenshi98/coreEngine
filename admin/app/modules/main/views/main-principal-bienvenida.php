@@ -34,5 +34,5 @@ $UserIMG = !empty($data['UserData']['UserIMG'])
         </div>
     </div>
 
-    <?php if($data['UserData']["Config_Principal_Radio"]==2){ $data['Fnc_WidgetsCommon']->widget_radio_player($BASE, 2);} ?>
+    <?php if(($data['UserData']['Config_Principal_Radio'] ?? 0)==2){ $data['Fnc_WidgetsCommon']->widget_radio_player($BASE, 2);} ?>
 </div>
