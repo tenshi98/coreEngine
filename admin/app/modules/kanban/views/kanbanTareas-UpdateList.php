@@ -8,35 +8,36 @@
     <div class="table-responsive">
         <div class="d-flex">
             <?php
-            //Verifico si hay datos
+            // Verifico si hay datos
             if(is_array($data['arrList'])){
-                //Recorro
-                foreach($data['arrList'] as $crud){ ?>
+                // Recorro
+                foreach($data['arrList'] as $crud){
+                    // Se obtiene el ID
+                    $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']); ?>
                     <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
-                        <div class="kanban status" id="<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']); ?>">
+                        <div class="kanban status" id="<?php echo $DataID['data']; ?>">
                             <h5 class="title text-center">
                                 <span class="<?php echo 'badge-sp1 badge-sp1-'.$crud['Color']; ?>"><?php echo $crud['Nombre']; ?></span>
                                 <?php
                                 // Se verifica si se tiene el permiso para visualizar el dato
                                 if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
                                     // Variables
-                                    $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idKanbanEstado']);
                                     $level       = $data['UserAccess']['LevelAccess'];
                                     $Entidad     = addslashes($crud['Nombre']); ?>
                                     <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                         <?php
                                         //Valido
-                                        if ($level >= 2) {echo '<button type="button" onclick="EditTabla(\''.$encryptedId.'\')"                  class="btn btn-secondary btn-sm"><i class="bi bi-pencil-square"></i></button>';}
-                                        if ($level >= 4) {echo '<button type="button" onclick="delTabla(\''.$encryptedId.'\', \''.$Entidad.'\')" class="btn btn-danger    btn-sm"><i class="bi bi-trash"></i></button>';}
+                                        if ($level >= 2) {echo '<button type="button" onclick="EditTabla(\''.$DataID['data'].'\')"                  class="btn btn-secondary btn-sm"><i class="bi bi-pencil-square"></i></button>';}
+                                        if ($level >= 4) {echo '<button type="button" onclick="delTabla(\''.$DataID['data'].'\', \''.$Entidad.'\')" class="btn btn-danger    btn-sm"><i class="bi bi-trash"></i></button>';}
                                         ?>
                                     </div>
                                 <?php } ?>
                             </h5>
 
                             <?php
-                            //Verifico si hay datos
+                            // Verifico si hay datos
                             if(is_array($data['arrTareas'])){
-                                //Recorro
+                                // Recorro
                                 foreach ($data['arrTareas'] as $Tareas=>$tarea){
                                     //Filtro los del mismo estado
                                     if($tarea[0]['idKanbanEstado']==$crud['idKanbanEstado']){
@@ -47,7 +48,7 @@
                                         $level       = $data['UserAccess']['LevelAccess'];
                                         $Entidad     = addslashes($tarea[0]['Titulo']);
                                         ?>
-                                        <div class="task <?php echo $col_borde; ?> todo" draggable="true" id="<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas); ?>">
+                                        <div class="task <?php echo $col_borde; ?> todo" draggable="true" id="<?php echo $encryptedId['data']; ?>">
                                             <h4 class="align-middle">
                                                 <span class="<?php echo 'badge-sp1 badge-sp1-'.$tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span>
                                                 <span class="float-end date"><i class="bi bi-calendar3"></i> <?php echo $data['Fnc_DataDate']->fechaEstandar($tarea[0]['Fecha']); ?></span>
@@ -76,8 +77,8 @@
                                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                                     <?php
                                                     //Valido
-                                                    if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId.'\')"                  class="btn btn-primary btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                                                    if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId.'\', \''.$Entidad.'\')" class="btn btn-danger  btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
+                                                    if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId['data'].'\')"                  class="btn btn-primary btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
+                                                    if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId['data'].'\', \''.$Entidad.'\')" class="btn btn-danger  btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
                                                     ?>
                                                 </div>
                                             </div>

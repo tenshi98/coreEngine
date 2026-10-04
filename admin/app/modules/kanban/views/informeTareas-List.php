@@ -37,7 +37,7 @@
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormSearchData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -68,7 +68,7 @@
             SendDataForms(Metodo, Direccion, Informacion, Options);
         }
     });
-    /******************************************/
+    /************************************/
     function listTableDataView(ID) {
         //Cargo el loader
         $('#PDloader').show();

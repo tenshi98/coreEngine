@@ -62,7 +62,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     /*********************************************************************/
     /*                        OPCIONES DE LA TABLA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function listTableDataView(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -76,7 +76,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function listTableDataEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -90,7 +90,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function listTableDataDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -128,7 +128,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         /*********************************************************************/
         /*                        OPCIONES DE LA TABLA                       */
         /*********************************************************************/
-        /******************************************/
+        /************************************/
         function EditTabla(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -142,7 +142,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
             //Se envian los datos al formulario
             UpdateContentId(Div, URL, Options);
         }
-        /******************************************/
+        /************************************/
         function delTabla(ID, Dato) {
             Swal.fire({
                 title: "Borrar Dato",
@@ -178,7 +178,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     /*********************************************************************/
     /*                              TAREAS                               */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function tareas_Add(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -192,7 +192,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tareas_Edit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -209,7 +209,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     /*********************************************************************/
     /*                           PARTICIPANTES                           */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function participantes_Add(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -223,7 +223,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function participantes_Del(ID, ID2) {
         Swal.fire({
             title: "Borrar Dato",
@@ -265,7 +265,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     /*********************************************************************/
     /*                           OTRAS OPCIONES                          */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function deleteFilter(collapse=null) {
         //Cargo el loader
         $('#PDloader').show();
@@ -282,7 +282,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
             $(collapse).collapse("toggle");
         }
     }
-    /******************************************/
+    /************************************/
     function changeStatus(Objeto, Destino) {
         //Cargo el loader
         $('#PDloader').show();
@@ -303,7 +303,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         //Se envian los datos al formulario
         SendDataForms(Metodo, Direccion, Informacion, Options);
     }
-    /******************************************/
+    /************************************/
     let draggableTodo = null;
     let objeto        = '';
     let destino       = '';
@@ -373,4 +373,3 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     call_1();
 
 </script>
-

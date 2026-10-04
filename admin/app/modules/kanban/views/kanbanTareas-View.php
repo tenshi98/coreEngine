@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']);
 ?>
 <div class="modal-header">
     <?php
@@ -22,7 +24,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <div class="row gutters">
@@ -31,17 +33,13 @@
                 <div class="kanban-container">
                     <div class="kanban-header">
                         <div class="row gutters">
-                            <?php
-                            // Variables
-                            $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']);
-                            ?>
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                                 <div class="float-end">
-                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$encryptedId; ?>" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Imprimir Tarea</a>
+                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$DataID['data']; ?>" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Imprimir Tarea</a>
                                     <?php
                                     if($data['rowData']['idEstadoCierre']==1){
                                         if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                            <a onclick="listTableDataEdit('<?php echo $encryptedId; ?>')" class="btn btn-secondary btn-sm"><i class="bi bi-pencil-square"></i> Editar Información</a>
+                                            <a onclick="listTableDataEdit('<?php echo $DataID['data']; ?>')" class="btn btn-secondary btn-sm"><i class="bi bi-pencil-square"></i> Editar Información</a>
                                         <?php }
                                     } ?>
                                 </div>
@@ -86,7 +84,7 @@
                                     <?php
                                     if($data['rowData']['idEstadoCierre']==1){
                                         if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                            <a onclick="tareas_Add('<?php echo $encryptedId; ?>');" class="btn btn-primary btn-sm float-end"><i class="bi bi-clipboard-plus"></i> Agregar Tarea</a>
+                                            <a onclick="tareas_Add('<?php echo $DataID['data']; ?>');" class="btn btn-primary btn-sm float-end"><i class="bi bi-clipboard-plus"></i> Agregar Tarea</a>
                                         <?php }
                                     } ?>
                                 </p>
@@ -110,7 +108,7 @@
                                                         <?php if($data['rowData']['idEstadoCierre']==1){ ?>
                                                             <td style="width: 120px;">
                                                                 <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                                                    <button class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información" type="button" onclick="tareas_Edit('<?php echo $encryptedTareas; ?>')"><i class="bi bi-pencil-square"></i> Editar</button>
+                                                                    <button class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información" type="button" onclick="tareas_Edit('<?php echo $encryptedTareas['data']; ?>')"><i class="bi bi-pencil-square"></i> Editar</button>
                                                                 <?php } ?>
                                                             </td>
                                                         <?php } ?>
@@ -126,7 +124,7 @@
                                                         <?php if($data['rowData']['idEstadoCierre']==1){ ?>
                                                             <td style="width: 120px;">
                                                                 <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                                                    <button class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información" type="button" onclick="tareas_Edit('<?php echo $encryptedTareas; ?>')"><i class="bi bi-pencil-square"></i> Editar</button>
+                                                                    <button class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información" type="button" onclick="tareas_Edit('<?php echo $encryptedTareas['data']; ?>')"><i class="bi bi-pencil-square"></i> Editar</button>
                                                                 <?php } ?>
                                                             </td>
                                                         <?php } ?>
@@ -143,7 +141,7 @@
                                     <strong><i class="bi bi-person-plus"></i> Participantes</strong>
                                     <?php if($data['rowData']['idEstadoCierre']==1){
                                         if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                            <a onclick="participantes_Add('<?php echo $encryptedId; ?>');" class="btn btn-primary btn-sm float-end"><i class="bi bi-person-plus"></i> Agregar Participante</a>
+                                            <a onclick="participantes_Add('<?php echo $DataID['data']; ?>');" class="btn btn-primary btn-sm float-end"><i class="bi bi-person-plus"></i> Agregar Participante</a>
                                         <?php }
                                     } ?>
                                 </p>
@@ -155,6 +153,8 @@
                                     <table class="table table-bordered">
                                         <tbody>
                                             <?php foreach ($data['arrParticipantes'] as $task){
+                                                // Se obtiene el ID
+                                                $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idParticipantes']);
                                                 //verifico si existe imagen
                                                 $UserIMG  = !empty($task['UsuarioImg'])
                                                             ? $data['UserData']['MainPathUrl'].$task['UsuarioImg']
@@ -165,7 +165,7 @@
                                                     <?php if($data['rowData']['idEstadoCierre']==1){ ?>
                                                         <td style="width: 120px;">
                                                             <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                                                <button class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información" type="button" onclick="participantes_Del('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idParticipantes']); ?>', '<?php echo $encryptedId; ?>')"><i class="bi bi-trash"></i> Borrar</button>
+                                                                <button class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información" type="button" onclick="participantes_Del('<?php echo $DataID['data']; ?>', '<?php echo $DataID['data']; ?>')"><i class="bi bi-trash"></i> Borrar</button>
                                                             <?php } ?>
                                                         </td>
                                                     <?php } ?>
@@ -197,7 +197,7 @@
                                             <?php
                                             // Variables
                                             $vowels = array('&lt;br&gt;', '&lt;br/&gt;');
-                                            //recorro
+                                            // Recorro
                                             foreach ($data['arrHistorial'] as $task){
                                                 //verifico si existe imagen
                                                 $UserIMG  = !empty($task['UsuarioImg'])

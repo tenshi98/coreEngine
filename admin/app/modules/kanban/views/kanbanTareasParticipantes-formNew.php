@@ -6,6 +6,9 @@
 //Nombre aleatorio para la variable
 $ProdName = 'room_'.rand(1, 999999);
 $RandName = 'rand_'.rand(1, 999999);
+
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']);
 ?>
 <form id="FormNewParticipante" name="FormNewParticipante" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
@@ -26,7 +29,7 @@ $RandName = 'rand_'.rand(1, 999999);
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
@@ -51,7 +54,7 @@ $RandName = 'rand_'.rand(1, 999999);
     </div>
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">
-            <button type="button" class="btn btn-danger" onclick="listTableDataView('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']); ?>')"><i class="bx bx-arrow-back"></i> Volver</button>
+            <button type="button" class="btn btn-danger" onclick="listTableDataView('<?php echo $DataID['data']; ?>')"><i class="bx bx-arrow-back"></i> Volver</button>
             <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
         </div>
     </div>
@@ -82,7 +85,7 @@ $RandName = 'rand_'.rand(1, 999999);
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewParticipante").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -104,7 +107,7 @@ $RandName = 'rand_'.rand(1, 999999);
             let Informacion = $("#FormNewParticipante").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#modalContent', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']); ?>', refreshTbl:'false'},
+                    {Div:'#modalContent', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'},
                     {Div:'#listTableData', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
@@ -120,7 +123,7 @@ $RandName = 'rand_'.rand(1, 999999);
     /*                        ELEMENTOS DINAMICOS                        */
     /*********************************************************************/
     /**********************************************************/
-	//variable
+	// Variable
 	let <?php echo $ProdName; ?> = 0; //New Participantes
     /**********************************************************/
 	//Se agrega producto

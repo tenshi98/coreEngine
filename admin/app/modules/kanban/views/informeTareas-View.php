@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']);
 ?>
 <div class="modal-header">
     <?php
@@ -22,7 +24,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <div class="row gutters">
@@ -35,7 +37,7 @@
 
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                                 <div class="float-end">
-                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idKanban']); ?>" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Imprimir Tarea</a>
+                                    <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$DataID['data']; ?>" class="btn btn-primary btn-sm"><i class="bi bi-printer"></i> Imprimir Tarea</a>
                                 </div>
                             </div>
                             <div class="clearfix"></div>
@@ -152,7 +154,7 @@
                                             <?php
                                             // Variables
                                             $vowels = array('&lt;br&gt;', '&lt;br/&gt;');
-                                            //recorro
+                                            // Recorro
                                             foreach ($data['arrHistorial'] as $task){
                                                 //verifico si existe imagen
                                                 $UserIMG  = !empty($task['UsuarioImg'])

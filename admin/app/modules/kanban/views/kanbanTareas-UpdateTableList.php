@@ -9,7 +9,7 @@
         <tr>
             <th scope="col">Estado</th>
             <th scope="col">Prioridad</th>
-            <th scope="col">Fecha</th>
+            <th scope="col" style="width: 100px;">Fecha</th>
             <th scope="col">Titulo</th>
             <th scope="col">Participantes</th>
             <th scope="col" style="width: 10px;">Acciones</th>
@@ -17,9 +17,9 @@
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrTareas'])&&!empty($data['arrTareas'])){
-            //Recorro
+            // Recorro los datos
             foreach ($data['arrTareas'] as $Tareas=>$tarea){
                 // Variables
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas);
@@ -55,8 +55,8 @@
                         <div class="btn-group" role="group">
                             <?php
                             //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId.'\')"                  class="btn btn-primary btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId.'\', \''.$Entidad.'\')" class="btn btn-danger  btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
+                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId['data'].'\')"                  class="btn btn-primary btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
+                            if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId['data'].'\', \''.$Entidad.'\')" class="btn btn-danger  btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
                             ?>
                         </div>
                     </td>

@@ -17,7 +17,7 @@
                                 <tr>
                                     <th scope="col">Estado</th>
                                     <th scope="col">Prioridad</th>
-                                    <th scope="col">Fecha</th>
+                                    <th scope="col" style="width: 100px;">Fecha</th>
                                     <th scope="col">Titulo</th>
                                     <th scope="col">Participantes</th>
                                     <th scope="col" style="width: 10px;">Acciones</th>
@@ -25,10 +25,12 @@
                             </thead>
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrTareas'])&&!empty($data['arrTareas'])){
-                                    //Recorro
-                                    foreach ($data['arrTareas'] as $Tareas=>$tarea){ ?>
+                                    // Recorro
+                                    foreach ($data['arrTareas'] as $Tareas=>$tarea){
+                                        // Se obtiene el ID
+                                        $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas); ?>
                                         <tr>
                                             <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$tarea[0]['KanbanColor']; ?>"><?php echo $tarea[0]['KanbanEstado']; ?></span></td>
                                             <td><span class="<?php echo 'badge-sp1 badge-sp1-'.$tarea[0]['PrioridadColor']; ?>"><?php echo $tarea[0]['PrioridadNombre']; ?></span></td>
@@ -57,7 +59,7 @@
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <?php if($data['UserAccess']['LevelAccess']>=1){ ?>
-                                                        <button type="button" onclick="listTableDataView('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $Tareas); ?>')"   class="btn btn-primary btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
+                                                        <button type="button" onclick="listTableDataView('<?php echo $DataID['data']; ?>')"   class="btn btn-primary btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
                                                     <?php } ?>
                                                 </div>
                                             </td>

@@ -4,14 +4,16 @@
 /*******************************************************************************************************************/
 class kanbanEstados extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -28,26 +30,36 @@ class kanbanEstados extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $KanbanEstadoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($KanbanEstadoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idKanbanEstado,Nombre,idColor,idPrioridad,idCierre',
             'table'   => 'kanban_estados',
             'join'    => '',
             'where'   => 'idKanbanEstado = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanEstadoID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idColor AS ID,Nombre',
@@ -60,11 +72,12 @@ class kanbanEstados extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams    = ['query' => $query];
+        // Ejecuto la query
         $arrColores = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idOpciones AS ID,Nombre',
@@ -77,8 +90,9 @@ class kanbanEstados extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrCierre = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -86,8 +100,8 @@ class kanbanEstados extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrColores['status'] && $arrCierre['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -100,15 +114,15 @@ class kanbanEstados extends ControllerBase {
                 'arrCierre'  => $arrCierre['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/kanbanEstados-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrColores,$arrCierre]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -116,15 +130,16 @@ class kanbanEstados extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
     public function Insert(){
 
-        /******************************/
-        //Se genera el chequeo
+        /************************************/
+        // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'Nombre,idColor,idPrioridad,idCierre',
@@ -134,104 +149,114 @@ class kanbanEstados extends ControllerBase {
             'table'     => 'kanban_estados',
             'Post'      => $_POST
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
-        /******************************/
-        // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if ($Response['status']){
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-        } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
 
-            /******************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idKanbanEstado,Nombre,idColor,idPrioridad,idCierre',
-                'required'  => 'Nombre,idColor,idPrioridad,idCierre',
-                'unique'    => 'Nombre',
-                'encode'    => '',
-                'table'     => 'kanban_estados',
-                'where'     => 'idKanbanEstado',
-                'Post'      => $_POST
-            ];
-            // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idKanbanEstado,Nombre,idColor,idPrioridad,idCierre',
+            'required'  => 'idKanbanEstado,Nombre,idColor,idPrioridad,idCierre',
+            'unique'    => 'Nombre',
+            'encode'    => '',
+            'table'     => 'kanban_estados',
+            'where'     => 'idKanbanEstado',
+            'Post'      => $_POST
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'kanban_estados',
-                'where'       => 'idKanbanEstado',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'kanban_estados',
+            'where'       => 'idKanbanEstado',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -264,7 +289,7 @@ class kanbanEstados extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 

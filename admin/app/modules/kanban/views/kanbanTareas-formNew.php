@@ -29,7 +29,7 @@ $RandName = 'rand_'.rand(1, 999999);
                             </h5>';
                             break;
                     } ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
                 </div>
                 <div class="modal-body">
                     <?php
@@ -132,7 +132,7 @@ $RandName = 'rand_'.rand(1, 999999);
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -170,7 +170,7 @@ $RandName = 'rand_'.rand(1, 999999);
     /*                         ELEMENTOS DINAMICOS                       */
     /*********************************************************************/
     /**********************************************************/
-	//variable
+	// Variable
 	let <?php echo $ProdName; ?> = [4];
 	<?php echo $ProdName; ?>[0] = 0; //Tareas
 	<?php echo $ProdName; ?>[1] = 0; //Participantes

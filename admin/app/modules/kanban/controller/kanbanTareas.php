@@ -4,8 +4,9 @@
 /*******************************************************************************************************************/
 class kanbanTareas extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $DataDate;
@@ -14,8 +15,9 @@ class kanbanTareas extends ControllerBase {
     private $CommonData;
     private $ServerServer;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -36,14 +38,16 @@ class kanbanTareas extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Listar Todo
+    /*******************************************************************/
+    // Listar
+    /*******************************************************************/
     public function listAll($f3){
-        /******************************************/
-        //Se instancia
+
+        /************************************/
+        // Se instancia
         $arrUserData = $this->getUserData($f3);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -59,11 +63,12 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'kanban_estados.idPrioridad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrList = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -92,11 +97,12 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'kanban_tareas.idKanbanEstado ASC, kanban_tareas.Fecha ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrTareas = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idPrioridad AS ID,Nombre',
@@ -109,20 +115,21 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'idPrioridad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrPrioridad = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["KanbanTareasAdminTabIndepend"]==2){
             $arrColores['status']   = true;
             $arrColores['data']     = [];
             $arrCierre['status']    = true;
             $arrCierre['data']      = [];
-        //Si se permite junto con la creacion de tareas
+        // Si se permite junto con la creacion de tareas
         }else{
-            /*******************************************************************/
+            /************************************/
             // Se genera la query
             $query = [
                 'data'    => 'idColor AS ID,Nombre',
@@ -135,11 +142,12 @@ class kanbanTareas extends ControllerBase {
                 'order'   => 'Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams    = ['query' => $query];
+            // Ejecuto la query
             $arrColores = $this->Base_GetList($xParams);
 
-            /*******************************************************************/
+            /************************************/
             // Se genera la query
             $query = [
                 'data'    => 'idOpciones AS ID,Nombre',
@@ -152,12 +160,13 @@ class kanbanTareas extends ControllerBase {
                 'order'   => 'Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams   = ['query' => $query];
+            // Ejecuto la query
             $arrCierre = $this->Base_GetList($xParams);
         }
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstadoCierre AS ID,Nombre',
@@ -170,11 +179,12 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'idEstadoCierre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams         = ['query' => $query];
+        // Ejecuto la query
         $arrEstadoCierre = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idUsuario AS ID,Nombre',
@@ -187,14 +197,15 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams     = ['query' => $query];
+        // Ejecuto la query
         $arrUsuarios = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
         if($arrUserData["KanbanTareasUsoTareas"]==2){
-            /*******************************************************************/
+            /************************************/
             // Se genera la query
             $query = [
                 'data'    => 'idTrabajo AS ID,Nombre',
@@ -207,10 +218,11 @@ class kanbanTareas extends ControllerBase {
                 'order'   => 'Nombre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams     = ['query' => $query];
+            // Ejecuto la query
             $arrTrabajos = $this->Base_GetList($xParams);
-        //Si se permite junto con la creacion de tareas
+        // Si se permite junto con la creacion de tareas
         }else{
             $arrTrabajos['status']   = true;
             $arrTrabajos['data']     = [];
@@ -222,12 +234,12 @@ class kanbanTareas extends ControllerBase {
         // Si hay resultados
         if($arrList['status'] && $arrTareas['status'] && $arrColores['status'] && $arrPrioridad['status'] && $arrCierre['status'] && $arrEstadoCierre['status'] && $arrUsuarios['status'] && $arrTrabajos['status']){
 
-            /******************************************/
+            /************************************/
             //Se agrupan los menus
             $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'PageTitle'       => 'Listado de Tareas',
@@ -254,23 +266,25 @@ class kanbanTareas extends ControllerBase {
                 'arrTrabajos'     => $arrTrabajos['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrList,$arrTareas,$arrColores,$arrPrioridad,$arrCierre,$arrEstadoCierre,$arrUsuarios,$arrTrabajos]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(1, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //List
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3){
-        /******************************/
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -286,11 +300,12 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'kanban_estados.idPrioridad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrList = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -319,12 +334,14 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'kanban_tareas.idKanbanEstado ASC, kanban_tareas.Fecha ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrTareas = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         //Se pide para el formulario de busqueda de la segunda pestaña
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idPrioridad AS ID,Nombre',
@@ -337,12 +354,14 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'idPrioridad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrPrioridad = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         //Se pide para el formulario de busqueda de la segunda pestaña
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstadoCierre AS ID,Nombre',
@@ -355,8 +374,9 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'idEstadoCierre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams         = ['query' => $query];
+        // Ejecuto la query
         $arrEstadoCierre = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -368,8 +388,8 @@ class kanbanTareas extends ControllerBase {
             //Se agrupan los menus
             $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Listado de Tareas',
@@ -388,35 +408,38 @@ class kanbanTareas extends ControllerBase {
                 'arrEstadoCierre' => $arrEstadoCierre['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrList,$arrTareas,$arrPrioridad,$arrEstadoCierre]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //List
+    /*******************************************************************/
+    // Listar
+    /*******************************************************************/
     public function UpdateTableList($f3){
-        /*******************************************************************/
+
+        /************************************/
         // Variables
         $WhereData_int     = 'idPrioridad,Fecha,idEstadoCierre';  // Datos búsqueda exacta
         $WhereData_string  = 'Titulo';                            // Datos búsqueda relativa
         $WhereData_between = '';                                  // Datos búsqueda Between
         $whereInt          = '';                                  // Se crea cadena
         $whereParams       = [];                                  // Valores bindeados asociados a $whereInt
-        /******************************************/
+        /************************************/
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_between);
         if($RespDataBetween!=''){
             Response::error($RespDataBetween, 500);
         }
+        /************************************/
         // Agrego variable busqueda
         $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'kanban_tareas', 1);
         $whereInt = $r['where']; $whereParams = $r['params'];
@@ -425,7 +448,7 @@ class kanbanTareas extends ControllerBase {
         $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'kanban_tareas', 3);
         $whereInt = $r['where']; $whereParams = $r['params'];
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -454,21 +477,22 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'kanban_tareas.idKanbanEstado ASC, kanban_tareas.Fecha ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrTareas = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrTareas['status']){
+        if ($arrTareas['status'] === true) {
 
             //Se agrupan los menus
             $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Listado de Tareas',
@@ -482,23 +506,32 @@ class kanbanTareas extends ControllerBase {
                 'arrTareas'       => $arrTareasNew,
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateTableList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrTareas]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //View
+    /*******************************************************************/
+    // View
+    /*******************************************************************/
     public function View($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($KanbanID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -520,16 +553,17 @@ class kanbanTareas extends ControllerBase {
                 LEFT JOIN core_estados_cierre      ON core_estados_cierre.idEstadoCierre     = kanban_tareas.idEstadoCierre
                 LEFT JOIN core_estados_colores     ON core_estados_colores.idColor           = kanban_estados.idColor',
             'where'   => 'kanban_tareas.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -544,17 +578,18 @@ class kanbanTareas extends ControllerBase {
                 LEFT JOIN core_estados_trabajos ON core_estados_trabajos.idEstadoTrabajo = kanban_tareas_tareas.idEstadoTrabajo
                 LEFT JOIN kanban_trabajos       ON kanban_trabajos.idTrabajo             = kanban_tareas_tareas.idTrabajo',
             'where'   => 'kanban_tareas_tareas.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_tareas_tareas.Tarea ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrTareas = $this->Base_GetList($xParams);
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -564,17 +599,18 @@ class kanbanTareas extends ControllerBase {
             'table'   => 'kanban_tareas_participantes',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_participantes.idUsuario',
             'where'   => 'kanban_tareas_participantes.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams          = ['query' => $query];
+        // Ejecuto la query
         $arrParticipantes = $this->Base_GetList($xParams);
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -586,14 +622,15 @@ class kanbanTareas extends ControllerBase {
             'table'   => 'kanban_tareas_historial',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_historial.idUsuario',
             'where'   => 'kanban_tareas_historial.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrHistorial = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -602,8 +639,8 @@ class kanbanTareas extends ControllerBase {
         // Si hay resultados
         if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status'] && $arrHistorial['status']){
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -619,23 +656,32 @@ class kanbanTareas extends ControllerBase {
                 'arrHistorial'     => $arrHistorial['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-View.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes,$arrHistorial]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //View
+    /*******************************************************************/
+    // Imprimir
+    /*******************************************************************/
     public function Print($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($KanbanID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -657,16 +703,17 @@ class kanbanTareas extends ControllerBase {
                 LEFT JOIN core_estados_cierre     ON core_estados_cierre.idEstadoCierre    = kanban_tareas.idEstadoCierre
                 LEFT JOIN core_estados_colores    ON core_estados_colores.idColor          = kanban_estados.idColor',
             'where'   => 'kanban_tareas.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -681,17 +728,18 @@ class kanbanTareas extends ControllerBase {
                 LEFT JOIN core_estados_trabajos ON core_estados_trabajos.idEstadoTrabajo = kanban_tareas_tareas.idEstadoTrabajo
                 LEFT JOIN kanban_trabajos       ON kanban_trabajos.idTrabajo             = kanban_tareas_tareas.idTrabajo',
             'where'   => 'kanban_tareas_tareas.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'kanban_tareas_tareas.Tarea ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams   = ['query' => $query];
+        // Ejecuto la query
         $arrTareas = $this->Base_GetList($xParams);
 
-        /******************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -701,14 +749,15 @@ class kanbanTareas extends ControllerBase {
             'table'   => 'kanban_tareas_participantes',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_participantes.idUsuario',
             'where'   => 'kanban_tareas_participantes.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams          = ['query' => $query];
+        // Ejecuto la query
         $arrParticipantes = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -717,8 +766,8 @@ class kanbanTareas extends ControllerBase {
         // Si hay resultados
         if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -733,23 +782,32 @@ class kanbanTareas extends ControllerBase {
                 'arrParticipantes' => $arrParticipantes['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(3, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Print.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($KanbanID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -765,18 +823,20 @@ class kanbanTareas extends ControllerBase {
             'table'   => 'kanban_tareas',
             'join'    => 'LEFT JOIN kanban_estados  ON kanban_estados.idKanbanEstado  = kanban_tareas.idKanbanEstado',
             'where'   => 'kanban_tareas.idKanban = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
         /*******************************************************************/
         //Verifico si permite el cierre
         if($rowData['data']['idCierre']==1){
+            /************************************/
             // Se genera la query
             $query = [
                 'data'    => 'idEstadoCierre AS ID,Nombre',
@@ -789,8 +849,9 @@ class kanbanTareas extends ControllerBase {
                 'order'   => 'idEstadoCierre ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
-            // Ejecuto la query
+            // Preparo los datos
             $xParams         = ['query' => $query];
+            // Ejecuto la query
             $arrEstadoCierre = $this->Base_GetList($xParams);
         //Si no lo permite se envia array vacio
         }else{
@@ -798,7 +859,7 @@ class kanbanTareas extends ControllerBase {
             $arrEstadoCierre['data']   = [];
         }
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idPrioridad AS ID,Nombre',
@@ -811,8 +872,9 @@ class kanbanTareas extends ControllerBase {
             'order'   => 'idPrioridad ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrPrioridad = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -820,8 +882,8 @@ class kanbanTareas extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrPrioridad['status'] && $arrEstadoCierre['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -836,15 +898,15 @@ class kanbanTareas extends ControllerBase {
                 'arrEstadoCierre'  => $arrEstadoCierre['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrPrioridad,$arrEstadoCierre]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -852,30 +914,31 @@ class kanbanTareas extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
     public function Insert($f3){
 
-        /******************************/
+        /************************************/
         // Usuario creador
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
-        /*******************************************************************/
+        /************************************/
         // Variables
         $ndata_1 = isset($_POST['Tarea']) ? count($_POST['Tarea']) : 0;
         $ndata_2 = isset($_POST['idParticipante']) ? count($_POST['idParticipante']) : 0;
 
-        //generacion de errores
+        /************************************/
+        // Generacion de errores
         if($ndata_2==0) {
             Response::error('No hay Participantes en la tarea', 500);
         }else{
 
-            /*******************************************************************/
-            //Se inicia la transacción: la reserva, sus recursos asociados y el historial deben
-            //aplicarse de forma atómica (todo o nada)
+            /************************************/
+            // Se inicia la transacción
             $this->Base_transactionBegin();
 
-            /******************************/
+            /************************************/
             // Se genera la query
             $query = [
                 'data'      => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
@@ -885,433 +948,488 @@ class kanbanTareas extends ControllerBase {
                 'table'     => 'kanban_tareas',
                 'Post'      => $_POST
             ];
-            //Se genera el chequeo
+            /************************************/
+            // Se genera el chequeo
             $dataCheck_1 = $this->dataCheck_1($_POST);
-            // Ejecuto la query
+            // Preparo los datos
             $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
+            // Ejecuto la query
             $Response = $this->Base_insert($xParams);
 
-            /*******************************************************************/
-            //Si falla la reserva principal, se revierte de inmediato
-            if (!$Response['status']){
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
                 $this->Base_transactionRollback();
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if ($Response['status']){
-                /******************************/
-                //Recorro las tareas ingresadas
-                if(isset($ndata_1)&&$ndata_1!=0){
-                    for($j1 = 0; $j1 < $ndata_1; $j1++){
-                        /******************************/
-                        // Se agrega respuesta
-                        $arrTareas = [
-                            'idKanban'         => $Response['data'],                //idKanban
-                            'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
-                            'idEstadoTrabajo'  => 1,                                //Estado abierto
-                            'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
-                        ];
-                        /******************************/
-                        // Se genera la query
-                        $query = [
-                            'data'      => 'idKanban,Tarea,idEstadoTrabajo,idTrabajo',
-                            'required'  => 'idKanban,Tarea,idEstadoTrabajo',
-                            'unique'    => '',
-                            'encode'    => '',
-                            'table'     => 'kanban_tareas_tareas',
-                            'Post'      => $arrTareas
-                        ];
-                        //Se genera el chequeo
-                        $dataCheck_2 = $this->dataCheck_2($arrTareas);
-                        // Ejecuto la query
-                        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
-                        $xInsert = $this->Base_insert($xParams);
+            /************************************/
+            // Recorro las tareas ingresadas
+            if(isset($ndata_1)&&$ndata_1!=0){
+                // Se acumulan las filas a insertar para evitar un INSERT por cada tarea (N+1)
+                $rowsTareas = [];
+                // Recorro los datos
+                for($j1 = 0; $j1 < $ndata_1; $j1++){
+                    /************************************/
+                    // Se agrega respuesta
+                    $rowsTareas[] = [
+                        'idKanban'         => $Response['data'],                //idKanban
+                        'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
+                        'idEstadoTrabajo'  => 1,                                //Estado abierto
+                        'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
+                    ];
+                }
 
-                        // Si falla la consulta, se revierte de inmediato
-                        if (!$xInsert['status']){
-                            $this->Base_transactionRollback();
-                            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
-                        }
+                /************************************/
+                // Si hay datos marcados, se insertan todos en una sola sentencia
+                if ($rowsTareas){
+                    /************************************/
+                    // Se genera el chequeo
+                    $DataCheck = $this->dataCheck_2('');
+                    /************************************/
+                    // Se genera la query
+                    $query = [
+                        'data'      => 'idKanban,Tarea,idEstadoTrabajo,idTrabajo',
+                        'required'  => 'idKanban,Tarea,idEstadoTrabajo',
+                        'table'     => 'kanban_tareas_tareas',
+                        'rows'      => $rowsTareas
+                    ];
+                    // Preparo los datos
+                    $xParams    = ['DataCheck' => $DataCheck, 'query' => $query];
+                    // Ejecuto la query
+                    $respTareas = $this->Base_insertMultiple($xParams);
+                    /************************************/
+                    // Si falla la ejecucion, se revierte de inmediato
+                    if ($respTareas['status'] === false) {
+                        $this->Base_transactionRollback();
+                        Response::error('Error al operar con la Base de Datos', 500, $respTareas['error']);
                     }
                 }
-                /******************************/
-                //Recorro las tareas ingresadas
-                if(isset($ndata_2)&&$ndata_2!=0){
-                    for($j2 = 0; $j2 < $ndata_2; $j2++){
-                        /******************************/
-                        // Se agrega respuesta
-                        $arrParticipantes = [
-                            'idKanban'  => $Response['data'],             //idKanban
-                            'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
-                        ];
-                        /******************************/
-                        // Se genera la query
-                        $query = [
-                            'data'      => 'idKanban,idUsuario',
-                            'required'  => 'idKanban,idUsuario',
-                            'unique'    => '',
-                            'encode'    => '',
-                            'table'     => 'kanban_tareas_participantes',
-                            'Post'      => $arrParticipantes
-                        ];
-                        //Se genera el chequeo
-                        $dataCheck_2 = $this->dataCheck_2($arrParticipantes);
-                        // Ejecuto la query
-                        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
-                        $xInsert = $this->Base_insert($xParams);
-
-                        // Si falla la consulta, se revierte de inmediato
-                        if (!$xInsert['status']){
-                            $this->Base_transactionRollback();
-                            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
-                        }
-                    }
-                }
-
-                /******************************/
-                //Se agrega historial
-                $arrTareas = [
-                    'idKanban'    => $Response['data'],       //idKanban
-                    'idUsuario'   => $_POST['idUsuario'],     //Usuario creador
-                    'Descripcion' => 'Tarea Creada',          //Descripcion
-                    'Fecha'       => $_POST['Fecha_Actual'],  //Fecha actual
-                    'Hora'        => $_POST['Hora_Actual'],   //Hora actual
-                ];
-                /******************************/
-                // Se genera la query
-                $query = [
-                    'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                    'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                    'unique'    => '',
-                    'encode'    => '',
-                    'table'     => 'kanban_tareas_historial',
-                    'Post'      => $arrTareas
-                ];
-                //Se genera el chequeo
-                $dataCheck_3 = $this->dataCheck_3($arrTareas);
-                // Ejecuto la query
-                $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query];
-                $xInsert = $this->Base_insert($xParams);
-
-                // Si falla la consulta, se revierte de inmediato
-                if (!$xInsert['status']){
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
-                }
-
-                /*******************************************************************/
-                //Se confirma la transacción
-                $this->Base_transactionCommit();
-
-                /******************************/
-                // Si es un ID numérico, se envía con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
             }
+            /************************************/
+            // Recorro las tareas ingresadas
+            if(isset($ndata_2)&&$ndata_2!=0){
+                // Se acumulan las filas a insertar para evitar un INSERT por cada participante (N+1)
+                $rowsParticipantes = [];
+                // Recorro los datos
+                for($j2 = 0; $j2 < $ndata_2; $j2++){
+                    /************************************/
+                    // Se agrega respuesta
+                    $rowsParticipantes[] = [
+                        'idKanban'  => $Response['data'],             //idKanban
+                        'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
+                    ];
+                }
+
+                /************************************/
+                // Si hay datos marcados, se insertan todos en una sola sentencia
+                if ($rowsParticipantes){
+                    /************************************/
+                    // Se genera el chequeo
+                    $DataCheck = $this->dataCheck_2('');
+                    /************************************/
+                    // Se genera la query
+                    $query = [
+                        'data'      => 'idKanban,idUsuario',
+                        'required'  => 'idKanban,idUsuario',
+                        'table'     => 'kanban_tareas_participantes',
+                        'rows'      => $rowsParticipantes
+                    ];
+                    // Preparo los datos
+                    $xParams           = ['DataCheck' => $DataCheck, 'query' => $query];
+                    // Ejecuto la query
+                    $respParticipantes = $this->Base_insertMultiple($xParams);
+                    /************************************/
+                    // Si falla la ejecucion, se revierte de inmediato
+                    if ($respParticipantes['status'] === false) {
+                        $this->Base_transactionRollback();
+                        Response::error('Error al operar con la Base de Datos', 500, $respParticipantes['error']);
+                    }
+                }
+            }
+
+            /************************************/
+            //Se agrega historial
+            $arrTareas = [
+                'idKanban'    => $Response['data'],       //idKanban
+                'idUsuario'   => $_POST['idUsuario'],     //Usuario creador
+                'Descripcion' => 'Tarea Creada',          //Descripcion
+                'Fecha'       => $_POST['Fecha_Actual'],  //Fecha actual
+                'Hora'        => $_POST['Hora_Actual'],   //Hora actual
+            ];
+            /************************************/
+            // Se genera la query
+            $query = [
+                'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+                'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+                'unique'    => '',
+                'encode'    => '',
+                'table'     => 'kanban_tareas_historial',
+                'Post'      => $arrTareas
+            ];
+            /************************************/
+            // Se genera el chequeo
+            $dataCheck_3 = $this->dataCheck_3($arrTareas);
+            // Preparo los datos
+            $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query];
+            // Ejecuto la query
+            $xInsert = $this->Base_insert($xParams);
+
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($xInsert['status'] === false) {
+                $this->Base_transactionRollback();
+                Response::error('Error al operar con la Base de Datos', 500, $xInsert['error']);
+            }
+
+            /************************************/
+            // Se confirma la transacción
+            $this->Base_transactionCommit();
+
+            /************************************/
+            // Si es un ID numérico, se envía con código 200 (OK)
+            Response::success($Response['data']);
 
         }
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update($f3){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            /******************************/
-            // Usuario creador
-            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
-            /******************************/
+        /************************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idKanban,idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
+            'required'  => 'idKanban,idPrioridad,Fecha,Titulo,Descripcion',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'kanban_tareas',
+            'where'     => 'idKanban',
+            'Post'      => $_POST
+        ];
+        /************************************/
+        // Se genera el chequeo
+        $dataCheck_1 = $this->dataCheck_1($_POST);
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idPrioridad AS ID,Nombre',
+            'table'   => 'core_prioridades',
+            'join'    => '',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'idPrioridad ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams      = ['query' => $query];
+        // Ejecuto la query
+        $arrPrioridad = $this->Base_GetList($xParams);
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idEstadoCierre AS ID,Nombre',
+            'table'   => 'core_estados_cierre',
+            'join'    => '',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'idEstadoCierre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams         = ['query' => $query];
+        // Ejecuto la query
+        $arrEstadoCierre = $this->Base_GetList($xParams);
+
+        /************************************/
+        // Variables
+        $arrPrioridadNew = [];
+        $arrEstadoNew    = [];
+        //Se guardan los datos
+        foreach ($arrPrioridad['data'] as $task){       $arrPrioridadNew[$task['ID']] = $task['Nombre'];}
+        foreach ($arrEstadoCierre['data'] as $task){    $arrEstadoNew[$task['ID']]    = $task['Nombre'];}
+
+        /************************************/
+        //Se hacen comparaciones
+        $comparacion = '';
+        $campos = [
+            'idPrioridad'    => ['label' => 'prioridad', 'array' => $arrPrioridadNew  ],
+            'Fecha'          => ['label' => 'fecha de termino'],
+            'Titulo'         => ['label' => 'titulo'],
+            'Descripcion'    => ['label' => 'descripcion'],
+            'idEstadoCierre' => ['label' => 'estado de cierre','array' => $arrEstadoNew]
+        ];
+
+        foreach ($campos as $campo => $config) {
+            $oldCampo = 'Old_' . $campo;
+            if (isset($_POST[$campo], $_POST[$oldCampo]) && $_POST[$campo] != $_POST[$oldCampo]) {
+                $valorAntiguo  = $config['array'][$_POST[$oldCampo]] ?? $_POST[$oldCampo];
+                $valorNuevo    = $config['array'][$_POST[$campo]] ?? $_POST[$campo];
+                $comparacion  .= "<br/> - Se cambia la {$config['label']} (de {$valorAntiguo} a {$valorNuevo})";
+            }
+        }
+
+        /************************************/
+        //Se hacen comparaciones
+        if($comparacion!=''){
+            /************************************/
+            //Se agrega historial
+            $arrTareas = [
+                'idKanban'    => $Response['data'],                                    //idKanban
+                'idUsuario'   => $_POST['idUsuario'],                                  //Usuario creador
+                'Descripcion' => 'Se cambian datos basicos de la tarea:'.$comparacion, //Descripcion
+                'Fecha'       => $_POST['Fecha_Actual'],                               //Fecha actual
+                'Hora'        => $_POST['Hora_Actual'],                                //Hora actual
+            ];
+            /************************************/
             // Se genera la query
             $query = [
-                'data'      => 'idKanban,idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
-                'required'  => 'idPrioridad,Fecha,Titulo,Descripcion',
+                'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+                'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+                'unique'    => '',
+                'encode'    => '',
+                'table'     => 'kanban_tareas_historial',
+                'Post'      => $arrTareas
+            ];
+            /************************************/
+            // Se genera el chequeo
+            $dataCheck_3 = $this->dataCheck_3($arrTareas);
+            // Preparo los datos
+            $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
+            $this->Base_insert($xParams);
+
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
+    }
+
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    public function ChangeStatus(){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        //Se decodifica
+        $KanbanID       = $this->Codification->encryptDecrypt('decrypt', $_POST['idKanban']);
+        $KanbanEstadoID = $this->Codification->encryptDecrypt('decrypt', $_POST['idKanbanEstado']);
+        // Se verifica
+        if (!$this->isValidDecrypted($KanbanID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+        if (!$this->isValidDecrypted($KanbanEstadoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        $idKanban       = $KanbanID['data'];
+        $idKanbanEstado = $KanbanEstadoID['data'];
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idKanbanEstado',
+            'table'   => 'kanban_tareas',
+            'join'    => '',
+            'where'   => 'idKanban = ?',
+            'params'  => [$idKanban],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        $rowData = $this->Base_GetByID($xParams);
+
+        /************************************/
+        //Verifico si son diferente
+        if($rowData['status'] && $rowData['data']['idKanbanEstado']!=$idKanbanEstado){
+            /************************************/
+            // Se agrega respuesta
+            $arrTareas = [
+                'idKanban'       => $idKanban,
+                'idKanbanEstado' => $idKanbanEstado,
+            ];
+            /************************************/
+            // Se genera la query
+            $query = [
+                'data'      => 'idKanban,idKanbanEstado',
+                'required'  => 'idKanbanEstado',
                 'unique'    => '',
                 'encode'    => '',
                 'table'     => 'kanban_tareas',
                 'where'     => 'idKanban',
-                'Post'      => $_POST
+                'Post'      => $arrTareas
             ];
-            //Se genera el chequeo
-            $dataCheck_1 = $this->dataCheck_1($_POST);
-            // Ejecuto la query
+            /************************************/
+            // Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($arrTareas);
+            // Preparo los datos
             $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
+            // Ejecuto la query
             $Response = $this->Base_update($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-
-                /*******************************************************************/
-                // Se genera la query
-                $query = [
-                    'data'    => 'idPrioridad AS ID,Nombre',
-                    'table'   => 'core_prioridades',
-                    'join'    => '',
-                    'where'   => '',
-                    'params'  => [],
-                    'group'   => '',
-                    'having'  => '',
-                    'order'   => 'idPrioridad ASC',
-                    'limit'   => ConfigAPP::APP["N_MaxItems"]
-                ];
-                // Ejecuto la query
-                $xParams      = ['query' => $query];
-                $arrPrioridad = $this->Base_GetList($xParams);
-
-                /*******************************************************************/
-                // Se genera la query
-                $query = [
-                    'data'    => 'idEstadoCierre AS ID,Nombre',
-                    'table'   => 'core_estados_cierre',
-                    'join'    => '',
-                    'where'   => '',
-                    'params'  => [],
-                    'group'   => '',
-                    'having'  => '',
-                    'order'   => 'idEstadoCierre ASC',
-                    'limit'   => ConfigAPP::APP["N_MaxItems"]
-                ];
-                // Ejecuto la query
-                $xParams         = ['query' => $query];
-                $arrEstadoCierre = $this->Base_GetList($xParams);
-
-                /*******************************************************************/
-                // Variables
-                $arrPrioridadNew = [];
-                $arrEstadoNew    = [];
-                //Se guardan los datos
-                foreach ($arrPrioridad['data'] as $task){       $arrPrioridadNew[$task['ID']] = $task['Nombre'];}
-                foreach ($arrEstadoCierre['data'] as $task){    $arrEstadoNew[$task['ID']]    = $task['Nombre'];}
-
-                /******************************/
-                //Se hacen comparaciones
-                $comparacion = '';
-                $campos = [
-                    'idPrioridad'    => ['label' => 'prioridad', 'array' => $arrPrioridadNew  ],
-                    'Fecha'          => ['label' => 'fecha de termino'],
-                    'Titulo'         => ['label' => 'titulo'],
-                    'Descripcion'    => ['label' => 'descripcion'],
-                    'idEstadoCierre' => ['label' => 'estado de cierre','array' => $arrEstadoNew]
-                ];
-
-                foreach ($campos as $campo => $config) {
-                    $oldCampo = 'Old_' . $campo;
-                    if (isset($_POST[$campo], $_POST[$oldCampo]) && $_POST[$campo] != $_POST[$oldCampo]) {
-                        $valorAntiguo  = $config['array'][$_POST[$oldCampo]] ?? $_POST[$oldCampo];
-                        $valorNuevo    = $config['array'][$_POST[$campo]] ?? $_POST[$campo];
-                        $comparacion  .= "<br/> - Se cambia la {$config['label']} (de {$valorAntiguo} a {$valorNuevo})";
-                    }
-                }
-
-                /******************************/
-                //Se hacen comparaciones
-                if($comparacion!=''){
-                    /******************************/
-                    //Se agrega historial
-                    $arrTareas = [
-                        'idKanban'    => $Response['data'],                                    //idKanban
-                        'idUsuario'   => $_POST['idUsuario'],                                  //Usuario creador
-                        'Descripcion' => 'Se cambian datos basicos de la tarea:'.$comparacion, //Descripcion
-                        'Fecha'       => $_POST['Fecha_Actual'],                               //Fecha actual
-                        'Hora'        => $_POST['Hora_Actual'],                                //Hora actual
-                    ];
-                    /******************************/
-                    // Se genera la query
-                    $query = [
-                        'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                        'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                        'unique'    => '',
-                        'encode'    => '',
-                        'table'     => 'kanban_tareas_historial',
-                        'Post'      => $arrTareas
-                    ];
-                    //Se genera el chequeo
-                    $dataCheck_3 = $this->dataCheck_3($arrTareas);
-                    // Ejecuto la query
-                    $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
-                    $this->Base_insert($xParams);
-
-                }
-
-                /******************************/
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
-        }
-    }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
-    public function ChangeStatus(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se decodifica
-            $idKanban       = $this->Codification->encryptDecrypt('decrypt', $_POST['idKanban']);
-            $idKanbanEstado = $this->Codification->encryptDecrypt('decrypt', $_POST['idKanbanEstado']);
-
-            /******************************************/
+            /************************************/
+            //Se agrega historial
+            $arrTareas = [
+                'idKanban'    => $Response['data'],               //idKanban
+                'idUsuario'   => $_POST['idUsuario'],             //Usuario creador
+                'Descripcion' => 'Tarea Actualizada de tablero',  //Descripcion
+                'Fecha'       => $_POST['Fecha_Actual'],          //Fecha actual
+                'Hora'        => $_POST['Hora_Actual'],           //Hora actual
+            ];
+            /************************************/
             // Se genera la query
             $query = [
-                'data'    => 'idKanbanEstado',
-                'table'   => 'kanban_tareas',
-                'join'    => '',
-                'where'   => 'idKanban = ?',
-                'params'  => [$idKanban],
-                'group'   => '',
-                'having'  => '',
-                'order'   => ''
+                'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+                'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+                'unique'    => '',
+                'encode'    => '',
+                'table'     => 'kanban_tareas_historial',
+                'Post'      => $arrTareas
             ];
-            // Ejecuto la query
-            $xParams = ['query' => $query];
-            $rowData = $this->Base_GetByID($xParams);
+            /************************************/
+            // Se genera el chequeo
+            $dataCheck_3 = $this->dataCheck_3($arrTareas);
+            // Preparo los datos
+            $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
+            $this->Base_insert($xParams);
+            /************************************/
+            // Devuelvo $Response con código 200 (OK)
+            Response::success($Response['data']);
 
-            /******************************/
-            //Verifico si son diferente
-            if($rowData['status'] && $rowData['data']['idKanbanEstado']!=$idKanbanEstado){
-                /******************************/
-                // Se agrega respuesta
-                $arrTareas = [
-                    'idKanban'       => $idKanban,
-                    'idKanbanEstado' => $idKanbanEstado,
-                ];
-                /******************************/
-                // Se genera la query
-                $query = [
-                    'data'      => 'idKanban,idKanbanEstado',
-                    'required'  => 'idKanbanEstado',
-                    'unique'    => '',
-                    'encode'    => '',
-                    'table'     => 'kanban_tareas',
-                    'where'     => 'idKanban',
-                    'Post'      => $arrTareas
-                ];
-                //Se genera el chequeo
-                $dataCheck_1 = $this->dataCheck_1($arrTareas);
-                // Ejecuto la query
-                $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
-                $Response = $this->Base_update($xParams);
-
-                /******************************/
-                // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-                if ($Response['status']){
-                    /******************************/
-                    //Se agrega historial
-                    $arrTareas = [
-                        'idKanban'    => $Response['data'],               //idKanban
-                        'idUsuario'   => $_POST['idUsuario'],             //Usuario creador
-                        'Descripcion' => 'Tarea Actualizada de tablero',  //Descripcion
-                        'Fecha'       => $_POST['Fecha_Actual'],          //Fecha actual
-                        'Hora'        => $_POST['Hora_Actual'],           //Hora actual
-                    ];
-                    /******************************/
-                    // Se genera la query
-                    $query = [
-                        'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                        'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                        'unique'    => '',
-                        'encode'    => '',
-                        'table'     => 'kanban_tareas_historial',
-                        'Post'      => $arrTareas
-                    ];
-                    //Se genera el chequeo
-                    $dataCheck_3 = $this->dataCheck_3($arrTareas);
-                    // Ejecuto la query
-                    $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
-                    $this->Base_insert($xParams);
-                    /******************************/
-                    // Devuelvo $Response con código 200 (OK)
-                    Response::success($Response['data']);
-                } else {
-                    // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                    // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-                }
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
         }
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'kanban_tareas',
-                'where'       => 'idKanban',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                /************************************************/
-                //Listado de las tablas a eliminar los datos relacionados
-                $arrTableDel  = array();
-                $arrTableDel[] = ['files' => '', 'table' => 'kanban_tareas_historial'];
-                $arrTableDel[] = ['files' => '', 'table' => 'kanban_tareas_participantes'];
-                $arrTableDel[] = ['files' => '', 'table' => 'kanban_tareas_tareas'];
-
-                /************************************************/
-                // Verifico si existe
-                if($arrTableDel){
-                    //recorro
-                    foreach ($arrTableDel as $tblDel) {
-                        // Se genera la query
-                        $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idKanban', 'SubCarpeta' => '', 'Post' => $dataDelete];
-                        // Ejecuto la query
-                        $xParams = ['query' => $query];
-                        $this->Base_delete($xParams);
-                    }
-                }
-
-                /******************************/
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'kanban_tareas',
+            'where'       => 'idKanban',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Listado de las tablas a eliminar los datos relacionados
+        $arrTableDel  = array();
+        $arrTableDel[] = ['files' => '', 'table' => 'kanban_tareas_historial'];
+        $arrTableDel[] = ['files' => '', 'table' => 'kanban_tareas_participantes'];
+        $arrTableDel[] = ['files' => '', 'table' => 'kanban_tareas_tareas'];
+
+        /************************************/
+        // Verifico si existe
+        if (!empty($arrTableDel)) {
+            // Recorro
+            foreach ($arrTableDel as $tblDel) {
+                /************************************/
+                // Se genera la query
+                $query = ['files' => $tblDel['files'], 'table' => $tblDel['table'], 'where' => 'idKanban', 'SubCarpeta' => '', 'Post' => $dataDelete];
+                // Preparo los datos
+                $xParams    = ['query' => $query];
+                // Ejecuto la query
+                $respDelRel = $this->Base_delete($xParams);
+                /************************************/
+                // Si falla la ejecucion, se revierte de inmediato
+                if ($respDelRel['status'] === false) {
+                    $this->Base_transactionRollback();
+                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                }
+            }
+        }
+
+        /************************************/
+        // Se confirma la transacción
+        $this->Base_transactionCommit();
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
@@ -1344,11 +1462,13 @@ class kanbanTareas extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
@@ -1381,11 +1501,13 @@ class kanbanTareas extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck_3($POST){
         // Variables
         $DataChecking = [
@@ -1418,7 +1540,7 @@ class kanbanTareas extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
