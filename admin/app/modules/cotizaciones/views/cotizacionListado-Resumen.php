@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
 
@@ -34,7 +36,8 @@
                                 $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',         'Name' => 'Observaciones',   'Id' => 'Edit_Observaciones',   'Value' => ($data['rowData']['Observaciones'] ?? ''),  'Required' => 1]);
 
                                 //datos ocultos
-                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCotizacion','Value' => $data['rowData']['idCotizacion'],'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idCotizacion', 'Value' => $data['rowData']['idCotizacion'], 'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'fecha_auto',   'Value' => $data['rowData']['fecha_auto'],   'Required' => 2]);
                                 ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
                                     <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>
@@ -45,16 +48,11 @@
 
                 </div>
 
-                <?php
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']);
-                ?>
-
                 <div class="tab-pane fade" id="resumen-items">
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Items de <?php echo 'Cotización N° '.$data['rowData']['idCotizacion']; ?>
-                            <button type="button" class="btn btn-success"  onclick="tabItemNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
+                            <button type="button" class="btn btn-success"  onclick="tabItemNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
@@ -67,7 +65,7 @@
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Productos de <?php echo 'Cotización N° '.$data['rowData']['idCotizacion']; ?>
-                            <button type="button" class="btn btn-success"  onclick="tabProdNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
+                            <button type="button" class="btn btn-success"  onclick="tabProdNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
@@ -80,7 +78,7 @@
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Servicios de <?php echo 'Cotización N° '.$data['rowData']['idCotizacion']; ?>
-                            <button type="button" class="btn btn-success"  onclick="tabServNew('<?php echo $encryptedId; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
+                            <button type="button" class="btn btn-success"  onclick="tabServNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Ingresar Nuevo</button>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
@@ -105,7 +103,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -127,7 +125,7 @@
             let Informacion = $("#FormEditData").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>'},
+                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$DataID['data']; ?>'},
                 ],
                 showNoti:'Datos Editados Correctamente',
                 triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
@@ -144,7 +142,7 @@
     /*********************************************************************/
     // Variables
     let ItemLoad = 0;
-    /******************************************/
+    /************************************/
     function tabItemLoadList() {
         //Comparo
         if(ItemLoad===0){
@@ -152,7 +150,7 @@
             $('#PDloader').show();
             //Ejecuto
             let Div       = '#tabItemDataTable';
-            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/items/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>';
+            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/items/updateList/'.$DataID['data']; ?>';
             const Options = {
                 closeObject:'#PDloader',
                 refreshTables:'true',
@@ -163,7 +161,7 @@
             ItemLoad = 1;
         }
     }
-    /******************************************/
+    /************************************/
     function tabItemNew(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -177,7 +175,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabItemEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -191,7 +189,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabItemDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -213,7 +211,7 @@
                 let Informacion = {"idExistencia": ID};
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#tabItemDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/items/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>', refreshTbl:'true'}
+                        {Div:'#tabItemDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/items/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                     ],
                     showNoti:'Dato Borrado Correctamente',
                     closeObject:'#PDloader',
@@ -228,7 +226,7 @@
     /*********************************************************************/
     // Variables
     let ProdLoad = 0;
-    /******************************************/
+    /************************************/
     function tabProdLoadList() {
         //Comparo
         if(ProdLoad===0){
@@ -236,7 +234,7 @@
             $('#PDloader').show();
             //Ejecuto
             let Div       = '#tabProdDataTable';
-            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/productos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>';
+            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/productos/updateList/'.$DataID['data']; ?>';
             const Options = {
                 closeObject:'#PDloader',
                 refreshTables:'true',
@@ -247,7 +245,7 @@
             ProdLoad = 1;
         }
     }
-    /******************************************/
+    /************************************/
     function tabProdNew(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -261,7 +259,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabProdEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -275,7 +273,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabProdDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -297,7 +295,7 @@
                 let Informacion = {"idExistencia": ID};
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#tabProdDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/productos/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>', refreshTbl:'true'}
+                        {Div:'#tabProdDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/productos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                     ],
                     showNoti:'Dato Borrado Correctamente',
                     closeObject:'#PDloader',
@@ -312,7 +310,7 @@
     /*********************************************************************/
     // Variables
     let ServLoad = 0;
-    /******************************************/
+    /************************************/
     function tabServLoadList() {
         //Comparo
         if(ServLoad===0){
@@ -320,7 +318,7 @@
             $('#PDloader').show();
             //Ejecuto
             let Div       = '#tabServDataTable';
-            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/servicios/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>';
+            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/servicios/updateList/'.$DataID['data']; ?>';
             const Options = {
                 closeObject:'#PDloader',
                 refreshTables:'true',
@@ -331,7 +329,7 @@
             ServLoad = 1;
         }
     }
-    /******************************************/
+    /************************************/
     function tabServNew(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -345,7 +343,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabServEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -359,7 +357,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabServDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -381,7 +379,7 @@
                 let Informacion = {"idExistencia": ID};
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#tabServDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/servicios/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idCotizacion']); ?>', refreshTbl:'true'}
+                        {Div:'#tabServDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/servicios/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                     ],
                     showNoti:'Dato Borrado Correctamente',
                     closeObject:'#PDloader',

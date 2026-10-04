@@ -10,7 +10,7 @@ $CompanyLogo =  !empty($data['UserData']['Sistema_IMGLogo'])
 
 /********************************/
 $NombreEntidad  = '';
-//Se obtiene el nombre o la razón social
+// Se obtiene el nombre o la razón social
 switch ($data['rowData']['idTipoEntidad']) {
     case 1: $NombreEntidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
     case 2: $NombreEntidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas
@@ -88,7 +88,7 @@ $To .= '</p>';
                     <?php
                     /*******************************************************************/
                     if(is_array($data['arrItems'])&&!empty($data['arrItems'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrItems'] as $crud){
                             echo '
                             <tr>
@@ -100,7 +100,7 @@ $To .= '</p>';
                     }
                     /*******************************************************************/
                     if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrProductos'] as $crud){
                             echo '
                             <tr>
@@ -112,7 +112,7 @@ $To .= '</p>';
                     }
                     /*******************************************************************/
                     if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrServicios'] as $crud){
                             echo '
                             <tr>

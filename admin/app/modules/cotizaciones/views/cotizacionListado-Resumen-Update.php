@@ -15,7 +15,7 @@
         <?php
         //Se verifica si existe
         $NombreEntidad = '';
-        //Se obtiene el nombre o la razón social
+        // Se obtiene el nombre o la razón social
         switch ($data['rowData']['idTipoEntidad']) {
             case 1: $NombreEntidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
             case 2: $NombreEntidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas

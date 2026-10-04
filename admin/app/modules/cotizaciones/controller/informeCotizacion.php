@@ -4,16 +4,18 @@
 /*******************************************************************************************************************/
 class informeCotizacion extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
     private $DataDate;
     private $DataNumbers;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -32,10 +34,12 @@ class informeCotizacion extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Listar Todo
+    /*******************************************************************/
+    // Listar
+    /*******************************************************************/
     public function listAll($f3){
-        /*******************************************************************/
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
@@ -48,12 +52,13 @@ class informeCotizacion extends ControllerBase {
             'order'   => 'ApellidoPat ASC,Nombre ASC,RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrEntidades = $this->Base_GetList($xParams);
 
-        /******************************************/
-        //Datos enviados a la pagina
+        /************************************/
+        // Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
             'PageTitle'       => 'Búsqueda Cotizaciones',
@@ -71,27 +76,30 @@ class informeCotizacion extends ControllerBase {
             'arrEntidades'    => $arrEntidades['data'],
         ];
 
-        /******************************************/
-        //Se instancia la vista
+        /************************************/
+        // Se instancia la vista
         $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
     }
 
-    /******************************************************************************/
-    //List
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3){
-        /*******************************************************************/
+
+        /************************************/
         // Variables
         $WhereData_int     = 'idEntidad';                          // Datos búsqueda exacta
         $WhereData_string  = '';                                   // Datos búsqueda relativa
         $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';  // Datos búsqueda Between
         $whereInt          = '';                                   // Se crea cadena
         $whereParams       = [];                                   // Valores bindeados asociados a $whereInt
-        /******************************************/
+        /************************************/
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_between);
         if($RespDataBetween!=''){
             Response::error($RespDataBetween, 500);
         }
+        /************************************/
         // Agrego variable busqueda
         $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'cotizacion_listado', 1);
         $whereInt = $r['where']; $whereParams = $r['params'];
@@ -100,7 +108,7 @@ class informeCotizacion extends ControllerBase {
         $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'cotizacion_listado', 3);
         $whereInt = $r['where']; $whereParams = $r['params'];
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -121,18 +129,19 @@ class informeCotizacion extends ControllerBase {
             'order'   => 'cotizacion_listado.Creacion_fecha DESC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status']){
+        if ($arrList['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Búsqueda de Cotizaciones',
@@ -147,15 +156,15 @@ class informeCotizacion extends ControllerBase {
                 'arrList'       => $arrList['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrList]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }

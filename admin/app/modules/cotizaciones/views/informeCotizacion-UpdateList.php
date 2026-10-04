@@ -15,7 +15,7 @@
                         <table class="table table-sm table-hover datatable">
                             <thead>
                                 <tr>
-                                    <th scope="col">Fecha</th>
+                                    <th scope="col" style="width: 100px;">Fecha</th>
                                     <th scope="col">Entidad</th>
                                     <th scope="col">Valor Total</th>
                                     <th scope="col" style="width: 10px;">Acciones</th>
@@ -23,15 +23,17 @@
                             </thead>
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
-                                    //Recorro
-                                    foreach($data['arrList'] as $crud){ ?>
+                                    // Recorro
+                                    foreach($data['arrList'] as $crud){
+                                        // Se obtiene el ID
+                                        $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCotizacion']);?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
                                             <td>
                                                 <?php
-                                                //Se obtiene el nombre o la razón social
+                                                // Se obtiene el nombre o la razón social
                                                 switch ($crud['idTipoEntidad']) {
                                                     case 1: $Entidad = $crud['EntidadesApellido'].', '.$crud['EntidadesNombre']; break; //Persona Natural
                                                     case 2: $Entidad = $crud['EntidadesRazonSocial']; break;                            //Empresas
@@ -44,7 +46,7 @@
                                             <td>
                                                 <div class="btn-group" role="group">
                                                     <?php if($data['UserAccess']['LevelAccess']>=1){ ?>
-                                                        <button type="button" onclick="listTableDataView('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCotizacion']); ?>')"    class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
+                                                        <button type="button" onclick="listTableDataView('<?php echo $DataID['data']; ?>')"    class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
                                                     <?php } ?>
                                                 </div>
                                             </td>

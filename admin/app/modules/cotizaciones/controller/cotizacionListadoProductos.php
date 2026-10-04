@@ -4,15 +4,17 @@
 /*******************************************************************************************************************/
 class cotizacionListadoProductos extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
     private $DataNumbers;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -30,26 +32,36 @@ class cotizacionListadoProductos extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear nuevo
+    /*******************************************************************/
+    // Crear nuevo
+    /*******************************************************************/
     public function New($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $CotizacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($CotizacionID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idCotizacion',
             'table'   => 'cotizacion_listado',
             'join'    => '',
             'where'   => 'idCotizacion = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$CotizacionID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idProducto AS ID,Nombre',
@@ -62,8 +74,9 @@ class cotizacionListadoProductos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -71,8 +84,8 @@ class cotizacionListadoProductos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrProductos['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -85,38 +98,32 @@ class cotizacionListadoProductos extends ControllerBase {
                 'arrProductos'    => $arrProductos['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-formNew.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrProductos]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
-    /******************************************************************************/
-    //List
-    public function UpdateList($f3, $params){
-        /******************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idEstadoPago',
-            'table'   => 'cotizacion_listado',
-            'join'    => '',
-            'where'   => 'idCotizacion = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Ejecuto la query
-        $xParams = ['query' => $query];
-        $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
+    public function UpdateList($f3, $params){
+
+        /************************************/
+        // Se obtiene el ID
+        $CotizacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($CotizacionID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -130,24 +137,25 @@ class cotizacionListadoProductos extends ControllerBase {
                 LEFT JOIN productos_listado     ON productos_listado.idProducto   = cotizacion_listado_productos.idProducto
                 LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed  = productos_listado.idUniMed',
             'where'   => 'cotizacion_listado_productos.idCotizacion = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$CotizacionID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_productos.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrProductos['status']){
+        if ($arrProductos['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -156,43 +164,52 @@ class cotizacionListadoProductos extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'rowData'         => $rowData['data'],
                 'arrProductos'    => $arrProductos['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData,$arrProductos]);
-            //Muestra los errores
+            // Busco errores de la consulta
+            $result = $this->mergeResponses([$arrProductos]);
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params){
-        /******************************************/
+
+        /************************************/
+        // Se obtiene el ID
+        $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idExistencia,idCotizacion,idProducto,Number,ValorTotal',
             'table'   => 'cotizacion_listado_productos',
             'join'    => '',
             'where'   => 'idExistencia = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$ExistenciaID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idProducto AS ID,Nombre',
@@ -205,8 +222,9 @@ class cotizacionListadoProductos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrProductos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -214,8 +232,8 @@ class cotizacionListadoProductos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrProductos['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -229,15 +247,15 @@ class cotizacionListadoProductos extends ControllerBase {
                 'arrProductos'  => $arrProductos['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrProductos]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -245,15 +263,20 @@ class cotizacionListadoProductos extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
     public function Insert(){
 
-        /******************************/
-        //Se genera el chequeo
+        /************************************/
+        // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
-        /******************************/
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idCotizacion,idProducto,Number,ValorTotal',
@@ -263,139 +286,195 @@ class cotizacionListadoProductos extends ControllerBase {
             'table'     => 'cotizacion_listado_productos',
             'Post'      => $_POST
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
-        /******************************/
-        // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-        if ($Response['status']){
-            /******************************************/
-            //Se actualizan los datos de la factura
-            $cotizacionListado = new cotizacionListado();
-            $cotizacionListado->updateFact(2, $_POST['idCotizacion']);
-            /******************************************/
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-        } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
+
+        /************************************/
+        // Se actualizan los datos de la factura
+        $cotizacionListado  = new cotizacionListado();
+        $ResponseCotizacion = $cotizacionListado->updateCotizacion(2, $_POST['idCotizacion'], $this->getDBConn());
+        if($ResponseCotizacion['code'] != 200){
+            $this->Base_transactionRollback();
+            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        Response::success($Response['data']);
 
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-            /******************************/
-            //Se genera el chequeo
-            $DataCheck = $this->dataCheck($_POST);
 
-            /******************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idExistencia,idCotizacion,idProducto,Number,ValorTotal',
-                'required'  => 'idCotizacion,idProducto,ValorTotal',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'cotizacion_listado_productos',
-                'where'     => 'idExistencia',
-                'Post'      => $_POST
-            ];
-            // Ejecuto la query
-            $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-            $Response = $this->Base_update($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($Response['status']){
-                /******************************************/
-                //Se actualizan los datos de la factura
-                $cotizacionListado = new cotizacionListado();
-                $cotizacionListado->updateFact(2, $_POST['idCotizacion']);
-                /******************************************/
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idExistencia,idCotizacion,idProducto,Number,ValorTotal',
+            'required'  => 'idExistencia,idCotizacion,idProducto,ValorTotal',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'cotizacion_listado_productos',
+            'where'     => 'idExistencia',
+            'Post'      => $_POST
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se actualizan los datos de la factura
+        $cotizacionListado  = new cotizacionListado();
+        $ResponseCotizacion = $cotizacionListado->updateCotizacion(2, $_POST['idCotizacion'], $this->getDBConn());
+        if($ResponseCotizacion['code'] != 200){
+            $this->Base_transactionRollback();
+            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
-            /******************************************/
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-
-            /******************************************/
-            // Se genera la query
-            $query = [
-                'data'    => 'idCotizacion',
-                'table'   => 'cotizacion_listado_productos',
-                'join'    => '',
-                'where'   => 'idExistencia = ?',
-                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia'])],
-                'group'   => '',
-                'having'  => '',
-                'order'   => ''
-            ];
-            // Ejecuto la query
-            $xParams        = ['query' => $query];
-            $rowFacturacion = $this->Base_GetByID($xParams);
-
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'cotizacion_listado_productos',
-                'where'       => 'idExistencia',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($rowFacturacion['status'] && $Response['status']){
-                /******************************************/
-                //Se actualizan los datos de la factura
-                $cotizacionListado = new cotizacionListado();
-                $cotizacionListado->updateFact(2, $rowFacturacion['data']['idCotizacion']);
-                /******************************************/
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se obtiene el ID
+        $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']);
+        if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idCotizacion',
+            'table'   => 'cotizacion_listado_productos',
+            'join'    => '',
+            'where'   => 'idExistencia = ?',
+            'params'  => [$ExistenciaID['data']],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams        = ['query' => $query];
+        // Ejecuto la query
+        $rowFacturacion = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($rowFacturacion['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error']);
+        }
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'cotizacion_listado_productos',
+            'where'       => 'idExistencia',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se actualizan los datos de la factura
+        $cotizacionListado  = new cotizacionListado();
+        $ResponseCotizacion = $cotizacionListado->updateCotizacion(2, $rowFacturacion['data']['idCotizacion'], $this->getDBConn());
+        if($ResponseCotizacion['code'] != 200){
+            $this->Base_transactionRollback();
+            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -428,7 +507,7 @@ class cotizacionListadoProductos extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
