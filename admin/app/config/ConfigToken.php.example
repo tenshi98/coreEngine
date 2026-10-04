@@ -24,9 +24,9 @@ define('ENV_ENCODE_KEY_11', getenv('ENCODE_KEY_11'));
 class ConfigToken{
 
     const JWT = [
-        'TOKEN_AUTHENTICATION' => true, // (boolean) - enable/disable token authentication
+        'TOKEN_AUTHENTICATION' => true,               // (boolean) - enable/disable token authentication
         'SECRET_KEY'           => ENV_JWT_SECRET_KEY, // (string) secret key for token encryption
-        'TIME_TO_LIVE'         => 86400, // (int) seconds  - token life time
+        'TIME_TO_LIVE'         => 86400,              // (int) seconds  - token life time
     ];
 
     const ENCODE_KEYS = [

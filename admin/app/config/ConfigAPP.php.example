@@ -4,6 +4,14 @@ require_once __DIR__ . '/EnvLoader.php';
 /*******************************************************************************************************************/
 /*                              Variables de entorno (credenciales de almacenamiento)                              */
 /*******************************************************************************************************************/
+define('ENV_SOFTWARE_NAME', getenv('SOFTWARE_NAME'));
+define('ENV_SOFTWARE_SLOGAN', getenv('SOFTWARE_SLOGAN'));
+define('ENV_SOFTWARE_COMPANYNAME', getenv('SOFTWARE_COMPANYNAME'));
+define('ENV_SOFTWARE_COMPANYEMAIL', getenv('SOFTWARE_COMPANYEMAIL'));
+define('ENV_SOFTWARE_COMPANYCREDITS', getenv('SOFTWARE_COMPANYCREDITS'));
+define('ENV_SOFTWARE_URL', getenv('SOFTWARE_URL'));
+define('ENV_SOFTWARE_MAINFOLDER', getenv('SOFTWARE_MAINFOLDER'));
+
 define('ENV_S3_KEY', getenv('S3_KEY'));
 define('ENV_S3_SECRET', getenv('S3_SECRET'));
 define('ENV_S3_REGION', getenv('S3_REGION'));
@@ -28,7 +36,7 @@ define('ENV_SFTP_BASE_URL', getenv('SFTP_BASE_URL'));
 /*******************************************************************************************************************/
 class ConfigAPP{
 
-    //Datos del Software
+    // Datos del Software
     const SOFTWARE = [
         /***********************************************************************
          * Datos del Software
@@ -39,15 +47,15 @@ class ConfigAPP{
          * CompanyCredits: Creditos
          * URL:            URL
          **********************************************************************/
-        'SoftwareName'    => 'coreEngine',
-        'SoftwareSlogan'  => 'Software Modular',
-        'CompanyName'     => 'coreEngine',
-        'CompanyEmail'    => 'coreEngine@coreEngine.cl',
-        'CompanyCredits'  => '',
-        'URL'             => 'http://localhost/coreEngine/admin/public/',
+        'SoftwareName'    => ENV_SOFTWARE_NAME,
+        'SoftwareSlogan'  => ENV_SOFTWARE_SLOGAN,
+        'CompanyName'     => ENV_SOFTWARE_COMPANYNAME,
+        'CompanyEmail'    => ENV_SOFTWARE_COMPANYEMAIL,
+        'CompanyCredits'  => ENV_SOFTWARE_COMPANYCREDITS,
+        'URL'             => ENV_SOFTWARE_URL,
     ];
 
-    //Configuracion de la aplicacion
+    // Configuracion de la aplicacion
     const APP = [
 
         /***********************************************************************
@@ -75,8 +83,8 @@ class ConfigAPP{
          * Driver:   LocalStorageDriver
          * Requiere: Ninguna librería externa
          **********************************************************************/
-        'uploadFolder' => __DIR__ . '/../../../admin/public/upload/',  // Ruta absoluta en disco
-        'uploadUrl'    => self::SOFTWARE['URL'].'upload',              // URL pública base (sin slash final)
+        'uploadFolder' => __DIR__ . '/../../../'.ENV_SOFTWARE_MAINFOLDER.'/public/upload/',  // Ruta absoluta en disco
+        'uploadUrl'    => self::SOFTWARE['URL'].'/upload',                                   // URL pública base (sin slash final)
 
         /***********************************************************************
          * AMAZON S3 (o servicios compatibles: MinIO, DigitalOcean Spaces,
@@ -86,15 +94,15 @@ class ConfigAPP{
          *   Instalación: cd coreEngine/vendors/libs/aws-sdk
          *                composer require aws/aws-sdk-php
          **********************************************************************/
-        's3Key'       => ENV_S3_KEY,                             // IAM Access Key ID
-        's3Secret'    => ENV_S3_SECRET,                          // IAM Secret Access Key
-        's3Region'    => ENV_S3_REGION,                          // Región AWS (ej: sa-east-1 para São Paulo)
-        's3Bucket'    => ENV_S3_BUCKET,                          // Nombre del bucket
-        's3Prefix'    => ENV_S3_PREFIX,                          // Prefijo global (carpeta raíz en el bucket)
-        's3Endpoint'  => ENV_S3_ENDPOINT,                        // Solo para S3-compatible (ej: 'https://minio.miapp.com')
-        's3Acl'       => 'private',                             // 'private' | 'public-read'
-        's3UrlSigned' => true,                                  // true = URLs pre-firmadas (seguro)
-        's3UrlExpiry' => 3600,                                  // Segundos de validez de la URL firmada
+        's3Key'       => ENV_S3_KEY,         // IAM Access Key ID
+        's3Secret'    => ENV_S3_SECRET,      // IAM Secret Access Key
+        's3Region'    => ENV_S3_REGION,      // Región AWS (ej: sa-east-1 para São Paulo)
+        's3Bucket'    => ENV_S3_BUCKET,      // Nombre del bucket
+        's3Prefix'    => ENV_S3_PREFIX,      // Prefijo global (carpeta raíz en el bucket)
+        's3Endpoint'  => ENV_S3_ENDPOINT,    // Solo para S3-compatible (ej: 'https://minio.miapp.com')
+        's3Acl'       => 'private',          // 'private' | 'public-read'
+        's3UrlSigned' => true,               // true = URLs pre-firmadas (seguro)
+        's3UrlExpiry' => 3600,               // Segundos de validez de la URL firmada
 
         /***********************************************************************
          * GOOGLE CLOUD STORAGE (GCS)
@@ -103,12 +111,12 @@ class ConfigAPP{
          *   Instalación: cd coreEngine/vendors/libs/gcs-sdk
          *                composer require google/cloud-storage
          **********************************************************************/
-        'gcsProjectId' => ENV_GCS_PROJECT_ID,                           // ID del proyecto en GCP
-        'gcsKeyFile'   => __DIR__ . '/keys/service-account.json',       // Ruta al JSON de cuenta de servicio
-        'gcsBucket'    => ENV_GCS_BUCKET,                               // Nombre del bucket GCS
-        'gcsPrefix'    => ENV_GCS_PREFIX,                               // Prefijo global dentro del bucket
-        'gcsUrlSigned' => true,                                         // true = URLs firmadas
-        'gcsUrlExpiry' => 3600,                                         // Segundos de validez (firmadas)
+        'gcsProjectId' => ENV_GCS_PROJECT_ID,                      // ID del proyecto en GCP
+        'gcsKeyFile'   => __DIR__ . '/keys/service-account.json',  // Ruta al JSON de cuenta de servicio
+        'gcsBucket'    => ENV_GCS_BUCKET,                          // Nombre del bucket GCS
+        'gcsPrefix'    => ENV_GCS_PREFIX,                          // Prefijo global dentro del bucket
+        'gcsUrlSigned' => true,                                    // true = URLs firmadas
+        'gcsUrlExpiry' => 3600,                                    // Segundos de validez (firmadas)
 
         /***********************************************************************
          * SFTP — Servidor remoto vía SSH File Transfer Protocol
@@ -117,15 +125,15 @@ class ConfigAPP{
          *   Instalación: cd coreEngine/vendors/libs/sftp-sdk
          *                composer require phpseclib/phpseclib:~3.0
          **********************************************************************/
-        'sftpHost'       => ENV_SFTP_HOST,                      // Hostname o IP del servidor
-        'sftpPort'       => ENV_SFTP_PORT,                      // Puerto SSH (default: 22)
-        'sftpUser'       => ENV_SFTP_USER,                      // Usuario SSH
-        'sftpPassword'   => ENV_SFTP_PASSWORD,                  // Password (vacío si usa clave privada)
-        'sftpPrivateKey' => __DIR__ . '/keys/id_rsa',           // Ruta a clave privada RSA (opcional)
-        'sftpKeyPass'    => ENV_SFTP_KEY_PASS,                  // Passphrase de la clave privada (si aplica)
-        'sftpTimeout'    => 30,                                 // Timeout de conexión en segundos
-        'sftpBasePath'   => ENV_SFTP_BASE_PATH,                 // Ruta absoluta en el servidor remoto
-        'sftpBaseUrl'    => ENV_SFTP_BASE_URL,                  // URL pública base (para getFileUrl())
+        'sftpHost'       => ENV_SFTP_HOST,             // Hostname o IP del servidor
+        'sftpPort'       => ENV_SFTP_PORT,             // Puerto SSH (default: 22)
+        'sftpUser'       => ENV_SFTP_USER,             // Usuario SSH
+        'sftpPassword'   => ENV_SFTP_PASSWORD,         // Password (vacío si usa clave privada)
+        'sftpPrivateKey' => __DIR__ . '/keys/id_rsa',  // Ruta a clave privada RSA (opcional)
+        'sftpKeyPass'    => ENV_SFTP_KEY_PASS,         // Passphrase de la clave privada (si aplica)
+        'sftpTimeout'    => 30,                        // Timeout de conexión en segundos
+        'sftpBasePath'   => ENV_SFTP_BASE_PATH,        // Ruta absoluta en el servidor remoto
+        'sftpBaseUrl'    => ENV_SFTP_BASE_URL,         // URL pública base (para getFileUrl())
 
         /***********************************************************************
          * Seguridad
@@ -144,10 +152,10 @@ class ConfigAPP{
         'auditLoggerPath'               => __DIR__ . '/../../security/',
         'rateLimiterFileIP'             => __DIR__ . '/../../security/rateLimit_IP.json',
         'rateLimiterFileUser'           => __DIR__ . '/../../security/rateLimit_User.json',
-        'rateLimiterGuestMaxAttempts'   => 5,
+        'rateLimiterGuestMaxAttempts'   => 20,
         'rateLimiterGuestWindowSeconds' => 60,
-        'rateLimiterUserMaxAttempts'    => 20,
-        'rateLimiterUserWindowSeconds'  => 120,
+        'rateLimiterUserMaxAttempts'    => 240,
+        'rateLimiterUserWindowSeconds'  => 480,
         'errorLogFile'                  => __DIR__ . '/../../security/error.log',
 
     ];
