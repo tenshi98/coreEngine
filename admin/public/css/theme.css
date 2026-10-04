@@ -1593,7 +1593,7 @@ body::-webkit-scrollbar-thumb {background-color: #aab7cf;}
 .title-divider .divider-text::before, .title-divider .divider-text::after {border-top: 1px solid rgba(67, 89, 113, 0.2);border-top-color: rgba(67, 89, 113, 0.2);}
 
 /*--------------------------------------------------------------
-# title-divider
+# infographicBox
 --------------------------------------------------------------*/
 .infographicBox i {color: #fff;}
 .infographicBox .headline {color: #333;}

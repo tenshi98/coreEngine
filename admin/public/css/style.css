@@ -726,7 +726,7 @@ textarea {resize:none !important;	}
 .title-divider .divider-text::before, .title-divider .divider-text::after {content: "";position: absolute;top: 50%;width: 100vw;}
 
 /*--------------------------------------------------------------
-# title-divider
+# infographicBox
 --------------------------------------------------------------*/
 .infographicBox i {font-size: 2.4em;display: block;float: left;margin-right: 15px;width: 60px;height: 60px;line-height: 60px;text-align: center;border-radius: 50%;background-clip: padding-box;}
 .infographicBox .headline {display: block;font-size: 1.2em;font-weight: 300;text-align: right;}
