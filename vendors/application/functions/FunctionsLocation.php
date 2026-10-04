@@ -49,13 +49,22 @@ class FunctionsLocation {
         /********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateValue($latitude1, 'latitude1');
-		$dataVal_2 = $this->_validateValue($latitude2, 'latitude2');
-		$dataVal_3 = $this->_validateValue($longitude1, 'longitude1');
-		$dataVal_4 = $this->_validateValue($longitude2, 'longitude2');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateValue($latitude2, 'latitude2');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_3 = $this->_validateValue($longitude1, 'longitude1');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_3 !== true) { return $dataVal_3; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_4 = $this->_validateValue($longitude2, 'longitude2');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_4 !== true) { return $dataVal_4; }
 
         /********************** Si todo esta ok **********************/
@@ -109,8 +118,12 @@ class FunctionsLocation {
     public function getGeocodeData($address, $ApiKey): array|bool|string {
 
         /********************** Validaciones   **********************/
-        if(!isset($address) || $address==''){ return 'No ha ingresado una direccion';}
-        if(!isset($ApiKey) || $ApiKey==''){   return 'No ha ingresado una ApiKey';}
+        if ($address === null || trim((string)$address) === '') {
+            return 'No ha ingresado una direccion';
+        }
+        if ($ApiKey === null || trim((string)$ApiKey) === '') {
+            return 'No ha ingresado una ApiKey';
+        }
 
         /********************** Si todo esta ok **********************/
         // Preparación de la dirección para URL (reemplazo de espacios y caracteres especiales)
@@ -166,30 +179,13 @@ class FunctionsLocation {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo o cadena vacía
-        if ($ubicacion=='') { return 'Sin datos ingresados en ubicacion';}
+        if ($ubicacion === null || trim((string)$ubicacion) === '') {
+            return 'Sin datos ingresados en ubicacion';
+        }
 
         /********************** Si todo esta ok **********************/
         // Normaliza las abreviaturas
-        $reemplazos = [
-            '/\bAVENIDA\b|\bAV(?:\.|\s|$)/iu'   => 'Avenida',   // Avenida
-            '/\bCALLE\b|\bCLL(?:\.|\s|$)/iu'    => 'Calle',     // Calle
-            '/\bPASAJE\b|\bPSJE(?:\.|\s|$)/iu'  => 'Pasaje',    // Pasaje
-            '/\bCAMINO\b|\bCAM(?:\.|\s|$)/iu'   => 'Camino',    // Camino
-            '/\bRUTA\b|\bRTA(?:\.|\s|$)/iu'     => 'Ruta',      // Ruta
-            '/\bKILOMETRO\b|\bKM(?:\.|\s|$)/iu' => 'Kilometro', // Kilómetro
-            '/\bN[°º]\b|\bNO\.\b|#/iu'          => '',          // Número
-        ];
-
-        // Realiza el cambio
-        foreach ($reemplazos as $patron => $reemplazo) {
-            $ubicacion = preg_replace($patron, $reemplazo, $ubicacion);
-        }
-
-        // Elimina espacios múltiples
-        $ubicacion = preg_replace('/\s+/', ' ', $ubicacion);
-
-        // Eliminacion de espacios en blanco
-        $ubicacion = trim($ubicacion);
+        $ubicacion = $this->normalizarDirecciones($ubicacion);
 
         // Construcción de la URL de consulta para Nominatim (formato JSON, límite 1 resultado)
         $url = "https://nominatim.openstreetmap.org/search?format=json&limit=1&q=" . urlencode($ubicacion);
@@ -224,6 +220,418 @@ class FunctionsLocation {
         return false;
     }
 
+    /************************************************************************************************************/
+    /**
+     * Normaliza una dirección chilena para facilitar su comparación.
+     *
+     * Ejemplos:
+     *
+     * "Av. Vicuña Mackenna N° 1234"
+     *   -> "AVENIDA VICUNA MACKENNA 1234"
+     *
+     * "Avda Vicuña Mackenna #1234"
+     *   -> "AVENIDA VICUNA MACKENNA 1234"
+     *
+     * "Vicuña Mackenna 1234, Depto. 501"
+     *   -> "VICUNA MACKENNA 1234 DEPARTAMENTO 501"
+     *
+     * "Pje. Las Rosas N° 25, Block B"
+     *   -> "PASAJE LAS ROSAS 25 BLOCK B"
+     *
+     * @param string $ubicacion
+     * @return string
+     */
+    public function normalizarDirecciones(string $Ubicacion): string {
+        // ---------------------------------------------------------------------
+        // 1. Limpieza inicial
+        // ---------------------------------------------------------------------
+        if ($Ubicacion === null || trim((string)$Ubicacion) === '') {
+            return '';
+        }
+
+        // Normaliza saltos de línea, tabs y espacios
+        $Ubicacion = preg_replace('/\s+/u', ' ', trim($Ubicacion));
+
+        // ---------------------------------------------------------------------
+        // 2. Mayúsculas
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = mb_strtoupper($Ubicacion, 'UTF-8');
+
+        // ---------------------------------------------------------------------
+        // 3. Normalización de caracteres
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = str_replace(
+            ['"', "'", '´', '`', '“', '”', '‘', '’'],
+            '',
+            $Ubicacion
+        );
+
+        // Normaliza diferentes tipos de guion
+        $Ubicacion = str_replace(
+            ['–', '—', '−'],
+            '-',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 4. Elimina tildes
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = strtr($Ubicacion, [
+            'Á' => 'A',
+            'É' => 'E',
+            'Í' => 'I',
+            'Ó' => 'O',
+            'Ú' => 'U',
+            'Ü' => 'U',
+            'Ñ' => 'N',
+        ]);
+
+        // ---------------------------------------------------------------------
+        // 5. Normalización de tipos de vía
+        // ---------------------------------------------------------------------
+
+        $reemplazos = [
+
+            // Avenida
+            '/\bAVDA?\.?\b/u'          => 'AVENIDA',
+            '/\bAVENIDA\b/u'           => 'AVENIDA',
+
+            // Calle
+            '/\bCLL?\.?\b/u'           => 'CALLE',
+            '/\bCALLE\b/u'             => 'CALLE',
+
+            // Pasaje
+            '/\bPSJ(?:E)?\.?\b/u'      => 'PASAJE',
+            '/\bPJE\.?\b/u'            => 'PASAJE',
+            '/\bPASAJE\b/u'            => 'PASAJE',
+
+            // Camino
+            '/\bCAM\.?\b/u'            => 'CAMINO',
+            '/\bCAMINO\b/u'            => 'CAMINO',
+
+            // Ruta
+            '/\bRTA\.?\b/u'            => 'RUTA',
+            '/\bRUTA\b/u'              => 'RUTA',
+
+            // Carretera
+            '/\bCTRA\.?\b/u'           => 'CARRETERA',
+            '/\bCARRET\.?\b/u'         => 'CARRETERA',
+            '/\bCARRETERA\b/u'         => 'CARRETERA',
+
+            // Autopista
+            '/\bAUT\.?\b/u'            => 'AUTOPISTA',
+            '/\bAUTOP\.?\b/u'          => 'AUTOPISTA',
+            '/\bAUTOPISTA\b/u'         => 'AUTOPISTA',
+
+            // Alameda
+            '/\bALAM\.?\b/u'           => 'ALAMEDA',
+            '/\bALAMEDA\b/u'            => 'ALAMEDA',
+
+            // Costanera
+            '/\bCOST\.?\b/u'           => 'COSTANERA',
+            '/\bCOSTANERA\b/u'         => 'COSTANERA',
+
+            // Diagonal
+            '/\bDIAG\.?\b/u'           => 'DIAGONAL',
+            '/\bDIAGONAL\b/u'          => 'DIAGONAL',
+
+            // Circular
+            '/\bCIRC\.?\b/u'           => 'CIRCULAR',
+            '/\bCIRCULAR\b/u'          => 'CIRCULAR',
+
+            // Boulevard
+            '/\bBLVD?\.?\b/u'          => 'BOULEVARD',
+            '/\bBLVRD\.?\b/u'          => 'BOULEVARD',
+            '/\bBOULEVARD\b/u'         => 'BOULEVARD',
+
+            // Paseo
+            '/\bPSO\.?\b/u'            => 'PASEO',
+            '/\bPASEO\b/u'             => 'PASEO',
+
+            // Plaza
+            '/\bPLZ\.?\b/u'            => 'PLAZA',
+            '/\bPLZA\.?\b/u'           => 'PLAZA',
+            '/\bPLAZA\b/u'             => 'PLAZA',
+        ];
+
+        foreach ($reemplazos as $patron => $reemplazo) {
+            $Ubicacion = preg_replace($patron, $reemplazo, $Ubicacion);
+        }
+
+        // ---------------------------------------------------------------------
+        // 6. Orientaciones
+        // ---------------------------------------------------------------------
+
+        $orientaciones = [
+
+            '/\bNTE?\.?\b/u'       => 'NORTE',
+            '/\bNORTE\b/u'         => 'NORTE',
+
+            '/\bSUR\b/u'           => 'SUR',
+
+            '/\bOTE?\.?\b/u'       => 'ORIENTE',
+            '/\bORIENTE\b/u'       => 'ORIENTE',
+
+            '/\bPTE?\.?\b/u'       => 'PONIENTE',
+            '/\bPONIENTE\b/u'      => 'PONIENTE',
+
+            '/\bOESTE\b/u'         => 'OESTE',
+        ];
+
+        foreach ($orientaciones as $patron => $reemplazo) {
+            $Ubicacion = preg_replace($patron, $reemplazo, $Ubicacion);
+        }
+
+        // ---------------------------------------------------------------------
+        // 7. Número de dirección
+        // ---------------------------------------------------------------------
+
+        // N°, Nº, N.°, NRO, NRO., NUM, NUMERO
+        $Ubicacion = preg_replace(
+            '/\bN(?:[°º]|\.?°|\.?\b)\s*/u',
+            '',
+            $Ubicacion
+        );
+
+        $Ubicacion = preg_replace(
+            '/\bNRO?\.?\s*/u',
+            '',
+            $Ubicacion
+        );
+
+        $Ubicacion = preg_replace(
+            '/\bNUM(?:ERO)?\.?\s*/u',
+            '',
+            $Ubicacion
+        );
+
+        // #
+        $Ubicacion = preg_replace('/#\s*/u', '', $Ubicacion);
+
+        // ---------------------------------------------------------------------
+        // 8. Departamento / oficina / local / piso
+        // ---------------------------------------------------------------------
+
+        $componentes = [
+
+            // Departamento
+            '/\bDEPTO?\.?\b/u'       => 'DEPARTAMENTO',
+            '/\bDPTO?\.?\b/u'        => 'DEPARTAMENTO',
+            '/\bDEPT\.?\b/u'         => 'DEPARTAMENTO',
+            '/\bDEPARTAMENTO\b/u'    => 'DEPARTAMENTO',
+
+            // Oficina
+            '/\bOF\.?\b/u'           => 'OFICINA',
+            '/\bOFIC\.?\b/u'         => 'OFICINA',
+            '/\bOFICINA\b/u'         => 'OFICINA',
+
+            // Local
+            '/\bLOC\.?\b/u'          => 'LOCAL',
+            '/\bLOCAL\b/u'           => 'LOCAL',
+
+            // Suite
+            '/\bSTE\.?\b/u'          => 'SUITE',
+            '/\bSUITE\b/u'           => 'SUITE',
+
+            // Piso
+            '/\bPISO\b/u'            => 'PISO',
+        ];
+
+        foreach ($componentes as $patron => $reemplazo) {
+            $Ubicacion = preg_replace($patron, $reemplazo, $Ubicacion);
+        }
+
+        // ---------------------------------------------------------------------
+        // 9. Block / casa / torre / edificio
+        // ---------------------------------------------------------------------
+
+        $vivienda = [
+
+            '/\bBLK\.?\b/u'              => 'BLOCK',
+            '/\bBLOCK\b/u'               => 'BLOCK',
+
+            '/\bTOR\.?\b/u'              => 'TORRE',
+            '/\bTORRE\b/u'               => 'TORRE',
+
+            '/\bCS\.?\b/u'               => 'CASA',
+            '/\bCSA\.?\b/u'              => 'CASA',
+            '/\bCASA\b/u'                => 'CASA',
+
+            '/\bEDIF\.?\b/u'             => 'EDIFICIO',
+            '/\bEDIFICIO\b/u'            => 'EDIFICIO',
+        ];
+
+        foreach ($vivienda as $patron => $reemplazo) {
+            $Ubicacion = preg_replace($patron, $reemplazo, $Ubicacion);
+        }
+
+        // ---------------------------------------------------------------------
+        // 10. Parcela / lote / sitio
+        // ---------------------------------------------------------------------
+
+        $terreno = [
+
+            '/\bPCL\.?\b/u'              => 'PARCELA',
+            '/\bPARC\.?\b/u'             => 'PARCELA',
+            '/\bPARCELA\b/u'             => 'PARCELA',
+
+            '/\bLOTE\b/u'                => 'LOTE',
+
+            '/\bSITIO\b/u'               => 'SITIO',
+        ];
+
+        foreach ($terreno as $patron => $reemplazo) {
+            $Ubicacion = preg_replace($patron, $reemplazo, $Ubicacion);
+        }
+
+        // ---------------------------------------------------------------------
+        // 11. Villa / población / condominio / sector
+        // ---------------------------------------------------------------------
+
+        $sectores = [
+
+            '/\bCONDO?\.?\b/u'           => 'CONDOMINIO',
+            '/\bCONDOMINIO\b/u'          => 'CONDOMINIO',
+
+            '/\bPOB\.?\b/u'              => 'POBLACION',
+            '/\bPOBL\.?\b/u'             => 'POBLACION',
+            '/\bPOBLACION\b/u'           => 'POBLACION',
+
+            '/\bSECT\.?\b/u'             => 'SECTOR',
+            '/\bSECTOR\b/u'              => 'SECTOR',
+
+            '/\bVILLA\b/u'               => 'VILLA',
+
+            '/\bPARCELACION\b/u'         => 'PARCELACION',
+        ];
+
+        foreach ($sectores as $patron => $reemplazo) {
+            $Ubicacion = preg_replace($patron, $reemplazo, $Ubicacion);
+        }
+
+        // ---------------------------------------------------------------------
+        // 12. Kilómetros
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = preg_replace(
+            '/\bKM\.?\s*/u',
+            'KILOMETRO ',
+            $Ubicacion
+        );
+
+        $Ubicacion = preg_replace(
+            '/\bKILOMETROS?\b/u',
+            'KILOMETRO',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 13. Normalización de ordinales
+        // ---------------------------------------------------------------------
+
+        // 1° -> 1
+        // 2º -> 2
+        // 3° -> 3
+        $Ubicacion = preg_replace(
+            '/(\d+)\s*[°º]/u',
+            '$1',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 14. Normalización de números con letras
+        // ---------------------------------------------------------------------
+
+        // 123 A -> 123-A
+        $Ubicacion = preg_replace(
+            '/\b(\d+)\s+([A-Z])\b/u',
+            '$1-$2',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 15. Limpieza de caracteres
+        // ---------------------------------------------------------------------
+
+        /*
+        * Conserva:
+        * - Letras
+        * - Números
+        * - Espacios
+        * - Puntos
+        * - Guiones
+        *
+        * En esta etapa todavía conservamos los puntos porque
+        * pueden formar parte de abreviaturas que no hayan sido
+        * procesadas.
+        */
+        $Ubicacion = preg_replace(
+            '/[^\p{L}\p{N}\s.\-]/u',
+            ' ',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 16. Normalización de puntos
+        // ---------------------------------------------------------------------
+
+        // Varios puntos consecutivos -> uno
+        $Ubicacion = preg_replace(
+            '/\.{2,}/u',
+            '.',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 17. Elimina puntos residuales
+        // ---------------------------------------------------------------------
+
+        /*
+        * A esta altura ya procesamos las abreviaturas.
+        *
+        * Por lo tanto:
+        *
+        * "AV." -> "AVENIDA"
+        * "DEPTO." -> "DEPARTAMENTO"
+        * "KM." -> "KILOMETRO"
+        *
+        * Los puntos restantes normalmente son ruido.
+        */
+        $Ubicacion = str_replace('.', ' ', $Ubicacion);
+
+        // ---------------------------------------------------------------------
+        // 18. Normalización de guiones
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = preg_replace(
+            '/\s*-\s*/u',
+            '-',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 19. Normalización de espacios
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = preg_replace(
+            '/\s+/u',
+            ' ',
+            $Ubicacion
+        );
+
+        // ---------------------------------------------------------------------
+        // 20. Limpieza final
+        // ---------------------------------------------------------------------
+
+        $Ubicacion = trim($Ubicacion, " .-\t\n\r\0\x0B");
+
+        return $Ubicacion;
+    }
+
+
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
@@ -235,7 +643,9 @@ class FunctionsLocation {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) { return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';

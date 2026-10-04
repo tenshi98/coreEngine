@@ -17,6 +17,12 @@ class FunctionsCommonData {
 	 * son los valores de la columna de ordenamiento. La clave utilizada para agrupar
 	 * es removida de los elementos internos.
 	 *
+	 * Guardas aplicadas:
+	 * - Si $clave_orden está vacío, retorna un arreglo vacío.
+	 * - Las filas que no sean arreglos se omiten.
+	 * - Las filas sin la clave, o con valor nulo/vacío, se agrupan bajo "Sin información".
+	 * - Los valores de clave no escalares (array/objeto) se omiten.
+	 *
 	 * @param array $array Arreglo de entrada que se desea reordenar.
 	 * @param string $clave_orden Nombre de la columna que actuará como índice de agrupación.
 	 *
@@ -40,11 +46,29 @@ class FunctionsCommonData {
 	 */
 	public function agruparPorClave(array $array, string $clave_orden): array {
 
+		/********************** Validaciones   **********************/
+		// Guarda: sin clave de agrupación no es posible construir la estructura
+		if (trim($clave_orden) === '') {
+			return [];
+		}
+
 		/**********************  Retorno datos  **********************/
 		// Utiliza array_reduce para iterar el arreglo y construir la estructura agrupada
 		return array_reduce($array, function ($carry, $item) use ($clave_orden) {
-				// Extrae el valor que servirá como nueva clave de grupo
-				$clave = $item[$clave_orden];
+				// Guarda: se omite la fila si no es un arreglo (evita error en el acceso a la clave)
+				if (!is_array($item)) {
+					return $carry;
+				}
+				// Guarda: se lee la clave sin emitir warning cuando no existe en la fila
+				$clave = array_key_exists($clave_orden, $item) ? $item[$clave_orden] : '';
+				// Guarda: los valores nulos o vacíos se agrupan bajo una etiqueta controlada
+				if ($clave === null || $clave === '') {
+					$clave = 'Sin información';
+				}
+				// Guarda: solo se permiten claves escalares (evita "Illegal offset type")
+				if (!is_scalar($clave)) {
+					return $carry;
+				}
 				// Elimina la clave de orden del elemento original para evitar redundancia
 				unset($item[$clave_orden]);
 				// Agrega el elemento al grupo correspondiente dentro del acumulador
@@ -202,73 +226,108 @@ class FunctionsCommonData {
 	/**
 	 * Valida y normaliza una ruta de archivo para prevenir ataques de salto de directorio.
 	 *
-	 * Resuelve la ruta absoluta del archivo y verifica que el resultado comience
-	 * estrictamente con el prefijo de la ruta raíz permitida. Si la ruta es inválida
-	 * o se encuentra fuera del rango permitido, retorna la ruta raíz.
+	 * Resuelve la ruta absoluta del archivo y de la raíz con realpath() (eliminando
+	 * enlaces simbólicos y segmentos '..') y verifica que el resultado sea igual a la
+	 * raíz o que comience estrictamente con ella, de modo que los directorios hermanos
+	 * (p. ej. /var/www/uploads_evil) queden bloqueados. Solo se aceptan rutas
+	 * existentes: si la ruta no existe, queda fuera de la raíz o los datos de entrada
+	 * son inválidos, la respuesta indica el fallo en la clave "error" y, cuando es
+	 * posible, la raíz canónica queda en "data" como valor seguro de respaldo.
 	 *
-	 * @param string $path Ruta del archivo o directorio a validar.
-	 * @param string $root Ruta base permitida que actúa como límite de seguridad.
+	 * @param string $path Ruta del archivo o directorio a validar (debe existir).
+	 * @param string $root Ruta base permitida que actúa como límite de seguridad (debe existir).
 	 *
-	 * @return string La ruta absoluta validada o la ruta raíz en caso de acceso denegado.
+	 * @return array Respuesta estructurada con las claves:
+	 *               - success (bool): true solo si la ruta existe y está permitida.
+	 *               - data (string): la ruta absoluta canónica validada; la raíz
+	 *                 canónica como respaldo cuando success=false, o '' si los datos
+	 *                 de entrada no permiten calcularla.
+	 *               - error (string|null): null cuando success=true; en caso contrario,
+	 *                 el motivo del fallo.
 	 *
 	 * @example
 	 * ```php
 	 * $root = '/var/www/uploads';
 	 * $path = '/var/www/uploads/imagen.jpg';
 	 *
-	 * echo $this->safePath($path, $root);
-	 * // Resultado: /var/www/uploads/imagen.jpg
+	 * $this->safePath($path, $root);
+	 * // ['success' => true, 'data' => '/var/www/uploads/imagen.jpg', 'error' => null]
 	 *
 	 *
 	 * $root = '/var/www/uploads';
 	 * $path = '/var/www/uploads/../uploads/documento.pdf';
 	 *
-	 * echo $this->safePath($path, $root);
-	 * // Resultado: /var/www/uploads/documento.pdf
+	 * $this->safePath($path, $root);
+	 * // ['success' => true, 'data' => '/var/www/uploads/documento.pdf', 'error' => null]
 	 *
 	 *
 	 * $root = '/var/www/uploads';
 	 * $path = '/var/www/uploads/../../etc/passwd';
 	 *
-	 * echo $this->safePath($path, $root);
-	 * // Resultado: /var/www/uploads (bloqueado)
+	 * $this->safePath($path, $root);
+	 * // ['success' => false, 'data' => '/var/www/uploads',
+	 * //  'error' => 'Acceso denegado: la ruta está fuera de la raíz permitida']
 	 *
 	 *
 	 * $root = '/var/www/uploads';
 	 * $path = '/var/www/uploads/no_existe.txt';
 	 *
-	 * echo $this->safePath($path, $root);
-	 * // Resultado: /var/www/uploads (fallback por seguridad)
+	 * $this->safePath($path, $root);
+	 * // ['success' => false, 'data' => '/var/www/uploads',
+	 * //  'error' => 'La ruta no existe o no es accesible']
 	 *
 	 *
 	 * $root = '/var/www/uploads';
 	 * $path = '/home/user/secret.txt';
 	 *
-	 * echo $this->safePath($path, $root);
-	 * // Resultado: /var/www/uploads (acceso denegado)
+	 * $this->safePath($path, $root);
+	 * // ['success' => false, 'data' => '/var/www/uploads',
+	 * //  'error' => 'Acceso denegado: la ruta está fuera de la raíz permitida']
 	 * ```
 	 *
 	 */
-	public function safePath($path, $root) {
+	public function safePath($path, $root): array {
 
 		/********************** Validaciones   **********************/
-        // Se verifica si esta vacio
-        if(!isset($path) || $path == ''){  return 'Sin datos ingresados'; }
-        if(!isset($root) || $root == ''){  return 'Sin datos ingresados'; }
+		// Guarda: se descartan entradas nulas, vacías o no escalares (evita warnings de conversión)
+		if ($path === null || !is_scalar($path) || trim((string)$path) === '') {
+			return ['success' => false, 'data' => '', 'error' => 'Sin datos ingresados'];
+		}
+		if ($root === null || !is_scalar($root) || trim((string)$root) === '') {
+			return ['success' => false, 'data' => '', 'error' => 'Sin datos ingresados'];
+		}
+		$path = (string)$path;
+		$root = (string)$root;
 
-        /********************** Si todo esta ok **********************/
-		// Obtiene la ruta absoluta real eliminando enlaces simbólicos y relativos
+		// Guarda: los bytes nulos provocan ValueError en realpath() desde PHP 8
+		if (str_contains($path, "\0") || str_contains($root, "\0")) {
+			return ['success' => false, 'data' => '', 'error' => 'La ruta contiene caracteres no permitidos'];
+		}
+
+		/********************** Si todo esta ok **********************/
+		// Canoniza también la raíz: elimina enlaces simbólicos, segmentos '..' y barra final
+		$realRoot = realpath($root);
+		if ($realRoot === false) {
+			return ['success' => false, 'data' => '', 'error' => 'La ruta raíz no existe o no es accesible'];
+		}
+		$realRoot = rtrim($realRoot, DIRECTORY_SEPARATOR);
+
+		// Obtiene la ruta absoluta real; solo se aceptan rutas existentes
 		$real = realpath($path);
-
-		// Valida si la ruta existe y si se mantiene dentro del directorio raíz
-		if ($real === false || strpos($real, rtrim($root, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR) !== 0) {
-			// Retorno de seguridad si se detecta una ruta fuera de los límites
-			return $root;
+		if ($real === false) {
+			// Retorno de seguridad: fallback a la raíz canónica
+			return ['success' => false, 'data' => $realRoot, 'error' => 'La ruta no existe o no es accesible'];
 		}
 
 		/**********************  Retorno datos  **********************/
-		// Retorno de la ruta real confirmada
-		return $real;
+		// La raíz exacta o cualquier ruta estrictamente dentro de ella está permitida
+		// (el separador posterior evita el bypass de hermanos tipo /var/www/uploads_evil)
+		if ($real === $realRoot || str_starts_with($real, $realRoot . DIRECTORY_SEPARATOR)) {
+			return ['success' => true, 'data' => $real, 'error' => null];
+		}
+
+		// Retorno de seguridad si se detecta una ruta fuera de los límites
+		return ['success' => false, 'data' => $realRoot, 'error' => 'Acceso denegado: la ruta está fuera de la raíz permitida'];
 	}
 
 	/******************************************************************************/

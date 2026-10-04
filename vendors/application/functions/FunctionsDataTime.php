@@ -129,7 +129,9 @@ class FunctionsDataTime {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0 || $Data=='00:00:00') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '' || $Data==0 || $Data=='00:00:00') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarHora($Data)) {
 			return 'El dato ingresado en '.$Name.' no es una hora (' . $Data . ')';

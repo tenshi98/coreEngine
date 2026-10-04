@@ -61,11 +61,11 @@ class UIWidgetsMaps {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2, 3, 4);
 		//Validaciones
-		if(!isset($Options['Latitud']) || $Options['Latitud']==''){   echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Latitud.');                                           exit;}
-		if(!isset($Options['Longitud']) || $Options['Longitud']==''){ echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Longitud.');                                          exit;}
-		if(!isset($Options['Titulo']) || $Options['Titulo']==''){     echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Titulo.');                                            exit;}
-        if(!isset($Options['IDGoogle']) || $Options['IDGoogle']==''){ echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado Una API de Google Maps.');                               exit;}
-		if(!in_array($Options['MapTypeId'], $tipos)){                 echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $MapTypeId entregada no esta dentro de las opciones.'); exit;}
+		if ($Options['Latitud'] === null || trim((string)$Options['Latitud']) === '') {   echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Latitud.');                                           exit;}
+		if ($Options['Longitud'] === null || trim((string)$Options['Longitud']) === '') { echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Longitud.');                                          exit;}
+		if ($Options['Titulo'] === null || trim((string)$Options['Titulo']) === '') {     echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Titulo.');                                            exit;}
+        if ($Options['IDGoogle'] === null || trim((string)$Options['IDGoogle']) === '') { echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado Una API de Google Maps.');                               exit;}
+		if(!in_array($Options['MapTypeId'], $tipos)) {                                    echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $MapTypeId entregada no esta dentro de las opciones.'); exit;}
 
 		/**********************  Definiciones   **********************/
 		$Latitud    = $Options['Latitud'];
@@ -244,9 +244,9 @@ class UIWidgetsMaps {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2, 3, 4);
 		//Validaciones
-		if(!isset($Options['Ubicacion']) || $Options['Ubicacion']==''){     echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion.');                                         exit;}
-        if(!isset($Options['IDGoogle']) || $Options['IDGoogle']==''){       echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado Una API de Google Maps.');                               exit;}
-		if(!in_array($Options['MapTypeId'], $tipos)){                       echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $MapTypeId entregada no esta dentro de las opciones.'); exit;}
+		if ($Options['Ubicacion'] === null || trim((string)$Options['Ubicacion']) === '') {     echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion.');                                         exit;}
+        if ($Options['IDGoogle'] === null || trim((string)$Options['IDGoogle']) === '') {       echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado Una API de Google Maps.');                               exit;}
+		if(!in_array($Options['MapTypeId'], $tipos)) {                                          echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $MapTypeId entregada no esta dentro de las opciones.'); exit;}
 
 		/**********************  Definiciones   **********************/
 
@@ -444,10 +444,10 @@ class UIWidgetsMaps {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2, 3, 4);
 		//Validaciones
-		if(!isset($Options['Ubicacion_1']) || $Options['Ubicacion_1']==''){  echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion 1.');                                       exit;}
-        if(!isset($Options['Ubicacion_2']) || $Options['Ubicacion_2']==''){  echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion 2.');                                       exit;}
-        if(!isset($Options['IDGoogle']) || $Options['IDGoogle']==''){        echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado Una API de Google Maps.');                               exit;}
-		if(!in_array($Options['MapTypeId'], $tipos)){                        echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $MapTypeId entregada no esta dentro de las opciones.'); exit;}
+		if ($Options['Ubicacion_1'] === null || trim((string)$Options['Ubicacion_1']) === '') {  echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion 1.');                                       exit;}
+        if ($Options['Ubicacion_2'] === null || trim((string)$Options['Ubicacion_2']) === '') {  echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion 2.');                                       exit;}
+        if ($Options['IDGoogle'] === null || trim((string)$Options['IDGoogle']) === '') {        echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado Una API de Google Maps.');                               exit;}
+		if(!in_array($Options['MapTypeId'], $tipos)) {                                           echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $MapTypeId entregada no esta dentro de las opciones.'); exit;}
 
 		/**********************  Definiciones   **********************/
 
@@ -762,7 +762,7 @@ class UIWidgetsMaps {
 		*=================================================    Modo de uso  =================================================
 		*
         *
-        *    //variable para los circulos
+        *    // Variable para los circulos
         *    $arrMarkers = [
         *        [-33.4389, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 1.'],
         *        [-33.4589, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 2.'],
@@ -770,14 +770,14 @@ class UIWidgetsMaps {
         *        [-33.4989, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 4.'],
         *    ];
         *
-        *   //variable para los poligonos
+        *   // Variable para los poligonos
 		*   $arrPolygon = [
         *        [[[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]], 'I am a polygon 1.'],
         *        [[[-33.465072090022645, -70.74491500854494], [-33.47681399959164, -70.74457168579103], [-33.46750651907221, -70.72465896606447]], 'I am a polygon 2.'],
         *        [[[-33.49012911778188, -70.72105407714845], [-33.494853345110236, -70.72156906127931], [-33.49356494503731, -70.71075439453126], [-33.48483195034282, -70.7102394104004]], 'I am a polygon 3.'],
         *    ];
         *
-        *    //variable para los circulos
+        *    // Variable para los circulos
 		*   $arrCircles = [
         *        [-33.4389, -70.6593, 1, 500, 'I am a circle 1.'],
         *        [-33.4589, -70.6593, 1, 500, 'I am a circle 2.'],
@@ -785,7 +785,7 @@ class UIWidgetsMaps {
         *        [-33.4989, -70.6593, 1, 500, 'I am a circle 4.'],
         *    ];
         *
-        *   //variable para las lineas
+        *   // Variable para las lineas
 		*   $arrPolyLine = [
         *        [[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]],
         *        [[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]],
@@ -819,8 +819,8 @@ class UIWidgetsMaps {
 		*/
 
         /**********************  Validaciones   **********************/
-		if(!isset($Options['Latitud']) || $Options['Latitud']==''){   echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Latitud.');  exit;}
-		if(!isset($Options['Longitud']) || $Options['Longitud']==''){ echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Longitud.'); exit;}
+		if ($Options['Latitud'] === null || trim((string)$Options['Latitud']) === '') {   echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Latitud.');  exit;}
+		if ($Options['Longitud'] === null || trim((string)$Options['Longitud']) === '') { echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Longitud.'); exit;}
 
 		/**********************  Definiciones   **********************/
 		$Latitud             = $Options['Latitud'];
@@ -1585,7 +1585,10 @@ class UIWidgetsMaps {
 		*/
 
         /**********************  Validaciones   **********************/
-		if(!isset($Options['arrDirecciones']) || $Options['arrDirecciones']==''){     echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion.');  exit;}
+        if (empty($Options['arrDirecciones']) || !is_array($Options['arrDirecciones'])) {
+            echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ubicacion.');
+            exit;
+        }
 
 		/**********************  Definiciones   **********************/
         $arrMarkers  = [];
@@ -1606,7 +1609,7 @@ class UIWidgetsMaps {
                 //Se hace la busqueda de lat y long por su direccion
                 $result = $fncLocation->geocodeAddress($Ubicacion);
                 // Si hay resultados se guarda
-                if ($result) {
+                if (is_array($result) && isset($result['lat'], $result['lon'])) {
                     //Se guarda el dato
                     $arrMarkers[] = [$result['lat'], $result['lon'], $iconExName, $iconFill, $contentHtml, $content];
                     //Se guarda el ultimo dato

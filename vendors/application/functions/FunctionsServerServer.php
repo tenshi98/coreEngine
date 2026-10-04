@@ -349,7 +349,6 @@ class FunctionsServerServer {
 
         } catch (Throwable $e) {
             // Registro del error en el log del sistema en caso de fallo crítico
-            error_log("Error al obtener datos del servidor: " . $e->getMessage());
             return (object) ['error' => 'No se pudieron obtener los datos del servidor.'];
         }
 
@@ -377,7 +376,9 @@ class FunctionsServerServer {
 
         /********************** Validaciones   **********************/
         // Validación de entrada obligatoria para evitar ejecuciones sobre rutas nulas
-        if(!isset($src) || $src==''){ return ['success' => false, 'error' => 'No ha ingresado la ruta de la carpeta'];}
+        if ($src === null || trim((string)$src) === '') {
+            return ['success' => false, 'error' => 'No ha ingresado la ruta de la carpeta'];
+        }
 
         /********************** Si todo esta ok **********************/
         try {
@@ -754,7 +755,9 @@ class FunctionsServerServer {
 
         /********************** Validaciones   **********************/
         // Validar que la ruta de entrada no esté vacía
-        if(!isset($path) || $path==''){ return 'No ha ingresado la ruta del directorio';}
+        if ($path === null || trim((string)$path) === '') {
+            return 'No ha ingresado la ruta del directorio';
+        }
 
         /********************** Si todo esta ok **********************/
         // Limpieza de separadores finales para asegurar consistencia en el bucle
@@ -798,7 +801,9 @@ class FunctionsServerServer {
     public function isWritableDirectory(string $directory, int $permission = 0755): array {
 
         /********************** Validaciones   **********************/
-        if(!isset($directory) || $directory==''){ return ['success' => false,'message' => "No ha ingresado la ruta del directorio."];}
+        if ($directory === null || trim((string)$directory) === '') {
+            return ['success' => false,'message' => "No ha ingresado la ruta del directorio."];
+        }
 
         /********************** Si todo esta ok **********************/
         try {
@@ -868,6 +873,11 @@ class FunctionsServerServer {
      */
     public function ensureDirectoryExists(string $path): array {
 
+        /********************** Validaciones   **********************/
+        if ($path === null || trim((string)$path) === '') {
+            return ['success' => false,'message' => "No ha ingresado la ruta del directorio."];
+        }
+
         /********************** Si todo esta ok **********************/
         // Verifica si la ruta ya existe y es un directorio válido
         if (!is_dir($path)) {
@@ -925,6 +935,11 @@ class FunctionsServerServer {
 	 *
      */
     public function ensurePermissions755(string $path): array {
+
+        /********************** Validaciones   **********************/
+        if ($path === null || trim((string)$path) === '') {
+            return ['success' => false,'message' => "No ha ingresado la ruta del directorio."];
+        }
 
         /********************** Validaciones   **********************/
         // Verifica la existencia física del elemento antes de operar
@@ -1007,6 +1022,11 @@ class FunctionsServerServer {
 	 *
      */
     public function canWrite(string $path): bool {
+
+        /********************** Validaciones   **********************/
+        if ($path === null || trim((string)$path) === '') {
+            return false;
+        }
 
         /********************** Si todo esta ok **********************/
         // Generación de un nombre de archivo temporal oculto y único

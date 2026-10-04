@@ -707,7 +707,9 @@ class FunctionsDataDate {
 		$Fecha = trim($Fecha);
 		/**********************  Validaciones   **********************/
 		// Comprobación de valor vacío o nulo
-		if($Fecha=='' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000'){   return 'Sin fecha ingresada en Fecha';}
+        if ($Fecha === null || trim((string)$Fecha) === '' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000') {
+            return 'Sin fecha ingresada en Fecha';
+        }
 		// Validación de formato estricto incluyendo horas, minutos y segundos
 		if(!$this->DataValidations->validarFecha($Fecha, 'Y-m-d H:i:s')){ return 'El dato ingresado en Fecha no es una fecha ('.$Fecha.')';}
 
@@ -741,8 +743,12 @@ class FunctionsDataDate {
 	private function _validateDate($Fecha, $Name){
 
 		/**********************  Validaciones   **********************/
-		if($Fecha=='' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000'){   return 'Sin fecha ingresada en '.$Name;}
-		if(!$this->DataValidations->validarFecha($Fecha)){                return 'El dato ingresado en '.$Name.' no es una fecha ('.$Fecha.')';}
+        if ($Fecha === null || trim((string)$Fecha) === '' || $Fecha=='0000-00-00' || $Fecha=='00-00-0000') {
+            return 'Sin fecha ingresada en '.$Name;
+        }
+		if(!$this->DataValidations->validarFecha($Fecha)){
+			return 'El dato ingresado en '.$Name.' no es una fecha ('.$Fecha.')';
+		}
 
 		/********************** Si todo esta ok **********************/
 		/**********************  Retorno datos  **********************/

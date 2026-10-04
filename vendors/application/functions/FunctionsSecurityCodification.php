@@ -21,7 +21,7 @@ class FunctionsSecurityCodification {
      * @param string $simple_string Texto original que se desea codificar.
      * @param string $passkey (Opcional) Llave de cifrado personalizada.
      *
-     * @return string Texto codificado y sanitizado. Distinto en cada llamada aunque el texto sea el mismo.
+     * @return array Texto codificado y sanitizado. Distinto en cada llamada aunque el texto sea el mismo.
 	 *
 	 * @example
 	 * ```php
@@ -30,10 +30,10 @@ class FunctionsSecurityCodification {
 	 * ```
 	 *
      */
-    public function simpleEncode($simple_string, $passkey): string {
+    public function simpleEncode($simple_string, $passkey): array {
 
         /********************** Validaciones   **********************/
-        if ($simple_string=='') { return 'Sin datos ingresados'; }
+        if ($simple_string==''){ return ['success' => false, 'error' => 'Sin datos ingresados'];}
 
         /********************** Si todo esta ok **********************/
         // Configuración de la llave de cifrado
@@ -58,7 +58,7 @@ class FunctionsSecurityCodification {
         $encryption = str_replace(['+', '/'], ['_', '---'], $encryption);
 
         /********************** Retorno datos  **********************/
-        return $encryption;
+        return ['success' => true, 'data' => $encryption];
     }
 
     /************************************************************************************************************/
@@ -71,7 +71,7 @@ class FunctionsSecurityCodification {
      * @param string $string Texto codificado que se desea recuperar.
      * @param string $passkey (Opcional) Llave de cifrado utilizada originalmente.
      *
-     * @return string Texto original decodificado.
+     * @return array Texto original decodificado.
 	 *
 	 * @example
 	 * ```php
@@ -79,10 +79,10 @@ class FunctionsSecurityCodification {
 	 * ```
 	 *
      */
-    public function simpleDecode($string, $passkey): string {
+    public function simpleDecode($string, $passkey): array {
 
         /********************** Validaciones   **********************/
-        if ($string=='') { return 'Sin datos ingresados'; }
+        if ($string==''){ return ['success' => false, 'error' => 'Sin datos ingresados'];}
 
         /********************** Si todo esta ok **********************/
         // Reversión de la sanitización (restaura caracteres originales de Base64)
@@ -109,34 +109,36 @@ class FunctionsSecurityCodification {
         $decryption = openssl_decrypt($ciphertext_raw, $ciphering, $decryption_key, $options, $decryption_iv);
 
         /********************** Retorno datos  **********************/
-        return (string)$decryption;
+        return ['success' => true, 'data' => $decryption];
     }
 
     /************************************************************************************************************/
     /**
-     * Genera un hash SHA-256 único basado en la identidad del servidor actual.
-     * * Utiliza el nombre del servidor (SERVER_NAME) o, en su defecto, el nombre del
-     * archivo actual para crear una huella digital. Esto ayuda a restringir o
-     * validar que ciertos procesos o datos pertenezcan al entorno correcto.
+     * Genera un hash SHA-256 basado en un identificador pseudoaleatorio seguro.
      *
-     * @return string Hash representativo del servidor.
-	 *
-	 * @example
-	 * ```php
-	 * $Codification->generateServerSpecificHash(); //Devuelve '421aa90e079fa326b6494f812ad13e79'
-	 * ```
-	 *
+     * Esta función genera una cadena de 32 bytes criptográficamente seguros mediante random_bytes,
+     * la convierte a representación hexadecimal y posteriormente aplica un algoritmo de hash SHA-256
+     * sobre dicha cadena para devolver una huella digital única de 64 caracteres.
+     *
+     * @return array Cadena de 64 caracteres hexadecimales correspondiente al hash SHA-256 del identificador.
+     * @throws Exception Si no se encuentra una fuente de entropía suficiente para la generación de bytes aleatorios.
+     *
+     * @example
+     * ```php
+     * $codification = new Codification();
+     * $hash =$codification->generateServerSpecificHash();
+     * // Devuelve una cadena similar a: '421aa90e079fa326b6494f812ad13e792e34f... (64 caracteres)'
+     * ```
      */
-    public function generateServerSpecificHash(): string {
+    public function generateServerSpecificHash(): array {
 
         /********************** Si todo esta ok **********************/
-        // Intenta obtener el nombre del servidor, de lo contrario usa el nombre del script
-        $identifier = (isset($_SERVER['SERVER_NAME']) && !empty($_SERVER['SERVER_NAME']))
-                    ? $_SERVER['SERVER_NAME']
-                    : pathinfo(__FILE__, PATHINFO_FILENAME);
+        // Genera 32 bytes aleatorios criptográficamente seguros y los convierte a formato hexadecimal (64 caracteres)
+        $identifier = bin2hex(random_bytes(32));
 
         /********************** Retorno datos  **********************/
-        return hash('sha256', $identifier);
+        // Genera y retorna el resumen criptográfico SHA-256 del identificador binario convertido
+        return ['success' => true, 'data' => hash('sha256', $identifier)];
     }
 
     /************************************************************************************************************/
@@ -151,7 +153,7 @@ class FunctionsSecurityCodification {
      * @param mixed  $string El contenido a procesar (texto o número).
      * @param string $passkey (Opcional) Llave personalizada de alta seguridad.
      *
-     * @return string|int El resultado procesado o False en caso de error.
+     * @return array El resultado procesado o False en caso de error.
 	 *
 	 * @example
 	 * ```php
@@ -168,11 +170,18 @@ class FunctionsSecurityCodification {
 	 * ```
 	 *
      */
-    public function encryptDecrypt($action, $string, $passkey = '') : string | int | bool {
+    public function encryptDecrypt($action, $string, $passkey = '') : array {
 
         /********************** Validaciones   **********************/
-        if ($action=='') { return 'Sin datos ingresados'; }
-        if ($string=='') { return 'Sin datos ingresados'; }
+        // Valida que la acción haya sido ingresada y que corresponda a una operación permitida.
+        if (!in_array($action, ['encrypt', 'decrypt'], true)) {
+            return ['success' => false, 'error' => 'Acción no válida'];
+        }
+
+        // Valida que el dato a procesar exista y no esté vacío.
+        if ($string === null || trim((string)$string) === '') {
+            return ['success' => false, 'error' => 'Sin datos ingresados'];
+        }
 
         /********************** Si todo esta ok **********************/
         $output         = false;
@@ -190,6 +199,8 @@ class FunctionsSecurityCodification {
             $ciphertext_raw = openssl_encrypt($string, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
             // Base64 URL-safe (sin '+', '/' ni '=' de relleno) para evitar problemas en URLs
             $output         = rtrim(strtr(base64_encode($iv . $ciphertext_raw), '+/', '-_'), '=');
+            // Retorno de datos
+            return ['success' => true, 'data' => $output];
         } elseif ($action == 'decrypt') {
             // Revierte Base64 URL-safe y restaura el relleno '=' antes de decodificar
             $base64  = strtr($string, '-_', '+/');
@@ -200,10 +211,14 @@ class FunctionsSecurityCodification {
             $iv             = substr($raw, 0, $iv_length);
             $ciphertext_raw = substr($raw, $iv_length);
             $output         = openssl_decrypt($ciphertext_raw, $encrypt_method, $key, OPENSSL_RAW_DATA, $iv);
+            // Verifico
+            if ($output === false) { return ['success' => false, 'error' => 'No se pudo desencriptar']; }
+            // Retorno de datos
+            return ['success' => true, 'data' => $output];
         }
 
         /********************** Retorno datos  **********************/
-        return $output;
+        return ['success' => false, 'error' => 'Registro inválido'];
     }
 
 }

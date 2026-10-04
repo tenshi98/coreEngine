@@ -46,9 +46,12 @@ class FunctionsDataText {
         /**********************  Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateEmpty($texto, 'texto');
-		$dataVal_2 = $this->_validateInteger($cuantos, 'cuantos');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($cuantos, 'cuantos');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
         /********************** Proceso de Recorte **********************/
@@ -453,26 +456,58 @@ class FunctionsDataText {
 	/**
      * Localiza una palabra o subcadena específica y extrae todo el contenido que aparece tras ella.
      *
+     * Busca la primera aparición de $palabra dentro de $cadena y devuelve la posición
+     * en la que comienza junto con el texto posterior a dicha palabra (sin incluirla).
+     *
+     * Características de la búsqueda:
+     * - sensible a mayúsculas/minúsculas (strpos),
+     * - solo considera la primera coincidencia,
+     * - trabaja por bytes: 'posicion' es un índice byte base 0, por lo que en cadenas
+     *   UTF-8 puede diferir del índice de carácter (ej: 'ñandú feliz' => posición 8).
+     *
+     * Guardas aplicadas:
+     * - Si $cadena está vacío, retorna success=false con 'Sin datos ingresados en cadena'.
+     * - Si $palabra está vacío, retorna success=false con 'Sin datos ingresados en palabra'.
+     * - Si $palabra no aparece en $cadena, retorna success=false con 'No se encuentra la posicion'.
+     *
      * @param string $cadena Texto completo donde se realizará la búsqueda.
      * @param string $palabra Término de referencia a ubicar.
      *
-     * @return array|string|false Array con 'posicion' y texto 'extraido', o false si no se encuentra.
+     * @return array Respuesta estructurada con las claves:
+     *               - success (bool): true solo si la palabra fue encontrada.
+     *               - data (array|string): cuando success=true, arreglo con:
+     *                   - 'posicion' (int): índice byte base 0 de la primera aparición.
+     *                   - 'extraido' (string): texto posterior a la palabra
+     *                     (puede ser '' si la palabra cierra la cadena);
+     *                 cuando success=false, cadena vacía ('').
+     *               - error (string): presente solo cuando success=false, indica el
+     *                 motivo del fallo; no se incluye en el retorno de éxito.
 	 *
 	 * @example
 	 * ```php
-	 * $DataText->buscarPalabraYExtraer('01 - titulo', '01 - '); //Devuelve 'titulo'
+	 * $DataText->buscarPalabraYExtraer('01 - titulo', '01 - ');
+	 * // ['success' => true, 'data' => ['posicion' => 0, 'extraido' => 'titulo']]
+	 *
+	 * $DataText->buscarPalabraYExtraer('Lorem ipsum dolor sit amet', 'ipsum');
+	 * // ['success' => true, 'data' => ['posicion' => 6, 'extraido' => ' dolor sit amet']]
+	 *
+	 * $DataText->buscarPalabraYExtraer('Lorem ipsum dolor', 'xyz');
+	 * // ['success' => false, 'data' => '', 'error' => 'No se encuentra la posicion']
 	 * ```
 	 *
      */
-    public function buscarPalabraYExtraer($cadena, $palabra): array | string | false {
+    public function buscarPalabraYExtraer($cadena, $palabra): array {
 
         /**********************  Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateEmpty($cadena, 'cadena');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal_1 !== true) { return ['success' => false, 'data' => '', 'error' => $dataVal_1]; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_2 = $this->_validateEmpty($palabra, 'palabra');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
-		if ($dataVal_1 !== true) { return $dataVal_1; }
-		if ($dataVal_2 !== true) { return $dataVal_2; }
+		if ($dataVal_2 !== true) { return ['success' => false, 'data' => '', 'error' => $dataVal_2]; }
 
         /********************** Localización y Extracción **********************/
         // Encuentra el índice numérico de la primera aparición de la palabra
@@ -480,7 +515,7 @@ class FunctionsDataText {
 
         /********************** Retorno datos **********************/
         if ($pos === false) {
-            return false;
+            return ['success' => false, 'data' => '', 'error' => 'No se encuentra la posicion'];
         } else {
             // Calcula el inicio del texto posterior sumando el largo de la palabra clave
             $posSiguiente = $pos + strlen($palabra);
@@ -489,10 +524,13 @@ class FunctionsDataText {
             $extraido = substr($cadena, $posSiguiente);
 
 			// Devolver un array con la posición y el texto extraído
-            return [
+            $data = [
                 'posicion' => $pos,
                 'extraido' => $extraido
             ];
+
+			// Retorno de datos
+			return ['success' => true, 'data' => $data];
         }
     }
 
@@ -548,9 +586,12 @@ class FunctionsDataText {
         /**********************  Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateEmpty($texto, 'texto');
-		$dataVal_2 = $this->_validateEmpty($divisor, 'divisor');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return ['izquierda' => trim($dataVal_1 ?? ''),'derecha'   => ''];}
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateEmpty($divisor, 'divisor');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return ['izquierda' => trim($dataVal_2 ?? ''),'derecha'   => ''];}
 
 		/********************** Si todo esta ok **********************/
@@ -678,7 +719,9 @@ class FunctionsDataText {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
 
 		/**********************  Retorno datos  **********************/
 		return true;
@@ -689,7 +732,9 @@ class FunctionsDataText {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
@@ -701,4 +746,3 @@ class FunctionsDataText {
 	}
 
 }
-

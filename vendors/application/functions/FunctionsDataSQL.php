@@ -229,12 +229,24 @@ class FunctionsDataSQL {
 
         /**********************  Validaciones   **********************/
         // Validación de campos obligatorios
-        if(!isset($host) || $host==''){          return ['success' => false, 'message' => 'No hay datos en $host'];}
-        if(!isset($username) || $username==''){  return ['success' => false, 'message' => 'No hay datos en $username'];}
-        if(!isset($password) || $password==''){  return ['success' => false, 'message' => 'No hay datos en $password'];}
-        if(!isset($port) || $port==''){          return ['success' => false, 'message' => 'No hay datos en $port'];}
-        if(!isset($charset) || $charset==''){    return ['success' => false, 'message' => 'No hay datos en $charset'];}
-        if(!isset($dbName) || $dbName==''){      return ['success' => false, 'message' => 'No hay datos en $dbName'];}
+        if ($host === null || trim((string)$host) === '') {
+            return ['success' => false, 'message' => 'No hay datos en $host'];
+        }
+        if ($username === null || trim((string)$username) === '') {
+            return ['success' => false, 'message' => 'No hay datos en $username'];
+        }
+        if ($password === null || trim((string)$password) === '') {
+            return ['success' => false, 'message' => 'No hay datos en $password'];
+        }
+        if ($port === null || trim((string)$port) === '') {
+            return ['success' => false, 'message' => 'No hay datos en $port'];
+        }
+        if ($charset === null || trim((string)$charset) === '') {
+            return ['success' => false, 'message' => 'No hay datos en $charset'];
+        }
+        if ($dbName === null || trim((string)$dbName) === '') {
+            return ['success' => false, 'message' => 'No hay datos en $dbName'];
+        }
 
         // Control de longitud según estándares de identificadores de motores SQL
         if (strlen($dbName) < 3 || strlen($dbName) > 64) {
@@ -329,7 +341,9 @@ class FunctionsDataSQL {
 
         /**********************  Validaciones   **********************/
         // Comprobación de parámetro obligatorio
-        if(!isset($PathFile) || $PathFile==''){  return ['success' => false,'message' => 'No hay datos en $PathFile'];}
+        if ($PathFile === null || trim((string)$PathFile) === '') {
+            return ['success' => false,'message' => 'No hay datos en $PathFile'];
+        }
 
         // Verificación de existencia física en el disco
         if (!file_exists($PathFile)) {

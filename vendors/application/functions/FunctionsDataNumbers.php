@@ -45,9 +45,12 @@ class FunctionsDataNumbers {
         /**********************  Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateValue($valor, 'valor');
-		$dataVal_2 = $this->_validateInteger($n_decimales, 'n_decimales');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($n_decimales, 'n_decimales');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
         /**********************  Retorno datos  **********************/
@@ -77,9 +80,12 @@ class FunctionsDataNumbers {
         /**********************  Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateInteger($valor, 'valor');
-		$dataVal_2 = $this->_validateInteger($n_ceros, 'n_ceros');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($n_ceros, 'n_ceros');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
         /**********************  Retorno datos  **********************/
@@ -109,9 +115,12 @@ class FunctionsDataNumbers {
         /**********************  Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateValue($valor, 'valor');
-		$dataVal_2 = $this->_validateInteger($n_decimales, 'n_decimales');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($n_decimales, 'n_decimales');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
         /**********************  Retorno datos  **********************/
@@ -320,9 +329,9 @@ class FunctionsDataNumbers {
 
 		/**********************  Validaciones   **********************/
         // Validaciones de existencia y longitud mínima/máxima
-        if(!isset($Fono) || $Fono==''){  return 'Sin datos ingresados en Fono';}
-        if(strlen($Fono)<=7){            return 'Numero demasiado corto, tiene '.strlen($Fono).' numeros y debe tener al menos 9';}
-        if(strlen($Fono)>=13){           return 'Numero demasiado largo, tiene '.strlen($Fono).' numeros y debe tener no mas de 11';}
+        if ($Fono === null || trim((string)$Fono) === '') {  return 'Sin datos ingresados en Fono';}
+        if (strlen($Fono)<=7) {                              return 'Numero demasiado corto, tiene '.strlen($Fono).' numeros y debe tener al menos 9';}
+        if (strlen($Fono)>=13) {                             return 'Numero demasiado largo, tiene '.strlen($Fono).' numeros y debe tener no mas de 11';}
 
 		/********************** Si todo esta ok **********************/
         // Llama a la función interna para estandarizar el prefijo y limpiar caracteres
@@ -356,9 +365,9 @@ class FunctionsDataNumbers {
 
         /**********************  Validaciones   **********************/
         // Validaciones de longitud y presencia de datos
-        if(!isset($Fono) || $Fono==''){  return 'Sin datos ingresados en Fono';}
-        if(strlen($Fono)<=7){            return 'Numero demasiado corto, tiene '.strlen($Fono).' numeros y debe tener al menos 9';}
-        if(strlen($Fono)>=13){           return 'Numero demasiado largo, tiene '.strlen($Fono).' numeros y debe tener no mas de 11';}
+        if ($Fono === null || trim((string)$Fono) === '') {  return 'Sin datos ingresados en Fono';}
+        if (strlen($Fono)<=7) {                              return 'Numero demasiado corto, tiene '.strlen($Fono).' numeros y debe tener al menos 9';}
+        if (strlen($Fono)>=13) {                             return 'Numero demasiado largo, tiene '.strlen($Fono).' numeros y debe tener no mas de 11';}
 
         /********************** Si todo esta ok **********************/
         // Corrección para números de 8 dígitos (formato antiguo) anteponiendo el dígito 9
@@ -425,7 +434,9 @@ class FunctionsDataNumbers {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) {return '0'; }
+        if ($Data === null || trim((string)$Data) === '') {
+            return '0';
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
@@ -440,7 +451,9 @@ class FunctionsDataNumbers {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';

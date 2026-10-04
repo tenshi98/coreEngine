@@ -33,7 +33,7 @@ class FunctionsSecurityPasswords {
      * @param int $longitud Largo de la contraseña generada.
      * @param string $tipo Tipo de caracteres: 'numerico' o 'alfanumerico'.
      *
-     * @return string La contraseña generada o un mensaje de error en caso de validación fallida.
+     * @return array La contraseña generada o un mensaje de error en caso de validación fallida.
 	 *
 	 * @example
 	 * ```php
@@ -42,18 +42,21 @@ class FunctionsSecurityPasswords {
 	 * ```
 	 *
      */
-    public function generarPassword($longitud, $tipo): string {
+    public function generarPassword($longitud = 15, $tipo = 'alfanumerico'): array {
 
         /********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal = $this->_validateInteger($longitud, 'longitud');
-		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
-		if ($dataVal !== true) { return $dataVal; }
-        // Se verifica si esta vacio
-        if(!isset($tipo) || $tipo == ''){  return 'Sin datos ingresados en tipo'; }
+		// Si la validación devuelve un valor distinto a true, se da un valor por defecto
+		if ($dataVal !== true) { $longitud = 10; }
+        // Si la longitud esta fuera de los parametros
+        if ($longitud < 1 || $longitud > 15) {
+            $longitud = 10;
+        }
+
         // Validación pertenencia de tipo a los permitidos
-        if ($tipo != "alfanumerico" && $tipo != "numerico"){
-            return 'El dato ingresado en tipo esta fuera de parámetros esperados';
+        if (!in_array($tipo, ['alfanumerico', 'numerico'], true)) {
+            return ['success' => false, 'error' => 'El dato ingresado en tipo esta fuera de parámetros esperados'];
         }
 
         /********************** Si todo esta ok **********************/
@@ -63,45 +66,21 @@ class FunctionsSecurityPasswords {
             'numerico'     => '0123456789',
         ];
 
-        // Seleccionar el alfabeto según el tipo solicitado
-        $alphabet = $alfabetos[$tipo] ?? $alfabetos['alfanumerico'];
+        // Se ontienen los datos
+        $alfabeto         = $alfabetos[$tipo];
+        $longitudAlfabeto = strlen($alfabeto);
 
-        // Asegurar que el pool de caracteres sea suficiente para la longitud pedida
-        $repeticiones = (int) ceil($longitud / strlen($alphabet));
-        $pool         = str_repeat($alphabet, $repeticiones);
+        // Variable
+        $password = '';
 
         // Mezclar aleatoriamente los caracteres del pool
-        $shuffled = str_shuffle($pool);
+        for ($i = 0; $i < $longitud; $i++) {
+            $password .= $alfabeto[random_int(0, $longitudAlfabeto - 1)];
+        }
 
         /********************** Retorno datos  **********************/
         // Retorna la subcadena truncada a la longitud deseada
-        return substr($shuffled, 0, (int)$longitud);
-
-    }
-
-    /************************************************************************************************************/
-    /**
-     * Genera una contraseña única basada en la estampa de tiempo (Timestamp) del servidor.
-     * * Concatena la fecha (YYYYMMDD) y la hora (HHMMSS) actual de Chile.
-     * Útil para identificadores rápidos que requieren orden cronológico.
-     *
-     * @return string Cadena numérica representativa del momento exacto (ej: 20260404132055).
-	 *
-	 * @example
-	 * ```php
-	 * $SecurityPasswords->generarPasswordUnica(); //Devuelve 20241007152055 (para la fecha 2024/10/07 15:20:55)
-	 * ```
-	 *
-     */
-    public function generarPasswordUnica(): string {
-
-        /********************** Si todo esta ok **********************/
-        // Establecer la zona horaria predeterminada a Chile para asegurar consistencia
-        date_default_timezone_set('America/Santiago');
-
-        /********************** Retorno datos  **********************/
-        // Devuelve la concatenación de fecha y hora actual
-        return date("Ymd") . date("His");
+        return ['success' => true, 'data' => $password];
 
     }
 
@@ -131,7 +110,7 @@ class FunctionsSecurityPasswords {
 	 * ```
 	 *
      */
-    public function caracteresRandom($longitud = 16, $lecturaAmigable = true, $incluirSimbolos = false, $sinDuplicados = false): string {
+    public function caracteresRandom($longitud = 16, $lecturaAmigable = true, $incluirSimbolos = false, $sinDuplicados = false): array {
 
         /********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
@@ -140,10 +119,10 @@ class FunctionsSecurityPasswords {
 		$dataVal_3 = $this->_validateBool($incluirSimbolos, 'incluirSimbolos');
 		$dataVal_4 = $this->_validateBool($sinDuplicados, 'sinDuplicados');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
-		if ($dataVal_1 !== true) { return $dataVal_1; }
-		if ($dataVal_2 !== true) { return $dataVal_2; }
-		if ($dataVal_3 !== true) { return $dataVal_3; }
-		if ($dataVal_4 !== true) { return $dataVal_4; }
+        if($dataVal_1 !== true){  return ['success' => false, 'error' => $dataVal_1]; }
+        if($dataVal_2 !== true){  return ['success' => false, 'error' => $dataVal_2]; }
+        if($dataVal_3 !== true){  return ['success' => false, 'error' => $dataVal_3]; }
+        if($dataVal_4 !== true){  return ['success' => false, 'error' => $dataVal_4]; }
 
         /********************** Si todo esta ok **********************/
         // Definición de sets de caracteres
@@ -162,7 +141,7 @@ class FunctionsSecurityPasswords {
         // Lógica de generación con duplicados permitidos (estándar)
         if (!$sinDuplicados) {
             $repeticiones = (int) ceil($longitud / strlen($pool));
-            return substr(str_shuffle(str_repeat($pool, $repeticiones)), 0, $longitud);
+            return ['success' => true, 'data' => substr(str_shuffle(str_repeat($pool, $repeticiones)), 0, $longitud)];
         }
 
         // Lógica de generación sin duplicados
@@ -183,7 +162,7 @@ class FunctionsSecurityPasswords {
 
         /********************** Retorno datos  **********************/
         // Extrae la porción solicitada del array mezclado y lo convierte a string
-        return implode('', array_slice($caracteres, 0, $longitud));
+        return ['success' => true, 'data' => implode('', array_slice($caracteres, 0, $longitud))];
 
     }
 
@@ -241,7 +220,9 @@ class FunctionsSecurityPasswords {
 
         /********************** Validaciones   **********************/
         // Se verifica si esta vacio
-        if(!isset($Texto) || $Texto == ''){  return 'Sin datos ingresados en Texto'; }
+        if ($Texto === null || trim((string)$Texto) === '') {
+            return 'Sin datos ingresados en Texto';
+        }
 
         /********************** Si todo esta ok **********************/
         // 'cost' define el número de iteraciones del algoritmo (2^n).
@@ -270,12 +251,16 @@ class FunctionsSecurityPasswords {
 	 * ```
 	 *
      */
-    public static function hashVerify($Texto, $Hash): string | bool {
+    public static function hashVerify($Texto, $Hash): bool {
 
         /********************** Validaciones   **********************/
         // Se verifica si esta vacio
-        if(!isset($Texto) || $Texto == ''){  return 'Sin datos ingresados en Texto'; }
-        if(!isset($Hash) || $Hash == ''){    return 'Sin datos ingresados en Hash'; }
+        if ($Texto === null || trim((string)$Texto) === '') {
+            return false;
+        }
+        if ($Hash === null || trim((string)$Hash) === '') {
+            return false;
+        }
 
         /********************** Si todo esta ok **********************/
         /********************** Retorno datos  **********************/
@@ -295,7 +280,10 @@ class FunctionsSecurityPasswords {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) { return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '' || $Data==0) {
+            return 'Sin datos ingresados en '.$Name;
+        }
+
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
@@ -310,7 +298,10 @@ class FunctionsSecurityPasswords {
 
 		/**********************  Validaciones   **********************/
         // Se verifica si esta vacio
-        if(!isset($Data) || $Data === null || $Data === ''){  return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
+
         // Validación pertenencia de tipo a los permitidos
         if (!is_bool($Data)) {
             return 'El dato ingresado en '.$Name.' esta fuera de parámetros esperados';

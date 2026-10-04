@@ -30,7 +30,15 @@ class FunctionsServerSecurity {
 
         /********************** Validaciones   **********************/
         // Verifica que la URL no sea una cadena vacía antes de instanciar servicios
-        if($URL==''){  return ['success' => false, 'error' => 'No ha ingresado una URL']; }
+        if ($URL === null || trim((string)$URL) === '') {
+            return ['success' => false, 'error' => 'No ha ingresado una URL'];
+        }
+
+        // Verifica que la URL sea valida
+        $DataValidations    = new FunctionsDataValidations();
+        if (!$DataValidations->validarURL($URL)) {
+            return ['success' => false, 'error' => 'No ha ingresado una URL Valida'];
+        }
 
         /********************** Si todo esta ok **********************/
         try {
@@ -86,7 +94,14 @@ class FunctionsServerSecurity {
 
         /********************** Validaciones   **********************/
         // Valida que el parámetro IP contenga información antes de proceder
-        if($IP==''){  return ['success' => false, 'error' => 'No ha ingresado una IP']; }
+        if ($IP === null || trim((string)$IP) === '') {
+            return ['success' => false, 'error' => 'No ha ingresado una IP'];
+        }
+
+        // Valida estrictamente que sea una dirección IPv4 o IPv6 válida.
+        if (filter_var($IP, FILTER_VALIDATE_IP) === false) {
+            return ['success' => false, 'error' => 'La dirección IP ingresada no es válida'];
+        }
 
         /********************** Si todo esta ok **********************/
         try {
@@ -107,4 +122,3 @@ class FunctionsServerSecurity {
     }
 
 }
-

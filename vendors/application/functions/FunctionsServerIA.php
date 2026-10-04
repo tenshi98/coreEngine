@@ -31,9 +31,13 @@ class FunctionsServerIA {
 
         /********************** Validaciones   **********************/
         // Verifica que la API Key no sea nula o una cadena vacía
-        if(!isset($api_key) || $api_key==''){   return ['success' => false, 'error' => 'No ha ingresado una apikey'];}
+        if ($api_key === null || trim((string)$api_key) === '') {
+            return ['success' => false, 'error' => 'No ha ingresado una apikey'];
+        }
         // Valida que el parámetro de datos sea un arreglo y contenga información
-        if(!is_array($data) || empty($data)){   return ['success' => false, 'error' => 'No ha ingresado la info a enviar'];}
+        if(!is_array($data) || empty($data)){
+            return ['success' => false, 'error' => 'No ha ingresado la info a enviar'];
+        }
 
         /********************** Si todo esta ok **********************/
         // Inicialización del recurso cURL para la comunicación con el endpoint de OpenAI

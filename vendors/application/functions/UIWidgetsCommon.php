@@ -57,12 +57,12 @@ class UIWidgetsCommon {
 			4 => ['color' => 'text-color-red'],
 		];
 
-		/******************************************/
+		/************************************/
 		//Se obtienen los datos
 		$ServerWeb = new FunctionsServerSecurity();
 		$XMLData   = $ServerWeb->getDataSIIindicadores('https://zeus.sii.cl/admin/rss/sii_ind_rss.xml');
 
-		/******************************************/
+		/************************************/
 		//Se verifica la recepcion de datos
 		if($XMLData['success']===true){
 			//Se recorren los datos
@@ -81,12 +81,12 @@ class UIWidgetsCommon {
 			$widgetData = $XMLData['data'];
 		}
 
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath('../app/templates/Widgets/widgetsIndicadoresSII_1.php');
 		$this->TemplateRender->assign('widgetData', $widgetData);
 
-		/******************************************/
+		/************************************/
 		//ejecucion
 		echo $this->TemplateRender->render();
 
@@ -137,7 +137,7 @@ class UIWidgetsCommon {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 6);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -152,7 +152,7 @@ class UIWidgetsCommon {
 			$Count  = 1;
             //Se crea el input
             $input = '<div class="accordion '.$accordionType.'" id="'.$nameID.'">';
-				//Recorro
+				// Recorro
 				foreach ( $arrData as $data ) {
 					//Verifico si se muestra
 					if($showOpen==$Count){$show='show';}else{$show='';}
@@ -226,7 +226,7 @@ class UIWidgetsCommon {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 6);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -323,7 +323,7 @@ class UIWidgetsCommon {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 6);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -351,7 +351,7 @@ class UIWidgetsCommon {
             //Se crean elementos
             $title   = '<ul class="nav nav-tabs '.$tabType.' '.$justifContent.'" id="'.$nameID.'" role="tablist">';
 			$content = '<div class="tab-content pt-2" id="'.$nameID.'_Content">';
-			//Recorro
+			// Recorro
 			foreach ( $arrData as $data ) {
 				//Verifico si se muestra
 				if($activeTab==$Count){$active='active';$show='show active';}else{$active='';$show='';}
@@ -399,9 +399,14 @@ class UIWidgetsCommon {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($BaseURL) || $BaseURL==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Dirección base del archivo.');    exit;}
-		if(!isset($Route) || $Route==''){      echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta a la carpeta contenedora.'); exit;}
-		if(!isset($File) || $File==''){        echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Nombre del archivo.');            exit;}
+        if ($BaseURL === null || trim((string)$BaseURL) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Dirección base del archivo.');
+			exit;
+        }
+        if ($File === null || trim((string)$File) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Nombre del archivo.');
+			exit;
+        }
 
 		/********************** Si todo esta ok **********************/
 		/****************************************/
@@ -422,10 +427,16 @@ class UIWidgetsCommon {
 
 		/****************************************/
 		//Se genera ruta del archivo
-		$RutaCompleta = '';
-		if(isset($BaseURL)&&$BaseURL!=''){ $RutaCompleta .= $BaseURL;}
-		if(isset($Route)&&$Route!=''){     $RutaCompleta .= $Route;}
-		if(isset($File)&&$File!=''){       $RutaCompleta .= '/'.$File;}
+		$UrlToFile = '';
+		if(isset($BaseURL)&&$BaseURL!=''){ $UrlToFile .= rtrim($BaseURL,'/').'/';}
+		if(isset($Route)&&$Route!=''){     $UrlToFile .= $Route.'/';}
+		if(isset($File)&&$File!=''){       $UrlToFile .= $File;}
+
+		/****************************************/
+		//Se genera ruta del archivo
+		$PathToFile = '';
+		if(isset($Route)&&$Route!=''){     $PathToFile .= $Route.'/';}
+		if(isset($File)&&$File!=''){       $PathToFile .= $File;}
 
 		/****************************************/
 		//Se agrega estilo
@@ -442,20 +453,20 @@ class UIWidgetsCommon {
 				/**************************************************/
 				//Si son imagenes
 				case 'JPG'; case 'jpg'; case 'jpeg'; case 'gif'; case 'png'; case 'bmp';
-					$input .= '<img class="preview_img square-rounded-2 w-100" src="'.$RutaCompleta.'" />';
+					$input .= '<img class="preview_img square-rounded-2 w-100" src="'.$UrlToFile.'" />';
 				break;
 				/**************************************************/
 				//Si son archivos microsoft office
 				case 'doc'; case 'docx'; case 'xls'; case 'xlsx'; case 'ppt'; case 'pptx';
 					$input .= '
-					<iframe class="preview_iframe" src="https://view.officeapps.live.com/op/embed.aspx?src='.$RutaCompleta.'" frameborder="0">
-						<a target="_blank" rel="noopener noreferrer" href="'.$RutaCompleta.'">Descargar Documento</a>
+					<iframe class="preview_iframe" src="https://view.officeapps.live.com/op/embed.aspx?src='.$UrlToFile.'" frameborder="0">
+						<a target="_blank" rel="noopener noreferrer" href="'.$UrlToFile.'">Descargar Documento</a>
 					</iframe>';
 				break;
 				/**************************************************/
 				//Si son archivos open office y pdf
 				case 'odt'; case 'odp'; case 'ods'; case 'pdf';
-					$input .= '<iframe class="preview_iframe" src="'.$BaseURL.'/vendor/ViewerJS/#../../'.$Route.'/'.$File.'" allowfullscreen webkitallowfullscreen></iframe>';
+					$input .= '<iframe class="preview_iframe" src="'.$BaseURL.'/vendor/ViewerJS/#../../'.$PathToFile.'" allowfullscreen webkitallowfullscreen></iframe>';
 				break;
 				/**************************************************/
 				//Si son archivos de audio
@@ -498,7 +509,7 @@ class UIWidgetsCommon {
 						</div>
 
 						<audio crossorigin>
-							<source src="'.$RutaCompleta.'">
+							<source src="'.$UrlToFile.'">
 						</audio>
 					</div>
 					<script src="'.$BaseURL.'/vendor/audio_player/js/index.js"></script>';
@@ -513,9 +524,9 @@ class UIWidgetsCommon {
 					<style> .video-js .vjs-big-play-button { visibility: hidden !important; } </style>
 					<video id="video_1" class="video-js vjs-default-skin" controls preload="none" width="640" height="264" poster="'.$BaseURL.'/vendor/video_player/img/video-thumbnail.png" data-setup="{}">';
 						switch ($Extension) {
-							case 'mp4':  $input .= '<source src="'.$RutaCompleta.'" type="video/mp4">'; break;
-							case 'webm': $input .= '<source src="'.$RutaCompleta.'" type="video/webm">'; break;
-							case 'ogv':  $input .= '<source src="'.$RutaCompleta.'" type="video/ogg">'; break;
+							case 'mp4':  $input .= '<source src="'.$UrlToFile.'" type="video/mp4">'; break;
+							case 'webm': $input .= '<source src="'.$UrlToFile.'" type="video/webm">'; break;
+							case 'ogv':  $input .= '<source src="'.$UrlToFile.'" type="video/ogg">'; break;
 						}
 						$input .= '<p class="vjs-no-js">To view this video please enable JavaScript, and consider upgrading to a web browser that <a href="https://videojs.com/html5-video-support/" target="_blank" rel="noopener noreferrer">supports HTML5 video</a></p>
 					</video>';
@@ -523,34 +534,34 @@ class UIWidgetsCommon {
 				/**************************************************/
 				//Si son archivos de texto plano
 				case 'txt'; case 'rtf';
-					$archivo = file_get_contents($RutaCompleta); //Guardamos archivo.txt en $archivo
-					$archivo = ucfirst($archivo);                //Le damos un poco de formato
-					$archivo = nl2br($archivo);                  //Transforma todos los saltos de linea en tag <br/>
+					$archivo = file_get_contents($UrlToFile); //Guardamos archivo.txt en $archivo
+					$archivo = ucfirst($archivo);             //Le damos un poco de formato
+					$archivo = nl2br($archivo);               //Transforma todos los saltos de linea en tag <br/>
 					$input   = $archivo;
 				break;
 				/**************************************************/
 				//Si son archivos comprimidos
 				case 'gz'; case 'gzip'; case '7Z'; case 'zip'; case 'rar';
-					$data  = 'No se pueden previsualizar los archivos comprimidos '.$Extension.', descarguelos presionando <a href="'.$RutaCompleta.'" class="">aqui</a>';
+					$data  = 'No se pueden previsualizar los archivos comprimidos '.$Extension.', descarguelos presionando <a href="'.$UrlToFile.'" class="">aqui</a>';
 					$input = $this->alertPostData(4, 4, 'exclamation-circle', 1, $data);
 				break;
 				/**************************************************/
 				//Si son archivos no reproducibles por los reproductores
 				case 'mp2'; case 'mpeg'; case 'mpg'; case 'mov'; case 'avi'; case 'oga'; case 'wav';
-					$data  = 'No se pueden previsualizar los archivos multimedia '.$Extension.', descarguelos presionando <a href="'.$RutaCompleta.'" class="">aqui</a>';
+					$data  = 'No se pueden previsualizar los archivos multimedia '.$Extension.', descarguelos presionando <a href="'.$UrlToFile.'" class="">aqui</a>';
 					$input = $this->alertPostData(4, 4, 'exclamation-circle', 1, $data);
 				break;
 				/**************************************************/
 				//excepcion
 				default;
-					$data  = 'No esta soportada la previsualizacion para los archivos '.$Extension.', para descargar el archivo presione <a href="'.$RutaCompleta.'" class="">aqui</a>';
+					$data  = 'No esta soportada la previsualizacion para los archivos '.$Extension.', para descargar el archivo presione <a href="'.$UrlToFile.'" class="">aqui</a>';
 					$input = $this->alertPostData(4, 4, 'exclamation-circle', 1, $data);
 				break;
 			}
 
 		}else{
-			if(isset($RutaCompleta)&&$RutaCompleta!=''){
-				$data  = 'No esta soportada la previsualizacion, para descargar el archivo presione <a href="'.$RutaCompleta.'" class="">aqui</a>';
+			if(isset($UrlToFile)&&$UrlToFile!=''){
+				$data  = 'No esta soportada la previsualizacion, para descargar el archivo presione <a href="'.$UrlToFile.'" class="">aqui</a>';
 				$input = $this->alertPostData(4, 4, 'exclamation-circle', 1, $data);
 			}else{
 				$data  = 'El Archivo a previsualizar no existe';
@@ -598,7 +609,6 @@ class UIWidgetsCommon {
 		$TextoCol  = $FormCol ?? 8;
 		$TituloCol = 12 - $TextoCol;
 
-
 		//Definir opciones válidas
 		$validOptions = [
 			'TextoCol'   => range(1, 12),
@@ -614,16 +624,16 @@ class UIWidgetsCommon {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 6);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
 		/********************** Si todo esta ok **********************/
         //Ejecucion si no hay errores
         if($errorn==0){
-			//Variable vacia
+			// Variable vacia
 			$input = '';
-			//Recorro
+			// Recorro
 			foreach ( $arrData as $data ) {
 				/*************************************/
 				// Verifico si existe un titulo
@@ -681,9 +691,18 @@ class UIWidgetsCommon {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($idDiv) || $idDiv==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el identificador.');              exit;}
-		if(!isset($Route) || $Route==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de acceso del archivo.'); exit;}
-		if(!isset($BASE) || $BASE==''){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de la raiz del sitio.');  exit;}
+        if ($idDiv === null || trim((string)$idDiv) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el identificador.');
+			exit;
+        }
+        if ($Route === null || trim((string)$Route) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de acceso del archivo.');
+			exit;
+        }
+        if ($BASE === null || trim((string)$BASE) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Ruta de la raiz del sitio.');
+			exit;
+        }
 
 		/********************** Si todo esta ok **********************/
 		$input = '
@@ -724,9 +743,18 @@ class UIWidgetsCommon {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13);
 		//Validaciones
-		if(!isset($type) || $type==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Tipo de elemento.');                                             exit;}
-		if(!isset($code) || $code==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Codigo a mostrar.');                                             exit;}
-		if(!in_array($type, $tipos)){    echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada en el codeblock no esta dentro de las opciones.'); exit;}
+        if ($type === null || trim((string)$type) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Tipo de elemento.');
+			exit;
+        }
+        if ($code === null || trim((string)$code) === '') {
+            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Codigo a mostrar.');
+			exit;
+        }
+		if(!in_array($type, $tipos)){
+			echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada en el codeblock no esta dentro de las opciones.');
+			exit;
+		}
 
 		/********************** Si todo esta ok **********************/
 		//Si todo esta ok
@@ -799,7 +827,7 @@ class UIWidgetsCommon {
 		//se definen las opciones disponibles
 		$tipos = array(1, 2);
 		//Validaciones
-		if(!isset($Options['URL']) || $Options['URL']==''){                                             echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la URL con la direccion del feed.');                exit;}
+        if ($Options['URL'] === null || trim((string)$Options['URL']) === '') {                         echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la URL con la direccion del feed.');                exit;}
 		if(isset($Options['MaxCount'])&&!$this->DataValidations->validarNumero($Options['MaxCount'])){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'El dato $MaxCount ingresado no es un numero.');                     exit;}
 		if(isset($Options['height'])&&!$this->DataValidations->validarNumero($Options['height'])){      echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'El dato $height ingresado no es un numero.');                       exit;}
 		if(isset($Options['Type'])&&!in_array($Options['Type'], $tipos)){                               echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'La configuracion $type entregada no esta dentro de las opciones.'); exit;}
@@ -1626,15 +1654,19 @@ class UIWidgetsCommon {
 		*/
 
 		/**********************  Validaciones   **********************/
-		if(!isset($Options['rootPaht']) || $Options['rootPaht']==''){  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el rootPaht.');    exit;}
+		if ($Options['BASE'] === null || trim((string)$Options['BASE']) === '') {          echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el BASE.');     exit;}
+		if ($Options['rootPath'] === null || trim((string)$Options['rootPath']) === '') {  echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el rootPath.'); exit;}
+		if ($Options['Route'] === null || trim((string)$Options['Route']) === '') {        echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el Route.');    exit;}
 
 		/**********************  Definiciones   **********************/
 		$fnc_Codification   = new FunctionsSecurityCodification();
 		$BASE               = $Options['BASE'];
-		$rootPaht           = $Options['rootPaht'];
-		$SubRoute           = (isset($Options['Route'])&&$Options['Route']!='') ? $Options['Route'] : '';
-        $Route              = $fnc_Codification->encryptDecrypt('encrypt', $SubRoute);
-		$ValidarTipo        = (isset($Options['ValidarTipo'])&&$Options['ValidarTipo']!='') ? $Options['ValidarTipo'] : 'all';
+		$rootPath           = rtrim($Options['rootPath'],'/').'/';
+		$SubRoute           = $Options['Route'];
+		$RouteID            = $fnc_Codification->encryptDecrypt('encrypt', $SubRoute);
+		$Route              = $RouteID['data'];
+		// Opcionales
+		$ValidarTipo        = (isset($Options['ValidarTipo'])&&$Options['ValidarTipo']!='')         ? $Options['ValidarTipo']     : 'all';
 		$levelPermission    = (isset($Options['levelPermission'])&&$Options['levelPermission']!='') ? $Options['levelPermission'] : 4;
 
 		/********************** Si todo esta ok **********************/
@@ -1694,7 +1726,7 @@ class UIWidgetsCommon {
 					<div class="modal-content">
 						<div class="modal-header">
 							<h5 class="modal-title" id="previewTitle"></h5>
-							<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+							<button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 						</div>
 						<div class="modal-body" id="previewBody"></div>
 						<div class="modal-footer">
@@ -2757,7 +2789,7 @@ class UIWidgetsCommon {
 					const modal    = new bootstrap.Modal(document.getElementById("previewModal"));
 					const body     = document.getElementById("previewBody");
 					const actions  = document.getElementById("previewActions"); // NUEVO contenedor de acciones
-					const filePath = `'.$rootPaht.$SubRoute.'${currentPath}/${file.name}`;
+					const filePath = `'.$rootPath.$SubRoute.'${currentPath}/${file.name}`;
 					const name     = file.name.toLowerCase();
 
 					document.getElementById("previewTitle").innerText = file.name;

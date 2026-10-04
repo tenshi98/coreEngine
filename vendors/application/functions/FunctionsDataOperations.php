@@ -48,9 +48,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateTime($hora, 'hora');
-		$dataVal_2 = $this->_validateInteger($divisor, 'divisor');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($divisor, 'divisor');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -82,9 +85,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateTime($hora, 'hora');
-		$dataVal_2 = $this->_validateInteger($multiplicador, 'multiplicador');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($multiplicador, 'multiplicador');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -132,9 +138,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateTime($hora, 'hora');
-		$dataVal_2 = $this->_validateTime($horaResta, 'horaResta');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateTime($horaResta, 'horaResta');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -189,9 +198,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateTime($hora, 'hora');
-		$dataVal_2 = $this->_validateTime($horaSuma, 'horaSuma');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateTime($horaSuma, 'horaSuma');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -241,9 +253,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateDate($Fecha, 'Fecha');
-		$dataVal_2 = $this->_validateInteger($nDias, 'nDias');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($nDias, 'nDias');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -272,9 +287,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateDate($Fecha, 'Fecha');
-		$dataVal_2 = $this->_validateInteger($nDias, 'nDias');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateInteger($nDias, 'nDias');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -378,9 +396,12 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateDate($fechaInicio, 'fechaInicio');
-		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -421,13 +442,22 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateDate($fechaInicio, 'fechaInicio');
-		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
-		$dataVal_3 = $this->_validateTime($horaInicio, 'horaInicio');
-		$dataVal_4 = $this->_validateTime($horaTermino, 'horaTermino');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_3 = $this->_validateTime($horaInicio, 'horaInicio');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_3 !== true) { return $dataVal_3; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+		$dataVal_4 = $this->_validateTime($horaTermino, 'horaTermino');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_4 !== true) { return $dataVal_4; }
 
 		/********************** Si todo esta ok **********************/
@@ -478,9 +508,13 @@ class FunctionsDataOperations {
 		/********************** Validaciones   **********************/
 		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
 		$dataVal_1 = $this->_validateDate($fechaInicio, 'fechaInicio');
-		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_1 !== true) { return $dataVal_1; }
+
+		// Ejecuta la validación interna del formato y consistencia de la fecha recibida
+
+		$dataVal_2 = $this->_validateDate($fechaTermino, 'fechaTermino');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal_2 !== true) { return $dataVal_2; }
 
 		/********************** Si todo esta ok **********************/
@@ -511,7 +545,9 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '' || $Data==0) {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarFecha($Data)) {
 			return 'El dato ingresado en '.$Name.' no es una fecha (' . $Data . ')';
@@ -526,7 +562,9 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '' || $Data==0) {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarHora($Data)) {
 			return 'El dato ingresado en '.$Name.' no es una hora (' . $Data . ')';
@@ -541,7 +579,9 @@ class FunctionsDataOperations {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='' || $Data==0) {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '' || $Data==0) {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';

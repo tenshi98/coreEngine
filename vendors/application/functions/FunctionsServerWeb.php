@@ -32,13 +32,23 @@ class FunctionsServerWeb {
 	 * ```
 	 *
      */
-	public function obtenerInfoIp($IP_Cliente, $purpose): string {
+	public function obtenerInfoIp($IP_Cliente, $purpose): array {
 
         /********************** Validaciones   **********************/
         // Verifica que la IP del cliente haya sido proporcionada y no sea una cadena vacía
-        if(!isset($IP_Cliente) || $IP_Cliente==''){ return 'No ha ingresado IP_Cliente';}
+        if ($IP_Cliente === null || trim((string)$IP_Cliente) === '') {
+            return ['success' => false, 'error' => 'No ha ingresado IP_Cliente'];
+        }
+
+        // Valida estrictamente que sea una dirección IPv4 o IPv6 válida.
+        if (filter_var($IP_Cliente, FILTER_VALIDATE_IP) === false) {
+            return ['success' => false, 'error' => 'La dirección IP_Cliente ingresada no es válida'];
+        }
+
         // Verifica que el propósito de la consulta haya sido proporcionado y no sea una cadena vacía
-        if(!isset($purpose) || $purpose==''){       return 'No ha ingresado purpose';}
+        if ($purpose === null || trim((string)$purpose) === '') {
+            return ['success' => false, 'error' => 'No ha ingresado purpose'];
+        }
 
         /********************** Si todo esta ok **********************/
         // Inicialización de la variable de salida
@@ -60,7 +70,7 @@ class FunctionsServerWeb {
 
         /********************** Retorno datos  **********************/
         // Devuelve el dato geográfico obtenido o una cadena vacía
-        return $output;
+        return ['success' => true, 'data' => $output];
 
     }
 
@@ -87,7 +97,7 @@ class FunctionsServerWeb {
 	 * ```
 	 *
      */
-	public function getBaseUrl($atRoot=false, $atCore=false, $parse=false): string {
+	public function getBaseUrl($atRoot = false, $atCore = false, $parse = false): string {
 
         /********************** Si todo esta ok **********************/
         // Verifica si el host está definido en las variables globales del servidor
@@ -243,6 +253,10 @@ class FunctionsServerWeb {
 	public function obtenerDatosXML($url): array {
 
         /**********************  Validaciones   **********************/
+        // Valida que exista una URL
+        if ($url === null || trim((string)$url) === '') {
+            return ['success' => false, 'error' => 'Sin datos ingresados'];
+        }
         // Valida que la cadena sea una URL válida y utilice el esquema de seguridad HTTPS
         if (!filter_var($url, FILTER_VALIDATE_URL) || parse_url($url, PHP_URL_SCHEME) !== 'https') {
             return ['success' => false, 'error' => "URL inválida o no segura. Solo se permite HTTPS."];
@@ -286,4 +300,3 @@ class FunctionsServerWeb {
     }
 
 }
-

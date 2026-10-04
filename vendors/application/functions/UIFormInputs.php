@@ -39,7 +39,7 @@ class UIFormInputs {
 	//Crea el input en base a los datos
 	private function checkInputGen($placeholder,$name, $ID, $tipo, $type, $valor, $check, $requerido, $requerido_div){
 
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath('../app/templates/Forms/formCheckInputGen_1.php');
 		$this->TemplateRender->assign('tipo',          $tipo);
@@ -52,7 +52,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('ID',            $ID);
 		$this->TemplateRender->assign('placeholder',   $placeholder);
 
-		/******************************************/
+		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
 	}
@@ -60,15 +60,15 @@ class UIFormInputs {
 	//Crea el input en base a los datos
 	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
-		/******************************************/
+		/************************************/
 		// Variables vacias
 		$Options = '';
 
-		/******************************************/
+		/************************************/
 		//Verifico si el placeholder usa icono
 		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 
-		/******************************************/
+		/************************************/
 		//generacion del input
 		switch ($FormAling) {
 			case 1: $formRoute = '../app/templates/Forms/formSelectInputGen_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -95,7 +95,7 @@ class UIFormInputs {
 		// Agrega todas las opciones generadas al conjunto final
 		$SelectOptions .= $Options;
 
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath($formRoute);
 		$this->TemplateRender->assign('nameID',           $nameID);
@@ -109,7 +109,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('dataInfo',         $dataInfo);
 		$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-		/******************************************/
+		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
 	}
@@ -117,11 +117,11 @@ class UIFormInputs {
 	//Crea el input en base a los datos
 	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
-		/******************************************/
+		/************************************/
 		// Variables vacias
 		$Options = '';
 
-		/******************************************/
+		/************************************/
 		//Verifico si el placeholder usa icono
 		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 
@@ -129,7 +129,7 @@ class UIFormInputs {
 		//Opero los datos
 		$newArray  = $this->CommonData->agruparPorClave ($arrData,'ID2'); //transforma a array multinivel
 
-		/******************************************/
+		/************************************/
 		//generacion del input
 		switch ($FormAling) {
 			case 1: $formRoute = '../app/templates/Forms/formSelectInputGen_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -165,7 +165,7 @@ class UIFormInputs {
 		// Agrega todas las opciones generadas al conjunto final
 		$SelectOptions .= $Options;
 
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath($formRoute);
 		$this->TemplateRender->assign('nameID',           $nameID);
@@ -179,7 +179,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('dataInfo',         $dataInfo);
 		$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-		/******************************************/
+		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
 	}
@@ -187,11 +187,11 @@ class UIFormInputs {
 	//Funcionalidad de select depend
 	private function selectInputEmpty($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $selectProperties, $dataPopover){
 
-		/******************************************/
+		/************************************/
 		//Verifico si el placeholder usa icono
 		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 
-		/******************************************/
+		/************************************/
 		//generacion del input
 		switch ($FormAling) {
 			case 1: $formRoute = '../app/templates/Forms/formSelectInputGen_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -204,7 +204,7 @@ class UIFormInputs {
 		/*******************************************/
 		// Variables
 		$SelectOptions  = '<option value="">Seleccione una Opción</option>';
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath($formRoute);
 		$this->TemplateRender->assign('nameID',           $nameID);
@@ -217,7 +217,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('SelectOptions',    $SelectOptions);
 		$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-		/******************************************/
+		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
 	}
@@ -231,7 +231,7 @@ class UIFormInputs {
 		//para corregir consulta en caso de vacio
 		if(!isset($value) || $value == ''){$value = 0;}
 
-		/******************************************/
+		/************************************/
 		//generacion del input
 		switch ($FormAling) {
 			case 1: $XDisplay = 'flex';break;//Horizontal Form
@@ -243,7 +243,7 @@ class UIFormInputs {
 
 		//caracteres prohibidos
 		$vowels = array(" ", "´", "-");
-		//Variable
+		// Variable
 		$RandName = 'Rand_'.rand(1, 999999);
 
 		/*********************** Datos del arreglo ***********************/
@@ -274,7 +274,7 @@ class UIFormInputs {
 			}
 		$MatrixData .= '};';
 
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath('../app/templates/Forms/formSelectInputScript_1.php');
 		$this->TemplateRender->assign('MatrixData',  $MatrixData);
@@ -284,7 +284,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('XDisplay',    $XDisplay);
 		$this->TemplateRender->assign('value',       $value);
 
-		/******************************************/
+		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
 	}
@@ -300,13 +300,13 @@ class UIFormInputs {
 			$dataList .= '<option value="'.$this->DataText->tituloMenu($select['Nombre']).'">';
 		}
 
-		/******************************************/
+		/************************************/
 		//Se agregan datos
 		$this->TemplateRender->templatePath('../app/templates/Forms/formInputData_1.php');
 		$this->TemplateRender->assign('dataList', $dataList);
 		$this->TemplateRender->assign('nameID',   $nameID);
 
-		/******************************************/
+		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
 	}
@@ -367,20 +367,20 @@ class UIFormInputs {
 			$options = ['h1', 'h2', 'h3', 'h4', 'h5', 'p', 'strong'];
 			$tipo    = $options[$type-1];
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formTittle_1.php');
 			$this->TemplateRender->assign('tipo',  $tipo);
 			$this->TemplateRender->assign('texto',  $Text);
 			$this->TemplateRender->assign('clase',  $Class);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -460,15 +460,15 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			$requerido = ($required === 2) ? 'required="required"' : '';
 
-			/******************************************/
+			/************************************/
 			//Si existe un valor entregado
 			$valor = ($value !== '') ? $value : '';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo '<input type="hidden" name="'.$name.'" id="'.$name.'" value="'.$valor.'" '.$requerido.' >';
 		}else{
@@ -502,6 +502,10 @@ class UIFormInputs {
 		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
 		*		'dataPops'        => array,                 //Popup con info
 		*	];
+		*-------------------------------------------------------------------------------------------------------------------
+		* Nota: el parametro 'Value' se valida automaticamente segun el FormType declarado
+		*       2=email | 4=entero positivo | 5=decimal | 6=entero con signo
+		*       7 y 8=fecha | 9 y 10=hora | 11=rut (un Value vacio no se valida)
 		*===================================================================================================================
 		*/
 
@@ -541,19 +545,26 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-        /******************************************/
+        /************************************/
         //Valido por tipo de elemento
         switch ($formType) {
-            case 4: $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 7); break; //number ->Numeros enteros positivos
-            case 6: $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 7); break; //number ->Numeros enteros, permite valores negativos
-            case 7: $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 8); break; //date
-            case 8: $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 8); break; //form_input_date
+            case 2:  $dataReturnSwitch = $this->DataValidations->checkData('', [['value' => $value, 'method' => 'validarEmail', 'label' => '$value', 'msg' => 'no es un email valido']], $placeholder, 2); break; //email
+            case 4:  $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 4); break; //number -> Enteros positivos (sin decimales ni signo)
+            case 5:  $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 3); break; //number -> Numeros reales (admite decimales con punto o coma)
+            case 6:  $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 5); break; //number -> Enteros con signo (admite negativos)
+            case 7:  $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 6); break; //date
+            case 8:  $dataReturnSwitch = $this->DataValidations->checkData('', $value, $placeholder, 6); break; //form_input_date
+            case 9:  //time
+            case 10: //form_time_picker
+                     $dataReturnSwitch = $this->DataValidations->checkData('', [['value' => $value, 'method' => 'validarHora', 'label' => '$value', 'msg' => 'no es una hora valida (formato H:M o H:M:S)']], $placeholder, 2); break;
+            case 11: //rut
+                     $dataReturnSwitch = $this->DataValidations->checkData('', [['value' => $value, 'method' => 'validarRut', 'label' => '$value', 'msg' => 'no es un RUT valido']], $placeholder, 2); break;
         }
-		//Verifico si hay datos
+		// Verifico si hay datos
 		if (isset($dataReturnSwitch) && !empty($dataReturnSwitch) && is_array($dataReturnSwitch)) {
 			$errorn += $dataReturnSwitch['nErrors'];
 			$alerts .= $dataReturnSwitch['alerts'];
@@ -563,11 +574,11 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			// Variables vacias
 			$ExtraClass = $ExtraClassGroup = $ExtraCode  = $input_1 = $input_2 = $input_3 = '';
 
-            /******************************************/
+            /************************************/
 			//Verifico si se utiliza el icono
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group '.$ExtraClassGroup.'"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
@@ -575,14 +586,14 @@ class UIFormInputs {
                 $input_3 = '</div>';
 			}
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                    break;//Si el dato no es requerido
@@ -590,7 +601,7 @@ class UIFormInputs {
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
 
-			/******************************************/
+			/************************************/
 			// Define el array de configuración
 			$formConfigurations = [
 				// 1: text
@@ -724,7 +735,7 @@ class UIFormInputs {
 				$ExtraCode       = $defaults['ExtraCode'];
 			}
 
-            /******************************************/
+            /************************************/
 			//generacion del input
 			switch ($formAlign) {
 				case 1: $formRoute = '../app/templates/Forms/formInput_1.php'; $this->TemplateRender->assign('otrcol', (12 - $formCol)); break;//Horizontal Form
@@ -734,7 +745,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formInput_5.php'; break;//Floating Labels Form
 			}
 
-            /******************************************/
+            /************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -754,18 +765,18 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//ejecucion
 			$input  = $this->TemplateRender->render();
 			$input .= $ExtraCode;
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -847,11 +858,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -859,7 +870,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                    break;//Si el dato no es requerido
@@ -867,14 +878,14 @@ class UIFormInputs {
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$valor           = ($value != 0) ? str_replace(',', '.', $value) : '';
 			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formInputNumberSpinner_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break;//Horizontal Form
@@ -884,7 +895,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formInputNumberSpinner_5.php'; break;//Floating Labels Form
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -900,13 +911,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('ndecimal',         $ndecimal);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -975,7 +986,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -983,11 +994,11 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			// Variables vacias
 			$input_1 = $input_2 = $input_3 = '';
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                    break;//Si el dato no es requerido
@@ -995,7 +1006,7 @@ class UIFormInputs {
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
 
-            /******************************************/
+            /************************************/
 			//Verifico si se utiliza el icono
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
@@ -1003,18 +1014,18 @@ class UIFormInputs {
                 $input_3 = '</div>';
 			}
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Posicion de la burbuja
 			$options = ['top', 'bottom'];
 			$x_pos   = $options[$position-1];
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formTime_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break;//Horizontal Form
@@ -1024,7 +1035,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formTime_5.php'; break;//Floating Labels Form
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -1040,13 +1051,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('x_pos',            $x_pos);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1113,11 +1124,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1125,7 +1136,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
@@ -1134,27 +1145,27 @@ class UIFormInputs {
 				default: $requerido = '';                    $requerido_div = '';          break;
 			}
 
-			/******************************************/
+			/************************************/
 			//Si el tab correspondiente esta seleccionado
 			$check = (isset($value) && $value == 2) ? 'checked' : '';
 			$valor = '2';
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Se genera input
 			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -1165,13 +1176,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
 			$this->TemplateRender->assign('dataPopover', $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1231,7 +1242,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1239,11 +1250,11 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
@@ -1252,32 +1263,32 @@ class UIFormInputs {
 				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//vars
 			$arrValTab = array_map('trim', explode(",", $value));
 
-			/******************************************/
+			/************************************/
 			$y         = 1;
 			$formInput = '';
-			//Recorro
+			// Recorro
 			foreach ( $arrData as $select ) {
-				/******************************************/
+				/************************************/
 				//Si el tab correspondiente esta seleccionado
 				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
 				$valor = '2';
-				/******************************************/
+				/************************************/
 				//generacion del input
 				$formInput .= $this->checkInputGen($select['Nombre'],$name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
 				//sumo
 				$y++;
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBoxActive_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -1286,13 +1297,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1359,11 +1370,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1371,7 +1382,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
@@ -1380,27 +1391,27 @@ class UIFormInputs {
 				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
-			/******************************************/
+			/************************************/
 			//Si el tab correspondiente esta seleccionado
 			$check = (isset($value) && $value == 2) ? 'checked' : '';
 			$valor = '2';
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Se genera input
 			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -1411,13 +1422,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
 			$this->TemplateRender->assign('dataPopover', $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1477,7 +1488,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1485,11 +1496,11 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
@@ -1498,32 +1509,32 @@ class UIFormInputs {
 				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//vars
 			$arrValTab = array_map('trim', explode(",", $value));
 
-			/******************************************/
+			/************************************/
 			$y         = 1;
 			$formInput = '';
-			//Recorro
+			// Recorro
 			foreach ( $arrData as $select ) {
-				/******************************************/
+				/************************************/
 				//Si el tab correspondiente esta seleccionado
 				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
 				$valor = '2';
-				/******************************************/
+				/************************************/
 				//generacion del input
 				$formInput .= $this->checkInputGen($select['Nombre'],$name, $nameID.'_'.$select['ID'], $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
 				//sumo
 				$y++;
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBoxActive_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -1532,13 +1543,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1605,11 +1616,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1617,7 +1628,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
@@ -1626,31 +1637,31 @@ class UIFormInputs {
 				default: $requerido = '';                    $requerido_div = '';          break;
 			}
 
-			/******************************************/
+			/************************************/
 			//Si el tab correspondiente esta seleccionado
 			$check = (isset($value) && $value == 2) ? 'checked' : '';
 			$valor = '2';
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//Si el valor es 0
 			$extracol = ((12 - $FormCol) != 0) ? '<label class="col-form-label col-sm-'.(12 - $FormCol).'">'.$placeholder.'</label>' : '';
 
-			/******************************************/
+			/************************************/
 			//Se genera input
 			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formSwitch_1.php');
 			$this->TemplateRender->assign('nameID',      $nameID);
@@ -1660,13 +1671,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataInfo',    $dataInfo);
 			$this->TemplateRender->assign('dataPopover', $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1726,7 +1737,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1734,11 +1745,11 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico si nombre viene de un array
 			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
@@ -1747,32 +1758,32 @@ class UIFormInputs {
 				default: $requerido = '';          $requerido_div = '';  break;
 			}
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//vars
 			$arrValTab = array_map('trim', explode(",", $value));
 
-			/******************************************/
+			/************************************/
 			$y         = 1;
 			$formInput = '';
-			//Recorro
+			// Recorro
 			foreach ( $arrData as $select ) {
-				/******************************************/
+				/************************************/
 				//Si el tab correspondiente esta seleccionado
 				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
 				$valor = '2';
-				/******************************************/
+				/************************************/
 				//generacion del input
 				$formInput .= $this->checkInputGen($select['Nombre'], $name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
 				//sumo
 				$y++;
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formSwitchActive_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -1781,13 +1792,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('FormCol',     $FormCol);
 			$this->TemplateRender->assign('formInput',   $formInput);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1848,7 +1859,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1856,7 +1867,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                    break;//Si el dato no es requerido
@@ -1864,13 +1875,13 @@ class UIFormInputs {
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formTextBox_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break;//Horizontal Form
@@ -1880,7 +1891,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formTextBox_5.php'; break;//Floating Labels Form
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -1892,13 +1903,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('value',            $value);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -1963,7 +1974,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -1971,14 +1982,14 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$requerido       = ($required === 2) ? 'required="required"' : '';
 			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formCKEditor_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -1988,7 +1999,7 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formCKEditor_5.php'; break; //Floating Labels Form
 			}
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -2000,13 +2011,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('value',            $value);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -2077,11 +2088,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2089,14 +2100,14 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
 			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 
@@ -2174,11 +2185,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2186,21 +2197,21 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID            = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties .= ($required === 2) ? 'required="required"' : '';
 			$dataInfo          = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover       = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
@@ -2274,11 +2285,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2286,14 +2297,14 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
 			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 
@@ -2369,11 +2380,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2381,21 +2392,21 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
 			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
@@ -2463,7 +2474,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2471,14 +2482,14 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : ''); // Configura propiedades para select multiple de forma compacta
 			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 			//ejecuto script
@@ -2489,7 +2500,7 @@ class UIFormInputs {
 				});
 			</script>';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
@@ -2557,7 +2568,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2565,14 +2576,14 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : ''); // Configura propiedades para select multiple de forma compacta
 			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 			//ejecuto script
@@ -2583,7 +2594,7 @@ class UIFormInputs {
 				});
 			</script>';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
@@ -2683,11 +2694,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 4);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, '', 5);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, '', 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2695,7 +2706,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID1           = (strpos($identificador1, '[]') !== false) ? str_replace('[]', '', $identificador1) . '_' . uniqid() : $identificador1;
 			$nameID2           = (strpos($identificador2, '[]') !== false) ? str_replace('[]', '', $identificador2) . '_' . uniqid() : $identificador2;
@@ -2704,13 +2715,13 @@ class UIFormInputs {
 			$dataPopover1      = (!empty($dataPops1)&&$dataPops1!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops1['style'].'" data-popover data-extraclass="popover-'.$dataPops1['style'].'" data-title="'.$dataPops1['title'].'" data-content="'.$dataPops1['content'].'" data-placement="'.$dataPops1['position'].'"><i class="'.$dataPops1['icon'].'"></i></button>' : '';
 			$dataPopover2      = (!empty($dataPops2)&&$dataPops2!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops2['style'].'" data-popover data-extraclass="popover-'.$dataPops2['style'].'" data-title="'.$dataPops2['title'].'" data-content="'.$dataPops2['content'].'" data-placement="'.$dataPops2['position'].'"><i class="'.$dataPops2['icon'].'"></i></button>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '', '', $dataPopover1);
 			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
 			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
@@ -2812,11 +2823,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 4);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, '', 5);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, '', 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2824,7 +2835,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID1           = (strpos($identificador1, '[]') !== false) ? str_replace('[]', '', $identificador1) . '_' . uniqid() : $identificador1;
 			$nameID2           = (strpos($identificador2, '[]') !== false) ? str_replace('[]', '', $identificador2) . '_' . uniqid() : $identificador2;
@@ -2833,7 +2844,7 @@ class UIFormInputs {
 			$dataPopover1      = (!empty($dataPops1)&&$dataPops1!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops1['style'].'" data-popover data-extraclass="popover-'.$dataPops1['style'].'" data-title="'.$dataPops1['title'].'" data-content="'.$dataPops1['content'].'" data-placement="'.$dataPops1['position'].'"><i class="'.$dataPops1['icon'].'"></i></button>' : '';
 			$dataPopover2      = (!empty($dataPops2)&&$dataPops2!='') ? ' <button type="button" class="btn btn-sm btn-outline-'.$dataPops2['style'].'" data-popover data-extraclass="popover-'.$dataPops2['style'].'" data-title="'.$dataPops2['title'].'" data-content="'.$dataPops2['content'].'" data-placement="'.$dataPops2['position'].'"><i class="'.$dataPops2['icon'].'"></i></button>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main', '', $dataPopover1);
 			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
@@ -2843,7 +2854,7 @@ class UIFormInputs {
 			$input .= ($required1 === 2) ? '<style>#div_'.$nameID1.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
 			$input .= ($required2 === 2) ? '<style>#div_'.$nameID2.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $input;
 
@@ -2916,11 +2927,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2928,7 +2939,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$requerido       = ($required === 2) ? 'required="required"' : '';
@@ -2936,7 +2947,7 @@ class UIFormInputs {
 			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//Se agregan los paises
 			$arrData = [
 				["value" => 1, "Nombre" => '🇦🇫 Afghanistan'],
@@ -3135,7 +3146,7 @@ class UIFormInputs {
 				["value" => 194, "Nombre" => 'Zimbabwe 🇿🇼']
 			];
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formSelectCountry_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -3148,7 +3159,7 @@ class UIFormInputs {
 			// Variables
 			$selectedx = 'selected="selected"';
 			$Options   = '';
-			//Recorro
+			// Recorro
 			foreach ($arrData as $select) {
 				$isSelected = ($value == $select['value']) ? 'selected="selected"' : '';
 				if ($isSelected){$selectedx = '';}
@@ -3160,7 +3171,7 @@ class UIFormInputs {
 			//validacion si es requerido
 			$dataRequire = ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -3174,13 +3185,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3257,11 +3268,11 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -3269,7 +3280,7 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-            /******************************************/
+            /************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$requerido       = ($required === 2) ? 'required="required"' : '';
@@ -3277,7 +3288,7 @@ class UIFormInputs {
 			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formSelectNAuto_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -3290,7 +3301,7 @@ class UIFormInputs {
 			// Variables
 			$selectedx = 'selected="selected"';
 			$Options   = '';
-			//Recorro
+			// Recorro
 			for ($ini = $valor_ini; $ini <= $valor_fin; $ini++) {
 				$isSelected = ($value == $ini) ? 'selected="selected"' : '';
 				if ($isSelected){$selectedx = '';}
@@ -3299,7 +3310,7 @@ class UIFormInputs {
 			$FormOptions  = '<option value="" '.$selectedx.'>Seleccione una Opción</option>';
 			$FormOptions .= $Options;
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -3312,13 +3323,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3362,7 +3373,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 3);
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -3370,17 +3381,17 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Verifico si es mas de un archivo
 			$ndat = (isset($max_files) && $max_files != 1) ? '[]' : '';
 
-			/******************************************/
+			/************************************/
 			//Mostrar Maximo de archivos
 			$s_msg    = '<strong><i class="fa fa-file-o" aria-hidden="true"></i> Maximo de Archivos Permitidos: </strong>'.$max_files.'<br/>';
 			$s_msg   .= '<strong><i class="fa fa-file-o" aria-hidden="true"></i> Extensiones de Archivos Permitidos: </strong><br/>'.$type_files;
 			$Alertas  = $this->Alertas->alertPostData(6, 4, 'exclamation-circle', 0, $s_msg);
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formMultipleUpload_1.php');
 			$this->TemplateRender->assign('Alertas',      $Alertas);
@@ -3390,13 +3401,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('type_files',   $type_files);
 			$this->TemplateRender->assign('max_files',    $max_files);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3452,7 +3463,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 6);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -3460,12 +3471,12 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formTermsAndConditions_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -3477,13 +3488,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('fin',         $fin);
 			$this->TemplateRender->assign('submitName',  $submitName);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3535,7 +3546,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 6);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -3543,12 +3554,12 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			//Selecciono el tipo de mensaje
 			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
 			$tipo    = $options[$color-1];
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formCondicionalSubmit_1.php');
 			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
@@ -3558,13 +3569,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('Text',        $Text);
 			$this->TemplateRender->assign('submitName',  $submitName);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3632,7 +3643,7 @@ class UIFormInputs {
 		$errorn = 0;
 		$alerts = '';
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 2);
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -3640,11 +3651,11 @@ class UIFormInputs {
 		//Ejecucion si no hay errores
 		if($errorn==0){
 
-			/******************************************/
+			/************************************/
 			// Variables vacias
 			$input_1 = $input_2 = $input_3 = '';
 
-			/******************************************/
+			/************************************/
 			//Valido si es requerido
 			switch ($required) {
 				case 1:$requerido = '';                    break;//Si el dato no es requerido
@@ -3652,7 +3663,7 @@ class UIFormInputs {
 				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
 			}
 
-            /******************************************/
+            /************************************/
 			//Verifico si se utiliza el icono
 			if (!empty($Icono)&&$Icono!='') {
 				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
@@ -3660,13 +3671,13 @@ class UIFormInputs {
                 $input_3 = '</div>';
 			}
 
-			/******************************************/
+			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
 			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
 
-			/******************************************/
+			/************************************/
 			//generacion del input
 			switch ($FormAling) {
 				case 1: $formRoute = '../app/templates/Forms/formInputDatalist_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
@@ -3676,11 +3687,11 @@ class UIFormInputs {
 				case 5: $formRoute = '../app/templates/Forms/formInputDatalist_5.php'; break; //Floating Labels Form
 			}
 
-			/******************************************/
+			/************************************/
 			//Se genera input
 			$dataList = $this->inputDatalist($name, $arrData);
 
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath($formRoute);
 			$this->TemplateRender->assign('nameID',           $nameID);
@@ -3697,13 +3708,13 @@ class UIFormInputs {
 			$this->TemplateRender->assign('dataList',         $dataList);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3735,23 +3746,23 @@ class UIFormInputs {
 		/********************** Si todo esta ok **********************/
 		//Ejecucion si no hay errores
 		if($errorn==0){
-			/******************************************/
+			/************************************/
 			// Variables vacias
 			$dataDetails = '';
-			//Recorro
+			// Recorro
 			foreach ( $arrData as $select ) {$dataDetails .= '<details><summary>'.$select['ID'].'</summary><p>'.$this->DataText->tituloMenu($select['Nombre']).'</p></details>';}
-			/******************************************/
+			/************************************/
 			//Se agregan datos
 			$this->TemplateRender->templatePath('../app/templates/Forms/formDetails_1.php');
 			$this->TemplateRender->assign('dataDetails', $dataDetails);
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $this->TemplateRender->render();
 
 		}else{
 
-			/******************************************/
+			/************************************/
 			//Imprimir dato
 			echo $alerts;
 
@@ -3789,7 +3800,7 @@ class UIFormInputs {
 		$this->TemplateRender->assign('URL',       $URL);
 		$this->TemplateRender->assign('ExtraData', $ExtraData);
 
-		/******************************************/
+		/************************************/
 		//Imprimir dato
 		echo $this->TemplateRender->render();
 

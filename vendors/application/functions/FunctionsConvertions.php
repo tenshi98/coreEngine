@@ -293,7 +293,9 @@ class FunctionsConvertions {
 
 		/**********************  Validaciones   **********************/
 		// Validación de entrada no vacía
-		if ($mes==''){ return 'Sin datos ingresados';}
+        if ($mes === null || trim((string)$mes) === '') {
+            return 'Sin datos ingresados';
+        }
 
 		/**********************  Definiciones   **********************/
 		// Mapeo de abreviaturas en minúsculas a nombres completos
@@ -641,7 +643,9 @@ class FunctionsConvertions {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
@@ -656,7 +660,9 @@ class FunctionsConvertions {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarNumero($Data) || !$this->DataValidations->validarEntero($Data)) {
             return 'El dato ingresado en '.$Name.' no es un numero ('.$Data.')';
@@ -671,7 +677,9 @@ class FunctionsConvertions {
 
 		/**********************  Validaciones   **********************/
         // Retorno inmediato si el valor es nulo, cadena vacía o numéricamente cero
-        if ($Data=='') {return 'Sin datos ingresados en '.$Name;}
+        if ($Data === null || trim((string)$Data) === '') {
+            return 'Sin datos ingresados en '.$Name;
+        }
         // Validación de tipos de datos mediante el componente externo DataValidations
         if (!$this->DataValidations->validarHora($Data)) {
             return 'El dato ingresado en '.$Name.' no es una hora ('.$Data.')';
@@ -684,5 +692,3 @@ class FunctionsConvertions {
 
 
 }
-
-
