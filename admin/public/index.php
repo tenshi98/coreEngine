@@ -29,6 +29,14 @@ ErrorHandler::register();
 // Limitador de solicitudes (por IP o por usuario logueado)
 require_once __DIR__ . '/../../vendors/application/security/RateLimiter.php';
 
+// Protección contra Cross-Site Request Forgery (token de sesión)
+require_once __DIR__ . '/../../vendors/application/security/CsrfToken.php';
+
+// Concesión de capacidades de acceso por ámbito (scope) para endpoints genéricos
+// compartidos por varios módulos (p.ej. /core/fileExplorer/*). Complementa al
+// CSRF: valida QUÉ puede hacer el usuario, no de dónde viene la petición.
+require_once __DIR__ . '/../../vendors/application/security/ScopeAccess.php';
+
 // Sistema de registro (logging) de auditoría para operaciones del sistema.
 require_once __DIR__ . '/../../vendors/application/security/AuditLogger.php';
 

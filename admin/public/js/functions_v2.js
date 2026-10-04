@@ -49,6 +49,17 @@
     }
 
     /**********************************************************/
+    // Devuelve el token CSRF ACTUAL de la pagina.
+    // Se lee en CADA peticion (no se "cocina" al cargar) para que, si la
+    // sesion lo rota (login/logout o una prueba como csrfTest), no quede obsoleto.
+    function currentCsrfToken() {
+        if (typeof window === 'undefined') { return ''; }
+        if (window.CSRF_TOKEN) { return window.CSRF_TOKEN; }
+        var meta = document.querySelector('meta[name="csrf-token"]');
+        return (meta && meta.content) ? meta.content : '';
+    }
+
+    /**********************************************************/
     //Parsea la respuesta del backend sin romper el flujo si no es JSON
     //(p. ej. una pagina de error HTML o una sesion expirada)
     function parseJsonSeguro(texto) {
@@ -752,4 +763,73 @@
     //tablas en lugar de mantener su propia copia (llamado dentro de DOMContentLoaded)
     window.initDataTables             = initDataTables;
     window.copiarTexto                = copiarTexto;
+
+    /**********************************************************/
+    //CSRF: inyecta el token en todas las peticiones y formularios.
+    //- Encabezado X-CSRF-Token global para jQuery ($.ajax / SendDataForms).
+    //- Campo oculto _token en todos los formularios (respaldo para envios nativos
+    //  y para serialize()/FormData que no pasan por el encabezado).
+    (function initCsrf() {
+        //Nombre del campo oculto (debe coincidir con ConfigAPP::APP['csrfTokenName'])
+        const FIELD = '_token';
+        //Encabezado por defecto (se refresca por peticion con el prefilter de abajo)
+        if (typeof $ !== 'undefined' && $.ajaxSetup) {
+            $.ajaxSetup({ headers: { 'X-CSRF-Token': currentCsrfToken() } });
+        }
+        //Prefilter global: inyecta el token ACTUAL en TODAS las peticiones jQuery
+        // (cubre SendDataForms, $.ajax directo de las vistas, etc.) y, si la
+        // respuesta trae un token nuevo, lo adopta (p. ej. tras csrfTest, que rota).
+        if (typeof $ !== 'undefined' && $.ajaxPrefilter) {
+            $.ajaxPrefilter(function (opts) {
+                const verb = String(opts.type || opts.method || 'GET').toUpperCase();
+                if (verb === 'GET' || verb === 'HEAD' || verb === 'OPTIONS') { return; }
+                const tok = currentCsrfToken();
+                if (tok) {
+                    opts.headers = opts.headers || {};
+                    opts.headers['X-CSRF-Token'] = tok;
+                    if (opts.data && typeof opts.data === 'object' && !(window.FormData && opts.data instanceof window.FormData)) {
+                        opts.data._token = tok;
+                    }
+                }
+                //Si la respuesta trae un token nuevo, se adopta
+                const prev = opts.success;
+                opts.success = function (data, textStatus, jqXHR) {
+                    const newTok = (jqXHR && jqXHR.getResponseHeader && jqXHR.getResponseHeader('X-CSRF-Token'))
+                                || (data && data.data && data.data.Token);
+                    if (newTok && typeof window !== 'undefined') { window.CSRF_TOKEN = newTok; }
+                    if (typeof prev === 'function') { prev.apply(this, arguments); }
+                };
+            });
+        }
+        //Agrega/actualiza el campo oculto del formulario con el token ACTUAL
+        function ensureField(form) {
+            if (!form || form.nodeName !== 'FORM') { return; }
+            let input = form.querySelector('input[data-csrf="1"]');
+            if (!input) {
+                input  = document.createElement('input');
+                input.type   = 'hidden';
+                input.name   = FIELD;
+                input.setAttribute('data-csrf', '1');
+                form.appendChild(input);
+            }
+            //Siempre se refresca: evita un token viejo si la sesion lo roto
+            input.value = currentCsrfToken();
+        }
+        //Agrega el campo a los formularios indicados (por defecto, todos los del documento)
+        window.injectCsrfFields = function (root) {
+            const scope = root || document;
+            if (!scope.querySelectorAll) { return; }
+            scope.querySelectorAll('form').forEach(ensureField);
+        };
+        //Inyeccion inicial (soporta scripts cargados antes o despues del DOM)
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => window.injectCsrfFields(document));
+        } else {
+            window.injectCsrfFields(document);
+        }
+        //Inyeccion justo antes del submit (fase de captura: corre antes de los
+        //handlers de las vistas, de modo que serialize() ya incluye el token).
+        //Cubre tambien formularios creados dinamicamente (modales, fragmentos).
+        document.addEventListener('submit', (e) => ensureField(e.target), true);
+    })();
 })();

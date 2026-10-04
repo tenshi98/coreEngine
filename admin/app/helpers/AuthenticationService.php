@@ -171,6 +171,10 @@ class AuthenticationService {
         $sessionService->destroy($f3);
 
         /************************************/
+        // Se limpia el token CSRF de la sesión
+        CsrfToken::clear($f3);
+
+        /************************************/
         // Retorno de datos
         return ['code' => 200, 'message' => 'Sesion cerrada correctamente'];
 
@@ -239,6 +243,10 @@ class AuthenticationService {
         /************************************/
         // Se crean la sesion y la coockie
         $sessionService->create($f3, $arrData, true);
+
+        /************************************/
+        // Se regenera el token CSRF tras el login (evita fijación de token)
+        CsrfToken::rotate($f3);
 
         /************************************/
         // Retorno de datos

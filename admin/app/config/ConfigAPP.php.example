@@ -158,6 +158,26 @@ class ConfigAPP{
         'rateLimiterUserWindowSeconds'  => 480,
         'errorLogFile'                  => __DIR__ . '/../../security/error.log',
 
+        /***********************************************************************
+         * Seguridad
+         * csrfEnabled:       Habilita la validación CSRF (token de sesión)
+         * csrfTokenName:     Nombre del campo oculto / POST que transporta el token
+         * csrfHeaderName:    Nombre del encabezado HTTP que transporta el token (AJAX)
+         * csrfExcludeVerbs:  Verbos HTTP que NO requieren token
+         * csrfExcludeRoutes: Rutas exentas ("VERBO /ruta" o "/ruta").
+         *                    El instalador queda exento por no disponer de sesión de usuario.
+         **********************************************************************/
+        'csrfEnabled'       => true,
+        'csrfTokenName'     => '_token',
+        'csrfHeaderName'    => 'X-CSRF-Token',
+        'csrfExcludeVerbs'  => ['GET', 'HEAD', 'OPTIONS'],
+        'csrfExcludeRoutes' => [
+            'POST /install/credentials',
+            'POST /install/database',
+            'POST /install/summary',
+            'POST /install/finish',
+        ],
+
     ];
 
 }
