@@ -44,7 +44,7 @@ admin/app/modules/archivos/
 │   └── archivosInstaller.php      # Instala/desinstala los permisos y rutas de menú del módulo
 ├── testing/
 │   ├── .htaccess                  # Deniega acceso directo
-│   └── archivosTesting.php        # Stub de pruebas (executeTest() → true)
+│   └── archivosTesting.php        # Suite de pruebas (9 métodos públicos *Test)
 └── views/
     ├── .htaccess                  # Deniega acceso directo
     └── archivosListado-List.php   # Vista del listado: invoca el widget fileExplorer
@@ -57,7 +57,7 @@ Responsabilidades:
 | `controller/archivosListado.php` | Clase `archivosListado extends ControllerBase` (`:5`). Prepara `$f3->data` (título, datos de usuario, nivel de acceso, instancia del widget) y renderiza la vista `archivosListado-List.php` (`:32-52`). |
 | `views/archivosListado-List.php` | Vista sin lógica de datos: arma `$Options` y llama a `$data['Fnc_WidgetsCommon']->widget_fileExplorer($Options)` (`:12-19`). |
 | `installer/archivosInstaller.php` | Clase `archivosInstaller extends ControllerBase` (`:5`). Expone `ListDataModule`, `InstallModule`, `UninstallModule`, `GetCountDataModule`, `listRouteModule` y el helper privado `RutaController`. |
-| `testing/archivosTesting.php` | Clase `archivosTesting extends ControllerBase` (`:5`) con `executeTest()` que devuelve `true` (`:25-27`). Placeholder sin casos reales. |
+| `testing/archivosTesting.php` | Clase `archivosTesting extends ControllerBase` (`:25`) con 9 métodos públicos de prueba (convención `*Test`, descubiertos por `sistemaTesteos::discoverTests()`) sobre estructura del módulo, controlador/vista, permisos de sesión, seguridad de rutas, validación de subida, ciclo de carpetas y autorización por ámbito. Detalle en la sección 9.2. |
 | `.htaccess` (todas las carpetas) | Contenido idéntico en los 5 archivos: `<Files .htaccess>` con `Order allow,deny / Deny from all` y una directiva final `deny from all` — bloquea el acceso directo por HTTP al contenido del módulo. |
 
 > **Nota:** el módulo **no posee carpeta `widgets/`** ni `models/`. El widget del explorador lo aporta la capa común `vendors/application/functions/UIWidgetsCommon.php` (ver sección 8).
@@ -289,7 +289,13 @@ El `0` inicial en el `IN` (`:224`) evita la lista vacía si no hay permisos prev
 | Denegación de acceso directo | 5 archivos `.htaccess` con `deny from all` (raíz + controller + installer + testing + views) | árbol en sección 2 |
 | Verificación de método HTTP | POST estricto (405) en create/upload/delete | `sistemaFuncionalidad.php:61-64, 85-88, 146-149, 170-173` |
 | Anti path-traversal | `sanitizePath()` server-side sobre `SubRoute`/`path` | `sistemaFuncionalidad.php:97-100, 174-176` |
+| **Autorización por ámbito (scope)** | Los endpoints `/core/fileExplorer/*` son **genéricos** y los comparten varios módulos, por lo que no pueden conocer el módulo invocador. El módulo que implementa la pantalla **concede** el nivel en la sesión (`ScopeAccess::grant()`) al renderizar la vista, y el endpoint **lo valida** (`ScopeAccess::check()`) exigiendo un mínimo por operación: `updateList`=1, `createFolder`/`uploadFile`=2, `delFolder`/`delFile`=3. El nivel **no viaja por el cliente**: el parámetro `AccessScope` solo *selecciona* una concesión ya existente y no puede crearla ni elevarla. La concesión se ata al `UserID` de sesión, caduca a los 15 min y los intentos denegados se registran en `AuditLogger` como `AUTHZ` | `ScopeAccess.php`, `sistemaFuncionalidad.php:27-82, 95, 130, 159, 225, 254`, `archivosListado.php:30-36`, `coreWidgets.php:281-286`, `UIWidgetsCommon.php:1672-1681` |
+| Bloqueo de borrado masivo de subrutas | `deleteFolder()` valida el nombre **ya sanitizado** antes de ensamblar la ruta: si `sanitizeFolderName()` lo reduce a cadena vacía (`..`, `.`, `!!!`) la operación se rechaza con `Nombre de carpeta inválido` (sin subruta: `No se permite eliminar la carpeta raíz`). La ruta final siempre es `SubRoute/path/<nombre explícito>`, nunca una subruta colapsada. La guarda de `createFolder()` aplica el mismo criterio | `FileManager.php:538-574, 596-645` |
+| Codificación URL en nombres | `sanitizeFolderName()` aplica `rawurldecode()` antes del filtro (igual que `sanitizePath()`), de modo que `%2e%2e` se normaliza a `..` y se descarta en lugar de convertirse en el nombre válido `2e2e` | `FileManager.php:690-698` |
+| Defensa en profundidad en el driver | `deleteDirectory()` de los 4 drivers (Local/S3/GCS/SFTP) rechaza una ruta vacía o solo con barras: en Local borraría la carpeta base de `upload/` y en S3/GCS el bucket completo | `LocalStorageDriver.php:128-139`, `S3StorageDriver.php:239-249`, `GCSStorageDriver.php:210-220`, `SFTPStorageDriver.php:171-181` |
 | Filtros de contenido (JS del widget) | `EXCLUDED_NAMES` (`.htaccess`, `.env`, `config.php`, `README.md`, `error_log`, …), `EXCLUDED_EXTENSIONS` (`php`, `phtml`, `ini`, `sh`, `exe`, `sql`, …), `EXCLUDED_FOLDERS` (`.git`, `vendor`, `node_modules`, `logs`, `backup`, …) y `sanitizePath()` JS que elimina `..` | `UIWidgetsCommon.php:1769-1800` |
+| Filtros de contenido (server-side, subida) | `validateFiles()` y `saveFileViaDriver()` rechazan `EXCLUDED_NAMES` (`.htaccess`, `.env`, `config.php`, …), cualquier nombre que comience por `.` (archivos ocultos) y las extensiones de `BLOCKED_EXTENSIONS` (incl. `htaccess`/`htpasswd`) | `FileManager.php:319-323, 858-865, 1057-1071` |
+| Extensión derivada del MIME (subida) | Multipart (`handleNormalUpload`): valida el MIME real contra la lista blanca por categoría y **reemplaza la extensión enviada por el cliente** por la derivada del MIME (`resolveExtensionFromMime`), igual que el flujo Base64; neutraliza variantes no listadas en la lista negra (`pht`, `php7`, `phps`, `shtml`, …) | `FileManager.php:801-825, 914-947, 1364-1368` |
 | Respuesta de error estándar | `Response::error('Error al operar con la Base de Datos', 500, $error)` en fallos de instalación | `archivosInstaller.php:111, 140` |
 
 > ✅ **Resuelto — el gate global existe y está demostrado en el bootstrap** `admin/public/index.php`:
@@ -297,7 +303,11 @@ El `0` inicial en el `IN` (`:224`) evita la lista vacía si no hay permisos prev
 > 2. **Las rutas del widget `/core/fileExplorer/*` solo se registran si `$UserSesion === true`**: `sistemaFuncionalidad.php` se incluye dentro de ese bloque (`admin/public/index.php:95-100`). Sin sesión válida, esas rutas no existen para Fat-Free.
 > 3. Las rutas de módulos (como `gestionDocumentacion/fileManager/listado/listAll`) se registran **dinámicamente desde `SESSION.arrPermisos`**, solo para el usuario autenticado (`admin/app/utils/userData.php:29-37`).
 > 4. Además se aplica un *rate limiter* por usuario/IP (HTTP 429 al exceder el límite) y el manejo seguro de errores está activo (`admin/public/index.php:29-33, 102-118`; `ErrorHandler.php`, `RateLimiter.php`).
-> **Matiz:** los endpoints del widget no re-verifican `levelPermission` por operación (cualquier usuario con sesión puede llamarlos directamente); la granularidad por nivel solo condiciona la UI. Esto se mantiene como deuda #9.
+> **Resuelto — la granularidad por nivel ya se valida en el backend:**
+> 1. Antes los endpoints `/core/fileExplorer/*` solo exigían sesión: cualquier usuario autenticado podía crear/subir/borrar en todo el almacenamiento aunque el módulo no estuviera entre sus permisos.
+> 2. Ahora cada módulo que implementa una pantalla del explorador **concede** su nivel en sesión al renderizar (`ScopeAccess::grant()`) y cada endpoint **valida** el mínimo de su operación (`ScopeAccess::check()`, fail-closed). Ver la fila "Autorización por ámbito" en la tabla 6.4.
+> 3. Cobertura de regresión: `autorizacionScopeTest()` (15 casos) valida normalización, umbrales por nivel, aislamiento entre ámbitos, atado al usuario, caducidad y revocación.
+> **Matiz pendiente:** las rutas de menú siguen exigiendo `idLevelLimit` de ruta (4 para este módulo), de modo que un usuario con nivel 1–3 no llega siquiera a la vista y, por tanto, no obtiene concesión. Los umbrales 1/2/3 de los endpoints actúan como segunda barrera para módulos futuros que sí expongan la pantalla con nivel menor.
 
 ---
 
@@ -403,9 +413,27 @@ Estas llamadas llegan a las rutas registradas en `admin/app/utils/sistemaFuncion
 
 ### 9.2 `archivosTesting` (testing)
 
-`admin/app/modules/archivos/testing/archivosTesting.php` — `archivosTesting extends ControllerBase` (`:5`), conexión `MySQL_1` (`:12`), con un único método `executeTest()` que devuelve `true` (`:25-27`).
+`admin/app/modules/archivos/testing/archivosTesting.php` — `archivosTesting extends ControllerBase` (`:25`), conexión `MySQL_1` (`:46`). **No** implementa `executeTest()`: el runner `sistemaTesteos` descubre automáticamente **todo método público cuyo nombre termina en `Test`** (`sistemaTesteos.php:285-345`) y los invoca inyectando la instancia de F3 a los que declaran parámetro. Cada prueba devuelve un arreglo `[caso => 'OK' | 'FALLO: razón']`, que `normalizeResult()` (`sistemaTesteos.php:503`) clasifica como EXITOSA o ERROR.
 
-**Escenarios cubiertos:** ninguno. Es un placeholder; no hay aserciones, fixtures ni invocaciones a los controladores del módulo. ⚠️ Cobertura de pruebas del módulo: **0 %** (deuda #5, sección 13).
+**Suite actual (9 pruebas):**
+
+| Prueba | Qué verifica | Casos aprox. | Línea |
+|---|---|---|---|
+| `estructuraModuloTest()` | Existencia de los archivos obligatorios (controlador, vista, testing, README), `.htaccess` con `deny from all` en cada carpeta, convención *clase = archivo* y herencia de `archivosListado` (`ControllerFiles`) y del propio testing (`ControllerBase`) | 7 | `:145` |
+| `controladorListadoTest()` | Firma de `listAll()` (público, 1 parámetro), ausencia de acciones de datos y uso de las piezas de presentación (`PageTitle`, `getUserData`, `getArrLevel`, `showVista(1,…)`, `returnRutaVista`, `UIWidgetsCommon`) | 11 | `:214` |
+| `permisosSesionTest($f3)` | Cadena de permisos con la sesión real: `SESSION.DataInfo`, `getUserData()`, `getArrLevel()` (nivel 1..4 y `RouteAccess`), registro de la ruta en `SESSION.arrPermisos` y presencia en el router de F3 con verbo GET | 11 | `:269` |
+| `vistaWidgetTest($f3)` | Contrato que la vista entrega a `widget_fileExplorer()` (`BASE`, `rootPath`, `Route`, `ValidarTipo`, `levelPermission`) y render real por nivel: con nivel 1 sin botones de escritura, nivel 2 con ellos, columna de acciones solo desde nivel 3; además cifrado de la ruta y verbos POST de los endpoints de escritura | 16 | `:358` |
+| `seguridadRutasTest()` | Defensa anti path-traversal de `FileManager::sanitizePath()` / `sanitizeFolderName()` (sin `..`, sin caracteres no permitidos, sin barras/espacios/puntos en nombres) | 6 | `:483` |
+| `validacionSubidaTest()` | Reglas de `FileManager::validateFiles()`: bloqueos por extensión, nombre sensible u oculto, MIME real no permitido, límite de peso, corte nativo de PHP, y el camino feliz con un `.txt` válido | 8 | `:551` |
+| `exploradorCarpetasTest()` | Ciclo crear/listar/eliminar carpeta propia de la prueba, rechazo de duplicados, protección de la carpeta raíz y listado del explorador con ruta cifrada (incluida ruta inválida) | 10 | `:666` |
+| `autorizacionScopeTest()` | Criterio de `ScopeAccess`: normalización del ámbito, *fail-closed* sin concesión, umbrales por nivel, aislamiento entre ámbitos, atado al usuario, caducidad y revocación (15 casos) | 15 | `:775` |
+| `borradoSubrutaInesperadoTest()` | Regresión del borrado de carpetas con nombre que se sanitiza a vacío (`..`, `.`, `!!!`, `%2e%2e`, …): `deleteFolder()`/`createFolder()` deben rechazar y dejar intacta la subruta; el driver bloquea la ruta vacía | 10 | `:901` |
+
+**Alcance y garantías:** las pruebas son **no destructivas**. No se ejercitan `InstallModule()` / `UninstallModule()` (alteran las tablas de permisos de la plataforma) ni `uploadFile()` real (el driver local usa `move_uploaded_file()`, que solo funciona en una petición POST autenticada). Las carpetas y archivos temporales que crean llevan el prefijo `tmp_pruebas_archivos_` y se eliminan siempre en un bloque `finally`.
+
+> ⚠️ **El installer NO tiene cobertura de pruebas.** Se retiró de forma deliberada la sección `/* INSTALADOR */` (los métodos `installerRutasTest()` e `installerEstadoBdTest()` y las comprobaciones `archivo_installer`, `htaccess_installer`, `clase_installer_cargada` y `herencia_installer` de `estructuraModuloTest()`), por depender de un seed de BD mutable. `archivosInstaller.php` sigue vigente y es requerido por `sistemaTesteos` para registrar el módulo en el listado de pruebas (`getModuleFolder()` lo localiza para descubrir los tests) y por el flujo de instalación de la plataforma.
+
+**Pendiente:** no existe cobertura de `FileManager::deleteFile()`/`uploadFile()` de extremo a extremo, ni de los endpoints `/core/fileExplorer/*` en `root_plataforma` (requerirían sesión y peticiones POST reales).
 
 ---
 
@@ -415,7 +443,7 @@ Estas llamadas llegan a las rutas registradas en `admin/app/utils/sistemaFuncion
 
 | Elemento | Uso en el módulo | Fuente |
 |---|---|---|
-| `ConfigDataBase::MySQL_1` | Conexión del controlador `archivosListado` y del testing (BD de negocio) | `archivosListado.php:17`; `archivosTesting.php:12` |
+| `ConfigDataBase::MySQL_1` | Conexión del controlador `archivosListado` y del testing (BD de negocio) | `archivosListado.php:17`; `archivosTesting.php:46` |
 | `ConfigDataBase::MySQL_ADMIN` | Conexión del installer (BD admin: tablas de permisos) | `archivosInstaller.php:17` |
 | `ConfigAPP::SOFTWARE['SoftwareName']` | `PageAuthor` y `PageKeywords` de la vista | `archivosListado.php:39-40` |
 | `ConfigAPP::APP['N_MaxItems']` | Límite en la consulta de permisos del desinstalador (2000 en config) | `archivosInstaller.php:183`; `admin/app/config/ConfigAPP.php:65` |
@@ -424,7 +452,7 @@ Estas llamadas llegan a las rutas registradas en `admin/app/utils/sistemaFuncion
 
 | Servicio / clase | Dónde se usa |
 |---|---|
-| `Database::getSQLConnection()` | Constructores de los 3 archivos del módulo (`archivosListado.php:17`, `archivosInstaller.php:17`, `archivosTesting.php:12`) |
+| `Database::getSQLConnection()` | Constructores de los 3 archivos del módulo (`archivosListado.php:17`, `archivosInstaller.php:17`, `archivosTesting.php:46`) |
 | `QueryBuilder` | Ídem (pasado a `ControllerBase`; los `Base_insert/GetList/…` delegan en él) |
 | `CheckData` | Ídem (instancia para `checkingData()` dentro de `Base_insert`, `ControllerBase.php:274`) |
 | `UIWidgetsCommon` | Instanciado en `listAll` y usado por la vista (`archivosListado.php:45`; `archivosListado-List.php:19`) |
@@ -477,7 +505,7 @@ Registrados en `admin/app/utils/sistemaFuncionalidad.php:5-9`, implementados en 
 | Desinstalar | `archivosInstaller::UninstallModule` | Borrado en cascada de permisos |
 | Conteo de rutas | `archivosInstaller::GetCountDataModule` | Indicador de instalación |
 | Rutas por permiso | `archivosInstaller::listRouteModule` | Define las rutas sembradas |
-| Pruebas | `archivosTesting::executeTest` | Stub (retorna `true`) |
+| Pruebas | `archivosTesting::*Test` (9 métodos) | Suite de pruebas del módulo descubierta por `sistemaTesteos::discoverTests()` (sección 9.2) |
 
 ---
 
@@ -508,7 +536,7 @@ Registrados en `admin/app/utils/sistemaFuncionalidad.php:5-9`, implementados en 
 
 ## 13. Observaciones técnicas / deudas detectadas
 
-> **Re-verificado contra el código vigente del módulo** (controller, installer, testing, vista y widget) en esta revisión. Las deudas ya resueltas por el equipo se marcan como ✅ y se conservan como registro histórico. **Resultado de esta auditoría:** los bugs **#13** (guarda de resultado de `UninstallModule()`) y **#14** (`dataCheck_2($_POST)`, no-op de validación) quedan **✅ RESUELTOS** en el código; #14 se confirma con el cambio de la línea `127` de `$_POST` a `$rutas` (fichero actualizado el 2026-09-17). Se mantienen vigentes #2 (parcial), #4, #5, #6, #8, #9, #10 (estilo), #12.
+> **Re-verificado contra el código vigente del módulo** (controller, installer, testing, vista y widget) en esta revisión. Las deudas ya resueltas por el equipo se marcan como ✅ y se conservan como registro histórico. **Resultado de esta auditoría:** los bugs **#13** (guarda de resultado de `UninstallModule()`) y **#14** (`dataCheck_2($_POST)`, no-op de validación) quedan **✅ RESUELTOS** en el código; #14 se confirma con el cambio de la línea `127` de `$_POST` a `$rutas` (fichero actualizado el 2026-09-17). El **#5** (testing vacío) queda **✅ RESUELTO**: `archivosTesting` expone hoy 9 pruebas reales (sección 9.2); en esa actualización se retiraron deliberadamente las pruebas del *installer*, que queda sin cobertura por depender del seed de permisos en BD. Se mantienen vigentes #2 (parcial), #4, #6, #8, #9, #10 (estilo), #12.
 
 | # | Estado | Deuda / observación | Evidencia | Impacto |
 |---|---|---|---|---|
@@ -516,7 +544,7 @@ Registrados en `admin/app/utils/sistemaFuncionalidad.php:5-9`, implementados en 
 | 2 | ✅ **PARCIALMENTE RESUELTA** | Queries dinámicas por **interpolación de strings** (`WHERE RutaController IN ("archivosListado")`, `IN (0 '.$subQuery.')`): los literales del módulo siguen hardcodeados; los `idPermisos` del `IN` sí viajan por interpolación (no bindeados), aunque provienen de una consulta previa a la misma BD. | `archivosInstaller.php:196, 217-219, 224-226, 273` | Mantenibilidad |
 | 3 | ✅ **RESUELTA** | ~~Sin `unique` en los INSERT del installer~~. **Actualizado:** el INSERT de permisos ahora declara `'unique' => 'Nombre,RutaWeb,RutaController'` (`:100`) y el de rutas `'unique' => 'RutaWeb,RutaController'` (`:134`). Re-instalar ya no duplica: `Base_insert` valida unicidad y la transacción se revierte (verificado con las filas existentes `idPermisos=33` / `idRutas=524`). | `archivosInstaller.php:100, 134`; BD verificada | Datos duplicados (resuelto) |
 | 4 | 🔄 **VIGENTE** | `listRouteModule()` solo implementa `case 1`; el parámetro `$Type` proviene de un contador interno (`$IntCounter`, `:88, 119, 154`), no de un catálogo. Con un solo permiso funciona, pero el diseño no escala a múltiples permisos. | `archivosInstaller.php:293-314` | Extensibilidad |
-| 5 | 🔄 **VIGENTE** | Testing vacío: `executeTest()` retorna `true` sin cubrir ningún escenario del módulo. | `archivosTesting.php:25-27` | Cobertura 0 % |
+| 5 | ✅ **RESUELTA** | ~~Testing vacío: `executeTest()` retorna `true` sin cubrir ningún escenario del módulo.~~ **Actualizado:** `archivosTesting` ya no es un stub: expone **9 pruebas** públicas bajo la convención `*Test` (estructura del módulo, controlador/vista, permisos de sesión, seguridad de rutas, validación de subida, ciclo de carpetas, autorización por ámbito y regresión de borrado de subruta), descubiertas automáticamente por `sistemaTesteos::discoverTests()` (sección 9.2). **Pendiente residual:** el *installer* quedó deliberadamente sin cobertura (`installerRutasTest()` e `installerEstadoBdTest()` se retiraron por depender del seed de permisos en BD) y no hay pruebas end-to-end de `uploadFile()`/`deleteFile()` ni de los endpoints `/core/fileExplorer/*`. | `archivosTesting.php:145-901`; `sistemaTesteos.php:285-345` | Cobertura de pruebas (resuelta) |
 | 6 | 🔄 **VIGENTE** | `listAll()` instancia una conexión MySQL (`MySQL_1`) que **no se utiliza** (no hay queries en el controlador). | `archivosListado.php:17` | Recursos/claridad |
 | 7 | ✅ **RESUELTA** | ~~Typo `rootPaht`~~. **Actualizado:** corregido a `rootPath` en la vista del módulo (`archivosListado-List.php:14`), en el widget (`UIWidgetsCommon.php:1629, 1634, 2761`) y en la vista de referencia de `root_maquetacion` (`coreWidgets-fileExplorer.php:14`). El contrato clave→valor es ahora consistente. | `archivosListado-List.php:14`; `UIWidgetsCommon.php:1629` | Legibilidad (resuelta) |
 | 8 | 🔄 **VIGENTE** | La vista envía `Route => ''` y `ValidarTipo => ''`: el explorador arranca en la raíz sin filtro de tipos; la restricción de tipos solo aplica a la subida. | `archivosListado-List.php:15-16`; `UIWidgetsCommon.php:1638` | Configuración por defecto amplia |
