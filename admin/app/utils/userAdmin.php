@@ -29,18 +29,19 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Formularios
     $f3->route('GET /Core/Formularios/formularios', 'coreFormularios->Formularios');  //Formularios
     //Widgets
-    $f3->route('GET /Core/Widgets/box',           'coreWidgets->box');            //box
-    $f3->route('GET /Core/Widgets/timeLine',      'coreWidgets->timeLine');       //timeLine
-    $f3->route('GET /Core/Widgets/dividers',      'coreWidgets->dividers');       //dividers
-    $f3->route('GET /Core/Widgets/textDividers',  'coreWidgets->textDividers');   //textDividers
-    $f3->route('GET /Core/Widgets/components',    'coreWidgets->components');     //Componentes
-    $f3->route('GET /Core/Widgets/calendar',      'coreWidgets->calendar');       //Calendario
-    $f3->route('GET /Core/Widgets/treeview',      'coreWidgets->treeview');       //Treeview
-    $f3->route('GET /Core/Widgets/codeVisor',     'coreWidgets->codeVisor');      //codeVisor
-    $f3->route('GET /Core/Widgets/meteo',         'coreWidgets->meteo');          //Widget meteorologico
-    $f3->route('GET /Core/Widgets/feed',          'coreWidgets->feed');           //Feed de noticias
-    $f3->route('GET /Core/Widgets/radio',         'coreWidgets->radio');          //Widget radio
-    $f3->route('GET /Core/Widgets/fileExplorer',  'coreWidgets->fileExplorer');   //Widget fileExplorer
+    $f3->route('GET /Core/Widgets/box',             'coreWidgets->box');               //box
+    $f3->route('GET /Core/Widgets/timeLine',        'coreWidgets->timeLine');          //timeLine
+    $f3->route('GET /Core/Widgets/dividers',        'coreWidgets->dividers');          //dividers
+    $f3->route('GET /Core/Widgets/textDividers',    'coreWidgets->textDividers');      //textDividers
+    $f3->route('GET /Core/Widgets/components',      'coreWidgets->components');        //Componentes
+    $f3->route('GET /Core/Widgets/calendar',        'coreWidgets->calendar');          //Calendario
+    $f3->route('GET /Core/Widgets/treeview',        'coreWidgets->treeview');          //Treeview
+    $f3->route('GET /Core/Widgets/codeVisor',       'coreWidgets->codeVisor');         //codeVisor
+    $f3->route('GET /Core/Widgets/meteo',           'coreWidgets->meteo');             //Widget meteorologico
+    $f3->route('GET /Core/Widgets/feed',            'coreWidgets->feed');              //Feed de noticias
+    $f3->route('GET /Core/Widgets/radio',           'coreWidgets->radio');             //Widget radio
+    $f3->route('GET /Core/Widgets/fileExplorer',    'coreWidgets->fileExplorer');      //Widget fileExplorer
+    $f3->route('GET /Core/Widgets/viewsComponents', 'coreWidgets->viewsComponents');   //Widget de componentes para las vistas
     //Tablas
     $f3->route('GET /Core/Tablas/normal',     'coreTablas->normal');        //Tablas Normales
     $f3->route('GET /Core/Tablas/dataTables', 'coreTablas->dataTables');    //Tablas dataTables
@@ -79,7 +80,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                       Crud Normal                         */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/pruebas/crudNormal/listAll', 'crudNormal->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/pruebas/crudNormal/listAll', 'crudNormal->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('POST /Core/pruebas/crudNormal/search',     'crudNormal->UpdateList');  //Filtrar datos
     $f3->route('GET  /Core/pruebas/crudNormal/updateList', 'crudNormal->UpdateList');  //Actualizar Lista
@@ -93,7 +94,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                       Crud Resumen                         */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/pruebas/crudResumen/listAll', 'crudResumen->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/pruebas/crudResumen/listAll', 'crudResumen->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('POST /Core/pruebas/crudResumen/search',             'crudResumen->UpdateList');     //Filtrar datos
     $f3->route('GET  /Core/pruebas/crudResumen/updateList',         'crudResumen->UpdateList');     //Actualizar Lista
@@ -102,9 +103,9 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     $f3->route('GET  /Core/pruebas/crudResumen/resumenUpdate/@id',  'crudResumen->ResumenUpdate');  //Mostrar Detallado
     //Acciones
     $f3->route('POST   /Core/pruebas/crudResumen',          'crudResumen->Insert');    //Crear
-    $f3->route('POST   /Core/pruebas/crudResumen/update',   'crudResumen->Update');    //Editar por post (modificar y subir archivos)
+    $f3->route('POST   /Core/pruebas/crudResumen/update',   'crudResumen->Update');    // Editar por post (modificar y subir archivos)
     $f3->route('PUT    /Core/pruebas/crudResumen/delFiles', 'crudResumen->DelFiles');  //Permite eliminar archivos
-    $f3->route('DELETE /Core/pruebas/crudResumen',          'crudResumen->Delete');    //Borrar dato y archivos
+    $f3->route('DELETE /Core/pruebas/crudResumen',          'crudResumen->Delete');    // Borrar dato y archivos
     //Observaciones - Fragments
     $f3->route('GET /Core/pruebas/crudResumen/observaciones/new/@id',        'crudResumenObservaciones->New');         //Mostrar modal nuevo
     $f3->route('GET /Core/pruebas/crudResumen/observaciones/updateList/@id', 'crudResumenObservaciones->UpdateList');  //Actualizar Lista
@@ -118,7 +119,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                       INFORMES                         */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/pruebas/crudInforme/listAll', 'crudInforme->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/pruebas/crudInforme/listAll', 'crudInforme->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('POST /Core/pruebas/crudInforme/search',   'crudInforme->UpdateList');     //Filtrar datos
     $f3->route('GET  /Core/pruebas/crudInforme/view/@id', 'crudInforme->View');           //Mostrar Detallado
@@ -127,7 +128,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*               Categoria de los Permisos                   */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/permisos/categorias/listAll', 'permisosCategorias->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/permisos/categorias/listAll', 'permisosCategorias->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('POST /Core/permisos/categorias/search',     'permisosCategorias->UpdateList');  //Filtrar datos
     $f3->route('GET  /Core/permisos/categorias/updateList', 'permisosCategorias->UpdateList');  //Actualizar Lista
@@ -141,7 +142,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                         Permisos                          */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/permisos/listado/listAll', 'permisosListado->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/permisos/listado/listAll', 'permisosListado->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('POST /Core/permisos/listado/search',            'permisosListado->UpdateList');     //Filtrar datos
     $f3->route('GET  /Core/permisos/listado/updateList',        'permisosListado->UpdateList');     //Actualizar Lista
@@ -165,7 +166,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                   Administracion de usuarios              */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/administracion/usuarios/listAll', 'usuarios->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/administracion/usuarios/listAll', 'usuarios->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('POST /Core/administracion/usuarios/search',            'usuarios->UpdateList');     //Filtrar datos
     $f3->route('GET  /Core/administracion/usuarios/updateList',        'usuarios->UpdateList');     //Actualizar Lista
@@ -189,11 +190,11 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     /*                      Bloqueos de usuarios                 */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/administracion/bloqueo-usuarios/listAll', 'usuariosBloqueados->listAll');        //Listar Toda la Información
+    $f3->route('GET /Core/administracion/bloqueo-usuarios/listAll', 'usuariosBloqueados->listAll');        // Listar Toda la Información
     //Fragments
     $f3->route('GET /Core/administracion/bloqueo-usuarios/updateList', 'usuariosBloqueados->UpdateList');  //Actualizar Lista
     //Acciones
-    $f3->route('DELETE /Core/administracion/bloqueo-usuarios', 'usuariosBloqueados->Delete');              //Borrar dato y archivos
+    $f3->route('DELETE /Core/administracion/bloqueo-usuarios', 'usuariosBloqueados->Delete');              // Borrar dato y archivos
     /*************************************************************/
     /*                    Opciones del Sistema                   */
     /*************************************************************/
@@ -202,19 +203,19 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     //Fragments
     $f3->route('GET /Core/plataforma/configuracion/resumenUpdate', 'sistemaOpciones->ResumenUpdate');  //Mostrar Detallado
     //Acciones
-    $f3->route('POST /Core/plataforma/configuracion/update',   'sistemaOpciones->Update');    //Editar por post (modificar y subir archivos)
+    $f3->route('POST /Core/plataforma/configuracion/update',   'sistemaOpciones->Update');    // Editar por post (modificar y subir archivos)
     $f3->route('PUT  /Core/plataforma/configuracion/delFiles', 'sistemaOpciones->DelFiles');  //Permite eliminar archivos
     /*************************************************************/
     /*                  Instalacion de Modulos                   */
     /*************************************************************/
     //Vistas
-    $f3->route('GET /Core/plataforma/instalacion/resumen',                     'sistemaInstalacion->Resumen');           //Listar modulos disponibles
+    $f3->route('GET /Core/plataforma/instalacion/resumen',                     'sistemaInstalacion->Resumen');           // Listar modulos disponibles
     $f3->route('GET /Core/plataforma/instalacion/resumenUpdate',               'sistemaInstalacion->resumenUpdate');     //Actualizar vista
     $f3->route('GET /Core/plataforma/instalacion/checkModuleData/@Controller', 'sistemaInstalacion->checkModuleData');   //Revisar las rutas deL instalador contra la BD
     $f3->route('GET /Core/plataforma/instalacion/checkModuleBBDD/@Controller', 'sistemaInstalacion->checkModuleBBDD');   //Revisar las rutas de la BD contra el instalador
     $f3->route('PUT /Core/plataforma/instalacion/installModule',               'sistemaInstalacion->installModule');     //Instalacion de modulos
     $f3->route('PUT /Core/plataforma/instalacion/uninstallModule',             'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
-    $f3->route('GET /Core/plataforma/rutas/listado',                           'sistemaRutas->Resumen');                 //Listar las rutas disponibles
+    $f3->route('GET /Core/plataforma/rutas/listado',                           'sistemaRutas->Resumen');                 // Listar las rutas disponibles
 
 
 }

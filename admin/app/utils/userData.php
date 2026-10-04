@@ -8,7 +8,8 @@ $f3->route('GET /principal/campanaCompSemanalResumen/@mes/@ano',  'gestionCampan
 $f3->route('GET /principal/campanaAnalisisContable/@ano',         'gestionCampanasWidgets->campanaAnalisisContable');    //Analisis Contable
 $f3->route('GET /principal/campanaPartidaConfirmada',             'gestionCampanasWidgets->campanaPartidaConfirmada');   //Últimas partidas confirmadas
 $f3->route('GET /principal/docMercantiles',                       'gestionDocumentosWidgets->pagosPendientes');          //Pagos pendientes de los documentos mercantiles
-$f3->route('GET /principal/bodegaStock',                          'bodegasWidgets->stocksProductos');                    //Productos con bajo Stock en las bodegas
+$f3->route('GET /principal/bodegaStock',                          'bodegasWidgets->stocksProductos');                    // Productos con bajo Stock en las bodegas
+$f3->route('GET /principal/reservas',                          'reservasWidgets->reservasSolicitadas');                    // Productos con bajo Stock en las bodegas
 
 /*******************************************************************************************************************/
 /*                                                 Mi Usuario                                                      */
@@ -20,14 +21,14 @@ $f3->route('GET /perfil/UpdateData', 'miUsuario->FRG_UpdateData');  //Actualizar
 $f3->route('GET /perfil/UpdateCard', 'miUsuario->FRG_UpdateCard');  //Actualizar imagen del perfil
 //Acciones
 $f3->route('GET  /auth/logout',     'miUsuario->logout');    //Cerrar la sesion
-$f3->route('POST /perfil/update',   'miUsuario->update');    //Editar por post (modificar y subir archivos)
+$f3->route('POST /perfil/update',   'miUsuario->update');    // Editar por post (modificar y subir archivos)
 $f3->route('PUT  /perfil/delFiles', 'miUsuario->delFiles');  //Permite eliminar el archivo de la imagen
 
 /*******************************************************************************************************************/
 /*                                             Rutas desde los permisos                                            */
 /*******************************************************************************************************************/
 $PermisosList = $f3->get('SESSION.arrPermisos');
-//recorro
+// Recorro
 foreach ($PermisosList as $permiso){
     //verifico si existe
     if(isset($permiso['Metodo'],$permiso['RutaWeb'],$permiso['RutaController'])&&$permiso['Metodo']!=''&&$permiso['RutaWeb']!=''&&$permiso['RutaController']!=''){
