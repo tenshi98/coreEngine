@@ -38,7 +38,7 @@
     /*********************************************************************/
     /*                        OPCIONES DE LA TABLA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function listTableDataView(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -52,7 +52,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function listTableDataEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -66,7 +66,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function listTableDataDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -101,7 +101,7 @@
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function deleteFilter(collapse=null) {
         //Cargo el loader
         $('#PDloader').show();
@@ -119,4 +119,3 @@
         }
     }
 </script>
-
