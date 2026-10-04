@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']);
 ?>
 <form id="FormEditPago" name="FormEditPago" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
@@ -23,7 +25,7 @@
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
@@ -34,7 +36,7 @@
 
         //se dibujan los inputs
         $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Documento Pago',    'Name' => 'idDocumentoPago',   'Id' => 'EditPago_idDocumentoPago',  'Value' => ($data['rowData']['idDocumentoPago'] ?? ''), 'Required' => 2, 'arrData' => $data['arrDocumentoPago']]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Numero Documento',  'Name' => 'N_Doc',             'Id' => 'EditPago_N_Doc',            'Value' => ($data['rowData']['N_Doc'] ?? ''),           'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4, 'Placeholder' => 'Numero Documento',  'Name' => 'N_Doc',             'Id' => 'EditPago_N_Doc',            'Value' => ($data['rowData']['N_Doc'] ?? ''),           'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Monto Pagado',      'Name' => 'MontoPagado',       'Id' => 'EditPago_MontoPagado',      'Value' => $x_EditPago_MontoPagado,                     'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Usuario Pago',      'Name' => 'UsuarioPagoFake',   'Id' => 'UsuarioPagoFake',           'Value' => ($data['rowData']['UsuarioPago'] ?? ''),     'Required' => 3]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Fecha Pago',        'Name' => 'FechaPagoFake',     'Id' => 'FechaPagoFake',             'Value' => ($data['rowData']['FechaPago'] ?? ''),       'Required' => 3]);
@@ -42,6 +44,7 @@
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idPago',        'Value' => $data['rowData']['idPago'],        'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idFacturacion', 'Value' => $data['rowData']['idFacturacion'], 'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaPago',     'Value' => $data['rowData']['FechaPago'],     'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -56,7 +59,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditPago").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -77,7 +80,7 @@
             let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/pagos/update'; ?>';
             let Informacion = $("#FormEditPago").serialize();
             const Options     = {
-                Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>',
+                Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$DataID['data']; ?>',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

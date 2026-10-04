@@ -11,8 +11,9 @@ class informeDocumentos extends ControllerBase {
     private $DataDate;
     private $DataNumbers;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -31,10 +32,12 @@ class informeDocumentos extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Listar Todo
+    /*******************************************************************/
+    // Listar
+    /*******************************************************************/
     public function listAll($f3){
-        /*******************************************************************/
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEntidad AS ID,CONCAT(CASE idTipoEntidad WHEN 1 THEN CONCAT_WS(" ", Nombre, ApellidoPat) WHEN 2 THEN RazonSocial END,IF(Nick IS NULL OR Nick = "","",CONCAT(" (", Nick, ")"))) AS Nombre',
@@ -47,11 +50,12 @@ class informeDocumentos extends ControllerBase {
             'order'   => 'ApellidoPat ASC,Nombre ASC,RazonSocial ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams      = ['query' => $query];
+        // Ejecuto la query
         $arrEntidades = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idDocumentos AS ID,Nombre',
@@ -64,11 +68,12 @@ class informeDocumentos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams       = ['query' => $query];
+        // Ejecuto la query
         $arrDocumentos = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstadoPago AS ID,Nombre',
@@ -81,11 +86,12 @@ class informeDocumentos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams       = ['query' => $query];
+        // Ejecuto la query
         $arrEstadoPago = $this->Base_GetList($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idTipo AS ID,Nombre',
@@ -98,12 +104,13 @@ class informeDocumentos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams    = ['query' => $query];
+        // Ejecuto la query
         $arrTipoMov = $this->Base_GetList($xParams);
 
-        /******************************************/
-        //Datos enviados a la pagina
+        /************************************/
+        // Datos enviados a la pagina
         $f3->data = [
             /*=========== Datos de la Pagina ===========*/
             'PageTitle'       => 'Búsqueda Documentos',
@@ -124,27 +131,30 @@ class informeDocumentos extends ControllerBase {
             'arrTipoMov'      => $arrTipoMov['data'],
         ];
 
-        /******************************************/
-        //Se instancia la vista
+        /************************************/
+        // Se instancia la vista
         $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
     }
 
-    /******************************************************************************/
-    //List
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3){
-        /*******************************************************************/
+
+        /************************************/
         // Variables
         $WhereData_int     = 'idDocumentos,idEntidad,idEstadoPago,idTipo';  // Datos búsqueda exacta
         $WhereData_string  = 'N_Doc';                                       // Datos búsqueda relativa
         $WhereData_between = 'Creacion_fecha-F_Inicio-F_Termino';           // Datos búsqueda Between
         $whereInt          = '';                                            // Se crea cadena
         $whereParams       = [];                                            // Valores bindeados asociados a $whereInt
-        /******************************************/
+        /************************************/
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_between);
         if($RespDataBetween!=''){
             Response::error($RespDataBetween, 500);
         }
+        /************************************/
         // Agrego variable busqueda
         $r = $this->searchWhere($whereInt, $whereParams, $WhereData_int, 'facturacion_listado', 1);
         $whereInt = $r['where']; $whereParams = $r['params'];
@@ -153,7 +163,7 @@ class informeDocumentos extends ControllerBase {
         $r = $this->searchWhere($whereInt, $whereParams, $WhereData_between, 'facturacion_listado', 3);
         $whereInt = $r['where']; $whereParams = $r['params'];
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -184,18 +194,19 @@ class informeDocumentos extends ControllerBase {
             'order'   => 'facturacion_listado.Creacion_fecha DESC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $arrList = $this->Base_GetList($xParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status']){
+        if ($arrList['status'] === true) {
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
                 'TableTitle'      => 'Busqueda de Documentos',
@@ -210,15 +221,15 @@ class informeDocumentos extends ControllerBase {
                 'arrList'       => $arrList['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$arrList]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }

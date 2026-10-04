@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']);
 ?>
 <div class="modal-header">
     <?php
@@ -22,7 +24,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
 
@@ -35,8 +37,8 @@
         <?php if(is_array($data['arrPagos'])&&!empty($data['arrPagos'])){ ?>          <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_6" data-bs-toggle="tab" data-bs-target="#tab_id_6" type="button" role="tab" aria-controls="tab_id_6" aria-selected="false" tabindex="-1"><i class="bi bi-currency-dollar"></i> Pagos</button></li><?php } ?>
         <li class="flex-grow-1">
             <div class="d-grid gap-2 d-md-flex justify-content-md-end">
-                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
-                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>" class="btn btn-secondary btn-sm"><i class="bi bi-printer"></i> Imprimir</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/noPrint/'.$DataID['data']; ?>" class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Documento</a>
+                <a target="new" href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/print/'.$DataID['data']; ?>" class="btn btn-secondary btn-sm"><i class="bi bi-printer"></i> Imprimir</a>
             </div>
         </li>
     </ul>
@@ -62,7 +64,7 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrItems'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['Item']; ?></td>
@@ -96,7 +98,7 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrProductos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['TipoMovimiento']; ?></td>
@@ -130,7 +132,7 @@
                                 </thead>
                                 <tbody>
                                     <?php
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrServicios'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['ServicioNombre']; ?></td>
@@ -155,18 +157,18 @@
                             <table class="table table-sm table-hover">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Fecha</th>
+                                        <th scope="col" style="width: 100px;">Fecha</th>
                                         <th scope="col">Documento</th>
                                         <th scope="col" class="text-end">Valor</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <?php
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrGuias'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']); ?></td>
-                                            <td><?php echo $crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacionRel']); ?></td>
+                                            <td><?php echo $crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef #'.$crud['idFacturacionRel']); ?></td>
                                             <td class="text-end"><?php echo $data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 2); ?></td>
                                         </tr>
                                     <?php } ?>
@@ -187,14 +189,14 @@
                             <table class="table table-sm table-hover">
                                 <thead>
                                     <tr>
-                                        <th scope="col">Fecha Pago</th>
+                                        <th scope="col" style="width: 100px;">Fecha Pago</th>
                                         <th scope="col">Usuario Pago</th>
                                         <th scope="col">Documento Pago</th>
                                         <th scope="col" class="text-end">Monto pago</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <?php //Recorro
+                                    <?php // Recorro
                                     foreach($data['arrPagos'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaPago']); ?></td>

@@ -7,7 +7,7 @@
 <table class="table table-sm table-hover datatable">
     <thead>
         <tr>
-            <th scope="col">Fecha Pago</th>
+            <th scope="col" style="width: 100px;">Fecha Pago</th>
             <th scope="col">Usuario Pago</th>
             <th scope="col">Documento Pago</th>
             <th scope="col" class="text-end">Monto pago</th>
@@ -18,9 +18,9 @@
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrPagos'])&&!empty($data['arrPagos'])){
-            //Recorro
+            // Recorro los datos
             foreach($data['arrPagos'] as $crud){ ?>
                 <tr>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaPago']); ?></td>
@@ -33,8 +33,8 @@
                         $Entidad     = addslashes($crud['DocPago'].' '.$crud['N_Doc']); ?>
                         <td>
                             <div class="btn-group" role="group">
-                                <button type="button" onclick="tabPagoEdit('<?php echo $encryptedId; ?>')"                            class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
-                                <button type="button" onclick="tabPagoDel( '<?php echo $encryptedId; ?>', '<?php echo $Entidad; ?>')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
+                                <button type="button" onclick="tabPagoEdit('<?php echo $encryptedId['data']; ?>')"                            class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
+                                <button type="button" onclick="tabPagoDel( '<?php echo $encryptedId['data']; ?>', '<?php echo $Entidad; ?>')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
                             </div>
                         </td>
                     <?php } ?>

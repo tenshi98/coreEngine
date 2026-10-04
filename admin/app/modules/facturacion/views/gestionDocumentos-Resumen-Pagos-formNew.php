@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']);
 ?>
 <form id="FormNewPago" name="FormNewPago" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
@@ -23,13 +25,13 @@
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
         //se dibujan los inputs
         $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Documento Pago',    'Name' => 'idDocumentoPago',   'Id' => 'NewPago_idDocumentoPago',  'Value' => '', 'Required' => 2, 'arrData' => $data['arrDocumentoPago']]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Numero Documento',  'Name' => 'N_Doc',             'Id' => 'NewPago_N_Doc',            'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4, 'Placeholder' => 'Numero Documento',  'Name' => 'N_Doc',             'Id' => 'NewPago_N_Doc',            'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 6, 'Placeholder' => 'Monto Pagado',      'Name' => 'MontoPagado',       'Id' => 'NewPago_MontoPagado',      'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-currency-dollar']);
 
         //datos ocultos
@@ -50,7 +52,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewPago").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -71,7 +73,7 @@
             let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/pagos'; ?>';
             let Informacion = $("#FormNewPago").serialize();
             const Options     = {
-                Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idFacturacion']); ?>',
+                Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$DataID['data']; ?>',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

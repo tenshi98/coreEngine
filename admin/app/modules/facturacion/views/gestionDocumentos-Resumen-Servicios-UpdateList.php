@@ -17,9 +17,9 @@
     </thead>
     <tbody>
         <?php
-        //Verifico si hay datos
+        // Verifico si hay datos
         if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
-            //Recorro
+            // Recorro los datos
             foreach($data['arrServicios'] as $crud){ ?>
                 <tr>
                     <td><?php echo $crud['ServicioNombre']; ?></td>
@@ -31,8 +31,8 @@
                         $Entidad     = addslashes($crud['ServicioNombre']); ?>
                         <td>
                             <div class="btn-group" role="group">
-                                <button type="button" onclick="tabServEdit('<?php echo $encryptedId; ?>')"                             class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
-                                <button type="button" onclick="tabServDel( '<?php echo $encryptedId; ?>', '<?php echo $Entidad; ?>')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
+                                <button type="button" onclick="tabServEdit('<?php echo $encryptedId['data']; ?>')"                             class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
+                                <button type="button" onclick="tabServDel( '<?php echo $encryptedId['data']; ?>', '<?php echo $Entidad; ?>')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
                             </div>
                         </td>
                     <?php } ?>

@@ -4,8 +4,9 @@
 /*******************************************************************************************************************/
 class gestionDocumentosPagos extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $controllerName;
     private $FormInputs;
     private $Codification;
@@ -13,8 +14,9 @@ class gestionDocumentosPagos extends ControllerBase {
     private $DataDate;
     private $ServerServer;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -34,43 +36,55 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Listar Todo
+    /*******************************************************************/
+    // Listar
+    /*******************************************************************/
     public function New_1($f3, $params){$this->New($f3, $params, 1);}
     public function New_2($f3, $params){$this->New($f3, $params, 2);}
-    //Listar Todo
+    // Listar Todo
     public function UpdateList_1($f3, $params){$this->UpdateList($f3, $params, 1);}
     public function UpdateList_2($f3, $params){$this->UpdateList($f3, $params, 2);}
-    //Listar Todo
+    // Listar Todo
     public function GetID_1($f3, $params){$this->GetID($f3, $params, 1);}
     public function GetID_2($f3, $params){$this->GetID($f3, $params, 2);}
 
     /******************************************************************************/
     /*                                  VISTAS                                    */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear nuevo
+    /*******************************************************************/
+    // Crear nuevo
+    /*******************************************************************/
     public function New($f3, $params, $idTipo){
-        /******************************************/
+
+        /************************************/
+        // Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
 
-        /******************************************/
+        /************************************/
+        // Se obtiene el ID
+        $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($FacturacionID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idFacturacion',
             'table'   => 'facturacion_listado',
             'join'    => '',
             'where'   => 'idFacturacion = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$FacturacionID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idDocumentoPago AS ID,Nombre',
@@ -83,8 +97,9 @@ class gestionDocumentosPagos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams          = ['query' => $query];
+        // Ejecuto la query
         $arrDocumentoPago = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -92,8 +107,8 @@ class gestionDocumentosPagos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrDocumentoPago['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -108,43 +123,53 @@ class gestionDocumentosPagos extends ControllerBase {
                 'idTipo'            => $idTipo,
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Pagos-formNew.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrDocumentoPago]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //List
+    /*******************************************************************/
+    // Actualizar Listar
+    /*******************************************************************/
     public function UpdateList($f3, $params, $idTipo){
-        /******************************************/
-        //Se verifica movimiento
+
+        /************************************/
+        // Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
 
-        /******************************************/
+        /************************************/
+        // Se obtiene el ID
+        $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($FacturacionID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstadoPago',
             'table'   => 'facturacion_listado',
             'join'    => '',
             'where'   => 'idFacturacion = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$FacturacionID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -159,14 +184,15 @@ class gestionDocumentosPagos extends ControllerBase {
                 LEFT JOIN usuarios_listado     ON usuarios_listado.idUsuario            = facturacion_listado_pagos.idUsuario
                 LEFT JOIN core_documentos_pago ON core_documentos_pago.idDocumentoPago  = facturacion_listado_pagos.idDocumentoPago',
             'where'   => 'facturacion_listado_pagos.idFacturacion = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$FacturacionID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => 'facturacion_listado_pagos.idPago ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams  = ['query' => $query];
+        // Ejecuto la query
         $arrPagos = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -175,8 +201,8 @@ class gestionDocumentosPagos extends ControllerBase {
         // Si hay resultados
         if($rowData['status'] && $arrPagos['status']){
 
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -191,27 +217,36 @@ class gestionDocumentosPagos extends ControllerBase {
                 'idTipo'      => $idTipo,
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Pagos-UpdateList.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrPagos]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
 
-    /******************************************************************************/
-    //Edit
+    /*******************************************************************/
+    // Editar
+    /*******************************************************************/
     public function GetID($f3, $params, $idTipo){
-        /******************************************/
-        //Se verifica movimiento
+
+        /************************************/
+        // Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
 
-        /******************************************/
+        /************************************/
+        // Se obtiene el ID
+        $PagoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        if (!$this->isValidDecrypted($PagoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -225,16 +260,17 @@ class gestionDocumentosPagos extends ControllerBase {
             'table'   => 'facturacion_listado_pagos',
             'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = facturacion_listado_pagos.idUsuario',
             'where'   => 'facturacion_listado_pagos.idPago = ?',
-            'params'  => [$this->Codification->encryptDecrypt('decrypt', $params['id'])],
+            'params'  => [$PagoID['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams = ['query' => $query];
+        // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
-        /*******************************************************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idDocumentoPago AS ID,Nombre',
@@ -247,8 +283,9 @@ class gestionDocumentosPagos extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
-        // Ejecuto la query
+        // Preparo los datos
         $xParams          = ['query' => $query];
+        // Ejecuto la query
         $arrDocumentoPago = $this->Base_GetList($xParams);
 
         /*******************************************************************/
@@ -256,8 +293,8 @@ class gestionDocumentosPagos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($rowData['status'] && $arrDocumentoPago['status']){
-            /******************************************/
-            //Datos enviados a la pagina
+            /************************************/
+            // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
@@ -272,15 +309,15 @@ class gestionDocumentosPagos extends ControllerBase {
                 'arrDocumentoPago'  => $arrDocumentoPago['data'],
             ];
 
-            /******************************************/
-            //Se instancia la vista
+            /************************************/
+            // Se instancia la vista
             $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Pagos-formEdit.php');
-        /*******************************************************************/
-        //si no hay resultados
+        /************************************/
+        // Si no hay resultados
         } else {
-            //Busco errores de la consulta
+            // Busco errores de la consulta
             $result = $this->mergeResponses([$rowData,$arrDocumentoPago]);
-            //Muestra los errores
+            // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
     }
@@ -288,160 +325,238 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Crear
+    /*******************************************************************/
+    // Insertar
+    /*******************************************************************/
     public function Insert($f3){
 
-        /******************************/
+        /************************************/
         // Usuario creador
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
-        //Envio los datos recibidos
-        $resultado = $this->insertPago($_POST);
-        //Imprimo la respuesta
-        Response::error($resultado['Response'], $resultado['status'], $resultado['Response']);
+        /************************************/
+        // Envio los datos recibidos
+        $ResponseUp = $this->insertPago($_POST);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if($ResponseUp['code'] != 200){
+            Response::error($ResponseUp['message'], $ResponseUp['code'], $ResponseUp['error'] ?? '');
+        }
+
+        /************************************/
+        // Si es un ID numérico, encripta y envía con código 200 (OK)
+        Response::success($ResponseUp['data']['data']);
+
     }
 
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update($f3){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            /******************************/
-            // Usuario creador
-            $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
-            /*******************************************************************/
+        /************************************/
+        // Usuario creador
+        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+            facturacion_listado.idFacturacion,
+            facturacion_listado.ValorTotal,
+            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$_POST['idFacturacion'].' AND idPago!='.$_POST['idPago'].') AS MontoPagado',
+            'table'   => 'facturacion_listado',
+            'join'    => '',
+            'where'   => 'idFacturacion = ?',
+            'params'  => [$_POST['idFacturacion']],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        $rowData = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($rowData['status'] === false) {
+            $this->Base_transactionRollback();
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+        }
+
+        /************************************/
+        //Se verifica si el monto es superior al valor del documento
+        if(isset($rowData['data']['ValorTotal'], $rowData['data']['MontoPagado'], $_POST['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$_POST['MontoPagado'])){
+            $this->Base_transactionRollback();
+            Response::error('Ha ingresado un monto superior al valor total del documento', 500);
+        }else{
+            /************************************/
             // Se genera la query
             $query = [
-                'data'    => '
-                facturacion_listado.idFacturacion,
-                facturacion_listado.ValorTotal,
-                (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$_POST['idFacturacion'].' AND idPago!='.$_POST['idPago'].') AS MontoPagado',
-                'table'   => 'facturacion_listado',
-                'join'    => '',
-                'where'   => 'idFacturacion = ?',
-                'params'  => [$_POST['idFacturacion']],
-                'group'   => '',
-                'having'  => '',
-                'order'   => ''
+                'data'      => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
+                'required'  => 'idPago,idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
+                'unique'    => '',
+                'encode'    => '',
+                'table'     => 'facturacion_listado_pagos',
+                'where'     => 'idPago',
+                'Post'      => $_POST
             ];
+            /************************************/
+            // Se genera el chequeo
+            $dataCheck_1 = $this->dataCheck_1($_POST);
+            // Preparo los datos
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             // Ejecuto la query
-            $xParams = ['query' => $query];
-            $rowData = $this->Base_GetByID($xParams);
+            $Response = $this->Base_update($xParams);
 
-            /******************************/
-            //Se verifica si el monto es superior al valor del documento
-            if(isset($rowData['data']['ValorTotal'], $rowData['data']['MontoPagado'], $_POST['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$_POST['MontoPagado'])){
-                Response::error('Ha ingresado un monto superior al valor total del documento', 500);
-            }else{
-                /******************************/
-                // Se genera la query
-                $query = [
-                    'data'      => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
-                    'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
-                    'unique'    => '',
-                    'encode'    => '',
-                    'table'     => 'facturacion_listado_pagos',
-                    'where'     => 'idPago',
-                    'Post'      => $_POST
-                ];
-                //Se genera el chequeo
-                $dataCheck_1 = $this->dataCheck_1($_POST);
-                // Ejecuto la query
-                $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
-                $Response = $this->Base_update($xParams);
-
-                /******************************/
-                // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-                if ($Response['status']){
-                    /******************************/
-                    // Se actualiza el estado de la factura
-                    $this->updateFact($_POST['idFacturacion']);
-                    /******************************/
-                    // Devuelvo $Response con código 200 (OK)
-                    Response::success($Response['data']);
-                } else {
-                    // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                    // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                    Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-                }
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
+                $this->Base_transactionRollback();
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+
+            /************************************/
+            // Se actualiza el estado de la factura
+            $ResponseUp = $this->updatePago($_POST['idFacturacion'], $this->getDBConn());
+
+            /************************************/
+            // Si falla la la ejecucion, se muestra alerta
+            if($ResponseUp['code'] != 200){
+                $this->Base_transactionRollback();
+                Response::error($ResponseUp['message'], $ResponseUp['code'], $ResponseUp['error'] ?? '');
+            }
+
+            /************************************/
+            // Confirmar transacción
+            $this->Base_transactionCommit();
+
+            /************************************/
+            // Devuelvo $Response con código 200 (OK)
+            Response::success($Response['data']);
+
         }
+
     }
 
-    /******************************************************************************/
-    //Borrar dato y archivos
+    /*******************************************************************/
+    // Borrar dato y archivos
+    /*******************************************************************/
     public function Delete(){
-        //Verificacion metodo PUT
-        if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
 
-            /******************************************/
-            //Se parsean los datos
-            parse_str(file_get_contents("php://input"),$dataDelete);
-
-            /******************************************/
-            // Se genera la query
-            $query = [
-                'data'    => 'idFacturacion',
-                'table'   => 'facturacion_listado_pagos',
-                'join'    => '',
-                'where'   => 'idPago = ?',
-                'params'  => [$this->Codification->encryptDecrypt('decrypt', $dataDelete['idPago'])],
-                'group'   => '',
-                'having'  => '',
-                'order'   => ''
-            ];
-            // Ejecuto la query
-            $xParams        = ['query' => $query];
-            $rowFacturacion = $this->Base_GetByID($xParams);
-
-            /******************************/
-            // Se genera la query
-            $query = [
-                'files'       => '',
-                'table'       => 'facturacion_listado_pagos',
-                'where'       => 'idPago',
-                'SubCarpeta'  => '',
-                'Post'        => $dataDelete
-            ];
-            // Ejecuto la query
-            $xParams  = ['query' => $query];
-            $Response = $this->Base_delete($xParams);
-
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-            if ($rowFacturacion['status'] && $Response['status']){
-                /******************************/
-                // Se actualiza el estado de la factura
-                $this->updateFact($rowFacturacion['data']['idFacturacion']);
-                /******************************/
-                // Devuelvo $Response con código 200 (OK)
-                Response::success($Response['data']);
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error']);
-            }
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'DELETE') {
+            Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataDelete);
+
+        /************************************/
+        // Se obtiene el ID
+        $PagoID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idPago']);
+        if (!$this->isValidDecrypted($PagoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idFacturacion',
+            'table'   => 'facturacion_listado_pagos',
+            'join'    => '',
+            'where'   => 'idPago = ?',
+            'params'  => [$PagoID['data']],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams        = ['query' => $query];
+        // Ejecuto la query
+        $rowFacturacion = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($rowFacturacion['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error']);
+        }
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'files'       => '',
+            'table'       => 'facturacion_listado_pagos',
+            'where'       => 'idPago',
+            'SubCarpeta'  => '',
+            'Post'        => $dataDelete
+        ];
+        // Preparo los datos
+        $xParams  = ['query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_delete($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            $this->Base_transactionRollback();
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se actualiza el estado de la factura
+        $ResponseUp = $this->updatePago($rowFacturacion['data']['idFacturacion'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se muestra alerta
+        if($ResponseUp['code'] != 200){
+            $this->Base_transactionRollback();
+            Response::error($ResponseUp['message'], $ResponseUp['code'], $ResponseUp['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /******************************************************************************/
     /*                             EJECUCION OTROS                                */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se actualizan los montos
-    public function updateFact($FacturacionID){
+    /*******************************************************************/
+    // Se actualizan los montos
+    /*******************************************************************/
+    public function updatePago($FacturacionID, $NewDBConn = null): array{
 
-        /******************************************/
+        /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $NewDBConn ?? $this->getDBConn();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -456,14 +571,21 @@ class gestionDocumentosPagos extends ControllerBase {
             'having'  => '',
             'order'   => ''
         ];
+        // Preparo los datos
+        $xParams = ['query' => $query, 'newBDConn' => $DBConn];
         // Ejecuto la query
-        $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************/
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($rowData['status'] === false) {
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+        }
+
+        /************************************/
         //Se determina si esta pagado
         if(isset($rowData['data']['ValorTotal'], $rowData['data']['MontoPagado'])&&$rowData['data']['ValorTotal']<=$rowData['data']['MontoPagado']){
-            $idEstadoPago = 2; //Pagado
+            $idEstadoPago = 2; // Pagado
         }else{
             $idEstadoPago = 1; //No Pagado
         }
@@ -471,9 +593,9 @@ class gestionDocumentosPagos extends ControllerBase {
         $arrTareas = [
             'idFacturacion'   => $rowData['data']['idFacturacion'],
             'idEstadoPago'    => $idEstadoPago,
-            'MontoPagado'     => $rowData['data']['MontoPagado'],
+            'MontoPagado'     => $rowData['data']['MontoPagado'] ?? 0,
         ];
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idFacturacion,idEstadoPago,MontoPagado',
@@ -484,18 +606,42 @@ class gestionDocumentosPagos extends ControllerBase {
             'where'     => 'idFacturacion',
             'Post'      => $arrTareas
         ];
-        //Se genera el chequeo
+        /************************************/
+        // Se genera el chequeo
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
+        // Preparo los datos
+        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'newBDConn' => $DBConn];
         // Ejecuto la query
-        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query];
-        $this->Base_update($xParams);
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+        }
+
+        /************************************/
+        // Retorno los datos
+        return ['code' => 200, 'data' => $Response];
 
     }
 
-    /******************************************************************************/
-    //Se genera el pago
-    public function insertPago($Data){
-        /*******************************************************************/
+    /*******************************************************************/
+    // Se genera el pago
+    /*******************************************************************/
+    public function insertPago($Data, $NewDBConn = null){
+
+        /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $NewDBConn ?? $this->getDBConn();
+
+        /************************************/
+        // Se inicia la transacción solo si corresponde
+        if($NewDBConn === null){
+            $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -510,16 +656,25 @@ class gestionDocumentosPagos extends ControllerBase {
             'having'  => '',
             'order'   => ''
         ];
+        // Preparo los datos
+        $xParams = ['query' => $query, 'newBDConn' => $DBConn];
         // Ejecuto la query
-        $xParams = ['query' => $query];
         $rowData = $this->Base_GetByID($xParams);
 
-        /******************************/
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($rowData['status'] === false) {
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+        }
+
+        /************************************/
         //Se verifica si el monto es superior al valor del documento
         if(isset($rowData['data']['ValorTotal'], $Data['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$Data['MontoPagado'])){
-            return ['status' => 500, 'Response' => 'Ha ingresado un monto superior al valor total del documento'];
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Ha ingresado un monto superior al valor total del documento'];
         }else{
-            /******************************/
+            /************************************/
             // Se genera la query
             $query = [
                 'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
@@ -529,26 +684,38 @@ class gestionDocumentosPagos extends ControllerBase {
                 'table'     => 'facturacion_listado_pagos',
                 'Post'      => $Data
             ];
-            //Se genera el chequeo
+            /************************************/
+            // Se genera el chequeo
             $dataCheck_1 = $this->dataCheck_1($Data);
+            // Preparo los datos
+            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query, 'newBDConn' => $DBConn];
             // Ejecuto la query
-            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
             $Response = $this->Base_insert($xParams);
 
-            /******************************/
-            // Se asume que $Response contendrá un array de errores/datos, un ID numérico o algún otro valor.
-            if ($Response['status']){
-                /******************************/
-                // Se actualiza el estado de la factura
-                $this->updateFact($Data['idFacturacion']);
-                /******************************/
-                // Si es un ID numérico, se envía con código 200 (OK)
-                return ['status' => 200, 'Response' => $Response['data']];
-            } else {
-                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-                return ['status' => 500, 'Response' => $Response['error']];
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($Response['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
             }
+
+            /************************************/
+            // Se actualiza el estado de la factura
+            $ResponsePago = $this->updatePago($Data['idFacturacion'], $DBConn);
+            if($ResponsePago['code'] != 200){
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return $ResponsePago;
+            }
+
+            /************************************/
+            // Confirmar transacción solo si corresponde
+            if($NewDBConn === null){
+                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+            }
+
+            /************************************/
+            // Si es un ID numérico, se envía con código 200 (OK)
+            return ['code' => 200, 'data' => $Response];
 
         }
     }
@@ -556,8 +723,9 @@ class gestionDocumentosPagos extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
@@ -590,11 +758,13 @@ class gestionDocumentosPagos extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
@@ -627,12 +797,13 @@ class gestionDocumentosPagos extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function tsrxName(int $idTipo): string{
         // Normalizar y mapear tipo a nombre de permiso (más eficiente que switch)
         $tsrxMap = [

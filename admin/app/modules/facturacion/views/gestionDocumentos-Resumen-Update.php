@@ -20,7 +20,7 @@
         }
         //valido
         $NombreEntidad  = '';
-        //Se obtiene el nombre o la razón social
+        // Se obtiene el nombre o la razón social
         switch ($data['rowData']['idTipoEntidad']) {
             case 1: $NombreEntidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
             case 2: $NombreEntidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas
@@ -31,7 +31,7 @@
 
         $arrData1 = [
             ['Icon' => '','Titulo' => 'Tipo Facturacion',    'Texto' => $data['rowData']['TipoFacturacion']],
-            ['Icon' => '','Titulo' => 'Documento Mercantil', 'Texto' => $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion'])],
+            ['Icon' => '','Titulo' => 'Documento Mercantil', 'Texto' => $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef #'.$data['rowData']['idFacturacion'])],
             ['Icon' => '','Titulo' => $Entidad,              'Texto' => $NombreEntidad],
             ['Icon' => '','Titulo' => 'Fecha de Creacion',   'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha'])],
             ['Icon' => '','Titulo' => 'Hora de Creacion',    'Texto' => $data['rowData']['Creacion_hora']],

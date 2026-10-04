@@ -10,7 +10,7 @@ $CompanyLogo =  !empty($data['UserData']['Sistema_IMGLogo'])
 
 /********************************/
 $NombreEntidad  = '';
-//Se obtiene el nombre o la razón social
+// Se obtiene el nombre o la razón social
 switch ($data['rowData']['idTipoEntidad']) {
     case 1: $NombreEntidad .= $data['rowData']['EntidadesApellido'].', '.$data['rowData']['EntidadesNombre']; break; //Persona Natural
     case 2: $NombreEntidad .= $data['rowData']['EntidadesRazonSocial']; break;                                       //Empresas
@@ -96,7 +96,7 @@ switch ($data['rowData']['idTipo']) {
             </div>
             <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
                 <p class="cs-primary_color cs-mb0"><b><?php echo $data['rowData']['Documento']; ?>:</b></p>
-                <p class="cs-mb0"><?php echo '#'.($data['rowData']['N_Doc'] ?? 'nRef '.$data['rowData']['idFacturacion']); ?></p>
+                <p class="cs-mb0"><?php echo '#'.($data['rowData']['N_Doc'] ?? 'nRef #'.$data['rowData']['idFacturacion']); ?></p>
             </div>
             <div class="cs-invoice_number cs-primary_color cs-mb0 cs-f16  display-flex justify-content-flex-end">
                 <p class="cs-primary_color cs-mb0"><b>Fecha:</b></p>
@@ -132,7 +132,7 @@ switch ($data['rowData']['idTipo']) {
                     <?php
                     /*******************************************************************/
                     if(is_array($data['arrItems'])&&!empty($data['arrItems'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrItems'] as $crud){
                             echo '
                             <tr>
@@ -144,7 +144,7 @@ switch ($data['rowData']['idTipo']) {
                     }
                     /*******************************************************************/
                     if(is_array($data['arrProductos'])&&!empty($data['arrProductos'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrProductos'] as $crud){
                             echo '
                             <tr>
@@ -156,7 +156,7 @@ switch ($data['rowData']['idTipo']) {
                     }
                     /*******************************************************************/
                     if(is_array($data['arrServicios'])&&!empty($data['arrServicios'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrServicios'] as $crud){
                             echo '
                             <tr>
@@ -168,11 +168,11 @@ switch ($data['rowData']['idTipo']) {
                     }
                     /*******************************************************************/
                     if(is_array($data['arrGuias'])&&!empty($data['arrGuias'])){
-                        //Recorro
+                        // Recorro
                         foreach($data['arrGuias'] as $crud){
                             echo '
                             <tr>
-                                <td>'.$crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef '.$crud['idFacturacionRel']).' ('.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']).')</td>
+                                <td>'.$crud['Documento'].' '.($crud['N_Doc'] ?? 'nRef #'.$crud['idFacturacionRel']).' ('.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']).')</td>
                                 <td></td>
                                 <td class="cs-text_right cs-primary_color">'.$data['Fnc_DataNumbers']->Valores($crud['ValorTotal'], 2).'</td>
                             </tr>';

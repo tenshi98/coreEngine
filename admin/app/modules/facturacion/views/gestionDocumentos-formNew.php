@@ -29,12 +29,12 @@ $RandName = 'rand_'.rand(1, 999999);
                             </h5>';
                             break;
                     } ?>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
                 </div>
                 <div class="modal-body">
                     <?php
                     $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Documento Mercantil', 'Name' => 'idDocumentos',    'Id' => 'New_idDocumentos',    'Value' => '', 'Required' => 2, 'arrData' => $data['arrDocumentos']]);
-                    $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'New_N_Doc',           'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
+                    $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Numero Documento',    'Name' => 'N_Doc',           'Id' => 'New_N_Doc',           'Value' => '', 'Required' => 1, 'Icon' => 'bi bi-sort-numeric-down']);
                     $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Entidad',             'Name' => 'idEntidad',       'Id' => 'New_idEntidad',       'Value' => '', 'Required' => 2, 'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrEntidades'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha de Creacion',   'Name' => 'Creacion_fecha',  'Id' => 'New_Creacion_fecha',  'Value' => '', 'Required' => 2, 'Icon' => 'bi bi-calendar3']);
                     $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observaciones',       'Name' => 'Observaciones',   'Id' => 'New_Observaciones',   'Value' => '', 'Required' => 1]);
@@ -69,7 +69,7 @@ $RandName = 'rand_'.rand(1, 999999);
                         <?php
                         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
                         if($data['UserData']["gestionDocumentosUsoBodega"]==2){
-                            //Se verifica movimiento
+                            // Se verifica movimiento
                             switch ($data['idTipo']) {
                                 /************************************/
                                 //Ingreso
@@ -170,7 +170,7 @@ $RandName = 'rand_'.rand(1, 999999);
 </div>
 
 <script>
-    /******************************************/
+    /************************************/
     //Oculto
     document.getElementById('div_Bodegas').style.display = 'none';
     document.getElementById('div_Guias').style.display   = 'none';
@@ -178,7 +178,7 @@ $RandName = 'rand_'.rand(1, 999999);
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormNewData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -216,7 +216,7 @@ $RandName = 'rand_'.rand(1, 999999);
     <?php
     //filtro
     $newData = $data['Fnc_CommonData']->agruparPorClave ($data['arrGuias'], 'idEntidad' );
-    //Recorro
+    // Recorro
     foreach ($newData as $EntidadID=>$datos){
         //imprimimos la categoría
         $DataID   = 'let id_data_guias_'.$EntidadID.' = new Array(""';
@@ -225,7 +225,7 @@ $RandName = 'rand_'.rand(1, 999999);
         foreach ($datos as $crud){
             // Construir nombre de la guía de forma más compacta
             $x_nombre = 'Guia Despacho ';
-            $x_nombre .= (!empty($crud['N_Doc'])) ? $crud['N_Doc'] : 'nRef '.$crud['idFacturacion'];
+            $x_nombre .= (!empty($crud['N_Doc'])) ? $crud['N_Doc'] : 'nRef #'.$crud['idFacturacion'];
             $x_nombre .= (!empty($crud['Creacion_fecha'])) ? ' Fecha '.$data['Fnc_DataDate']->fechaEstandar($crud['Creacion_fecha']) : '';
             //se imprime
             $DataID   .= ',"'.$crud['idFacturacion'].'"';
@@ -285,11 +285,11 @@ $RandName = 'rand_'.rand(1, 999999);
     }
 
     /**********************************************************/
-	//variable
+	// Variable
 	let <?php echo $ProdName; ?> = [4];
-	<?php echo $ProdName; ?>[0] = 0; //Items
-	<?php echo $ProdName; ?>[1] = 0; //Productos
-	<?php echo $ProdName; ?>[2] = 0; //Servicios
+	<?php echo $ProdName; ?>[0] = 0; // Items
+	<?php echo $ProdName; ?>[1] = 0; // Productos
+	<?php echo $ProdName; ?>[2] = 0; // Servicios
 	<?php echo $ProdName; ?>[3] = 0; //Guias de despacho
     /**********************************************************/
 	//Se agrega item
