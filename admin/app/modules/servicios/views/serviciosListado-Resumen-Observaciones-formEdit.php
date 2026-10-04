@@ -3,7 +3,10 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idServicio']);
 ?>
+
 <form id="FormEditObservacion" name="FormEditObservacion" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
         <?php
@@ -23,7 +26,7 @@
                 </h5>';
                 break;
         } ?>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
     </div>
     <div class="modal-body">
         <?php
@@ -32,7 +35,9 @@
         $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',    'Name' => 'Observacion',        'Id' => 'EditObs_Observacion',  'Value' => ($data['rowData']['Observacion'] ?? ''),                                                                            'Required' => 2]);
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idObservaciones','Value' => $data['rowData']['idObservaciones'],'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idObservaciones',  'Value' => $data['rowData']['idObservaciones'],        'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idServicio',       'Value' => $data['rowData']['idServicio'],             'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion',    'Value' => $data['Fnc_ServerServer']->fechaActual(),   'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -47,7 +52,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditObservacion").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -69,7 +74,7 @@
             let Informacion = $("#FormEditObservacion").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idServicio']); ?>', refreshTbl:'true'}
+                    {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
                 closeModal:'#viewModal-lg',

@@ -22,7 +22,7 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -46,18 +46,23 @@
                             <table class="table table-sm table-hover">
                                 <tbody>
                                     <?php
-                                    //Verifico si hay datos
+                                    // Verifico si hay datos
                                     if(is_array($data['arrDocumentos'])&&!empty($data['arrDocumentos'])){
-                                        //Recorro
-                                        foreach($data['arrDocumentos'] as $crud){ ?>
+                                        // Recorro
+                                        foreach($data['arrDocumentos'] as $crud){
+                                            $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idDocumentos']);?>
                                             <tr>
                                                 <td><?php echo $crud['Nombre']; ?></td>
                                                 <td><?php echo $crud['FVencimiento']; ?></td>
-                                                <td><?php echo $crud['NombreArchivo']; ?></td>
+                                                <td>
+                                                    <div class="btn-group" role="group">
+                                                        <button type="button" onclick="viewDocumentosView('<?php echo $encryptedId['data']; ?>')"  class="btn btn-primary btn-sm"><i class="bi bi-eye"></i> Ver Archivo</button>
+                                                    </div>
+                                                </td>
                                             </tr>
                                         <?php } ?>
                                     <?php }else{
-                                        echo '<tr><td colspan="3">No se encontraron entradas</td></tr>';
+                                        echo '<tr><td>No se encontraron entradas</td></tr>';
                                     } ?>
                                 </tbody>
                             </table>
@@ -75,17 +80,17 @@
                         <table class="table table-sm table-hover">
                             <tbody>
                                 <?php
-                                //Verifico si hay datos
+                                // Verifico si hay datos
                                 if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
-                                    //Recorro
+                                    // Recorro
                                     foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
-                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
-                                            <td><?php echo $crud['Observacion']; ?></td>
+                                            <td style="width: 100px;"><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
+                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?></td>
                                         </tr>
                                     <?php } ?>
                                 <?php }else{
-                                    echo '<tr><td colspan="2">No se encontraron entradas</td></tr>';
+                                    echo '<tr><td>No se encontraron entradas</td></tr>';
                                 } ?>
                             </tbody>
                         </table>
@@ -106,3 +111,21 @@ if($data['UserData']["sistemaModalCloseBTN"]==2){
 }else{
     echo '<style>.modal-body {max-height: 80vh;}</style>';
 } ?>
+
+<script>
+    /************************************/
+    function viewDocumentosView(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#popupModalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/view/'; ?>'+ID;
+        const Options = {
+            closeObject:'#PDloader',
+            callFNC:'openPopupModal',
+            callFNCData:'PopupModalLarge',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+</script>
