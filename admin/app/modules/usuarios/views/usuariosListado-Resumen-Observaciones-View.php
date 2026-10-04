@@ -22,14 +22,14 @@
             </h5>';
             break;
     } ?>
-    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <button type="button" class="btn-close" aria-label="Close" data-modal-close></button>
 </div>
 <div class="modal-body">
 
     <?php
     $arrData = [
         ['Icon' => '','Titulo' => 'Fecha Creacion', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion'])],
-        ['Icon' => '','Titulo' => 'Observación',    'Texto' => $data['rowData']['Observacion']],
+        ['Icon' => '','Titulo' => 'Observación',    'Texto' => '<strong>'.$data['rowData']['Usuario'].':</strong><br>'.$data['rowData']['Observacion']],
     ];
     $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
     ?>

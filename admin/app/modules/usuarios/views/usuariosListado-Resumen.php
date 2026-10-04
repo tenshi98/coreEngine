@@ -3,6 +3,8 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
+// Se obtiene el ID
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
 
@@ -42,7 +44,8 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',    'Id'  => 'Edit_Direccion',   'Value'  => ($data['rowData']['Direccion'] ?? ''),    'Required'  => 1, 'Icon' => 'bi bi-geo-alt-fill']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Configuración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelectFilter([         'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario', 'Id' => 'Edit_idTipoUsuario',  'Value' => ($data['rowData']['idTipoUsuario'] ?? ''), 'Required' => 2,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelectFilter([   'Placeholder' => 'Tipo de Usuario',  'Name' => 'idTipoUsuario',   'Id' => 'Edit_idTipoUsuario',   'Value' => ($data['rowData']['idTipoUsuario'] ?? ''),   'Required' => 2,'arrData' => $data['arrTipoUsuario'], 'BASE' => $BASE]);
+                                $data['Fnc_FormInputs']->formSelect([         'Placeholder' => 'Posición Menu',    'Name' => 'idMenuPosicion',  'Id' => 'Edit_idMenuPosicion',  'Value' => ($data['rowData']['idMenuPosicion'] ?? ''),  'Required' => 2,'arrData' => $data['arrPosicion']]);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Social', 'Clase' => 'box-title text-color-red-dark']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'X (Twitter)', 'Name' => 'Social_X',          'Id' => 'Edit_Social_X',         'Value' => ($data['rowData']['Social_X'] ?? ''),         'Required' => 1, 'Icon' => 'bi bi-x']);
@@ -51,7 +54,8 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',   'Id' => 'Edit_Social_Linkedin',  'Value' => ($data['rowData']['Social_Linkedin'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
                                 $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
-                                $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => ($data['rowData']['idEstado'] ?? ''),  'Required' => 2,'arrData' => $data['arrEstado']]);
+                                $data['Fnc_FormInputs']->formSelect([ 'Placeholder' => 'Estado',        'Name' => 'idEstado',        'Id' => 'Edit_idEstado',        'Value' => ($data['rowData']['idEstado'] ?? ''),        'Required' => 2,'arrData' => $data['arrEstado']]);
+
                                 $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'Edit_password',  'Value'  => '',    'Required' => 1,'Icon' => 'bi bi-key']);
 
@@ -93,7 +97,16 @@
                     <?php }else{ ?>
                         <div class="d-flex justify-content-center pt-3">
                             <div class="col-xs-12 col-sm-12 col-md-8 col-lg-8 col-xl-6 col-xxl-5">
-                                <?php $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Direccion_img','URL' => $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update','ExtraData' => '"idUsuario": '.$data['rowData']['idUsuario']]);?>
+                                <?php
+                                // Se construye el dato
+                                $ExtraData  = '"idUsuario": '.$data['rowData']['idUsuario'];
+                                $ExtraData .= ',"idTipoUsuario": '.$data['rowData']['idTipoUsuario'];
+                                $ExtraData .= ',"idEstado": '.$data['rowData']['idEstado'];
+                                $ExtraData .= ',"email": "'.$data['rowData']['email'].'"';
+                                $ExtraData .= ',"Nombre": "'.$data['rowData']['Nombre'].'"';
+                                $ExtraData .= ',"idMenuPosicion": '.$data['rowData']['idMenuPosicion'];
+                                // Se imprime el dato
+                                $data['Fnc_FormInputs']->formUploadIMG(['Name' => 'Direccion_img','URL' => $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update','ExtraData' => $ExtraData]);?>
                             </div>
                         </div>
                     <?php } ?>
@@ -115,7 +128,7 @@
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Observaciones de <?php echo $data['rowData']['Nombre']; ?>
-                            <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                            <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
@@ -168,7 +181,7 @@
     /*********************************************************************/
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormEditData").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
@@ -190,7 +203,7 @@
             let Informacion = $("#FormEditData").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>'},
+                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$DataID['data']; ?>'},
                 ],
                 showNoti:'Datos Editados Correctamente',
                 triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
@@ -204,7 +217,7 @@
     /*********************************************************************/
     /*                             IMAGENES                              */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     function delIMG(File) {
         Swal.fire({
             title: "Borrar Imagen",
@@ -228,7 +241,7 @@
                     "Direccion_img": File
                 };
                 const Options     = {
-                    Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>',
+                    Destino:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$DataID['data']; ?>',
                     closeObject:'#PDloader',
                 };
                 //Se envian los datos al formulario
@@ -239,10 +252,10 @@
     /*********************************************************************/
     /*                          OBSERVACIONES                            */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     // Variables
     let ObsLoad = 0;
-    /******************************************/
+    /************************************/
     function tabObsLoadList() {
         //Comparo
         if(ObsLoad===0){
@@ -250,7 +263,7 @@
             $('#PDloader').show();
             //Ejecuto
             let Div       = '#tabObsDataTable';
-            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>';
+            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$DataID['data']; ?>';
             const Options = {
                 closeObject:'#PDloader',
                 refreshTables:'true',
@@ -261,7 +274,7 @@
             ObsLoad = 1;
         }
     }
-    /******************************************/
+    /************************************/
     function tabObsNew(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -275,7 +288,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabObsView(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -289,7 +302,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabObsEdit(ID) {
         //Cargo el loader
         $('#PDloader').show();
@@ -303,7 +316,7 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /******************************************/
+    /************************************/
     function tabObsDel(ID, Dato) {
         Swal.fire({
             title: "Borrar Dato",
@@ -325,7 +338,7 @@
                 let Informacion = {"idObservaciones": ID};
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']); ?>', refreshTbl:'true'}
+                        {Div:'#tabObsDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                     ],
                     showNoti:'Dato Borrado Correctamente',
                     closeObject:'#PDloader',

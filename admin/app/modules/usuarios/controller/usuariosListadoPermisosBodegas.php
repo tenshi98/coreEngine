@@ -4,13 +4,15 @@
 /*******************************************************************************************************************/
 class usuariosListadoPermisosBodegas extends ControllerBase {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $Codification;
     private $ServerServer;
 
-    /******************************************************************************/
-    //Constructor
+    /*******************************************************************/
+    // Constructor
+    /*******************************************************************/
     public function __construct(){
         /*=========== Se instancian los datos ===========*/
         $DB_conn_1     = Database::getSQLConnection(ConfigDataBase::MySQL_1);
@@ -26,130 +28,148 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
     /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
-    /******************************************************************************/
-    //Editar por put (solo modificar datos)
-    //Editar por post (modificar y subir archivos)
+    /*******************************************************************/
+    // Editar por put (solo modificar datos)
+    // Editar por post (modificar y subir archivos)
+    /*******************************************************************/
     public function Update(){
-        //Verificacion metodo POST
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-            /*******************************************************************/
-            //Se traen los permisos
-            $query = [
-                'data'    => '
-                    idBodegas,
-                    idBodegas AS ID,
-                    (SELECT COUNT(idPermisoUsuario) FROM bodegas_listado_permisos_usuarios WHERE idBodegas = ID AND idUsuario = '.$_POST['idUsuario'].' LIMIT 1) AS cuentaPerms',
-                'table'   => 'bodegas_listado',
-                'join'    => '',
-                'where'   => 'idEstado = ?',
-                'params'  => [1],
-                'group'   => '',
-                'having'  => '',
-                'order'   => 'idBodegas ASC',
-                'limit'   => ConfigAPP::APP["N_MaxItems"]
-            ];
-            // Ejecuto la query
-            $xParams     = ['query' => $query];
-            $arrPermisos = $this->Base_GetList($xParams);
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
-            /*******************************************************************/
-            // Si hay datos
-            if ($arrPermisos['status']){
-                // Se acumulan las filas a insertar para evitar un INSERT por cada recurso nuevo (N+1)
-                $rowsPermisosNuevos = [];
-                // Recorro los permisos
-                foreach ($arrPermisos['data'] as $permisos){
-                    // Se verifica si esta marcado
-                    switch ($_POST['switch_'.$permisos['idBodegas']]) {
-                        /*******************************************************************/
-                        // Inactivo
-                        case 1:
-                            // Se verifica si permiso existe
-                            switch ($permisos['cuentaPerms']) {
-                                /*******************************************************************/
-                                // No existe permiso previo
-                                case 0:
-                                    // Nada
-                                    break;
-                                /*******************************************************************/
-                                // Si hay al menos un permiso
-                                default:
-                                    /******************************/
-                                    // Se borran los datos
-                                    $Post = [
-                                        'idUsuario'  => $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']),
-                                        'idBodegas'  => $this->Codification->encryptDecrypt('encrypt',$permisos['idBodegas']),
-                                    ];
-                                    /******************************/
-                                    // Se genera la query
-                                    $query = [
-                                        'files'       => '',
-                                        'table'       => 'bodegas_listado_permisos_usuarios',
-                                        'where'       => 'idUsuario,idBodegas',
-                                        'SubCarpeta'  => '',
-                                        'Post'        => $Post
-                                    ];
-                                    // Ejecuto la query
-                                    $xParams = ['query' => $query];
-                                    $this->Base_delete($xParams);
-                                    break;
-                            }
-                            break;
-                        /*******************************************************************/
-                        // Activo
-                        case 2:
-                            // Verifico si existe
-                            switch ($permisos['cuentaPerms']) {
-                                /*******************************************************************/
-                                // Si no hay permisos se crea
-                                case 0:
-                                    /******************************/
-                                    // Se acumula la fila para insertarla junto con el resto de recursos nuevos
-                                    $rowsPermisosNuevos[]    = [
-                                        'idUsuario'     => $_POST['idUsuario'],
-                                        'idBodegas'     => $permisos['idBodegas'],
-                                        'fechaCreacion' => $this->ServerServer->fechaActual(),
-                                    ];
-                                    break;
-                            }
-                            break;
-                    }
-                }
+        /*******************************************************************/
+        //Se traen los permisos
+        $query = [
+            'data'    => '
+                idBodegas,
+                idBodegas AS ID,
+                (SELECT COUNT(idPermisoUsuario) FROM bodegas_listado_permisos_usuarios WHERE idBodegas = ID AND idUsuario = '.$_POST['idUsuario'].' LIMIT 1) AS cuentaPerms',
+            'table'   => 'bodegas_listado',
+            'join'    => '',
+            'where'   => 'idEstado = ?',
+            'params'  => [1],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'idBodegas ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams     = ['query' => $query];
+        // Ejecuto la query
+        $arrPermisos = $this->Base_GetList($xParams);
 
-                /******************************/
-                // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
-                if ($rowsPermisosNuevos){
-                    //Se genera el chequeo
-                    $DataCheck = $this->dataCheck('');
-                    // Se genera la query
-                    $query = [
-                        'data'      => 'idUsuario,idBodegas,fechaCreacion',
-                        'required'  => 'idUsuario,idBodegas',
-                        'table'     => 'bodegas_listado_permisos_usuarios',
-                        'rows'      => $rowsPermisosNuevos
-                    ];
-                    // Ejecuto la query
-                    $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
-                    $this->Base_insertMultiple($xParams);
+        /*******************************************************************/
+        // Si hay datos
+        if ($arrPermisos['status']){
+            // Se acumulan las filas a insertar para evitar un INSERT por cada permiso nuevo (N+1)
+            $rowsPermisosNuevos = [];
+            // Recorro los permisos
+            foreach ($arrPermisos['data'] as $permisos){
+                // Se verifica si esta marcado
+                switch ($_POST['switch_'.$permisos['idBodegas']]) {
+                    /*******************************************************************/
+                    // Inactivo
+                    case 1:
+                        // Se verifica si permiso existe
+                        switch ($permisos['cuentaPerms']) {
+                            /*******************************************************************/
+                            // No existe permiso previo
+                            case 0:
+                                // Nada
+                                break;
+                            /*******************************************************************/
+                            // Si hay al menos un permiso
+                            default:
+                                /************************************/
+                                // Se obtiene el ID
+                                $UsuarioID  = $this->Codification->encryptDecrypt('encrypt',$_POST['idUsuario']);
+                                $BodegasID  = $this->Codification->encryptDecrypt('encrypt',$permisos['idBodegas']);
+                                // Se verifica
+                                if (!$this->isValidDecrypted($UsuarioID, 'text')) {
+                                    Response::error('Registro inválido', 400);
+                                }
+                                if (!$this->isValidDecrypted($BodegasID, 'text')) {
+                                    Response::error('Registro inválido', 400);
+                                }
+                                // Se borran los datos
+                                $Post = [
+                                    'idUsuario'  => $UsuarioID['data'],
+                                    'idBodegas'  => $BodegasID['data'],
+                                ];
+                                /************************************/
+                                // Se genera la query
+                                $query = [
+                                    'files'       => '',
+                                    'table'       => 'bodegas_listado_permisos_usuarios',
+                                    'where'       => 'idUsuario,idBodegas',
+                                    'SubCarpeta'  => '',
+                                    'Post'        => $Post
+                                ];
+                                // Preparo los datos
+                                $xParams = ['query' => $query];
+                                // Ejecuto la query
+                                $this->Base_delete($xParams);
+                                break;
+                        }
+                        break;
+                    /*******************************************************************/
+                    // Activo
+                    case 2:
+                        // Verifico si existe
+                        switch ($permisos['cuentaPerms']) {
+                            /*******************************************************************/
+                            // Si no hay permisos se crea
+                            case 0:
+                                /************************************/
+                                // Se acumula la fila para insertarla junto con el resto de recursos nuevos
+                                $rowsPermisosNuevos[]    = [
+                                    'idUsuario'     => $_POST['idUsuario'],
+                                    'idBodegas'     => $permisos['idBodegas'],
+                                    'fechaCreacion' => $this->ServerServer->fechaActual(),
+                                ];
+                                break;
+                        }
+                        break;
                 }
             }
 
-            /******************************/
-            // Devuelvo true con código 200 (OK)
-            Response::success(true);
-        }else {
-            // Request Method no esperado
-            Response::error('Error en el Request Method', 500);
+            /************************************/
+            // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
+            if ($rowsPermisosNuevos){
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck('');
+                /************************************/
+                // Se genera la query
+                $query = [
+                    'data'      => 'idUsuario,idBodegas,fechaCreacion',
+                    'required'  => 'idUsuario,idBodegas',
+                    'table'     => 'bodegas_listado_permisos_usuarios',
+                    'rows'      => $rowsPermisosNuevos
+                ];
+                // Preparo los datos
+                $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
+                // Ejecuto la query
+                $this->Base_insertMultiple($xParams);
+            }
         }
+
+        /************************************/
+        // Devuelvo true con código 200 (OK)
+        Response::success(true);
+
     }
 
 
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /******************************************************************************/
-    //Se validan los datos
+    /*******************************************************************/
+    // Se validan los datos
+    /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
@@ -182,7 +202,7 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
             'ValidarSoloLetras'         => '',
             'Post'                      => $POST,
         ];
-        //Devuelvo
+        // Retorno los datos
         return $DataChecking;
     }
 

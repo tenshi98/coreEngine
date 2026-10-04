@@ -4,6 +4,7 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
+
 <form id="FormUpdatePermisosMaquinas" name="FormUpdatePermisosMaquinas" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <table class="table table-sm table-hover">
         <thead>
@@ -14,9 +15,9 @@
         </thead>
         <tbody>
             <?php
-            //Verifico si hay datos
+            // Verifico si hay datos
             if(is_array($data['arrPermisosMaquinas'])&&!empty($data['arrPermisosMaquinas'])){
-                //Recorro
+                // Recorro
                 foreach ($data['arrPermisosMaquinas'] as $perm){
                     //si tiene permiso
                     if(isset($perm['cuentaPerms'])&&$perm['cuentaPerms']!=0){
@@ -55,7 +56,7 @@
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     $("#FormUpdatePermisosMaquinas").submit(function(e) {
         // Si ya se está ejecutando, salimos
         if (ejecutandoForm.valor) return;
@@ -79,4 +80,3 @@
     });
 
 </script>
-

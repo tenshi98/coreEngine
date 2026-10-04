@@ -15,11 +15,11 @@
         </thead>
         <tbody>
             <?php
-            //Verifico si hay datos
+            // Verifico si hay datos
             if(is_array($data['arrPermisos'])&&!empty($data['arrPermisos'])){
                 //filtro
                 $newData = $data['Fnc_CommonData']->agruparPorClave ($data['arrPermisos'], 'PermisosCat' );
-                //Recorro
+                // Recorro
                 foreach ($newData as $Categoria=>$permisos){
                     //imprimimos la categoría
                     echo ' <tr class="table-secondary"><td colspan="7"><strong>'.$Categoria.'</strong></td></tr>';
@@ -109,7 +109,7 @@
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/
-    /******************************************/
+    /************************************/
     <?php
     echo 'const div = [];';
     foreach ($data['arrPermisos'] as $perm){
@@ -122,7 +122,7 @@
     }
     ?>
 
-    /******************************************/
+    /************************************/
     function activar(ID) {
         //Mostrar
         if (div[ID]==0) {
@@ -133,7 +133,7 @@
             div[ID] = 0;
         }
     }
-    /******************************************/
+    /************************************/
     $("#FormUpdatePermisos").submit(function(e) {
         // Si ya se está ejecutando, salimos
         if (ejecutandoForm.valor) return;
