@@ -15,6 +15,7 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>">  <i class="bi bi-card-list text-color-blue"></i> Configuracion Sistema</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/instalacion/resumen'; ?>">    <i class="bi bi-card-list text-color-blue"></i> Instalacion de Modulos</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/rutas/listado'; ?>">          <i class="bi bi-card-list text-color-blue"></i> Comparación Rutas</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/plataforma/testeos/resumen'; ?>">        <i class="bi bi-clipboard-check text-color-blue"></i> Sistema de Testeos</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -24,9 +25,8 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Pruebas</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/controladores'; ?>">           <i class="bi bi-gear        text-color-gray"></i> Pruebas controlador</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/funciones'; ?>">               <i class="bi bi-gear        text-color-gray"></i> Pruebas funciones</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/inteligenciaArtificial'; ?>">  <i class="bi bi-chat-square text-color-gray"></i> Pruebas IA</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/controladores'; ?>">  <i class="bi bi-gear text-color-gray"></i> Pruebas controlador</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/testeos/funciones'; ?>">      <i class="bi bi-gear text-color-gray"></i> Pruebas funciones</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -107,18 +107,19 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
         <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
             <li class="dropdown-header">Widgets</li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/box'; ?>">           <i class="bi bi-puzzle text-color-red"></i> Box</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Time Line</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/dividers'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Divider</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/components'; ?>">    <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">      <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/codeVisor'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Visor de Codigo</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/meteo'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget meteorologico</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/feed'; ?>">          <i class="bi bi-puzzle text-color-red"></i> Feed de noticias</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/radio'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Widget radio</a></li>
-            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/fileExplorer'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Widget fileExplorer</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/box'; ?>">              <i class="bi bi-puzzle text-color-red"></i> Box</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/timeLine'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Time Line</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/dividers'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Divider</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/textDividers'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Text Divider</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/components'; ?>">       <i class="bi bi-puzzle text-color-red"></i> Componentes Web</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/calendar'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Calendario</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/treeview'; ?>">         <i class="bi bi-puzzle text-color-red"></i> Treeview</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/codeVisor'; ?>">        <i class="bi bi-puzzle text-color-red"></i> Visor de Codigo</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/meteo'; ?>">            <i class="bi bi-puzzle text-color-red"></i> Widget meteorologico</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/feed'; ?>">             <i class="bi bi-puzzle text-color-red"></i> Feed de noticias</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/radio'; ?>">            <i class="bi bi-puzzle text-color-red"></i> Widget radio</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/fileExplorer'; ?>">     <i class="bi bi-puzzle text-color-red"></i> Widget fileExplorer</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Widgets/viewsComponents'; ?>">  <i class="bi bi-puzzle text-color-red"></i> Componentes para Vistas</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>
@@ -153,6 +154,17 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/apexcharts'; ?>">     <i class="bi bi-bar-chart-line text-color-amber-text"></i> Apexcharts</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/chartjs'; ?>">        <i class="bi bi-bar-chart-line text-color-amber-text"></i> Chartjs</a></li>
             <li><a class="notification-item" href="<?php echo $BASE.'/Core/Graficos/echarts'; ?>">        <i class="bi bi-bar-chart-line text-color-amber-text"></i> Echarts</a></li>
+            <li><hr class="dropdown-divider"></li>
+        </ul>
+    </li>
+
+    <li class="nav-item dropdown">
+        <a class="nav-link nav-icon" href="#" data-bs-toggle="dropdown"><i class="bi bi-card-list"></i></a>
+        <ul class="dropdown-menu dropdown-menu-end dropdown-menu-arrow notifications">
+            <li class="dropdown-header">Páginas</li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Paginas/error404'; ?>">     <i class="bi bi-file-earmark-code text-color-amber-text"></i> Error 404</a></li>
+            <li><a class="notification-item" href="<?php echo $BASE.'/Core/Paginas/error5xx'; ?>">     <i class="bi bi-file-earmark-code text-color-amber-text"></i> Error 5xx</a></li>
             <li><hr class="dropdown-divider"></li>
         </ul>
     </li>

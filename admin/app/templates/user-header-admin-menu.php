@@ -17,15 +17,15 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
                 <li><a href="<?php echo $BASE.'/Core/plataforma/configuracion/resumen'; ?>">  <i class="bi bi-card-list text-color-blue"></i> Configuracion Sistema</a></li>
                 <li><a href="<?php echo $BASE.'/Core/plataforma/instalacion/resumen'; ?>">    <i class="bi bi-card-list text-color-blue"></i> Instalacion de Modulos</a></li>
                 <li><a href="<?php echo $BASE.'/Core/plataforma/rutas/listado'; ?>">          <i class="bi bi-card-list text-color-blue"></i> Comparación Rutas</a></li>
+                <li><a href="<?php echo $BASE.'/Core/plataforma/testeos/resumen'; ?>">        <i class="bi bi-clipboard-check text-color-blue"></i> Sistema de Testeos</a></li>
             </ul>
         </li>
 
         <li class="col-xs-12 col-sm-6 col-md-4 col-lg-4 col-xl-4 col-xxl-4">
             <ul>
                 <li class="dropdown-tittle">Pruebas</li>
-                <li><a href="<?php echo $BASE.'/Core/testeos/controladores'; ?>">           <i class="bi bi-gear        text-color-gray"></i> Pruebas controlador</a></li>
-                <li><a href="<?php echo $BASE.'/Core/testeos/funciones'; ?>">               <i class="bi bi-gear        text-color-gray"></i> Pruebas funciones</a></li>
-                <li><a href="<?php echo $BASE.'/Core/testeos/inteligenciaArtificial'; ?>">  <i class="bi bi-chat-square text-color-gray"></i> Pruebas IA</a></li>
+                <li><a href="<?php echo $BASE.'/Core/testeos/controladores'; ?>">   <i class="bi bi-gear text-color-gray"></i> Pruebas controlador</a></li>
+                <li><a href="<?php echo $BASE.'/Core/testeos/funciones'; ?>">       <i class="bi bi-gear text-color-gray"></i> Pruebas funciones</a></li>
                 <li class="divider"></li>
             </ul>
             <ul>
