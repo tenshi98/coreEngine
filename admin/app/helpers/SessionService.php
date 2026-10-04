@@ -25,7 +25,7 @@ class SessionService {
      */
     public function create($f3, $arrData, $createCoockie = false){
 
-        /******************************/
+        /************************************/
         // Seteo las variables
         if(isset($arrData['TokenUser'])){    $f3->set('SESSION.TokenUser',    $arrData['TokenUser']);}     // Token del usuario
         if(isset($arrData['TokenExpires'])){ $f3->set('SESSION.TokenExpires', $arrData['TokenExpires']);}  // Token valido por 1 dia
@@ -34,7 +34,7 @@ class SessionService {
         if(isset($arrData['arrPermisos'])){  $f3->set('SESSION.arrPermisos',  $arrData['arrPermisos']);}   // Rutas
         if(isset($arrData['arrLevel'])){     $f3->set('SESSION.arrLevel',     $arrData['arrLevel']);}      // Niveles de permisos
 
-        /******************************/
+        /************************************/
         // Se genera la cookie con expiración de 1 día
         if($createCoockie){
             setcookie(
@@ -68,11 +68,11 @@ class SessionService {
      */
     public function check($f3, $cookieToken){
 
-        /******************************/
+        /************************************/
         // Se verifica la existencia de la coockie
         if (empty($cookieToken)) { return false; }
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $userSessionDataService  = new UserSessionDataService();
         // Se valida el acceso en la base de datos, si aun tiene una sesion activa
@@ -82,7 +82,7 @@ class SessionService {
             return false;
         }
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $userRepository = new UserRepository();
         // Se obtienen los datos del usuario
@@ -97,7 +97,7 @@ class SessionService {
             return false;
         }
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $authenticationService = new AuthenticationService();
         $sessionService        = new SessionService();
@@ -129,16 +129,16 @@ class SessionService {
      */
     public function validate($Token, $TokenExpires, $TokenUser, $UserData){
 
-        /******************************/
+        /************************************/
         // Se verifica la existencia de la coockie
         if (empty($Token)) { return false; }
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
 		$ServerClient = new FunctionsServerClient();
         // Se verifica
         try {
-            /******************************/
+            /************************************/
             // Verifico la expiracion
             if ($TokenExpires!='' && date('Y-m-d H:i:s') > $TokenExpires) {  return false;}
             // Se compara si el valor de la coockie es distinto al de la sesion en el servidor
@@ -164,7 +164,7 @@ class SessionService {
      */
     public function refresh($f3){
 
-        /******************************/
+        /************************************/
         // Limpio las variables
         $f3->clear('SESSION.DataInfo');  //Datos del usuario
 
@@ -182,7 +182,7 @@ class SessionService {
      */
     public function destroy($f3){
 
-        /******************************/
+        /************************************/
         // Limpio las variables
         $f3->clear('SESSION.TokenUser');    //Token del usuario
         $f3->clear('SESSION.TokenExpires'); //token valido por 1 dia
@@ -191,7 +191,7 @@ class SessionService {
         $f3->clear('SESSION.arrPermisos');  //Rutas
         $f3->clear('SESSION.arrLevel');     //Niveles de permisos
 
-        /******************************/
+        /************************************/
         // Se limpian las cookies
         setcookie('Sesion_tk','',time()-1);
         // También es recomendable unset($_COOKIE['']) para borrar la cookie de la superglobal $_COOKIE

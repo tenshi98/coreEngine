@@ -8,8 +8,9 @@
  */
 class PasswordService {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $Passwords;
 
     /******************************************************************************/
@@ -35,18 +36,18 @@ class PasswordService {
      */
     public function verify($PostPassword, $DBPassword){
 
-        /******************************************/
+        /************************************/
         // Llamo a las otras clases
 		$response = false;
 
-        /******************************/
+        /************************************/
         // Se verifica la contraseña
         $checkPassword = $this->Passwords->hashVerify($PostPassword, $DBPassword);
         if($checkPassword===true){
             $response = $checkPassword;
         }
 
-        /******************************/
+        /************************************/
 		// Retorno de datos
         return $response;
 
@@ -61,13 +62,14 @@ class PasswordService {
      */
     public function generate(){
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $SecurityPasswords = new FunctionsSecurityPasswords();
+        $NewPassword       = $SecurityPasswords->generarPassword(20,'alfanumerico');
 
-        /******************************/
+        /************************************/
         // Retorno de datos
-        return $SecurityPasswords->generarPassword(20,'alfanumerico');
+        return $NewPassword['data'];
 
     }
 

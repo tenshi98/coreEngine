@@ -9,8 +9,9 @@
  */
 class UserSessionDataService {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $DBConn;
     private $QBuilder;
 
@@ -41,16 +42,16 @@ class UserSessionDataService {
      */
     public function checkAccess($cookieToken){
 
-        /******************************************/
+        /************************************/
         // Se crea el arreglo
 		$response['status'] = false;
         $response['data']   = null;
 
-        /******************************************/
+        /************************************/
         // Se cargan las clases
 		$ServerClient  = new FunctionsServerClient();
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'   => 'idUsuario, IP_Client, token, expiration_date',
@@ -65,21 +66,21 @@ class UserSessionDataService {
         // Verifico si hay un dato
         $result = $this->QBuilder->queryRow($query, $this->DBConn);
 
-        /******************************/
+        /************************************/
         // Si no hay resultados
         if ($result === false || !isset($result['status']) || $result['status'] === false) {
             // Retorno de datos
             return $response;
         }
 
-        /******************************/
+        /************************************/
 		// Se compara la IP para evitar accesos no autorizados
         if (!isset($result['data']['IP_Client']) || $result['data']['IP_Client'] != $ServerClient->getClientIp()) {
             // Retorno de datos
             return $response;
         }
 
-        /******************************/
+        /************************************/
 		// Retorno de datos
         $response['status'] = true;
         $response['data']   = $result['data'];
@@ -116,6 +117,7 @@ class UserSessionDataService {
             'idEstado'        => 1,
             'idTipoAcceso'    => 1, // Acceso Web
         ];
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idUsuario, Fecha, Hora, DateTime, IP_Client, Agent_Transp, idSistema, token, expiration_date, idEstado, idTipoAcceso',
@@ -145,6 +147,7 @@ class UserSessionDataService {
         $Post['idUsuario']    = $UsuarioID;
         $Post['idEstado']     = 2; //inactivo
         $Post['idTipoAcceso'] = 1; // Acceso Web
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idEstado',

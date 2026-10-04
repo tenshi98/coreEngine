@@ -6,8 +6,9 @@
  */
 class UserRepository {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $DB_conn;
     private $queryBuilder;
 
@@ -69,6 +70,7 @@ class UserRepository {
             'IP_Client'       => $Client->getClientIp(),
             'Agent_Transp'    => $Client->getBrowser(),
         ];
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idUsuario,Ultimo_acceso,IP_Client,Agent_Transp',
@@ -101,6 +103,7 @@ class UserRepository {
             'idUsuario' => $UsuarioID,
             'password'  => $NewPasswords,
         ];
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'password',
@@ -146,7 +149,7 @@ class UserRepository {
             'UserIP'             => $Client->getClientIp(),
             'MainPathUrl'        => $FileManager->getMainPathUrl(),
         ];
-        /******************************/
+        /************************************/
         // Se cargan los datos de la plataforma
         $query = [
             'data'   => '*',
@@ -161,13 +164,13 @@ class UserRepository {
         // Verifico si hay un dato
         $rowOpciones = $this->queryBuilder->queryRow($query, $this->DB_conn);
 
-        /******************************/
+        /************************************/
         // Si no hay resultados, se evita fusionar con un valor que no sea array
         $datosSistema = (isset($rowOpciones['status']) && $rowOpciones['status'] === true && is_array($rowOpciones['data']))
             ? $rowOpciones['data']
             : [];
 
-        /******************************/
+        /************************************/
         // Retorno de datos
         return array_merge($rowUsuario, $datosSistema);
     }
@@ -184,12 +187,12 @@ class UserRepository {
      */
     private function searchData(String $Data, String $Param): ?array {
 
-        /******************************************/
+        /************************************/
         // Llamo a las otras clases
 		$response['status'] = false;
         $response['data']   = '';
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'   => '
@@ -217,14 +220,14 @@ class UserRepository {
         // Verifico si hay un dato
         $result = $this->queryBuilder->queryRow($query, $this->DB_conn);
 
-        /******************************/
+        /************************************/
         // Si no hay resultados
         if ($result === false || !isset($result['status']) || $result['status'] === false) {
             // Retorno de datos
             return $response;
         }
 
-        /******************************/
+        /************************************/
 		// Retorno de datos
         $response['status'] = true;
         $response['data']   = $result['data'];
@@ -240,12 +243,12 @@ class UserRepository {
      */
     public function getSystemData(): ?array {
 
-        /******************************************/
+        /************************************/
         // Llamo a las otras clases
 		$response['status'] = false;
         $response['data']   = null;
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'   => 'Config_motorEmail,Sistema_IMGLogo, Sistema_Direccion, Sistema_Email, Social_X, Social_Facebook, Social_Instagram, Social_Linkedin',
@@ -260,14 +263,14 @@ class UserRepository {
         // Verifico si hay un dato
         $result = $this->queryBuilder->queryRow($query, $this->DB_conn);
 
-        /******************************/
+        /************************************/
         // Si no hay resultados
         if ($result === false || !isset($result['status']) || $result['status'] === false) {
             // Retorno de datos
             return $response;
         }
 
-        /******************************/
+        /************************************/
 		// Retorno de datos
         $response['status'] = true;
         $response['data']   = $result['data'];

@@ -9,8 +9,9 @@
  */
 class BruteForceService {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $DBConn;
     private $QBuilder;
 
@@ -44,7 +45,7 @@ class BruteForceService {
         // Variable
         $TimeValid = time() - (2 * 60 * 60);  //Tiempo actual menos 2 horas
 
-        /******************************/
+        /************************************/
         // Se genera la query
         $query = [
             'data'   => 'idAcceso',
@@ -58,7 +59,7 @@ class BruteForceService {
             'limit'  => 60
         ];
 
-        /******************************/
+        /************************************/
         // Ejecuto la query
         $num_rows = $this->QBuilder->queryNRows($query, $this->DBConn);
 
@@ -99,7 +100,7 @@ class BruteForceService {
      */
     public function register($Fecha, $Hora, $DateTime, $Email, $Password, $IP_Client, $Agent_Transp){
 
-        /******************************/
+        /************************************/
         // Se agrega respuesta
         $Post = [
             'Fecha'        => $Fecha,
@@ -110,6 +111,7 @@ class BruteForceService {
             'IP_Client'    => $IP_Client,
             'Agent_Transp' => $Agent_Transp,
         ];
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'Fecha, Hora, DateTime, Email, Password, IP_Client, Agent_Transp',

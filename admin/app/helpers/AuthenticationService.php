@@ -10,8 +10,9 @@
  */
 class AuthenticationService {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $userRepository;
     private $CommonData;
 
@@ -47,13 +48,13 @@ class AuthenticationService {
      */
     public function authenticate($f3, $POST){
 
-        /******************************************/
+        /************************************/
         // Se cargan las clases
         $Server            = new FunctionsServerServer();
 		$Client            = new FunctionsServerClient();
         $bruteForceService = new BruteForceService();
 
-        /******************************************/
+        /************************************/
         // Variables
         $dataVars = $this->loadVars($Server, $Client);
 
@@ -102,13 +103,13 @@ class AuthenticationService {
      */
     public function recoverPassword($f3, $POST){
 
-        /******************************************/
+        /************************************/
         // Se cargan las clases
         $Server            = new FunctionsServerServer();
 		$Client            = new FunctionsServerClient();
         $bruteForceService = new BruteForceService();
 
-        /******************************************/
+        /************************************/
         // Variables
         $dataVars = $this->loadVars($Server, $Client);
 
@@ -153,23 +154,23 @@ class AuthenticationService {
      */
     public function closeSession($f3){
 
-        /******************************/
+        /************************************/
         // Obtengo el id del usuario
         $UsuarioID = $f3->get('SESSION.DataInfo.UserID');
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $userSessionDataService = new UserSessionDataService();
         // Se desactivan todas las sesiones anteriores
         $userSessionDataService->disabledAllAccess($UsuarioID);
 
-        /******************************************/
+        /************************************/
         // Se cargan las clases
         $sessionService = new SessionService();
         // Se elimina cualquier dato existente de las sesiones
         $sessionService->destroy($f3);
 
-        /******************************/
+        /************************************/
         // Retorno de datos
         return ['code' => 200, 'message' => 'Sesion cerrada correctamente'];
 
@@ -200,28 +201,28 @@ class AuthenticationService {
      */
     public function createSession($f3, $rowData, $sessionService, $passwordService, $Server, $Client){
 
-        /******************************************/
+        /************************************/
         // Variable vacia
         $arrData = [];
 
-        /******************************************/
+        /************************************/
         // Se elimina cualquier dato existente de las sesiones
         $sessionService->destroy($f3);
 
-        /******************************************/
+        /************************************/
         // Regenera el ID de sesión para evitar fijación de sesión
         session_regenerate_id(true);
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $Operations = new FunctionsDataOperations();
 
-        /******************************/
+        /************************************/
         // Se generan Variables
         $arrData['TokenUser']    = $passwordService->generate();
         $arrData['TokenExpires'] = $Operations->sumarDias($Server->fechaActual(),1).' '.$Server->horaActual();
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $userSessionDataService = new UserSessionDataService();
         // Se desactivan todas las sesiones anteriores
@@ -231,15 +232,15 @@ class AuthenticationService {
         // Se actualiza la sesion actual del usuario
         $this->userRepository->updateUserAccess($rowData['idUsuario'], $Server, $Client);
 
-        /******************************/
+        /************************************/
         // Se arman los datos de menu, permisos y niveles
         $arrData = array_merge($arrData, $this->buildSessionPayload($rowData, $Client));
 
-        /******************************/
+        /************************************/
         // Se crean la sesion y la coockie
         $sessionService->create($f3, $arrData, true);
 
-        /******************************/
+        /************************************/
         // Retorno de datos
         return ['code' => 200, 'message' => 'Acceso Correcto'];
 
@@ -263,38 +264,38 @@ class AuthenticationService {
      */
     public function regenerateSession($f3, $rowData, $sessionService, $passwordService, $Server, $Client){
 
-        /******************************************/
+        /************************************/
         // Se elimina cualquier dato existente de las sesiones
         $sessionService->destroy($f3);
 
-        /******************************************/
+        /************************************/
         // Regenera el ID de sesión para evitar fijación de sesión
         session_regenerate_id(true);
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $Operations = new FunctionsDataOperations();
 
-        /******************************/
+        /************************************/
         // Variable vacia
         $arrData = [];
         // Se generan Variables
         $arrData['TokenUser']    = $passwordService->generate();
         $arrData['TokenExpires'] = $Operations->sumarDias($Server->fechaActual(),1).' '.$Server->horaActual();
 
-        /******************************/
+        /************************************/
         // Se actualiza la sesion actual del usuario
         $this->userRepository->updateUserAccess($rowData['idUsuario'], $Server, $Client);
 
-        /******************************/
+        /************************************/
         // Se arman los datos de menu, permisos y niveles
         $arrData = array_merge($arrData, $this->buildSessionPayload($rowData, $Client));
 
-        /******************************/
+        /************************************/
         // Se crea la sesion y se renueva la coockie con el nuevo token
         $sessionService->create($f3, $arrData, true);
 
-        /******************************/
+        /************************************/
         // Retorno de datos
         return true;
 
@@ -315,14 +316,14 @@ class AuthenticationService {
      */
     private function buildSessionPayload($rowData, $Client){
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $permissionService = new PermissionService();
         // Se obtienen los datos
         $arrMenu     = $permissionService->getMenu($rowData['idTipoUsuario'], $rowData['idUsuario']);
         $arrPermisos = $permissionService->getRoutes($rowData['idTipoUsuario'], $rowData['idUsuario']);
 
-        /******************************/
+        /************************************/
         // Retorno de datos
         return [
             'DataInfo'    => $this->userRepository->getDataInfo($rowData, $Client),
@@ -343,29 +344,36 @@ class AuthenticationService {
      * @param SessionService $sessionService Servicio de manejo de SESSION.
      * @param object         $Client         Helper de datos de cliente.
      *
-     * @return bool true una vez actualizada la sesión.
+     * @return bool true si la sesión fue actualizada; false si no se pudo obtener el usuario.
      */
     public function updateSession($f3, $UsuarioID, $sessionService, $Client){
 
-        /******************************************/
-        // Se elimina los datos del usuario y la empresa
-        $sessionService->refresh($f3);
-
-        /******************************/
+        /************************************/
         // Obtengo los datos del usuario
         $rowData = $this->userRepository->findById($UsuarioID);
 
-        /******************************/
+        /************************************/
+        // Si no hay resultados, se conserva la sesion actual
+        if ($rowData['status'] !== true || !is_array($rowData['data'])) {
+            // Retorno de datos
+            return false;
+        }
+
+        /************************************/
+        // Se elimina los datos del usuario y la empresa
+        $sessionService->refresh($f3);
+
+        /************************************/
         // Variable vacia
         $arrData = [];
         // Se arman los datos a guardar
-        $arrData['DataInfo'] = $this->userRepository->getDataInfo($rowData, $Client);
+        $arrData['DataInfo'] = $this->userRepository->getDataInfo($rowData['data'], $Client);
 
-        /******************************/
+        /************************************/
         // Se actualiza la sesion
         $sessionService->create($f3, $arrData);
 
-        /******************************/
+        /************************************/
         // Retorno de datos
         return true;
 
@@ -421,7 +429,7 @@ class AuthenticationService {
      */
     private function checkAccessAttempt($dataVars, $POST, $bruteForceService, $requierePassword = true){
 
-        /******************************/
+        /************************************/
         // Validaciones
         if (empty($POST['email'])){
             // Retorno de datos
@@ -502,17 +510,17 @@ class AuthenticationService {
      */
     private function createDataLogin($f3, $dataVars, $POST, $Server, $Client, $bruteForceService){
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $sessionService = new SessionService();
         // Se elimina cualquier dato existente de las sesiones
         $sessionService->destroy($f3);
 
-        /******************************/
+        /************************************/
         // Validaciones
         $validateUser = $this->userRepository->findByEmail($POST['email']);
 
-        /******************************/
+        /************************************/
         // Si no hay resultados
         if(empty($validateUser['data'])){
             // Se guarda registro
@@ -521,7 +529,7 @@ class AuthenticationService {
             return ["code" => 400, "message" => "Credenciales incorrectas"];
         }
 
-        /******************************/
+        /************************************/
         // Verifico el estado
         if(isset($validateUser['data']['idEstado'])&&$validateUser['data']['idEstado']!=1){
             // Retorno de datos
@@ -532,7 +540,7 @@ class AuthenticationService {
             return ["code" => 500, "message" => "No hay password Almacenada"];
         }
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $passwordService = new PasswordService();
         // Se verifica la contraseña
@@ -544,7 +552,7 @@ class AuthenticationService {
             return ["code" => 401, "message" => "Credenciales incorrectas"];
         }
 
-        /******************************/
+        /************************************/
         // Se cargan los datos de la sesion
         $newSesion = $this->createSession($f3, $validateUser['data'], $sessionService, $passwordService, $Server, $Client);
         if ($newSesion === false) {
@@ -572,7 +580,7 @@ class AuthenticationService {
         // Validaciones
         $validateUser = $this->userRepository->findByEmail($POST['email']);
 
-        /******************************/
+        /************************************/
         // Si no hay resultados
         if($validateUser['status']===false){
             // Se guarda registro
@@ -581,14 +589,14 @@ class AuthenticationService {
             return ["code" => 400, "message" => "Credenciales incorrectas"];
         }
 
-        /******************************/
+        /************************************/
         // Verifico el estado
         if(isset($validateUser['data']['idEstado'])&&$validateUser['data']['idEstado']!=1){
             // Retorno de datos
             return ["code" => 403, "message" => "Usuario Inactivo"];
         }
 
-        /******************************/
+        /************************************/
 		// Retorno de datos
         return ["code" => 200, "data" => $validateUser['data']];
 
@@ -610,7 +618,7 @@ class AuthenticationService {
      */
     private function sendNewPassword($f3, $dataUser){
 
-        /******************************/
+        /************************************/
         // Se cargan los datos de la plataforma
         $SystemData = $this->userRepository->getSystemData();
         // Si no hay resultados
@@ -624,21 +632,21 @@ class AuthenticationService {
             return ["code" => 500, "message" => "No hay un motor de correos configurado"];
         }
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $Passwords = new FunctionsSecurityPasswords();
         // Se genera la nueva contraseña
         $NewPasswords  = $Passwords->generarPassword(10,'alfanumerico');
 
-        /******************************/
+        /************************************/
         // Se envia el correo primero: si falla, no se persiste la nueva contraseña
         try {
 
-            /******************************/
+            /************************************/
             // Se cargan las clases
             $mailService = new MailService();
             // Se entrega la info para el envio del correo
-            $Respuesta = $mailService->sendPasswordReset($f3, $dataUser, $SystemData, $NewPasswords);
+            $Respuesta = $mailService->sendPasswordReset($f3, $dataUser, $SystemData, $NewPasswords['data']);
 
             // Si no es la respuesta esperada
             if ($Respuesta!==true) {
@@ -650,11 +658,11 @@ class AuthenticationService {
             return ['code' => 500, 'message' => 'No se ha podido enviar el correo, contacte con el administrador'];
         }
 
-        /******************************/
+        /************************************/
         // El correo se envio correctamente, se actualiza la nueva contraseña
-        $Response = $this->userRepository->updateUserPassword($dataUser['idUsuario'], $NewPasswords);
+        $Response = $this->userRepository->updateUserPassword($dataUser['idUsuario'], $NewPasswords['data']);
 
-        /******************************/
+        /************************************/
         // Si hay respuesta positiva.
         if (!$Response){
             // Retorno de datos

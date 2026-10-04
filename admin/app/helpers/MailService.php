@@ -8,8 +8,9 @@
  */
 class MailService {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $DB_conn;
     private $queryBuilder;
 
@@ -38,13 +39,14 @@ class MailService {
      */
     public function sendPasswordReset($f3, $dataUser, $SystemData, $NewPasswords){
 
-        /******************************/
+        /************************************/
         // Se agrega respuesta
         $arrData = [
             'Asunto'  => 'Cambio de contraseña',
             'Hacia'   => $dataUser['email'],
             'Mensaje' => 'Se ha generado una nueva contraseña para el email '.$dataUser['email'].', su nueva contraseña es: '.$NewPasswords,
         ];
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'Asunto,Hacia,Mensaje',
@@ -52,7 +54,7 @@ class MailService {
             'Post'      => $arrData,
         ];
 
-        /******************************/
+        /************************************/
         // Se arma la informacion del sistema
         $UserData['Sistema_IMGLogo']   = $SystemData['data']['Sistema_IMGLogo'];
         $UserData['Sistema_Direccion'] = $SystemData['data']['Sistema_Direccion'];
@@ -63,7 +65,7 @@ class MailService {
         $UserData['Social_Linkedin']   = $SystemData['data']['Social_Linkedin'];
         $BASE                          = $f3->get('BASE');
 
-        /******************************/
+        /************************************/
         // Se cargan las clases
         $ControllerBase = new ControllerBase($this->DB_conn, $this->queryBuilder, '');
         // Se hace el envio del correo

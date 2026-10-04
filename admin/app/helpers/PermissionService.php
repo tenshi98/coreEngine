@@ -8,8 +8,9 @@
  */
 class PermissionService {
 
-    /******************************************************************************/
+    /*******************************************************************/
     // Variables
+    /*******************************************************************/
     private $DBConn;
     private $QBuilder;
 
@@ -167,11 +168,11 @@ class PermissionService {
      */
     public function getLevels($TipoUsuarioID, $arrMenu){
 
-        /******************************/
+        /************************************/
         // Se crea variable para los niveles de permisos
         $arrLevel = [];
         // Si hay datos
-        if ($arrMenu['status']){
+        if ($arrMenu['status'] === true) {
             // Se recorren las variables
             foreach ($arrMenu['data'] as $value) {
                 // Se crea la variable
