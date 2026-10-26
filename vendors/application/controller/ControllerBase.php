@@ -511,6 +511,86 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
+     * Bloquea (SELECT ... FOR UPDATE) una o mas filas dentro de la transaccion activa,
+     * para serializar escrituras concurrentes sobre datos compartidos (partes "lee y escribe"
+     * que de otro modo perderian actualizaciones entre si: controles de unicidad,
+     * verificaciones de solapamiento, recalculo de totales o stocks calculados en PHP).
+     *
+     * Debe llamarse JUSTO DESPUES de Base_transactionBegin() y ANTES de cualquier
+     * SELECT de la operacion: la primera lectura consistente de la transaccion
+     * crea el snapshot (REPEATABLE READ), y si ocurre antes del lock, el lock ya
+     * no basta para ver lo confirmado por otras transacciones.
+     *
+     * Reglas de uso:
+     * - Bloquear primero la fila padre (campana, documento, cotizacion, espacio)
+     *   y despues las filas de productos (el helper ya ordena por ID ascendente)
+     *   para evitar deadlocks entre flujos distintos.
+     * - En metodos que admiten 'newBDConn', pasar la misma conexion de la
+     *   transaccion; lockear siempre (aunque la transaccion la haya abierto
+     *   el llamador), abrir/confirmar solo si corresponde.
+     *
+     * @param string $table Nombre de la tabla a bloquear (solo [A-Za-z0-9_]).
+     * @param string $pkCol Columna del indice a filtrar (solo [A-Za-z0-9_]).
+     * @param array  $ids   Identificadores a bloquear (se castean a entero,
+     *                      se deduplican y se ordenan ascendentemente).
+     * @param mixed  $DBConn Conexion; por defecto la de la clase.
+     * @return array ['status' => true, 'data' => filas] |
+     *               ['status' => false, 'error' => string]
+     *
+     * @example
+     * ```php
+     *  $this->Base_transactionBegin();
+     *  // Se bloquea la campana para serializar la creacion de partidas concurrentes
+     *  $lock = $this->lockRowsForUpdate('campanas_listado', 'idCampana', [$_POST['idCampana']]);
+     *  if ($lock['status'] === false) {
+     *      $this->Base_transactionRollback();
+     *      Response::error('Error al operar con la Base de Datos', 500, $lock['error']);
+     *  }
+     * ```
+     *
+     */
+    protected function lockRowsForUpdate(string $table, string $pkCol, array $ids, $DBConn = null): array{
+
+        /**********************     Valores     **********************/
+        $DBConn = $DBConn ?? $this->DBConn;
+
+        /*************** Validaciones ***************/
+        // Los identificadores SQL (tabla y columna) viajan como literales en
+        // la sentencia: solo se aceptan caracteres seguros para evitar inyeccion.
+        if (!preg_match('/^[A-Za-z0-9_]+$/', $table) || !preg_match('/^[A-Za-z0-9_]+$/', $pkCol)) {
+            return ['status' => false, 'error' => 'Query Error: identificador de lock invalido'];
+        }
+        // Los valores siempre viajan bindeados; se normalizan a enteros
+        // positivos, se deduplican y se ordenan ascendentemente para que dos
+        // transacciones distintas adquieran los mismos locks en el mismo orden.
+        $ids = array_values(array_unique(array_map('intval', $ids)));
+        $ids = array_values(array_filter($ids, fn($v) => $v > 0));
+        sort($ids);
+        if (count($ids) === 0) {
+            return ['status' => false, 'error' => 'Query Error: lock sin identificadores'];
+        }
+
+        /*************** Generacion Query ***************/
+        // Se arma la sentencia con un placeholder por identificador
+        $placeholders = implode(',', array_fill(0, count($ids), '?'));
+        $ActionSQL    = 'SELECT '.$pkCol.' FROM `'.$table.'` WHERE '.$pkCol.' IN ('.$placeholders.') FOR UPDATE';
+
+        /*************** Ejecutar   ***************/
+        // Uso directo del QueryBuilder para enviar los valores bindeados
+        // (Base_queryExecute no admite parametros).
+        try {
+            $result = $this->queryBuilder->queryExecute($ActionSQL, $DBConn, false, false, $ids);
+            if ($result['status'] === false) {
+                return ['status' => false, 'error' => $result['error'] ?? '', 'data' => $result['internal_error'] ?? ''];
+            }
+            return ['status' => true, 'data' => $result['data']];
+        } catch (Exception $e) {
+            return ['status' => false, 'error' => $e->getMessage()];
+        }
+    }
+
+    /************************************************************************************************************/
+    /**
      * Confirma (COMMIT) una transacción previamente iniciada con Base_transactionBegin().
      *
      * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
@@ -553,6 +633,60 @@ class ControllerBase {
         } catch (Exception $e) {
             return ['status' => false, 'error' => 'No se pudo revertir la transacción: '.$e->getMessage()];
         }
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Revierte la transaccion activa y responde segun el origen del fallo de una operacion de escritura.
+     *
+     * Clasificacion de la respuesta:
+     * - checkingData/unique (array de mensajes) -> 400 "Registro inválido" con el array en data.
+     * - Excepcion SQL (logError: generico en 'error', firma 'QueryBuilder Error' en
+     *   'internal_error'/'data') -> 500 "Error al operar con la Base de Datos" con el
+     *   mensaje generico en data (sin fugas de SQL).
+     * - required/archivos/'Query Error' de Base_* -> 400 con el mensaje original.
+     *
+     * Es seguro llamarla sin transaccion activa: Base_transactionRollback() es no-op en ese caso.
+     *
+     * @param array $Response Respuesta con forma ['status' => false, 'error' => string|array, ...]
+     * @return void Termina la ejecucion via Response::error
+     *
+	 * @example
+     * ```php
+     * $Response = $this->Base_insert($xParams);
+     * if ($Response['status'] === false) { $this->failOperation($Response); }
+     *
+     * $this->Base_transactionCommit();
+     * Response::success($NuevoID);
+     * ```
+     */
+    protected function failOperation(array $Response){
+
+        /**********************  Revertir  **********************/
+        // Se revierte la transaccion activa (no-op si no hay transaccion)
+        $this->Base_transactionRollback();
+
+        /**********************  Origen del fallo  **********************/
+        // Mensaje devuelto por Base_*/QueryBuilder
+        $error  = $Response['error'] ?? '';
+        // Detalle tecnico: Base_* lo expone en 'data'; queryExecute directo en 'internal_error'
+        $detail = $Response['internal_error'] ?? ($Response['data'] ?? '');
+
+        /**********************  Errores de formato  **********************/
+        // checkingData/unique: array de mensajes -> 400 con el array tal cual
+        if (is_array($error)) {
+            Response::error('Registro inválido', 400, $error);
+        }
+
+        /**********************  Excepcion SQL  **********************/
+        // logError() emite el generico en 'error' y 'QueryBuilder Error: ...' en internal_error/data
+        if ((is_string($error) && str_contains($error, 'Se produjo un error al procesar la solicitud'))
+         || (is_string($detail) && str_contains($detail, 'QueryBuilder Error'))) {
+            Response::error('Error al operar con la Base de Datos', 500, $error);
+        }
+
+        /**********************  Reglas de validacion / archivos  **********************/
+        Response::error(($error !== '' ? $error : 'Registro inválido'), 400);
     }
 
     /************************************************************************************************************/

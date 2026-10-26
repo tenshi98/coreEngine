@@ -419,7 +419,7 @@ class ControllerInstaller {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($permisosID['status'] === false) {
-                // Se revierte la transaccion
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
                 // Se reporta el error
                 Response::error('Error al operar con la Base de Datos', 500, $permisosID['error']);
@@ -457,7 +457,7 @@ class ControllerInstaller {
                     /************************************/
                     // Si falla la ejecucion, se revierte de inmediato
                     if ($rutaID['status'] === false) {
-                        // Se revierte la transaccion
+                        // Se revierte la transaccion activa (no-op si no hay transaccion)
                         $this->Base_transactionRollback();
                         // Se reporta el error
                         Response::error('Error al operar con la Base de Datos', 500, $rutaID['error']);
@@ -564,7 +564,9 @@ class ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($Response['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     return false;
                 }
             }
@@ -596,7 +598,9 @@ class ControllerInstaller {
                     /************************************/
                     // Si falla la ejecucion, se revierte de inmediato
                     if ($Response['status'] === false) {
+                        // Se revierte la transaccion activa (no-op si no hay transaccion)
                         $this->Base_transactionRollback();
+                        // Se reporta el error
                         return false;
                     }
                 }
@@ -667,20 +671,21 @@ class ControllerInstaller {
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idPermisosCat,idEstado,idTipo,idLevelLimit',
-            'ValidarEntero'             => 'idPermisosCat,idEstado,idTipo,idLevelLimit',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Descripcion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idPermisosCat,idEstado,idTipo,idLevelLimit',
+            'ValidarEntero'              => 'idPermisosCat,idEstado,idTipo,idLevelLimit',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Descripcion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre' => 120,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Descripcion',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
@@ -706,34 +711,33 @@ class ControllerInstaller {
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idPermisos,idMetodo,idLevelLimit',
-            'ValidarEntero'             => 'idPermisos,idMetodo,idLevelLimit',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Descripcion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Descripcion',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idPermisos,idMetodo,idLevelLimit',
+            'ValidarEntero'              => 'idPermisos,idMetodo,idLevelLimit',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Descripcion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => 'Descripcion',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;
