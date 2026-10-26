@@ -12,6 +12,7 @@ class tercerosEntidadesListado extends ControllerBase {
     private $Codification;
     private $DataDate;
     private $WidgetsCommon;
+    private $WidgetsViews;
     private $DataNumbers;
 
     /*******************************************************************/
@@ -28,6 +29,7 @@ class tercerosEntidadesListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
 		$this->DataNumbers    = new FunctionsDataNumbers();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
@@ -444,6 +446,7 @@ class tercerosEntidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -525,6 +528,7 @@ class tercerosEntidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
@@ -601,6 +605,7 @@ class tercerosEntidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -640,9 +645,16 @@ class tercerosEntidadesListado extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Si se cambia la password, se fuerza el cambio en el primer ingreso
+        if(isset($_POST['password'])&&$_POST['password']!=''){
+            $_POST['PasswordForzarCambio'] = 1;
+            $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso',
+            'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'idEntidad,idEstado,idTipo,idTipoEntidad',
             'unique'    => 'Rut,Email,Fono1,Fono2',
             'encode'    => 'password',
@@ -663,14 +675,23 @@ class tercerosEntidadesListado extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -687,20 +708,43 @@ class tercerosEntidadesListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email,RepLegalEmail',
-            'ValidarNumero'             => 'Fono1,Fono2,RepLegalFono1,RepLegalFono2',
-            'ValidarEntero'             => '',
-            'ValidarRut'                => 'Rut,RepLegalRut',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'FNacimiento',
-            'ValidarHora'               => '',
-            'ValidarURL'                => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarLargoMinimo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email,RepLegalEmail',
+            'ValidarNumero'              => 'Fono1,Fono2,RepLegalFono1,RepLegalFono2',
+            'ValidarEntero'              => 'idEstado,idCiudad,idComuna,idSector,idSexo,idTipo,idTipoEntidad',
+            'ValidarRut'                 => 'Rut,RepLegalRut',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'FNacimiento',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
+            'ValidarLargoMinimo'         => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Rut'              => 15,
+                'RepLegalRut'      => 15,
+                'Fono1'            => 15,
+                'Fono2'            => 15,
+                'RepLegalFono1'    => 15,
+                'RepLegalFono2'    => 15,
+                'Social_X'         => 255,
+                'Social_Facebook'  => 255,
+                'Social_Instagram' => 255,
+                'Social_Linkedin'  => 255,
+                'Agent_Transp'     => 240,
+                'IP_Client'        => 120,
+                'Web'              => 255,
+                'Email'            => 255,
+                'RepLegalEmail'    => 255,
+                'Nombre'           => 255,
+                'ApellidoPat'      => 255,
+                'ApellidoMat'      => 255,
+                'RazonSocial'      => 255,
+                'Nick'             => 255,
+                'Direccion'        => 255,
+                'Giro'             => 255,
+                'RepLegalNombre'   => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
             'ValidarEspaciosVacios'     => 'Email,RepLegalEmail,Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'Email,RepLegalEmail',

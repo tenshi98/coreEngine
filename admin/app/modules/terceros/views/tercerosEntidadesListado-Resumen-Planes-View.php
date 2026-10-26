@@ -27,15 +27,23 @@
 <div class="modal-body">
 
     <?php
-    $arrData = [
-        ['Icon' => '','Titulo' => 'Servicio',        'Texto' => $data['rowData']['Servicio']],
-        ['Icon' => '','Titulo' => 'Fecha Ingreso',   'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
-        ['Icon' => '','Titulo' => 'Monto Servicio',  'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['Monto'], 0)],
-        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
-        ['Icon' => '','Titulo' => 'Observación',     'Texto' => $data['rowData']['Observacion']],
+    $Theme_color = 'summary-theme-color-2';
+    $arrData1 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tools',           'Icon_color' => 10,'Title' => 'Servicio',        'Text' => $data['rowData']['Servicio']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event',  'Icon_color' => 10,'Title' => 'Fecha Ingreso',   'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-currency-dollar', 'Icon_color' => 10,'Title' => 'Monto Servicio',  'Text' => $data['Fnc_DataNumbers']->Valores($data['rowData']['Monto'], 0)],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',           'Icon_color' => 10,'Title' => 'Estado',          'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+    ];
+    $arrData2 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text',  'Icon_color' => 10,'Title' => 'Observación',     'Text' => $data['rowData']['Observacion']],
     ];
 
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+        $OptionsTable['Cols'] = 1;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+    echo '</div>';
     ?>
 
 </div>

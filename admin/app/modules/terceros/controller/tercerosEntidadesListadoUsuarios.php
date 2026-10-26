@@ -13,6 +13,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,6 +28,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -339,6 +341,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
@@ -465,13 +468,19 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     public function Insert(){
 
         /************************************/
+        // Password inicial por defecto: se fuerza el cambio en el primer ingreso
+        $_POST['password']             = '1234';
+        $_POST['PasswordForzarCambio'] = 1;
+        $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
+
+        /************************************/
         // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idEntidad,password,idTipoUsuario,idEstado,email,Nombre,Rut,Fono,Direccion_img,Ultimo_acceso,IP_Client,Agent_Transp',
+            'data'      => 'idEntidad,password,idTipoUsuario,idEstado,email,Nombre,Rut,Fono,Direccion_img,Ultimo_acceso,IP_Client,Agent_Transp,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'idEntidad,password,idTipoUsuario,idEstado,email,Nombre',
             'unique'    => 'email,Rut',
             'encode'    => 'password',
@@ -480,14 +489,23 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -512,9 +530,16 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Si se cambia la password, se fuerza el cambio en el primer ingreso
+        if(isset($_POST['password'])&&$_POST['password']!=''){
+            $_POST['PasswordForzarCambio'] = 1;
+            $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idUsuario,idEntidad,password,idTipoUsuario,idEstado,email,Nombre,Rut,Fono,Direccion_img,Ultimo_acceso,IP_Client,Agent_Transp',
+            'data'      => 'idUsuario,idEntidad,password,idTipoUsuario,idEstado,email,Nombre,Rut,Fono,Direccion_img,Ultimo_acceso,IP_Client,Agent_Transp,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'idUsuario,idEntidad,idTipoUsuario,idEstado,email,Nombre',
             'unique'    => 'email,Rut',
             'encode'    => 'password',
@@ -524,14 +549,23 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -555,6 +589,10 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -569,10 +607,14 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -589,20 +631,27 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'email',
-            'ValidarNumero'             => 'idEntidad,idTipoUsuario,idEstado,Fono',
-            'ValidarEntero'             => 'idEntidad,idTipoUsuario,idEstado',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'Ultimo_acceso',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'email,Nombre',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'email,Nombre',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'email',
+            'ValidarNumero'              => 'idEntidad,idTipoUsuario,idEstado,Fono',
+            'ValidarEntero'              => 'idEntidad,idTipoUsuario,idEstado',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'Ultimo_acceso',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'email,Nombre',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Agent_Transp'  => 240,
+                'IP_Client'     => 120,
+                'Fono'          => 15,
+                'Rut'           => 13,
+                'Direccion_img' => 120,
+                'email'         => 60,
+                'Nombre'        => 60,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre',
             'ValidarEspaciosVacios'     => 'email',
             'ValidarMayusculas'         => 'email',

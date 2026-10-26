@@ -43,7 +43,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Administración', 'Clase' => 'box-title text-color-red-dark']);
         $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado',       'Name' => 'idEstado',   'Id' => 'EditUsuarios_idEstado',  'Value'  => ($data['rowData']['idEstado'] ?? ''),  'Required' => 2,'arrData' => $data['arrEstado']]);
 
-        $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
+        $data['Fnc_FormInputs']->formPostData(1, 4, 'bi bi-exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
         $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'EditUsuarios_password',  'Value'  => '',    'Required' => 1,'Icon' => 'bi bi-key']);
 
         //datos ocultos

@@ -27,14 +27,22 @@
 <div class="modal-body">
 
     <?php
-    $arrData = [
-        ['Icon' => '','Titulo' => 'Máquina',         'Texto' => $data['rowData']['Maquina']],
-        ['Icon' => '','Titulo' => 'Fecha Ingreso',   'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
-        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
-        ['Icon' => '','Titulo' => 'Observación',     'Texto' => $data['rowData']['Observacion']],
+    $Theme_color = 'summary-theme-color-2';
+    $arrData1 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cpu',            'Icon_color' => 10,'Title' => 'Máquina',         'Text' => $data['rowData']['Maquina']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event', 'Icon_color' => 10,'Title' => 'Fecha Ingreso',   'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',          'Icon_color' => 10,'Title' => 'Estado',          'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+    ];
+    $arrData2 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text', 'Icon_color' => 10,'Title' => 'Observación',     'Text' => $data['rowData']['Observacion']],
     ];
 
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+        $OptionsTable['Cols'] = 1;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+    echo '</div>';
     ?>
 
 </div>

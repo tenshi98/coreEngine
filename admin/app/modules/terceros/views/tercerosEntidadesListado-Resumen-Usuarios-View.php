@@ -49,27 +49,33 @@
                 </div>
                 <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
                     <?php
+                    $Theme_color = 'summary-theme-color-2';
                     $arrData_1 = [
-                        ['Icon' => '','Titulo' => 'Tipo de usuario', 'Texto' => $data['rowData']['TipoUsuario']],
-                        ['Icon' => '','Titulo' => 'Email',           'Texto' => $data['rowData']['email']],
-                        ['Icon' => '','Titulo' => 'Nombre',          'Texto' => $data['rowData']['Nombre']],
-                        ['Icon' => '','Titulo' => 'Rut',             'Texto' => $data['rowData']['Rut']],
-                        ['Icon' => '','Titulo' => 'Fono',            'Texto' => $data['rowData']['Fono']],
-                        ['Icon' => '','Titulo' => 'Email',           'Texto' => $data['rowData']['email']],
-                        ['Icon' => '','Titulo' => 'Estado',          'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-badge', 'Icon_color' => 10,'Title' => 'Tipo de usuario', 'Text' => $data['rowData']['TipoUsuario']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Email',           'Text' => $data['rowData']['email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['email']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',    'Icon_color' => 10,'Title' => 'Nombre',          'Text' => $data['rowData']['Nombre']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Rut',             'Text' => $data['rowData']['Rut']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone',    'Icon_color' => 10,'Title' => 'Fono',            'Text' => $data['rowData']['Fono'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Fono']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',        'Icon_color' => 10,'Title' => 'Estado',          'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
                     ];
                     $arrData_2 = [
-                        ['Icon' => '','Titulo' => 'Ultimo acceso', 'Texto' => $data['rowData']['Ultimo_acceso']],
-                        ['Icon' => '','Titulo' => 'IP',            'Texto' => $data['rowData']['IP_Client']],
-                        ['Icon' => '','Titulo' => 'Navegador',     'Texto' => $data['rowData']['Agent_Transp']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-clock-history', 'Icon_color' => 10,'Title' => 'Ultimo acceso', 'Text' => $data['rowData']['Ultimo_acceso']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-hdd-network',   'Icon_color' => 10,'Title' => 'IP',            'Text' => $data['rowData']['IP_Client']],
+                        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-window',        'Icon_color' => 10,'Title' => 'Navegador',     'Text' => $data['rowData']['Agent_Transp']],
                     ];
 
                     /*******************************************/
-                    echo '<h5 class="box-title text-color-red-dark">Datos del Perfil</h5>';
-                    $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
+                    echo $data['Fnc_WidgetsViews']->tittle_v2('Datos del Perfil', 23);
+                    echo '<div class="row">';
+                        $OptionsTable['Cols'] = 2;
+                        echo $data['Fnc_WidgetsViews']->table_v6($arrData_1, $OptionsTable);
+                    echo '</div>';
 
-                    echo '<h5 class="box-title text-color-red-dark">Datos de Acceso</h5>';
-                    $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 8);
+                    echo $data['Fnc_WidgetsViews']->tittle_v2('Datos de Acceso', 23);
+                    echo '<div class="row">';
+                        $OptionsTable['Cols'] = 2;
+                        echo $data['Fnc_WidgetsViews']->table_v6($arrData_2, $OptionsTable);
+                    echo '</div>';
 
                     ?>
                 </div>
@@ -81,7 +87,7 @@
             <div class="tab-pane fade" id="tab_id_2" role="tabpanel" aria-labelledby="view_tab_2">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                        <h5 class="box-title text-color-red-dark">Permisos a las máquinas</h5>
+                        <?php echo $data['Fnc_WidgetsViews']->tittle_v2('Permisos a las máquinas', 23); ?>
                         <div class="clearfix"></div>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
@@ -109,7 +115,7 @@
                 <div class="tab-pane fade" id="tab_id_3" role="tabpanel" aria-labelledby="view_tab_3">
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                            <h5 class="box-title text-color-red-dark">Permisos a las notificaciones</h5>
+                            <?php echo $data['Fnc_WidgetsViews']->tittle_v2('Permisos a las notificaciones', 23); ?>
                             <div class="clearfix"></div>
                             <div class="table-responsive">
                                 <table class="table table-sm table-hover">

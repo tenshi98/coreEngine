@@ -13,31 +13,37 @@
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10 record-attachment">
         <?php
+        // Color
+        $Theme_color = 'summary-theme-color-2';
+
         //selecciono
         switch ($data['rowData']['idTipoEntidad']) {
             //Persona Natural
             case 1:
                 $arrData_1 = [
-                    ['Icon' => '','Titulo' => 'Tipo Entidad',     'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']],
-                    ['Icon' => '','Titulo' => 'Nick',             'Texto' => $data['rowData']['Nick']],
-                    ['Icon' => '','Titulo' => 'Sexo',             'Texto' => $data['rowData']['Sexo']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',         'Icon_color' => 10,'Title' => 'Tipo Entidad',     'Text' => $data['rowData']['TipoEntidad']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',        'Icon_color' => 10,'Title' => 'Nombre',           'Text' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-at',               'Icon_color' => 10,'Title' => 'Nick',             'Text' => $data['rowData']['Nick']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-gender-ambiguous', 'Icon_color' => 10,'Title' => 'Sexo',             'Text' => $data['rowData']['Sexo']],
                 ];
                 break;
             //Empresas
             case 2:
                 $arrData_1 = [
-                    ['Icon' => '','Titulo' => 'Tipo Entidad', 'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $data['rowData']['RazonSocial']],
-                    ['Icon' => '','Titulo' => 'Nick',         'Texto' => $data['rowData']['Nick']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',  'Icon_color' => 10,'Title' => 'Tipo Entidad', 'Text' => $data['rowData']['TipoEntidad']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',       'Text' => $data['rowData']['RazonSocial']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-at',        'Icon_color' => 10,'Title' => 'Nick',         'Text' => $data['rowData']['Nick']],
                 ];
                 break;
         }
 
-        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_1, $OptionsTable);
+        echo '</div>';
 
         ?>
     </div>

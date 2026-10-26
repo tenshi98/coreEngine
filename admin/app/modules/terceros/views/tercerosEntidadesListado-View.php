@@ -38,7 +38,7 @@
             <div class="tab-pane fade" id="tab_id_2" role="tabpanel" aria-labelledby="view_tab_2">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                        <h5 class="box-title text-color-red-dark">Planes</h5>
+                        <?php echo $data['Fnc_WidgetsViews']->tittle_v2('Planes', 23); ?>
                         <div class="clearfix"></div>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">
@@ -69,7 +69,7 @@
             <div class="tab-pane fade" id="tab_id_3" role="tabpanel" aria-labelledby="view_tab_3">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                        <h5 class="box-title text-color-red-dark">Usuarios</h5>
+                        <?php echo $data['Fnc_WidgetsViews']->tittle_v2('Usuarios', 23); ?>
                         <div class="clearfix"></div>
                         <div class="table-responsive">
                             <table class="table table-sm table-hover">

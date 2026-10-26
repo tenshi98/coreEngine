@@ -31,7 +31,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     <div class="modal-body">
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Cada usuario nuevo creado lleva por defecto la contraseña 1234');
+        $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-circle', 0, 'Cada usuario nuevo creado lleva por defecto la contraseña 1234');
         $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',               'Name' => 'email',         'Id' => 'NewUsuario_email',          'Value' => '',  'Required' => 2,  'Icon' => 'bx bx-mail-send']);
         $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',              'Name' => 'Nombre',        'Id' => 'NewUsuario_Nombre',         'Value' => '',  'Required' => 2]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',                 'Name' => 'Rut',           'Id' => 'NewUsuario_Rut',            'Value' => '',  'Required' => 1,  'Icon' => 'bi bi-person-circle']);
@@ -40,7 +40,6 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad', 'Value' => $data['rowData']['idEntidad'],  'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password',  'Value' => '1234',                         'Required' => 2]);//password por defecto
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',  'Value' => 1,                              'Required' => 2]);//Usuario Activo
         ?>
     </div>

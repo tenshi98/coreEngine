@@ -159,6 +159,10 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
         // Ejecuto la query
         $arrPermisos = $this->Base_GetList($xParams);
 
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         /*******************************************************************/
         // Si hay datos
         if ($arrPermisos['status']){
@@ -209,7 +213,11 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                                 // Preparo los datos
                                 $xParams = ['query' => $query];
                                 // Ejecuto la query
-                                $this->Base_delete($xParams);
+                                $respDel = $this->Base_delete($xParams);
+                                // Si falla la ejecucion, se revierte de inmediato
+                                if ($respDel['status'] === false) {
+                                    $this->failOperation($respDel);
+                                }
                                 break;
                         }
                         break;
@@ -250,10 +258,18 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
                 // Preparo los datos
                 $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
-                $this->Base_insertMultiple($xParams);
+                $respIns = $this->Base_insertMultiple($xParams);
+                // Si falla la ejecucion, se revierte de inmediato
+                if ($respIns['status'] === false) {
+                    $this->failOperation($respIns);
+                }
             }
 
         }
+
+        /************************************/
+        // Se confirma la transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo true con código 200 (OK)
@@ -270,34 +286,33 @@ class tercerosEntidadesListadoUsuariosMaq extends ControllerBase {
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idUsuario,idMaquina',
-            'ValidarEntero'             => 'idUsuario,idMaquina',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idUsuario,idMaquina',
+            'ValidarEntero'              => 'idUsuario,idMaquina',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;
