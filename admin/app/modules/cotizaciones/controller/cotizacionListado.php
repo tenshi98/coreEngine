@@ -16,6 +16,7 @@ class cotizacionListado extends ControllerBase {
     private $CommonData;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -33,6 +34,7 @@ class cotizacionListado extends ControllerBase {
 		$this->ServerServer   = new FunctionsServerServer();
 		$this->CommonData     = new FunctionsCommonData();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -393,6 +395,7 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -568,6 +571,7 @@ class cotizacionListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -675,6 +679,7 @@ class cotizacionListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
@@ -755,6 +760,7 @@ class cotizacionListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -873,8 +879,7 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -917,8 +922,7 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respItems['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respItems['error']);
+                    $this->failOperation($respItems);
                 }
             }
         }
@@ -963,8 +967,7 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respProductos['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respProductos['error']);
+                    $this->failOperation($respProductos);
                 }
             }
         }
@@ -1009,8 +1012,7 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respServicios['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respServicios['error']);
+                    $this->failOperation($respServicios);
                 }
             }
         }
@@ -1075,7 +1077,7 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1120,8 +1122,7 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1146,8 +1147,7 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -1166,6 +1166,23 @@ class cotizacionListado extends ControllerBase {
     /*                             EJECUCION OTROS                                */
     /******************************************************************************/
     /*******************************************************************/
+    // Borrar archivos
+    /*******************************************************************/
+    public function delFiles(){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Las cotizaciones no almacenan archivos propios
+        Response::success();
+
+    }
+
+    /*******************************************************************/
     // Se actualizan los montos
     /*******************************************************************/
     public function updateCotizacion($Tipo, $CotizacionID, $NewDBConn = null): array{
@@ -1173,6 +1190,10 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Verifico si se ejecuta otro hilo
         $DBConn = $NewDBConn ?? $this->getDBConn();
+
+        /************************************/
+        // El ID se interpola en los subselects de abajo: se fuerza a entero
+        $CotizacionID = (int)$CotizacionID;
 
         /************************************/
         // Se abre cadena
@@ -1211,6 +1232,17 @@ class cotizacionListado extends ControllerBase {
         // Se inicia la transacción solo si corresponde
         if($NewDBConn === null){
             $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Se bloquea la fila madre para serializar recálculos concurrentes
+        // de la misma cotización (evita lost update en los totales).
+        $lock = $this->lockRowsForUpdate('cotizacion_listado', 'idCotizacion', [$CotizacionID], $DBConn);
+        if ($lock['status'] === false) {
+            if($NewDBConn === null){
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            }
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error']];
         }
 
         /************************************/
@@ -1297,34 +1329,33 @@ class cotizacionListado extends ControllerBase {
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idUsuario,idEntidad,Creacion_Semana,Creacion_mes,Creacion_ano,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios',
-            'ValidarEntero'             => 'idUsuario,idEntidad',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'fecha_auto,Creacion_fecha',
-            'ValidarHora'               => 'Creacion_hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Observaciones',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Observaciones',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => 'fecha_auto',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idUsuario,idEntidad,Creacion_Semana,Creacion_mes,Creacion_ano,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios,TotalGuias',
+            'ValidarEntero'              => 'idUsuario,idEntidad,Creacion_Semana,Creacion_mes,Creacion_ano',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'fecha_auto,Creacion_fecha',
+            'ValidarHora'                => 'Creacion_hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Observaciones',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => 'Observaciones',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => 'fecha_auto',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;
@@ -1336,20 +1367,21 @@ class cotizacionListado extends ControllerBase {
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idCotizacion,idProducto,idServicio,Number,ValorTotal',
-            'ValidarEntero'             => 'idCotizacion,idProducto,idServicio',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Item',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Item',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idCotizacion,idProducto,idServicio,Number,ValorTotal',
+            'ValidarEntero'              => 'idCotizacion,idProducto,idServicio',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Item',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Item' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Item',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
@@ -1375,34 +1407,33 @@ class cotizacionListado extends ControllerBase {
     private function dataCheck_3($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idCotizacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios',
-            'ValidarEntero'             => 'idCotizacion',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idCotizacion,ValorNeto,IVA,ValorTotal,TotalItems,TotalProductos,TotalServicios',
+            'ValidarEntero'              => 'idCotizacion',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

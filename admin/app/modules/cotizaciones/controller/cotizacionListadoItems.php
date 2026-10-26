@@ -249,8 +249,7 @@ class cotizacionListadoItems extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -258,7 +257,9 @@ class cotizacionListadoItems extends ControllerBase {
         $cotizacionListado  = new cotizacionListado();
         $ResponseCotizacion = $cotizacionListado->updateCotizacion(1, $_POST['idCotizacion'], $this->getDBConn());
         if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
         }
 
@@ -311,8 +312,7 @@ class cotizacionListadoItems extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -320,7 +320,9 @@ class cotizacionListadoItems extends ControllerBase {
         $cotizacionListado  = new cotizacionListado();
         $ResponseCotizacion = $cotizacionListado->updateCotizacion(1, $_POST['idCotizacion'], $this->getDBConn());
         if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
         }
 
@@ -380,8 +382,7 @@ class cotizacionListadoItems extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error']);
+            $this->failOperation($rowFacturacion);
         }
 
         /************************************/
@@ -401,8 +402,7 @@ class cotizacionListadoItems extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -410,7 +410,9 @@ class cotizacionListadoItems extends ControllerBase {
         $cotizacionListado = new cotizacionListado();
         $ResponseCotizacion = $cotizacionListado->updateCotizacion(1, $rowFacturacion['data']['idCotizacion'], $this->getDBConn());
         if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
         }
 
@@ -433,20 +435,21 @@ class cotizacionListadoItems extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idCotizacion,Number,ValorTotal',
-            'ValidarEntero'             => 'idCotizacion',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Item',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Item',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idCotizacion,Number,ValorTotal',
+            'ValidarEntero'              => 'idCotizacion',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Item',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Item' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Item',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

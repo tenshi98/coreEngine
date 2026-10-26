@@ -114,7 +114,7 @@ class cotizacionInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -126,16 +126,18 @@ class cotizacionInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -269,7 +271,13 @@ class cotizacionInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
+        // Incluye los sub-recursos: Base_uninstallModule() borra
+        // core_permisos_listado_rutas WHERE Controller IN (esta lista), asi que
+        // omitirlos dejaria sus rutas huerfanas al desinstalar el modulo
         $RutaController  = '"cotizacionListado"';
+        $RutaController .= ',"cotizacionListadoItems"';
+        $RutaController .= ',"cotizacionListadoProductos"';
+        $RutaController .= ',"cotizacionListadoServicios"';
         $RutaController .= ',"informeCotizacion"';
 
         /************************************/
@@ -325,18 +333,14 @@ class cotizacionInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE cotizacion_listado ADD INDEX idx_cotizacion_usuario (idUsuario),ADD INDEX idx_cotizacion_entidad (idEntidad),ADD INDEX idx_cotizacion_fecha (Creacion_fecha),ADD INDEX idx_cotizacion_fecha_auto (fecha_auto),ADD INDEX idx_cotizacion_entidad_fecha (idEntidad, Creacion_fecha),ADD INDEX idx_cotizacion_usuario_fecha (idUsuario, Creacion_fecha);',
-            'optimization' => 'ALTER TABLE cotizacion_listado_items ADD INDEX idx_cotizacion_items_cotizacion (idCotizacion);',
-            'optimization' => 'ALTER TABLE cotizacion_listado_productos ADD INDEX idx_cotizacion_productos_cotizacion (idCotizacion),ADD INDEX idx_cotizacion_productos_producto (idProducto),ADD INDEX idx_cotizacion_productos_cotizacion_producto (idCotizacion, idProducto);',
-            'optimization' => 'ALTER TABLE cotizacion_listado_servicios ADD INDEX idx_cotizacion_servicios_cotizacion (idCotizacion),ADD INDEX idx_cotizacion_servicios_servicio (idServicio),ADD INDEX idx_cotizacion_servicios_cotizacion_servicio (idCotizacion, idServicio);',
+        $arrOptimizations = [
+            'ALTER TABLE cotizacion_listado ADD INDEX IF NOT EXISTS idx_cotizacion_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_cotizacion_entidad (idEntidad),ADD INDEX IF NOT EXISTS idx_cotizacion_fecha (Creacion_fecha),ADD INDEX IF NOT EXISTS idx_cotizacion_fecha_auto (fecha_auto),ADD INDEX IF NOT EXISTS idx_cotizacion_entidad_fecha (idEntidad, Creacion_fecha),ADD INDEX IF NOT EXISTS idx_cotizacion_usuario_fecha (idUsuario, Creacion_fecha);',
+            'ALTER TABLE cotizacion_listado_items ADD INDEX IF NOT EXISTS idx_cotizacion_items_cotizacion (idCotizacion);',
+            'ALTER TABLE cotizacion_listado_productos ADD INDEX IF NOT EXISTS idx_cotizacion_productos_cotizacion (idCotizacion),ADD INDEX IF NOT EXISTS idx_cotizacion_productos_producto (idProducto),ADD INDEX IF NOT EXISTS idx_cotizacion_productos_cotizacion_producto (idCotizacion, idProducto);',
+            'ALTER TABLE cotizacion_listado_servicios ADD INDEX IF NOT EXISTS idx_cotizacion_servicios_cotizacion (idCotizacion),ADD INDEX IF NOT EXISTS idx_cotizacion_servicios_servicio (idServicio),ADD INDEX IF NOT EXISTS idx_cotizacion_servicios_cotizacion_servicio (idCotizacion, idServicio);',
         ];
 
         /************************************/
