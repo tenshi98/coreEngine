@@ -36,10 +36,14 @@ class gestionDocumentosWidgets extends ControllerBase {
     public function loadWidgets(){
 
         // Variables
+        // Cada sub-widget (Compras / Ventas) tiene su propia vista y su propio endpoint,
+        // de modo que pueden activarse/desactivarse y ordenarse de forma independiente.
         $Data['Menu_Name']   = 'Gestión Documentos Mercantiles';
+        // Titulo que se muestra una sola vez sobre el bloque en la pantalla principal
+        $Data['Menu_Title']  = 'Compras / Ventas';
         $Data['Menu_Value']  = [
-            'Compras'  => '../app/modules/facturacion/widgets/widgets-doc-mercantiles.php',
-            'Ventas'   => '../app/modules/facturacion/widgets/widgets-doc-mercantiles.php',
+            'Compras'  => ['Ruta' => '../app/modules/facturacion/widgets/widgets-doc-compras.php', 'Permiso' => 'Compras'],
+            'Ventas'   => ['Ruta' => '../app/modules/facturacion/widgets/widgets-doc-ventas.php',  'Permiso' => 'Ventas'],
         ];
 
         // Retorno los datos
@@ -50,28 +54,42 @@ class gestionDocumentosWidgets extends ControllerBase {
     /*                                  VISTAS                                    */
     /******************************************************************************/
     /*******************************************************************/
-    // Actualizacion campañas
+    // Pagos pendientes de los documentos mercantiles (Compras / Ventas)
+    // Separamos en dos endpoints para que cada sub-widget (Compras y Ventas)
+    // se renderice de forma independiente en la pantalla principal.
     /*******************************************************************/
-    public function pagosPendientes($f3, $params){
+    public function pagosPendientesCompras($f3, $params){
+        $this->pagosPendientesData($f3, 1);
+    }
+    public function pagosPendientesVentas($f3, $params){
+        $this->pagosPendientesData($f3, 2);
+    }
+
+    /*******************************************************************/
+    // Carga de datos de pagos pendientes segun el tipo (1=Compras, 2=Ventas)
+    /*******************************************************************/
+    private function pagosPendientesData($f3, $idTipo){
 
         /************************************/
         // Se llaman los datos
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /************************************/
+        // Nombre del widget/permiso y vista segun el tipo
+        $NombreWidget = ($idTipo==1) ? 'Compras' : 'Ventas';
+        $VistaWidget  = ($idTipo==1) ? 'widgets-doc-compras-update.php' : 'widgets-doc-ventas-update.php';
+
+        /************************************/
         // Variables
         $MainViewData = [
             'Count_DocMercantiles' => 0,
-            'Data_ComprasTotal'    => '',
-            'Data_ComprasListado'  => '',
-            'Data_VentasTotal'     => '',
-            'Data_VentasListado'   => '',
+            'Data_Total'           => '',
+            'Data_Listado'         => '',
         ];
-        // Se asignan datos a buscar
+        // Se asignan datos a buscar (solo el widget solicitado)
         $menuCounters = [
             'Gestión Documentos Mercantiles' => [
-                'Compras'  => 'Count_DocMercantiles',
-                'Ventas'   => 'Count_DocMercantiles',
+                $NombreWidget => 'Count_DocMercantiles',
             ],
         ];
         // Se recorren los permisos y se validan
@@ -89,74 +107,27 @@ class gestionDocumentosWidgets extends ControllerBase {
         // Se hacen las consultas
         if($MainViewData['Count_DocMercantiles']!=0){
             /************************************/
-            //Total Compras
+            //Total (Compras si idTipo=1, Ventas si idTipo=2)
             $query = [
                 'data'    => '
                     SUM( ValorTotal ) AS ValorTotal,
-	                SUM( MontoPagado ) AS MontoPagado',
+                    SUM( MontoPagado ) AS MontoPagado',
                 'table'   => 'facturacion_listado',
                 'join'    => '',
                 'where'   => 'idTipo = ? AND idEstadoPago = ?',
-                'params'  => [1, 1],
+                'params'  => [$idTipo, 1],
                 'group'   => '',
                 'having'  => '',
                 'order'   => ''
             ];
             // Preparo los datos
-            $xParams                           = ['query' => $query];
+            $xParams                    = ['query' => $query];
             // Ejecuto la query
-            $TempData                          = $this->Base_GetByID($xParams);
-            $MainViewData['Data_ComprasTotal'] = $TempData['data'];
+            $TempData                   = $this->Base_GetByID($xParams);
+            $MainViewData['Data_Total'] = $TempData['data'];
 
             /************************************/
-            // Listado Compras
-            $query = [
-                'data'    => '
-                    facturacion_listado.ValorTotal,
-                    facturacion_listado.MontoPagado,
-
-                    entidades_listado.idTipoEntidad,
-                    entidades_listado.Nombre AS EntidadesNombre,
-                    entidades_listado.ApellidoPat AS EntidadesApellido,
-                    entidades_listado.RazonSocial AS EntidadesRazonSocial,
-                    entidades_listado.Nick AS EntidadesNick',
-                'table'   => 'facturacion_listado',
-                'join'    => 'LEFT JOIN entidades_listado ON entidades_listado.idEntidad = facturacion_listado.idEntidad',
-                'where'   => 'facturacion_listado.idTipo = ? AND facturacion_listado.idEstadoPago = ?',
-                'params'  => [1, 1],
-                'group'   => '',
-                'having'  => '',
-                'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
-                'limit'   => 9
-            ];
-            // Preparo los datos
-            $xParams                             = ['query' => $query];
-            // Ejecuto la query
-            $TempData                            = $this->Base_GetList($xParams);
-            $MainViewData['Data_ComprasListado'] = $TempData['data'];
-
-            /************************************/
-            //Total Compras
-            $query = [
-                'data'    => '
-                    SUM( ValorTotal ) AS ValorTotal,
-	                SUM( MontoPagado ) AS MontoPagado',
-                'table'   => 'facturacion_listado',
-                'join'    => '',
-                'where'   => 'idTipo = ? AND idEstadoPago = ?',
-                'params'  => [2, 1],
-                'group'   => '',
-                'having'  => '',
-                'order'   => ''
-            ];
-            // Preparo los datos
-            $xParams                          = ['query' => $query];
-            // Ejecuto la query
-            $TempData                         = $this->Base_GetByID($xParams);
-            $MainViewData['Data_VentasTotal'] = $TempData['data'];
-
-            /************************************/
-            // Listado Ventas
+            // Listado (Compras si idTipo=1, Ventas si idTipo=2)
             $query = [
                 'data'    => '
                     facturacion_listado.N_Doc,
@@ -175,17 +146,17 @@ class gestionDocumentosWidgets extends ControllerBase {
                     LEFT JOIN entidades_listado             ON entidades_listado.idEntidad                = facturacion_listado.idEntidad
                     LEFT JOIN core_documentos_mercantiles   ON core_documentos_mercantiles.idDocumentos   = facturacion_listado.idDocumentos',
                 'where'   => 'facturacion_listado.idTipo = ? AND facturacion_listado.idEstadoPago = ?',
-                'params'  => [2, 1],
+                'params'  => [$idTipo, 1],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.N_Doc DESC, facturacion_listado.idFacturacion DESC',
                 'limit'   => 9
             ];
             // Preparo los datos
-            $xParams                            = ['query' => $query];
+            $xParams                       = ['query' => $query];
             // Ejecuto la query
-            $TempData                           = $this->Base_GetList($xParams);
-            $MainViewData['Data_VentasListado'] = $TempData['data'];
+            $TempData                      = $this->Base_GetList($xParams);
+            $MainViewData['Data_Listado']  = $TempData['data'];
         }
 
         /************************************/
@@ -203,7 +174,7 @@ class gestionDocumentosWidgets extends ControllerBase {
 
         /************************************/
         // Se instancia la vista
-        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/widgets-doc-mercantiles-update.php');
+        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$VistaWidget);
     }
 
 }

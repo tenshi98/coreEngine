@@ -11,7 +11,7 @@
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10 record-attachment">
         <?php
         //Se verifica movimiento
         switch ($data['rowData']['idTipo']) {
@@ -29,32 +29,48 @@
                         ? ' ('.$data['rowData']['EntidadesNick'].')'
                         : '';
 
+        $Theme_color = 'summary-theme-color-2';
         $arrData1 = [
-            ['Icon' => '','Titulo' => 'Tipo Facturacion',    'Texto' => $data['rowData']['TipoFacturacion']],
-            ['Icon' => '','Titulo' => 'Documento Mercantil', 'Texto' => $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef #'.$data['rowData']['idFacturacion'])],
-            ['Icon' => '','Titulo' => $Entidad,              'Texto' => $NombreEntidad],
-            ['Icon' => '','Titulo' => 'Fecha de Creacion',   'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha'])],
-            ['Icon' => '','Titulo' => 'Hora de Creacion',    'Texto' => $data['rowData']['Creacion_hora']],
-            ['Icon' => '','Titulo' => 'Observaciones',       'Texto' => $data['rowData']['Observaciones']],
-            ['Icon' => '','Titulo' => 'Usuario Creacion',    'Texto' => $data['rowData']['Usuario']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-receipt',           'Icon_color' => 10,'Title' => 'Tipo Facturacion',    'Text' => $data['rowData']['TipoFacturacion']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-file-earmark-text', 'Icon_color' => 10,'Title' => 'Documento Mercantil', 'Text' => $data['rowData']['Documento'].' '.($data['rowData']['N_Doc'] ?? 'nRef #'.$data['rowData']['idFacturacion'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',          'Icon_color' => 10,'Title' => $Entidad,              'Text' => $NombreEntidad],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event',    'Icon_color' => 10,'Title' => 'Fecha de Creacion',   'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Creacion_fecha'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-clock',             'Icon_color' => 10,'Title' => 'Hora de Creacion',    'Text' => $data['rowData']['Creacion_hora']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-fill',       'Icon_color' => 10,'Title' => 'Usuario Creacion',    'Text' => $data['rowData']['Usuario']],
         ];
         $arrData2 = [
-            ['Icon' => '','Titulo' => 'Bodega Productos',    'Texto' => $Movimiento],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text',    'Icon_color' => 10,'Title' => 'Observaciones',       'Text' => $data['rowData']['Observaciones']],
         ];
         $arrData3 = [
-            ['Icon' => '','Titulo' => 'Valor Neto',    'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorNeto'], 2)],
-            ['Icon' => '','Titulo' => 'IVA',           'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['IVA'], 2)],
-            ['Icon' => '','Titulo' => 'Valor Total',   'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorTotal'], 2)],
-            ['Icon' => '','Titulo' => 'Monto Pagado',  'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['MontoPagado'], 2)],
-            ['Icon' => '','Titulo' => 'Estado Pago',   'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['EstadoPago'].'</span>'],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-box-seam', 'Icon_color' => 10,'Title' => 'Bodega Productos',    'Text' => $Movimiento],
+        ];
+        $arrData4 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-currency-dollar', 'Icon_color' => 10,'Title' => 'Valor Neto',    'Text' => $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorNeto'], 2)],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-currency-dollar', 'Icon_color' => 10,'Title' => 'IVA',           'Text' => $data['Fnc_DataNumbers']->Valores($data['rowData']['IVA'], 2)],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-currency-dollar', 'Icon_color' => 10,'Title' => 'Valor Total',   'Text' => $data['Fnc_DataNumbers']->Valores($data['rowData']['ValorTotal'], 2)],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-currency-dollar', 'Icon_color' => 10,'Title' => 'Monto Pagado',  'Text' => $data['Fnc_DataNumbers']->Valores($data['rowData']['MontoPagado'], 2)],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-credit-card',     'Icon_color' => 10,'Title' => 'Estado Pago',   'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['EstadoPago'].'</span>'],
         ];
 
-        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData1, 8);
-        echo '<h5 class="box-title text-color-red-dark">Productos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData2, 8);
-        echo '<h5 class="box-title text-color-red-dark">Montos y Pagos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData3, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+            $OptionsTable['Cols'] = 1;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+        echo '</div>';
+
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Bodegas', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData3, $OptionsTable);
+        echo '</div>';
+
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Montos y Pagos', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v4($arrData4, $OptionsTable);
+        echo '</div>';
 
         ?>
     </div>

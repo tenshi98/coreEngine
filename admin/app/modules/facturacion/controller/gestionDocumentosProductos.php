@@ -460,7 +460,9 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
         }
 
@@ -469,7 +471,9 @@ class gestionDocumentosProductos extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(2, $PostData['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return $ResponseGestionDoc;
         }
 
@@ -496,14 +500,23 @@ class gestionDocumentosProductos extends ControllerBase {
             $rowMovimiento = $this->Base_GetByID($xParams);
 
             /************************************/
+            // Se verifica que exista el movimiento de bodega del documento
+            if ($rowMovimiento['status'] !== true || empty($rowMovimiento['data'])) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                return ['code' => 404, 'message' => 'No se encontró el movimiento de bodega del documento'];
+            }
+
+            /************************************/
             // Variable
             $PostMovProd = array();
             // Productos
             $PostMovProd['idMovimiento']       = $rowMovimiento['data']['idMovimiento'];
             $PostMovProd['idEstadoIngreso']    = $rowMovimiento['data']['idEstadoIngreso'];
             switch ($rowMovimiento['data']['idEstadoIngreso']) {
-                case 1: $PostMovProd['idBodega'] = $rowMovimiento['data']['idBodegasIngreso']; break;
-                case 2: $PostMovProd['idBodega'] = $rowMovimiento['data']['idBodegasEgreso']; break;
+                case 1: $PostMovProd['idBodegas'] = $rowMovimiento['data']['idBodegasIngreso']; break;
+                case 2: $PostMovProd['idBodegas'] = $rowMovimiento['data']['idBodegasEgreso']; break;
             }
             $PostMovProd['idProducto']    = $PostData['idProducto'];
             $PostMovProd['Number']        = $PostData['Number'];
@@ -513,7 +526,9 @@ class gestionDocumentosProductos extends ControllerBase {
             $bodegasMovimientoProductos = new bodegasMovimientoProductos();
             $ResponseBodMovProd         = $bodegasMovimientoProductos->insertMov($PostMovProd, $this->getDBConn());
             if($ResponseBodMovProd['code'] != 200){
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
+                // Se reporta el error
                 return $ResponseBodMovProd;
             }
 
@@ -566,7 +581,9 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
         }
 
@@ -575,7 +592,9 @@ class gestionDocumentosProductos extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(2, $PostData['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return $ResponseGestionDoc;
         }
 
@@ -608,6 +627,15 @@ class gestionDocumentosProductos extends ControllerBase {
             $rowMovimiento = $this->Base_GetByID($xParams);
 
             /************************************/
+            // Se verifica que exista el movimiento de bodega del documento
+            if ($rowMovimiento['status'] !== true || empty($rowMovimiento['data'])) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                return ['code' => 404, 'message' => 'No se encontró el movimiento de bodega del documento'];
+            }
+
+            /************************************/
             // Variable
             $PostMovProd = array();
             // Productos
@@ -624,7 +652,9 @@ class gestionDocumentosProductos extends ControllerBase {
             $bodegasMovimientoProductos = new bodegasMovimientoProductos();
             $ResponseBodMovProd         = $bodegasMovimientoProductos->updateMov($PostMovProd, $this->getDBConn());
             if($ResponseBodMovProd['code'] != 200){
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
+                // Se reporta el error
                 return $ResponseBodMovProd;
             }
 
@@ -680,7 +710,9 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowFacturacion['error']];
         }
 
@@ -701,7 +733,9 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
         }
 
@@ -710,7 +744,9 @@ class gestionDocumentosProductos extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(2, $rowFacturacion['data']['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             return $ResponseGestionDoc;
         }
 
@@ -737,10 +773,21 @@ class gestionDocumentosProductos extends ControllerBase {
             $rowMovimiento = $this->Base_GetByID($xParams);
 
             /************************************/
+            // Se verifica que exista el movimiento de bodega del documento
+            if ($rowMovimiento['status'] !== true || empty($rowMovimiento['data'])) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                return ['code' => 404, 'message' => 'No se encontró el movimiento de bodega del documento'];
+            }
+
+            /************************************/
             // Productos
             $ExistenciaID = $this->Codification->encryptDecrypt('encrypt', $rowMovimiento['data']['idExistencia']);
             if (!$this->isValidDecrypted($ExistenciaID, 'text')) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
+                // Se reporta el error
                 return ['code' => 400, 'message' => 'Registro inválido'];
             }
             // Variable
@@ -753,7 +800,9 @@ class gestionDocumentosProductos extends ControllerBase {
             $bodegasMovimientoProductos = new bodegasMovimientoProductos();
             $ResponseBodMovProd         = $bodegasMovimientoProductos->deleteMov($PostMovProd, $this->getDBConn());
             if($ResponseBodMovProd['code'] != 200){
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
+                // Se reporta el error
                 return $ResponseBodMovProd;
             }
 
@@ -778,34 +827,33 @@ class gestionDocumentosProductos extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idFacturacion,idEstadoIngreso,idBodegas,idProducto,Number,ValorTotal',
-            'ValidarEntero'             => 'idFacturacion,idEstadoIngreso,idBodegas,idProducto',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idFacturacion,idEstadoIngreso,idBodegas,idProducto,Number,ValorTotal',
+            'ValidarEntero'              => 'idFacturacion,idEstadoIngreso,idBodegas,idProducto',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

@@ -296,8 +296,7 @@ class gestionDocumentosItems extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -305,7 +304,9 @@ class gestionDocumentosItems extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(1, $_POST['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseGestionDoc['message'], $ResponseGestionDoc['code'], $ResponseGestionDoc['error']);
         }
 
@@ -358,8 +359,7 @@ class gestionDocumentosItems extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -367,7 +367,9 @@ class gestionDocumentosItems extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(1, $_POST['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseGestionDoc['message'], $ResponseGestionDoc['code'], $ResponseGestionDoc['error']);
         }
 
@@ -427,8 +429,7 @@ class gestionDocumentosItems extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error']);
+            $this->failOperation($rowFacturacion);
         }
 
         /************************************/
@@ -448,8 +449,7 @@ class gestionDocumentosItems extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -457,7 +457,9 @@ class gestionDocumentosItems extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(1, $rowFacturacion['data']['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseGestionDoc['message'], $ResponseGestionDoc['code'], $ResponseGestionDoc['error']);
         }
 
@@ -480,20 +482,21 @@ class gestionDocumentosItems extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idFacturacion,Number,ValorTotal',
-            'ValidarEntero'             => 'idFacturacion',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Item',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Item',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idFacturacion,Number,ValorTotal',
+            'ValidarEntero'              => 'idFacturacion',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Item',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Item' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Item',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

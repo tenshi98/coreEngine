@@ -109,31 +109,46 @@ class informeDocumentos extends ControllerBase {
         // Ejecuto la query
         $arrTipoMov = $this->Base_GetList($xParams);
 
-        /************************************/
-        // Datos enviados a la pagina
-        $f3->data = [
-            /*=========== Datos de la Pagina ===========*/
-            'PageTitle'       => 'Búsqueda Documentos',
-            'PageDescription' => 'Búsqueda Documentos.',
-            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
-            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-            'TableTitle'      => 'Búsqueda Documentos',
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $this->getUserData($f3),
-            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_FormInputs'   => $this->FormInputs,
-            'Fnc_Codification' => $this->Codification,
-            /*=========== Datos Consultados ===========*/
-            'arrEntidades'    => $arrEntidades['data'],
-            'arrDocumentos'   => $arrDocumentos['data'],
-            'arrEstadoPago'   => $arrEstadoPago['data'],
-            'arrTipoMov'      => $arrTipoMov['data'],
-        ];
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if ($arrEntidades['status'] === true && $arrDocumentos['status'] === true && $arrEstadoPago['status'] === true && $arrTipoMov['status'] === true) {
+
+            /************************************/
+            // Datos enviados a la pagina
+            $f3->data = [
+                /*=========== Datos de la Pagina ===========*/
+                'PageTitle'       => 'Búsqueda Documentos',
+                'PageDescription' => 'Búsqueda Documentos.',
+                'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+                'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+                'TableTitle'      => 'Búsqueda Documentos',
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_FormInputs'   => $this->FormInputs,
+                'Fnc_Codification' => $this->Codification,
+                /*=========== Datos Consultados ===========*/
+                'arrEntidades'    => $arrEntidades['data'],
+                'arrDocumentos'   => $arrDocumentos['data'],
+                'arrEstadoPago'   => $arrEstadoPago['data'],
+                'arrTipoMov'      => $arrTipoMov['data'],
+            ];
+
+            /************************************/
+            // Se instancia la vista
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
 
         /************************************/
-        // Se instancia la vista
-        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
+        // Si no hay resultados
+        } else {
+            // Busco errores de la consulta
+            $result = $this->mergeResponses([$arrEntidades,$arrDocumentos,$arrEstadoPago,$arrTipoMov]);
+            // Despliegue de errores
+            $this->showError(1, $f3, $result);
+        }
     }
 
     /*******************************************************************/

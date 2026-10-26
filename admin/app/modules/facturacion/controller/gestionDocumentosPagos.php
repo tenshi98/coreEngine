@@ -376,7 +376,7 @@ class gestionDocumentosPagos extends ControllerBase {
             'data'    => '
             facturacion_listado.idFacturacion,
             facturacion_listado.ValorTotal,
-            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$_POST['idFacturacion'].' AND idPago!='.$_POST['idPago'].') AS MontoPagado',
+            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.(int)$_POST['idFacturacion'].' AND idPago!='.(int)$_POST['idPago'].') AS MontoPagado',
             'table'   => 'facturacion_listado',
             'join'    => '',
             'where'   => 'idFacturacion = ?',
@@ -393,14 +393,24 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowData['status'] === false) {
+            $this->failOperation($rowData);
+        }
+
+        /************************************/
+        // Se verifica que el monto sea numerico antes de compararlo
+        if(isset($_POST['MontoPagado'])&&!is_numeric($_POST['MontoPagado'])){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+            // Se reporta el error
+            Response::error('El monto ingresado no es un número válido', 500);
         }
 
         /************************************/
         //Se verifica si el monto es superior al valor del documento
         if(isset($rowData['data']['ValorTotal'], $rowData['data']['MontoPagado'], $_POST['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$_POST['MontoPagado'])){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error('Ha ingresado un monto superior al valor total del documento', 500);
         }else{
             /************************************/
@@ -425,8 +435,7 @@ class gestionDocumentosPagos extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                $this->Base_transactionRollback();
-                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+                $this->failOperation($Response);
             }
 
             /************************************/
@@ -436,7 +445,9 @@ class gestionDocumentosPagos extends ControllerBase {
             /************************************/
             // Si falla la la ejecucion, se muestra alerta
             if($ResponseUp['code'] != 200){
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
+                // Se reporta el error
                 Response::error($ResponseUp['message'], $ResponseUp['code'], $ResponseUp['error'] ?? '');
             }
 
@@ -498,8 +509,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error']);
+            $this->failOperation($rowFacturacion);
         }
 
         /************************************/
@@ -519,8 +529,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -530,7 +539,9 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if($ResponseUp['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseUp['message'], $ResponseUp['code'], $ResponseUp['error'] ?? '');
         }
 
@@ -557,12 +568,20 @@ class gestionDocumentosPagos extends ControllerBase {
         $DBConn = $NewDBConn ?? $this->getDBConn();
 
         /************************************/
+        // Se bloquea la fila madre para serializar recálculos del estado de
+        // pago del mismo documento. El llamador gestiona la transacción.
+        $lock = $this->lockRowsForUpdate('facturacion_listado', 'idFacturacion', [(int)$FacturacionID], $DBConn);
+        if ($lock['status'] === false) {
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error']];
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
             facturacion_listado.idFacturacion,
             facturacion_listado.ValorTotal,
-            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$FacturacionID.') AS MontoPagado',
+            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.(int)$FacturacionID.') AS MontoPagado',
             'table'   => 'facturacion_listado',
             'join'    => '',
             'where'   => 'idFacturacion = ?',
@@ -642,12 +661,23 @@ class gestionDocumentosPagos extends ControllerBase {
         }
 
         /************************************/
+        // Se bloquea la fila madre para serializar la validación de sobrepago
+        // del mismo documento ante pagos concurrentes.
+        $lock = $this->lockRowsForUpdate('facturacion_listado', 'idFacturacion', [(int)$Data['idFacturacion']], $DBConn);
+        if ($lock['status'] === false) {
+            if($NewDBConn === null){
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            }
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error']];
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
             facturacion_listado.idFacturacion,
             facturacion_listado.ValorTotal,
-            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.$Data['idFacturacion'].') AS MontoPagado',
+            (SELECT SUM(MontoPagado) FROM facturacion_listado_pagos WHERE idFacturacion='.(int)$Data['idFacturacion'].') AS MontoPagado',
             'table'   => 'facturacion_listado',
             'join'    => '',
             'where'   => 'idFacturacion = ?',
@@ -666,6 +696,13 @@ class gestionDocumentosPagos extends ControllerBase {
         if ($rowData['status'] === false) {
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
             return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+        }
+
+        /************************************/
+        // Se verifica que el monto sea numerico antes de compararlo
+        if(isset($Data['MontoPagado'])&&!is_numeric($Data['MontoPagado'])){
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'El monto ingresado no es un número válido'];
         }
 
         /************************************/
@@ -729,20 +766,21 @@ class gestionDocumentosPagos extends ControllerBase {
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado',
-            'ValidarEntero'             => 'idPago,idFacturacion,idUsuario,idDocumentoPago',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'FechaPago',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idPago,idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado',
+            'ValidarEntero'              => 'idPago,idFacturacion,idUsuario,idDocumentoPago',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'FechaPago',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'N_Doc' => 60,
+            ],
             'ValidarPalabrasCensuradas' => '',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
@@ -768,34 +806,33 @@ class gestionDocumentosPagos extends ControllerBase {
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idFacturacion,idEstadoPago,MontoPagado',
-            'ValidarEntero'             => 'idFacturacion,idEstadoPago',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idFacturacion,idEstadoPago,MontoPagado',
+            'ValidarEntero'              => 'idFacturacion,idEstadoPago',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

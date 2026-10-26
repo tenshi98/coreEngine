@@ -43,6 +43,7 @@
                                                 switch ($crud['idTipoEntidad']) {
                                                     case 1: $Entidad = $crud['EntidadesApellido'].', '.$crud['EntidadesNombre']; break; //Persona Natural
                                                     case 2: $Entidad = $crud['EntidadesRazonSocial']; break;                            //Empresas
+                                                    default: $Entidad = '-'; break;                                                         //Tipo no contemplado
                                                 }
                                                 // Imprimir
                                                 echo $Entidad;

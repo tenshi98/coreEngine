@@ -338,8 +338,7 @@ class gestionDocumentosServicios extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -347,7 +346,9 @@ class gestionDocumentosServicios extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(3, $_POST['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseGestionDoc['message'], $ResponseGestionDoc['code'], $ResponseGestionDoc['error']);
         }
 
@@ -400,8 +401,7 @@ class gestionDocumentosServicios extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -409,7 +409,9 @@ class gestionDocumentosServicios extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(3, $_POST['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseGestionDoc['message'], $ResponseGestionDoc['code'], $ResponseGestionDoc['error']);
         }
 
@@ -469,8 +471,7 @@ class gestionDocumentosServicios extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error']);
+            $this->failOperation($rowFacturacion);
         }
 
         /************************************/
@@ -490,8 +491,7 @@ class gestionDocumentosServicios extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -499,7 +499,9 @@ class gestionDocumentosServicios extends ControllerBase {
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(3, $rowFacturacion['data']['idFacturacion'], $this->getDBConn());
         if($ResponseGestionDoc['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponseGestionDoc['message'], $ResponseGestionDoc['code'], $ResponseGestionDoc['error']);
         }
 
@@ -522,34 +524,33 @@ class gestionDocumentosServicios extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idFacturacion,idServicio,Number,ValorTotal',
-            'ValidarEntero'             => 'idFacturacion,idServicio',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idFacturacion,idServicio,Number,ValorTotal',
+            'ValidarEntero'              => 'idFacturacion,idServicio',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

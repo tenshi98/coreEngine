@@ -114,7 +114,7 @@ class gestionDocumentosInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -126,16 +126,18 @@ class gestionDocumentosInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -304,8 +306,8 @@ class gestionDocumentosInstaller extends ControllerInstaller {
                 ['idMetodo' => 2, 'RutaWeb' => 'gestionDocumentos/ventas/listado/servicios',                  'RutaController' => 'gestionDocumentosServicios->Insert',        'Descripcion' => 'Crear Información',                              'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosServicios'],
                 ['idMetodo' => 2, 'RutaWeb' => 'gestionDocumentos/ventas/listado/servicios/update',           'RutaController' => 'gestionDocumentosServicios->Update',        'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosServicios'],
                 ['idMetodo' => 3, 'RutaWeb' => 'gestionDocumentos/ventas/listado/servicios',                  'RutaController' => 'gestionDocumentosServicios->Delete',        'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosServicios'],
-                ['idMetodo' => 1, 'RutaWeb' => 'gestionDocumentos/ventas/listado/guias/new/@id',              'RutaController' => 'gestionDocumentosGuias->New_1',             'Descripcion' => 'Mostrar modal nuevo',                            'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosGuias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'gestionDocumentos/ventas/listado/guias/updateList/@id',       'RutaController' => 'gestionDocumentosGuias->UpdateList_1',      'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosGuias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'gestionDocumentos/ventas/listado/guias/new/@id',              'RutaController' => 'gestionDocumentosGuias->New_2',             'Descripcion' => 'Mostrar modal nuevo',                            'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosGuias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'gestionDocumentos/ventas/listado/guias/updateList/@id',       'RutaController' => 'gestionDocumentosGuias->UpdateList_2',      'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosGuias'],
                 ['idMetodo' => 2, 'RutaWeb' => 'gestionDocumentos/ventas/listado/guias',                      'RutaController' => 'gestionDocumentosGuias->Insert',            'Descripcion' => 'Crear Información',                              'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosGuias'],
                 ['idMetodo' => 3, 'RutaWeb' => 'gestionDocumentos/ventas/listado/guias',                      'RutaController' => 'gestionDocumentosGuias->Delete',            'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosGuias'],
                 ['idMetodo' => 1, 'RutaWeb' => 'gestionDocumentos/ventas/listado/pagos/new/@id',              'RutaController' => 'gestionDocumentosPagos->New_2',             'Descripcion' => 'Mostrar modal nuevo',                            'idLevelLimit' => 2, 'Controller' => 'gestionDocumentosPagos'],
@@ -332,9 +334,18 @@ class gestionDocumentosInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
+        // Incluye los controladores de las rutas (columna Controller): Base_uninstallModule()
+        // borra core_permisos_listado_rutas WHERE Controller IN (esta lista), asi que
+        // omitirlos dejaria sus rutas huerfanas al desinstalar el modulo
         $RutaController  = '"gestionDocumentosCompras"';
         $RutaController .= ',"gestionDocumentosVentas"';
         $RutaController .= ',"informeDocumentos"';
+        $RutaController .= ',"gestionDocumentos"';
+        $RutaController .= ',"gestionDocumentosItems"';
+        $RutaController .= ',"gestionDocumentosProductos"';
+        $RutaController .= ',"gestionDocumentosServicios"';
+        $RutaController .= ',"gestionDocumentosGuias"';
+        $RutaController .= ',"gestionDocumentosPagos"';
 
         /************************************/
         // Retorno los datos
@@ -401,20 +412,16 @@ class gestionDocumentosInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE facturacion_listado ADD INDEX idx_facturacion_usuario (idUsuario),ADD INDEX idx_facturacion_tipo (idTipo),ADD INDEX idx_facturacion_entidad (idEntidad),ADD INDEX idx_facturacion_fecha (Creacion_fecha),ADD INDEX idx_facturacion_documento (idDocumentos),ADD INDEX idx_facturacion_estado_pago (idEstadoPago);',
-            'optimization' => 'ALTER TABLE facturacion_listado_productos ADD INDEX idx_flp_facturacion (idFacturacion),ADD INDEX idx_flp_producto (idProducto),ADD INDEX idx_flp_bodega (idBodegas),ADD INDEX idx_flp_estado_bodega (idEstadoIngreso, idBodegas),ADD INDEX idx_flp_facturacion_producto (idFacturacion, idProducto);',
-            'optimization' => 'ALTER TABLE facturacion_listado_servicios ADD INDEX idx_fls_facturacion (idFacturacion),ADD INDEX idx_fls_servicio (idServicio),ADD INDEX idx_fls_facturacion_servicio (idFacturacion, idServicio);',
-            'optimization' => 'ALTER TABLE facturacion_listado_items ADD INDEX idx_fli_facturacion (idFacturacion);',
-            'optimization' => 'ALTER TABLE facturacion_listado_guias ADD INDEX idx_flg_facturacion (idFacturacion),ADD INDEX idx_flg_relacion (idFacturacionRel),ADD INDEX idx_flg_facturacion_relacion (idFacturacion, idFacturacionRel);',
-            'optimization' => 'ALTER TABLE facturacion_listado_pagos ADD INDEX idx_flp_facturacion (idFacturacion),ADD INDEX idx_flp_usuario (idUsuario),ADD INDEX idx_flp_fecha (FechaPago),ADD INDEX idx_flp_documento (idDocumentoPago),ADD INDEX idx_flg_facturacion_pago (idFacturacion, FechaPago);',
+        $arrOptimizations = [
+            'ALTER TABLE facturacion_listado ADD INDEX IF NOT EXISTS idx_facturacion_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_facturacion_tipo (idTipo),ADD INDEX IF NOT EXISTS idx_facturacion_entidad (idEntidad),ADD INDEX IF NOT EXISTS idx_facturacion_fecha (Creacion_fecha),ADD INDEX IF NOT EXISTS idx_facturacion_documento (idDocumentos),ADD INDEX IF NOT EXISTS idx_facturacion_estado_pago (idEstadoPago);',
+            'ALTER TABLE facturacion_listado_productos ADD INDEX IF NOT EXISTS idx_flp_facturacion (idFacturacion),ADD INDEX IF NOT EXISTS idx_flp_producto (idProducto),ADD INDEX IF NOT EXISTS idx_flp_bodega (idBodegas),ADD INDEX IF NOT EXISTS idx_flp_estado_bodega (idEstadoIngreso, idBodegas),ADD INDEX IF NOT EXISTS idx_flp_facturacion_producto (idFacturacion, idProducto);',
+            'ALTER TABLE facturacion_listado_servicios ADD INDEX IF NOT EXISTS idx_fls_facturacion (idFacturacion),ADD INDEX IF NOT EXISTS idx_fls_servicio (idServicio),ADD INDEX IF NOT EXISTS idx_fls_facturacion_servicio (idFacturacion, idServicio);',
+            'ALTER TABLE facturacion_listado_items ADD INDEX IF NOT EXISTS idx_fli_facturacion (idFacturacion);',
+            'ALTER TABLE facturacion_listado_guias ADD INDEX IF NOT EXISTS idx_flg_facturacion (idFacturacion),ADD INDEX IF NOT EXISTS idx_flg_relacion (idFacturacionRel),ADD INDEX IF NOT EXISTS idx_flg_facturacion_relacion (idFacturacion, idFacturacionRel);',
+            'ALTER TABLE facturacion_listado_pagos ADD INDEX IF NOT EXISTS idx_flp_facturacion (idFacturacion),ADD INDEX IF NOT EXISTS idx_flp_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_flp_fecha (FechaPago),ADD INDEX IF NOT EXISTS idx_flp_documento (idDocumentoPago),ADD INDEX IF NOT EXISTS idx_flg_facturacion_pago (idFacturacion, FechaPago);',
         ];
 
         /************************************/
