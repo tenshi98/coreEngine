@@ -151,10 +151,49 @@ class UserSessionDataService {
         // Se genera la query
         $query = [
             'data'      => 'idEstado',
-            'required'  => 'token',
+            'required'  => '',
             'unique'    => '',
             'table'     => 'usuarios_accesos',
             'where'     => 'idUsuario,idTipoAcceso',
+            'Post'      => $Post,
+        ];
+        // Ejecuto la query
+        $this->QBuilder->queryUpdate($query, $this->DBConn);
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Rota el token de la sesión activa (idEstado=1, acceso web) de un usuario,
+     * actualizando el token y su fecha de expiración para que la base de datos
+     * acompañe al nuevo valor emitido en la cookie "Sesion_tk".
+     *
+     * Solo se modifican las filas activas: las inactivas conservan su token
+     * histórico (auditoría). idEstado entra únicamente como condición WHERE.
+     *
+     * @param int    $UsuarioID      Id del usuario cuya sesión activa se rota.
+     * @param string $Token          Nuevo token de sesión (cookie).
+     * @param string $ExpirationDate Nueva fecha de expiración (Y-m-d H:i:s).
+     *
+     * @return void
+     */
+    public function rotateActiveAccess($UsuarioID, $Token, $ExpirationDate){
+
+        // Se agrega respuesta
+        $Post                    = [];
+        $Post['idUsuario']       = $UsuarioID;
+        $Post['idTipoAcceso']    = 1; // Acceso Web
+        $Post['idEstado']        = 1; // Solo la fila activa (condicion WHERE)
+        $Post['token']           = $Token;
+        $Post['expiration_date'] = $ExpirationDate;
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'token,expiration_date',
+            'required'  => '',
+            'unique'    => '',
+            'table'     => 'usuarios_accesos',
+            'where'     => 'idUsuario,idTipoAcceso,idEstado',
             'Post'      => $Post,
         ];
         // Ejecuto la query

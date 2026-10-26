@@ -193,7 +193,19 @@ class SessionService {
 
         /************************************/
         // Se limpian las cookies
-        setcookie('Sesion_tk','',time()-1);
+        // Mismos atributos que la creacion (create) para que el borrado matchee
+        // la cookie almacenada en el cliente (RFC 6265: el Path debe coincidir)
+        setcookie(
+            'Sesion_tk',
+            '',
+            [
+                'expires'  => time() - 1,
+                'path'     => '/',
+                'secure'   => true,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]
+        );
         // También es recomendable unset($_COOKIE['']) para borrar la cookie de la superglobal $_COOKIE
         unset($_COOKIE['Sesion_tk']);
 

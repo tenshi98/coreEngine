@@ -1,8 +1,10 @@
 <?php
 /**
- * Acceso a datos del usuario (tabla usuarios_listado) y a la configuración
+ * Acceso a datos del usuario (tabla usuarios_listado), de los tokens de
+ * recuperación de contraseña (usuarios_password_reset) y de la configuración
  * general del sistema (core_sistemas): búsqueda por id/email, actualización
- * de último acceso y contraseña, y armado de los datos de sesión (DataInfo).
+ * de último acceso y contraseña, ciclo de vida de tokens de reset (crear,
+ * validar, invalidar) y armado de los datos de sesión (DataInfo).
  */
 class UserRepository {
 
@@ -102,11 +104,13 @@ class UserRepository {
         $arrData = [
             'idUsuario' => $UsuarioID,
             'password'  => $NewPasswords,
+            'PasswordForzarCambio' => 0,
+            'PasswordUltimoCambio' => date('Y-m-d H:i:s'),
         ];
         /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'password',
+            'data'      => 'password,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'password',
             'unique'    => '',
             'encode'    => 'password',
@@ -123,12 +127,200 @@ class UserRepository {
 
     /******************************************************************************/
     /**
+     * Crea un token de recuperación de contraseña en usuarios_password_reset.
+     *
+     * Solo se persiste el hash sha256 del token (nunca el token en claro).
+     * FechaUso no se envía: queda NULL por defecto de columna (token activo).
+     *
+     * @param int    $UsuarioID      Id del usuario destinatario.
+     * @param string $TokenHash      Hash sha256 hex (64 chars) del token.
+     * @param string $FechaCreacion  Fecha/hora de creación ('Y-m-d H:i:s').
+     * @param string $FechaExpiracion Fecha/hora de expiración ('Y-m-d H:i:s').
+     * @param string $IP_Client      IP de origen de la solicitud.
+     * @param string $Agent_Transp   User agent de la solicitud.
+     *
+     * @return int|false id del token insertado (idPasswordReset), o false si el insert falló.
+     */
+    public function createResetToken($UsuarioID, $TokenHash, $FechaCreacion, $FechaExpiracion, $IP_Client, $Agent_Transp) {
+
+        // Se agrega respuesta
+        $arrData = [
+            'idUsuario'       => $UsuarioID,
+            'token_hash'      => $TokenHash,
+            'FechaCreacion'   => $FechaCreacion,
+            'FechaExpiracion' => $FechaExpiracion,
+            'IP_Client'       => $IP_Client,
+            'Agent_Transp'    => $Agent_Transp,
+        ];
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idUsuario,token_hash,FechaCreacion,FechaExpiracion,IP_Client,Agent_Transp',
+            'required'  => 'idUsuario,token_hash,FechaCreacion,FechaExpiracion',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'usuarios_password_reset',
+            'Post'      => $arrData,
+        ];
+        // Ejecuto la query
+        $result = $this->queryBuilder->queryInsert($query, $this->DB_conn);
+        // Retorno de datos (id insertado para poder invalidarlo si el correo falla)
+        return (($result['status'] ?? false) === true) ? (int) $result['data'] : false;
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Indica si el usuario tiene un token activo creado hace menos de
+     * $minutos minutos (throttle anti-bombardeo de correos por destinatario).
+     *
+     * @param int $UsuarioID Id del usuario a consultar.
+     * @param int $minutos   Ventana del throttle en minutos (por defecto 5).
+     *
+     * @return bool true si existe un token activo dentro de la ventana.
+     */
+    public function hasRecentResetToken($UsuarioID, $minutos = 5) {
+
+        // Fecha límite calculada en PHP (portable, sin placeholder dentro de INTERVAL)
+        $Limite = date('Y-m-d H:i:s', time() - ((int) $minutos * 60));
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'   => 'idPasswordReset',
+            'table'  => 'usuarios_password_reset',
+            'join'   => '',
+            'where'  => 'idUsuario = ? AND FechaUso IS NULL AND FechaCreacion > ?',
+            'params' => [$UsuarioID, $Limite],
+            'group'  => '',
+            'having' => '',
+            'order'  => ''
+        ];
+        // Verifico si hay un dato
+        $result = $this->queryBuilder->queryRow($query, $this->DB_conn);
+
+        /************************************/
+        // Retorno de datos
+        return ($result !== false && ($result['status'] ?? false) === true && !empty($result['data']));
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Invalida todos los tokens de recuperación del usuario (setea FechaUso).
+     *
+     * Se ejecuta antes de crear un token nuevo: garantiza como máximo un
+     * token activo por usuario (uso único de los enlaces anteriores).
+     *
+     * @param int $UsuarioID Id del usuario cuyos tokens se invalidan.
+     *
+     * @return bool true si la actualización fue exitosa.
+     */
+    public function invalidateResetTokens($UsuarioID) {
+
+        // Se agrega respuesta
+        $arrData = [
+            'idUsuario' => $UsuarioID,
+            'FechaUso'  => date('Y-m-d H:i:s'),
+        ];
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'FechaUso',
+            'required'  => '',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'usuarios_password_reset',
+            'where'     => 'idUsuario',
+            'Post'      => $arrData,
+        ];
+        // Ejecuto la query
+        $result = $this->queryBuilder->queryUpdate($query, $this->DB_conn);
+        // Retorno de datos
+        return ($result['status'] ?? false) === true;
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Busca un token de reset activo (sin usar y no expirado) por su hash.
+     *
+     * @param string $TokenHash Hash sha256 hex (64 chars) calculado sobre el token recibido.
+     *
+     * @return array|null Fila del token ('idPasswordReset','idUsuario','token_hash',
+     *                    'FechaCreacion','FechaExpiracion') o null si no hay coincidencia activa.
+     */
+    public function findActiveResetToken($TokenHash) {
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'   => 'idPasswordReset,idUsuario,token_hash,FechaCreacion,FechaExpiracion',
+            'table'  => 'usuarios_password_reset',
+            'join'   => '',
+            'where'  => 'token_hash = ? AND FechaUso IS NULL AND FechaExpiracion > NOW()',
+            'params' => [$TokenHash],
+            'group'  => '',
+            'having' => '',
+            'order'  => ''
+        ];
+        // Verifico si hay un dato
+        $result = $this->queryBuilder->queryRow($query, $this->DB_conn);
+
+        /************************************/
+        // Si no hay resultados
+        if ($result === false || ($result['status'] ?? false) !== true || empty($result['data'])) {
+            // Retorno de datos
+            return null;
+        }
+
+        /************************************/
+        // Retorno de datos
+        return $result['data'];
+    }
+
+    /******************************************************************************/
+    /**
+     * Marca un token de reset como usado (setea FechaUso), dejándolo
+     * invalidado de forma permanente (uso único).
+     *
+     * @param int $idPasswordReset Id del token a marcar.
+     *
+     * @return bool true si la actualización fue exitosa.
+     */
+    public function markResetTokenUsed($idPasswordReset) {
+
+        // Se agrega respuesta
+        $arrData = [
+            'idPasswordReset' => $idPasswordReset,
+            'FechaUso'        => date('Y-m-d H:i:s'),
+        ];
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'FechaUso',
+            'required'  => '',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'usuarios_password_reset',
+            'where'     => 'idPasswordReset',
+            'Post'      => $arrData,
+        ];
+        // Ejecuto la query
+        $result = $this->queryBuilder->queryUpdate($query, $this->DB_conn);
+        // Retorno de datos
+        return ($result['status'] ?? false) === true;
+
+    }
+
+    /******************************************************************************/
+    /**
      * Arma el arreglo de datos de usuario ("DataInfo") que se guarda en
      * SESSION, combinando los datos de la fila del usuario con la
      * configuración general de la plataforma (core_sistemas).
      *
      * @param array  $rowData Fila del usuario (usuarios_listado + joins).
-     * @param object $Client  Helper de datos de cliente (IP).
+     * @param object $Client  Helper de datos de cliente (IP, dispositivo móvil).
      *
      * @return array Datos de usuario fusionados con la configuración del sistema.
      */
@@ -138,16 +330,19 @@ class UserRepository {
 
         // Armo los datos del usuario
         $rowUsuario = [
-            'UserID'             => $rowData['idUsuario'],
-            'UserType'           => $rowData['idTipoUsuario'],
-            'UserIMG'            => $rowData['Direccion_img'],
-            'UserName'           => $rowData['Nombre'],
-            'UserPosition'       => $rowData['Posicion'],
-            'idMenuPosicion'     => $rowData['idMenuPosicion'],
-            'UbicacionNombre'    => $rowData['UbicacionNombre'],
-            'UbicacionWheater'   => $rowData['UbicacionWheater'],
-            'UserIP'             => $Client->getClientIp(),
-            'MainPathUrl'        => $FileManager->getMainPathUrl(),
+            'UserID'                => $rowData['idUsuario'],
+            'UserType'              => $rowData['idTipoUsuario'],
+            'UserIMG'               => $rowData['Direccion_img'],
+            'UserName'              => $rowData['Nombre'],
+            'UserPosition'          => $rowData['Posicion'],
+            'idMenuPosicion'        => $rowData['idMenuPosicion'],
+            'UbicacionNombre'       => $rowData['UbicacionNombre'],
+            'UbicacionWheater'      => $rowData['UbicacionWheater'],
+            'PasswordForzarCambio'  => (int) ($rowData['PasswordForzarCambio'] ?? 0),
+            'PasswordUltimoCambio'  => $rowData['PasswordUltimoCambio'] ?? null,
+            'UserIP'                => $Client->getClientIp(),
+            'DeviceMobile'          => $Client->validarDispositivoMovil(),
+            'MainPathUrl'           => $FileManager->getMainPathUrl(),
         ];
         /************************************/
         // Se cargan los datos de la plataforma
@@ -204,6 +399,8 @@ class UserRepository {
                 usuarios_listado.Direccion_img,
                 usuarios_listado.idMenuPosicion,
                 usuarios_listado.password,
+                usuarios_listado.PasswordForzarCambio,
+                usuarios_listado.PasswordUltimoCambio,
                 core_tipos_usuario.Nombre AS Posicion,
                 core_ubicacion_ciudad.Nombre AS UbicacionNombre,
                 core_ubicacion_ciudad.Wheater AS UbicacionWheater',

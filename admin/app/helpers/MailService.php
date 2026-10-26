@@ -28,23 +28,26 @@ class MailService {
 
     /******************************************************************************/
     /**
-     * Arma y envía el correo de aviso de nueva contraseña generada.
+     * Arma y envía el correo con el enlace de restablecimiento de contraseña.
      *
-     * @param Base   $f3           Instancia de Fat-Free Framework (usa 'BASE').
-     * @param array  $dataUser     Datos del usuario destinatario ('email', ...).
-     * @param array  $SystemData   Configuración del sistema (logo, contacto, redes, motor de correo).
-     * @param string $NewPasswords Nueva contraseña generada, incluida en el cuerpo del mensaje.
+     * El mensaje solo incluye la URL con el token de un solo uso (nunca una
+     * contraseña): el usuario define su nueva contraseña al abrir el enlace.
+     *
+     * @param Base   $f3        Instancia de Fat-Free Framework (usa 'BASE').
+     * @param array  $dataUser  Datos del usuario destinatario ('email', ...).
+     * @param array  $SystemData Configuración del sistema (logo, contacto, redes, motor de correo).
+     * @param string $ResetURL  Enlace de restablecimiento (…/reset-password?token=…).
      *
      * @return mixed Resultado de ControllerBase::Base_SelectMail() (true si el envío fue exitoso).
      */
-    public function sendPasswordReset($f3, $dataUser, $SystemData, $NewPasswords){
+    public function sendPasswordReset($f3, $dataUser, $SystemData, $ResetURL){
 
         /************************************/
         // Se agrega respuesta
         $arrData = [
-            'Asunto'  => 'Cambio de contraseña',
+            'Asunto'  => 'Recuperación de contraseña',
             'Hacia'   => $dataUser['email'],
-            'Mensaje' => 'Se ha generado una nueva contraseña para el email '.$dataUser['email'].', su nueva contraseña es: '.$NewPasswords,
+            'Mensaje' => 'Se recibió una solicitud para restablecer la contraseña del email '.$dataUser['email'].'. Para definir una nueva contraseña, abra el siguiente enlace (válido por 60 minutos): '.$ResetURL.'. Si usted no solicitó este cambio, ignore este mensaje.',
         ];
         /************************************/
         // Se genera la query
