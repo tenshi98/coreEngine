@@ -7,9 +7,14 @@
 <?php
 // Verifico si hay datos
 if(!empty($data['MainViewData']['Data_arrBodegas'])&&is_array($data['MainViewData']['Data_arrBodegas'])){
+    // Valor
+    $aosDuration = 1;
     // Recorro
-    foreach($data['MainViewData']['Data_arrBodegas'] as $bod){ ?>
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
+    foreach($data['MainViewData']['Data_arrBodegas'] as $bod){
+        // Se suma
+        $aosDuration++;
+        ?>
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-4 col-xl-4 col-xxl-4" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="<?php echo $aosDuration; ?>00">
             <div class="card">
                 <div class="card-body p-4">
                     <div class="infographicBox">

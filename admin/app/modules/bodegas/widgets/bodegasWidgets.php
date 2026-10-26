@@ -37,6 +37,8 @@ class bodegasWidgets extends ControllerBase {
 
         // Variables
         $Data['Menu_Name']   = 'Gestión Bodegas y Productos';
+        // Titulo que se muestra una sola vez sobre el bloque en la pantalla principal
+        $Data['Menu_Title']  = 'Bodegas';
         $Data['Menu_Value']  = [
             'Stock Productos'   => '../app/modules/bodegas/widgets/widgets-stock.php',
         ];

@@ -10,6 +10,7 @@
             <th scope="col">Tipo Movimiento</th>
             <th scope="col">Bodega</th>
             <th scope="col">Producto</th>
+            <th scope="col">Posición</th>
             <th scope="col">Cantidad</th>
             <th scope="col" style="width: 10px;">Acciones</th>
         </tr>
@@ -27,6 +28,7 @@
                     <td><?php echo $crud['TipoMovimiento']; ?></td>
                     <td><?php echo $crud['Bodega']; ?></td>
                     <td><?php echo $crud['ProductoNombre']; ?></td>
+                    <td><?php echo (!empty($crud['Posicion'])) ? $crud['Posicion'] : '<span class="text-muted">—</span>'; ?></td>
                     <td><?php echo $data['Fnc_DataNumbers']->Cantidades($crud['ProductoCantidad'], 2).' '.$crud['UnidadMedida']; ?></td>
                     <td>
                         <div class="btn-group" role="group">

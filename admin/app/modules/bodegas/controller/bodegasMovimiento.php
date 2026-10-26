@@ -13,7 +13,7 @@ class bodegasMovimiento extends ControllerBase {
     private $DataNumbers;
     private $DataDate;
     private $ServerServer;
-    private $WidgetsCommon;
+    private $WidgetsViews;
 
     /*******************************************************************/
     // Constructor
@@ -30,7 +30,7 @@ class bodegasMovimiento extends ControllerBase {
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->ServerServer   = new FunctionsServerServer();
-		$this->WidgetsCommon  = new UIWidgetsCommon();
+        $this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -440,8 +440,8 @@ class bodegasMovimiento extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
                 'arrProductos'     => $arrProductos['data'],
@@ -553,10 +553,10 @@ class bodegasMovimiento extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
             ];
@@ -659,7 +659,7 @@ class bodegasMovimiento extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -758,7 +758,7 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -801,6 +801,23 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     /*                             EJECUCION OTROS                                */
     /******************************************************************************/
+    /*******************************************************************/
+    // Borrar archivos
+    /*******************************************************************/
+    public function delFiles(){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Los movimientos no almacenan archivos propios
+        Response::success();
+
+    }
+
     /*******************************************************************/
     // Creación del movimiento de mercaderías
     /*******************************************************************/
@@ -875,7 +892,10 @@ class bodegasMovimiento extends ControllerBase {
                 return ['code' => 400, 'message' => 'Falta la cantidad del producto'];
             }
 
-            $cantidad = (float)$PostData['Number'][$j1];
+            // Normalizacion: la validacion admite coma decimal (formato chileno),
+            // pero (float) solo entiende punto -> se convierte antes de castear
+            // (si no, "2,5" quedaria truncado a 2 en silencio).
+            $cantidad = (float)str_replace(',', '.', $PostData['Number'][$j1]);
 
             if ($cantidad <= 0) {
                 return ['code' => 400, 'message' => 'La cantidad debe ser mayor que cero'];
@@ -886,6 +906,18 @@ class bodegasMovimiento extends ControllerBase {
         // Se inicia la transacción solo si corresponde
         if($NewDBConn === null){
             $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Se bloquean los productos para serializar escrituras concurrentes
+        // de stock (los stocks se leen y recalculan en PHP: SELECT previo).
+        // Orden ascendente por ID (lo maneja el helper) para evitar deadlocks.
+        $lockProd = $this->lockRowsForUpdate('productos_listado', 'idProducto', array_values((array)($PostData['idProducto'] ?? [])), $DBConn);
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($lockProd['status'] === false) {
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockProd['error'] ?? ''];
         }
 
         /************************************/
@@ -932,12 +964,12 @@ class bodegasMovimiento extends ControllerBase {
             $chainx_1 = '';
             // Se verifica movimiento
             switch ($idEstadoIngreso) {
-                case 1: $chainx_1 = ',Cantidad_idBodegas_' . $idBodegaIngreso . ' AS Cantidad_1'; break; // Ingreso
-                case 2: $chainx_1 = ',Cantidad_idBodegas_' . $idBodegaEgreso . ' AS Cantidad_1'; break;  // Egreso
+                case 1: $chainx_1 = ',bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodegaIngreso . ' AS Cantidad_1'; break; // Ingreso
+                case 2: $chainx_1 = ',bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodegaEgreso . ' AS Cantidad_1'; break;  // Egreso
                 case 3:
                     // Traspaso
-                    $chainx_1 = ',Cantidad_idBodegas_' . $idBodegaIngreso . ' AS Cantidad_1';
-                    $chainx_1 .= ',Cantidad_idBodegas_' . $idBodegaEgreso . ' AS Cantidad_2';
+                    $chainx_1  = ',bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodegaIngreso . ' AS Cantidad_1';
+                    $chainx_1 .= ',bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodegaEgreso . ' AS Cantidad_2';
                     break;
                 default:
                     $this->Base_transactionRollback(['newBDConn' => $DBConn]);
@@ -954,14 +986,18 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Se consultan los stocks
             $query = [
-                'data'    => 'idStocks,idProducto'.$chainx_1,
+                'data'    => '
+                    bodegas_productos_stocks.idStocks,
+                    bodegas_productos_stocks.idProducto,
+                    productos_listado.Nombre AS Producto'
+                    .$chainx_1,
                 'table'   => 'bodegas_productos_stocks',
-                'join'    => '',
-                'where'   => 'idProducto IN ('.$placeholders.')',
+                'join'    => 'LEFT JOIN productos_listado ON productos_listado.idProducto = bodegas_productos_stocks.idProducto',
+                'where'   => 'bodegas_productos_stocks.idProducto IN ('.$placeholders.')',
                 'params'  => $ElementsIDs,
                 'group'   => '',
                 'having'  => '',
-                'order'   => 'idProducto ASC',
+                'order'   => 'bodegas_productos_stocks.idProducto ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
             // Preparo los datos
@@ -985,7 +1021,8 @@ class bodegasMovimiento extends ControllerBase {
                 $arrProdStock[$idProducto] = [
                     'idStocks'   => $crud['idStocks'] ?? null,
                     'Cantidad_1' => (float)($crud['Cantidad_1'] ?? 0),
-                    'Cantidad_2' => (float)($crud['Cantidad_2'] ?? 0)
+                    'Cantidad_2' => (float)($crud['Cantidad_2'] ?? 0),
+                    'Nombre'     => ($crud['Producto'] ?? 'Producto ID '.$idProducto)
                 ];
             }
 
@@ -996,7 +1033,8 @@ class bodegasMovimiento extends ControllerBase {
             for ($j1 = 0; $j1 < $ndata_1; $j1++) {
 
                 $idProducto = (int)$PostData['idProducto'][$j1];
-                $cantidad   = (float)$PostData['Number'][$j1];
+                // Normalizacion coma decimal (ver validacion inicial de cantidades)
+                $cantidad   = (float)str_replace(',', '.', $PostData['Number'][$j1]);
 
                 /*******************************************************/
                 /*           SI NO EXISTE STOCK, SE INICIALIZA         */
@@ -1005,7 +1043,8 @@ class bodegasMovimiento extends ControllerBase {
                     $arrProdStock[$idProducto] = [
                         'idStocks'   => null,
                         'Cantidad_1' => 0,
-                        'Cantidad_2' => 0
+                        'Cantidad_2' => 0,
+                        'Nombre'     => null
                     ];
                 }
 
@@ -1078,7 +1117,7 @@ class bodegasMovimiento extends ControllerBase {
                         // Validar stock suficiente
                         if ($cantidad > $stockActual) {
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                            return ['code' => 400, 'message' => 'Stock insuficiente para el producto ' . $idProducto];
+                            return ['code' => 400, 'message' => 'Stock insuficiente para el producto ' . $arrProdStock[$idProducto]['Nombre'] . ' ('.$stockActual.' Actual)'];
                         }
                         $nuevoStock = $stockActual - $cantidad;
 
@@ -1105,7 +1144,7 @@ class bodegasMovimiento extends ControllerBase {
                         /* Cantidad_2 corresponde a la bodega de egreso/origen. */
                         if ($cantidad > $stockOrigen) {
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                            return ['code' => 400, 'message' => 'Stock insuficiente para realizar el traspaso del producto '. $idProducto];
+                            return ['code' => 400, 'message' => 'Stock insuficiente para realizar el traspaso del producto '. $arrProdStock[$idProducto]['Nombre'] . ' ('.$stockOrigen.' Actual)'];
                         }
 
                         /************************************/
@@ -1210,6 +1249,16 @@ class bodegasMovimiento extends ControllerBase {
             $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $PostData['idMovimiento']);
             if (!$this->isValidDecrypted($MovimientoID, 'id')) {
                 return ['code' => 400, 'message' => 'Registro inválido.'];
+            }
+
+            /************************************/
+            // Se bloquea el movimiento para serializar eliminaciones concurrentes
+            $lockMov = $this->lockRowsForUpdate('bodegas_movimientos', 'idMovimiento', [$MovimientoID['data']], $DBConn);
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($lockMov['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockMov['error'] ?? ''];
             }
 
             /************************************/
@@ -1801,34 +1850,33 @@ class bodegasMovimiento extends ControllerBase {
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,idUsuario,idFacturacion',
-            'ValidarEntero'             => 'idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,idUsuario,idFacturacion',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'Creacion_fecha,fecha_auto',
-            'ValidarHora'               => 'Creacion_hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Observaciones',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Observaciones',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => 'fecha_auto',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,idUsuario,idFacturacion',
+            'ValidarEntero'              => 'idEstadoIngreso,idBodegasIngreso,idBodegasEgreso,idUsuario,idFacturacion',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'Creacion_fecha,fecha_auto',
+            'ValidarHora'                => 'Creacion_hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Observaciones',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => 'Observaciones',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => 'fecha_auto',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;
@@ -1840,34 +1888,33 @@ class bodegasMovimiento extends ControllerBase {
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
-            'ValidarEntero'             => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+            'ValidarEntero'              => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;
@@ -1879,34 +1926,33 @@ class bodegasMovimiento extends ControllerBase {
     private function dataCheck_3($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idStocks,idProducto',
-            'ValidarEntero'             => 'idStocks,idProducto',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idStocks,idProducto',
+            'ValidarEntero'              => 'idStocks,idProducto',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

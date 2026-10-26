@@ -100,7 +100,7 @@ class bodegasInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -112,16 +112,44 @@ class bodegasInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
+                }
+            }
+        }
+
+        /*******************************************************/
+        /*            SEMBRADO DE LOS CATALOGOS                */
+        /*  Los catalogos no tienen pantalla de administracion, */
+        /*  por lo que el instalador los siembra (INSERT IGNORE */
+        /*  sobre la clave unica de Nombre: repetible).         */
+        /*******************************************************/
+        $arrSeed = $this->seedCatalogs();
+        if($arrSeed){
+            // Recorro los datos
+            foreach ($arrSeed as $seed) {
+                /************************************/
+                // Preparo los datos
+                $xParams     = ['query' => $seed];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -237,23 +265,49 @@ class bodegasInstaller extends ControllerInstaller {
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/listAll',                        'RutaController' => 'bodegasListado->listAll',                   'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/search',                         'RutaController' => 'bodegasListado->UpdateList',                'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/updateList',                     'RutaController' => 'bodegasListado->UpdateList',                'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/view/@id',                       'RutaController' => 'bodegasListado->View',                      'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/resumen/@id',                    'RutaController' => 'bodegasListado->Resumen',                   'Descripcion' => 'Mostrar Resúmen',                               'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/resumenUpdate/@id',              'RutaController' => 'bodegasListado->ResumenUpdate',             'Descripcion' => 'Mostrar información',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado',                                'RutaController' => 'bodegasListado->Insert',                    'Descripcion' => 'Crear Información',                             'idLevelLimit' => 3, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/update',                         'RutaController' => 'bodegasListado->Update',                    'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 4, 'RutaWeb' => 'administracion/bodegas/listado/delFiles',                       'RutaController' => 'bodegasListado->DelFiles',                  'Descripcion' => 'Permite eliminar archivos',                     'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado',                                'RutaController' => 'bodegasListado->Delete',                    'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 4, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/new/@id',          'RutaController' => 'bodegasListadoObservaciones->New',          'Descripcion' => 'Mostrar modal nuevo',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/updateList/@id',   'RutaController' => 'bodegasListadoObservaciones->UpdateList',   'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/view/@id',         'RutaController' => 'bodegasListadoObservaciones->View',         'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/getID/@id',        'RutaController' => 'bodegasListadoObservaciones->GetID',        'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/observaciones',                  'RutaController' => 'bodegasListadoObservaciones->Insert',       'Descripcion' => 'Crear Información',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/update',           'RutaController' => 'bodegasListadoObservaciones->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado/observaciones',                  'RutaController' => 'bodegasListadoObservaciones->Delete',       'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/listAll',                             'RutaController' => 'bodegasListado->listAll',                     'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/search',                              'RutaController' => 'bodegasListado->UpdateList',                  'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/updateList',                          'RutaController' => 'bodegasListado->UpdateList',                  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/view/@id',                            'RutaController' => 'bodegasListado->View',                        'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/resumen/@id',                         'RutaController' => 'bodegasListado->Resumen',                     'Descripcion' => 'Mostrar Resúmen',                               'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/resumenUpdate/@id',                   'RutaController' => 'bodegasListado->ResumenUpdate',               'Descripcion' => 'Mostrar información',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado',                                     'RutaController' => 'bodegasListado->Insert',                      'Descripcion' => 'Crear Información',                             'idLevelLimit' => 3, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/update',                              'RutaController' => 'bodegasListado->Update',                      'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 4, 'RutaWeb' => 'administracion/bodegas/listado/delFiles',                            'RutaController' => 'bodegasListado->DelFiles',                    'Descripcion' => 'Permite eliminar archivos',                     'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado',                                     'RutaController' => 'bodegasListado->Delete',                      'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 4, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/new/@id',               'RutaController' => 'bodegasListadoObservaciones->New',            'Descripcion' => 'Mostrar modal nuevo',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/updateList/@id',        'RutaController' => 'bodegasListadoObservaciones->UpdateList',     'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/view/@id',              'RutaController' => 'bodegasListadoObservaciones->View',           'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/getID/@id',             'RutaController' => 'bodegasListadoObservaciones->GetID',          'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/observaciones',                       'RutaController' => 'bodegasListadoObservaciones->Insert',         'Descripcion' => 'Crear Información',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/observaciones/update',                'RutaController' => 'bodegasListadoObservaciones->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado/observaciones',                       'RutaController' => 'bodegasListadoObservaciones->Delete',         'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoObservaciones'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/new/@id',                       'RutaController' => 'bodegasListadoZonas->New',                    'Descripcion' => 'Mostrar modal nuevo',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListadoZonas'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/view/@id',                      'RutaController' => 'bodegasListadoZonas->View',                   'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasListadoZonas'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/getID/@id',                     'RutaController' => 'bodegasListadoZonas->GetID',                  'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoZonas'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/zonas',                               'RutaController' => 'bodegasListadoZonas->Insert',                 'Descripcion' => 'Crear Información',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoZonas'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/zonas/update',                        'RutaController' => 'bodegasListadoZonas->Update',                 'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListadoZonas'],
+                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado/zonas',                               'RutaController' => 'bodegasListadoZonas->Delete',                 'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoZonas'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/new/@id',              'RutaController' => 'bodegasListadoPasillos->New',                 'Descripcion' => 'Mostrar modal nuevo',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/updateList/@id',       'RutaController' => 'bodegasListadoPasillos->UpdateList',          'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/view/@id',             'RutaController' => 'bodegasListadoPasillos->View',                'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/getID/@id',            'RutaController' => 'bodegasListadoPasillos->GetID',               'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos',                      'RutaController' => 'bodegasListadoPasillos->Insert',              'Descripcion' => 'Crear Información',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/update',               'RutaController' => 'bodegasListadoPasillos->Update',              'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos',                      'RutaController' => 'bodegasListadoPasillos->Delete',              'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoPasillos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks/new/@id',        'RutaController' => 'bodegasListadoRacks->New',                    'Descripcion' => 'Mostrar modal nuevo',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks/updateList/@id', 'RutaController' => 'bodegasListadoRacks->UpdateList',             'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks/view/@id',       'RutaController' => 'bodegasListadoRacks->View',                   'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks/getID/@id',      'RutaController' => 'bodegasListadoRacks->GetID',                  'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks',                'RutaController' => 'bodegasListadoRacks->Insert',                 'Descripcion' => 'Crear Información',                             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks/update',         'RutaController' => 'bodegasListadoRacks->Update',                 'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 3, 'RutaWeb' => 'administracion/bodegas/listado/zonas/pasillos/racks',                'RutaController' => 'bodegasListadoRacks->Delete',                 'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'bodegasListadoRacks'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/distribucion/estructura/@id',         'RutaController' => 'bodegasListadoDistribucion->Estructura',      'Descripcion' => 'Arbol de zonas, pasillos y racks',              'idLevelLimit' => 1, 'Controller' => 'bodegasListadoDistribucion'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/distribucion/mapa/@id',               'RutaController' => 'bodegasListadoDistribucion->Mapa',            'Descripcion' => 'Mapa de posiciones',                            'idLevelLimit' => 1, 'Controller' => 'bodegasListadoDistribucion'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/distribucion/visual/@id',             'RutaController' => 'bodegasListadoDistribucion->Visual',          'Descripcion' => 'Vista 3D isométrica',                           'idLevelLimit' => 1, 'Controller' => 'bodegasListadoDistribucion'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/distribucion/posicion/@id',           'RutaController' => 'bodegasListadoDistribucion->Posicion',        'Descripcion' => 'Formulario de estado de posición',              'idLevelLimit' => 2, 'Controller' => 'bodegasListadoDistribucion'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/distribucion/posiciones/@id',         'RutaController' => 'bodegasListadoDistribucion->Posiciones',      'Descripcion' => 'Opciones de posición para formularios',         'idLevelLimit' => 1, 'Controller' => 'bodegasListadoDistribucion'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/distribucion/posicion',               'RutaController' => 'bodegasListadoDistribucion->PosicionUpdate',  'Descripcion' => 'Cambiar el estado de una posición',             'idLevelLimit' => 2, 'Controller' => 'bodegasListadoDistribucion'],
 
             ],
             2 => [
@@ -329,6 +383,10 @@ class bodegasInstaller extends ControllerInstaller {
         // Se obtiene el nombre de los Controladores utilizados
         $RutaController  = '"bodegasListado"';
         $RutaController .= ',"bodegasListadoObservaciones"';
+        $RutaController .= ',"bodegasListadoZonas"';
+        $RutaController .= ',"bodegasListadoPasillos"';
+        $RutaController .= ',"bodegasListadoRacks"';
+        $RutaController .= ',"bodegasListadoDistribucion"';
         $RutaController .= ',"bodegasMovimientoIngreso"';
         $RutaController .= ',"bodegasMovimientoEgreso"';
         $RutaController .= ',"bodegasMovimientoTraspaso"';
@@ -353,13 +411,13 @@ class bodegasInstaller extends ControllerInstaller {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'bodegas_listado',
-            'data'       => '`idBodegas` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`DistribucionFisica` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`DistribucionVisual` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idBodegas` int(10) unsigned NOT NULL AUTO_INCREMENT,`Codigo` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT \'\',`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`DistribucionFisica` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`DistribucionVisual` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idBodegas',
             'comentario' => 'Creado desde el Instalador',
         ];
         $arrTables[] = [
             'table'      => 'bodegas_listado_observaciones',
-            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idBodegas` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idBodegas` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL,`idUsuarioEdicion` int(10) unsigned NULL DEFAULT NULL,`FechaEdicion` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -377,7 +435,7 @@ class bodegasInstaller extends ControllerInstaller {
         ];
         $arrTables[] = [
             'table'      => 'bodegas_movimientos_productos',
-            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idMovimiento` bigint(20) unsigned NOT NULL,`idEstadoIngreso` int(10) unsigned NOT NULL,`idBodegas` int(10) unsigned NOT NULL,`idProducto` int(10) unsigned NOT NULL,`Number` decimal(10, 2) UNSIGNED NOT NULL',
+            'data'       => '`idExistencia` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idMovimiento` bigint(20) unsigned NOT NULL,`idEstadoIngreso` int(10) unsigned NOT NULL,`idBodegas` int(10) unsigned NOT NULL,`idPosicion` int(10) unsigned NULL DEFAULT NULL,`idProducto` int(10) unsigned NOT NULL,`Number` decimal(10, 2) UNSIGNED NOT NULL',
             'primaryKey' => 'idExistencia',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -385,6 +443,51 @@ class bodegasInstaller extends ControllerInstaller {
             'table'      => 'bodegas_productos_stocks',
             'data'       => '`idStocks` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idProducto` int(10) unsigned NOT NULL,`Cantidad_idBodegas_1` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_2` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_3` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_4` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_5` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_6` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_7` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_8` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_9` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_10` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_11` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_12` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_13` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_14` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_15` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_16` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_17` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_18` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_19` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_20` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_21` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_22` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_23` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_24` decimal(10, 2) NULL DEFAULT NULL,`Cantidad_idBodegas_25` decimal(10, 2) NULL DEFAULT NULL',
             'primaryKey' => 'idStocks',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        /*******************************************************/
+        /*        DISTRIBUCION FISICA (zonas, pasillos, ...)    */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'bodegas_zonas_tipos',
+            'data'       => '`idZonaTipo` int(10) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Color` varchar(30) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT \'bg-secondary\',`Orden` int(10) unsigned NOT NULL DEFAULT 0',
+            'primaryKey' => 'idZonaTipo',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_posiciones_estados',
+            'data'       => '`idEstadoPosicion` int(10) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Color` varchar(30) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT \'bg-secondary\',`Orden` int(10) unsigned NOT NULL DEFAULT 0',
+            'primaryKey' => 'idEstadoPosicion',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_zonas',
+            'data'       => '`idZona` int(10) unsigned NOT NULL AUTO_INCREMENT,`idBodegas` int(10) unsigned NOT NULL,`idZonaTipo` int(10) unsigned NOT NULL,`Nombre` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Descripcion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Orden` int(10) unsigned NOT NULL DEFAULT 0,`idEstado` int(10) unsigned NOT NULL DEFAULT 1',
+            'primaryKey' => 'idZona',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_pasillos',
+            'data'       => '`idPasillo` int(10) unsigned NOT NULL AUTO_INCREMENT,`idBodegas` int(10) unsigned NOT NULL,`idZona` int(10) unsigned NOT NULL,`Nombre` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Orientacion` char(1) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL DEFAULT \'H\',`Orden` int(10) unsigned NOT NULL DEFAULT 0,`idEstado` int(10) unsigned NOT NULL DEFAULT 1',
+            'primaryKey' => 'idPasillo',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_racks',
+            'data'       => '`idRack` int(10) unsigned NOT NULL AUTO_INCREMENT,`idBodegas` int(10) unsigned NOT NULL,`idPasillo` int(10) unsigned NOT NULL,`Nombre` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Niveles` int(10) unsigned NOT NULL DEFAULT 1,`PosicionesPorNivel` int(10) unsigned NOT NULL DEFAULT 1,`Orden` int(10) unsigned NOT NULL DEFAULT 0,`idEstado` int(10) unsigned NOT NULL DEFAULT 1,`idRackEnfrentado` int(10) unsigned NULL DEFAULT NULL',
+            'primaryKey' => 'idRack',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_niveles',
+            'data'       => '`idNivel` int(10) unsigned NOT NULL AUTO_INCREMENT,`idBodegas` int(10) unsigned NOT NULL,`idRack` int(10) unsigned NOT NULL,`Nivel` int(10) unsigned NOT NULL',
+            'primaryKey' => 'idNivel',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_posiciones',
+            'data'       => '`idPosicion` int(10) unsigned NOT NULL AUTO_INCREMENT,`idBodegas` int(10) unsigned NOT NULL,`idNivel` int(10) unsigned NOT NULL,`Codigo` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Numero` int(10) unsigned NOT NULL,`idEstadoPosicion` int(10) unsigned NOT NULL DEFAULT 1',
+            'primaryKey' => 'idPosicion',
             'comentario' => 'Creado desde el Instalador',
         ];
 
@@ -399,24 +502,58 @@ class bodegasInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE bodegas_listado ADD INDEX idx_bodegas_estado (idEstado),ADD INDEX idx_bodegas_ciudad (idCiudad),ADD INDEX idx_bodegas_comuna (idComuna);',
-            'optimization' => 'ALTER TABLE bodegas_listado_observaciones ADD INDEX idx_bodegas_obs_bodega (idBodegas),ADD INDEX idx_bodegas_obs_usuario (idUsuario),ADD INDEX idx_bodegas_obs_bodega_fecha (idBodegas, FechaCreacion);',
-            'optimization' => 'ALTER TABLE bodegas_listado_permisos_usuarios ADD UNIQUE INDEX uk_bodegas_permiso_usuario (idUsuario, idBodegas),ADD INDEX idx_bodegas_permiso_bodega (idBodegas);',
-            'optimization' => 'ALTER TABLE bodegas_movimientos ADD INDEX idx_mov_estado_ingreso (idEstadoIngreso),ADD INDEX idx_mov_bodega_ingreso (idBodegasIngreso),ADD INDEX idx_mov_bodega_egreso (idBodegasEgreso),ADD INDEX idx_mov_usuario (idUsuario),ADD INDEX idx_mov_facturacion (idFacturacion),ADD INDEX idx_mov_fecha_auto (fecha_auto),ADD INDEX idx_mov_creacion_fecha (Creacion_fecha),ADD INDEX idx_mov_bodega_fecha (idBodegasIngreso, Creacion_fecha),ADD INDEX idx_mov_estado_fecha (idEstadoIngreso, Creacion_fecha);',
-            'optimization' => 'ALTER TABLE bodegas_movimientos_productos ADD INDEX idx_movprod_movimiento (idMovimiento),ADD INDEX idx_movprod_producto (idProducto),ADD INDEX idx_movprod_bodega (idBodegas),ADD INDEX idx_movprod_estado (idEstadoIngreso),ADD INDEX idx_movprod_bodega_producto (idBodegas, idProducto),ADD INDEX idx_movprod_producto_bodega (idProducto, idBodegas);',
+        $arrOptimizations = [
+            'ALTER TABLE bodegas_listado ADD INDEX IF NOT EXISTS idx_bodegas_estado (idEstado),ADD INDEX IF NOT EXISTS idx_bodegas_ciudad (idCiudad),ADD INDEX IF NOT EXISTS idx_bodegas_comuna (idComuna),ADD UNIQUE INDEX IF NOT EXISTS uk_bodegas_codigo (Codigo);',
+            'ALTER TABLE bodegas_listado_observaciones ADD INDEX IF NOT EXISTS idx_bodegas_obs_bodega (idBodegas),ADD INDEX IF NOT EXISTS idx_bodegas_obs_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_bodegas_obs_bodega_fecha (idBodegas, FechaCreacion);',
+            'ALTER TABLE bodegas_listado_permisos_usuarios ADD UNIQUE INDEX IF NOT EXISTS uk_bodegas_permiso_usuario (idUsuario, idBodegas),ADD INDEX IF NOT EXISTS idx_bodegas_permiso_bodega (idBodegas);',
+            'ALTER TABLE bodegas_movimientos ADD INDEX IF NOT EXISTS idx_mov_estado_ingreso (idEstadoIngreso),ADD INDEX IF NOT EXISTS idx_mov_bodega_ingreso (idBodegasIngreso),ADD INDEX IF NOT EXISTS idx_mov_bodega_egreso (idBodegasEgreso),ADD INDEX IF NOT EXISTS idx_mov_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_mov_facturacion (idFacturacion),ADD INDEX IF NOT EXISTS idx_mov_fecha_auto (fecha_auto),ADD INDEX IF NOT EXISTS idx_mov_creacion_fecha (Creacion_fecha),ADD INDEX IF NOT EXISTS idx_mov_bodega_fecha (idBodegasIngreso, Creacion_fecha),ADD INDEX IF NOT EXISTS idx_mov_estado_fecha (idEstadoIngreso, Creacion_fecha);',
+            'ALTER TABLE bodegas_movimientos_productos ADD INDEX IF NOT EXISTS idx_movprod_movimiento (idMovimiento),ADD INDEX IF NOT EXISTS idx_movprod_producto (idProducto),ADD INDEX IF NOT EXISTS idx_movprod_bodega (idBodegas),ADD INDEX IF NOT EXISTS idx_movprod_estado (idEstadoIngreso),ADD INDEX IF NOT EXISTS idx_movprod_bodega_producto (idBodegas, idProducto),ADD INDEX IF NOT EXISTS idx_movprod_producto_bodega (idProducto, idBodegas),ADD INDEX IF NOT EXISTS idx_movprod_posicion (idPosicion),ADD INDEX IF NOT EXISTS idx_movprod_bodega_posicion (idBodegas, idPosicion);',
+            'ALTER TABLE bodegas_zonas ADD INDEX IF NOT EXISTS idx_bzonas_tipo (idZonaTipo),ADD INDEX IF NOT EXISTS idx_bzonas_estado (idEstado),ADD UNIQUE INDEX IF NOT EXISTS uk_bzonas_bodega_nombre (idBodegas, Nombre);',
+            'ALTER TABLE bodegas_pasillos ADD INDEX IF NOT EXISTS idx_bpasillos_bodega (idBodegas),ADD INDEX IF NOT EXISTS idx_bpasillos_estado (idEstado),ADD UNIQUE INDEX IF NOT EXISTS uk_bpasillos_zona_nombre (idZona, Nombre);',
+            'ALTER TABLE bodegas_racks ADD INDEX IF NOT EXISTS idx_bracks_bodega (idBodegas),ADD INDEX IF NOT EXISTS idx_bracks_estado (idEstado),ADD UNIQUE INDEX IF NOT EXISTS uk_bracks_pasillo_nombre (idPasillo, Nombre);',
+            'ALTER TABLE bodegas_racks ADD COLUMN IF NOT EXISTS idRackEnfrentado int(10) unsigned NULL DEFAULT NULL AFTER idEstado,ADD INDEX IF NOT EXISTS idx_bracks_enfrentado (idRackEnfrentado);',
+            'ALTER TABLE bodegas_niveles ADD INDEX IF NOT EXISTS idx_bniveles_bodega (idBodegas),ADD UNIQUE INDEX IF NOT EXISTS uk_bniveles_rack_nivel (idRack, Nivel);',
+            'ALTER TABLE bodegas_posiciones ADD INDEX IF NOT EXISTS idx_bposiciones_estado (idEstadoPosicion),ADD INDEX IF NOT EXISTS idx_bposiciones_bodega_estado (idBodegas, idEstadoPosicion),ADD UNIQUE INDEX IF NOT EXISTS uk_bposiciones_bodega_codigo (idBodegas, Codigo),ADD UNIQUE INDEX IF NOT EXISTS uk_bposiciones_nivel_numero (idNivel, Numero);',
+            'ALTER TABLE bodegas_zonas_tipos ADD UNIQUE INDEX IF NOT EXISTS uk_bzonatipos_nombre (Nombre);',
+            'ALTER TABLE bodegas_posiciones_estados ADD UNIQUE INDEX IF NOT EXISTS uk_bposestado_nombre (Nombre);',
         ];
 
         /************************************/
         // Retorno True por defecto
         return $arrOptimizations;
+
+    }
+
+    /*******************************************************************/
+    // Sembrado de los catalogos de la distribucion fisica
+    /*******************************************************************/
+    public function seedCatalogs(){
+
+        /************************************/
+        // Variables
+        $arrSeed = array();
+
+        /*******************************************************/
+        /*                  SEMILLAS                           */
+        /*******************************************************/
+        $arrSeed[] = 'INSERT IGNORE INTO bodegas_zonas_tipos (idZonaTipo, Nombre, Color, Orden) VALUES '
+                   . '(1, \'Almacenamiento\', \'bg-primary\', 1), '
+                   . '(2, \'Recepcion\', \'bg-info\', 2), '
+                   . '(3, \'Despacho\', \'bg-warning\', 3), '
+                   . '(4, \'Preparacion de pedidos\', \'bg-success\', 4), '
+                   . '(5, \'Otras\', \'bg-secondary\', 5);';
+        $arrSeed[] = 'INSERT IGNORE INTO bodegas_posiciones_estados (idEstadoPosicion, Nombre, Color, Orden) VALUES '
+                   . '(1, \'Disponible\', \'bg-success\', 1), '
+                   . '(2, \'Bloqueada\', \'bg-danger\', 2), '
+                   . '(3, \'Reservada\', \'bg-warning\', 3), '
+                   . '(4, \'Desactivada\', \'bg-secondary\', 4);';
+
+        /************************************/
+        // Retorno los datos
+        return $arrSeed;
 
     }
 

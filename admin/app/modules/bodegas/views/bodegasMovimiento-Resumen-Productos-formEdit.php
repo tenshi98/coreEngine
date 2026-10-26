@@ -35,10 +35,11 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                             : '';
 
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Tipo Movimiento', 'Name' => 'TipoMovimientoFake', 'Id' => 'TipoMovimientoFake',  'Value' => ($data['rowData']['TipoMovimiento'] ?? ''), 'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega',          'Name' => 'BodegaFake',         'Id' => 'BodegaFake',          'Value' => ($data['rowData']['Bodega'] ?? ''),         'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Producto',        'Name' => 'ProductoFake',       'Id' => 'ProductoFake',        'Value' => ($data['rowData']['ProductoNombre'] ?? ''), 'Required' => 3]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',        'Name' => 'Number',             'Id' => 'EditProd_Number',     'Value' => $x_EditProd_Number,                         'Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Tipo Movimiento',     'Name' => 'TipoMovimientoFake', 'Id' => 'TipoMovimientoFake',  'Value' => ($data['rowData']['TipoMovimiento'] ?? ''), 'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Bodega',              'Name' => 'BodegaFake',         'Id' => 'BodegaFake',          'Value' => ($data['rowData']['Bodega'] ?? ''),         'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'Producto',            'Name' => 'ProductoFake',       'Id' => 'ProductoFake',        'Value' => ($data['rowData']['ProductoNombre'] ?? ''), 'Required' => 3]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',            'Name' => 'Number',             'Id' => 'EditProd_Number',     'Value' => $x_EditProd_Number,                         'Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Posición (opcional)', 'Name' => 'idPosicion',         'Id' => 'EditProd_idPosicion', 'Value' => ($data['rowData']['idPosicion'] ?? ''),     'Required' => 1,'arrData' => $data['arrPosicion'], 'DataInfo' => 'Ubicación física del producto dentro de la bodega']);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idExistencia',    'Value' => $data['rowData']['idExistencia'],    'Required' => 2]);

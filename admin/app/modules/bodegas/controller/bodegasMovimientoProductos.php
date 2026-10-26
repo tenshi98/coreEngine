@@ -156,11 +156,44 @@ class bodegasMovimientoProductos extends ControllerBase {
         // Ejecuto la query
         $arrTipoMov = $this->Base_GetList($xParams);
 
+        /************************************/
+        // Se determinan las bodegas cuyas posiciones se ofrecen
+        $idBodegasPos = match ($idTipoIngreso) {
+            1       => array_filter([(int)($rowData['data']['idBodegasIngreso'] ?? 0)]),
+            2       => array_filter([(int)($rowData['data']['idBodegasEgreso'] ?? 0)]),
+            default => array_filter([(int)($rowData['data']['idBodegasIngreso'] ?? 0), (int)($rowData['data']['idBodegasEgreso'] ?? 0)]),
+        };
+
+        /************************************/
+        // Se genera la query (posiciones de las bodegas del movimiento)
+        if (!empty($idBodegasPos)) {
+            // Se preparan los placeholders del IN
+            $placeholders = implode(',', array_fill(0, count($idBodegasPos), '?'));
+            $query = [
+                'data'    => 'bodegas_posiciones.idPosicion AS ID, bodegas_posiciones.Codigo AS Nombre',
+                'table'   => 'bodegas_posiciones',
+                'join'    => '',
+                'where'   => 'bodegas_posiciones.idBodegas IN ('.$placeholders.')',
+                'params'  => array_values($idBodegasPos),
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'bodegas_posiciones.Codigo ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            // Preparo los datos
+            $xParams      = ['query' => $query];
+            // Ejecuto la query
+            $arrPosicion = $this->Base_GetList($xParams);
+        // Si no hay bodegas, no hay posiciones que ofrecer
+        } else {
+            $arrPosicion = ['status' => true, 'data' => [], 'error' => ''];
+        }
+
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrTipoMov['status']){
+        if($rowData['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrTipoMov['status'] && $arrPosicion['status']){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -175,6 +208,7 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'arrBodegas'      => $arrBodegas['data'],
                 'arrProductos'    => $arrProductos['data'],
                 'arrTipoMov'      => $arrTipoMov['data'],
+                'arrPosicion'     => $arrPosicion['data'],
                 'idTipoIngreso'   => $idTipoIngreso,
             ];
 
@@ -185,7 +219,7 @@ class bodegasMovimientoProductos extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData,$arrBodegas,$arrProductos,$arrTipoMov]);
+            $result = $this->mergeResponses([$rowData,$arrBodegas,$arrProductos,$arrTipoMov,$arrPosicion]);
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
@@ -220,12 +254,14 @@ class bodegasMovimientoProductos extends ControllerBase {
                 bodegas_listado.Nombre AS Bodega,
                 productos_listado.Nombre AS ProductoNombre,
                 bodegas_movimientos_productos.Number AS ProductoCantidad,
+                bodegas_posiciones.Codigo AS Posicion,
                 core_unidades_medida.Nombre AS UnidadMedida',
             'table'   => 'bodegas_movimientos_productos',
             'join'    => '
                 LEFT JOIN core_estados_ingreso  ON core_estados_ingreso.idEstadoIngreso  = bodegas_movimientos_productos.idEstadoIngreso
                 LEFT JOIN bodegas_listado       ON bodegas_listado.idBodegas             = bodegas_movimientos_productos.idBodegas
                 LEFT JOIN productos_listado     ON productos_listado.idProducto          = bodegas_movimientos_productos.idProducto
+                LEFT JOIN bodegas_posiciones    ON bodegas_posiciones.idPosicion         = bodegas_movimientos_productos.idPosicion
                 LEFT JOIN core_unidades_medida  ON core_unidades_medida.idUniMed         = productos_listado.idUniMed',
             'where'   => 'bodegas_movimientos_productos.idMovimiento = ?',
             'params'  => [$MovimientoID['data']],
@@ -300,15 +336,18 @@ class bodegasMovimientoProductos extends ControllerBase {
                 bodegas_movimientos_productos.idMovimiento,
                 bodegas_movimientos_productos.idEstadoIngreso,
                 bodegas_movimientos_productos.idBodegas,
+                bodegas_movimientos_productos.idPosicion,
                 bodegas_movimientos_productos.idProducto,
                 bodegas_movimientos_productos.Number,
                 core_estados_ingreso.Nombre AS TipoMovimiento,
                 bodegas_listado.Nombre AS Bodega,
+                bodegas_posiciones.Codigo AS Posicion,
                 productos_listado.Nombre AS ProductoNombre',
             'table'   => 'bodegas_movimientos_productos',
             'join'    => '
                 LEFT JOIN core_estados_ingreso  ON core_estados_ingreso.idEstadoIngreso  = bodegas_movimientos_productos.idEstadoIngreso
                 LEFT JOIN bodegas_listado       ON bodegas_listado.idBodegas             = bodegas_movimientos_productos.idBodegas
+                LEFT JOIN bodegas_posiciones    ON bodegas_posiciones.idPosicion         = bodegas_movimientos_productos.idPosicion
                 LEFT JOIN productos_listado     ON productos_listado.idProducto          = bodegas_movimientos_productos.idProducto',
             'where'   => 'bodegas_movimientos_productos.idExistencia = ?',
             'params'  => [$ExistenciaID['data']],
@@ -321,11 +360,32 @@ class bodegasMovimientoProductos extends ControllerBase {
         // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
+        /************************************/
+        // Se genera la query (posiciones de la bodega de la linea)
+        $arrPosicion = ['status' => true, 'data' => [], 'error' => ''];
+        if ($rowData['status'] === true && !empty($rowData['data']['idBodegas'])) {
+            $query = [
+                'data'    => 'bodegas_posiciones.idPosicion AS ID, bodegas_posiciones.Codigo AS Nombre',
+                'table'   => 'bodegas_posiciones',
+                'join'    => '',
+                'where'   => 'bodegas_posiciones.idBodegas = ?',
+                'params'  => [$rowData['data']['idBodegas']],
+                'group'   => '',
+                'having'  => '',
+                'order'   => 'bodegas_posiciones.Codigo ASC',
+                'limit'   => ConfigAPP::APP["N_MaxItems"]
+            ];
+            // Preparo los datos
+            $xParams      = ['query' => $query];
+            // Ejecuto la query
+            $arrPosicion = $this->Base_GetList($xParams);
+        }
+
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if ($rowData['status'] === true) {
+        if ($rowData['status'] === true && $arrPosicion['status'] === true) {
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -338,6 +398,7 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
+                'arrPosicion'   => $arrPosicion['data'],
             ];
 
             /************************************/
@@ -347,7 +408,7 @@ class bodegasMovimientoProductos extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData]);
+            $result = $this->mergeResponses([$rowData,$arrPosicion]);
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
@@ -453,8 +514,10 @@ class bodegasMovimientoProductos extends ControllerBase {
         $idMovimiento    = (int)($PostData['idMovimiento'] ?? 0);
         $idEstadoIngreso = (int)($PostData['idEstadoIngreso'] ?? 0);
         $idBodega        = (int)($PostData['idBodegas'] ?? 0);
+        $idPosicion      = (int)($PostData['idPosicion'] ?? 0);
         $idProducto      = (int)($PostData['idProducto'] ?? 0);
-        $cantidad        = (float)($PostData['Number'] ?? 0);
+        // Normalizacion coma decimal (formato chileno): (float) solo entiende punto
+        $cantidad        = (float)str_replace(',', '.', ($PostData['Number'] ?? 0));
 
         /*******************************************************************/
         // Validaciones
@@ -464,11 +527,27 @@ class bodegasMovimientoProductos extends ControllerBase {
         if ($idBodega <= 0) {                             return ['code' => 400, 'message' => 'Debe indicar una bodega válida'];}
         if ($idProducto <= 0) {                           return ['code' => 400, 'message' => 'Producto inválido'];}
         if ($cantidad <= 0) {                             return ['code' => 400, 'message' => 'La cantidad debe ser mayor que cero'];}
+        /************************************/
+        // La posición es opcional, pero si se indica debe existir y ser de la bodega
+        if ($idPosicion > 0 && !$this->existePosicionEnBodega($idPosicion, $idBodega, $DBConn)) {
+            return ['code' => 400, 'message' => 'La posición indicada no existe o no pertenece a la bodega seleccionada'];
+        }
 
         /************************************/
         // Se inicia la transacción solo si corresponde
         if($NewDBConn === null){
             $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Se bloquea el producto para serializar escrituras concurrentes de
+        // stock (el stock se lee y se recalcula en PHP: SELECT previo)
+        $lockProd = $this->lockRowsForUpdate('productos_listado', 'idProducto', [$idProducto], $DBConn);
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($lockProd['status'] === false) {
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockProd['error'] ?? ''];
         }
 
         /************************************/
@@ -483,13 +562,14 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'idMovimiento'    => $idMovimiento,
                 'idEstadoIngreso' => $idEstadoIngreso,
                 'idBodegas'       => $idBodega,
+                'idPosicion'      => ($idPosicion > 0) ? $idPosicion : '',
                 'idProducto'      => $idProducto,
                 'Number'          => $cantidad
             ];
             /************************************/
             // Se genera la query
             $query = [
-                'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+                'data'      => 'idMovimiento,idEstadoIngreso,idBodegas,idPosicion,idProducto,Number',
                 'required'  => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                 'unique'    => '',
                 'encode'    => '',
@@ -515,17 +595,21 @@ class bodegasMovimientoProductos extends ControllerBase {
             // Obtener stock actual
             /*******************************************************************/
             // Variable
-            $campoStock = 'Cantidad_idBodegas_' . $idBodega;
+            $campoStock = ', bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodega . ' AS Cantidad';
             //Se consultan los stocks
             $query = [
-                'data'    => 'idStocks,idProducto,' . $campoStock . ' AS Cantidad',
+                'data'    => '
+                    bodegas_productos_stocks.idStocks,
+                    bodegas_productos_stocks.idProducto,
+                    productos_listado.Nombre AS Producto'
+                    .$campoStock,
                 'table'   => 'bodegas_productos_stocks',
-                'join'    => '',
-                'where'   => 'idProducto = ?',
+                'join'    => 'LEFT JOIN productos_listado ON productos_listado.idProducto = bodegas_productos_stocks.idProducto',
+                'where'   => 'bodegas_productos_stocks.idProducto = ?',
                 'params'  => [$idProducto],
                 'group'   => '',
                 'having'  => '',
-                'order'   => 'idProducto ASC',
+                'order'   => 'bodegas_productos_stocks.idProducto ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
             // Preparo los datos
@@ -543,13 +627,15 @@ class bodegasMovimientoProductos extends ControllerBase {
             /*******************************************************************/
             // Preparar stock
             /*******************************************************************/
-            $idStocks     = null;
-            $stockActual  = 0;
+            $idStocks        = null;
+            $stockActual     = 0;
+            $ProductoNombre  = null;
 
             if (!empty($arrStocks['data'])) {
-                $stock       = $arrStocks['data'][0];
-                $idStocks    = $stock['idStocks'] ?? null;
-                $stockActual = (float)($stock['Cantidad'] ?? 0);
+                $stock          = $arrStocks['data'][0];
+                $idStocks       = $stock['idStocks'] ?? null;
+                $stockActual    = (float)($stock['Cantidad'] ?? 0);
+                $ProductoNombre = ($stock['Producto'] ?? 'Producto ID '.$idProducto);
             }
 
             /*******************************************************************/
@@ -566,7 +652,7 @@ class bodegasMovimientoProductos extends ControllerBase {
             /*******************************************************************/
             if ($idEstadoIngreso === 2 && $nuevoStock < 0) {
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 400, 'message' => 'Stock insuficiente para el producto ' . $idProducto];
+                return ['code' => 400, 'message' => 'Stock insuficiente para el producto ' . $ProductoNombre . ' ('.$stockActual.' Actual)'];
             }
 
             /*******************************************************************/
@@ -615,9 +701,11 @@ class bodegasMovimientoProductos extends ControllerBase {
         $idMovimiento     = (int)($PostData['idMovimiento'] ?? 0);
         $idEstadoIngreso  = (int)($PostData['idEstadoIngreso'] ?? 0);
         $idBodega         = (int)($PostData['idBodegas'] ?? 0);
+        $idPosicion       = (int)($PostData['idPosicion'] ?? 0);
         $idProducto       = (int)($PostData['idProducto'] ?? 0);
-        $cantidadNueva    = (float)($PostData['Number'] ?? 0);
-        $cantidadAnterior = (float)($PostData['NumberOld'] ?? 0);
+        // Normalizacion coma decimal (formato chileno): (float) solo entiende punto
+        $cantidadNueva    = (float)str_replace(',', '.', ($PostData['Number'] ?? 0));
+        $cantidadAnterior = (float)str_replace(',', '.', ($PostData['NumberOld'] ?? 0));
 
         /*******************************************************************/
         // Validaciones
@@ -629,6 +717,11 @@ class bodegasMovimientoProductos extends ControllerBase {
         if ($idProducto <= 0) {                           return ['code' => 400, 'message' => 'Producto inválido'];}
         if ($cantidadNueva <= 0) {                        return ['code' => 400, 'message' => 'La cantidad debe ser mayor que cero'];}
         if ($cantidadAnterior < 0) {                      return ['code' => 400, 'message' => 'La cantidad anterior no es válida'];}
+        /************************************/
+        // La posición es opcional, pero si se indica debe existir y ser de la bodega
+        if ($idPosicion > 0 && !$this->existePosicionEnBodega($idPosicion, $idBodega, $DBConn)) {
+            return ['code' => 400, 'message' => 'La posición indicada no existe o no pertenece a la bodega seleccionada'];
+        }
 
         /*******************************************************************/
         // Calcular diferencia
@@ -639,6 +732,17 @@ class bodegasMovimientoProductos extends ControllerBase {
         // Se inicia la transacción solo si corresponde
         if($NewDBConn === null){
             $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
+
+        /************************************/
+        // Se bloquea el producto para serializar escrituras concurrentes de
+        // stock (el stock se lee y se recalcula en PHP: SELECT previo)
+        $lockProd = $this->lockRowsForUpdate('productos_listado', 'idProducto', [$idProducto], $DBConn);
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($lockProd['status'] === false) {
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockProd['error'] ?? ''];
         }
 
         /************************************/
@@ -654,13 +758,14 @@ class bodegasMovimientoProductos extends ControllerBase {
                 'idMovimiento'    => $idMovimiento,
                 'idEstadoIngreso' => $idEstadoIngreso,
                 'idBodegas'       => $idBodega,
+                'idPosicion'      => ($idPosicion > 0) ? $idPosicion : '',
                 'idProducto'      => $idProducto,
                 'Number'          => $cantidadNueva
             ];
             /************************************/
             // Se genera la query
             $query = [
-                'data'      => 'idExistencia,idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
+                'data'      => 'idExistencia,idMovimiento,idEstadoIngreso,idBodegas,idPosicion,idProducto,Number',
                 'required'  => 'idExistencia,idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
                 'unique'    => '',
                 'encode'    => '',
@@ -684,6 +789,25 @@ class bodegasMovimientoProductos extends ControllerBase {
             }
 
             /*******************************************************************/
+            // Si el formulario envio la posicion vacia, se limpia explicitamente
+            // (queryUpdate omite vacios y no pisaria el valor anterior);
+            // los llamadores internos que no envian la clave no alteran la posicion
+            /*******************************************************************/
+            if (array_key_exists('idPosicion', $PostData) && $idPosicion <= 0) {
+                $QueryBuilder  = new QueryBuilder();
+                $ResponseNull  = $QueryBuilder->queryExecute(
+                    'UPDATE bodegas_movimientos_productos SET idPosicion = NULL WHERE idExistencia = ?',
+                    $DBConn, false, false, [$idExistencia]
+                );
+                /************************************/
+                // Si falla la ejecucion, se revierte de inmediato
+                if ($ResponseNull['status'] === false) {
+                    $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseNull['error']];
+                }
+            }
+
+            /*******************************************************************/
             // Si no cambió la cantidad, no es necesario modificar stock
             /*******************************************************************/
             if ($diferencia == 0) {
@@ -695,17 +819,21 @@ class bodegasMovimientoProductos extends ControllerBase {
             // Obtener stock actual
             /*******************************************************************/
             // Variable
-            $campoStock = 'Cantidad_idBodegas_' . $idBodega;
+            $campoStock = ', bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodega. ' AS Cantidad';
             // Se consultan los stocks
             $query = [
-                'data'    => 'idStocks,idProducto,' . $campoStock . ' AS Cantidad',
+                'data'    => '
+                    bodegas_productos_stocks.idStocks,
+                    bodegas_productos_stocks.idProducto,
+                    productos_listado.Nombre AS Producto'
+                    .$campoStock,
                 'table'   => 'bodegas_productos_stocks',
-                'join'    => '',
-                'where'   => 'idProducto = ?',
+                'join'    => 'LEFT JOIN productos_listado ON productos_listado.idProducto = bodegas_productos_stocks.idProducto',
+                'where'   => 'bodegas_productos_stocks.idProducto = ?',
                 'params'  => [$idProducto],
                 'group'   => '',
                 'having'  => '',
-                'order'   => 'idProducto ASC',
+                'order'   => 'bodegas_productos_stocks.idProducto ASC',
                 'limit'   => ConfigAPP::APP["N_MaxItems"]
             ];
             // Preparo los datos
@@ -723,13 +851,15 @@ class bodegasMovimientoProductos extends ControllerBase {
             /*******************************************************************/
             // Preparar stock
             /*******************************************************************/
-            $idStocks    = null;
-            $stockActual = 0;
+            $idStocks        = null;
+            $stockActual     = 0;
+            $ProductoNombre  = null;
 
             if (!empty($arrStocks['data'])) {
-                $stock       = $arrStocks['data'][0];
-                $idStocks    = $stock['idStocks'] ?? null;
-                $stockActual = (float)($stock['Cantidad'] ?? 0);
+                $stock          = $arrStocks['data'][0];
+                $idStocks       = $stock['idStocks'] ?? null;
+                $stockActual    = (float)($stock['Cantidad'] ?? 0);
+                $ProductoNombre = ($stock['Producto'] ?? 'Producto ID '.$idProducto);
             }
 
             /*******************************************************************/
@@ -746,7 +876,7 @@ class bodegasMovimientoProductos extends ControllerBase {
             /*******************************************************************/
             if ($idEstadoIngreso === 2 && $nuevoStock < 0) {
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 400, 'message' => 'Stock insuficiente para modificar el producto ' . $idProducto];
+                return ['code' => 400, 'message' => 'Stock insuficiente para modificar el producto ' . $ProductoNombre . ' ('.$stockActual.' Actual)'];
             }
 
             /*******************************************************************/
@@ -838,6 +968,19 @@ class bodegasMovimientoProductos extends ControllerBase {
             }
 
             $producto = $arrProducto['data'][0];
+
+            /*******************************************************************/
+            // Se bloquea el producto para serializar escrituras concurrentes de
+            // stock (el stock se lee y se recalcula en PHP: SELECT previo).
+            // Mejora-sobre-lectura: se lockea apenas se conoce el idProducto.
+            /*******************************************************************/
+            $lockProd = $this->lockRowsForUpdate('productos_listado', 'idProducto', [$producto['idProducto']], $DBConn);
+            /************************************/
+            // Si falla la ejecucion, se revierte de inmediato
+            if ($lockProd['status'] === false) {
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockProd['error'] ?? ''];
+            }
 
             /*******************************************************************/
             // Normalizar datos
@@ -1022,39 +1165,70 @@ class bodegasMovimientoProductos extends ControllerBase {
     /*                             Métodos privados                               */
     /******************************************************************************/
     /*******************************************************************/
+    // Verifica que la posición exista y pertenezca a la bodega indicada
+    /*******************************************************************/
+    private function existePosicionEnBodega(int $idPosicion, int $idBodega, $DBConn = null): bool {
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idPosicion,idBodegas',
+            'table'   => 'bodegas_posiciones',
+            'join'    => '',
+            'where'   => 'idPosicion = ? AND idBodegas = ?',
+            'params'  => [$idPosicion, $idBodega],
+            'group'   => '',
+            'having'  => '',
+            'order'   => '',
+            'limit'   => 1
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Se indica la conexión cuando la entrega el llamador
+        if ($DBConn !== null) {
+            $xParams['newBDConn'] = $DBConn;
+        }
+        // Ejecuto la query
+        $Row = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // Retorno el resultado
+        return ($Row['status'] === true && !empty($Row['data']));
+    }
+
+    /*******************************************************************/
     // Se validan los datos
     /*******************************************************************/
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto,Number',
-            'ValidarEntero'             => 'idMovimiento,idEstadoIngreso,idBodegas,idProducto',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => '',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => '',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idMovimiento,idEstadoIngreso,idBodegas,idPosicion,idProducto,Number',
+            'ValidarEntero'              => 'idMovimiento,idEstadoIngreso,idBodegas,idPosicion,idProducto',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => '',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => '',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

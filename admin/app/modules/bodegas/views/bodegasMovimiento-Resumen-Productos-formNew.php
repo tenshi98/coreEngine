@@ -54,6 +54,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         //se dibujan los inputs
         $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Producto',  'Name' => 'idProducto',   'Id' => 'NewProd_idProducto',  'Value' => '','Required' => 2,'arrData' => $data['arrProductos']]);
         $data['Fnc_FormInputs']->formInput(['FormType' => 5, 'Placeholder' => 'Cantidad',  'Name' => 'Number',       'Id' => 'NewProd_Number',      'Value' => '','Required' => 2,'Icon' => 'bi bi-sort-numeric-down']);
+        $data['Fnc_FormInputs']->formSelect([                'Placeholder' => 'Posición (opcional)', 'Name' => 'idPosicion', 'Id' => 'NewProd_idPosicion', 'Value' => '','Required' => 1,'arrData' => $data['arrPosicion'], 'DataInfo' => 'Ubicación física del producto dentro de la bodega']);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMovimiento', 'Value' => $data['rowData']['idMovimiento'], 'Required' => 2]);

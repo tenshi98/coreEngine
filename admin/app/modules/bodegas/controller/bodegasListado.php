@@ -11,7 +11,7 @@ class bodegasListado extends ControllerBase {
     private $FormInputs;
     private $Codification;
     private $DataDate;
-    private $WidgetsCommon;
+    private $WidgetsViews;
 
     /*******************************************************************/
     // Constructor
@@ -26,7 +26,7 @@ class bodegasListado extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
-		$this->WidgetsCommon  = new UIWidgetsCommon();
+        $this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -44,6 +44,7 @@ class bodegasListado extends ControllerBase {
         $query = [
             'data'    => '
                 bodegas_listado.idBodegas,
+                bodegas_listado.Codigo,
                 bodegas_listado.Nombre,
                 core_estados.Nombre AS Estado,
                 core_estados.Color AS EstadoColor',
@@ -188,6 +189,7 @@ class bodegasListado extends ControllerBase {
         $query = [
             'data'    => '
                 bodegas_listado.idBodegas,
+                bodegas_listado.Codigo,
                 bodegas_listado.Nombre,
                 core_estados.Nombre AS Estado,
                 core_estados.Color AS EstadoColor',
@@ -254,6 +256,7 @@ class bodegasListado extends ControllerBase {
         // Se genera la query
         $query = [
             'data'    => '
+                bodegas_listado.Codigo,
                 bodegas_listado.Nombre,
                 bodegas_listado.Direccion,
                 bodegas_listado.Direccion_img,
@@ -311,8 +314,8 @@ class bodegasListado extends ControllerBase {
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
-                'Fnc_DataDate'         => $this->DataDate,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_DataDate'        => $this->DataDate,
+                'Fnc_WidgetsViews'    => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
                 'arrObservaciones' => $arrObservaciones['data'],
@@ -348,6 +351,7 @@ class bodegasListado extends ControllerBase {
         $query = [
             'data'    => '
                 bodegas_listado.idBodegas,
+                bodegas_listado.Codigo,
                 bodegas_listado.Nombre,
                 bodegas_listado.Direccion,
                 bodegas_listado.Direccion_img,
@@ -447,9 +451,9 @@ class bodegasListado extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
                 'arrEstado'       => $arrEstado['data'],
@@ -486,6 +490,7 @@ class bodegasListado extends ControllerBase {
         // Se genera la query
         $query = [
             'data'    => '
+                bodegas_listado.Codigo,
                 bodegas_listado.Nombre,
                 bodegas_listado.Direccion,
                 bodegas_listado.Direccion_img,
@@ -523,7 +528,7 @@ class bodegasListado extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -554,6 +559,10 @@ class bodegasListado extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción (registro + codigo correlativo)
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idEstado,Nombre,idCiudad,idComuna,Direccion,DistribucionFisica,DistribucionVisual',
@@ -569,14 +578,45 @@ class bodegasListado extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
+        }
+        $idBodegas = (int)$Response['data'];
+
+        /************************************
+         * El codigo se deriva del identificador recien generado, con el mismo
+         * criterio que la migracion de backfill (BOD-001, BOD-002, ...). Al ser
+         * una columna unica, la asignacion viaja en una segunda sentencia
+         * dentro de la misma transaccion.
+         */
+        $Codigo = 'BOD-'.str_pad((string)$idBodegas, 3, '0', STR_PAD_LEFT);
+        $query  = [
+            'data'      => 'idBodegas,Codigo',
+            'required'  => 'idBodegas,Codigo',
+            'encode'    => '',
+            'table'     => 'bodegas_listado',
+            'where'     => 'idBodegas',
+            'Post'      => ['idBodegas' => $idBodegas, 'Codigo' => $Codigo]
+        ];
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $this->dataCheck(['idBodegas' => $idBodegas, 'Codigo' => $Codigo]), 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_update($xParams);
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            $this->failOperation($Response);
         }
 
         /************************************/
+        // Se confirma la transacción
+        $this->Base_transactionCommit();
+
+        /************************************/
         // Si es un ID numérico, encripta y envía con código 200 (OK)
-        $DataID = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
+        $DataID = $this->Codification->encryptDecrypt('encrypt', $idBodegas);
         if (!$this->isValidDecrypted($DataID, 'text')) {
             Response::error('Registro inválido', 400);
         }
@@ -630,7 +670,7 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -655,8 +695,31 @@ class bodegasListado extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se descifra y valida el identificador
+        $BodegasID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idBodegas'] ?? '');
+        if (!$this->isValidDecrypted($BodegasID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
+
+        /************************************
+         * Se anulan las referencias de las posiciones de la bodega en los
+         * movimientos: `bodegas_movimientos_productos` conserva el historial
+         * y solo pierde la ubicacion fisica que deja de existir.
+         */
+        $Response = $this->queryExecuteRaw(
+            'UPDATE bodegas_movimientos_productos SET idPosicion = NULL
+              WHERE idPosicion IN (
+                    SELECT bodegas_posiciones.idPosicion FROM bodegas_posiciones
+                     WHERE bodegas_posiciones.idBodegas = ?)',
+            [(int)$BodegasID['data']]
+        );
+        if ($Response['status'] === false) {
+            $this->failOperation($Response);
+        }
 
         /************************************/
         // Se genera la query
@@ -675,14 +738,19 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
         // Listado de las tablas a eliminar los datos relacionados
         $arrTableDel   = array();
         $arrTableDel[] = ['files' => '', 'table' => 'bodegas_listado_observaciones'];
+        // Distribucion fisica: de lo mas especifico a lo general
+        $arrTableDel[] = ['files' => '', 'table' => 'bodegas_posiciones'];
+        $arrTableDel[] = ['files' => '', 'table' => 'bodegas_niveles'];
+        $arrTableDel[] = ['files' => '', 'table' => 'bodegas_racks'];
+        $arrTableDel[] = ['files' => '', 'table' => 'bodegas_pasillos'];
+        $arrTableDel[] = ['files' => '', 'table' => 'bodegas_zonas'];
 
         /************************************/
         // Verifico si existe
@@ -699,8 +767,7 @@ class bodegasListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -747,7 +814,7 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -760,25 +827,43 @@ class bodegasListado extends ControllerBase {
     /*                             Métodos privados                               */
     /******************************************************************************/
     /*******************************************************************/
+    // Ejecuta SQL crudo con parametros bindeados (borrado en cascada)
+    /*******************************************************************/
+    private function queryExecuteRaw(string $sql, array $params = []){
+
+        /************************************
+         * ControllerBase::$queryBuilder es privado y Base_queryExecute no admite
+         * parametros bindeados, por lo que se instancia un QueryBuilder propio
+         * sobre la misma conexion: asi participa de la transaccion activa.
+         */
+        $QueryBuilder = new QueryBuilder();
+        /************************************/
+        // Ejecuto la query
+        return $QueryBuilder->queryExecute($sql, $this->getDBConn(), false, false, $params);
+    }
+
+    /*******************************************************************/
     // Se validan los datos
     /*******************************************************************/
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idEstado,idCiudad,idComuna',
-            'ValidarEntero'             => 'idEstado,idCiudad,idComuna',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Direccion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,Direccion',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idEstado,idCiudad,idComuna',
+            'ValidarEntero'              => 'idEstado,idCiudad,idComuna',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Direccion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre'    => 255,
+                'Direccion' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Direccion',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

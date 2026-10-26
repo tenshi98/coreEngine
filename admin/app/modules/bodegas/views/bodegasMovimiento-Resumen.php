@@ -9,6 +9,20 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
 
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Movimiento';
+        $SubTitle       = 'Resumen del Movimiento';
+        $Text           = 'Información general y datos asociados al Movimiento';
+        $IMG            = $BASE.'/img/img-backgrounds/Bodegas_2.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">

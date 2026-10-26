@@ -9,6 +9,20 @@ $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
 
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Bodega';
+        $SubTitle       = 'Resumen de la Bodega '.($data['rowData']['Nombre'] ?? '');
+        $Text           = 'Información general y datos asociados a la bodega';
+        $IMG            = $BASE.'/img/img-backgrounds/Bodegas_1.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -16,8 +30,9 @@ $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs" onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
-                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-pasillos"><i class="bi bi-image"></i> Pasillos</button></li>
-                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-visual"><i class="bi bi-image"></i> Visual</button></li>
+                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-distribucion" onclick="distLoadEstructura()"><i class="bi bi-diagram-3"></i> Distribución</button></li>
+                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-mapa" onclick="distLoadMapa()"><i class="bi bi-grid-3x3-gap"></i> Mapa</button></li>
+                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-visual" onclick="distLoadVisual()"><i class="bi bi-box-seam"></i> Visual</button></li>
             </ul>
             <div class="tab-content pt-2">
 
@@ -104,15 +119,29 @@ $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData
                     </div>
                 </div>
 
-                <div class="tab-pane fade" id="resumen-pasillos">
+                <div class="tab-pane fade" id="resumen-distribucion">
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
-                            Pasillos de <?php echo $data['rowData']['Nombre']; ?>
-                            <button type="button" class="btn btn-success" onclick="addEditBlock()"><i class="bi bi-plus-lg me-1"></i> Agregar Pasillo</button>
+                            Distribución de <?php echo $data['rowData']['Nombre']; ?>
+                            <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
+                            <button type="button" class="btn btn-success" onclick="distZonaNew('<?php echo $BodegasID['data']; ?>')"><i class="bi bi-plus-lg"></i> Crear Zona</button>
+                            <?php } ?>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
-                    <div id="editBlocksContainer">
+                    <div id="tabDistEstructura">
+
+                    </div>
+                </div>
+
+                <div class="tab-pane fade" id="resumen-mapa">
+                    <h5 class="text-color-red-dark">
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-between">
+                            Mapa de posiciones de <?php echo $data['rowData']['Nombre']; ?>
+                        </div>
+                    </h5>
+                    <div class="clearfix"></div>
+                    <div id="tabDistMapa">
 
                     </div>
                 </div>
@@ -121,11 +150,10 @@ $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData
                     <h5 class="text-color-red-dark">
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             Visual de <?php echo $data['rowData']['Nombre']; ?>
-                            <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $BodegasID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
-                    <div class="table-responsive" id="tabObsDataTable">
+                    <div id="tabDistVisual">
 
                     </div>
                 </div>
@@ -314,287 +342,372 @@ $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData
             }
         });
     }
-
-
-    // ============================================================
-    // Simulated PHP Backend Data
-    // In a real app, this would come from an API/PHP endpoint
-    // ============================================================
-    let pasillos = [
-        { id: 1, name: 'Pasillo 1', filas: '4', columnas: '10', consolidado: 'No' },
-        { id: 2, name: 'Pasillo 2', filas: '2', columnas: '10', consolidado: 'No' },
-        { id: 3, name: 'Pasillo 3', filas: '2', columnas: '10', consolidado: 'No' },
-        { id: 4, name: 'Pasillo 4', filas: '3', columnas: '10', consolidado: 'No' },
-    ];
-
-    let nextId = 5;
-
-    // ============================================================
-    // EDIT VIEW
-    // ============================================================
-    let editBlocks = [];
-
-    function initEditView() {
-        editBlocks = pasillos.map(p => ({ ...p }));
-        renderEditBlocks();
+    /*********************************************************************/
+    /*                        DISTRIBUCION FISICA                        */
+    /*********************************************************************/
+    /************************************/
+    function distLoadEstructura() {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#tabDistEstructura';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/estructura/'.$BodegasID['data']; ?>';
+        const Options = {
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
     }
-
-    function renderEditBlocks() {
-        const container = document.getElementById('editBlocksContainer');
-        if (editBlocks.length === 0) {
-            container.innerHTML = `
-                <div class="empty-state">
-                    <i class="bi bi-plus-circle"></i>
-                    <h5>No hay pasillos para editar</h5>
-                    <p>Agrega pasillos desde el formulario de creación.</p>
-                </div>`;
-            return;
+    /************************************/
+    function distLoadMapa() {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#tabDistMapa';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/mapa/'.$BodegasID['data']; ?>';
+        const Options = {
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    // three.js (carga unica, diferida) para la vista visual 3D
+    function distLoadVisual() {
+        //Destruyo la escena anterior si existia (libera WebGL/RAF)
+        if (window.bodegaVisual3D && typeof window.bodegaVisual3D.destroy === 'function') {
+            window.bodegaVisual3D.destroy();
         }
-
-        container.innerHTML = editBlocks.map((block, index) => `
-            <div class="card" id="editBlock_${index}" data-index="${index}">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between mb-3">
-                        <div class="d-flex align-items-center gap-2">
-                            <span class="badge rounded-pill bg-primary block-number">${index + 1}</span>
-                            <span class="fw-bold text-warning">
-                                <i class="bi bi-pencil-fill me-1"></i>${escapeHtml(block.name || 'Sin nombre')}
-                            </span>
-                            ${block.id ? `<small class="text-muted">(ID: ${block.id})</small>` : '<small class="text-muted">(Nuevo)</small>'}
-                        </div>
-                        <div class="d-flex gap-1">
-                            <button type="button" class="btn btn-outline-success btn-move-up" onclick="moveEditBlock(${index}, -1)" title="Mover arriba" ${index === 0 ? 'disabled' : ''}>
-                                <i class="bi bi-chevron-up"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-success btn-move-down" onclick="moveEditBlock(${index}, 1)" title="Mover abajo" ${index === editBlocks.length - 1 ? 'disabled' : ''}>
-                                <i class="bi bi-chevron-down"></i>
-                            </button>
-                            <button type="button" class="btn btn-outline-danger btn-remove ms-2" onclick="removeEditBlock(${index})" title="Eliminar">
-                                <i class="bi bi-x-lg"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="row g-3">
-                        <div class="col-md-4">
-                            <label class="form-label fw-semibold">Nombre</label>
-                            <input type="text" class="form-control" placeholder="Ej: Pasillo 1"
-                                value="${escapeHtml(block.name)}"
-                                onchange="editBlocks[${index}].name = this.value">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Filas</label>
-                            <input type="number" class="form-control" min="1" placeholder="4"
-                                value="${escapeHtml(block.filas)}"
-                                onchange="editBlocks[${index}].filas = this.value">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Columnas</label>
-                            <input type="number" class="form-control" min="1" placeholder="10"
-                                value="${escapeHtml(block.columnas)}"
-                                onchange="editBlocks[${index}].columnas = this.value">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label fw-semibold">Consolidado</label>
-                            <select class="form-select" onchange="editBlocks[${index}].consolidado = this.value">
-                                <option value="No" ${block.consolidado === 'No' ? 'selected' : ''}>No</option>
-                                <option value="Sí" ${block.consolidado === 'Sí' ? 'selected' : ''}>Sí</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2 d-flex align-items-end">
-                            <div class="w-100 text-center p-2 rounded" style="background: #fff3e0;">
-                                <small class="text-muted d-block">Posición</small>
-                                <strong class="text-warning fs-5">${index + 1}</strong>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `).join('');
+        //Cargo el loader
+        $('#PDloader').show();
+        //Direccion base de los vendor
+        let VendorBase = '<?php echo $BASE; ?>/vendor/threejs';
+        //Cargo three.js + OrbitControls en secuencia (solo la primera vez)
+        function loadScript(Src) {
+            return new Promise(function(Resolve, Reject){
+                if (document.querySelector('script[src="'+Src+'"]')) { Resolve(); return; }
+                let s = document.createElement('script');
+                s.src = Src;
+                s.onload  = Resolve;
+                s.onerror = function(){ Reject(new Error(Src)); };
+                document.head.appendChild(s);
+            });
+        }
+        loadScript(VendorBase+'/three.min.js')
+            .then(function(){ return loadScript(VendorBase+'/OrbitControls.js'); })
+            .then(function(){
+                //Ejecuto
+                let Div       = '#tabDistVisual';
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/visual/'.$BodegasID['data']; ?>';
+                const Options = {
+                    closeObject:'#PDloader',
+                };
+                //Se envian los datos al formulario
+                UpdateContentId(Div, URL, Options);
+            })
+            .catch(function(){
+                //Cierro el loader y aviso
+                $('#PDloader').hide();
+                if (typeof notiBubble === 'function') {
+                    notiBubble('No se pudo cargar three.js para la vista 3D', 'error', true);
+                }
+            });
+    }
+    /************************************/
+    function distShowMapa() {
+        //Se activa la pestana del mapa
+        $('.nav-tabs button[data-bs-target="#resumen-mapa"]').tab('show');
+        //Se carga el mapa
+        distLoadMapa();
     }
 
-    function addEditBlock() {
-        editBlocks.push({ id: null, name: '', filas: '', columnas: '', consolidado: 'No' });
-        renderEditBlocks();
-        setTimeout(() => {
-            const newBlock = document.getElementById(`editBlock_${editBlocks.length - 1}`);
-            if (newBlock) {
-                newBlock.classList.add('highlight-up');
-                newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    /*********************************************************************/
+    /*                              ZONAS                                */
+    /*********************************************************************/
+    /************************************/
+    function distZonaNew(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/new/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distZonaView(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/view/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distZonaEdit(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/getID/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distZonaDel(ID, idZona, Nombre) {
+        Swal.fire({
+            title: "Borrar Zona",
+            text: "Esta a punto de eliminar la zona " + Nombre + " y toda su estructura (pasillos, racks y posiciones), ¿Desea continuar?",
+            icon: "warning",
+            confirmButtonColor: "#81A1C1",
+            confirmButtonText: "<i class='bi bi-check-circle'></i> Si, borrar",
+            showCancelButton: true,
+            cancelButtonText: "<i class='bi bi-x-circle'></i> Cancelar",
+            cancelButtonColor: "#EA5757",
+            reverseButtons: true,
+        }).then((resultZona) => {
+            if (resultZona.isConfirmed) {
+                //Cargo el loader
+                $('#PDloader').show();
+                //Ejecuto
+                let Metodo      = 'DELETE';
+                let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas'; ?>';
+                let Informacion = {"idZona": ID};
+                const Options     = {
+                    UpdateDiv : [
+                        {Div:'#tabDistEstructura', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/estructura/'; ?>'+BodegasID['data']}
+                    ],
+                    showNoti:'Zona Borrada Correctamente',
+                    closeObject:'#PDloader',
+                };
+                //Se envian los datos al formulario
+                SendDataForms(Metodo, Direccion, Informacion, Options);
             }
-        }, 50);
-        showToast('Bloque agregado', 'success');
+        });
+    }
+    /************************************/
+    function distZonaTogglePasillos(ID, idZona) {
+        //Variables
+        let Contenedor = '#tabPasillosZ'+idZona;
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = Contenedor;
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/updateList/'; ?>'+ID;
+        const Options = {
+            refreshTables:'true',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+        //Se muestra el contenedor
+        $(Contenedor).show();
     }
 
-    function removeEditBlock(index) {
-        editBlocks.splice(index, 1);
-        renderEditBlocks();
-        showToast('Bloque eliminado', 'info');
+    /*********************************************************************/
+    /*                             PASILLOS                              */
+    /*********************************************************************/
+    /************************************/
+    function distPasilloNew(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/new/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
     }
-
-    function moveEditBlock(index, direction) {
-        const newIndex = index + direction;
-        if (newIndex < 0 || newIndex >= editBlocks.length) return;
-
-        // Sync current values
-        syncEditInputs();
-
-        const temp = editBlocks[index];
-        editBlocks[index] = editBlocks[newIndex];
-        editBlocks[newIndex] = temp;
-
-        renderEditBlocks();
-
-        setTimeout(() => {
-            const block = document.getElementById(`editBlock_${newIndex}`);
-            if (block) {
-                block.classList.add(direction < 0 ? 'highlight-up' : 'highlight-down');
+    /************************************/
+    function distPasilloView(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/view/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distPasilloEdit(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/getID/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distPasilloDel(ID, idPasillo, idZona, Nombre) {
+        Swal.fire({
+            title: "Borrar Pasillo",
+            text: "Esta a punto de eliminar el pasillo " + Nombre + " y toda su estructura (racks y posiciones), ¿Desea continuar?",
+            icon: "warning",
+            confirmButtonColor: "#81A1C1",
+            confirmButtonText: "<i class='bi bi-check-circle'></i> Si, borrar",
+            showCancelButton: true,
+            cancelButtonText: "<i class='bi bi-x-circle'></i> Cancelar",
+            cancelButtonColor: "#EA5757",
+            reverseButtons: true,
+        }).then((resultPas) => {
+            if (resultPas.isConfirmed) {
+                //Cargo el loader
+                $('#PDloader').show();
+                //Ejecuto
+                let Metodo      = 'DELETE';
+                let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos'; ?>';
+                let Informacion = {"idPasillo": ID};
+                const Options     = {
+                    UpdateDiv : [
+                        {Div:'#tabPasillosZ'+idZona, fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/updateList/'; ?>'+ID, refreshTbl:'true'}
+                    ],
+                    showNoti:'Pasillo Borrado Correctamente',
+                    closeObject:'#PDloader',
+                };
+                //Se envian los datos al formulario
+                SendDataForms(Metodo, Direccion, Informacion, Options);
             }
-        }, 50);
+        });
+    }
+    /************************************/
+    function distPasilloToggleRacks(ID, idPasillo) {
+        //Variables
+        let Contenedor = '#tabRacksP'+idPasillo;
+        let Fila       = '#tabRacksRowP'+idPasillo;
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = Contenedor;
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/racks/updateList/'; ?>'+ID;
+        const Options = {
+            refreshTables:'true',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+        //Se muestra el contenedor
+        $(Fila).show();
     }
 
-    function syncEditInputs() {
-        editBlocks.forEach((block, i) => {
-            const container = document.getElementById(`editBlock_${i}`);
-            if (container) {
-                const inputs = container.querySelectorAll('input, select');
-                if (inputs[0]) block.name = inputs[0].value;
-                if (inputs[1]) block.filas = inputs[1].value;
-                if (inputs[2]) block.columnas = inputs[2].value;
-                if (inputs[3]) block.consolidado = inputs[3].value;
+    /*********************************************************************/
+    /*                              RACKS                                */
+    /*********************************************************************/
+    /************************************/
+    function distRackNew(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/racks/new/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distRackView(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/racks/view/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distRackEdit(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/racks/getID/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
+        };
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
+    }
+    /************************************/
+    function distRackDel(ID, idPasillo, IDPasillo, Nombre) {
+        Swal.fire({
+            title: "Borrar Rack",
+            text: "Esta a punto de eliminar el rack " + Nombre + " y sus posiciones, ¿Desea continuar?",
+            icon: "warning",
+            confirmButtonColor: "#81A1C1",
+            confirmButtonText: "<i class='bi bi-check-circle'></i> Si, borrar",
+            showCancelButton: true,
+            cancelButtonText: "<i class='bi bi-x-circle'></i> Cancelar",
+            cancelButtonColor: "#EA5757",
+            reverseButtons: true,
+        }).then((resultRack) => {
+            if (resultRack.isConfirmed) {
+                //Cargo el loader
+                $('#PDloader').show();
+                //Ejecuto
+                let Metodo      = 'DELETE';
+                let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/racks'; ?>';
+                let Informacion = {"idRack": ID};
+                const Options     = {
+                    UpdateDiv : [
+                        {Div:'#tabRacksP'+idPasillo, fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/zonas/pasillos/racks/updateList/'; ?>'+IDPasillo, refreshTbl:'true'}
+                    ],
+                    showNoti:'Rack Borrado Correctamente',
+                    closeObject:'#PDloader',
+                };
+                //Se envian los datos al formulario
+                SendDataForms(Metodo, Direccion, Informacion, Options);
             }
         });
     }
 
-    function saveEdited() {
-        syncEditInputs();
-
-        // Validate
-        let valid = true;
-        const errors = [];
-
-        editBlocks.forEach((block, i) => {
-            if (!block.name.trim()) {
-                errors.push(`Bloque ${i + 1}: El nombre es requerido`);
-                valid = false;
-            }
-            if (!block.filas || parseInt(block.filas) < 1) {
-                errors.push(`Bloque ${i + 1}: Las filas deben ser mayor a 0`);
-                valid = false;
-            }
-            if (!block.columnas || parseInt(block.columnas) < 1) {
-                errors.push(`Bloque ${i + 1}: Las columnas deben ser mayor a 0`);
-                valid = false;
-            }
-        });
-
-        if (!valid) {
-            errors.forEach(err => showToast(err, 'danger'));
-            return;
-        }
-
-        // Save
-        pasillos = editBlocks.map(block => ({
-            id: block.id || nextId++,
-            name: block.name.trim(),
-            filas: block.filas,
-            columnas: block.columnas,
-            consolidado: block.consolidado
-        }));
-
-        showToast('Cambios guardados exitosamente', 'success');
-        showView('list');
-    }
-
-    // ============================================================
-    // DELETE
-    // ============================================================
-    function confirmDelete(id) {
-        const pasillo = pasillos.find(p => p.id === id);
-        if (!pasillo) return;
-
-        const modal = document.getElementById('confirmModal');
-        modal.innerHTML = `
-            <div class="confirm-overlay" id="confirmOverlay">
-                <div class="card" style="max-width: 420px; width: 90%;">
-                    <div class="card-body p-4 text-center">
-                        <div class="mb-3">
-                            <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 3rem;"></i>
-                        </div>
-                        <h5 class="fw-bold mb-2">¿Eliminar Pasillo?</h5>
-                        <p class="text-muted mb-4">Se eliminará <strong>${escapeHtml(pasillo.name)}</strong> permanentemente.</p>
-                        <div class="d-flex gap-2 justify-content-center">
-                            <button class="btn btn-outline-secondary px-4" onclick="closeConfirm()">Cancelar</button>
-                            <button class="btn btn-danger px-4" onclick="deletePasillo(${id})">
-                                <i class="bi bi-trash me-1"></i>Eliminar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>`;
-    }
-
-    function closeConfirm() {
-        document.getElementById('confirmModal').innerHTML = '';
-    }
-
-    function deletePasillo(id) {
-        pasillos = pasillos.filter(p => p.id !== id);
-        closeConfirm();
-        showToast('Pasillo eliminado correctamente', 'success');
-        renderList();
-    }
-
-    // ============================================================
-    // TOAST NOTIFICATIONS
-    // ============================================================
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toastContainer');
-        const icons = {
-            success: 'bi-check-circle-fill',
-            danger: 'bi-exclamation-circle-fill',
-            warning: 'bi-exclamation-triangle-fill',
-            info: 'bi-info-circle-fill'
+    /*********************************************************************/
+    /*                           POSICIONES                              */
+    /*********************************************************************/
+    /************************************/
+    function distPosicionView(ID) {
+        //Cargo el loader
+        $('#PDloader').show();
+        //Ejecuto
+        let Div       = '#modalContent-lg';
+        let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/posicion/'; ?>'+ID;
+        const Options = {
+            showModal : '#viewModal-lg',
+            closeObject:'#PDloader',
         };
-        const bgColors = {
-            success: '#2e7d32',
-            danger: '#c62828',
-            warning: '#e65100',
-            info: '#1565c0'
-        };
-
-        const toastEl = document.createElement('div');
-        toastEl.className = 'toast show mb-2';
-        toastEl.setAttribute('role', 'alert');
-        toastEl.innerHTML = `
-            <div class="toast-body d-flex align-items-center gap-2 text-white" style="background: ${bgColors[type] || bgColors.info}; border-radius: 8px;">
-                <i class="bi ${icons[type] || icons.info}"></i>
-                <span>${message}</span>
-                <button type="button" class="btn-close btn-close-white ms-auto" onclick="this.closest('.toast').remove()"></button>
-            </div>`;
-        container.appendChild(toastEl);
-
-        setTimeout(() => {
-            toastEl.classList.remove('show');
-            setTimeout(() => toastEl.remove(), 300);
-        }, 3500);
+        //Se envian los datos al formulario
+        UpdateContentId(Div, URL, Options);
     }
-
-    // ============================================================
-    // HELPERS
-    // ============================================================
-    function escapeHtml(text) {
-        const div = document.createElement('div');
-        div.textContent = text || '';
-        return div.innerHTML;
-    }
-
-    // ============================================================
-    // INIT
-    // ============================================================
-    document.addEventListener('DOMContentLoaded', () => {
-        initEditView();
-    });
-
-
 
 </script>
