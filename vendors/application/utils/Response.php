@@ -58,6 +58,14 @@ class Response {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-*');
 
+        // Token CSRF actual de la sesión (si existe): permite al cliente
+        // (functions_v2.js) sincronizar window.CSRF_TOKEN en cada respuesta,
+        // tanto en éxitos como en errores 419, evitando tokens obsoletos.
+        // Clave alineada con CsrfToken::SESSION_KEY ('csrf_token').
+        if (!headers_sent() && session_status() === PHP_SESSION_ACTIVE && !empty($_SESSION['csrf_token'])) {
+            header('X-CSRF-Token: '.$_SESSION['csrf_token']);
+        }
+
         // Estructura estándar de respuesta
         $response = [
             'status'  => $status,

@@ -221,8 +221,15 @@ class CsrfToken {
             'Token inválido. Verbo '.(string) $f3->get('VERB').' ruta '.(string) $f3->get('PATTERN')
         );
 
+        // Auto-sanación: se devuelve el token ACTUAL de la sesión al cliente para
+        // que este pueda adoptarlo y reintentar sin requerir una recarga manual.
+        // (Sucede p.ej. cuando la sesión PHP se reconstruye vía SessionService::check()
+        //  y el navegador aún conserva el token anterior en su página abierta.)
+        $tokenActual = self::getToken($f3);
+        header('X-CSRF-Token: '.$tokenActual);
+
         // Se corta la ejecución (fail-closed)
-        Response::error('Token de seguridad inválido o expirado. Recargue la página e intente nuevamente.', 419, ['csrf' => true]);
+        Response::error('Token de seguridad inválido o expirado. Recargue la página e intente nuevamente.', 419, ['csrf' => true, 'Token' => $tokenActual]);
         return false;
     }
 
