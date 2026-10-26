@@ -85,6 +85,9 @@ class CheckData{
      *   'ValidarLargoMinimoN'       => 3,             -> Número mínimo de caracteres
      *   'ValidarLargoMaximo'        => '',            -> Validar longitud máxima de caracteres
      *   'ValidarLargoMaximoN'       => 255,           -> Número máximo de caracteres
+     *   'ValidarLargoMinimoPorCampo' => ['campo' => 3],       -> Largo mínimo exacto por campo
+     *   'ValidarLargoMaximoPorCampo' => ['campo' => 255],     -> Largo máximo exacto por campo
+     *   'ValidarFechaFormato'        => ['campo' => 'Y-m-d'], -> Fecha con formato exacto (date/datetime)
      *   'ValidarPalabrasCensuradas' => '',            -> Validar si contiene palabras censuradas
      *   'ValidarEspaciosVacios'     => 'password',    -> Validar que no existan espacios en blanco
      *   'ValidarMayusculas'         => '',            -> Validar que no existan letras mayúsculas
@@ -178,6 +181,35 @@ class CheckData{
                     }
                     $errors[] = ["message" => "El dato en $field " . $errorMsg];
                 }
+            }
+        }
+
+        /******************************************************************/
+        // PASO 2.b: Reglas de largo y formato por campo (mapas campo => valor)
+        /**
+         * Se ejecutan después de emptyData y de las reglas generales. Solo se
+         * aplican a campos presentes y no vacíos; la obligatoriedad sigue
+         * dependiendo de 'emptyData'.
+         */
+        foreach (($config['ValidarLargoMinimoPorCampo'] ?? []) as $field => $min) {
+            $value = $postData[$field] ?? null;
+            if ($value === null || $value === '') { continue; }
+            if (!$this->DataValidations->validarLargoMinimo($value, $min)) {
+                $errors[] = ["message" => "El dato en $field no tiene el mínimo de caracteres requerido ($min carácteres)"];
+            }
+        }
+        foreach (($config['ValidarLargoMaximoPorCampo'] ?? []) as $field => $max) {
+            $value = $postData[$field] ?? null;
+            if ($value === null || $value === '') { continue; }
+            if (!$this->DataValidations->validarLargoMaximo($value, $max)) {
+                $errors[] = ["message" => "El dato en $field no tiene el máximo de caracteres requerido ($max carácteres)"];
+            }
+        }
+        foreach (($config['ValidarFechaFormato'] ?? []) as $field => $format) {
+            $value = $postData[$field] ?? null;
+            if ($value === null || $value === '') { continue; }
+            if (!$this->DataValidations->validarFecha($value, $format)) {
+                $errors[] = ["message" => "El dato en $field no es una fecha válida (formato $format)"];
             }
         }
 
@@ -340,7 +372,14 @@ class CheckData{
             ],
             'ValidarEdadMinima' => [
                 'provider' => 'internal',
-                'logic'    => fn($v) => (time() - strtotime($v)) / (365*24*60*60) >= 18,
+                // Edad en años cumplidos con DateTime::diff (considera años bisiestos y
+                // el día exacto de cumpleaños; el cálculo anterior dividía segundos entre
+                // 365 días e ignoraba los bisiestos).
+                'logic'    => function ($v) {
+                    $fn = date_create((string)$v);
+                    if ($fn === false) { return false; }
+                    return $fn->diff(new DateTime('today'))->y >= 18;
+                },
                 'errorMsg' => 'indica que el usuario es menor de edad'
             ],
             'ValidarJSON' => [
@@ -360,7 +399,16 @@ class CheckData{
             ],
             'ValidarDominioEmail' => [
                 'provider' => 'internal',
-                'logic'    => fn($v) => str_contains($v, '@') && checkdnsrr(explode('@', $v)[1], 'MX'),
+                // Nota: checkdnsrr() es BLOQUEANTE (consulta DNS síncrona), por lo que puede
+                // añadir latencia a la validación del formulario. Se cachea el resultado por
+                // dominio durante la petición para no repetir consultas del mismo dominio.
+                'logic'    => function ($v) {
+                    static $dnsCache = [];
+                    if (!str_contains((string)$v, '@')) { return false; }
+                    $dominio = explode('@', (string)$v)[1];
+                    if ($dominio === '') { return false; }
+                    return $dnsCache[$dominio] ??= checkdnsrr($dominio, 'MX');
+                },
                 'errorMsg' => 'el dominio del email no existe'
             ],
             'ValidarSoloAlfanumerico' => [

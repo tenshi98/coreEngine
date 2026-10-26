@@ -43,8 +43,20 @@ class TemplateRenderer{
      * @return string El contenido procesado de la plantilla (HTML/Texto).
      */
     public function render(){
-        // Convierte el arreglo asociativo en variables locales individuales
-        extract($this->data);
+        // Expone los datos como variables locales para el scope de la plantilla.
+        // Endurecimiento (equivalente a extract() con filtro): solo se aceptan claves que
+        // sean nombres de variable válidos y que no colisionen con variables locales del
+        // método ni con nombres reservados, evitando que una clave arbitraria sobrescriba
+        // $this->templatePath, $output, etc.
+        static $reserved = ['this', 'templatePath', 'data', 'output', 'reserved', '__key', '__value'];
+        foreach ($this->data as $__key => $__value) {
+            if (is_string($__key)
+                && preg_match('/^[A-Za-z_][A-Za-z0-9_]*$/', $__key)
+                && !in_array($__key, $reserved, true)
+                && !isset(${$__key})) {
+                ${$__key} = $__value;
+            }
+        }
 
         // Inicia el almacenamiento temporal en memoria de la salida generada
         ob_start();

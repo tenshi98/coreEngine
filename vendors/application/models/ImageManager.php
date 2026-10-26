@@ -22,10 +22,13 @@ class ImageManager{
 	public function optimize($Options){
 
 		/********************** Definiciones   **********************/
-		// Extracción de parámetros con valores por defecto para asegurar la ejecución
-		$FileOriginal   = $Options['FileOriginal'];
-		$FileNew        = $Options['FileNew'];
-		$rutaArchivo    = $Options['rutaArchivo'];
+		// Extracción de parámetros con valores por defecto para asegurar la ejecución.
+		// Sanitización (hardening): FileOriginal/FileNew se reducen a su nombre base para
+		// impedir path traversal ("../") aunque el llamador no depure; rutaArchivo se
+		// normaliza sin separador final.
+		$FileOriginal   = basename((string)($Options['FileOriginal'] ?? ''));
+		$FileNew        = basename((string)($Options['FileNew'] ?? ''));
+		$rutaArchivo    = rtrim((string)($Options['rutaArchivo'] ?? ''), '/');
 		$Formato        = $Options['Formato'] ?? 'jpeg';
 		$quality        = $Options['quality'] ?? 75;
 		$max_width      = $Options['max_width'] ?? 640;
@@ -37,17 +40,30 @@ class ImageManager{
 		/********************** Lectura de Imagen **********************/
 		// Obtiene metadatos físicos del archivo (ancho, alto y tipo MIME)
 		$FileInfo    = getimagesize($rutaArchivo.'/'.$FileOriginal);
+
+		// getimagesize() devuelve false si el archivo no existe o no es una imagen válida
+		if ($FileInfo === false) { return false; }
+
 		$file_width  = $FileInfo[0];
 		$file_height = $FileInfo[1];
 		$file_type   = $FileInfo["mime"];
 
-		// Crea un recurso de imagen en memoria dependiendo del formato de origen
+		// Crea un recurso de imagen en memoria dependiendo del formato de origen.
+		// Si el formato no está soportado se aborta: antes $TempIMG quedaba indefinido
+		// y provocaba un TypeError en PHP 8 al usarlo en imagefilter/imagecopyresampled.
 		switch ($file_type) {
 			case 'image/jpg':
 			case 'image/jpeg': $TempIMG = imagecreatefromjpeg($rutaArchivo.'/'.$FileOriginal); break;
 			case 'image/gif':  $TempIMG = imagecreatefromgif($rutaArchivo.'/'.$FileOriginal); break;
 			case 'image/png':  $TempIMG = imagecreatefrompng($rutaArchivo.'/'.$FileOriginal); break;
+			case 'image/webp': $TempIMG = imagecreatefromwebp($rutaArchivo.'/'.$FileOriginal); break;
+			case 'image/bmp':
+			case 'image/x-ms-bmp': $TempIMG = imagecreatefrombmp($rutaArchivo.'/'.$FileOriginal); break;
+			default: return false;
 		}
+
+		// Si GD no pudo crear el recurso (función no disponible / archivo corrupto), se aborta.
+		if (!$TempIMG) { return false; }
 
 		/********************** Cálculo de Proporciones **********************/
 		// Lógica de redimensionamiento proporcional para evitar deformaciones

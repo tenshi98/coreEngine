@@ -1472,8 +1472,8 @@ class QueryBuilder{
         if(!isset($filepath) || $filepath==''){ return ['status' => false, 'error' => 'Query Error: No hay datos en $filepath', 'data' => []];}
 
         // Inicializa la utilidad de validación para comprobar la integridad de la ruta
-        $DataSQL = new FunctionsDataSQL();
-        $result  = $DataSQL->validatePathFile($filepath);
+        $Files   = new FunctionsCommonFiles();
+        $result  = $Files->validatePathFile($filepath);
 
         // Valida la existencia física del archivo antes de intentar leerlo
         if($result['success']===false){ return ['status' => false, 'error' => 'Query Error: Archivo SQL no encontrado:'.$filepath, 'data' => []];}

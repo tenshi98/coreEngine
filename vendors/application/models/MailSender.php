@@ -41,30 +41,8 @@ class MailSender{
      * @return bool|array Retorna true si el proceso se inicia correctamente o un arreglo con los errores de validación.
      */
     public function sendSMTPMail($TemplateData, $query){
-
-        /********************** Configuración   **********************/
-        // Mapea las constantes globales de configuración SMTP a un arreglo local.
-        // Esto centraliza las credenciales (Host, Puerto, Seguridad, Usuario, Pass)
-        // protegiendo los datos sensibles fuera de la lógica del controlador.
-        $ConfigMail = [
-            'ServerURL'    => ConfigMail::SMTPSender["SERVERURL"],
-            'ServerPort'   => ConfigMail::SMTPSender["SERVERPORT"],
-            'ServerSecure' => ConfigMail::SMTPSender["SERVERSECURE"],
-            'UserName'     => ConfigMail::SMTPSender["USERNAME"],
-            'UserEmail'    => ConfigMail::SMTPSender["USEREMAIL"],
-            'UserPass'     => ConfigMail::SMTPSender["PASSWORD"],
-        ];
-
-        /********************** Validaciones   **********************/
-        // Ejecuta la validación de los datos del correo (ej: formato de email, asunto no vacío).
-        // Antes de intentar conectar al servidor SMTP, se asegura de que el envío sea lógico.
-        $DataVal = $this->validateMail($query);
-
-        /********************** Retorno datos  **********************/
-        // Si la validación es exitosa (true), procede con el envío físico.
-        // De lo contrario, corta el flujo y devuelve el detalle de los errores encontrados.
-        return ($DataVal===true) ? $this->sendMail($TemplateData, $ConfigMail, $query) : $DataVal;
-
+        // Configuración del canal SMTP + validación + envío (ver dispatch()).
+        return $this->dispatch($this->channelConfig('smtp'), $TemplateData, $query);
     }
 
     /******************************************************************************/
@@ -79,27 +57,8 @@ class MailSender{
      * @return bool|array Retorna true si el proceso es exitoso o un arreglo de errores.
      */
     public function sendGMail($TemplateData, $query){
-
-        /********************** Configuración   **********************/
-        // Extrae las credenciales específicas del nodo GmailSender en ConfigMail.
-        // Gmail requiere configuraciones particulares de puerto (465 o 587) y seguridad (SSL/TLS).
-        $ConfigMail = [
-            'ServerURL'    => ConfigMail::GmailSender["SERVERURL"],
-            'ServerPort'   => ConfigMail::GmailSender["SERVERPORT"],
-            'ServerSecure' => ConfigMail::GmailSender["SERVERSECURE"],
-            'UserName'     => ConfigMail::GmailSender["USERNAME"],
-            'UserEmail'    => ConfigMail::GmailSender["USEREMAIL"],
-            'UserPass'     => ConfigMail::GmailSender["PASSWORD"],
-        ];
-
-        /********************** Validaciones   **********************/
-        // Verifica que el arreglo $query contenga correos válidos y campos obligatorios.
-        $DataVal = $this->validateMail($query);
-
-        /********************** Retorno datos  **********************/
-        // Si la validación es correcta, invoca sendMail pasando la configuración de Gmail.
-        return ($DataVal===true) ? $this->sendMail($TemplateData, $ConfigMail, $query) : $DataVal;
-
+        // Configuración del canal Gmail (misma lógica que SMTP; ver dispatch()).
+        return $this->dispatch($this->channelConfig('gmail'), $TemplateData, $query);
     }
 
     /******************************************************************************/
@@ -121,20 +80,22 @@ class MailSender{
         // Construcción del objeto JSON requerido por la API de Sendinblue.
         // Se utiliza desanitizarTexto para que los nombres y asuntos recuperen caracteres
         // especiales que pudieron ser escapados previamente.
+        // Cabeceras/campos de envío: se elimina CR/LF (anti header-injection, defensa en profundidad).
         $data = array(
             "sender" => array(
-                "email" => $this->DataText->desanitizarTexto($query['Post']['De_correo']),
-                "name"  => $this->DataText->desanitizarTexto($query['Post']['De_nombre'])
+                "email" => $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['De_correo'])),
+                "name"  => $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['De_nombre']))
             ),
             "to" => array(
                 array(
-                    "email" => $this->DataText->desanitizarTexto($query['Post']['Hacia_correo']),
-                    "name"  => $this->DataText->desanitizarTexto($query['Post']['Hacia_nombre'])
+                    "email" => $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['Hacia_correo'])),
+                    "name"  => $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['Hacia_nombre']))
                 )
             ),
-            "subject"     => $this->DataText->desanitizarTexto($query['Post']['Asunto']),
+            "subject"     => $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['Asunto'])),
             // Procesa el HTML final utilizando el motor de plantillas interno del sistema.
-            "htmlContent" => $this->templateEmail($TemplateData, $query['template'], $query['Post'])
+            // allowHtml: el cuerpo admite HTML (histórico); con false se escapa.
+            "htmlContent" => $this->templateEmail($TemplateData, $query['template'], $query['Post'], $query['allowHtml'] ?? true)
         );
 
         /********************** Validaciones   **********************/
@@ -207,6 +168,43 @@ class MailSender{
 	/*                                              Metodos Internos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
+    /******************************************************************************/
+    /**
+     * Devuelve la configuración de credenciales del canal de correo solicitado.
+     * Centraliza el mapeo de ConfigMail, reutilizado por sendSMTPMail() y sendGMail().
+     *
+     * @param string $channel 'smtp' (por defecto) o 'gmail'.
+     * @return array Credenciales normalizadas (ServerURL, ServerPort, ServerSecure, UserName, UserEmail, UserPass).
+     */
+    private function channelConfig(string $channel): array {
+        // Selección del nodo de configuración (constantes de ConfigMail).
+        $node = ($channel === 'gmail') ? ConfigMail::GmailSender : ConfigMail::SMTPSender;
+
+        return [
+            'ServerURL'    => $node["SERVERURL"],
+            'ServerPort'   => $node["SERVERPORT"],
+            'ServerSecure' => $node["SERVERSECURE"],
+            'UserName'     => $node["USERNAME"],
+            'UserEmail'    => $node["USEREMAIL"],
+            'UserPass'     => $node["PASSWORD"],
+        ];
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida el envío y, si es correcto, delega en sendMail(). Compartido por los canales SMTP/Gmail.
+     *
+     * @param array $ConfigMail Credenciales del canal (ver channelConfig()).
+     * @param mixed $TemplateData Datos de la plantilla / identificador.
+     * @param array $query Configuración del envío.
+     * @return bool|array true si se envió, false si falló, o arreglo de errores de validación.
+     */
+    private function dispatch(array $ConfigMail, $TemplateData, $query) {
+        $DataVal = $this->validateMail($query);
+        return ($DataVal === true) ? $this->sendMail($TemplateData, $ConfigMail, $query) : $DataVal;
+    }
+
+    /******************************************************************************/
     /**
      * Valida que los datos necesarios para el envío de un correo estén presentes.
      * * @param array $query Configuración que contiene 'data' (campos requeridos), 'template' y 'Post'.
@@ -228,6 +226,18 @@ class MailSender{
         foreach ($arrData as $field) {
             if (empty($query['Post'][$field])) {
                 $errors[] = ["message" => "$field es obligatorio"];
+            }
+        }
+
+        /************************************/
+        // Anti header-injection: los campos que terminan en cabeceras del correo
+        // (SMTP o payload JSON de la API) no pueden contener CR/LF; un salto de línea
+        // permitiría inyectar cabeceras (p. ej. Bcc:) o alterar el asunto.
+        $headerFields = ['Hacia', 'Asunto', 'De_correo', 'Hacia_correo', 'De_nombre', 'Hacia_nombre'];
+        foreach ($headerFields as $field) {
+            if (isset($query['Post'][$field]) && is_string($query['Post'][$field])
+                && preg_match('/[\r\n]/', $query['Post'][$field])) {
+                $errors[] = ["message" => "$field contiene caracteres no permitidos"];
             }
         }
 
@@ -255,8 +265,13 @@ class MailSender{
         $UserName     = $this->DataText->desanitizarTexto($ConfigMail['UserName']);
         $UserEmail    = $this->DataText->desanitizarTexto($ConfigMail['UserEmail']);
         $UserPass     = $ConfigMail['UserPass'];
-        $Hacia        = $this->DataText->desanitizarTexto($query['Post']['Hacia']);
-        $Asunto       = $this->DataText->desanitizarTexto($query['Post']['Asunto']);
+
+        // Cabeceras: se elimina CR/LF para impedir header injection (defensa en profundidad,
+        // además de la validación previa en validateMail()).
+        $Hacia        = $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['Hacia']));
+        $Asunto       = $this->sanitizeHeaderValue($this->DataText->desanitizarTexto($query['Post']['Asunto']));
+        $UserName     = $this->sanitizeHeaderValue($UserName);
+        $UserEmail    = $this->sanitizeHeaderValue($UserEmail);
 
         /************************************/
         // Inicialización del objeto SMTP con los parámetros del servidor
@@ -269,17 +284,35 @@ class MailSender{
         $smtp->set('Errors-to', '<'.$UserEmail.'>');
 
         // Generación del cuerpo HTML procesando la plantilla correspondiente
-        $message = $this->templateEmail($TemplateData, $query['template'], $query['Post']);
+        // allowHtml: por defecto el Mensaje admite HTML (comportamiento histórico); con false se escapa.
+        $message = $this->templateEmail($TemplateData, $query['template'], $query['Post'], $query['allowHtml'] ?? true);
 
         // Ejecución del envío
         $sent  = $smtp->send($message, true);
 
-        // Captura de trazas para auditoría técnica en caso de error
-        $mylog = $smtp->log();
+        // En fallo NO se devuelve el log SMTP (puede contener credenciales AUTH LOGIN en base64);
+        // se registra en el log del servidor con la credencial enmascarada y se retorna false.
+        if (!$sent) {
+            $mylog = preg_replace('/(AUTH LOGIN\s+)([A-Za-z0-9+\/=]+)/i', '$1***', (string)$smtp->log());
+            error_log('[MailSender] Fallo al enviar correo: ' . $mylog);
+            return false;
+        }
 
         // Retorno de datos
-        return ($sent) ? true : $mylog;
+        return true;
 
+    }
+
+    /******************************************************************************/
+    /**
+     * Sanea un valor destinado a una cabecera de correo eliminando CR/LF.
+     * Evita header injection (p. ej. inyectar "Bcc:" mediante un salto de línea).
+     *
+     * @param mixed $valor Valor a sanear.
+     * @return string Valor sin retornos de carro ni saltos de línea, sin espacios extremos.
+     */
+    private function sanitizeHeaderValue($valor): string {
+        return trim(str_replace(["\r", "\n"], '', (string)$valor));
     }
 
     /******************************************************************************/
@@ -288,14 +321,22 @@ class MailSender{
      * Motor de renderizado de plantillas de correo electrónico.
      * * Selecciona el archivo físico de la plantilla y asigna las variables dinámicas
      * para generar el contenido HTML final del mensaje.
-     * * @param array $TemplateData Configuración global (Redes sociales, logos, URLs).
+     *      * @param array $TemplateData Configuración global (Redes sociales, logos, URLs).
      * @param int $Template Identificador de la estructura de plantilla a utilizar.
      * @param array $Data Datos específicos del mensaje (Asunto, Cuerpo).
+     * @param bool $allowHtml true (por defecto) permite HTML en el Mensaje; false lo escapa como texto.
      * @return string Contenido HTML renderizado.
      */
-    private function templateEmail($TemplateData, $Template, $Data){
+    private function templateEmail($TemplateData, $Template, $Data, $allowHtml = true){
 
     try {
+            // Asunto: siempre texto plano → siempre escapado (evita HTML injection en el correo).
+            $Asunto  = htmlspecialchars((string)($Data['Asunto'] ?? ''), ENT_QUOTES, 'UTF-8');
+            // Mensaje: admite HTML por defecto (comportamiento histórico). Con $allowHtml=false se escapa.
+            $Mensaje = $allowHtml
+                ? (string)($Data['Mensaje'] ?? '')
+                : htmlspecialchars((string)($Data['Mensaje'] ?? ''), ENT_QUOTES, 'UTF-8');
+
             /************************************/
             // Selección de lógica según el tipo de plantilla (switch)
             switch ($Template) {
@@ -304,7 +345,7 @@ class MailSender{
                 case 1:
                     $this->TemplateRender->templatePath('../app/templates/Mail/mailTemplate_1.php');
                     $this->TemplateRender->assign('title', 'maqueta');
-                    $this->TemplateRender->assign('Mensaje', $Data['Mensaje']);
+                    $this->TemplateRender->assign('Mensaje', $Mensaje);
                     break;
 
                 // Caso 2: Plantilla corporativa con Redes Sociales y Logos
@@ -333,8 +374,8 @@ class MailSender{
                     $this->TemplateRender->assign('Sistema_Direccion', $TemplateData['Sistema_Direccion']);
                     $this->TemplateRender->assign('Sistema_Email', $TemplateData['Sistema_Email']);
                     $this->TemplateRender->assign('Social_icon', $Social_icon);
-                    $this->TemplateRender->assign('Asunto', $Data['Asunto']);
-                    $this->TemplateRender->assign('Mensaje', $Data['Mensaje']);
+                    $this->TemplateRender->assign('Asunto', $Asunto);
+                    $this->TemplateRender->assign('Mensaje', $Mensaje);
                     break;
 
                 case 3:
