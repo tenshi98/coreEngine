@@ -92,10 +92,16 @@
             });
         //si hay datos
         } else if (jsonData.data) {
-            // data es un string u otro valor
-            message = jsonData.message && jsonData.message != jsonData.data
-                ? `${jsonData.message}<br>${jsonData.data}`
-                : jsonData.data;
+            // data escalar: se combina con message; si es un objeto (p. ej.
+            // flags {'csrf': true, 'Token': ...} de un 419) NO se concatena
+            // el objeto (evita mostrar "[object Object]" al usuario)
+            if (typeof jsonData.data === 'object') {
+                message = jsonData.message || 'Error desconocido';
+            } else {
+                message = jsonData.message && jsonData.message != jsonData.data
+                    ? `${jsonData.message}<br>${jsonData.data}`
+                    : jsonData.data;
+            }
         //si no lo es solo se muestra
         } else {
             // No existe data
@@ -205,27 +211,104 @@
     }
 
     /**********************************************************/
+    //CSRF: extrae el token vigente de una respuesta HTTP 419 (cabecera o cuerpo)
+    function tokenDesdeRespuesta419(jqXHR) {
+        //Sin respuesta no hay token que extraer
+        if (!jqXHR) { return ''; }
+        //1) Cabecera X-CSRF-Token (emitida por Response::json y por CsrfToken::guard)
+        if (jqXHR.getResponseHeader) {
+            const porCabecera = jqXHR.getResponseHeader('X-CSRF-Token');
+            if (porCabecera) { return porCabecera; }
+        }
+        //2) Cuerpo JSON: data.Token
+        if (jqXHR.responseJSON && jqXHR.responseJSON.data && jqXHR.responseJSON.data.Token) {
+            return jqXHR.responseJSON.data.Token;
+        }
+        const cuerpo = parseJsonSeguro(jqXHR.responseText);
+        return (cuerpo && cuerpo.data && cuerpo.data.Token) ? cuerpo.data.Token : '';
+    }
+
+    /**********************************************************/
+    //CSRF: adopta un token nuevo devuelto por el servidor y refresca los
+    //campos ocultos _token de todos los formularios del documento.
+    function adoptarTokenCsrf(nuevoTok) {
+        //Sin token no hay nada que sincronizar
+        if (!nuevoTok || typeof window === 'undefined') { return; }
+        //Se actualiza la fuente usada por currentCsrfToken() y el prefilter
+        window.CSRF_TOKEN = nuevoTok;
+        //Se refrescan los inputs ocultos _token inyectados (data-csrf="1")
+        if (window.injectCsrfFields) { window.injectCsrfFields(document); }
+    }
+
+    /**********************************************************/
+    //CSRF: actualiza el _token YA embebido en los datos de la peticion
+    //(cadena serializada o FormData). El servidor lee $_POST['_token'] ANTES
+    //que la cabecera, asi que un valor viejo en el cuerpo invalidaria el
+    //reintento aunque la cabecera X-CSRF-Token este actualizada.
+    function refrescarTokenEnDatos(data, tok) {
+        //Sin datos o sin token no se hace nada
+        if (!data || !tok) { return data; }
+        //Cadena serializada: se reemplaza el valor de _token si existe
+        if (typeof data === 'string') {
+            return (data.indexOf('_token=') !== -1)
+                ? data.replace(/(_token=)[^&]*/, '$1' + encodeURIComponent(tok))
+                : data;
+        }
+        //FormData: se actualiza la entrada si esta presente
+        if (typeof FormData !== 'undefined' && data instanceof FormData) {
+            if (data.has('_token')) { data.set('_token', tok); }
+            return data;
+        }
+        //Objeto plano: se sobreescribe el campo
+        if (typeof data === 'object') { data._token = tok; }
+        return data;
+    }
+
+    /**********************************************************/
     //Envia el formulario por AJAX.
     //Centraliza SendDataForms y SendDataFormsFiles (eran el mismo codigo con
     //processData/contentType como unica diferencia).
+    //Incluye auto-sanacion CSRF: si el backend responde 419 con el token
+    //vigente, se adopta y se reintenta UNA vez de forma transparente (evita
+    //que el usuario tenga que recargar la pagina tras una reconstruccion de
+    //sesion en el servidor).
     function sendAjaxForm(esArchivo, Metodo, Direccion, Informacion, Options) {
         //log
         logFNCS('SendDataForms: ingreso');
-        //Configuracion base
-        const config = { method: Metodo, url: Direccion, data: Informacion };
-        //Los formularios con archivos no deben procesar ni serializar los datos
-        if (esArchivo) {
-            config.processData = false;
-            config.contentType = false;
+        //Primer intento
+        enviarFormulario(0);
+
+        function enviarFormulario(intento) {
+            //Configuracion base
+            const config = { method: Metodo, url: Direccion, data: Informacion };
+            //Los formularios con archivos no deben procesar ni serializar los datos
+            if (esArchivo) {
+                config.processData = false;
+                config.contentType = false;
+            }
+            //consulto los datos
+            $.ajax(config).done(function (data, textStatus, jqXHR) {
+                //Se ejecutan las opciones
+                SendDataOptions(Options, jqXHR);
+            }).fail(function (jqXHR, textStatus, errorThrown) {
+                //Auto-sanacion CSRF: solo en el primer intento y solo si el
+                //backend devolvio un token vigente distinto al que se envio
+                if (intento === 0 && jqXHR && jqXHR.status === 419) {
+                    const nuevoTok = tokenDesdeRespuesta419(jqXHR);
+                    if (nuevoTok) {
+                        //Se adopta el token y se refresca el cuerpo de la peticion
+                        adoptarTokenCsrf(nuevoTok);
+                        Informacion = refrescarTokenEnDatos(Informacion, nuevoTok);
+                        //Se reintenta una unica vez (sin notificar error al usuario)
+                        logFNCS('SendDataForms: 419 CSRF, reintento con token actualizado');
+                        enviarFormulario(1);
+                        return;
+                    }
+                }
+                //Se ejecutan los errores
+                SendDataErrors(Options, jqXHR);
+            });
         }
-        //consulto los datos
-        $.ajax(config).done(function (data, textStatus, jqXHR) {
-            //Se ejecutan las opciones
-            SendDataOptions(Options, jqXHR);
-        }).fail(function (jqXHR, textStatus, errorThrown) {
-            //Se ejecutan los errores
-            SendDataErrors(Options, jqXHR);
-        });
     }
 
     /**********************************************************/
@@ -791,13 +874,29 @@
                         opts.data._token = tok;
                     }
                 }
-                //Si la respuesta trae un token nuevo, se adopta
+                //Si la respuesta trae un token nuevo, se adopta (exito o error)
                 const prev = opts.success;
                 opts.success = function (data, textStatus, jqXHR) {
                     const newTok = (jqXHR && jqXHR.getResponseHeader && jqXHR.getResponseHeader('X-CSRF-Token'))
                                 || (data && data.data && data.data.Token);
                     if (newTok && typeof window !== 'undefined') { window.CSRF_TOKEN = newTok; }
                     if (typeof prev === 'function') { prev.apply(this, arguments); }
+                };
+                //Auto-sanacion en error: cuando el backend responde 419 con el
+                //token vigente (reconstruccion de sesion en el servidor), se
+                //adopta aqui para que el SIGUIENTE envio del usuario ya no falle
+                //(cubre los $.ajax directos de las vistas, que no usan sendAjaxForm)
+                const prevErr = opts.error;
+                opts.error = function (xhr, textStatus, errorThrown) {
+                    if (xhr && xhr.status === 419) {
+                        const newTok = (xhr.getResponseHeader && xhr.getResponseHeader('X-CSRF-Token'))
+                                    || (xhr.responseJSON && xhr.responseJSON.data && xhr.responseJSON.data.Token);
+                        if (newTok && typeof window !== 'undefined') {
+                            window.CSRF_TOKEN = newTok;
+                            if (window.injectCsrfFields) { window.injectCsrfFields(document); }
+                        }
+                    }
+                    if (typeof prevErr === 'function') { prevErr.apply(this, arguments); }
                 };
             });
         }
