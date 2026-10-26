@@ -19,7 +19,7 @@
                 // registró en sesión al renderizar la vista (ver archivosListado.php)
                 'AccessScope'      => 'archivosListado',
             ];
-            $data['Fnc_WidgetsCommon']->widget_fileExplorer($Options);
+            $data['Fnc_WidgetsFileExplorer']->widget_fileExplorer($Options);
             ?>
         </div>
 

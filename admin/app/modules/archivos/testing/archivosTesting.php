@@ -457,6 +457,8 @@ class archivosTesting extends ControllerBase {
             'UserData'      => ['MainPathUrl' => $rootPath],
             'UserAccess'    => ['LevelAccess' => $nivel],
             'Fnc_WidgetsCommon' => new UIWidgetsCommon(),
+            'Fnc_WidgetsViews'  => new UIWidgetsViews(),
+            'Fnc_WidgetsFileExplorer' => new UIWidgetsFileExplorer(),
         ];
         $rutaVista = $this->rutaModulo('../views/archivosListado-List.php');
 

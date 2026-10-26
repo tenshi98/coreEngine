@@ -47,6 +47,7 @@ class archivosListado extends ControllerFiles {
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            'Fnc_WidgetsFileExplorer'    => new UIWidgetsFileExplorer(),
         ];
 
         /************************************/
