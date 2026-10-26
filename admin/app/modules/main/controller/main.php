@@ -73,6 +73,57 @@ class main extends ControllerBase {
     }
 
     /*******************************************************************/
+    // Vista - Restablecer contraseña (enlace por correo)
+    /*******************************************************************/
+    public function resetPassword($f3){
+
+        /************************************/
+        //Se cargan los datos de la plataforma
+        $query = [
+            'data'   => 'Sistema_idTema',
+            'table'  => 'core_sistemas',
+            'join'   => '',
+            'where'  => 'idSistema = ?',
+            'params'  => [1],
+            'group'  => '',
+            'having' => '',
+            'order'  => ''
+        ];
+        //Verifico si hay un dato
+        $xParams     = ['query' => $query];
+        // Ejecuto la query
+        $rowOpciones = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // El token no se valida en GET (la validación es en POST): la vista se
+        // renderiza siempre, sin revelar si el enlace es válido (RF-002a)
+        $Token = $f3->get('GET.token');
+        $Token = is_string($Token) ? $Token : '';
+
+        /************************************/
+        // Datos enviados a la pagina
+        $f3->data = [
+            /*=========== Datos de la Pagina ===========*/
+            'PageTitle'       => 'Restablecer Contraseña',
+            'PageDescription' => 'Restablecer Contraseña',
+            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+            /*=========== Datos Consultados ===========*/
+            'rowOpciones'    => $rowOpciones['data'],
+            /*===========    Token recibido    ===========*/
+            'Token'          => $Token,
+        ];
+
+        /************************************/
+        // Se instancia la vista
+        $view     = new View;
+        echo $view->render('../app/templates/guest-header.php');
+        echo $view->render('../'.$this->returnRutaVista(__DIR__, 'app').'/main-reset-password.php');
+        echo $view->render('../app/templates/guest-footer.php');
+
+    }
+
+    /*******************************************************************/
     // Recuperar Contraseña
     /*******************************************************************/
     public function error404($f3){
@@ -102,47 +153,100 @@ class main extends ControllerBase {
 
         /************************************/
         // Variable vacia
-        $MainViewData = [];
-        $menuCounters = [];
+        $MainViewData   = [];
+        $MainViewBlocks = [];
 
-        //Arreglo con los controladores con widgets, considerar que desde aqui se ordenan
-        $array = $this->arrayWidgetViews();
         /************************************/
-        // Verifico si existe
-        if(is_array($array) && count($array)>0){
-            // Recorro los datos
-            foreach ($array as $data) {
-                /************************************/
-                // Se genera la query
-                $loadWidgets = method_exists($data, 'loadWidgets');
-                //si el metodo existe
-                if($loadWidgets===true){
-                    // Se instancia SIN ejecutar el constructor: loadWidgets() solo devuelve
-                    // un arreglo estatico y no usa la Base de Datos. Ejecutar el constructor
-                    // abriria una conexion PDO por cada modulo, agotando el limite de
-                    // conexiones del servidor (SQLSTATE[HY000] [1040] Too many connections).
-                    $arrModules = $this->loadWidgetsSinConexion($data);
-                    //Permisos
-                    if(is_array($arrModules) && isset($arrModules['Menu_Name'], $arrModules['Menu_Value']) && is_array($arrModules['Menu_Value'])){
-                        $menuCounters[$arrModules['Menu_Name']] = $arrModules['Menu_Value'];
-                    }
-                }
+        // Se normaliza $arrMenu a array para tolerar sesiones vacias o corruptas
+        $arrMenu = is_array($arrMenu) ? $arrMenu : [];
+
+        /************************************/
+        // Se cargan los widgets y se combinan con el orden configurado en core_sistemas
+        // (Config_Principal_Widgets). Sin configuracion = orden por defecto (alfabetico).
+        // Los widgets nuevos quedan al final y, si ya hay configuracion, se persisten.
+        $query = [
+            'data'   => 'Config_Principal_Widgets',
+            'table'  => 'core_sistemas',
+            'join'   => '',
+            'where'  => 'idSistema = ?',
+            'params' => [1],
+            'group'  => '',
+            'having' => '',
+            'order'  => ''
+        ];
+        $xParams    = ['query' => $query];
+        $rowWidgets = $this->Base_GetByID($xParams);
+        // Si la columna aun no existe en la BD (query fallida) se usa el orden por defecto
+        $jsonWidgets = ($rowWidgets['status']===true && is_array($rowWidgets['data'])) ? ($rowWidgets['data']['Config_Principal_Widgets'] ?? null) : null;
+        $merged      = WidgetsOrderService::merge(WidgetsOrderService::discover(), $jsonWidgets);
+
+        /************************************/
+        // Si hay widgets nuevos, se guarda el orden resultante (quedan al final)
+        if($rowWidgets['status']===true && $merged['hasNew']===true){
+            $Post   = ['idSistema' => 1, 'Config_Principal_Widgets' => WidgetsOrderService::encode($merged['items'])];
+            $query  = [
+                'data'     => 'idSistema,Config_Principal_Widgets',
+                'required' => 'idSistema',
+                'unique'   => '',
+                'encode'   => '',
+                'table'    => 'core_sistemas',
+                'where'    => 'idSistema',
+                'Post'     => $Post,
+            ];
+            // Se inicia la transacción
+            $this->Base_transactionBegin();
+            $xParams = ['DataCheck' => [], 'query' => $query, 'novalidate' => true];
+            $saved   = $this->Base_update($xParams);
+            if($saved['status']===false){
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                error_log('[coreEngine][principal] No se pudo guardar el orden de widgets: ' . ($saved['error'] ?? ''));
+            } else {
+                $this->Base_transactionCommit();
             }
         }
 
         /************************************/
-        // Se recorren los permisos y se validan
-        // (Se normaliza $arrMenu a array para tolerar sesiones vacias o corruptes)
-        $arrMenu = is_array($arrMenu) ? $arrMenu : [];
-        foreach ($menuCounters as $section => $names) {
-            // Verifico si existen datos del menu
-            if (!empty($arrMenu[$section])) {
-                // Recorro el menu
-                foreach ($arrMenu[$section] as $asd) {
-                    if (isset($names[$asd['Nombre']])) {
-                        $MainViewData[] = $names[$asd['Nombre']]; //Se guardan las URL
+        // Se recorren los bloques y sus sub-widgets en orden: solo bloques y widgets
+        // activos, y con permiso del usuario.
+        //   - Bloque activo (switch maestro) && el usuario tiene acceso a la seccion.
+        //   - Sub-widget activo (switch individual) && el permiso (Permiso) existe en el menu.
+        foreach ($merged['items'] as $block) {
+            // Bloque desactivado (switch maestro)
+            if((int)$block['activo']===0){
+                continue;
+            }
+            // Permiso de seccion: el bloque debe existir en el menu del usuario
+            if(empty($arrMenu[$block['Menu_Name']])){
+                continue;
+            }
+            // Se recorren los sub-widgets del bloque
+            $RutasBloque = [];
+            foreach ($block['items'] as $widget) {
+                // Widget desactivado (switch individual)
+                if((int)($widget['activo'] ?? 1)===0){
+                    continue;
+                }
+                // Permiso: el Nombre de la transaccion (Permiso) debe existir en la seccion
+                $Permiso = !empty($widget['Permiso']) ? $widget['Permiso'] : $widget['Nombre'];
+                foreach ($arrMenu[$block['Menu_Name']] as $asd) {
+                    if(isset($asd['Nombre']) && $asd['Nombre']===$Permiso){
+                        $RutasBloque[]  = $widget['Ruta']; //Se guardan las URL
+                        $MainViewData[] = $widget['Ruta'];
+                        break;
                     }
                 }
+            }
+            // Si el bloque aporta al menos un sub-widget, se registra el bloque
+            // con su titulo para renderizarlo una sola vez como unidad
+            $RutasBloque = array_values(array_unique($RutasBloque));
+            if(count($RutasBloque) > 0){
+                $MainViewBlocks[] = [
+                    'key'    => $block['key'],
+                    'Titulo' => !empty($block['Titulo']) ? $block['Titulo'] : $block['Menu_Name'],
+                    'Rutas'  => $RutasBloque,
+                ];
             }
         }
 
@@ -163,8 +267,12 @@ class main extends ControllerBase {
             'Fnc_ServerServer'    => $this->ServerServer,
             'Fnc_DataDate'        => $this->DataDate,
             'Fnc_WidgetsCommon'   => new UIWidgetsCommon(),
+            'Fnc_WidgetsFeed'     => new UIWidgetsFeed(),
+            'Fnc_WidgetsMedia'    => new UIWidgetsMedia(),
+            'Fnc_WidgetsWeather'  => new UIWidgetsWeather(),
             /*=========== Datos Consultados ===========*/
             'MainViewData'    => $MainViewData,
+            'MainViewBlocks'  => $MainViewBlocks,
         ];
 
         /************************************/
@@ -173,113 +281,10 @@ class main extends ControllerBase {
     }
 
     /*******************************************************************/
-    // Se listan los controladores
+    // Se listan los controladores (la logica vive en WidgetsOrderService)
     /*******************************************************************/
     public function arrayWidgetViews(){
-
-        /*******************************************************/
-        // Variable vacia
-        $array = array();
-
-        /*******************************************************/
-        // Carpeta raiz de los modulos (ruta ABSOLUTA resuelta con realpath para
-        // no depender del directorio de trabajo actual, que puede diferir entre
-        // localhost y produccion)
-        $modulesPath = realpath(__DIR__ . '/../../');
-
-        /*******************************************************/
-        // Si no se pudo resolver la ruta (permisos, open_basedir, symlinks) se registra
-        if($modulesPath===false || !is_dir($modulesPath)){
-            error_log('[coreEngine][arrayWidgetViews] No se pudo resolver la ruta de modulos desde ' . __DIR__);
-            return $array;
-        }
-
-        /*******************************************************/
-        // Se escanean los archivos *Widgets.php de cada modulo
-        $files = glob($modulesPath . '/*/widgets/*Widgets.php');
-
-        /*******************************************************/
-        // glob() devuelve false ante error (tipicamente open_basedir en produccion)
-        if(!is_array($files)){
-            error_log('[coreEngine][arrayWidgetViews] glob() no pudo listar widgets en ' . $modulesPath);
-            return $array;
-        }
-
-        /*******************************************************/
-        // Orden alfabetico para que el orden de los widgets sea estable
-        sort($files);
-
-        /*******************************************************/
-        // Recorro los archivos encontrados
-        foreach ($files as $file) {
-            /************************************/
-            // Nombre de la clase (igual al nombre del archivo)
-            $class = basename($file, '.php');
-
-            /************************************/
-            // Se carga el archivo de forma explicita: class_exists() delegaba en el
-            // autoload de F3, que resuelve rutas RELATIVAS al directorio de trabajo.
-            if(!class_exists($class, false)){
-                require_once $file;
-            }
-
-            /************************************/
-            // Se valida que la clase se haya cargado y tenga el metodo loadWidgets
-            if (!class_exists($class)) {
-                error_log('[coreEngine][arrayWidgetViews] Widget ignorado (clase inexistente): ' . $class);
-                continue;
-            }
-            if (!method_exists($class, 'loadWidgets')) {
-                error_log('[coreEngine][arrayWidgetViews] Widget ignorado (sin loadWidgets): ' . $class);
-                continue;
-            }
-            $array[] = $class;
-        }
-
-        // Retorno los datos
-        return $array;
+        return WidgetsOrderService::discoverClasses();
     }
-
-    /************************************************************************************************************/
-    /**
-     * Invoca loadWidgets() de un controlador de widgets SIN ejecutar su constructor.
-     *
-     * Los controladores de widgets extienden de ControllerBase y su constructor abre
-     * una conexion PDO a la Base de Datos (Database::getSQLConnection). La pantalla
-     * principal solo necesita leer el arreglo estatico que devuelve loadWidgets(),
-     * por lo que instanciarlos "normalmente" abre una conexion por cada modulo
-     * instalado y puede agotar el limite max_user_connections del servidor.
-     *
-     * Se usa ReflectionClass::newInstanceWithoutConstructor() para obtener la
-     * instancia sin disparar el constructor. Si algun dia loadWidgets() llegara a
-     * depender del estado del objeto, el error queda registrado en el log y ese
-     * modulo se omite (no se degrada al resto de la pagina).
-     *
-     * @param string $Class Nombre de la clase controladora del widget.
-     *
-     * @return array Arreglo con Menu_Name y Menu_Value, o [] si no fue posible obtenerlo.
-     */
-    private function loadWidgetsSinConexion($Class){
-
-        /********************** Si todo esta ok **********************/
-        // Validacion temprana: la clase debe existir y exponer el metodo
-        if(!is_string($Class) || $Class==='' || !class_exists($Class) || !method_exists($Class, 'loadWidgets')){
-            return [];
-        }
-
-        /********************** Instancia sin constructor **********************/
-        try {
-            $reflection = new ReflectionClass($Class);
-            $instancia  = $reflection->newInstanceWithoutConstructor();
-            $resultado  = $instancia->loadWidgets();
-        } catch (Throwable $e) {
-            error_log('[coreEngine][loadWidgetsSinConexion] ' . $Class . ' -> ' . $e->getMessage());
-            return [];
-        }
-
-        /**********************  Retorno datos  **********************/
-        return is_array($resultado) ? $resultado : [];
-    }
-
 
 }

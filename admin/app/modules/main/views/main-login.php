@@ -44,7 +44,7 @@
                                     <div class="tab-pane fade" id="bordered-tab_2" role="tabpanel" aria-labelledby="tab_2">
                                         <div class="pt-4 pb-2">
                                             <h5 class="card-title text-center pb-0 fs-4">¿Olvidaste tu contraseña?</h5>
-                                            <p class="text-center small">Ingresa tu Email para recuperar tu contraseña.Revisa la bandeja de entrada o spam de tu correo.</p>
+                                            <p class="text-center small">Ingresa tu Email y te enviaremos un enlace para restablecer tu contraseña. Revise la bandeja de entrada o spam.</p>
                                         </div>
                                         <form id="RecoverForm" name="RecoverForm" autocomplete="off" method="POST" class="row g-3" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
 

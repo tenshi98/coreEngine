@@ -13,6 +13,7 @@ class miUsuario extends ControllerBase {
     private $DataNumbers;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,6 +28,7 @@ class miUsuario extends ControllerBase {
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -68,6 +70,34 @@ class miUsuario extends ControllerBase {
         $Response = $authenticationService->recoverPassword($f3, $_POST);
 
         /************************************/
+        //imprimo resultados
+        Response::error($Response['message'], $Response['code'], $Response['message']);
+
+    }
+
+    /*******************************************************************/
+    // Restablecer contraseña (enlace por correo)
+    /*******************************************************************/
+    public function resetPassword($f3){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Se llama la clase
+        $authenticationService = new AuthenticationService();
+        // Se ejecuta el restablecimiento con el token de un solo uso
+        $Response = $authenticationService->resetPassword($f3, $_POST);
+
+        /************************************/
+        // Si es correcto
+        if($Response['code']==200){
+            //Se informa el resultado
+            Response::success($Response['message']);
+        }
         //imprimo resultados
         Response::error($Response['message'], $Response['code'], $Response['message']);
 
@@ -229,6 +259,7 @@ class miUsuario extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
                 'arrCiudad'       => $arrCiudad['data'],
@@ -311,6 +342,7 @@ class miUsuario extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
             ];
@@ -443,6 +475,10 @@ class miUsuario extends ControllerBase {
             if($_POST['password']!=$_POST['rePassword']){
                 Response::error('Las contraseñas no coinciden', 500);
             }
+            /************************************/
+            // Cambio de contraseña valido: se levanta el cambio forzado y se registra la fecha
+            $_POST['PasswordForzarCambio'] = 0;
+            $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
 
         }
 
@@ -453,7 +489,7 @@ class miUsuario extends ControllerBase {
         /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idUsuario,password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
+            'data'      => 'idUsuario,password,PasswordForzarCambio,PasswordUltimoCambio,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
             'required'  => 'idUsuario,idTipoUsuario,idEstado,email,Nombre,idMenuPosicion',
             'unique'    => '',
             'encode'    => 'password',
@@ -472,6 +508,9 @@ class miUsuario extends ControllerBase {
                 ],
             ]
         ];
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Preparo los datos
         $xParams        = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -486,12 +525,13 @@ class miUsuario extends ControllerBase {
             $Client                = new FunctionsServerClient();
             //Se actualiza la sesion del usuario
             $authenticationService->updateSession($f3, $_POST['idUsuario'], $sessionService, $Client);
+            // Se confirma la transacción
+            $this->Base_transactionCommit();
             // Devuelvo $Response con código 200 (OK)
             Response::success($ResponseSesion['data']);
         } else {
-            // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
-            // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
-            Response::error('Error al operar con la Base de Datos', 500, $ResponseSesion['error']);
+            // Si falla la ejecucion, se revierte de inmediato
+            $this->failOperation($ResponseSesion);
         }
 
     }
@@ -520,16 +560,23 @@ class miUsuario extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataPut
         ];
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
         $Response = $this->Base_delFiles($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Se confirma la transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Se cargan las clases
@@ -564,8 +611,15 @@ class miUsuario extends ControllerBase {
             'ValidarURL'                => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarLargoMinimo'        => 'mainPassword,oldPassword,password,rePassword,email,Nombre,Direccion',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'mainPassword,oldPassword,password,rePassword,email,Nombre,Direccion',
-            'ValidarLargoMaximoN'       => 255,
+            'ValidarLargoMaximoPorCampo' => [
+                'mainPassword' => 255,
+                'oldPassword'  => 255,
+                'password'     => 255,
+                'rePassword'   => 255,
+                'email'        => 60,
+                'Nombre'       => 60,
+                'Direccion'    => 60,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Direccion',
             'ValidarEspaciosVacios'     => 'email,mainPassword,oldPassword,password,rePassword,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'email',

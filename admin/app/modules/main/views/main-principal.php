@@ -13,6 +13,39 @@
     $AppRoot = dirname(dirname(dirname(dirname(__DIR__))));  // .../admin
 
     /**************************************/
+    // Aviso de contraseña desactualizada (PasswordUltimoCambio vs. fecha actual).
+    // - Sin fecha registrada: nunca cambió la contraseña.
+    // - Con más de 60 días desde el último cambio: toca renovarla.
+    // No bloquea el acceso: sólo informa y da un botón hacia /perfil, igual que
+    // el aviso de PasswordForzarCambio (ese caso redirige /principal a /perfil).
+    // Sesiones activas anteriores a este cambio no traen la clave: se omite el aviso
+    // hasta el proximo login (o hasta que updateSession refresque DataInfo).
+    $PasswordDataOk       = array_key_exists('PasswordUltimoCambio', (array)($data['UserData'] ?? []));
+    $PasswordForzada      = (int)($data['UserData']['PasswordForzarCambio'] ?? 0) === 1;
+    $PasswordUltimoCambio = trim((string)($data['UserData']['PasswordUltimoCambio'] ?? ''));
+    $PasswordDiasLimite   = 60;
+    $PasswordSinFecha     = ($PasswordUltimoCambio === '');
+    $TsUltimoCambio       = $PasswordSinFecha ? false : strtotime($PasswordUltimoCambio);
+    $PasswordVencida      = (!$PasswordSinFecha && $TsUltimoCambio !== false)
+                          && ((time() - $TsUltimoCambio) > ($PasswordDiasLimite * 86400));
+
+    // Se emite el aviso sólo si corresponde
+    if ($PasswordDataOk && !$PasswordForzada && ($PasswordVencida || $PasswordSinFecha)) {
+        // Texto distinto según si hay fecha registrada o no
+        $PasswordTexto = $PasswordSinFecha
+            ? 'Nunca has cambiado tu contraseña. Te recomendamos actualizarla.'
+            : 'Tu contraseña tiene más de ' . $PasswordDiasLimite . ' días sin cambiarse. Te recomendamos actualizarla.';
+        // Alerta con botón hacia el perfil (pestaña «Cambiar Password»)
+        $Btn_Text = '<span>'
+            . htmlspecialchars($PasswordTexto, ENT_QUOTES, 'UTF-8')
+            . '</span>'
+            . '<a class="btn btn-warning" href="' . htmlspecialchars($BASE . '/perfil', ENT_QUOTES, 'UTF-8') . '">'
+            . '<i class="bi bi-key"></i> Cambiar contraseña</a>';
+        // Mostrar alerta
+        $data['Fnc_WidgetsCommon']->printAlertData(5, 4, 'bi bi-exclamation-triangle-fill', 0, $Btn_Text);
+    }
+
+    /**************************************/
     // Cuadro de bienvenida (siempre visible)
     require_once(__DIR__ . '/main-principal-bienvenida.php');
 
@@ -30,30 +63,55 @@
     }
 
     /**************************************/
-    // Se cargan los widgets de los modulos.
-    // Las rutas llegan como '../app/modules/<modulo>/widgets/<vista>.php' y antes se
-    // resolvian respecto al CWD. Ahora se convierten a ruta absoluta usando la raiz
-    // de la aplicacion y se validan con is_file() antes de incluirlas.
-    foreach ((array)($data['MainViewData'] ?? []) as $value) {
+    // Se cargan los widgets de los modulos, agrupados por bloque.
+    // Cada bloque emite su titulo una sola vez y sus sub-widgets dentro del
+    // mismo contenedor. Las rutas llegan como '../app/modules/<modulo>/widgets/<vista>.php'
+    // y se resuelven a ruta absoluta usando la raiz de la aplicacion.
+    $BlockIndex = 0;
+    foreach ((array)($data['MainViewBlocks'] ?? []) as $Bloque) {
 
-        // Se ignoran entradas vacias o que no son string
-        if(!is_string($value) || trim($value)===''){
+        // Se valida la estructura del bloque
+        if(!is_array($Bloque) || empty($Bloque['Rutas']) || !is_array($Bloque['Rutas'])){
             continue;
         }
+        $TituloBloque = !empty($Bloque['Titulo']) ? $Bloque['Titulo'] : 'Widgets';
+        $BlockIndex++;
 
-        // Se arma la ruta absoluta a partir de la raiz de la aplicacion
-        $RutaWidget = str_starts_with($value, '/')
-            ? $value
-            : $AppRoot . '/' . ltrim($value, './');
+        // Titulo del bloque (una sola vez)
+        echo '<h1 class="title-divider"><span class="divider-text">'
+            . htmlspecialchars($TituloBloque, ENT_QUOTES, 'UTF-8')
+            . '</span></h1>';
 
-        // Validacion: el archivo debe existir antes de incluirlo
-        if(!is_file($RutaWidget)){
-            error_log('[coreEngine][main-principal] Widget no encontrado: ' . $RutaWidget);
-            continue;
+        // Contenedor unico del bloque con sus sub-widgets dentro
+        echo '<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" id="bloque-widgets-' . $BlockIndex . '">'
+            .'<div class="row">';
+
+        // Se incluyen las vistas de los sub-widgets del bloque
+        foreach ($Bloque['Rutas'] as $value) {
+
+            // Se ignoran entradas vacias o que no son string
+            if(!is_string($value) || trim($value)===''){
+                continue;
+            }
+
+            // Se arma la ruta absoluta a partir de la raiz de la aplicacion
+            $RutaWidget = str_starts_with($value, '/')
+                ? $value
+                : $AppRoot . '/' . ltrim($value, './');
+
+            // Validacion: el archivo debe existir antes de incluirlo
+            if(!is_file($RutaWidget)){
+                error_log('[coreEngine][main-principal] Widget no encontrado: ' . $RutaWidget);
+                continue;
+            }
+
+            // Se incluye la vista del widget
+            require_once($RutaWidget);
         }
 
-        // Se incluye la vista del widget
-        require_once($RutaWidget);
+        // Cierre del contenedor del bloque
+        echo '</div>'
+        .'</div>';
     }
     ?>
 </div>

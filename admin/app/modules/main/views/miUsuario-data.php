@@ -4,6 +4,12 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
+<?php if ((int) ($_SESSION['DataInfo']['PasswordForzarCambio'] ?? 0) === 1){
+    // Mensaje
+    $Btn_Text = 'Debes cambiar tu contraseña inicial antes de continuar. Usa la pestaña «Cambiar Password».';
+    // Mostrar alerta
+    $data['Fnc_WidgetsCommon']->printAlertData(5, 4, 'bi bi-exclamation-triangle-fill', 0, $Btn_Text);
+} ?>
 <section class="section profile">
     <div class="row">
         <div class="col-xs-12 col-sm-12 col-md-3 col-lg-3 col-xl-3 col-xxl-3" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
@@ -55,6 +61,12 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Instagram',   'Name' => 'Social_Instagram', 'Value' => ($data['rowData']['Social_Instagram'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-instagram']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Linkedin',    'Name' => 'Social_Linkedin',  'Value' => ($data['rowData']['Social_Linkedin'] ?? ''),  'Required' => 1, 'Icon' => 'bi bi-linkedin']);
 
+                                //datos ocultos
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipoUsuario',   'Value' => $data['rowData']['idTipoUsuario'],  'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',        'Value' => $data['rowData']['idEstado'],       'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'email',           'Value' => $data['rowData']['email'],          'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMenuPosicion',  'Value' => $data['rowData']['idMenuPosicion'], 'Required' => 2]);
+
                                 ?>
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">
@@ -101,8 +113,14 @@
 
                                 <?php
                                 //se dibujan los inputs
-                                $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Posición Menu: </strong> permite seleccionar si se va a utilizar el menu lateral o el menu superior');
+                                $data['Fnc_FormInputs']->formPostData(1, 4, 'bi bi-exclamation-circle', 0, '<strong>Posición Menu: </strong> permite seleccionar si se va a utilizar el menu lateral o el menu superior');
                                 $data['Fnc_FormInputs']->formSelect([ 'Placeholder' => 'Posición Menu', 'Name' => 'idMenuPosicion','Value' => ($data['rowData']['idMenuPosicion'] ?? ''),'Required' => 2,'arrData' => $data['arrPosicion']]);
+
+                                //datos ocultos
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipoUsuario',   'Value' => $data['rowData']['idTipoUsuario'],  'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',        'Value' => $data['rowData']['idEstado'],       'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'email',           'Value' => $data['rowData']['email'],          'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Nombre',          'Value' => $data['rowData']['Nombre'],         'Required' => 2]);
 
                                 ?>
 
@@ -125,6 +143,12 @@
 
                                 //datos ocultos
                                 $data['Fnc_FormInputs']->formInputHidden(['Name' => 'mainPassword', 'Value' => $data['rowData']['password'], 'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipoUsuario',   'Value' => $data['rowData']['idTipoUsuario'],  'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',        'Value' => $data['rowData']['idEstado'],       'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'email',           'Value' => $data['rowData']['email'],          'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Nombre',          'Value' => $data['rowData']['Nombre'],         'Required' => 2]);
+                                $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMenuPosicion',  'Value' => $data['rowData']['idMenuPosicion'], 'Required' => 2]);
+
                                 ?>
 
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-center">

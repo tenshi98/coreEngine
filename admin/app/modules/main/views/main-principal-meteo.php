@@ -12,6 +12,6 @@
         'latitude'  => $data['UserData']['Latitud'],
         'longitude' => $data['UserData']['Longitud'],
     ];
-    $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+    $data['Fnc_WidgetsWeather']->widget_meteo($Options);
     ?>
 </div>
