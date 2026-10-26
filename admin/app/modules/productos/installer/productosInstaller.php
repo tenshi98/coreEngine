@@ -81,7 +81,7 @@ class productosInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -93,16 +93,18 @@ class productosInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -112,23 +114,23 @@ class productosInstaller extends ControllerInstaller {
         /*                 SE GENERAN LAS RUTAS                */
         /*******************************************************/
         $arrPermisos[] = [
-            'idPermisosCat'  => '1',                                                            // Administración
+            'idPermisosCat'  => '10',                                                           // Administración
             'idEstado'       => '1',                                                            // Activo
             'idTipo'         => '1',                                                            // Crud Normal
             'Nombre'         => 'Productos - Categorias',                                       // Nombre de la transaccion
             'Descripcion'    => 'Permite la administración de las categorías de los productos', // Descripcion de la transaccion
             'idLevelLimit'   => '4',                                                            // Ver / Editar / Crear / Borrar
-            'RutaWeb'        => 'administracion/productos/categorias',                          // Ruta web de la transaccion
+            'RutaWeb'        => 'mantencionSistema/productos/categorias',                       // Ruta web de la transaccion
             'RutaController' => 'productosCategorias',                                          // Controlador de la transaccion
         ];
         $arrPermisos[] = [
-            'idPermisosCat'  => '1',                                                   // Administración
+            'idPermisosCat'  => '10',                                                  // Administración
             'idEstado'       => '1',                                                   // Activo
             'idTipo'         => '1',                                                   // Crud Normal
             'Nombre'         => 'Productos - Tipos',                                   // Nombre de la transaccion
             'Descripcion'    => 'Permite la administración de los tipos de productos', // Descripcion de la transaccion
             'idLevelLimit'   => '4',                                                   // Ver / Editar / Crear / Borrar
-            'RutaWeb'        => 'administracion/productos/tipos',                      // Ruta web de la transaccion
+            'RutaWeb'        => 'mantencionSistema/productos/tipos',                   // Ruta web de la transaccion
             'RutaController' => 'productosTipos',                                      // Controlador de la transaccion
         ];
         $arrPermisos[] = [
@@ -198,24 +200,24 @@ class productosInstaller extends ControllerInstaller {
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/categorias/listAll',      'RutaController' => 'productosCategorias->listAll',      'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/categorias/search',       'RutaController' => 'productosCategorias->UpdateList',   'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/categorias/updateList',   'RutaController' => 'productosCategorias->UpdateList',   'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/categorias/view/@id',     'RutaController' => 'productosCategorias->View',         'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/categorias/getID/@id',    'RutaController' => 'productosCategorias->GetID',        'Descripcion' => 'Información para el formulario edición',         'idLevelLimit' => 2, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/categorias',              'RutaController' => 'productosCategorias->Insert',       'Descripcion' => 'Crear Información',                              'idLevelLimit' => 3, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/categorias/update',       'RutaController' => 'productosCategorias->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'productosCategorias'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/productos/categorias',              'RutaController' => 'productosCategorias->Delete',       'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 4, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/categorias/listAll',      'RutaController' => 'productosCategorias->listAll',      'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/productos/categorias/search',       'RutaController' => 'productosCategorias->UpdateList',   'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/categorias/updateList',   'RutaController' => 'productosCategorias->UpdateList',   'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/categorias/view/@id',     'RutaController' => 'productosCategorias->View',         'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/categorias/getID/@id',    'RutaController' => 'productosCategorias->GetID',        'Descripcion' => 'Información para el formulario edición',         'idLevelLimit' => 2, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/productos/categorias',              'RutaController' => 'productosCategorias->Insert',       'Descripcion' => 'Crear Información',                              'idLevelLimit' => 3, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/productos/categorias/update',       'RutaController' => 'productosCategorias->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'productosCategorias'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/productos/categorias',              'RutaController' => 'productosCategorias->Delete',       'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 4, 'Controller' => 'productosCategorias'],
             ],
             2 => [
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/tipos/listAll',      'RutaController' => 'productosTipos->listAll',      'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/tipos/search',       'RutaController' => 'productosTipos->UpdateList',   'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/tipos/updateList',   'RutaController' => 'productosTipos->UpdateList',   'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/tipos/view/@id',     'RutaController' => 'productosTipos->View',         'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/tipos/getID/@id',    'RutaController' => 'productosTipos->GetID',        'Descripcion' => 'Información para el formulario edición',         'idLevelLimit' => 2, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/tipos',              'RutaController' => 'productosTipos->Insert',       'Descripcion' => 'Crear Información',                              'idLevelLimit' => 3, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/tipos/update',       'RutaController' => 'productosTipos->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'productosTipos'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/productos/tipos',              'RutaController' => 'productosTipos->Delete',       'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 4, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/tipos/listAll',      'RutaController' => 'productosTipos->listAll',      'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/productos/tipos/search',       'RutaController' => 'productosTipos->UpdateList',   'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/tipos/updateList',   'RutaController' => 'productosTipos->UpdateList',   'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/tipos/view/@id',     'RutaController' => 'productosTipos->View',         'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/productos/tipos/getID/@id',    'RutaController' => 'productosTipos->GetID',        'Descripcion' => 'Información para el formulario edición',         'idLevelLimit' => 2, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/productos/tipos',              'RutaController' => 'productosTipos->Insert',       'Descripcion' => 'Crear Información',                              'idLevelLimit' => 3, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/productos/tipos/update',       'RutaController' => 'productosTipos->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'productosTipos'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/productos/tipos',              'RutaController' => 'productosTipos->Delete',       'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 4, 'Controller' => 'productosTipos'],
             ],
             3 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/listAll',                         'RutaController' => 'productosListado->listAll',                   'Descripcion' => 'Listar Toda la Información',                      'idLevelLimit' => 1, 'Controller' => 'productosListado'],
@@ -303,7 +305,7 @@ class productosInstaller extends ControllerInstaller {
         ];
         $arrTables[] = [
             'table'      => 'productos_listado_observaciones',
-            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idProducto` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idProducto` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL,`idUsuarioEdicion` int(10) unsigned NULL DEFAULT NULL,`FechaEdicion` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -319,19 +321,15 @@ class productosInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE productos_categorias ADD INDEX idx_producto_categoria (idCategoria);',
-            'optimization' => 'ALTER TABLE productos_tipos ADD INDEX idx_producto_tipo (idTipoProducto);',
-            'optimization' => 'ALTER TABLE productos_listado ADD INDEX idx_producto_estado (idEstado),ADD INDEX idx_producto_tipo (idTipoProducto),ADD INDEX idx_producto_categoria (idCategoria),ADD INDEX idx_producto_unidad (idUniMed);',
-            'optimization' => 'ALTER TABLE productos_listado_documentos ADD INDEX idx_eld_producto (idProducto),ADD INDEX idx_eld_vencimiento (FVencimiento);',
-            'optimization' => 'ALTER TABLE productos_listado_observaciones ADD INDEX idx_elo_producto (idProducto),ADD INDEX idx_elo_usuario (idUsuario),ADD INDEX idx_elo_fecha (FechaCreacion);',
+        $arrOptimizations = [
+            'ALTER TABLE productos_categorias ADD INDEX IF NOT EXISTS idx_producto_categoria (idCategoria);',
+            'ALTER TABLE productos_tipos ADD INDEX IF NOT EXISTS idx_producto_tipo (idTipoProducto);',
+            'ALTER TABLE productos_listado ADD INDEX IF NOT EXISTS idx_producto_estado (idEstado),ADD INDEX IF NOT EXISTS idx_producto_tipo (idTipoProducto),ADD INDEX IF NOT EXISTS idx_producto_categoria (idCategoria),ADD INDEX IF NOT EXISTS idx_producto_unidad (idUniMed);',
+            'ALTER TABLE productos_listado_documentos ADD INDEX IF NOT EXISTS idx_eld_producto (idProducto),ADD INDEX IF NOT EXISTS idx_eld_vencimiento (FVencimiento);',
+            'ALTER TABLE productos_listado_observaciones ADD INDEX IF NOT EXISTS idx_elo_producto (idProducto),ADD INDEX IF NOT EXISTS idx_elo_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_elo_fecha (FechaCreacion);',
         ];
 
         /************************************/

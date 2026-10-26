@@ -13,6 +13,7 @@ class productosListado extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,6 +28,7 @@ class productosListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -380,6 +382,7 @@ class productosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -543,6 +546,7 @@ class productosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
@@ -628,6 +632,7 @@ class productosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -675,7 +680,7 @@ class productosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -734,7 +739,7 @@ class productosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -779,8 +784,7 @@ class productosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -804,8 +808,7 @@ class productosListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -852,7 +855,7 @@ class productosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -870,20 +873,23 @@ class productosListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idEstado,idTipoProducto,idCategoria,idUniMed,StockLimite,ValorIngreso,ValorEgreso',
-            'ValidarEntero'             => 'idEstado,idTipoProducto,idCategoria,idUniMed',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Marca,Descripcion,Codigo',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,Marca,Codigo',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idEstado,idTipoProducto,idCategoria,idUniMed,StockLimite,ValorIngreso,ValorEgreso',
+            'ValidarEntero'              => 'idEstado,idTipoProducto,idCategoria,idUniMed',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Marca,Descripcion,Codigo',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre' => 255,
+                'Marca'  => 255,
+                'Codigo' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Marca,Descripcion,Codigo',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
