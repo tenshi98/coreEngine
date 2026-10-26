@@ -7,7 +7,10 @@
 <?php
 // Verifico si hay modulos instalados
 if(empty($data['arrModules'])){
-    echo '<div class="alert alert-secondary"><i class="bi bi-info-circle"></i> No hay modulos instalados con pruebas disponibles.</div>';
+    // Mensaje
+    $Btn_Text = 'No hay modulos instalados con pruebas disponibles.';
+    // Mostrar alerta
+    $data['Fnc_WidgetsCommon']->printAlertData(2, 4, 'bi bi-info-circle', 0, $Btn_Text);
 }
 ?>
 <?php foreach ($data['arrModules'] as $module) { ?>
@@ -54,8 +57,11 @@ if(empty($data['arrModules'])){
                     </tbody>
                 </table>
             </div>
-        <?php } else { ?>
-            <div class="alert alert-secondary mb-0 mt-2"><i class="bi bi-info-circle"></i> Sin pruebas disponibles en este módulo.</div>
-        <?php } ?>
+        <?php } else {
+            // Mensaje
+            $Btn_Text = 'Sin pruebas disponibles en este módulo.';
+            // Mostrar alerta
+            $data['Fnc_WidgetsCommon']->printAlertData(2, 4, 'bi bi-info-circle', 0, $Btn_Text);
+        } ?>
     </div>
 <?php } ?>

@@ -13,6 +13,8 @@ class crudResumen extends ControllerBase {
     private $DataNumbers;
     private $Codification;
     private $WidgetsCommon;
+    private $WidgetsViews;
+    private $WidgetsPreview;
 
     /*******************************************************************/
     // Constructor
@@ -29,6 +31,8 @@ class crudResumen extends ControllerBase {
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsPreview  = new UIWidgetsPreview();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -241,6 +245,7 @@ class crudResumen extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
                 'arrObservaciones' => $arrObservaciones['data'],
@@ -307,6 +312,8 @@ class crudResumen extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsPreview'    => $this->WidgetsPreview,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_Codification'     => $this->Codification,
@@ -371,6 +378,7 @@ class crudResumen extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -422,7 +430,7 @@ class crudResumen extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -494,7 +502,7 @@ class crudResumen extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -539,8 +547,7 @@ class crudResumen extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -563,8 +570,7 @@ class crudResumen extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -611,7 +617,7 @@ class crudResumen extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -629,20 +635,22 @@ class crudResumen extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'idUsuario,Numero',
-            'ValidarEntero'             => 'idUsuario',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'Fecha',
-            'ValidarHora'               => 'Hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Email,Palabra',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Email,Palabra',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email',
+            'ValidarNumero'              => 'idUsuario,Numero',
+            'ValidarEntero'              => 'idUsuario',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'Fecha',
+            'ValidarHora'                => 'Hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Email,Palabra',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Email'    => 255,
+                'Palabra'  => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Palabra',
             'ValidarEspaciosVacios'     => 'Email',
             'ValidarMayusculas'         => 'Email',

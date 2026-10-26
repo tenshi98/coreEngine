@@ -10,6 +10,7 @@ class sistemaOpciones extends ControllerBase {
     private $controllerName;
     private $FormInputs;
     private $WidgetsCommon;
+    private $WidgetsViews;
     private $DataDate;
     private $DataNumbers;
     private $Codification;
@@ -26,6 +27,7 @@ class sistemaOpciones extends ControllerBase {
         $this->controllerName = 'Empty';
 		$this->FormInputs     = new UIFormInputs();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->Codification   = new FunctionsSecurityCodification();
@@ -315,6 +317,7 @@ class sistemaOpciones extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_Codification'     => $this->Codification,
@@ -460,6 +463,7 @@ class sistemaOpciones extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -586,14 +590,23 @@ class sistemaOpciones extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Se cargan las clases
@@ -634,14 +647,23 @@ class sistemaOpciones extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['query' => $query];
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
         // Ejecuto la query
         $Response = $this->Base_delFiles($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -670,8 +692,15 @@ class sistemaOpciones extends ControllerBase {
             'ValidarURL'                => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarLargoMinimo'        => 'Sistema_Email,Contacto_Email,RepresentanteEmail,Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
             'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Sistema_Email,Contacto_Email,RepresentanteEmail,Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
-            'ValidarLargoMaximoN'       => 255,
+            'ValidarLargoMaximoPorCampo' => [
+                'Sistema_Email'       => 60,
+                'Contacto_Email'      => 120,
+                'RepresentanteEmail'  => 120,
+                'Sistema_Nombre'      => 120,
+                'Sistema_Direccion'   => 180,
+                'Contacto_Nombre'     => 120,
+                'RepresentanteNombre' => 120,
+            ],
             'ValidarPalabrasCensuradas' => 'Sistema_Nombre,Sistema_Direccion,Contacto_Nombre,RepresentanteNombre',
             'ValidarEspaciosVacios'     => 'Sistema_Email,Contacto_Email,RepresentanteEmail,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'Sistema_Email,Contacto_Email,RepresentanteEmail',

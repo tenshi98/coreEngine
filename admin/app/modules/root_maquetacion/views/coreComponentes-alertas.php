@@ -28,14 +28,14 @@
                 <div class="card-body">
                     <h5 class="card-title">Default With Icon</h5>
                     <?php
-                    $data['Fnc_WidgetsCommon']->printAlertData(1, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(2, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(3, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(4, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(5, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(6, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(7, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
-                    $data['Fnc_WidgetsCommon']->printAlertData(8, 2, 'star', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(1, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(2, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(3, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(4, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(5, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(6, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(7, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
+                    $data['Fnc_WidgetsCommon']->printAlertData(8, 2, 'bi bi-star me-1', 1, 'A simple primary alert with icon—check it out!');
                     ?>
                 </div>
             </div>
@@ -60,14 +60,14 @@
                 <div class="card-body">
                     <h5 class="card-title">Outlined With Icon</h5>
                     <?php
-                    $data['Fnc_WidgetsCommon']->printAlertData(1, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(2, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(3, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(4, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(5, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(6, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(7, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(8, 4, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(1, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(2, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(3, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(4, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(5, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(6, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(7, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(8, 4, 'bi bi-star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
                     ?>
                 </div>
             </div>
@@ -92,14 +92,14 @@
                 <div class="card-body">
                     <h5 class="card-title">Default Solid Color</h5>
                     <?php
-                    $data['Fnc_WidgetsCommon']->printAlertData(1, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(2, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(3, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(4, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(5, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(6, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(7, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
-                    $data['Fnc_WidgetsCommon']->printAlertData(8, 6, 'star', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(1, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(2, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(3, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(4, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(5, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(6, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(7, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
+                    $data['Fnc_WidgetsCommon']->printAlertData(8, 6, '', 1, 'A simple primary alert with icon—check it out!<br>A simple primary');
                     ?>
                 </div>
             </div>

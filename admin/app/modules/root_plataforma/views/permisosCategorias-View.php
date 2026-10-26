@@ -33,13 +33,21 @@
                 : '';
 
     //envio los datos
-    $arrData = [
-        ['Icon' => '','Titulo' => 'Nombre',              'Texto' => $data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'Icono',               'Texto' => '<i class="'.$Icono.'"></i>' ],
-        ['Icon' => '','Titulo' => 'Descripcion',         'Texto' => $data['rowData']['Descripcion']],
-        ['Icon' => '','Titulo' => 'Carpeta Contenedora', 'Texto' => $data['rowData']['Carpeta']],
+    $Theme_color = 'summary-theme-color-2';
+    $arrData1 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',              'Text' => $data['rowData']['Nombre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-palette',   'Icon_color' => 10,'Title' => 'Icono',               'Text' => '<i class="'.$Icono.'"></i>' ],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-folder',    'Icon_color' => 10,'Title' => 'Carpeta Contenedora', 'Text' => $data['rowData']['Carpeta']],
     ];
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    $arrData2 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Descripcion',         'Text' => $data['rowData']['Descripcion']],
+    ];
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+        $OptionsTable['Cols'] = 1;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+    echo '</div>';
     ?>
 </div>
 <?php

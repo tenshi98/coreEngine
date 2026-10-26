@@ -54,6 +54,8 @@ class sistemaTesteos extends ControllerBase {
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_WidgetsCommon'   => new UIWidgetsCommon(),
                 /*=========== Datos Consultados ===========*/
                 'arrModules' => $arrModules,
             ];

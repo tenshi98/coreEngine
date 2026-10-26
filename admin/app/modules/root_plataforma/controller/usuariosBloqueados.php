@@ -176,6 +176,10 @@ class usuariosBloqueados extends ControllerBase {
         }
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -190,10 +194,14 @@ class usuariosBloqueados extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)

@@ -17,7 +17,7 @@
                         'URL'    => 'https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/section/chile/portada',
                         'BASE'   => $BASE,
                     ];
-                    $data['Fnc_WidgetsCommon']->widget_feed($Options);
+                    $data['Fnc_WidgetsFeed']->widget_feed($Options);
                     ?>
                 </div>
                 <div class="col-sm-4 col-xl-4">
@@ -28,7 +28,7 @@
                         'Type'   => 2,
                         'BASE'   => $BASE,
                     ];
-                    $data['Fnc_WidgetsCommon']->widget_feed($Options);
+                    $data['Fnc_WidgetsFeed']->widget_feed($Options);
                     ?>
                 </div>
                 <div class="col-sm-4 col-xl-4">

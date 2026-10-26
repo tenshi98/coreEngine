@@ -19,7 +19,7 @@
                 // registró en sesión al renderizar la vista (ver coreWidgets.php)
                 'AccessScope'      => 'coreWidgets',
             ];
-            $data['Fnc_WidgetsCommon']->widget_fileExplorer($Options);
+            $data['Fnc_WidgetsFileExplorer']->widget_fileExplorer($Options);
             ?>
         </div>
 

@@ -107,7 +107,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                         <div class="d-flex justify-content-center pt-4">
                             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                                 <div class="d-flex justify-content-center">
-                                    <?php $data['Fnc_WidgetsCommon']->previewDocs($BASE, 'upload', $data['rowData']['File']); ?>
+                                    <?php $data['Fnc_WidgetsPreview']->previewDocs($BASE, 'upload', $data['rowData']['File']); ?>
                                 </div>
                                 <div class="d-flex justify-content-center pt-2">
                                     <button  onclick="delFile('<?php echo $data['rowData']['File']; ?>')" class="btn btn-danger btn-sm"><i class="bi bi-trash"></i> Borrar Archivo</button>

@@ -14,6 +14,7 @@ class crudNormal extends ControllerBase {
     private $Codification;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -29,6 +30,7 @@ class crudNormal extends ControllerBase {
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -223,6 +225,7 @@ class crudNormal extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
             ];
@@ -316,6 +319,10 @@ class crudNormal extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
@@ -331,10 +338,14 @@ class crudNormal extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -363,6 +374,10 @@ class crudNormal extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idCrud,idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
@@ -379,10 +394,14 @@ class crudNormal extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -406,6 +425,10 @@ class crudNormal extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -420,10 +443,14 @@ class crudNormal extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -440,20 +467,22 @@ class crudNormal extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'idUsuario,Numero',
-            'ValidarEntero'             => 'idUsuario',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => 'Patente',
-            'ValidarFecha'              => 'Fecha',
-            'ValidarHora'               => 'Hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Email,Palabra',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Email,Palabra',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email',
+            'ValidarNumero'              => 'idUsuario,Numero',
+            'ValidarEntero'              => 'idUsuario',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => 'Patente',
+            'ValidarFecha'               => 'Fecha',
+            'ValidarHora'                => 'Hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Email,Palabra',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Email'    => 255,
+                'Palabra'  => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Palabra',
             'ValidarEspaciosVacios'     => 'Email',
             'ValidarMayusculas'         => 'Email',

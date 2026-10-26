@@ -42,7 +42,6 @@
                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección',           'Name'  => 'Direccion',   'Value'  => '',  'Required'  => 1, 'Icon' => 'bi bi-geo-alt-fill']);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password',       'Value' => '1234', 'Required' => 2]);//password por defecto
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipoUsuario',  'Value' => 1,      'Required' => 2]);//Super administrador
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',       'Value' => 1,      'Required' => 2]);//Usuario Activo
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMenuPosicion', 'Value' => 2,      'Required' => 2]);//Superior

@@ -26,15 +26,19 @@
 </div>
 <div class="modal-body">
     <?php
+    $Theme_color = 'summary-theme-color-2';
     $arrData = [
-        ['Icon' => '','Titulo' => 'Metodo',           'Texto' => $data['rowData']['Metodo']],
-        ['Icon' => '','Titulo' => 'Ruta Web',         'Texto' => $data['rowData']['RutaWeb']],
-        ['Icon' => '','Titulo' => 'Ruta Controller',  'Texto' => $data['rowData']['RutaController']],
-        ['Icon' => '','Titulo' => 'Descripcion',      'Texto' => $data['rowData']['Descripcion']],
-        ['Icon' => '','Titulo' => 'Objetivo',         'Texto' => $data['rowData']['LevelLimit']],
-        ['Icon' => '','Titulo' => 'Controller',       'Texto' => $data['rowData']['Controller']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-code-slash', 'Icon_color' => 10,'Title' => 'Metodo',           'Text' => $data['rowData']['Metodo']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-link-45deg', 'Icon_color' => 10,'Title' => 'Ruta Web',         'Text' => $data['rowData']['RutaWeb']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-signpost-2', 'Icon_color' => 10,'Title' => 'Ruta Controller',  'Text' => $data['rowData']['RutaController']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',  'Icon_color' => 10,'Title' => 'Descripcion',      'Text' => $data['rowData']['Descripcion']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-bullseye',   'Icon_color' => 10,'Title' => 'Objetivo',         'Text' => $data['rowData']['LevelLimit']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-code-slash', 'Icon_color' => 10,'Title' => 'Controller',       'Text' => $data['rowData']['Controller']],
     ];
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData, $OptionsTable);
+    echo '</div>';
     ?>
 </div>
 <?php

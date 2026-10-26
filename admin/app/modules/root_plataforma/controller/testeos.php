@@ -66,20 +66,21 @@ class testeos extends ControllerBase {
         ];
 
         $DataCheck1 = [
-            'emptyData'                 => 'Email,Numero',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'Numero',
-            'ValidarEntero'             => 'Numero',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => 'Patente',
-            'ValidarFecha'              => 'Fecha',
-            'ValidarHora'               => 'Hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Palabra',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Palabra',
-            'ValidarLargoMaximoN'       => 15,
+            'emptyData'                  => 'Email,Numero',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email',
+            'ValidarNumero'              => 'Numero',
+            'ValidarEntero'              => 'Numero',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => 'Patente',
+            'ValidarFecha'               => 'Fecha',
+            'ValidarHora'                => 'Hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Palabra',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Palabra' => 15,
+            ],
             'ValidarPalabrasCensuradas' => 'Palabra',
             'ValidarEspaciosVacios'     => 'Palabra',
             'ValidarMayusculas'         => 'Palabra',
@@ -97,20 +98,21 @@ class testeos extends ControllerBase {
         ];
 
         $DataCheck2 = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email,Palabra',
-            'ValidarNumero'             => 'Numero',
-            'ValidarEntero'             => 'Numero',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => 'Patente',
-            'ValidarFecha'              => 'Fecha',
-            'ValidarHora'               => 'Hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Palabra',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Palabra',
-            'ValidarLargoMaximoN'       => 15,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email,Palabra',
+            'ValidarNumero'              => 'Numero',
+            'ValidarEntero'              => 'Numero',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => 'Patente',
+            'ValidarFecha'               => 'Fecha',
+            'ValidarHora'                => 'Hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Palabra',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Palabra' => 15,
+            ],
             'ValidarPalabrasCensuradas' => 'Palabra',
             'ValidarEspaciosVacios'     => 'Palabra',
             'ValidarMayusculas'         => 'Palabra',
@@ -423,7 +425,7 @@ class testeos extends ControllerBase {
         /*  - FunctionsLocation::getGeocodeData / geocodeAddress             */
         /*      Solo se prueban sus validaciones; la geocodificacion real    */
         /*      requiere ApiKey de Google / Nominatim y salida a Internet.   */
-        /*  - FunctionsServerServer::tareasServer                           */
+        /*  - FunctionsServerShell::tareasServer                            */
         /*      Solo se prueban sus validaciones; los casos validos ejecutan */
         /*      comandos de sistema (iptables, wget).                        */
         /*  - FunctionsServerServer::removeDirectoryRecursive                */
@@ -441,15 +443,22 @@ class testeos extends ControllerBase {
 
         /**********  FunctionsCommonData  **********/
         //--------------------- safePath ---------------------
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   ['/var/www/uploads/imagen.jpg','/var/www/uploads'],                          'array',   '("/var/www/uploads/imagen.jpg","/var/www/uploads"                -> Devuelve {"success":true,"data":"/var/www/uploads/imagen.jpg","error":"null"})');
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   ['/var/www/uploads/../uploads/documento.pdf','/var/www/uploads'],            'array',   '("/var/www/uploads/../uploads/documento.pdf","/var/www/uploads"  -> Devuelve {"success":true,"data":"/var/www/uploads/documento.pdf","error":"null"})');
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   ['/var/www/uploads/../../etc/passwd','/var/www/uploads'],                    'array',   '("/var/www/uploads/../../etc/passwd","/var/www/uploads"          -> Devuelve {"success":false,"data":"","error":"La ruta raíz no existe o no es accesible"})');
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   ['/var/www/uploads/no_existe.txt','/var/www/uploads'],                       'array',   '("/var/www/uploads/no_existe.txt","/var/www/uploads"             -> Devuelve {"success":false,"data":"","error":"La ruta raíz no existe o no es accesible"})');
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   ['/home/user/secret.txt','/var/www/uploads'],                                'array',   '("/home/user/secret.txt","/var/www/uploads"                      -> Devuelve {"success":false,"data":"","error":"La ruta raíz no existe o no es accesible"})');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   ['/var/www/uploads/imagen.jpg','/var/www/uploads'],                          'array',   '("/var/www/uploads/imagen.jpg","/var/www/uploads"                -> Devuelve {"success":true,"data":"/var/www/uploads/imagen.jpg","error":"null"})');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   ['/var/www/uploads/../uploads/documento.pdf','/var/www/uploads'],            'array',   '("/var/www/uploads/../uploads/documento.pdf","/var/www/uploads"  -> Devuelve {"success":true,"data":"/var/www/uploads/documento.pdf","error":"null"})');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   ['/var/www/uploads/../../etc/passwd','/var/www/uploads'],                    'array',   '("/var/www/uploads/../../etc/passwd","/var/www/uploads"          -> Devuelve {"success":false,"data":"","error":"La ruta raíz no existe o no es accesible"})');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   ['/var/www/uploads/no_existe.txt','/var/www/uploads'],                       'array',   '("/var/www/uploads/no_existe.txt","/var/www/uploads"             -> Devuelve {"success":false,"data":"","error":"La ruta raíz no existe o no es accesible"})');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   ['/home/user/secret.txt','/var/www/uploads'],                                'array',   '("/home/user/secret.txt","/var/www/uploads"                      -> Devuelve {"success":false,"data":"","error":"La ruta raíz no existe o no es accesible"})');
         // Caso real valido: archivo existente dentro de la raiz permitida
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   [__FILE__, __DIR__],                                                         'array',   '(__FILE__, __DIR__ -> Devuelve success=true, data=ruta real del archivo, error=null)');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   [__FILE__, __DIR__],                                                         'array',   '(__FILE__, __DIR__ -> Devuelve success=true, data=ruta real del archivo, error=null)');
         // Caso sin datos: retorna el arreglo de error del metodo
-        $this->runTest($test, 'FunctionsCommonData',   'safePath',                   ['', ''],                                                                    'array',   '("","" -> Devuelve success=false, data="", error=Sin datos ingresados)');
+        $this->runTest($test, 'FunctionsCommonFiles',   'safePath',                   ['', ''],                                                                    'array',   '("","" -> Devuelve success=false, data="", error=Sin datos ingresados)');
+        //--------------------- validatePathFile ---------------------
+        // Datos correctos: ruta existente dentro del root
+        $this->runTest($test, 'FunctionsCommonFiles',   'validatePathFile',            ['/var/www/uploads/imagen.jpg', '/var/www/uploads'], 'array',   '("/var/www/uploads/imagen.jpg","/var/www/uploads" -> Exito)');
+        // Datos sin datos: vacíos
+        $this->runTest($test, 'FunctionsCommonFiles',   'validatePathFile',            ['', ''],                                                                    'array',   '("", "" -> Sin datos ingresados)');
+        // Datos erróneos: ruta fuera de root
+        $this->runTest($test, 'FunctionsCommonFiles',   'validatePathFile',            ['/var/www/uploads/../../etc/passwd', '/var/www/uploads'], 'array',   '("/var/www/uploads/../../etc/passwd","/var/www/uploads" -> Acceso denegado)');
         //--------------------- agruparPorClave ---------------------
         $this->runTest($test, 'FunctionsCommonData',   'agruparPorClave',            [[['cat'=>'A','v'=>1],['cat'=>'B','v'=>2],['cat'=>'A','v'=>3]], 'cat'],      'array',   '([[3 registros]], "cat"                                          -> Devuelve {"A":[{"v":1},{"v":3}],"B":[{"v":2}]})');
         $this->runTest($test, 'FunctionsCommonData',   'agruparPorClave',            [[['v'=>1],['cat'=>'A'],['v'=>2]], 'cat'],                                   'array',   '([[3 registros]], "cat"                                          -> Devuelve {"Sin información":[{"v":1},{"v":2}],"A":[[]]})');
@@ -457,20 +466,32 @@ class testeos extends ControllerBase {
         //--------------------- agruparYContar ---------------------
         $this->runTest($test, 'FunctionsCommonData',   'agruparYContar',             [[['estado'=>'ok'],['estado'=>'ok'],['estado'=>'']], ['estado']],            'array',   '([[3 registros]], ["estado"]                                     -> Devuelve {"estado":[{"nombre":"ok","cantidad":2})');
         //--------------------- colorMasClaro ---------------------
-        $this->runTest($test, 'FunctionsCommonData',   'colorMasClaro',              ['#1A2B3C', 0.35],                                                         'string',  '("#1A2B3C", 0.35                                               -> Devuelve #5484B5)');
+        $this->runTest($test, 'FunctionsCommonColors',   'colorMasClaro',              ['#1A2B3C', 0.35],                                                         'string',  '("#1A2B3C", 0.35                                               -> Devuelve #5484B5)');
         //--------------------- objectToArrayRecursive ---------------------
         $this->runTest($test, 'FunctionsCommonData',   'objectToArrayRecursive',     [(object)['nombre'=>'Ana','direccion'=>(object)['ciudad'=>'Madrid']]],       'array',   '(object                                                          -> Devuelve {"nombre":"Ana","direccion":{"ciudad":"Madrid"}})');
         //--------------------- obtenerExtensionArchivo ---------------------
-        $this->runTest($test, 'FunctionsCommonData',   'obtenerExtensionArchivo',    ['documento.pdf'],                                                           'string',  '("documento.pdf"                                                 -> Devuelve pdf)');
+        $this->runTest($test, 'FunctionsCommonFiles',   'obtenerExtensionArchivo',    ['documento.pdf'],                                                           'string',  '("documento.pdf"                                                 -> Devuelve pdf)');
         //--------------------- parseDataCommas ---------------------
         $this->runTest($test, 'FunctionsCommonData',   'parseDataCommas',            ['uno, dos,tres'],                                                           'array',   '("uno, dos,tres"                                                 -> Devuelve ["uno","dos","tres"])');
         //--------------------- parseDataSeparator ---------------------
         $this->runTest($test, 'FunctionsCommonData',   'parseDataSeparator',         ['uno-dos-tres'],                                                            'array',   '("uno-dos-tres"                                                  -> Devuelve ["uno","dos","tres"])');
-        //--------------------- parseDataSymbol ---------------------
+//--------------------- parseDataSymbol ---------------------
         $this->runTest($test, 'FunctionsCommonData',   'parseDataSymbol',            ['edad=18'],                                                                 'array',   '("edad=18"                                                       -> Devuelve ["edad","18"])');
+        //--------------------- invertirArreglo ---------------------
+        $this->runTest($test, 'FunctionsCommonData',   'invertirArreglo',            [['a'=>1,'b'=>2,'c'=>3]],      'array',   '[a=>1,b=>2,c=>3] -> [c=>3,b=>2,a=>1)');
+        $this->runTest($test, 'FunctionsCommonData',   'invertirArreglo',            [['']],                                                    'array',   '[vacío] -> [])');
+        $this->runTest($test, 'FunctionsCommonData',   'invertirArreglo',            [['a'=>['nested']]],                                       'array',   '[anidado] -> error tipo)');
+        //--------------------- aplanarArreglo ---------------------
+        $this->runTest($test, 'FunctionsCommonData',   'aplanarArreglo',             [[1,[2,3],['a'=>4]]],                                      'array',   '[1,[2,3],a=>4] -> [1,2,3,a=>4)');
+        $this->runTest($test, 'FunctionsCommonData',   'aplanarArreglo',             [['']],                                                    'array',   '[vacío] -> [])');
+        $this->runTest($test, 'FunctionsCommonData',   'aplanarArreglo',             [['a'=>['deep']]],                                         'array',   '[deep] -> error profundidad)');
+        //--------------------- mezclarArreglosProfundo ---------------------
+        $this->runTest($test, 'FunctionsCommonData',   'mezclarArreglosProfundo',    [['a'=>1,'b'=>[2]], ['b'=>[3],'c'=>4]],                    'array',   '[a=>1,b=>[2]] + [b=>[3],c=>4] -> [a=>1,b=>[2,3],c=>4)');
+        $this->runTest($test, 'FunctionsCommonData',   'mezclarArreglosProfundo',    [[], []],                                                    'array',   '[vacío] + [vacío] -> [])');
+        $this->runTest($test, 'FunctionsCommonData',   'mezclarArreglosProfundo',    [['a'=>1], [['malo']]],                                    'array',   '[simple] + [arreglo] -> error tipo)');
 
 
-        /**********  FunctionsConvertions  **********/
+         /**********  FunctionsConvertions  **********/
         //--------------------- numero2horas ---------------------
         $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     [''],           'string',  '(""  -> Devuelve Sin datos ingresados en horasDecimales)');
         $this->runTest($test, 'FunctionsConvertions',   'numero2horas',     ['a'],          'string',  '("a" -> Devuelve El dato ingresado en horasDecimales no es un numero (a))');
@@ -816,7 +837,7 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsDataValidations',   'validarEntero',           ['a'],                       'bool',  '("a" -> Devuelve false)');
         $this->runTest($test, 'FunctionsDataValidations',   'validarEntero',           [16],                        'bool',  '(16  -> Devuelve true)');
         //--------------------- validarDispositivoMovil ---------------------
-        $this->runTest($test, 'FunctionsDataValidations',   'validarDispositivoMovil', [],                          'bool',  '(""  -> Devuelve false)');
+        $this->runTest($test, 'FunctionsServerClient',     'validarDispositivoMovil', [],                          'bool',  '(""  -> Devuelve false)');
         //--------------------- validarLargoMinimo ---------------------
         $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMinimo',      ['', 10],                    'bool',  '("" - 10                -> Devuelve false)');
         $this->runTest($test, 'FunctionsDataValidations',   'validarLargoMinimo',      ['Lorem ipsum dolor', ''],   'bool',  '(Lorem ipsum dolor - "" -> Devuelve false)');
@@ -902,6 +923,22 @@ class testeos extends ControllerBase {
         $this->runTest($test, 'FunctionsSecurityPasswords', 'hashVerify',           ['', ''],                                                                     'bool',    '("",""                  -> Devuelve false)');
         $this->runTest($test, 'FunctionsSecurityPasswords', 'hashVerify',           ['palabra', '$2y$12$pd1.kBABacsBwq8YXNDieuqNELrjJiq68kXCFtHoaj7IwqljDLdj6'],  'bool',    '("palabra","$2y$12$..." -> Devuelve true)');
 
+        /**********  Recuperacion de password por token (proyecto reset-password-token)  **********/
+        // NOTA: pruebas puras de utilidades de token (sin BD): longitud/formato del
+        // token, unicidad entre invocaciones, hash sha256 y hash_equals.
+        //--------------------- tokenBin2Hex(64) ---------------------
+        $Token_1 = $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex', [64], 'array', '(64 -> Devuelve {"success":true,"data":"<token hexadecimal de 64 caracteres>"})');
+        $Token_2 = $this->runTest($test, 'FunctionsSecurityPasswords', 'tokenBin2Hex', [64], 'array', '(64 -> Segunda invocacion, token distinto al primero)');
+        $test->expect(($Token_1['success'] ?? false)===true && is_string($Token_1['data'] ?? null) && strlen($Token_1['data'])===64 && ctype_xdigit($Token_1['data'])===true, 'tokenBin2Hex(64) -> Devuelve 64 caracteres hexadecimales', $Token_1['data'] ?? null);
+        $test->expect(($Token_1['data'] ?? '')!=='' && ($Token_1['data'] ?? '')!==($Token_2['data'] ?? ''), 'tokenBin2Hex(64) -> Dos invocaciones devuelven tokens distintos', $Token_2['data'] ?? null);
+        //--------------------- hash('sha256') ---------------------
+        $Token_Hash = hash('sha256', (string)($Token_1['data'] ?? ''));
+        $Token_Hash_2 = hash('sha256', (string)($Token_2['data'] ?? ''));
+        $test->expect(strlen($Token_Hash)===64 && ctype_xdigit($Token_Hash)===true, "hash('sha256', token) -> Devuelve 64 caracteres hexadecimales", $Token_Hash);
+        //--------------------- hash_equals ---------------------
+        $test->expect(hash_equals($Token_Hash, hash('sha256', (string)($Token_1['data'] ?? '')))===true, 'hash_equals -> Devuelve true con el mismo token', 'true');
+        $test->expect(hash_equals($Token_Hash, $Token_Hash_2)===false, 'hash_equals -> Devuelve false con un token distinto', 'false');
+
         /**********  FunctionsDataText  **********/
         $this->runTest($test, 'FunctionsServerClient',   'getClientIp',              [],   'string',  '( -> Devuelve '.$this->ServerClient->getClientIp().')');
         // NOTA: la comprobacion original (sin argumentos) se conserva comentada; se agrega una
@@ -923,9 +960,9 @@ class testeos extends ControllerBase {
         //--------------------- tareasServer ---------------------
         // NOTA: Solo se cubren las validaciones de entrada. Los casos validos ejecutan comandos
         // reales en el sistema operativo (iptables, wget), por lo que no se ejecutan por ser destructivos.
-        $this->runTest($test, 'FunctionsServerServer',   'tareasServer',           ['', 1],         'array',  '("", 1 -> Devuelve error por tarea vacia)');
-        $this->runTest($test, 'FunctionsServerServer',   'tareasServer',           ['no-es-ip', 1], 'array',  '("no-es-ip", 1 -> Devuelve error por dato invalido)');
-        $this->runTest($test, 'FunctionsServerServer',   'tareasServer',           ['no-es-url', 2],'array',  '("no-es-url", 2 -> Devuelve error por dato invalido)');
+        $this->runTest($test, 'FunctionsServerShell',   'tareasServer',           ['', 1],         'array',  '("", 1 -> Devuelve error por tarea vacia)');
+        $this->runTest($test, 'FunctionsServerShell',   'tareasServer',           ['no-es-ip', 1], 'array',  '("no-es-ip", 1 -> Devuelve error por dato invalido)');
+        $this->runTest($test, 'FunctionsServerShell',   'tareasServer',           ['no-es-url', 2],'array',  '("no-es-url", 2 -> Devuelve error por dato invalido)');
         //--------------------- indicesServer ---------------------
         $this->runTest($test, 'FunctionsServerServer',   'indicesServer',          [],              'object', '( -> Devuelve objeto con indices de $_SERVER)');
         //--------------------- getParentPath ---------------------
@@ -1355,7 +1392,7 @@ class testeos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Result['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Result['error']);
+            $this->failOperation($Result);
         }
 
         /***************************************/

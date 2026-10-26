@@ -172,7 +172,7 @@
             '</div>' +
             '<div class="modal-body">' +
                 '<p class="mb-2"><strong>Modulo: </strong>' + escTesteo(d.Module) + ' | <strong>Tiempo total: </strong>' + escTesteo(d.TiempoTotal || 0) + ' ms</p>' +
-                (d.ResultadoError ? '<div class="alert alert-danger"><i class="bi bi-exclamation-octagon"></i> ' + escTesteo(d.ResultadoError) + '</div>' : '') +
+                (d.ResultadoError ? '<div class="alert border-danger alert-information alert-dismissible fade show " role="alert"><div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-0"><h4>' + escTesteo(d.ResultadoError) + '</h4></div></div>' : '') +
                 '<div class="table-responsive" style="overflow:auto;">' +
                     '<table class="table table-sm table-hover align-middle mb-0">' +
                         '<thead class="table-light" style="position:sticky;top:0;z-index:1;">' +

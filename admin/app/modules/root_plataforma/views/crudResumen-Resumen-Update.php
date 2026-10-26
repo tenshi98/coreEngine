@@ -13,21 +13,25 @@
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10 record-attachment">
         <?php
+        $Theme_color = 'summary-theme-color-2';
         $arrData = [
-            ['Icon' => '','Titulo' => 'idUsuario',  'Texto' => $data['rowData']['idUsuario']],
-            ['Icon' => '','Titulo' => 'Email',      'Texto' => $data['rowData']['Email']],
-            ['Icon' => '','Titulo' => 'Numero',     'Texto' => $data['Fnc_DataNumbers']->Valores($data['rowData']['Numero'], 2)],
-            ['Icon' => '','Titulo' => 'Rut',        'Texto' => $data['rowData']['Rut']],
-            ['Icon' => '','Titulo' => 'Patente',    'Texto' => $data['rowData']['Patente']],
-            ['Icon' => '','Titulo' => 'Fecha',      'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
-            ['Icon' => '','Titulo' => 'Hora',       'Texto' => $data['rowData']['Hora']],
-            ['Icon' => '','Titulo' => 'Palabra',    'Texto' => $data['rowData']['Palabra']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-badge',     'Icon_color' => 10,'Title' => 'idUsuario',  'Text' => $data['rowData']['idUsuario']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',         'Icon_color' => 10,'Title' => 'Email',      'Text' => $data['rowData']['Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Email']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-hash',             'Icon_color' => 10,'Title' => 'Numero',     'Text' => $data['Fnc_DataNumbers']->Valores($data['rowData']['Numero'], 2)],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard',     'Icon_color' => 10,'Title' => 'Rut',        'Text' => $data['rowData']['Rut']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-truck',            'Icon_color' => 10,'Title' => 'Patente',    'Text' => $data['rowData']['Patente']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event',   'Icon_color' => 10,'Title' => 'Fecha',      'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['Fecha'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-clock',            'Icon_color' => 10,'Title' => 'Hora',       'Text' => $data['rowData']['Hora']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-square-text', 'Icon_color' => 10,'Title' => 'Palabra',    'Text' => $data['rowData']['Palabra']],
         ];
 
-        echo '<h5 class="box-title text-color-red-dark">Datos del Perfil</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Datos del Perfil', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData, $OptionsTable);
+        echo '</div>';
         ?>
     </div>
 </div>

@@ -14,6 +14,7 @@ class crudResumenObservaciones extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -29,6 +30,7 @@ class crudResumenObservaciones extends ControllerBase {
 		$this->ServerServer   = new FunctionsServerServer();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -201,6 +203,7 @@ class crudResumenObservaciones extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
@@ -297,6 +300,10 @@ class crudResumenObservaciones extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idUsuario,idCrud,Observacion,FechaCreacion',
@@ -312,10 +319,14 @@ class crudResumenObservaciones extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -344,6 +355,10 @@ class crudResumenObservaciones extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idObservaciones,idUsuario,idCrud,Observacion',
@@ -360,10 +375,14 @@ class crudResumenObservaciones extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -387,6 +406,10 @@ class crudResumenObservaciones extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -401,10 +424,14 @@ class crudResumenObservaciones extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -421,34 +448,33 @@ class crudResumenObservaciones extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idCrud',
-            'ValidarEntero'             => 'idCrud',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'FechaCreacion',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Observacion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Observacion',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idCrud',
+            'ValidarEntero'              => 'idCrud',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'FechaCreacion',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Observacion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => 'Observacion',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

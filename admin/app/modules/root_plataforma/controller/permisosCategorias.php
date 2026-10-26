@@ -12,6 +12,7 @@ class permisosCategorias extends ControllerBase {
     private $Codification;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -25,6 +26,7 @@ class permisosCategorias extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -229,6 +231,7 @@ class permisosCategorias extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
             ];
@@ -370,6 +373,10 @@ class permisosCategorias extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'Nombre,Icon,IdIconColor,Descripcion,Carpeta',
@@ -385,10 +392,14 @@ class permisosCategorias extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -413,6 +424,10 @@ class permisosCategorias extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idPermisosCat,Nombre,Icon,IdIconColor,Descripcion,Carpeta',
@@ -429,10 +444,14 @@ class permisosCategorias extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -456,6 +475,10 @@ class permisosCategorias extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -470,10 +493,14 @@ class permisosCategorias extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -490,20 +517,23 @@ class permisosCategorias extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'IdIconColor',
-            'ValidarEntero'             => 'IdIconColor',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Icon,Descripcion,Carpeta',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,Icon,Carpeta',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'IdIconColor',
+            'ValidarEntero'              => 'IdIconColor',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Icon,Descripcion,Carpeta',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre'  => 60,
+                'Icon'    => 120,
+                'Carpeta' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Icon,Descripcion,Carpeta',
             'ValidarEspaciosVacios'     => 'Carpeta',
             'ValidarMayusculas'         => '',

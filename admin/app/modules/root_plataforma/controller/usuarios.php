@@ -13,6 +13,7 @@ class usuarios extends ControllerBase {
     private $Codification;
     private $DataNumbers;
     private $WidgetsCommon;
+    private $WidgetsViews;
     private $ServerServer;
 
     /*******************************************************************/
@@ -30,6 +31,7 @@ class usuarios extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
 		$this->ServerServer   = new FunctionsServerServer();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
@@ -241,6 +243,7 @@ class usuarios extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
                 'arrObservaciones' => $arrObservaciones['data'],
@@ -370,6 +373,7 @@ class usuarios extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_Codification'     => $this->Codification,
@@ -444,6 +448,7 @@ class usuarios extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
                 'arrObservaciones' => $arrObservaciones['data'],
@@ -556,13 +561,19 @@ class usuarios extends ControllerBase {
     public function Insert(){
 
         /************************************/
+        // Password inicial por defecto: se fuerza el cambio en el primer ingreso
+        $_POST['password']             = '1234';
+        $_POST['PasswordForzarCambio'] = 1;
+        $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
+
+        /************************************/
         // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
+            'data'      => 'password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'password,idTipoUsuario,idEstado,email,Nombre,idMenuPosicion',
             'unique'    => 'email',
             'encode'    => 'password',
@@ -577,7 +588,7 @@ class usuarios extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -607,9 +618,16 @@ class usuarios extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Si se cambia la password, se fuerza el cambio en el primer ingreso
+        if(isset($_POST['password'])&&$_POST['password']!=''){
+            $_POST['PasswordForzarCambio'] = 1;
+            $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idUsuario,password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion',
+            'data'      => 'idUsuario,password,idTipoUsuario,idEstado,email,Nombre,Rut,fNacimiento,Fono,idCiudad,idComuna,Direccion,Ultimo_acceso,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,idMenuPosicion,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'idUsuario,idTipoUsuario,idEstado,email,Nombre,idMenuPosicion',
             'unique'    => 'email',
             'encode'    => 'password',
@@ -636,7 +654,7 @@ class usuarios extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -681,8 +699,7 @@ class usuarios extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -705,8 +722,7 @@ class usuarios extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -753,7 +769,7 @@ class usuarios extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -771,20 +787,25 @@ class usuarios extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'email',
-            'ValidarNumero'             => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion,Fono',
-            'ValidarEntero'             => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'fNacimiento,Ultimo_acceso',
-            'ValidarHora'               => '',
-            'ValidarURL'                => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarLargoMinimo'        => 'email,password,email,Nombre,Direccion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'email,password,email,Nombre,Direccion',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'email',
+            'ValidarNumero'              => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion,Fono',
+            'ValidarEntero'              => 'idTipoUsuario,idEstado,idCiudad,idComuna,idMenuPosicion',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'fNacimiento,Ultimo_acceso',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => 'Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
+            'ValidarLargoMinimo'         => 'email,password,email,Nombre,Direccion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'email'     => 60,
+                'password'  => 255,
+                'email'     => 60,
+                'Nombre'    => 60,
+                'Direccion' => 60,
+            ],
             'ValidarPalabrasCensuradas' => 'password,Nombre,Direccion',
             'ValidarEspaciosVacios'     => 'email,password,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
             'ValidarMayusculas'         => 'email',

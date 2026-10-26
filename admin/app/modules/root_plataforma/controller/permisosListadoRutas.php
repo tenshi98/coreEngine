@@ -13,6 +13,7 @@ class permisosListadoRutas extends ControllerBase {
     private $CommonData;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,6 +28,7 @@ class permisosListadoRutas extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->CommonData     = new FunctionsCommonData();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -156,6 +158,7 @@ class permisosListadoRutas extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
             ];
@@ -284,6 +287,10 @@ class permisosListadoRutas extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
@@ -298,10 +305,14 @@ class permisosListadoRutas extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         //Se actualizan los permisos al crear uno nuevo
@@ -334,6 +345,10 @@ class permisosListadoRutas extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idRutas,idPermisos,idMetodo,RutaWeb,RutaController,Descripcion,idLevelLimit,Controller',
@@ -349,10 +364,14 @@ class permisosListadoRutas extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         //Se actualizan los permisos al crear uno nuevo
@@ -384,6 +403,10 @@ class permisosListadoRutas extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -398,10 +421,14 @@ class permisosListadoRutas extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         //Se actualizan los permisos al crear uno nuevo
@@ -426,20 +453,24 @@ class permisosListadoRutas extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idPermisos,idMetodo,idLevelLimit',
-            'ValidarEntero'             => 'idPermisos,idMetodo,idLevelLimit',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'RutaWeb,RutaController,Descripcion,Controller',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'RutaWeb,RutaController,Descripcion,Controller',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idPermisos,idMetodo,idLevelLimit',
+            'ValidarEntero'              => 'idPermisos,idMetodo,idLevelLimit',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'RutaWeb,RutaController,Descripcion,Controller',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'RutaWeb'         => 255,
+                'RutaController'  => 255,
+                'Descripcion'     => 255,
+                'Controller'      => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'RutaWeb,RutaController,Descripcion,Controller',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

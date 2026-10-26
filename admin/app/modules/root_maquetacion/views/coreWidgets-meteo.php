@@ -13,7 +13,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 1,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -22,7 +22,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 2,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -31,7 +31,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 3,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -40,7 +40,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 4,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -49,7 +49,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 5,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -58,7 +58,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 6,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -67,7 +67,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 7,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -76,7 +76,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 8,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -85,7 +85,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 9,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -94,7 +94,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 10,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
         <div class="col-xs-12 col-sm-6 col-md-6 col-lg-4 col-xl-4 col-xxl-4">
@@ -103,7 +103,7 @@
                 'BASE'   => $BASE,
                 'Type'   => 11,
             ];
-            $data['Fnc_WidgetsCommon']->widget_meteo($Options);
+            $data['Fnc_WidgetsWeather']->widget_meteo($Options);
             ?>
         </div>
 

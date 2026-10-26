@@ -42,7 +42,7 @@
 
                                 //Se condiciona el uso de Whatsapp
                                 if($data['UserData']["sistemaUsoWhatsapp"]==2){
-                                    $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
+                                    $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => ($data['rowData']['Sistema_NotiWhatsapp'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
                                 }
 

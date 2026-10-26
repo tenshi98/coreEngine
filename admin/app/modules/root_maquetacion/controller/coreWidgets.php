@@ -220,6 +220,7 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            'Fnc_WidgetsWeather'    => new UIWidgetsWeather(),
         ];
 
         /************************************/
@@ -243,6 +244,7 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            'Fnc_WidgetsFeed'     => new UIWidgetsFeed(),
         ];
 
         /************************************/
@@ -266,6 +268,7 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            'Fnc_WidgetsMedia'    => new UIWidgetsMedia(),
         ];
 
         /************************************/
@@ -297,6 +300,7 @@ class coreWidgets extends ControllerBase {
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
             'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            'Fnc_WidgetsFileExplorer'    => new UIWidgetsFileExplorer(),
             /*=========== Ámbito concedido ===========*/
             'AccessScope'   => $scope,
         ];

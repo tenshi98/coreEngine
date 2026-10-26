@@ -27,11 +27,15 @@
 <div class="modal-body">
 
     <?php
+    $Theme_color = 'summary-theme-color-2';
     $arrData = [
-        ['Icon' => '','Titulo' => 'Fecha Creacion', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion'])],
-        ['Icon' => '','Titulo' => 'Observación',    'Texto' => $data['rowData']['Observacion']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event', 'Icon_color' => 10,'Title' => 'Fecha Creacion', 'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion'])],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text', 'Icon_color' => 10,'Title' => 'Observación',    'Text' => $data['rowData']['Observacion']],
     ];
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 1;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData, $OptionsTable);
+    echo '</div>';
     ?>
 
 </div>

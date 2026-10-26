@@ -15,6 +15,7 @@ class permisosListado extends ControllerBase {
     private $CommonData;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -31,6 +32,7 @@ class permisosListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->CommonData     = new FunctionsCommonData();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -403,6 +405,7 @@ class permisosListado extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
@@ -684,6 +687,7 @@ class permisosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
@@ -791,6 +795,7 @@ class permisosListado extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
@@ -842,7 +847,7 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($rowData['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
+            $this->failOperation($rowData);
         }
 
         /************************************/
@@ -887,8 +892,7 @@ class permisosListado extends ControllerBase {
         /************************************/
         //Si falla la reserva principal, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1322,8 +1326,7 @@ class permisosListado extends ControllerBase {
                 /************************************/
                 //Si falla la reserva principal, se revierte de inmediato
                 if ($ResponseInsert['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $ResponseInsert['error'] ?? '');
+                    $this->failOperation($ResponseInsert);
                 }
             }
         }
@@ -1332,7 +1335,9 @@ class permisosListado extends ControllerBase {
         //Se actualizan los permisos al crear uno nuevo
         $ResponsePermisos = $this->updatePermisos($f3);
         if($ResponsePermisos['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponsePermisos['message'], $ResponsePermisos['code'], $ResponsePermisos['error'] ?? '');
         }
 
@@ -1385,7 +1390,7 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1437,8 +1442,7 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1458,15 +1462,16 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($ResponseDelRutas['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $ResponseDelRutas['error'] ?? '');
+            $this->failOperation($ResponseDelRutas);
         }
 
         /************************************/
         //Se actualizan los permisos al crear uno nuevo
         $ResponsePermisos = $this->updatePermisos($f3);
         if($ResponsePermisos['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponsePermisos['message'], $ResponsePermisos['code'], $ResponsePermisos['error'] ?? '');
         }
 
@@ -1489,20 +1494,21 @@ class permisosListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => '',
-            'ValidarEntero'             => '',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Descripcion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => '',
+            'ValidarEntero'              => '',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Descripcion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre' => 120,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Descripcion',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

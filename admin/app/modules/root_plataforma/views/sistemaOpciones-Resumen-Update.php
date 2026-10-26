@@ -57,96 +57,97 @@
     <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
         <?php
         /**********************************************************/
+        $Theme_color = 'summary-theme-color-2';
         $arrData_1   = [];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Nombre',     'Texto' => $data['rowData']['Sistema_Nombre']];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Email',      'Texto' => $data['rowData']['Sistema_Email']];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Rut',        'Texto' => $data['rowData']['Sistema_Rut']];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Ciudad',     'Texto' => $data['rowData']['Ciudad']];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Comuna',     'Texto' => $data['rowData']['Comuna']];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Direccion',  'Texto' => $data['rowData']['Sistema_Direccion']];
-        $arrData_1[] = ['Icon' => '','Titulo' => 'Tema',       'Texto' => $data['rowData']['Tema']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',    'Icon_color' => 10,'Title' => 'Nombre',     'Text' => $data['rowData']['Sistema_Nombre']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Email',      'Text' => $data['rowData']['Sistema_Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Sistema_Email']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Rut',        'Text' => $data['rowData']['Sistema_Rut']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',      'Icon_color' => 10,'Title' => 'Ciudad',     'Text' => $data['rowData']['Ciudad']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',      'Icon_color' => 10,'Title' => 'Comuna',     'Text' => $data['rowData']['Comuna']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-fill',     'Icon_color' => 10,'Title' => 'Direccion',  'Text' => $data['rowData']['Sistema_Direccion']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-palette',      'Icon_color' => 10,'Title' => 'Tema',       'Text' => $data['rowData']['Tema']];
         //Se condiciona el uso de Whatsapp
         if($data['UserData']["sistemaUsoWhatsapp"]==2){
-            $arrData_1[] = ['Icon' => '','Titulo' => 'Fono Noti Whatsapp',  'Texto' => $data['rowData']['Sistema_NotiWhatsapp']];
+            $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-phone', 'Icon_color' => 10,'Title' => 'Fono Noti Whatsapp',  'Text' => $data['rowData']['Sistema_NotiWhatsapp'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Sistema_NotiWhatsapp']];
         }
         /**********************************************************/
         $arrData_2 = [
-            ['Icon' => '','Titulo' => 'Contacto Nombre', 'Texto' => $data['rowData']['Contacto_Nombre']],
-            ['Icon' => '','Titulo' => 'Contacto Fono1',  'Texto' => $data['rowData']['Contacto_Fono1']],
-            ['Icon' => '','Titulo' => 'Contacto Fono2',  'Texto' => $data['rowData']['Contacto_Fono2']],
-            ['Icon' => '','Titulo' => 'Contacto Fax',    'Texto' => $data['rowData']['Contacto_Fax']],
-            ['Icon' => '','Titulo' => 'Contacto Email',  'Texto' => $data['rowData']['Contacto_Email']],
-            ['Icon' => '','Titulo' => 'Contacto Web',    'Texto' => $data['rowData']['Contacto_Web']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person',    'Icon_color' => 10,'Title' => 'Contacto Nombre', 'Text' => $data['rowData']['Contacto_Nombre']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone', 'Icon_color' => 10,'Title' => 'Contacto Fono1',  'Text' => $data['rowData']['Contacto_Fono1'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Contacto_Fono1']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone', 'Icon_color' => 10,'Title' => 'Contacto Fono2',  'Text' => $data['rowData']['Contacto_Fono2'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Contacto_Fono2']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-printer',   'Icon_color' => 10,'Title' => 'Contacto Fax',    'Text' => $data['rowData']['Contacto_Fax']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',  'Icon_color' => 10,'Title' => 'Contacto Email',  'Text' => $data['rowData']['Contacto_Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Contacto_Email']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-globe',     'Icon_color' => 10,'Title' => 'Contacto Web',    'Text' => $data['rowData']['Contacto_Web']],
         ];
         /**********************************************************/
         $arrData_3 = [
-            ['Icon' => '','Titulo' => 'Representante Nombre',  'Texto' => $data['rowData']['RepresentanteNombre']],
-            ['Icon' => '','Titulo' => 'Representante Rut',     'Texto' => $data['rowData']['RepresentanteRut']],
-            ['Icon' => '','Titulo' => 'Representante Fono',    'Texto' => $data['rowData']['RepresentanteFono']],
-            ['Icon' => '','Titulo' => 'Representante Email',   'Texto' => $data['rowData']['RepresentanteEmail']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person',       'Icon_color' => 10,'Title' => 'Representante Nombre',  'Text' => $data['rowData']['RepresentanteNombre']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Representante Rut',     'Text' => $data['rowData']['RepresentanteRut']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone',    'Icon_color' => 10,'Title' => 'Representante Fono',    'Text' => $data['rowData']['RepresentanteFono'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['RepresentanteFono']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Representante Email',   'Text' => $data['rowData']['RepresentanteEmail'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['RepresentanteEmail']],
         ];
         /**********************************************************/
         $arrData_4   = [];
         //Se condiciona el motor de mapas
         switch ($data['UserData']["Config_motorMap"]) {
-            case 1:$arrData_4[] = ['Icon' => '', 'Titulo' => 'Config API GoogleMaps', 'Texto' => $data['rowData']['Config_API_GoogleMaps']];break;
+            case 1:$arrData_4[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key', 'Icon_color' => 10, 'Title' => 'Config API GoogleMaps', 'Text' => $data['rowData']['Config_API_GoogleMaps']];break;
         }
         //Se condiciona el uso de Whatsapp
         if($data['UserData']["sistemaUsoWhatsapp"]==2){
-            $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Token',        'Texto' => $data['rowData']['Config_WhatsappToken']];
-            $arrData_4[] = ['Icon' => '','Titulo' => 'Config Whatsapp Instance Id',  'Texto' => $data['rowData']['Config_WhatsappInstanceId']];
+            $arrData_4[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key',  'Icon_color' => 10,'Title' => 'Config Whatsapp Token',        'Text' => $data['rowData']['Config_WhatsappToken']];
+            $arrData_4[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-gear', 'Icon_color' => 10,'Title' => 'Config Whatsapp Instance Id',  'Text' => $data['rowData']['Config_WhatsappInstanceId']];
         }
         /**********************************************************/
         $arrData_5   = [];
         //Se condiciona el uso de IA
         if($data['UserData']["Config_IA_Uso"]==2){
-            $arrData_5[] = ['Icon' => '','Titulo' => 'Provider',             'Texto' => $data['rowData']['IAProvider']];
-            $arrData_5[] = ['Icon' => '','Titulo' => 'API Key',              'Texto' => $data['rowData']['Config_IA_ApiKey']];
-            $arrData_5[] = ['Icon' => '','Titulo' => 'API Model',            'Texto' => $data['rowData']['Config_IA_Model']];
-            $arrData_5[] = ['Icon' => '','Titulo' => 'API Base URL',         'Texto' => $data['rowData']['Config_IA_Base_URL']];
-            $arrData_5[] = ['Icon' => '','Titulo' => 'Nombre IA',            'Texto' => $data['rowData']['Config_IA_Name']];
-            $arrData_5[] = ['Icon' => '','Titulo' => 'Tono IA',              'Texto' => $data['rowData']['Config_IA_Tone']];
-            $arrData_5[] = ['Icon' => '','Titulo' => 'Uso Memoria Cache IA', 'Texto' => activo($data['rowData']['Config_IA_UsoCache'])];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-robot',          'Icon_color' => 10,'Title' => 'Provider',             'Text' => $data['rowData']['IAProvider']];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key',            'Icon_color' => 10,'Title' => 'API Key',              'Text' => $data['rowData']['Config_IA_ApiKey']];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cpu',            'Icon_color' => 10,'Title' => 'API Model',            'Text' => $data['rowData']['Config_IA_Model']];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-link-45deg',     'Icon_color' => 10,'Title' => 'API Base URL',         'Text' => $data['rowData']['Config_IA_Base_URL']];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-robot',          'Icon_color' => 10,'Title' => 'Nombre IA',            'Text' => $data['rowData']['Config_IA_Name']];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-sliders',        'Icon_color' => 10,'Title' => 'Tono IA',              'Text' => $data['rowData']['Config_IA_Tone']];
+            $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-database-check', 'Icon_color' => 10,'Title' => 'Uso Memoria Cache IA', 'Text' => activo($data['rowData']['Config_IA_UsoCache'])];
         }
 
         /**********************************************************/
         $arrData_6 = [
-            ['Icon' => '','Titulo' => 'URL Twitter',    'Texto' => (!empty($data['rowData']['Social_X']) ? '<a href="'.$data['rowData']['Social_X'].'" class="twitter"><i class="bi bi-twitter"></i> Twitter</a>' : '')],
-            ['Icon' => '','Titulo' => 'URL Facebook',   'Texto' => (!empty($data['rowData']['Social_Facebook']) ? '<a href="'.$data['rowData']['Social_Facebook'].'"  class="facebook"><i class="bi bi-facebook"></i> Facebook</a>' : '')],
-            ['Icon' => '','Titulo' => 'URL Instagram',  'Texto' => (!empty($data['rowData']['Social_Instagram']) ? '<a href="'.$data['rowData']['Social_Instagram'].'" class="instagram"><i class="bi bi-instagram"></i> Instagram</a>' : '')],
-            ['Icon' => '','Titulo' => 'URL Linkedin',   'Texto' => (!empty($data['rowData']['Social_Linkedin']) ? '<a href="'.$data['rowData']['Social_Linkedin'].'"  class="linkedin"><i class="bi bi-linkedin"></i> Linkedin</a>' : '')],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-twitter-x', 'Icon_color' => 10,'Title' => 'URL Twitter',    'Text' => (!empty($data['rowData']['Social_X']) ? '<a href="'.$data['rowData']['Social_X'].'" class="twitter"><i class="bi bi-twitter"></i> Twitter</a>' : '')],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-facebook',  'Icon_color' => 10,'Title' => 'URL Facebook',   'Text' => (!empty($data['rowData']['Social_Facebook']) ? '<a href="'.$data['rowData']['Social_Facebook'].'"  class="facebook"><i class="bi bi-facebook"></i> Facebook</a>' : '')],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-instagram', 'Icon_color' => 10,'Title' => 'URL Instagram',  'Text' => (!empty($data['rowData']['Social_Instagram']) ? '<a href="'.$data['rowData']['Social_Instagram'].'" class="instagram"><i class="bi bi-instagram"></i> Instagram</a>' : '')],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-linkedin',  'Icon_color' => 10,'Title' => 'URL Linkedin',   'Text' => (!empty($data['rowData']['Social_Linkedin']) ? '<a href="'.$data['rowData']['Social_Linkedin'].'"  class="linkedin"><i class="bi bi-linkedin"></i> Linkedin</a>' : '')],
         ];
         /**********************************************************/
         $arrData_7 = [
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Modal - Subtítulos',                                     'Texto' => activo($data['rowData']['sistemaModalSubtitle'])],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Modal - Botón Cerrar',                                   'Texto' => activo($data['rowData']['sistemaModalCloseBTN'])],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Uso Whatsapp',                                           'Texto' => activo($data['rowData']['sistemaUsoWhatsapp'])],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Motor Email',                                            'Texto' => $data['rowData']['ConfigEmail']],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Motor Mapas',                                            'Texto' => $data['rowData']['ConfigMap']],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Meteorologico',                           'Texto' => activo($data['rowData']['Config_Principal_Meteo'])],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Radio',                                   'Texto' => activo($data['rowData']['Config_Principal_Radio'])],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Mostrar Widget Feed',                                    'Texto' => activo($data['rowData']['Config_Principal_Feed'])],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> URL Feed Noticias',                                      'Texto' => $data['rowData']['Config_Principal_FeedURL']],
-            ['Icon' => '','Titulo' => '<strong>Sistema:</strong> Configuracion Uso IA',                                   'Texto' => activo($data['rowData']['Config_IA_Uso'])],
-            ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Uso listados de tareas en las Tareas Pendientes',  'Texto' => activo($data['rowData']['KanbanTareasUsoTareas'])],
-            ['Icon' => '','Titulo' => '<strong>Kanban Tareas:</strong> Admin Tableros Independiente de las Tareas',       'Texto' => activo($data['rowData']['KanbanTareasAdminTabIndepend'])],
-            ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Cargas',                                   'Texto' => activo($data['rowData']['entidadesListadoVerCargas'])],
-            ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Contactos',                                'Texto' => activo($data['rowData']['entidadesListadoVerContactos'])],
-            ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Documentos',                               'Texto' => activo($data['rowData']['entidadesListadoVerDocumentos'])],
-            ['Icon' => '','Titulo' => '<strong>Gestión Entidades:</strong> Uso Password',                                 'Texto' => activo($data['rowData']['entidadesListadoUsoPassword'])],
-            ['Icon' => '','Titulo' => '<strong>Productos - Listado:</strong> Uso Documentos',                             'Texto' => activo($data['rowData']['productosListadoVerDocumentos'])],
-            ['Icon' => '','Titulo' => '<strong>Servicios - Listado:</strong> Uso Documentos',                             'Texto' => activo($data['rowData']['serviciosListadoVerDocumentos'])],
-            ['Icon' => '','Titulo' => '<strong>Gestión Documentos:</strong> Uso Bodega',                                  'Texto' => activo($data['rowData']['gestionDocumentosUsoBodega'])],
-            ['Icon' => '','Titulo' => '<strong>Externalización Servicios:</strong> Clientes - Uso Planes',                'Texto' => activo($data['rowData']['entidadesListadoUsoPlanes'])],
-            ['Icon' => '','Titulo' => '<strong>Externalización Servicios:</strong> Clientes - Uso Usuarios',              'Texto' => activo($data['rowData']['entidadesListadoUsoUsuarios'])],
-            ['Icon' => '','Titulo' => '<strong>Externalización Servicios:</strong> Clientes - Uso Máquinas',              'Texto' => activo($data['rowData']['entidadesListadoUsoMaquinas'])],
-            ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Uso Documentos',                              'Texto' => activo($data['rowData']['maquinasListadoVerDocumentos'])],
-            ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Uso Componentes',                             'Texto' => activo($data['rowData']['maquinasListadoComponentes'])],
-            ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Uso Telemetría',                              'Texto' => activo($data['rowData']['maquinasListadoTelemetria'])],
-            ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Uso Backups Telemetría',                      'Texto' => activo($data['rowData']['maquinasListadoBackups'])],
-            ['Icon' => '','Titulo' => '<strong>Maquinas - Listado:</strong> Envío de Notificaciones',                     'Texto' => activo($data['rowData']['maquinasListadoNotificaciones'])],
-            ['Icon' => '','Titulo' => '<strong>Usuarios - Listado:</strong> Uso Permisos Bodegas',                        'Texto' => activo($data['rowData']['usuariosPermisosBodegas'])],
-            ['Icon' => '','Titulo' => '<strong>Usuarios - Listado:</strong> Uso Permisos Maquinas',                       'Texto' => activo($data['rowData']['usuariosPermisosMaquinas'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-window',             'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Modal - Subtítulos',                                     'Text' => activo($data['rowData']['sistemaModalSubtitle'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-x-circle',           'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Modal - Botón Cerrar',                                   'Text' => activo($data['rowData']['sistemaModalCloseBTN'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-whatsapp',           'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Uso Whatsapp',                                           'Text' => activo($data['rowData']['sistemaUsoWhatsapp'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope-gear',      'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Motor Email',                                            'Text' => $data['rowData']['ConfigEmail']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-map',                'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Motor Mapas',                                            'Text' => $data['rowData']['ConfigMap']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cloud-sun',          'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Mostrar Widget Meteorologico',                           'Text' => activo($data['rowData']['Config_Principal_Meteo'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-broadcast',          'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Mostrar Widget Radio',                                   'Text' => activo($data['rowData']['Config_Principal_Radio'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-rss',                'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Mostrar Widget Feed',                                    'Text' => activo($data['rowData']['Config_Principal_Feed'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-rss',                'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> URL Feed Noticias',                                      'Text' => $data['rowData']['Config_Principal_FeedURL']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-robot',              'Icon_color' => 10,'Title' => '<strong>Sistema:</strong> Configuracion Uso IA',                                   'Text' => activo($data['rowData']['Config_IA_Uso'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-list-check',         'Icon_color' => 10,'Title' => '<strong>Kanban Tareas:</strong> Uso listados de tareas en las Tareas Pendientes',  'Text' => activo($data['rowData']['KanbanTareasUsoTareas'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-kanban',             'Icon_color' => 10,'Title' => '<strong>Kanban Tareas:</strong> Admin Tableros Independiente de las Tareas',       'Text' => activo($data['rowData']['KanbanTareasAdminTabIndepend'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-file-earmark-plus',  'Icon_color' => 10,'Title' => '<strong>Gestión Entidades:</strong> Uso Cargas',                                   'Text' => activo($data['rowData']['entidadesListadoVerCargas'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-lines-fill',  'Icon_color' => 10,'Title' => '<strong>Gestión Entidades:</strong> Uso Contactos',                                'Text' => activo($data['rowData']['entidadesListadoVerContactos'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-file-earmark-text',  'Icon_color' => 10,'Title' => '<strong>Gestión Entidades:</strong> Uso Documentos',                               'Text' => activo($data['rowData']['entidadesListadoVerDocumentos'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key',                'Icon_color' => 10,'Title' => '<strong>Gestión Entidades:</strong> Uso Password',                                 'Text' => activo($data['rowData']['entidadesListadoUsoPassword'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-file-earmark-text',  'Icon_color' => 10,'Title' => '<strong>Productos - Listado:</strong> Uso Documentos',                             'Text' => activo($data['rowData']['productosListadoVerDocumentos'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-file-earmark-text',  'Icon_color' => 10,'Title' => '<strong>Servicios - Listado:</strong> Uso Documentos',                             'Text' => activo($data['rowData']['serviciosListadoVerDocumentos'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-box-seam',           'Icon_color' => 10,'Title' => '<strong>Gestión Documentos:</strong> Uso Bodega',                                  'Text' => activo($data['rowData']['gestionDocumentosUsoBodega'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-checklist',     'Icon_color' => 10,'Title' => '<strong>Externalización Servicios:</strong> Clientes - Uso Planes',                'Text' => activo($data['rowData']['entidadesListadoUsoPlanes'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-people',             'Icon_color' => 10,'Title' => '<strong>Externalización Servicios:</strong> Clientes - Uso Usuarios',              'Text' => activo($data['rowData']['entidadesListadoUsoUsuarios'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cpu',                'Icon_color' => 10,'Title' => '<strong>Externalización Servicios:</strong> Clientes - Uso Máquinas',              'Text' => activo($data['rowData']['entidadesListadoUsoMaquinas'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-file-earmark-text',  'Icon_color' => 10,'Title' => '<strong>Maquinas - Listado:</strong> Uso Documentos',                              'Text' => activo($data['rowData']['maquinasListadoVerDocumentos'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cpu',                'Icon_color' => 10,'Title' => '<strong>Maquinas - Listado:</strong> Uso Componentes',                             'Text' => activo($data['rowData']['maquinasListadoComponentes'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-activity',           'Icon_color' => 10,'Title' => '<strong>Maquinas - Listado:</strong> Uso Telemetría',                              'Text' => activo($data['rowData']['maquinasListadoTelemetria'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-database',           'Icon_color' => 10,'Title' => '<strong>Maquinas - Listado:</strong> Uso Backups Telemetría',                      'Text' => activo($data['rowData']['maquinasListadoBackups'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-bell',               'Icon_color' => 10,'Title' => '<strong>Maquinas - Listado:</strong> Envío de Notificaciones',                     'Text' => activo($data['rowData']['maquinasListadoNotificaciones'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-shield-lock',        'Icon_color' => 10,'Title' => '<strong>Usuarios - Listado:</strong> Uso Permisos Bodegas',                        'Text' => activo($data['rowData']['usuariosPermisosBodegas'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-shield-lock',        'Icon_color' => 10,'Title' => '<strong>Usuarios - Listado:</strong> Uso Permisos Maquinas',                       'Text' => activo($data['rowData']['usuariosPermisosMaquinas'])],
         ];
 
         /**************************************/
@@ -154,33 +155,56 @@
         echo '
         <div class="row">
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-                $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 6);
+                echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+                echo '<div class="row">';
+                    $OptionsTable['Cols'] = 1;
+                    echo $data['Fnc_WidgetsViews']->table_v6($arrData_1, $OptionsTable);
+                echo '</div>';
             echo '
             </div>
+
             <div class="col-xs-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 col-xxl-6">';
-                echo '<h5 class="box-title text-color-red-dark">Datos de Contacto</h5>';
-                $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 6);
+                echo $data['Fnc_WidgetsViews']->tittle_v2('Datos de Contacto', 23);
+                echo '<div class="row">';
+                    $OptionsTable['Cols'] = 1;
+                    echo $data['Fnc_WidgetsViews']->table_v6($arrData_2, $OptionsTable);
+                echo '</div>';
             echo '
             </div>
+
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-6 col-xl-12 col-xxl-12">';
-                echo '<h5 class="box-title text-color-red-dark">Representante Legal</h5>';
-                $data['Fnc_WidgetsCommon']->responsiveTable($arrData_3, 8);
+                echo $data['Fnc_WidgetsViews']->tittle_v2('Representante Legal', 23);
+                echo '<div class="row">';
+                    $OptionsTable['Cols'] = 1;
+                    echo $data['Fnc_WidgetsViews']->table_v6($arrData_3, $OptionsTable);
+                echo '</div>';
             echo '
             </div>
         </div>';
 
-        echo '<h5 class="box-title text-color-red-dark">APIS</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('APIS', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_4, $OptionsTable);
+        echo '</div>';
 
-        echo '<h5 class="box-title text-color-red-dark">Inteligencia Artificial</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Inteligencia Artificial', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_5, $OptionsTable);
+        echo '</div>';
 
-        echo '<h5 class="box-title text-color-red-dark">Redes Sociales</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_6, 4);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Redes Sociales', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_6, $OptionsTable);
+        echo '</div>';
 
-        echo '<h5 class="box-title text-color-red-dark">Configuracion Sistema</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_7, 4);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Configuracion Sistema', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_7, $OptionsTable);
+        echo '</div>';
 
         //funcion para devolver el uso
         function activo($valor){

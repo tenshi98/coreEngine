@@ -14,6 +14,7 @@ class crudInforme extends ControllerBase {
     private $Codification;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -29,6 +30,7 @@ class crudInforme extends ControllerBase {
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -188,6 +190,7 @@ class crudInforme extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
             ];
