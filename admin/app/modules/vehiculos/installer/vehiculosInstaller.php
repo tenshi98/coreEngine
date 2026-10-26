@@ -81,7 +81,7 @@ class vehiculosInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -93,16 +93,18 @@ class vehiculosInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -115,7 +117,7 @@ class vehiculosInstaller extends ControllerInstaller {
             'idPermisosCat'  => '1',                                 // Administración
             'idEstado'       => '1',                                 // Activo
             'idTipo'         => '2',                                 // Crud Resumen
-            'Nombre'         => 'Vehículos - Listado',       // Nombre de la transaccion
+            'Nombre'         => 'Vehículos - Listado',               // Nombre de la transaccion
             'Descripcion'    => 'Permite administrar las vehiculos', // Descripcion de la transaccion
             'idLevelLimit'   => '4',                                 // Ver / Editar / Crear / Borrar
             'RutaWeb'        => 'administracion/vehiculos/listado',  // Ruta web de la transaccion
@@ -250,7 +252,7 @@ class vehiculosInstaller extends ControllerInstaller {
         ];
         $arrTables[] = [
             'table'      => 'vehiculos_listado_observaciones',
-            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL, `idVehiculo` int(10) unsigned NOT NULL, `Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL, `FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL, `idVehiculo` int(10) unsigned NOT NULL, `Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL, `FechaCreacion` date NOT NULL,`idUsuarioEdicion` int(10) unsigned NULL DEFAULT NULL,`FechaEdicion` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -266,17 +268,13 @@ class vehiculosInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE vehiculos_listado ADD INDEX idx_vehiculo_estado (idEstado),ADD INDEX idx_vehiculo_tipo (idTipo),ADD INDEX idx_vehiculo_tipo_carga (idTipoCarga);',
-            'optimization' => 'ALTER TABLE vehiculos_listado_documentos ADD INDEX idx_eld_vehiculo (idVehiculo),ADD INDEX idx_eld_vencimiento (FechaVencimiento);',
-            'optimization' => 'ALTER TABLE vehiculos_listado_observaciones ADD INDEX idx_elo_vehiculo (idVehiculo),ADD INDEX idx_elo_usuario (idUsuario),ADD INDEX idx_elo_fecha (FechaCreacion);',
+        $arrOptimizations = [
+            'ALTER TABLE vehiculos_listado ADD INDEX IF NOT EXISTS idx_vehiculo_estado (idEstado),ADD INDEX IF NOT EXISTS idx_vehiculo_tipo (idTipo),ADD INDEX IF NOT EXISTS idx_vehiculo_tipo_carga (idTipoCarga);',
+            'ALTER TABLE vehiculos_listado_documentos ADD INDEX IF NOT EXISTS idx_eld_vehiculo (idVehiculo),ADD INDEX IF NOT EXISTS idx_eld_vencimiento (FechaVencimiento);',
+            'ALTER TABLE vehiculos_listado_observaciones ADD INDEX IF NOT EXISTS idx_elo_vehiculo (idVehiculo),ADD INDEX IF NOT EXISTS idx_elo_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_elo_fecha (FechaCreacion);',
         ];
 
         /************************************/

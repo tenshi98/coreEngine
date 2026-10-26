@@ -57,30 +57,37 @@
             echo '</div>';
         } ?>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10 record-attachment">
         <?php
-        $arrData_1 = [
-            ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $data['rowData']['Nombre']],
-            ['Icon' => '','Titulo' => 'Tipo de Vehículo', 'Texto' => $data['rowData']['Tipo']],
-            ['Icon' => '','Titulo' => 'Marca',            'Texto' => $data['rowData']['Marca']],
-            ['Icon' => '','Titulo' => 'Modelo',           'Texto' => $data['rowData']['Modelo']],
-            ['Icon' => '','Titulo' => 'Patente',          'Texto' => $data['rowData']['Patente']],
-            ['Icon' => '','Titulo' => 'Estado',           'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        $Theme_color = 'summary-theme-color-2';
+        $arrData1 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',           'Text' => $data['rowData']['Nombre']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-truck',     'Icon_color' => 10,'Title' => 'Tipo de Vehículo', 'Text' => $data['rowData']['Tipo']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-bookmark',  'Icon_color' => 10,'Title' => 'Marca',            'Text' => $data['rowData']['Marca']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tag',       'Icon_color' => 10,'Title' => 'Modelo',           'Text' => $data['rowData']['Modelo']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-truck',     'Icon_color' => 10,'Title' => 'Patente',          'Text' => $data['rowData']['Patente']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',     'Icon_color' => 10,'Title' => 'Estado',           'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ];
-        $arrData_2 = [
-            ['Icon' => '','Titulo' => 'Año de Fabricación',  'Texto' => $data['rowData']['AnoFab']],
-            ['Icon' => '','Titulo' => 'Número de serie',     'Texto' => $data['rowData']['Num_serie']],
-            ['Icon' => '','Titulo' => 'Capacidad Pasajeros', 'Texto' => $data['rowData']['CapacidadPersonas']],
-            ['Icon' => '','Titulo' => 'Capacidad (Kilos)',   'Texto' => $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Capacidad'])],
-            ['Icon' => '','Titulo' => 'Metros Cubicos (M3)', 'Texto' => $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['MCubicos'])],
-            ['Icon' => '','Titulo' => 'Tipo de Carga',       'Texto' => $data['rowData']['TipoCarga']],
+        $arrData2 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar3',    'Icon_color' => 10,'Title' => 'Año de Fabricación',  'Text' => $data['rowData']['AnoFab']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-hash',         'Icon_color' => 10,'Title' => 'Número de serie',     'Text' => $data['rowData']['Num_serie']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-people',       'Icon_color' => 10,'Title' => 'Capacidad Pasajeros', 'Text' => $data['rowData']['CapacidadPersonas']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-speedometer2', 'Icon_color' => 10,'Title' => 'Capacidad (Kilos)',   'Text' => $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['Capacidad'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-box',          'Icon_color' => 10,'Title' => 'Metros Cubicos (M3)', 'Text' => $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($data['rowData']['MCubicos'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-box-seam',     'Icon_color' => 10,'Title' => 'Tipo de Carga',       'Text' => $data['rowData']['TipoCarga']],
         ];
 
-        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+        echo '</div>';
 
-        echo '<h5 class="box-title text-color-red-dark">Característicos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Característicos', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+        echo '</div>';
 
         ?>
     </div>

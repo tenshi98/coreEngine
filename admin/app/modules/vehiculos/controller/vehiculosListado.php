@@ -13,6 +13,7 @@ class vehiculosListado extends ControllerBase {
     private $DataDate;
     private $DataNumbers;
     private $WidgetsCommon;
+    private $WidgetsViews;
     private $ServerServer;
 
     /*******************************************************************/
@@ -30,6 +31,7 @@ class vehiculosListado extends ControllerBase {
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         $this->ServerServer   = new FunctionsServerServer();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
@@ -445,6 +447,7 @@ class vehiculosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
@@ -595,6 +598,7 @@ class vehiculosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
@@ -685,6 +689,7 @@ class vehiculosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
@@ -734,7 +739,7 @@ class vehiculosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -793,7 +798,7 @@ class vehiculosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -838,8 +843,7 @@ class vehiculosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -863,8 +867,7 @@ class vehiculosListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -911,7 +914,7 @@ class vehiculosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -929,20 +932,25 @@ class vehiculosListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idVehiculo,idEstado,idTipo,idTipoCarga,AnoFab,CapacidadPersonas,Capacidad,MCubicos',
-            'ValidarEntero'             => 'idVehiculo,idEstado,idTipo,idTipoCarga,AnoFab,CapacidadPersonas,Capacidad,MCubicos',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => 'Patente',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Marca,Modelo,Num_serie,Patente',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,Marca,Modelo,Num_serie,Patente',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idVehiculo,idEstado,idTipo,idTipoCarga,AnoFab,CapacidadPersonas,Capacidad,MCubicos,Latitud,Longitud,Velocidad',
+            'ValidarEntero'              => 'idVehiculo,idEstado,idTipo,idTipoCarga,AnoFab,CapacidadPersonas,Capacidad,MCubicos',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => 'Patente',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Marca,Modelo,Num_serie,Patente',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre'    => 255,
+                'Marca'     => 255,
+                'Modelo'    => 255,
+                'Num_serie' => 255,
+                'Patente'   => 120,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Marca,Modelo,Num_serie',
             'ValidarEspaciosVacios'     => 'Num_serie,Patente',
             'ValidarMayusculas'         => 'Num_serie,Patente',

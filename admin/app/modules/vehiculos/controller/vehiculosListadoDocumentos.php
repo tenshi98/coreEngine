@@ -11,6 +11,8 @@ class vehiculosListadoDocumentos extends ControllerBase {
     private $FormInputs;
     private $Codification;
     private $WidgetsCommon;
+    private $WidgetsViews;
+    private $WidgetsPreview;
     private $DataDate;
     private $ServerServer;
 
@@ -27,6 +29,8 @@ class vehiculosListadoDocumentos extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsPreview  = new UIWidgetsPreview();
 		$this->DataDate       = new FunctionsDataDate();
         $this->ServerServer   = new FunctionsServerServer();
         /*========== Datos para la clase padre ==========*/
@@ -232,6 +236,8 @@ class vehiculosListadoDocumentos extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsPreview' => $this->WidgetsPreview,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
@@ -342,6 +348,10 @@ class vehiculosListadoDocumentos extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idTipo,idVehiculo,Nombre,Observacion,FechaCreacion,FechaVencimiento',
@@ -368,10 +378,14 @@ class vehiculosListadoDocumentos extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -396,6 +410,10 @@ class vehiculosListadoDocumentos extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idDocumentos,idTipo,idVehiculo,Nombre,Observacion,FechaCreacion,FechaVencimiento',
@@ -412,10 +430,14 @@ class vehiculosListadoDocumentos extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -439,6 +461,10 @@ class vehiculosListadoDocumentos extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => 'NombreArchivo',
@@ -453,10 +479,14 @@ class vehiculosListadoDocumentos extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -473,20 +503,21 @@ class vehiculosListadoDocumentos extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idTipo,idVehiculo',
-            'ValidarEntero'             => 'idTipo,idVehiculo',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'FechaCreacion,FechaVencimiento',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Observacion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idTipo,idVehiculo',
+            'ValidarEntero'              => 'idTipo,idVehiculo',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'FechaCreacion,FechaVencimiento',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Observacion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Observacion',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
