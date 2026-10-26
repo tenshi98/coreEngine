@@ -13,19 +13,27 @@
         ?>
         <img src="<?php echo $UserIMG; ?>" alt="Profile" class="square-rounded-2 square-border-3 w-100">
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10 record-attachment">
         <?php
-        $arrData = [
-            ['Icon' => '','Titulo' => 'Categoria',      'Texto' => $data['rowData']['Categoria']],
-            ['Icon' => '','Titulo' => 'Nombre',         'Texto' => $data['rowData']['Nombre']],
-            ['Icon' => '','Titulo' => 'Valor Ingreso',  'Texto' => $data['rowData']['ValorIngreso']],
-            ['Icon' => '','Titulo' => 'Valor Egreso',   'Texto' => $data['rowData']['ValorEgreso']],
-            ['Icon' => '','Titulo' => 'Descripcion',    'Texto' => $data['rowData']['Descripcion']],
-            ['Icon' => '','Titulo' => 'Codigo',         'Texto' => $data['rowData']['Codigo']],
-            ['Icon' => '','Titulo' => 'Estado',         'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        $Theme_color = 'summary-theme-color-2';
+        $arrData1 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tag',       'Icon_color' => 10,'Title' => 'Categoria',      'Text' => $data['rowData']['Categoria']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',         'Text' => $data['rowData']['Nombre']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cash-coin', 'Icon_color' => 10,'Title' => 'Valor Ingreso',  'Text' => $data['rowData']['ValorIngreso']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cash-coin', 'Icon_color' => 10,'Title' => 'Valor Egreso',   'Text' => $data['rowData']['ValorEgreso']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-upc-scan',  'Icon_color' => 10,'Title' => 'Codigo',         'Text' => $data['rowData']['Codigo']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',     'Icon_color' => 10,'Title' => 'Estado',         'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        ];
+        $arrData2 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Descripcion',    'Text' => $data['rowData']['Descripcion']],
         ];
 
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+            $OptionsTable['Cols'] = 1;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+        echo '</div>';
 
         ?>
     </div>

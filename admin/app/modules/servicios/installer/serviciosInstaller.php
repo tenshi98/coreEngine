@@ -81,7 +81,7 @@ class serviciosInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -93,16 +93,18 @@ class serviciosInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -112,13 +114,13 @@ class serviciosInstaller extends ControllerInstaller {
         /*                 SE GENERAN LAS RUTAS                */
         /*******************************************************/
         $arrPermisos[] = [
-            'idPermisosCat'  => '1',                                                            // Administración
+            'idPermisosCat'  => '10',                                                           // Administración
             'idEstado'       => '1',                                                            // Activo
             'idTipo'         => '1',                                                            // Crud Normal
             'Nombre'         => 'Servicios - Categorias',                                       // Nombre de la transaccion
             'Descripcion'    => 'Permite la administración de las categorías de los servicios', // Descripcion de la transaccion
             'idLevelLimit'   => '4',                                                            // Ver / Editar / Crear / Borrar
-            'RutaWeb'        => 'administracion/servicios/categorias',                          // Ruta web de la transaccion
+            'RutaWeb'        => 'mantencionSistema/servicios/categorias',                       // Ruta web de la transaccion
             'RutaController' => 'serviciosCategorias',                                          // Controlador de la transaccion
         ];
         $arrPermisos[] = [
@@ -188,14 +190,14 @@ class serviciosInstaller extends ControllerInstaller {
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/servicios/categorias/listAll',      'RutaController' => 'serviciosCategorias->listAll',      'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/servicios/categorias/search',       'RutaController' => 'serviciosCategorias->UpdateList',   'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/servicios/categorias/updateList',   'RutaController' => 'serviciosCategorias->UpdateList',   'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/servicios/categorias/view/@id',     'RutaController' => 'serviciosCategorias->View',         'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/servicios/categorias/getID/@id',    'RutaController' => 'serviciosCategorias->GetID',        'Descripcion' => 'Información para el formulario edición',         'idLevelLimit' => 2, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/servicios/categorias',              'RutaController' => 'serviciosCategorias->Insert',       'Descripcion' => 'Crear Información',                              'idLevelLimit' => 3, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/servicios/categorias/update',       'RutaController' => 'serviciosCategorias->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'serviciosCategorias'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/servicios/categorias',              'RutaController' => 'serviciosCategorias->Delete',       'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 4, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/servicios/categorias/listAll',      'RutaController' => 'serviciosCategorias->listAll',      'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/servicios/categorias/search',       'RutaController' => 'serviciosCategorias->UpdateList',   'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/servicios/categorias/updateList',   'RutaController' => 'serviciosCategorias->UpdateList',   'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/servicios/categorias/view/@id',     'RutaController' => 'serviciosCategorias->View',         'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/servicios/categorias/getID/@id',    'RutaController' => 'serviciosCategorias->GetID',        'Descripcion' => 'Información para el formulario edición',         'idLevelLimit' => 2, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/servicios/categorias',              'RutaController' => 'serviciosCategorias->Insert',       'Descripcion' => 'Crear Información',                              'idLevelLimit' => 3, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/servicios/categorias/update',       'RutaController' => 'serviciosCategorias->Update',       'Descripcion' => 'Editar por post (modificar y subir archivos)',   'idLevelLimit' => 2, 'Controller' => 'serviciosCategorias'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/servicios/categorias',              'RutaController' => 'serviciosCategorias->Delete',       'Descripcion' => 'Borrar dato y archivos',                         'idLevelLimit' => 4, 'Controller' => 'serviciosCategorias'],
             ],
             2 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/servicios/listado/listAll',                         'RutaController' => 'serviciosListado->listAll',                   'Descripcion' => 'Listar Toda la Información',                      'idLevelLimit' => 1, 'Controller' => 'serviciosListado'],
@@ -276,7 +278,7 @@ class serviciosInstaller extends ControllerInstaller {
         ];
         $arrTables[] = [
             'table'      => 'servicios_listado_observaciones',
-            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idServicio` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idServicio` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL,`idUsuarioEdicion` int(10) unsigned NULL DEFAULT NULL,`FechaEdicion` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -292,18 +294,14 @@ class serviciosInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE servicios_categorias ADD INDEX idx_servicio_categoria (idCategoria);',
-            'optimization' => 'ALTER TABLE servicios_listado ADD INDEX idx_servicio_estado (idEstado),ADD INDEX idx_servicio_categoria (idCategoria);',
-            'optimization' => 'ALTER TABLE servicios_listado_documentos ADD INDEX idx_eld_servicio (idServicio),ADD INDEX idx_eld_vencimiento (FVencimiento);',
-            'optimization' => 'ALTER TABLE servicios_listado_observaciones ADD INDEX idx_elo_servicio (idServicio),ADD INDEX idx_elo_usuario (idUsuario),ADD INDEX idx_elo_fecha (FechaCreacion);',
+        $arrOptimizations = [
+            'ALTER TABLE servicios_categorias ADD INDEX IF NOT EXISTS idx_servicio_categoria (idCategoria);',
+            'ALTER TABLE servicios_listado ADD INDEX IF NOT EXISTS idx_servicio_estado (idEstado),ADD INDEX IF NOT EXISTS idx_servicio_categoria (idCategoria);',
+            'ALTER TABLE servicios_listado_documentos ADD INDEX IF NOT EXISTS idx_eld_servicio (idServicio),ADD INDEX IF NOT EXISTS idx_eld_vencimiento (FVencimiento);',
+            'ALTER TABLE servicios_listado_observaciones ADD INDEX IF NOT EXISTS idx_elo_servicio (idServicio),ADD INDEX IF NOT EXISTS idx_elo_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_elo_fecha (FechaCreacion);',
         ];
 
         /************************************/

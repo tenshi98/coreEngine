@@ -13,6 +13,7 @@ class serviciosListado extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,6 +28,7 @@ class serviciosListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -332,6 +334,7 @@ class serviciosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -451,6 +454,7 @@ class serviciosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
@@ -528,6 +532,7 @@ class serviciosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -575,7 +580,7 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -634,7 +639,7 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -679,8 +684,7 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -704,8 +708,7 @@ class serviciosListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -752,7 +755,7 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -770,20 +773,22 @@ class serviciosListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idEstado,idCategoria,ValorIngreso,ValorEgreso',
-            'ValidarEntero'             => 'idEstado,idCategoria',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,Descripcion,Codigo',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,Codigo',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idEstado,idCategoria,ValorIngreso,ValorEgreso',
+            'ValidarEntero'              => 'idEstado,idCategoria',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,Descripcion,Codigo',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre' => 255,
+                'Codigo' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,Descripcion,Codigo',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
