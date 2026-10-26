@@ -7,22 +7,13 @@ $f3->route('GET /principal/campanaResumen/@ano',                  'gestionCampan
 $f3->route('GET /principal/campanaCompSemanalResumen/@mes/@ano',  'gestionCampanasWidgets->campanaCompSemanalResumen');  //Resumen Semanal
 $f3->route('GET /principal/campanaAnalisisContable/@ano',         'gestionCampanasWidgets->campanaAnalisisContable');    //Analisis Contable
 $f3->route('GET /principal/campanaPartidaConfirmada',             'gestionCampanasWidgets->campanaPartidaConfirmada');   //Últimas partidas confirmadas
-$f3->route('GET /principal/docMercantiles',                       'gestionDocumentosWidgets->pagosPendientes');          //Pagos pendientes de los documentos mercantiles
+$f3->route('GET /principal/docMercantilesCompras',                'gestionDocumentosWidgets->pagosPendientesCompras'); //Pagos pendientes de documentos mercantiles (Compras)
+$f3->route('GET /principal/docMercantilesVentas',                 'gestionDocumentosWidgets->pagosPendientesVentas');  //Pagos pendientes de documentos mercantiles (Ventas)
 $f3->route('GET /principal/bodegaStock',                          'bodegasWidgets->stocksProductos');                    // Productos con bajo Stock en las bodegas
 $f3->route('GET /principal/reservas',                          'reservasWidgets->reservasSolicitadas');                    // Productos con bajo Stock en las bodegas
 
-/*******************************************************************************************************************/
-/*                                                 Mi Usuario                                                      */
-/*******************************************************************************************************************/
-//Vistas
-$f3->route('GET /perfil', 'miUsuario->view');                   //Ver mi perfil
-//Fragments
-$f3->route('GET /perfil/UpdateData', 'miUsuario->FRG_UpdateData');  //Actualizar datos del perfil
-$f3->route('GET /perfil/UpdateCard', 'miUsuario->FRG_UpdateCard');  //Actualizar imagen del perfil
-//Acciones
-$f3->route('GET  /auth/logout',     'miUsuario->logout');    //Cerrar la sesion
-$f3->route('POST /perfil/update',   'miUsuario->update');    // Editar por post (modificar y subir archivos)
-$f3->route('PUT  /perfil/delFiles', 'miUsuario->delFiles');  //Permite eliminar el archivo de la imagen
+// Rutas de Mi Usuario (compartidas con el modo de cambio de password forzado)
+require_once __DIR__ . '/userMiUsuario.php';
 
 /*******************************************************************************************************************/
 /*                                             Rutas desde los permisos                                            */
