@@ -79,6 +79,16 @@ class coreSistemaInstaller extends ControllerInstaller {
             'RutaWeb'        => 'administracion/sistema',                      // Ruta web de la transaccion
             'RutaController' => 'coreSistema',                                 // Controlador de la transaccion
         ];
+        $arrPermisos[] = [
+            'idPermisosCat'  => '10',                                                             // Administración
+            'idEstado'       => '1',                                                              // Activo
+            'idTipo'         => '2',                                                              // Crud Resumen
+            'Nombre'         => 'Orden de Widgets',                                               // Nombre de la transaccion
+            'Descripcion'    => 'Permite ordenar y activar los widgets de la pantalla principal', // Descripcion de la transaccion
+            'idLevelLimit'   => '2',                                                              // Ver / Editar
+            'RutaWeb'        => 'mantencionSistema/sistema/widgetsOrden',                         // Ruta web de la transaccion
+            'RutaController' => 'coreSistema',                                                    // Controlador de la transaccion
+        ];
         /************************************/
         // Verifico si existe
         if($arrPermisos){
@@ -140,6 +150,10 @@ class coreSistemaInstaller extends ControllerInstaller {
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/sistema/resumenUpdate',  'RutaController' => 'coreSistema->ResumenUpdate',  'Descripcion' => 'Mostrar información',                           'idLevelLimit' => 2, 'Controller' => 'coreSistema'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/sistema/update',         'RutaController' => 'coreSistema->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'coreSistema'],
                 ['idMetodo' => 4, 'RutaWeb' => 'administracion/sistema/delFiles',       'RutaController' => 'coreSistema->DelFiles',       'Descripcion' => 'Permite eliminar archivos',                     'idLevelLimit' => 2, 'Controller' => 'coreSistema'],
+            ],
+            2 => [
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/sistema/widgetsOrden/listAll', 'RutaController' => 'coreSistema->WidgetsOrden',     'Descripcion' => 'Mostrar orden de widgets',            'idLevelLimit' => 2, 'Controller' => 'coreSistema'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/sistema/widgetsOrden/save',    'RutaController' => 'coreSistema->WidgetsOrdenSave', 'Descripcion' => 'Guardar orden y estado de widgets',   'idLevelLimit' => 2, 'Controller' => 'coreSistema'],
             ],
             default => [],
         };
