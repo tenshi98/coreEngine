@@ -13,6 +13,7 @@ class maquinasListado extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,6 +28,7 @@ class maquinasListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -324,6 +326,7 @@ class maquinasListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -477,6 +480,7 @@ class maquinasListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
@@ -572,6 +576,7 @@ class maquinasListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -617,9 +622,9 @@ class maquinasListado extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -676,9 +681,9 @@ class maquinasListado extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -723,13 +728,26 @@ class maquinasListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
+        }
+
+        /************************************/
+        // Limpieza del pivote tareas-componente: la tabla no tiene idMaquina,
+        // se resuelve por subquery sobre los componentes de la máquina
+        $Response = $this->queryExecuteRaw(
+            'DELETE FROM maquinas_componentes_tareas_rel WHERE idComponente IN (SELECT idComponentes FROM maquinas_listado_componentes WHERE idMaquina = ?)',
+            [$dataDelete['idMaquina'] ?? 0]
+        );
+
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            $this->failOperation($Response);
         }
 
         /************************************/
         // Listado de las tablas a eliminar los datos relacionados
         $arrTableDel  = array();
+        $arrTableDel[] = ['files' => 'NombreArchivo', 'table' => 'maquinas_listado_componentes'];
         $arrTableDel[] = ['files' => 'NombreArchivo', 'table' => 'maquinas_listado_documentos'];
         $arrTableDel[] = ['files' => '',              'table' => 'maquinas_listado_observaciones'];
 
@@ -748,8 +766,7 @@ class maquinasListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -794,9 +811,9 @@ class maquinasListado extends ControllerBase {
         $Response = $this->Base_delFiles($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato (no-op sin transacción)
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -814,20 +831,24 @@ class maquinasListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idEstado,Sim_Num_Tel,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana',
-            'ValidarEntero'             => 'idEstado,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => 'TiempoFueraLinea,AlertaTemprCritica,AlertaTemprNormal',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre,CodIdentificador,Descripcion,Sim_Compania',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre,CodIdentificador,Sim_Compania',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idEstado,Sim_Num_Tel,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana',
+            'ValidarEntero'              => 'idEstado,idTab,id_Geo,id_Sensores,idBackup,NregBackup,idAlertaTemprana',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => 'TiempoFueraLinea,AlertaTemprCritica,AlertaTemprNormal',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre,CodIdentificador,Descripcion,Sim_Compania',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Sim_Num_Tel'      => 255,
+                'Nombre'           => 255,
+                'CodIdentificador' => 255,
+                'Sim_Compania'     => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,CodIdentificador,Descripcion,Sim_Compania',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
@@ -845,6 +866,22 @@ class maquinasListado extends ControllerBase {
         ];
         // Retorno los datos
         return $DataChecking;
+    }
+
+    /*******************************************************************/
+    // Ejecuta SQL crudo con parametros bindeados (pivote tareas-componente)
+    /*******************************************************************/
+    private function queryExecuteRaw(string $sql, array $params = []){
+
+        /************************************
+         * ControllerBase::$queryBuilder es privado y Base_queryExecute no admite
+         * parametros bindeados, por lo que se instancia un QueryBuilder propio
+         * sobre la misma conexion: asi participa de la transaccion activa.
+         */
+        $QueryBuilder = new QueryBuilder();
+        /************************************/
+        // Ejecuto la query
+        return $QueryBuilder->queryExecute($sql, $this->getDBConn(), false, false, $params);
     }
 
 }

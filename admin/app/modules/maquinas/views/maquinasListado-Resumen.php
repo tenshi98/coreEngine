@@ -142,7 +142,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                 Componentes de <?php echo $data['rowData']['Nombre']; ?>
-                                <button type="button" class="btn btn-success"  onclick="tabObsNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                <button type="button" class="btn btn-success"  onclick="tabComponentesNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
                             </div>
                         </h5>
                         <div class="clearfix"></div>
@@ -167,7 +167,10 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                             <h5 class="text-color-red-dark">
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                                     Sensores de <?php echo $data['rowData']['Nombre']; ?>
-                                    <button type="button" class="btn btn-success"  onclick="tabSensoresNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                    <div class="d-grid gap-2 d-md-flex">
+                                        <button type="button" class="btn btn-primary"  onclick="guardarOrdenSensores()"><i class="bi bi-arrow-down-up"></i> Guardar Orden</button>
+                                        <button type="button" class="btn btn-success"  onclick="tabSensoresNew('<?php echo $DataID['data']; ?>')"><i class="bi bi-file-earmark"></i> Crear Nuevo</button>
+                                    </div>
                                 </div>
                             </h5>
                             <div class="clearfix"></div>
@@ -202,6 +205,13 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     <a href="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/listAll'; ?>" class="btn btn-danger float-end"><i class="bi bi-arrow-left-circle"></i> Volver</a>
 </div>
 <div class="clearfix"></div>
+
+<style>
+    /* Fila de sensor durante el arrastre (ghost) */
+    #tabSensoresDataBody .sensor-ghost { opacity: .4; background: #f5f5f5; }
+    /* Clon que sigue al cursor en modo fallback (KvSortable 1.5.1) */
+    #tabSensoresDataBody .sensor-dragging { list-style: none; opacity: .95 !important; background: #fff; border: 1px solid rgba(0,0,0,.125); border-radius: .25rem; box-shadow: 0 .5rem 1rem rgba(0,0,0,.15); width: var(--sensor-drag-width, auto) !important; transform: translateX(-15px); display: block; }
+</style>
 
 <script>
     /*********************************************************************/
@@ -516,6 +526,20 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             UpdateContentId(Div, URL, Options);
         }
         /************************************/
+        function tabComponentesNewSub(ID, idPlain) {
+            //Cargo el loader
+            $('#PDloader').show();
+            //Ejecuto
+            let Div       = '#modalContent-lg';
+            let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/newSub/'; ?>'+ID;
+            const Options = {
+                showModal : '#viewModal-lg',
+                closeObject:'#PDloader',
+            };
+            //Se envian los datos al formulario
+            UpdateContentId(Div, URL, Options);
+        }
+        /************************************/
         function tabComponentesView(ID) {
             //Cargo el loader
             $('#PDloader').show();
@@ -575,6 +599,33 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 }
             });
         }
+        /************************************/
+        function tabComponentesToggleHijos(ID, idPlain) {
+            //Variables
+            let Contenedor = '#tabCompHijos'+idPlain;
+            let Fila       = '#tabCompHijosRow'+idPlain;
+            //Si ya esta visible, solo se colapsa
+            if ($(Fila).is(':visible')) {
+                $(Fila).hide();
+                return;
+            }
+            //Lazy-load: los hijos se cargan una sola vez por nodo
+            if ($.trim($(Contenedor).html()) === '') {
+                //Cargo el loader
+                $('#PDloader').show();
+                //Ejecuto
+                let Div       = Contenedor;
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/hijos/'; ?>'+ID;
+                const Options = {
+                    refreshTables:'true',
+                    closeObject:'#PDloader',
+                };
+                //Se envian los datos al formulario
+                UpdateContentId(Div, URL, Options);
+            }
+            //Se muestra el contenedor
+            $(Fila).show();
+        }
     <?php } ?>
     <?php if($data['UserData']["maquinasListadoTelemetria"]==2){ ?>
         /*********************************************************************/
@@ -629,7 +680,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$DataID['data']; ?>';
                     const Options = {
                         closeObject:'#PDloader',
-                        refreshTables:'true',
+                        callFNC:'initSensoresSortable',
                     };
                     //Se envian los datos al formulario
                     UpdateContentId(Div, URL, Options);
@@ -652,12 +703,12 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 UpdateContentId(Div, URL, Options);
             }
             /************************************/
-            function tabSensoresView(ID) {
+            function tabSensoresView(uid) {
                 //Cargo el loader
                 $('#PDloader').show();
                 //Ejecuto
                 let Div       = '#modalContent-lg';
-                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/view/'; ?>'+ID;
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/view/'.$DataID['data']; ?>'+'?uid='+encodeURIComponent(uid);
                 const Options = {
                     showModal : '#viewModal-lg',
                     closeObject:'#PDloader',
@@ -666,12 +717,12 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 UpdateContentId(Div, URL, Options);
             }
             /************************************/
-            function tabSensoresEdit(ID) {
+            function tabSensoresEdit(uid) {
                 //Cargo el loader
                 $('#PDloader').show();
                 //Ejecuto
                 let Div       = '#modalContent-lg';
-                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/getID/'; ?>'+ID;
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/getID/'.$DataID['data']; ?>'+'?uid='+encodeURIComponent(uid);
                 const Options = {
                     showModal : '#viewModal-lg',
                     closeObject:'#PDloader',
@@ -680,7 +731,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 UpdateContentId(Div, URL, Options);
             }
             /************************************/
-            function tabSensoresDel(ID, Dato) {
+            function tabSensoresDel(uid, Dato) {
                 Swal.fire({
                     title: "Borrar Dato",
                     text: "Esta a punto de eliminar el dato " + Dato + ", ¿Desea continuar?",
@@ -698,10 +749,10 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                         //Ejecuto
                         let Metodo      = 'DELETE';
                         let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores'; ?>';
-                        let Informacion = {"idSensores": ID};
+                        let Informacion = {"idMaquina": "<?php echo $DataID['data']; ?>", "uid": uid};
                         const Options     = {
                             UpdateDiv : [
-                                {Div:'#tabSensoresDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
+                                {Div:'#tabSensoresDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$DataID['data']; ?>', callFNC:'initSensoresSortable'}
                             ],
                             showNoti:'Dato Borrado Correctamente',
                             closeObject:'#PDloader',
@@ -710,6 +761,74 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                         SendDataForms(Metodo, Direccion, Informacion, Options);
                     }
                 });
+            }
+            /************************************/
+            // Se activa el arrastre de la tabla de sensores (KvSortable 1.5.1).
+            // IMPORTANTE: esta version NO soporta el selector '> .clase' en 'draggable',
+            // por eso se usa 'tr' (clase/etiqueta valida) y handle por clase.
+            // Se re-inicializa tras cada recarga AJAX del listado (opcion callFNC).
+            window.initSensoresSortable = function () {
+                const tbody = document.getElementById('tabSensoresDataBody');
+                const Lib   = window.KvSortable || window.Sortable;
+                if (!tbody) {
+                    return false;
+                }
+                if (!Lib) {
+                    console.error('Sensores: no se encontro la libreria de arrastre (KvSortable).');
+                    return false;
+                }
+                // Si la vista se recarga por AJAX, se destruye la instancia previa
+                if (tbody._sortable && typeof tbody._sortable.destroy === 'function') {
+                    try { tbody._sortable.destroy(); } catch (e) { /* se reintenta crear */ }
+                }
+                // KvSortable 1.5.1 usa expando 'KvSortable<timestamp>' (no '_sortable')
+                for (const k in tbody) {
+                    if (Object.prototype.hasOwnProperty.call(tbody, k)
+                        && k.indexOf('KvSortable') === 0
+                        && tbody[k] && typeof tbody[k].destroy === 'function') {
+                        try { tbody[k].destroy(); } catch (e) { /* se reintenta crear */ }
+                    }
+                }
+                new Lib(tbody, {
+                    animation: 150,
+                    forceFallback: true,
+                    fallbackTolerance: 3,
+                    fallbackOnBody: true,
+                    handle: '.handle-sensor',
+                    draggable: 'tr',
+                    ghostClass: 'sensor-ghost',
+                    chosenClass: 'sensor-chosen',
+                    fallbackClass: 'sensor-dragging',
+                    onStart: function (evt) {
+                        document.documentElement.style.setProperty('--sensor-drag-width', evt.item.getBoundingClientRect().width + 'px');
+                    },
+                });
+                return true;
+            };
+            /************************************/
+            // Se persiste el orden actual de la tabla (data-uid en el orden del DOM)
+            function guardarOrdenSensores() {
+                // Se recolectan los uid en el orden visible
+                const uids = [];
+                $("#tabSensoresDataBody > tr").each(function () {
+                    const uid = $(this).attr('data-uid');
+                    if (uid) { uids.push(uid); }
+                });
+                // Sin sensores no hay nada que guardar
+                if (uids.length === 0) { return; }
+                // Si ya se está ejecutando, salimos
+                if (ejecutandoForm.valor) return;
+                // Cambio los valores
+                ejecutandoForm.valor = true;
+                // Cargo el loader
+                $('#PDloader').show();
+                const Options = {
+                    showNoti: 'Orden de sensores guardado correctamente',
+                    closeObject: '#PDloader',
+                    changeValForm: ejecutandoForm,
+                };
+                // Se envian los datos al formulario
+                SendDataForms('POST', '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/order'; ?>', {idMaquina: '<?php echo $DataID['data']; ?>', uids: uids}, Options);
             }
             /*********************************************************************/
             /*                              ALARMAS                              */
@@ -804,11 +923,11 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                             showNoti:'Dato Borrado Correctamente',
                             closeObject:'#PDloader',
                         };
-                        //Se envian los datos al formulario
-                        SendDataForms(Metodo, Direccion, Informacion, Options);
-                    }
-                });
-            }
-        <?php } ?>
+                    //Se envian los datos al formulario
+                    SendDataForms(Metodo, Direccion, Informacion, Options);
+                }
+            });
+        }
+    <?php } ?>
     <?php } ?>
 </script>

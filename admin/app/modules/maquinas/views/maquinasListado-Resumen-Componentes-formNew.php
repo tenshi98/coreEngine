@@ -3,26 +3,26 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
-// Se obtiene el ID
+// Se obtiene el ID de la máquina (para el refresco de la lista)
 $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
 ?>
 
-<form id="FormNewDocumentos" name="FormNewDocumentos" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+<form id="FormNewComponentes" name="FormNewComponentes" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
     <div class="modal-header">
         <?php
         switch ($data['UserData']["sistemaModalSubtitle"]) {
             case 1:
                 echo '
                 <h5 class="modal-title">
-                    <i class="bi bi-file-earmark"></i> Crear Nuevo
+                    <i class="bi bi-puzzle"></i> Crear Nuevo Componente
                 </h5>';
                 break;
             case 2:
                 echo '
                 <h5 class="modal-title modal-subtitle">
-                    <div class="icon"><i class="bi bi-file-earmark"></i></div>
-                    Crear Nuevo<br>
-                    <small>Permite crear un nuevo elemento</small>
+                    <div class="icon"><i class="bi bi-puzzle"></i></div>
+                    Crear Nuevo Componente<br>
+                    <small>Permite crear un nuevo componente (raíz) para la máquina</small>
                 </h5>';
                 break;
         } ?>
@@ -31,13 +31,36 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     <div class="modal-body">
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name' => 'Nombre',        'Id' => 'NewDocumentos_Nombre',         'Value' => '','Required' => 2]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Vencimiento', 'Name' => 'FVencimiento',  'Id' => 'NewDocumentos_FVencimiento',   'Value' => '','Required' => 2,'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',       'Name' => 'Observacion',   'Id' => 'NewDocumentos_Observacion',    'Value' => '','Required' => 1]);
-        $data['Fnc_FormInputs']->formUploadMultiple([        'Placeholder' => 'Subir archivos',    'Name' => 'NombreArchivo', 'Id' => 'NewDocumentos_NombreArchivo',  'MaxFiles' => 1,'TypeFiles' => '"jpg", "png", "gif", "jpeg", "bmp", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "mp3", "wav", "pdf", "txt", "rtf", "mp2", "mpeg", "mpg", "mov", "avi", "gz", "gzip", "7Z", "zip", "rar"']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',              'Name' => 'Nombre',           'Id' => 'NewComponentes_Nombre',           'Value' => '',   'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',              'Name' => 'Codigo',           'Id' => 'NewComponentes_Codigo',           'Value' => '',   'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',               'Name' => 'Marca',            'Id' => 'NewComponentes_Marca',            'Value' => '',   'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Modelo',              'Name' => 'Modelo',           'Id' => 'NewComponentes_Modelo',           'Value' => '',   'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo Saf',          'Name' => 'CodigoSaf',        'Id' => 'NewComponentes_CodigoSaf',        'Value' => '',   'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero',              'Name' => 'Numero',           'Id' => 'NewComponentes_Numero',           'Value' => '',   'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Año de Fabricación',  'Name' => 'AnioFabricacion',  'Id' => 'NewComponentes_AnioFabricacion',  'Value' => '',   'Required' => 1, 'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Serie',               'Name' => 'Serie',            'Id' => 'NewComponentes_Serie',            'Value' => '',   'Required' => 1]);
+        ?>
+        <div class="row mb-3" id="div_NewComponentes_idTareas">
+            <legend class="col-form-label col-sm-4 pt-0">Tareas Asignadas</legend>
+            <div class="col-sm-8 field">
+                <?php foreach (($data['arrTareas'] ?? []) as $tarea) {
+                    $idTarea = (int)($tarea['ID'] ?? 0);
+                    if ($idTarea <= 0) { continue; } ?>
+                    <div class="form-check checkbox-primary">
+                        <input class="form-check-input" type="checkbox" name="idTareas[]" value="<?php echo $idTarea; ?>" id="NewComponentes_idTarea_<?php echo $idTarea; ?>">
+                        <label class="form-check-label" for="NewComponentes_idTarea_<?php echo $idTarea; ?>"><?php echo htmlspecialchars($tarea['Nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?></label>
+                    </div>
+                <?php } ?>
+                <p class="formHelp text-muted">Seleccione una o varias tareas del catálogo (opcional)</p>
+            </div>
+        </div>
+        <?php
+        $data['Fnc_FormInputs']->formCheckbox(['Placeholder' => 'No Utilizable', 'Name' => 'NoUtilizable', 'Id' => 'NewComponentes_NoUtilizable', 'Value' => '', 'Required' => 1, 'Color' => 3, 'DataInfo' => 'Marca el componente como no utilizable']);
+        // Subida de archivos
+        $data['Fnc_FormInputs']->formUploadMultiple(['Placeholder' => 'Subir archivo', 'Name' => 'NombreArchivo', 'MaxFiles' => 1, 'TypeFiles' => '"jpg", "png", "gif", "jpeg", "bmp", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "mp3", "wav", "pdf", "txt", "rtf", "mp2", "mpeg", "mpg", "mov", "avi", "gz", "gzip", "7Z", "zip", "rar"']);
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina','Value' => $data['rowData']['idMaquina'],'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina', 'Value' => $data['rowData']['idMaquina'], 'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -53,7 +76,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
     /************************************/
-    $("#FormNewDocumentos").submit(function(e) {
+    $("#FormNewComponentes").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
         //verifico el resultado
@@ -70,15 +93,15 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             $('#PDloader').show();
             //Ejecuto
             let Metodo      = 'POST';
-            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos'; ?>';
-            let Informacion = appendFiles('#FormNewDocumentos', 'NombreArchivo', 1);
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes'; ?>';
+            let Informacion = appendFiles('#FormNewComponentes', 'NombreArchivo', 1);
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#tabDocumentosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
+                    {Div:'#tabComponentesDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',
                 closeModal:'#viewModal-lg',
-                ClearForm:'FormNewDocumentos',
+                ClearForm:'FormNewComponentes',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

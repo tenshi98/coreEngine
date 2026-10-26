@@ -81,7 +81,7 @@ class maquinasInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -93,16 +93,44 @@ class maquinasInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
+                }
+            }
+        }
+
+        /*******************************************************/
+        /*            SEMBRADO DE LOS CATALOGOS                */
+        /*  Los catalogos no tienen pantalla de administracion, */
+        /*  por lo que el instalador los siembra (INSERT IGNORE */
+        /*  sobre la clave unica de Nombre: repetible).         */
+        /*******************************************************/
+        $arrSeed = $this->seedCatalogs();
+        if($arrSeed){
+            // Recorro los datos
+            foreach ($arrSeed as $seed) {
+                /************************************/
+                // Preparo los datos
+                $xParams     = ['query' => $seed];
+                // Ejecuto la query
+                $ResponseExec = $this->Base_queryExecute($xParams);
+                /************************************/
+                // Si falla la la ejecucion, se muestra alerta
+                if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -120,6 +148,26 @@ class maquinasInstaller extends ControllerInstaller {
             'idLevelLimit'   => '4',                                         // Ver / Editar / Crear / Borrar
             'RutaWeb'        => 'administracion/maquinas/listado',           // Ruta web de la transaccion
             'RutaController' => 'maquinasListado',                           // Controlador de la transaccion
+        ];
+        $arrPermisos[] = [
+            'idPermisosCat'  => '10',                                          // Mantenimiento Sistema
+            'idEstado'       => '1',                                           // Activo
+            'idTipo'         => '1',                                           // Crud Normal
+            'Nombre'         => 'Maquinas - Sensores Grupos',                  // Nombre de la transaccion
+            'Descripcion'    => 'Permite administrar los grupos de sensores',  // Descripcion de la transaccion
+            'idLevelLimit'   => '4',                                           // Ver / Editar / Crear / Borrar
+            'RutaWeb'        => 'mantencionSistema/maquinas/sensores/grupos',     // Ruta web de la transaccion
+            'RutaController' => 'maquinasSensoresGrupos',                      // Controlador de la transaccion
+        ];
+        $arrPermisos[] = [
+            'idPermisosCat'  => '10',                                              // Mantenimiento Sistema
+            'idEstado'       => '1',                                               // Activo
+            'idTipo'         => '1',                                               // Crud Normal
+            'Nombre'         => 'Maquinas - Sensores Subgrupos',                   // Nombre de la transaccion
+            'Descripcion'    => 'Permite administrar los subgrupos de sensores',   // Descripcion de la transaccion
+            'idLevelLimit'   => '4',                                               // Ver / Editar / Crear / Borrar
+            'RutaWeb'        => 'mantencionSistema/maquinas/sensores/subgrupos',      // Ruta web de la transaccion
+            'RutaController' => 'maquinasSensoresSubgrupos',                       // Controlador de la transaccion
         ];
         /************************************/
         // Verifico si existe
@@ -203,11 +251,13 @@ class maquinasInstaller extends ControllerInstaller {
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/documentos/update',               'RutaController' => 'maquinasListadoDocumentos->Update',          'Descripcion' => 'Editar por post (modificar y subir archivos)',    'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/maquinas/listado/documentos',                      'RutaController' => 'maquinasListadoDocumentos->Delete',          'Descripcion' => 'Borrar dato y archivos',                          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/componentes/new/@id',             'RutaController' => 'maquinasListadoComponentes->New',            'Descripcion' => 'Mostrar modal nuevo',                             'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/componentes/newSub/@id',          'RutaController' => 'maquinasListadoComponentes->NewSub',         'Descripcion' => 'Mostrar modal nuevo subcomponente',               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/componentes/updateList/@id',      'RutaController' => 'maquinasListadoComponentes->UpdateList',     'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/componentes/hijos/@id',           'RutaController' => 'maquinasListadoComponentes->Hijos',          'Descripcion' => 'Actualizar Lista de Hijos',                       'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/componentes/view/@id',            'RutaController' => 'maquinasListadoComponentes->View',           'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/componentes/getID/@id',           'RutaController' => 'maquinasListadoComponentes->GetID',          'Descripcion' => 'Información para el formulario edición',          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/componentes',                     'RutaController' => 'maquinasListadoComponentes->Insert',         'Descripcion' => 'Crear Información',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/componentes/update',              'RutaController' => 'maquinasListadoComponentes->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)',    'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/componentes/update',              'RutaController' => 'maquinasListadoComponentes->Update',         'Descripcion' => 'Editar por post (modificar datos y tareas)',    'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/maquinas/listado/componentes',                     'RutaController' => 'maquinasListadoComponentes->Delete',         'Descripcion' => 'Borrar dato y archivos',                          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoComponentes'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/sensores/new/@id',                'RutaController' => 'maquinasListadoSensores->New',               'Descripcion' => 'Mostrar modal nuevo',                             'idLevelLimit' => 2, 'Controller' => 'maquinasListadoSensores'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/sensores/updateList/@id',         'RutaController' => 'maquinasListadoSensores->UpdateList',        'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'maquinasListadoSensores'],
@@ -216,6 +266,7 @@ class maquinasInstaller extends ControllerInstaller {
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/sensores',                        'RutaController' => 'maquinasListadoSensores->Insert',            'Descripcion' => 'Crear Información',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoSensores'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/sensores/update',                 'RutaController' => 'maquinasListadoSensores->Update',            'Descripcion' => 'Editar por post (modificar y subir archivos)',    'idLevelLimit' => 2, 'Controller' => 'maquinasListadoSensores'],
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/maquinas/listado/sensores',                        'RutaController' => 'maquinasListadoSensores->Delete',            'Descripcion' => 'Borrar dato y archivos',                          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoSensores'],
+                ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/sensores/order',                  'RutaController' => 'maquinasListadoSensores->SaveOrder',         'Descripcion' => 'Guardar el orden de los sensores',                'idLevelLimit' => 2, 'Controller' => 'maquinasListadoSensores'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/alarmas/new/@id',                 'RutaController' => 'maquinasListadoAlarmas->New',                'Descripcion' => 'Mostrar modal nuevo',                             'idLevelLimit' => 2, 'Controller' => 'maquinasListadoAlarmas'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/alarmas/updateList/@id',          'RutaController' => 'maquinasListadoAlarmas->UpdateList',         'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'maquinasListadoAlarmas'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/alarmas/view/@id',                'RutaController' => 'maquinasListadoAlarmas->View',               'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoAlarmas'],
@@ -223,6 +274,26 @@ class maquinasInstaller extends ControllerInstaller {
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/alarmas',                         'RutaController' => 'maquinasListadoAlarmas->Insert',             'Descripcion' => 'Crear Información',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoAlarmas'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/alarmas/update',                  'RutaController' => 'maquinasListadoAlarmas->Update',             'Descripcion' => 'Editar por post (modificar y subir archivos)',    'idLevelLimit' => 2, 'Controller' => 'maquinasListadoAlarmas'],
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/maquinas/listado/alarmas',                         'RutaController' => 'maquinasListadoAlarmas->Delete',             'Descripcion' => 'Borrar dato y archivos',                          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoAlarmas'],
+            ],
+            2 => [
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos/listAll',      'RutaController' => 'maquinasSensoresGrupos->listAll',     'Descripcion' => 'Listar Toda la Información',                   'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos/search',       'RutaController' => 'maquinasSensoresGrupos->UpdateList',  'Descripcion' => 'Filtrar datos',                                'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos/updateList',   'RutaController' => 'maquinasSensoresGrupos->UpdateList',  'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos/view/@id',     'RutaController' => 'maquinasSensoresGrupos->View',        'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos/getID/@id',    'RutaController' => 'maquinasSensoresGrupos->GetID',       'Descripcion' => 'Información para el formulario edición',       'idLevelLimit' => 2, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos',              'RutaController' => 'maquinasSensoresGrupos->Insert',      'Descripcion' => 'Crear Información',                            'idLevelLimit' => 3, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos/update',       'RutaController' => 'maquinasSensoresGrupos->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)', 'idLevelLimit' => 2, 'Controller' => 'maquinasSensoresGrupos'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/grupos',              'RutaController' => 'maquinasSensoresGrupos->Delete',      'Descripcion' => 'Borrar dato y archivos',                       'idLevelLimit' => 4, 'Controller' => 'maquinasSensoresGrupos'],
+            ],
+            3 => [
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos/listAll',    'RutaController' => 'maquinasSensoresSubgrupos->listAll',     'Descripcion' => 'Listar Toda la Información',                   'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos/search',     'RutaController' => 'maquinasSensoresSubgrupos->UpdateList',  'Descripcion' => 'Filtrar datos',                                'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos/updateList', 'RutaController' => 'maquinasSensoresSubgrupos->UpdateList',  'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos/view/@id',   'RutaController' => 'maquinasSensoresSubgrupos->View',        'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 1, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos/getID/@id',  'RutaController' => 'maquinasSensoresSubgrupos->GetID',       'Descripcion' => 'Información para el formulario edición',       'idLevelLimit' => 2, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos',            'RutaController' => 'maquinasSensoresSubgrupos->Insert',      'Descripcion' => 'Crear Información',                            'idLevelLimit' => 3, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos/update',     'RutaController' => 'maquinasSensoresSubgrupos->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)', 'idLevelLimit' => 2, 'Controller' => 'maquinasSensoresSubgrupos'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/maquinas/sensores/subgrupos',            'RutaController' => 'maquinasSensoresSubgrupos->Delete',      'Descripcion' => 'Borrar dato y archivos',                       'idLevelLimit' => 4, 'Controller' => 'maquinasSensoresSubgrupos'],
             ],
             default => [],
         };
@@ -235,9 +306,17 @@ class maquinasInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
+        // Incluye los controladores de las rutas (columna Controller): Base_uninstallModule()
+        // borra core_permisos_listado_rutas WHERE Controller IN (esta lista), asi que
+        // omitirlos dejaria sus rutas huerfanas al desinstalar el modulo
         $RutaController  = '"maquinasListado"';
         $RutaController .= ',"maquinasListadoDocumentos"';
         $RutaController .= ',"maquinasListadoObservaciones"';
+        $RutaController .= ',"maquinasListadoComponentes"';
+        $RutaController .= ',"maquinasListadoSensores"';
+        $RutaController .= ',"maquinasListadoAlarmas"';
+        $RutaController .= ',"maquinasSensoresGrupos"';
+        $RutaController .= ',"maquinasSensoresSubgrupos"';
 
         /************************************/
         // Retorno los datos
@@ -258,7 +337,7 @@ class maquinasInstaller extends ControllerInstaller {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'maquinas_listado',
-            'data'       => '`idMaquina` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idMaquina` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Sim_Num_Tel` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Sim_Compania` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`TiempoFueraLinea` time NULL DEFAULT NULL,`idTab` int(10) unsigned NULL DEFAULT NULL,`id_Geo` int(10) unsigned NULL DEFAULT NULL,`id_Sensores` int(10) unsigned NULL DEFAULT NULL,`idBackup` int(10) unsigned NULL DEFAULT NULL,`NregBackup` int(10) unsigned NULL DEFAULT NULL,`idAlertaTemprana` int(10) unsigned NULL DEFAULT NULL,`AlertaTemprCritica` time NULL DEFAULT NULL,`AlertaTemprNormal` time NULL DEFAULT NULL,`Sensores` longtext CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idMaquina',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -270,7 +349,7 @@ class maquinasInstaller extends ControllerInstaller {
         ];
         $arrTables[] = [
             'table'      => 'maquinas_listado_observaciones',
-            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idMaquina` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idMaquina` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL,`idUsuarioEdicion` int(10) unsigned NULL DEFAULT NULL,`FechaEdicion` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -278,6 +357,36 @@ class maquinasInstaller extends ControllerInstaller {
             'table'      => 'maquinas_listado_permisos_usuarios',
             'data'       => '`idPermisoUsuario` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idMaquina` int(10) unsigned NOT NULL,`fechaCreacion` date DEFAULT NULL',
             'primaryKey' => 'idPermisoUsuario',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_listado_componentes',
+            'data'       => '`idComponentes` int(10) unsigned NOT NULL AUTO_INCREMENT,`idMaquina` int(10) unsigned NOT NULL,`idPadre` int(10) unsigned NULL DEFAULT NULL,`Nivel` tinyint(3) unsigned NOT NULL,`NoUtilizable` tinyint(1) NOT NULL DEFAULT 0,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Codigo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Marca` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Modelo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`CodigoSaf` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Numero` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`AnioFabricacion` smallint(5) unsigned NULL DEFAULT NULL,`Serie` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`NombreArchivo` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'primaryKey' => 'idComponentes',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_componentes_tareas',
+            'data'       => '`idTarea` tinyint(3) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Orden` tinyint(3) unsigned NOT NULL DEFAULT 0',
+            'primaryKey' => 'idTarea',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_componentes_tareas_rel',
+            'data'       => '`id` int(10) unsigned NOT NULL AUTO_INCREMENT,`idComponente` int(10) unsigned NOT NULL,`idTarea` tinyint(3) unsigned NOT NULL',
+            'primaryKey' => 'id',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_sensores_grupos',
+            'data'       => '`idGrupo` int(10) unsigned NOT NULL AUTO_INCREMENT,`Nombre` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL',
+            'primaryKey' => 'idGrupo',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'maquinas_sensores_subgrupos',
+            'data'       => '`idSubGrupo` int(10) unsigned NOT NULL AUTO_INCREMENT,`idGrupo` int(10) unsigned NOT NULL,`Nombre` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL',
+            'primaryKey' => 'idSubGrupo',
             'comentario' => 'Creado desde el Instalador',
         ];
 
@@ -292,23 +401,46 @@ class maquinasInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE maquinas_listado ADD INDEX idx_maquina_estado (idEstado),ADD INDEX idx_maquina_tab (idTab),ADD INDEX idx_maquina_geo (id_Geo),ADD INDEX idx_maquina_sensores (id_Sensores);',
-            'optimization' => 'ALTER TABLE maquinas_listado_observaciones ADD INDEX idx_mlo_maquina (idMaquina),ADD INDEX idx_mlo_usuario (idUsuario),ADD INDEX idx_mlo_fecha (FechaCreacion);',
-            'optimization' => 'ALTER TABLE maquinas_listado_documentos ADD INDEX idx_mld_maquina (idMaquina),ADD INDEX idx_mld_vencimiento (FVencimiento);',
-            'optimization' => 'ALTER TABLE maquinas_listado_permisos_usuarios ADD INDEX idx_mld_usuario (idUsuario),ADD INDEX idx_mld_maquina (idMaquina);',
+        $arrOptimizations = [
+            'ALTER TABLE maquinas_listado ADD INDEX IF NOT EXISTS idx_maquina_estado (idEstado),ADD INDEX IF NOT EXISTS idx_maquina_tab (idTab),ADD INDEX IF NOT EXISTS idx_maquina_geo (id_Geo),ADD INDEX IF NOT EXISTS idx_maquina_sensores (id_Sensores),ADD COLUMN IF NOT EXISTS Sensores LONGTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;',
+            'ALTER TABLE maquinas_listado_observaciones ADD INDEX IF NOT EXISTS idx_mlo_maquina (idMaquina),ADD INDEX IF NOT EXISTS idx_mlo_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_mlo_fecha (FechaCreacion);',
+            'ALTER TABLE maquinas_listado_documentos ADD INDEX IF NOT EXISTS idx_mld_maquina (idMaquina),ADD INDEX IF NOT EXISTS idx_mld_vencimiento (FVencimiento);',
+            'ALTER TABLE maquinas_listado_permisos_usuarios ADD INDEX IF NOT EXISTS idx_mld_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_mld_maquina (idMaquina);',
+            'ALTER TABLE maquinas_listado_componentes ADD INDEX IF NOT EXISTS idx_mcomp_maquina (idMaquina),ADD INDEX IF NOT EXISTS idx_mcomp_padre (idPadre);',
+            'ALTER TABLE maquinas_componentes_tareas_rel ADD UNIQUE INDEX IF NOT EXISTS uk_mctrel_componente_tarea (idComponente, idTarea);',
+            'ALTER TABLE maquinas_sensores_subgrupos ADD INDEX IF NOT EXISTS idx_mss_idGrupo (idGrupo);',
         ];
 
         /************************************/
         // Retorno True por defecto
         return $arrOptimizations;
+
+    }
+
+    /*******************************************************************/
+    // Sembrado de los catalogos de componentes
+    /*******************************************************************/
+    public function seedCatalogs(){
+
+        /************************************/
+        // Variables
+        $arrSeed = array();
+
+        /*******************************************************/
+        /*                  SEMILLAS                           */
+        /*******************************************************/
+        $arrSeed[] = 'INSERT IGNORE INTO maquinas_componentes_tareas (idTarea, Nombre, Orden) VALUES '
+                   . '(1, \'Utilizacion Grasa\', 1), '
+                   . '(2, \'Utilizacion Aceite\', 2), '
+                   . '(3, \'Utilizacion Otros Productos\', 3), '
+                   . '(4, \'Inspecciones u Otros\', 4);';
+
+        /************************************/
+        // Retorno los datos
+        return $arrSeed;
 
     }
 
@@ -319,6 +451,11 @@ class maquinasInstaller extends ControllerInstaller {
 
         $Data = '
         core_estados(idEstado,Nombre)
+        maquinas_listado(idMaquina,Nombre)
+        maquinas_listado_componentes(idComponentes,idMaquina,idPadre,Nombre)
+        maquinas_componentes_tareas(idTarea,Nombre)
+        maquinas_sensores_grupos(idGrupo,Nombre)
+        maquinas_sensores_subgrupos(idSubGrupo,idGrupo,Nombre)
         ';
 
         /************************************/

@@ -14,6 +14,7 @@ class maquinasListadoObservaciones extends ControllerBase {
     private $DataDate;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -29,6 +30,7 @@ class maquinasListadoObservaciones extends ControllerBase {
 		$this->ServerServer   = new FunctionsServerServer();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -116,9 +118,13 @@ class maquinasListadoObservaciones extends ControllerBase {
                 maquinas_listado_observaciones.idObservaciones,
                 maquinas_listado_observaciones.Observacion,
                 maquinas_listado_observaciones.FechaCreacion,
-                usuarios_listado.Nombre AS Usuario',
+                maquinas_listado_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
             'table'   => 'maquinas_listado_observaciones',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = maquinas_listado_observaciones.idUsuario',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = maquinas_listado_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = maquinas_listado_observaciones.idUsuarioEdicion',
             'where'   => 'maquinas_listado_observaciones.idMaquina = ?',
             'params'  => [$MaquinaID['data']],
             'group'   => '',
@@ -208,6 +214,7 @@ class maquinasListadoObservaciones extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
@@ -305,6 +312,10 @@ class maquinasListadoObservaciones extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idUsuario,idMaquina,Observacion,FechaCreacion',
@@ -320,10 +331,14 @@ class maquinasListadoObservaciones extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -344,18 +359,23 @@ class maquinasListadoObservaciones extends ControllerBase {
         }
 
         /************************************/
-        // Usuario creador
-        $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+        // Usuario y fecha de la edicion (se conservan el autor y la fecha de creacion)
+        $_POST['idUsuarioEdicion'] = $f3->get('SESSION.DataInfo.UserID');
+        $_POST['FechaEdicion']     = date('Y-m-d H:i:s');
 
         /************************************/
         // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idObservaciones,idUsuario,idMaquina,Observacion,FechaCreacion',
-            'required'  => 'idObservaciones,idUsuario,idMaquina,Observacion,FechaCreacion',
+            'data'      => 'idObservaciones,Observacion,idUsuarioEdicion,FechaEdicion',
+            'required'  => 'idObservaciones,Observacion,idUsuarioEdicion,FechaEdicion',
             'unique'    => '',
             'encode'    => '',
             'table'     => 'maquinas_listado_observaciones',
@@ -368,10 +388,14 @@ class maquinasListadoObservaciones extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -395,6 +419,10 @@ class maquinasListadoObservaciones extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -409,10 +437,14 @@ class maquinasListadoObservaciones extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -429,34 +461,33 @@ class maquinasListadoObservaciones extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idMaquina',
-            'ValidarEntero'             => 'idMaquina',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'FechaCreacion',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Observacion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
-            'ValidarPalabrasCensuradas' => 'Observacion',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idMaquina',
+            'ValidarEntero'              => 'idMaquina',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'FechaCreacion',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Observacion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
+            'ValidarPalabrasCensuradas'  => 'Observacion',
+            'ValidarEspaciosVacios'      => '',
+            'ValidarMayusculas'          => '',
+            'ValidarCoincidencias'       => '',
+            'ValidarDominioEmail'        => '',
+            'ValidarPasswordSegura'      => '',
+            'ValidarFechaRango'          => '',
+            'ValidarEdadMinima'          => '',
+            'ValidarJSON'                => '',
+            'ValidarUUID'                => '',
+            'ValidarIP'                  => '',
+            'ValidarSoloAlfanumerico'    => '',
+            'ValidarSoloLetras'          => '',
+            'Post'                       => $POST,
         ];
         // Retorno los datos
         return $DataChecking;

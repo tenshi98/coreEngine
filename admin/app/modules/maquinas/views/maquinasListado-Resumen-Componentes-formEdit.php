@@ -3,11 +3,24 @@
 /** @var array $data */   // Variable global para datos de F3
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
-// Se obtiene el ID
+// Se obtiene el ID (máquina) para el refresco de la lista de raíces
 $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
+
+// Refresco del nivel afectado: si el nodo es hijo, se recarga el contenedor
+// de hijos del padre (donde vive su fila); si es raíz, la lista de raíces
+$idPadre = $data['rowData']['idPadre'] ?? '';
+if (!empty($idPadre)) {
+    $PadreID    = $data['Fnc_Codification']->encryptDecrypt('encrypt', $idPadre);
+    $UpdateDiv  = "[{Div:'#tabCompHijos{$idPadre}', fromData:'{$BASE}/{$data['UserAccess']['RouteAccess']}/componentes/hijos/{$PadreID['data']}'}]";
+} else {
+    $UpdateDiv  = "[{Div:'#tabComponentesDataTable', fromData:'{$BASE}/{$data['UserAccess']['RouteAccess']}/componentes/updateList/{$DataID['data']}', refreshTbl:'true'}]";
+}
+
+// Tareas ya asignadas al componente (para premarcar los checkboxes)
+$selTareas = array_fill_keys(array_map('intval', ($data['arrTareasSel'] ?? [])), true);
 ?>
 
-<form id="FormEditDocumentos" name="FormEditDocumentos" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+<form id="FormEditComponentes" name="FormEditComponentes" autocomplete="off" method="POST" action="" role="form" novalidate aria-label="Formulario de ejecucion">
     <div class="modal-header">
         <?php
         switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -22,7 +35,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 <h5 class="modal-title modal-subtitle">
                     <div class="icon"><i class="bi bi-pencil-square"></i></div>
                     Editar Información<br>
-                    <small>Permite editar un elemento existente</small>
+                    <small>Permite editar un componente existente</small>
                 </h5>';
                 break;
         } ?>
@@ -31,12 +44,35 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     <div class="modal-body">
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name' => 'Nombre',        'Id' => 'EditDocumentos_Nombre',         'Value' => ($data['rowData']['Nombre'] ?? ''),       'Required' => 2]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Vencimiento', 'Name' => 'FVencimiento',  'Id' => 'EditDocumentos_FVencimiento',   'Value' => ($data['rowData']['FVencimiento'] ?? ''), 'Required' => 2,'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',       'Name' => 'Observacion',   'Id' => 'EditDocumentos_Observacion',    'Value' => ($data['rowData']['Observacion'] ?? ''),  'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',              'Name' => 'Nombre',           'Id' => 'EditComponentes_Nombre',           'Value' => ($data['rowData']['Nombre'] ?? ''),          'Required' => 2]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo',              'Name' => 'Codigo',           'Id' => 'EditComponentes_Codigo',           'Value' => ($data['rowData']['Codigo'] ?? ''),          'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Marca',               'Name' => 'Marca',            'Id' => 'EditComponentes_Marca',            'Value' => ($data['rowData']['Marca'] ?? ''),           'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Modelo',              'Name' => 'Modelo',           'Id' => 'EditComponentes_Modelo',           'Value' => ($data['rowData']['Modelo'] ?? ''),          'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Codigo Saf',          'Name' => 'CodigoSaf',        'Id' => 'EditComponentes_CodigoSaf',        'Value' => ($data['rowData']['CodigoSaf'] ?? ''),       'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Numero',              'Name' => 'Numero',           'Id' => 'EditComponentes_Numero',           'Value' => ($data['rowData']['Numero'] ?? ''),          'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Año de Fabricación',  'Name' => 'AnioFabricacion',  'Id' => 'EditComponentes_AnioFabricacion',  'Value' => ($data['rowData']['AnioFabricacion'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-calendar3']);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Serie',               'Name' => 'Serie',            'Id' => 'EditComponentes_Serie',            'Value' => ($data['rowData']['Serie'] ?? ''),           'Required' => 1]);
+        ?>
+        <div class="row mb-3" id="div_EditComponentes_idTareas">
+            <legend class="col-form-label col-sm-4 pt-0">Tareas Asignadas</legend>
+            <div class="col-sm-8 field">
+                <?php foreach (($data['arrTareas'] ?? []) as $tarea) {
+                    $idTarea = (int)($tarea['ID'] ?? 0);
+                    if ($idTarea <= 0) { continue; } ?>
+                    <div class="form-check checkbox-primary">
+                        <input class="form-check-input" type="checkbox" name="idTareas[]" value="<?php echo $idTarea; ?>" <?php echo isset($selTareas[$idTarea]) ? 'checked' : ''; ?> id="EditComponentes_idTarea_<?php echo $idTarea; ?>">
+                        <label class="form-check-label" for="EditComponentes_idTarea_<?php echo $idTarea; ?>"><?php echo htmlspecialchars($tarea['Nombre'] ?? '', ENT_QUOTES, 'UTF-8'); ?></label>
+                    </div>
+                <?php } ?>
+                <p class="formHelp text-muted">Seleccione una o varias tareas del catálogo (opcional)</p>
+            </div>
+        </div>
+        <?php
+        $data['Fnc_FormInputs']->formCheckbox(['Placeholder' => 'No Utilizable', 'Name' => 'NoUtilizable', 'Id' => 'EditComponentes_NoUtilizable', 'Value' => ((($data['rowData']['NoUtilizable'] ?? 0) == 1) ? 2 : ''), 'Required' => 1, 'Color' => 3, 'DataInfo' => 'Marca el componente como no utilizable']);
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idDocumentos','Value' => $data['rowData']['idDocumentos'],'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idComponentes', 'Value' => $data['rowData']['idComponentes'], 'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina',     'Value' => $data['rowData']['idMaquina'],     'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -52,7 +88,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
     /************************************/
-    $("#FormEditDocumentos").submit(function(e) {
+    $("#FormEditComponentes").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
         //verifico el resultado
@@ -69,12 +105,10 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             $('#PDloader').show();
             //Ejecuto
             let Metodo      = 'POST';
-            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/update'; ?>';
-            let Informacion = $("#FormEditDocumentos").serialize();
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/componentes/update'; ?>';
+            let Informacion = $("#FormEditComponentes").serialize();
             const Options     = {
-                UpdateDiv : [
-                    {Div:'#tabDocumentosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
-                ],
+                UpdateDiv : <?php echo $UpdateDiv; ?>,
                 showNoti:'Datos Editados Correctamente',
                 closeModal:'#viewModal-lg',
                 closeObject:'#PDloader',

@@ -4,10 +4,10 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 // Se obtiene el ID
-$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
+$DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['idMaquina']);
 ?>
 
-<form id="FormEditDocumentos" name="FormEditDocumentos" autocomplete="off" method="POST" action="" role="form" novalidate enctype="multipart/form-data" aria-label="Formulario de ejecucion">
+<form id="FormEditSensores" name="FormEditSensores" autocomplete="off" method="POST" action="" role="form" novalidate aria-label="Formulario de ejecucion">
     <div class="modal-header">
         <?php
         switch ($data['UserData']["sistemaModalSubtitle"]) {
@@ -31,12 +31,15 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     <div class="modal-body">
         <?php
         //se dibujan los inputs
-        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',            'Name' => 'Nombre',        'Id' => 'EditDocumentos_Nombre',         'Value' => ($data['rowData']['Nombre'] ?? ''),       'Required' => 2]);
-        $data['Fnc_FormInputs']->formInput(['FormType' => 8,  'Placeholder' => 'Fecha Vencimiento', 'Name' => 'FVencimiento',  'Id' => 'EditDocumentos_FVencimiento',   'Value' => ($data['rowData']['FVencimiento'] ?? ''), 'Required' => 2,'Icon' => 'bi bi-calendar3']);
-        $data['Fnc_FormInputs']->formTextarea([               'Placeholder' => 'Observacion',       'Name' => 'Observacion',   'Id' => 'EditDocumentos_Observacion',    'Value' => ($data['rowData']['Observacion'] ?? ''),  'Required' => 1]);
+        $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',           'Name' => 'Nombre',     'Id' => 'EditSensores_Nombre',     'Value' => ($data['rowData']['Nombre'] ?? ''),    'Required' => 2]);
+        $data['Fnc_FormInputs']->formSelectDepend([           'Placeholder1' => 'Grupo',           'Name1' => 'idGrupo',   'Id1' => 'EditSensores_idGrupo',   'Value1' => ($data['rowData']['idGrupo'] ?? ''),   'Required1' => 2, 'arrData1' => $data['arrGrupos'],
+                                                              'Placeholder2' => 'Subgrupo',        'Name2' => 'idSubGrupo','Id2' => 'EditSensores_idSubGrupo','Value2' => ($data['rowData']['idSubGrupo'] ?? ''),'Required2' => 2, 'arrData2' => $data['arrSubgrupos']]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Unidad de Medida', 'Name' => 'idUniMed',   'Id' => 'EditSensores_idUniMed',   'Value' => ($data['rowData']['idUniMed'] ?? ''),   'Required' => 2, 'arrData' => $data['arrUnimed']]);
+        $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Estado Sensor',    'Name' => 'idEstado',   'Id' => 'EditSensores_idEstado',   'Value' => ($data['rowData']['idEstado'] ?? ''),   'Required' => 2, 'arrData' => $data['arrEstado']]);
 
         //datos ocultos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idDocumentos','Value' => $data['rowData']['idDocumentos'],'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idMaquina','Value' => ($data['idMaquina'] ?? ''),'Required' => 2]);
+        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'uid',      'Value' => ($data['rowData']['uid'] ?? ''),'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -52,7 +55,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     /*                      EJECUCION DE LA LOGICA                       */
     /*********************************************************************/
     /************************************/
-    $("#FormEditDocumentos").submit(function(e) {
+    $("#FormEditSensores").submit(function(e) {
         //Se validan los datos de los formularios
         var validatorResult = validator.checkAll(this);
         //verifico el resultado
@@ -69,11 +72,11 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             $('#PDloader').show();
             //Ejecuto
             let Metodo      = 'POST';
-            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/update'; ?>';
-            let Informacion = $("#FormEditDocumentos").serialize();
+            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/update'; ?>';
+            let Informacion = $("#FormEditSensores").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#tabDocumentosDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/documentos/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
+                    {Div:'#tabSensoresDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/sensores/updateList/'.$DataID['data']; ?>', callFNC:'initSensoresSortable'}
                 ],
                 showNoti:'Datos Editados Correctamente',
                 closeModal:'#viewModal-lg',
