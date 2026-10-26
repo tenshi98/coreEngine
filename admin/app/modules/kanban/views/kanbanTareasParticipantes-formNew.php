@@ -35,9 +35,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         <?php
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idKanban',   'Value' => $data['rowData']['idKanban'],  'Required' => 2]);
-        //Datos antiguos
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual', 'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',  'Value' => $data['Fnc_ServerServer']->horaActual(),   'Required' => 2]);
+        // El usuario y la fecha/hora del historial los pone el servidor
         ?>
 
         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -107,7 +105,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             let Informacion = $("#FormNewParticipante").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#modalContent', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'},
+                    {Div:'#modalContent-xl', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'},
                     {Div:'#listTableData', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Dato Creado Correctamente',

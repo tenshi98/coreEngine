@@ -26,13 +26,17 @@
 </div>
 <div class="modal-body">
     <?php
+    $Theme_color = 'summary-theme-color-2';
     $arrData = [
-        ['Icon' => '','Titulo' => 'Nombre Tablero',                'Texto' => $data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'Color Icono',                   'Texto' => $data['rowData']['idPrioridad']],
-        ['Icon' => '','Titulo' => 'Prioridad',                     'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['Color'].'">'.$data['rowData']['Color'].'</span>'],
-        ['Icon' => '','Titulo' => '¿Permite Cierre de la Tarea?',  'Texto' => $data['rowData']['Cierre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-kanban',    'Icon_color' => 10,'Title' => 'Nombre Tablero',                'Text' => $data['rowData']['Nombre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-flag',      'Icon_color' => 10,'Title' => 'Prioridad',                     'Text' => $data['rowData']['idPrioridad']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-palette',   'Icon_color' => 10,'Title' => 'Color Icono',                   'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['Color'].'">'.$data['rowData']['Color'].'</span>'],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => '¿Permite Cierre de la Tarea?',  'Text' => $data['rowData']['Cierre']],
     ];
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData, $OptionsTable);
+    echo '</div>';
     ?>
 </div>
 <?php

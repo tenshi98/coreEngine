@@ -77,29 +77,42 @@ class informeTareas extends ControllerBase {
         // Ejecuto la query
         $arrEstadoCierre = $this->Base_GetList($xParams);
 
-        /************************************/
-        // Datos enviados a la pagina
-        $f3->data = [
-            /*=========== Datos de la Pagina ===========*/
-            'PageTitle'       => 'Informes',
-            'PageDescription' => 'Testeos de Informes.',
-            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
-            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-            'TableTitle'      => 'Informes',
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $this->getUserData($f3),
-            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_FormInputs'   => $this->FormInputs,
-            'Fnc_Codification' => $this->Codification,
-            /*=========== Datos Consultados ===========*/
-            'arrPrioridad'     => $arrPrioridad['data'],
-            'arrEstadoCierre'  => $arrEstadoCierre['data'],
-        ];
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if($arrPrioridad['status'] && $arrEstadoCierre['status']){
+            /************************************/
+            // Datos enviados a la pagina
+            $f3->data = [
+                /*=========== Datos de la Pagina ===========*/
+                'PageTitle'       => 'Informes',
+                'PageDescription' => 'Testeos de Informes.',
+                'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+                'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+                'TableTitle'      => 'Informes',
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_FormInputs'   => $this->FormInputs,
+                'Fnc_Codification' => $this->Codification,
+                /*=========== Datos Consultados ===========*/
+                'arrPrioridad'     => $arrPrioridad['data'],
+                'arrEstadoCierre'  => $arrEstadoCierre['data'],
+            ];
 
+            /************************************/
+            // Se instancia la vista
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
         /************************************/
-        // Se instancia la vista
-        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
+        // Si no hay resultados
+        } else {
+            // Busco errores de la consulta
+            $result = $this->mergeResponses([$arrPrioridad,$arrEstadoCierre]);
+            // Despliegue de errores
+            $this->showError(1, $f3, $result);
+        }
     }
 
     /*******************************************************************/
@@ -306,7 +319,7 @@ class informeTareas extends ControllerBase {
             'params'  => [$KanbanID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'usuarios_listado.Nombre ASC',
+            'order'   => 'kanban_tareas_historial.Fecha ASC, kanban_tareas_historial.Hora ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         // Preparo los datos

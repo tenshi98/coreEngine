@@ -153,8 +153,8 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                                     <table class="table table-bordered">
                                         <tbody>
                                             <?php foreach ($data['arrParticipantes'] as $task){
-                                                // Se obtiene el ID
-                                                $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idParticipantes']);
+                                                // Se obtiene el ID del participante (sin pisar $DataID, que es el ID de la tarea)
+                                                $DataParticipanteID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idParticipantes']);
                                                 //verifico si existe imagen
                                                 $UserIMG  = !empty($task['UsuarioImg'])
                                                             ? $data['UserData']['MainPathUrl'].$task['UsuarioImg']
@@ -165,7 +165,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                                                     <?php if($data['rowData']['idEstadoCierre']==1){ ?>
                                                         <td style="width: 120px;">
                                                             <?php if($data['UserAccess']['LevelAccess']>=2){ ?>
-                                                                <button class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información" type="button" onclick="participantes_Del('<?php echo $DataID['data']; ?>', '<?php echo $DataID['data']; ?>')"><i class="bi bi-trash"></i> Borrar</button>
+                                                                <button class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información" type="button" onclick="participantes_Del('<?php echo $DataParticipanteID['data']; ?>', '<?php echo $DataID['data']; ?>')"><i class="bi bi-trash"></i> Borrar</button>
                                                             <?php } ?>
                                                         </td>
                                                     <?php } ?>

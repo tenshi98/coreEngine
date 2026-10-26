@@ -244,61 +244,79 @@ class kanbanTareasTareas extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
-        // Usuario creador
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Usuario creador (sesion): no se acepta del formulario
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
         /************************************/
         // Variables
-        $ndata_1 = isset($_POST['Tarea']) ? count($_POST['Tarea']) : 0;
+        $ndata_1 = (isset($_POST['Tarea']) && is_array($_POST['Tarea'])) ? count($_POST['Tarea']) : 0;
+
+        /************************************/
         // Generacion de errores
         if ($ndata_1==0) {
-            Response::error('No hay Tareas nuevas creadas', 500);
+            Response::error('No hay Tareas nuevas creadas', 400);
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataTarea = 'Nueva Tarea Asignada:';
+        // La tarea debe existir y seguir abierta
+        $this->validarTareaAbierta($_POST['idKanban'] ?? '');
+
         /************************************/
-        // Recorro las tareas ingresadas
+        // Se inicia la transacción (subtareas + historial)
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera el texto del historial y se acumulan las filas a insertar (una sola sentencia)
+        $DataTarea  = 'Nueva Tarea Asignada:';
+        $rowsTareas = [];
         for($j1 = 0; $j1 < $ndata_1; $j1++){
             /************************************/
             //Guardo la tarea
             $DataTarea .= '<br/> - '.$_POST['Tarea'][$j1];
             /************************************/
             // Se agrega respuesta
-            $arrTareas = [
+            $rowsTareas[] = [
                 'idKanban'         => $_POST['idKanban'],               //idKanban
                 'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
                 'idEstadoTrabajo'  => 1,                                //Estado abierto
                 'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
             ];
-            /************************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idKanban,Tarea,idEstadoTrabajo,idTrabajo',
-                'required'  => 'idKanban,Tarea,idEstadoTrabajo',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'kanban_tareas_tareas',
-                'Post'      => $arrTareas
-            ];
-            /************************************/
-            // Se genera el chequeo
-            $dataCheck_1 = $this->dataCheck_1($arrTareas);
-            // Preparo los datos
-            $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
-            // Ejecuto la query
-            $this->Base_insert($xParams);
+        }
+        /************************************/
+        // Se genera el chequeo (se valida cada fila)
+        $dataCheck_1 = $this->dataCheck_1('');
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idKanban,Tarea,idEstadoTrabajo,idTrabajo',
+            'required'  => 'idKanban,Tarea,idEstadoTrabajo',
+            'table'     => 'kanban_tareas_tareas',
+            'rows'      => $rowsTareas
+        ];
+        // Preparo los datos
+        $xParams    = ['DataCheck' => $dataCheck_1, 'query' => $query];
+        // Ejecuto la query
+        $respTareas = $this->Base_insertMultiple($xParams);
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($respTareas['status'] === false) {
+            $this->failOperation($respTareas);
         }
 
         /************************************/
-        //Se agrega historial
+        //Se agrega historial (fecha y hora del servidor)
         $arrTareas = [
-            'idKanban'    => $_POST['idKanban'],      //idKanban
-            'idUsuario'   => $_POST['idUsuario'],     //Usuario creador
-            'Descripcion' => $DataTarea,              //Descripcion
-            'Fecha'       => $_POST['Fecha_Actual'],  //Fecha actual
-            'Hora'        => $_POST['Hora_Actual'],   //Hora actual
+            'idKanban'    => $_POST['idKanban'],                //idKanban
+            'idUsuario'   => $_POST['idUsuario'],               //Usuario creador
+            'Descripcion' => $DataTarea,                        //Descripcion
+            'Fecha'       => $this->ServerServer->fechaActual(),//Fecha actual (servidor)
+            'Hora'        => $this->ServerServer->horaActual(), //Hora actual (servidor)
         ];
         /************************************/
         // Se genera la query
@@ -315,7 +333,16 @@ class kanbanTareasTareas extends ControllerBase {
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
         // Preparo los datos
         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
-        $this->Base_insert($xParams);
+        $xInsert = $this->Base_insert($xParams);
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($xInsert['status'] === false) {
+            $this->failOperation($xInsert);
+        }
+
+        /************************************/
+        // Se confirma la transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         //devuelvo el ultimo id
@@ -336,8 +363,12 @@ class kanbanTareasTareas extends ControllerBase {
         }
 
         /************************************/
-        // Usuario creador
+        // Usuario creador (sesion): no se acepta del formulario
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+        /************************************/
+        // La subtarea debe pertenecer a la tarea enviada y esta debe seguir abierta
+        $this->validarSubtareaDeTareaAbierta($_POST['idTareas'] ?? '', $_POST['idKanban'] ?? '');
 
         /************************************/
         // Se genera la query
@@ -361,7 +392,7 @@ class kanbanTareasTareas extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -405,8 +436,9 @@ class kanbanTareasTareas extends ControllerBase {
         $arrEstadoNew    = [];
         $arrTrabajosNew    = [];
         //Se guardan los datos
-        foreach ($arrEstadoTrabajo['data'] as $task){    $arrEstadoNew[$task['ID']]   = $task['Nombre'];}
-        foreach ($arrTrabajos['data'] as $task){         $arrTrabajosNew[$task['ID']] = $task['Nombre'];}
+        // (solo si las consultas de catalogo respondieron)
+        foreach (($arrEstadoTrabajo['status'] ? $arrEstadoTrabajo['data'] : []) as $task){    $arrEstadoNew[$task['ID']]   = $task['Nombre'];}
+        foreach (($arrTrabajos['status'] ? $arrTrabajos['data'] : []) as $task){              $arrTrabajosNew[$task['ID']] = $task['Nombre'];}
 
         /************************************/
         //Se hacen comparaciones
@@ -436,8 +468,8 @@ class kanbanTareasTareas extends ControllerBase {
                 'idKanban'    => $_POST['idKanban'],                           //idKanban
                 'idUsuario'   => $_POST['idUsuario'],                          //Usuario creador
                 'Descripcion' => 'Se cambian datos de la tarea:'.$comparacion, //Descripcion
-                'Fecha'       => $_POST['Fecha_Actual'],                       //Fecha actual
-                'Hora'        => $_POST['Hora_Actual'],                        //Hora actual
+                'Fecha'       => $this->ServerServer->fechaActual(),           //Fecha actual (servidor)
+                'Hora'        => $this->ServerServer->horaActual(),            //Hora actual (servidor)
             ];
             /************************************/
             // Se genera la query
@@ -467,25 +499,99 @@ class kanbanTareasTareas extends ControllerBase {
     /*                             Métodos privados                               */
     /******************************************************************************/
     /*******************************************************************/
+    // Se valida que la tarea exista y siga abierta (responde 400 si no)
+    /*******************************************************************/
+    private function validarTareaAbierta($idKanban){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idKanban,idEstadoCierre',
+            'table'   => 'kanban_tareas',
+            'join'    => '',
+            'where'   => 'idKanban = ?',
+            'params'  => [is_scalar($idKanban) ? $idKanban : ''],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        $rowData = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, la tarea no existe o esta cerrada
+        if ($rowData['status'] === false) {
+            $this->failOperation($rowData);
+        }
+        if (empty($rowData['data'])) {
+            Response::error('Registro inválido', 400);
+        }
+        if ((int)$rowData['data']['idEstadoCierre'] !== 1) {
+            Response::error('La tarea está cerrada', 400);
+        }
+
+    }
+
+    /*******************************************************************/
+    // Se valida que la subtarea pertenezca a la tarea enviada y que
+    // esta siga abierta (responde 400 si no)
+    /*******************************************************************/
+    private function validarSubtareaDeTareaAbierta($idTareas, $idKanban){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'kanban_tareas_tareas.idTareas, kanban_tareas.idEstadoCierre',
+            'table'   => 'kanban_tareas_tareas',
+            'join'    => 'INNER JOIN kanban_tareas ON kanban_tareas.idKanban = kanban_tareas_tareas.idKanban',
+            'where'   => 'kanban_tareas_tareas.idTareas = ? AND kanban_tareas_tareas.idKanban = ?',
+            'params'  => [is_scalar($idTareas) ? $idTareas : '', is_scalar($idKanban) ? $idKanban : ''],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        $rowData = $this->Base_GetByID($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, la subtarea no es de esa tarea o la tarea esta cerrada
+        if ($rowData['status'] === false) {
+            $this->failOperation($rowData);
+        }
+        if (empty($rowData['data'])) {
+            Response::error('Registro inválido', 400);
+        }
+        if ((int)$rowData['data']['idEstadoCierre'] !== 1) {
+            Response::error('La tarea está cerrada', 400);
+        }
+
+    }
+
+    /*******************************************************************/
     // Se validan los datos
     /*******************************************************************/
     private function dataCheck_1($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idKanban,idEstadoTrabajo,idTrabajo',
-            'ValidarEntero'             => 'idKanban,idEstadoTrabajo,idTrabajo',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Tarea',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Tarea',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idKanban,idEstadoTrabajo,idTrabajo',
+            'ValidarEntero'              => 'idKanban,idEstadoTrabajo,idTrabajo',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Tarea',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Tarea' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Tarea',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',
@@ -511,20 +617,19 @@ class kanbanTareasTareas extends ControllerBase {
     private function dataCheck_2($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idKanban,idUsuario',
-            'ValidarEntero'             => 'idKanban,idUsuario',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'Fecha',
-            'ValidarHora'               => 'Hora',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Descripcion',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => '',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idKanban,idUsuario',
+            'ValidarEntero'              => 'idKanban,idUsuario',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'Fecha',
+            'ValidarHora'                => 'Hora',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Descripcion',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [],
             'ValidarPalabrasCensuradas' => 'Descripcion',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

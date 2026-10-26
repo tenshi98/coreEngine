@@ -44,8 +44,6 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         //Datos antiguos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Tarea',           'Value' => ($data['rowData']['Tarea'] ?? ''),            'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idEstadoTrabajo', 'Value' => ($data['rowData']['idEstadoTrabajo'] ?? ''),  'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual',        'Value' => $data['Fnc_ServerServer']->fechaActual(),     'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',         'Value' => $data['Fnc_ServerServer']->horaActual(),      'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -82,7 +80,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             let Informacion = $("#FormEditTareas").serialize();
             const Options     = {
                 UpdateDiv : [
-                    {Div:'#modalContent', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'}
+                    {Div:'#modalContent-xl', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'}
                 ],
                 showNoti:'Datos Editados Correctamente',
                 closeObject:'#PDloader',

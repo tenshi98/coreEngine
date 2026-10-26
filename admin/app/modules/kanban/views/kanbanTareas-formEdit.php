@@ -48,8 +48,6 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Fecha',        'Value' => ($data['rowData']['Fecha'] ?? ''),        'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Titulo',       'Value' => ($data['rowData']['Titulo'] ?? ''),       'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_Descripcion',  'Value' => ($data['rowData']['Descripcion'] ?? ''),  'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Fecha_Actual',     'Value' => $data['Fnc_ServerServer']->fechaActual(), 'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Hora_Actual',      'Value' => $data['Fnc_ServerServer']->horaActual(),  'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">
@@ -87,7 +85,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             const Options     = {
                 UpdateDiv : [
                     {Div:'#listTableData', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>', refreshTbl:'true', callFNC:'call_1'},
-                    {Div:'#modalContent', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'}
+                    {Div:'#modalContent-xl', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/view/'.$DataID['data']; ?>', refreshTbl:'false'}
                 ],
                 showNoti:'Datos Editados Correctamente',
                 closeObject:'#PDloader',

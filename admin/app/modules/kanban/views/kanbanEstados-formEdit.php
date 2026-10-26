@@ -75,7 +75,7 @@
                     {Div:'#listTableData', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>', refreshTbl:'true'}
                 ],
                 showNoti:'Datos Editados Correctamente',
-                closeModal:'#viewModal-lg',
+                closeModal:'#viewModal-xl',
                 closeObject:'#PDloader',
                 changeValForm: ejecutandoForm,
             };

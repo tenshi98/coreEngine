@@ -12,6 +12,7 @@ class kanbanTrabajos extends ControllerBase {
     private $Codification;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -25,6 +26,7 @@ class kanbanTrabajos extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -87,11 +89,11 @@ class kanbanTrabajos extends ControllerBase {
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
-                'PageTitle'       => 'Tareas Kanban',
-                'PageDescription' => 'Tareas Kanban.',
+                'PageTitle'       => 'Trabajos Kanban',
+                'PageDescription' => 'Trabajos Kanban.',
                 'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
                 'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-                'TableTitle'      => 'Listado Tareas Kanban',
+                'TableTitle'      => 'Listado Trabajos Kanban',
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
@@ -175,7 +177,7 @@ class kanbanTrabajos extends ControllerBase {
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
-                'TableTitle'    => 'Listado Tareas Kanban',
+                'TableTitle'    => 'Listado Trabajos Kanban',
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
@@ -224,7 +226,7 @@ class kanbanTrabajos extends ControllerBase {
             'params'  => [$TrabajoID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'kanban_trabajos.Nombre ASC'
+            'order'   => ''
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -244,6 +246,7 @@ class kanbanTrabajos extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon'   => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
             ];
@@ -348,8 +351,18 @@ class kanbanTrabajos extends ControllerBase {
     public function Insert(){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -367,10 +380,14 @@ class kanbanTrabajos extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -395,6 +412,10 @@ class kanbanTrabajos extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idTrabajo,Nombre,idEstado',
@@ -411,10 +432,14 @@ class kanbanTrabajos extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -438,6 +463,42 @@ class kanbanTrabajos extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se obtiene el ID
+        $TrabajoID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idTrabajo'] ?? '');
+        if (!$this->isValidDecrypted($TrabajoID, 'id')) {
+            Response::error('Registro inválido', 400);
+        }
+
+        /************************************/
+        // No se puede borrar un trabajo asignado a subtareas (se debe desactivar cambiando su estado)
+        $query = [
+            'data'    => 'idTareas',
+            'table'   => 'kanban_tareas_tareas',
+            'join'    => '',
+            'where'   => 'idTrabajo = ?',
+            'params'  => [$TrabajoID['data']],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        $nUso    = $this->Base_GetCountData($xParams);
+        // Si falla la ejecucion, se muestra alerta
+        if ($nUso['status'] === false) {
+            $this->failOperation($nUso);
+        }
+        // Si esta en uso, no se borra
+        if ((int)$nUso['data'] > 0) {
+            Response::error('El trabajo está asignado a subtareas y no se puede borrar. Desactívelo cambiando su estado.', 400);
+        }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -452,10 +513,14 @@ class kanbanTrabajos extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -472,20 +537,21 @@ class kanbanTrabajos extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => '',
-            'ValidarNumero'             => 'idEstado',
-            'ValidarEntero'             => 'idEstado',
-            'ValidarRut'                => '',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Nombre',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Nombre',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idEstado',
+            'ValidarEntero'              => 'idEstado',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Nombre' => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre',
             'ValidarEspaciosVacios'     => '',
             'ValidarMayusculas'         => '',

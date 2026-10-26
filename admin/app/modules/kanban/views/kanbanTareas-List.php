@@ -244,10 +244,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
                 let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'Participantes'; ?>';
                 let Informacion = {
                     "idParticipantes": ID,
-                    "idKanbanDel": ID2,
-                    "idUsuarioDel": <?php echo $data['UserData']['UserID']; ?>,
-                    "Fecha_Actual": '<?php echo $data['Fnc_ServerServer']->fechaActual(); ?>',
-                    "Hora_Actual": '<?php echo $data['Fnc_ServerServer']->horaActual(); ?>'
+                    "idKanbanDel": ID2
                 };
                 const Options     = {
                     UpdateDiv : [
@@ -291,10 +288,7 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/changeStatus'; ?>';
         let Informacion = {
             "idKanban": Objeto,
-            "idKanbanEstado": Destino,
-            "idUsuario": <?php echo $data['UserData']['UserID']; ?>,
-            "Fecha_Actual": '<?php echo $data['Fnc_ServerServer']->fechaActual(); ?>',
-            "Hora_Actual": '<?php echo $data['Fnc_ServerServer']->horaActual(); ?>'
+            "idKanbanEstado": Destino
         };
         const Options     = {
             showNoti:'Dato Modificado Correctamente',
@@ -313,7 +307,6 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         setTimeout(() => {
             this.style.display = "none";
         }, 0);
-        console.log("dragStart");
         objeto = this.id;
     }
     /**********************/
@@ -322,7 +315,6 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
         setTimeout(() => {
             this.style.display = "block";
         }, 0);
-        console.log("dragEnd");
         //se actualiza
         changeStatus(objeto, destino);
     }
@@ -333,19 +325,16 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
     /**********************/
     function dragEnter() {
         this.style.border = "1px dashed #ccc";
-        console.log("dragEnter");
         destino = this.id;
     }
     /**********************/
     function dragLeave() {
         this.style.border = "1px solid #ebeef4";
-        console.log("dragLeave");
     }
     /**********************/
     function dragDrop() {
         this.style.border = "1px solid #ebeef4";
         this.appendChild(draggableTodo);
-        console.log("dropped");
     }
     /**********************/
     function call_1() {
@@ -354,7 +343,6 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
             todo.addEventListener("dragstart", dragStart);
             todo.addEventListener("dragend", dragEnd);
         });
-        console.log("call_1");
         call_2();
     }
     /**********************/
@@ -366,7 +354,6 @@ if($data['UserData']["KanbanTareasAdminTabIndepend"]!=2){
             status.addEventListener("dragleave", dragLeave);
             status.addEventListener("drop", dragDrop);
         });
-        console.log("call_2");
     }
     /**********************/
     //Ejecuto la funcion

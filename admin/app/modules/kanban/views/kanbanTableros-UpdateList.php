@@ -8,8 +8,8 @@
     <thead>
         <tr>
             <th scope="col">Nombre Tablero</th>
-            <th scope="col">Color Icono</th>
             <th scope="col">Prioridad</th>
+            <th scope="col">Color Icono</th>
             <th scope="col">¿Permite Cierre de la Tarea?</th>
             <th scope="col" style="width: 10px;">Acciones</th>
         </tr>

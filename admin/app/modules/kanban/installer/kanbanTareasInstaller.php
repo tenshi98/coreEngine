@@ -93,7 +93,7 @@ class kanbanTareasInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -105,16 +105,18 @@ class kanbanTareasInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -144,20 +146,20 @@ class kanbanTareasInstaller extends ControllerInstaller {
             'RutaController' => 'informeTareas',                         // Controlador de la transaccion
         ];
         $arrPermisos[] = [
-            'idPermisosCat'  => '1',                              // Administración
-            'idEstado'       => '1',                              // Activo
-            'idTipo'         => '1',                              // Crud Normal
-            'Nombre'         => 'Proyectos - Tableros',   // Nombre de la transaccion
-            'Descripcion'    => 'Listado de tableros kanban',     // Descripcion de la transaccion
-            'idLevelLimit'   => '4',                              // Ver / Editar / Crear / Borrar
-            'RutaWeb'        => 'administracion/kanban/tableros', // Ruta web de la transaccion
-            'RutaController' => 'kanbanTableros',                 // Controlador de la transaccion
+            'idPermisosCat'  => '10',                                // Administración
+            'idEstado'       => '1',                                 // Activo
+            'idTipo'         => '1',                                 // Crud Normal
+            'Nombre'         => 'Proyectos - Tableros',              // Nombre de la transaccion
+            'Descripcion'    => 'Listado de tableros kanban',        // Descripcion de la transaccion
+            'idLevelLimit'   => '4',                                 // Ver / Editar / Crear / Borrar
+            'RutaWeb'        => 'mantencionSistema/kanban/tableros', // Ruta web de la transaccion
+            'RutaController' => 'kanbanTableros',                    // Controlador de la transaccion
         ];
         $arrPermisos[] = [
             'idPermisosCat'  => '1',                                                       // Administración
             'idEstado'       => '1',                                                       // Activo
             'idTipo'         => '1',                                                       // Crud Normal
-            'Nombre'         => 'Proyectos - Tareas',                              // Nombre de la transaccion
+            'Nombre'         => 'Proyectos - Trabajos',                                    // Nombre de la transaccion
             'Descripcion'    => 'Permite crear los trabajos a hacer dentro de las tareas', // Descripcion de la transaccion
             'idLevelLimit'   => '4',                                                       // Ver / Editar / Crear / Borrar
             'RutaWeb'        => 'administracion/kanban/trabajos',                          // Ruta web de la transaccion
@@ -250,14 +252,14 @@ class kanbanTareasInstaller extends ControllerInstaller {
                 ['idMetodo' => 1, 'RutaWeb' => 'gestionProyectos/kanban/informeTareas/print/@id', 'RutaController' => 'informeTareas->Print',       'Descripcion' => 'Pantalla imprimir',  'idLevelLimit' => 1, 'Controller' => 'informeTareas'],
             ],
             3 => [
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/kanban/tableros/listAll',     'RutaController' => 'kanbanTableros->listAll',     'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/kanban/tableros/search',      'RutaController' => 'kanbanTableros->UpdateList',  'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/kanban/tableros/updateList',  'RutaController' => 'kanbanTableros->UpdateList',  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/kanban/tableros/view/@id',    'RutaController' => 'kanbanTableros->View',        'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/kanban/tableros/getID/@id',   'RutaController' => 'kanbanTableros->GetID',       'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/kanban/tableros',             'RutaController' => 'kanbanTableros->Insert',      'Descripcion' => 'Crear Información',                             'idLevelLimit' => 3, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/kanban/tableros/update',      'RutaController' => 'kanbanTableros->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'kanbanTableros'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/kanban/tableros',             'RutaController' => 'kanbanTableros->Delete',      'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 4, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/kanban/tableros/listAll',     'RutaController' => 'kanbanTableros->listAll',     'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/kanban/tableros/search',      'RutaController' => 'kanbanTableros->UpdateList',  'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/kanban/tableros/updateList',  'RutaController' => 'kanbanTableros->UpdateList',  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/kanban/tableros/view/@id',    'RutaController' => 'kanbanTableros->View',        'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/kanban/tableros/getID/@id',   'RutaController' => 'kanbanTableros->GetID',       'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/kanban/tableros',             'RutaController' => 'kanbanTableros->Insert',      'Descripcion' => 'Crear Información',                             'idLevelLimit' => 3, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/kanban/tableros/update',      'RutaController' => 'kanbanTableros->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'kanbanTableros'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/kanban/tableros',             'RutaController' => 'kanbanTableros->Delete',      'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 4, 'Controller' => 'kanbanTableros'],
             ],
             4 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/kanban/trabajos/listAll',     'RutaController' => 'kanbanTrabajos->listAll',     'Descripcion' => 'Listar Toda la Información',                   'idLevelLimit' => 1, 'Controller' => 'kanbanTrabajos'],
@@ -353,20 +355,16 @@ class kanbanTareasInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE kanban_estados ADD INDEX idx_kanban_estados_color (idColor),ADD INDEX idx_kanban_estados_prioridad (idPrioridad),ADD INDEX idx_kanban_estados_cierre (idCierre);',
-            'optimization' => 'ALTER TABLE kanban_tareas ADD INDEX idx_kanban_tareas_estado (idKanbanEstado),ADD INDEX idx_kanban_tareas_cierre (idEstadoCierre),ADD INDEX idx_kanban_tareas_prioridad (idPrioridad),ADD INDEX idx_kanban_tareas_usuario (idUsuario),ADD INDEX idx_kanban_tareas_fecha (Fecha),ADD INDEX idx_kanban_tareas_fecha_creacion (FechaCreacion),ADD INDEX idx_kanban_tareas_estado_usuario (idKanbanEstado, idUsuario),ADD INDEX idx_kanban_tareas_estado_fecha (idKanbanEstado, Fecha);',
-            'optimization' => 'ALTER TABLE kanban_tareas_historial ADD INDEX idx_kanban_historial_kanban (idKanban),ADD INDEX idx_kanban_historial_usuario (idUsuario),ADD INDEX idx_kanban_historial_fecha (Fecha),ADD INDEX idx_kanban_historial_kanban_fecha (idKanban, Fecha);',
-            'optimization' => 'ALTER TABLE kanban_tareas_participantes ADD INDEX idx_kanban_participantes_kanban (idKanban),ADD INDEX idx_kanban_participantes_usuario (idUsuario),ADD UNIQUE INDEX uk_kanban_participante (idKanban, idUsuario);',
-            'optimization' => 'ALTER TABLE kanban_tareas_tareas ADD INDEX idx_kanban_tareas_tareas_kanban (idKanban),ADD INDEX idx_kanban_tareas_tareas_estado (idEstadoTrabajo),ADD INDEX idx_kanban_tareas_tareas_trabajo (idTrabajo),ADD INDEX idx_kanban_tareas_tareas_kanban_estado (idKanban, idEstadoTrabajo),ADD INDEX idx_kanban_tareas_tareas_kanban_trabajo (idKanban, idTrabajo);',
-            'optimization' => 'ALTER TABLE kanban_trabajos ADD INDEX idx_kanban_trabajos_estado (idEstado);',
+        $arrOptimizations = [
+            'ALTER TABLE kanban_estados ADD INDEX IF NOT EXISTS idx_kanban_estados_color (idColor),ADD INDEX IF NOT EXISTS idx_kanban_estados_prioridad (idPrioridad),ADD INDEX IF NOT EXISTS idx_kanban_estados_cierre (idCierre);',
+            'ALTER TABLE kanban_tareas ADD INDEX IF NOT EXISTS idx_kanban_tareas_estado (idKanbanEstado),ADD INDEX IF NOT EXISTS idx_kanban_tareas_cierre (idEstadoCierre),ADD INDEX IF NOT EXISTS idx_kanban_tareas_prioridad (idPrioridad),ADD INDEX IF NOT EXISTS idx_kanban_tareas_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_kanban_tareas_fecha (Fecha),ADD INDEX IF NOT EXISTS idx_kanban_tareas_fecha_creacion (FechaCreacion),ADD INDEX IF NOT EXISTS idx_kanban_tareas_estado_usuario (idKanbanEstado, idUsuario),ADD INDEX IF NOT EXISTS idx_kanban_tareas_estado_fecha (idKanbanEstado, Fecha);',
+            'ALTER TABLE kanban_tareas_historial ADD INDEX IF NOT EXISTS idx_kanban_historial_kanban (idKanban),ADD INDEX IF NOT EXISTS idx_kanban_historial_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_kanban_historial_fecha (Fecha),ADD INDEX IF NOT EXISTS idx_kanban_historial_kanban_fecha (idKanban, Fecha);',
+            'ALTER TABLE kanban_tareas_participantes ADD INDEX IF NOT EXISTS idx_kanban_participantes_kanban (idKanban),ADD INDEX IF NOT EXISTS idx_kanban_participantes_usuario (idUsuario),ADD UNIQUE INDEX uk_kanban_participante (idKanban, idUsuario);',
+            'ALTER TABLE kanban_tareas_tareas ADD INDEX IF NOT EXISTS idx_kanban_tareas_tareas_kanban (idKanban),ADD INDEX IF NOT EXISTS idx_kanban_tareas_tareas_estado (idEstadoTrabajo),ADD INDEX IF NOT EXISTS idx_kanban_tareas_tareas_trabajo (idTrabajo),ADD INDEX IF NOT EXISTS idx_kanban_tareas_tareas_kanban_estado (idKanban, idEstadoTrabajo),ADD INDEX IF NOT EXISTS idx_kanban_tareas_tareas_kanban_trabajo (idKanban, idTrabajo);',
+            'ALTER TABLE kanban_trabajos ADD INDEX IF NOT EXISTS idx_kanban_trabajos_estado (idEstado);',
         ];
 
         /************************************/
