@@ -9,7 +9,7 @@ class UIFormInputs {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $DataValidations;
 	private $DataText;
@@ -17,8 +17,18 @@ class UIFormInputs {
 	private $Alertas;
 	private $TemplateRender;
 
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
+	/**
+	 * Crea las instancias que la clase necesita (validaciones, texto, datos comunes, alertas
+	 * y renderizado de plantillas) al construir el objeto.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * ```
+	 */
 	public function __construct() {
 		$this->DataValidations = new FunctionsDataValidations();
 		$this->DataText        = new FunctionsDataText();
@@ -29,15 +39,31 @@ class UIFormInputs {
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Privados                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/*******************************************************************************************************************/
-	/*                                                 Privadas                                                        */
-	/*******************************************************************************************************************/
-	/****************************************************************************************/
-	//Crea el input en base a los datos
-	private function checkInputGen($placeholder,$name, $ID, $tipo, $type, $valor, $check, $requerido, $requerido_div){
+	/******************************************************************************/
+	/**
+	 * Genera el HTML de un input checkbox o radio a partir de la plantilla formCheckInputGen_1.
+	 *
+	 * @param string $placeholder   Texto a mostrar al lado del input.
+	 * @param string $name          Nombre (name) del input.
+	 * @param string $ID            Identificador (id) del input.
+	 * @param string $tipo          Clase Bootstrap del estado (default, primary, success, danger, warning, info).
+	 * @param string $type          Tipo de input HTML (checkbox o radio).
+	 * @param string $valor         Valor del input (ej: 2).
+	 * @param string $check         Atributo checked (checked o vacio).
+	 * @param string $requerido     Atributo requerido (required="required", disabled o vacio).
+	 * @param string $requerido_div Clase required en el div contenedor (required o vacio).
+	 *
+	 * @return string HTML del input generado.
+	 *
+	 * @example
+	 * ```php
+	 * $html = $this->_checkInputGen('Acepto terminos', 'acepto', 'acepto', 'primary', 'checkbox', '2', 'checked', 'required="required"', 'required');
+	 * ```
+	 */
+	private function _checkInputGen($placeholder,$name, $ID, $tipo, $type, $valor, $check, $requerido, $requerido_div){
 
 		/************************************/
 		//Se agregan datos
@@ -55,10 +81,37 @@ class UIFormInputs {
 		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
+
 	}
-	/****************************************************************************************/
-	//Crea el input en base a los datos
-	private function selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
+
+	/******************************************************************************/
+	/**
+	 * Genera el HTML de un select con opciones planas segun la alineacion del formulario.
+	 * Incluye siempre la opcion vacia "Seleccione una Opcion" y marca como selected el valor
+	 * que coincida con $value.
+	 *
+	 * @param int    $FormAling        Alineacion del formulario (1 al 5).
+	 * @param int    $FormCol          Columnas del formulario (0 al 12).
+	 * @param string $placeholder      Texto del placeholder / etiqueta del campo.
+	 * @param string $PlaceholderIcon  Icono a mostrar al lado del placeholder (vacio si no aplica).
+	 * @param string $name             Nombre (name) del select.
+	 * @param string $nameID           Identificador (id) del select.
+	 * @param string $value            Valor precargado (se marca selected si coincide con el ID).
+	 * @param string $selectProperties Propiedades HTML extra del select (ej: required="required").
+	 * @param array  $arrData          Filas con claves ID y Nombre para generar cada option.
+	 * @param string $classMain        Clase CSS extra del contenedor (vacio si no aplica).
+	 * @param string $dataInfo         Informacion a mostrar debajo del input (vacio si no aplica).
+	 * @param string $dataPopover      Icono popover con info (vacio si no aplica).
+	 *
+	 * @return string HTML del select generado.
+	 *
+	 * @example
+	 * ```php
+	 * $arrData = [['ID' => 1, 'Nombre' => 'Metropolitana'], ['ID' => 2, 'Nombre' => 'Valparaiso']];
+	 * $html = $this->_selectInputGen(2, 8, 'Region', '', 'region', 'region', '', '', $arrData, '', '', '');
+	 * ```
+	 */
+	private function _selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
 		/************************************/
 		// Variables vacias
@@ -66,17 +119,11 @@ class UIFormInputs {
 
 		/************************************/
 		//Verifico si el placeholder usa icono
-		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
 
 		/************************************/
 		//generacion del input
-		switch ($FormAling) {
-			case 1: $formRoute = '../app/templates/Forms/formSelectInputGen_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-			case 2: $formRoute = '../app/templates/Forms/formSelectInputGen_2.php'; break; //Vertical Form
-			case 3: $formRoute = '../app/templates/Forms/formSelectInputGen_3.php'; break; //Multi Columns Form
-			case 4: $formRoute = '../app/templates/Forms/formSelectInputGen_4.php'; break; //No Labels Form
-			case 5: $formRoute = '../app/templates/Forms/formSelectInputGen_5.php'; break; //Floating Labels Form
-		}
+		$formRoute = $this->_resolveFormRoute('formSelectInputGen', $FormAling, $FormCol);
 
 		/*******************************************/
 		// Inicializa la variable que marcará la opción vacía como seleccionada por defecto
@@ -112,10 +159,37 @@ class UIFormInputs {
 		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
+
 	}
-	/****************************************************************************************/
-	//Crea el input en base a los datos
-	private function selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
+
+	/******************************************************************************/
+	/**
+	 * Genera el HTML de un select con opciones agrupadas en optgroup segun la alineacion del
+	 * formulario. Agrupa $arrData por la clave ID2 y usa Nombre2 como etiqueta de grupo.
+	 *
+	 * @param int    $FormAling        Alineacion del formulario (1 al 5).
+	 * @param int    $FormCol          Columnas del formulario (0 al 12).
+	 * @param string $placeholder      Texto del placeholder / etiqueta del campo.
+	 * @param string $PlaceholderIcon  Icono a mostrar al lado del placeholder (vacio si no aplica).
+	 * @param string $name             Nombre (name) del select.
+	 * @param string $nameID           Identificador (id) del select.
+	 * @param string $value            Valor precargado (se marca selected si coincide con ID1).
+	 * @param string $selectProperties Propiedades HTML extra del select (ej: required="required").
+	 * @param array  $arrData          Filas con claves ID1, ID2, Nombre1 y Nombre2 para generar
+	 *                                  los optgroup y sus opciones.
+	 * @param string $classMain        Clase CSS extra del contenedor (vacio si no aplica).
+	 * @param string $dataInfo         Informacion a mostrar debajo del input (vacio si no aplica).
+	 * @param string $dataPopover      Icono popover con info (vacio si no aplica).
+	 *
+	 * @return string HTML del select agrupado generado.
+	 *
+	 * @example
+	 * ```php
+	 * $arrData = [['ID1' => 1, 'ID2' => 10, 'Nombre1' => 'Cobre', 'Nombre2' => 'Materiales']];
+	 * $html = $this->_selectInputGroupGen(2, 8, 'Material', '', 'material', 'material', '', '', $arrData, '', '', '');
+	 * ```
+	 */
+	private function _selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, $classMain, $dataInfo, $dataPopover){
 
 		/************************************/
 		// Variables vacias
@@ -123,7 +197,7 @@ class UIFormInputs {
 
 		/************************************/
 		//Verifico si el placeholder usa icono
-		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
 
 		/********************************************************/
 		//Opero los datos
@@ -131,13 +205,7 @@ class UIFormInputs {
 
 		/************************************/
 		//generacion del input
-		switch ($FormAling) {
-			case 1: $formRoute = '../app/templates/Forms/formSelectInputGen_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-			case 2: $formRoute = '../app/templates/Forms/formSelectInputGen_2.php'; break; //Vertical Form
-			case 3: $formRoute = '../app/templates/Forms/formSelectInputGen_3.php'; break; //Multi Columns Form
-			case 4: $formRoute = '../app/templates/Forms/formSelectInputGen_4.php'; break; //No Labels Form
-			case 5: $formRoute = '../app/templates/Forms/formSelectInputGen_5.php'; break; //Floating Labels Form
-		}
+		$formRoute = $this->_resolveFormRoute('formSelectInputGen', $FormAling, $FormCol);
 
 		/*******************************************/
 		// Variable que indica si la opción vacía ("Seleccione una Opción") debe estar seleccionada por defecto
@@ -182,24 +250,39 @@ class UIFormInputs {
 		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
+
 	}
-	/****************************************************************************************/
-	//Funcionalidad de select depend
-	private function selectInputEmpty($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $selectProperties, $dataPopover){
+
+	/******************************************************************************/
+	/**
+	 * Genera el HTML de un select vacio (solo la opcion "Seleccione una Opcion") para el segundo
+	 * campo de un select dependiente; las opciones se cargan luego via _selectInputScript.
+	 *
+	 * @param int    $FormAling        Alineacion del formulario (1 al 5).
+	 * @param int    $FormCol          Columnas del formulario (0 al 12).
+	 * @param string $placeholder      Texto del placeholder / etiqueta del campo.
+	 * @param string $PlaceholderIcon  Icono a mostrar al lado del placeholder (vacio si no aplica).
+	 * @param string $name             Nombre (name) del select.
+	 * @param string $nameID           Identificador (id) del select.
+	 * @param string $selectProperties Propiedades HTML extra del select (ej: required="required").
+	 * @param string $dataPopover      Icono popover con info (vacio si no aplica).
+	 *
+	 * @return string HTML del select vacio generado.
+	 *
+	 * @example
+	 * ```php
+	 * $html = $this->_selectInputEmpty(2, 8, 'Comuna', '', 'comuna', 'comuna', '', '');
+	 * ```
+	 */
+	private function _selectInputEmpty($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $selectProperties, $dataPopover){
 
 		/************************************/
 		//Verifico si el placeholder usa icono
-		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
+		$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
 
 		/************************************/
 		//generacion del input
-		switch ($FormAling) {
-			case 1: $formRoute = '../app/templates/Forms/formSelectInputGen_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-			case 2: $formRoute = '../app/templates/Forms/formSelectInputGen_2.php'; break; //Vertical Form
-			case 3: $formRoute = '../app/templates/Forms/formSelectInputGen_3.php'; break; //Multi Columns Form
-			case 4: $formRoute = '../app/templates/Forms/formSelectInputGen_4.php'; break; //No Labels Form
-			case 5: $formRoute = '../app/templates/Forms/formSelectInputGen_5.php'; break; //Floating Labels Form
-		}
+		$formRoute = $this->_resolveFormRoute('formSelectInputGen', $FormAling, $FormCol);
 
 		/*******************************************/
 		// Variables
@@ -220,10 +303,29 @@ class UIFormInputs {
 		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
+
 	}
-	/****************************************************************************************/
-	//Funcionalidad de select depend
-	private function selectInputScript($arrData, $value, $name1, $name2, $FormAling){
+
+	/******************************************************************************/
+	/**
+	 * Genera el script y la matriz de datos JavaScript que permiten cargar las opciones del
+	 * segundo select en funcion del valor elegido en el primero (select dependiente).
+	 *
+	 * @param array $arrData Filas con claves ID1, ID2 y Nombre de las opciones del segundo select.
+	 * @param mixed $value   Valor precargado del segundo select (vacio se corrige a 0).
+	 * @param string $name1  Identificador del select padre.
+	 * @param string $name2  Identificador del select dependiente.
+	 * @param int   $FormAling Alineacion del formulario del segundo select (1 al 5).
+	 *
+	 * @return string HTML con el script y la matriz de datos del select dependiente.
+	 *
+	 * @example
+	 * ```php
+	 * $arrData = [['ID1' => 1, 'ID2' => 10, 'Nombre' => 'Santiago']];
+	 * $html = $this->_selectInputScript($arrData, '', 'region', 'comuna', 2);
+	 * ```
+	 */
+	private function _selectInputScript($arrData, $value, $name1, $name2, $FormAling){
 		/********************************************************/
 		//Opero los datos
 		$newArray  = $this->CommonData->agruparPorClave ($arrData, 'ID2');    //transforma a array multinivel
@@ -287,10 +389,25 @@ class UIFormInputs {
 		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
+
 	}
-	/****************************************************************************************/
-	//Crea el input en base a los datos
-	private function inputDatalist($nameID, $arrData){
+
+	/******************************************************************************/
+	/**
+	 * Genera las etiquetas option de un datalist a partir de los datos recibidos.
+	 *
+	 * @param string $nameID Identificador (id) del input asociado al datalist.
+	 * @param array  $arrData Filas con la clave Nombre de cada opcion sugerida.
+	 *
+	 * @return string HTML con las opciones del datalist.
+	 *
+	 * @example
+	 * ```php
+	 * $arrData = [['Nombre' => 'Santiago'], ['Nombre' => 'Valparaiso']];
+	 * $html = $this->_inputDatalist('ciudad', $arrData);
+	 * ```
+	 */
+	private function _inputDatalist($nameID, $arrData){
 
 		/*******************************************/
 		//Datos
@@ -309,32 +426,33 @@ class UIFormInputs {
 		/************************************/
 		//devuelvo
 		return $this->TemplateRender->render();
+
 	}
 
-
-
-
 	/*******************************************************************************************************************/
-	/*                                                 PUBLICAS                                                        */
+	/*                                                                                                                 */
+	/*                                              Metodos Publicos                                                   */
+	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/*******************************************************************************************************************/
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo titulo.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'Tipo' => Tipo de
+	 *                      formulario (1 al 7); 'Texto' => Texto a mostrar.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formTittle([
+	 *     'Tipo'  => 1,
+	 *     'Texto' => '',
+	 * ]);
+	 * ```
+	 */
 	public function formTittle($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite crear un input tipo titulo
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formTittle($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'Tipo'  => 1,  //Tipo de formulario (1 al 7)
-		*		'Texto' => ''  //Texto a mostrar
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$type  = $Options['Tipo'];
@@ -385,52 +503,108 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un elemento details que despliega informacion.
+	 *
+	 * @param array $arrData Filas a desplegar: 'ID' => titulo del elemento (summary); 'Nombre' =>
+	 *                      contenido del detalle.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formDetails([
+	 *     'ID'     => 'Nombre',
+	 *     'Nombre' => 'URL',
+	 * ]);
+	 * ```
+	 */
+	public function formDetails($arrData){
+
+		/********************************************************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+			/************************************/
+			// Variables vacias
+			$dataDetails = '';
+			// Recorro
+			foreach ( $arrData as $select ) {$dataDetails .= '<details><summary>'.$this->_scapeValue($select['ID']).'</summary><p>'.$this->_scapeValue($this->DataText->tituloMenu($select['Nombre'])).'</p></details>';}
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formDetails_1.php');
+			$this->TemplateRender->assign('dataDetails', $dataDetails);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un elemento tipo alerta.
+	 *
+	 * @param string $color Numerico 1 al 8, permite seleccionar entre los colores disponibles.
+	 * @param string $type Numerico 1 al 6, permite seleccionar el tipo de mensaje.
+	 * @param string $icon icono a utilizar(fontawesome u otro).
+	 * @param string $autoClose Numerico 0 o 1, muestra la opcion de mostrar el boton de cerrado.
+	 * @param string $Text Texto del mensaje.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formPostData(6, 4, 'exclamation-circle', 0, 'Operacion exitosa');
+	 * ```
+	 */
 	public function formPostData($color, $type, $icon, $autoClose, $Text){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite crear un elemento tipo alerta
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formPostData($color, $type, $icon, $autoClose, $Text);
-		*
-		*=================================================    Parametros   =================================================
-		* String   $color      Numerico 1 al 8, permite seleccionar entre los colores disponibles
-		* String   $type       Numerico 1 al 6, permite seleccionar el tipo de mensaje
-		* String   $icon       icono a utilizar(fontawesome u otro)
-		* String   $autoClose  Numerico 0 o 1, muestra la opcion de mostrar el boton de cerrado
-		* String   $Text       Texto del mensaje
-		* @return  HTML
-		*===================================================================================================================
-		*/
 
 		/********************** Si todo esta ok **********************/
 		//Ejecucion si no hay errores
 		echo $this->Alertas->alertPostData($color, $type, $icon, $autoClose, $Text);
 
 	}
-    /*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo oculto.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'Name' => Nombre del
+	 *                      input; 'Value' => Valor del input; 'Required' => Si input es requerido
+	 *                      (1 al 2).
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formInputHidden([
+	 *     'Name'     => 'Nombre',
+	 *     'Value'    => 'asd',
+	 *     'Required' => 1,
+	 * ]);
+	 * ```
+	 */
 	public function formInputHidden($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Permite crear un input tipo oculto
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formInputHidden($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'Name'     => 'Nombre', //Nombre del input
-		*		'Value'    => 'asd',    //Valor del input
-		*		'Required' => 1         //Si input es requerido (1 al 2)
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$name     = $Options['Name'];
@@ -470,44 +644,54 @@ class UIFormInputs {
 
 			/************************************/
 			//Imprimir dato
-			echo '<input type="hidden" name="'.$name.'" id="'.$name.'" value="'.$valor.'" '.$requerido.' >';
+			echo '<input type="hidden" name="'.$this->_scapeValue($name).'" id="'.$this->_scapeValue($name).'" value="'.$this->_scapeValue($valor).'" '.$requerido.' >';
 		}else{
 			echo $alerts;
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input basado en las configuraciones, ofrece varias opciones.
+	 *
+	 * Nota: el parametro 'Value' se valida automaticamente segun el FormType declarado
+	 * 2=email | 4=entero positivo | 5=decimal | 6=entero con signo
+	 * 7 y 8=fecha | 9 y 10=hora | 11=rut (un Value vacio no se valida)
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormType' => Tipo de
+	 *                      formulario (1 al 13); 'FormAling' => Alineacion del formulario (1 al 5);
+	 *                      'FormCol' => Columnas del formulario (0 al 12); 'Placeholder' => Nombre
+	 *                      a mostrar; 'PlaceholderIcon' => Icono a mostrar al lado izquierdo Nombre
+	 *                      a mostrar; 'Name' => Nombre del input; 'Id' => Identificador del input;
+	 *                      'Value' => Valor del input; 'Required' => Si input es requerido (1 al
+	 *                      3); 'InputClass' => Clase extra; 'Icon' => Icono a mostrar; 'DataInfo'
+	 *                      => Informacion a mostrar debajo de un input; 'dataPops' => Popup con
+	 *                      info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formInput([
+	 *     'FormType'        => 1,
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 1,
+	 *     'InputClass'      => '',
+	 *     'Icon'            => '',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formInput($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input basado en las configuraciones, ofrece varias
-		* opciones
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formInput($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormType'        => 1,                     //Tipo de formulario (1 al 13)
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
-		*		'InputClass'      => '',                    //Clase extra
-		*		'Icon'            => '',                    //Icono a mostrar
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*-------------------------------------------------------------------------------------------------------------------
-		* Nota: el parametro 'Value' se valida automaticamente segun el FormType declarado
-		*       2=email | 4=entero positivo | 5=decimal | 6=entero con signo
-		*       7 y 8=fecha | 9 y 10=hora | 11=rut (un Value vacio no se valida)
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -581,7 +765,7 @@ class UIFormInputs {
             /************************************/
 			//Verifico si se utiliza el icono
 			if (!empty($Icono)&&$Icono!='') {
-				$input_1 = '<div class="input-group '.$ExtraClassGroup.'"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
+				$input_1 = '<div class="input-group '.$ExtraClassGroup.'"><span class="input-group-text" id="basic-addon1"><i class="'.$this->_scapeValue($Icono).'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
 			}
@@ -589,9 +773,9 @@ class UIFormInputs {
 			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//Valido si es requerido
@@ -642,7 +826,7 @@ class UIFormInputs {
 					'ExtraCode'    => '
 								<script type="text/javascript">
 									$(document).ready(function(){
-										$("#'.$nameID.'").bootstrapMaterialDatePicker
+										$("#'.$this->_escapeJs($nameID).'").bootstrapMaterialDatePicker
 										({
 											time: false,
 											lang: "es",
@@ -665,7 +849,7 @@ class UIFormInputs {
 					'ExtraCode'    => '
 								<script type="text/javascript">
 									$(document).ready(function(){
-										$("#'.$nameID.'").bootstrapMaterialDatePicker
+										$("#'.$this->_escapeJs($nameID).'").bootstrapMaterialDatePicker
 										({
 											date: false,
 											shortTime: false,
@@ -682,7 +866,7 @@ class UIFormInputs {
 				11 => [
 					'InTipo'       => 'text',
 					'jsValidation' => 'onkeydown="return soloRut(event)"',
-					'ExtraCode'    => '<script>$("#'.$nameID.'").rut();</script>',
+					'ExtraCode'    => '<script>$("#'.$this->_escapeJs($nameID).'").rut();</script>',
 				],
 				// 12: color
 				12 => [
@@ -694,8 +878,8 @@ class UIFormInputs {
 					'ExtraCode'    => '
 								<script type="text/javascript">
 									$(function(){
-										$("#'.$nameID.'").colorpickerplus();
-										$("#'.$nameID.'").on("changeColor", function(e,color){
+										$("#'.$this->_escapeJs($nameID).'").colorpickerplus();
+										$("#'.$this->_escapeJs($nameID).'").on("changeColor", function(e,color){
 											if(color==null)
 												$(this).val("transparent").css("background-color", "#fff");//tranparent
 											else
@@ -737,13 +921,7 @@ class UIFormInputs {
 
             /************************************/
 			//generacion del input
-			switch ($formAlign) {
-				case 1: $formRoute = '../app/templates/Forms/formInput_1.php'; $this->TemplateRender->assign('otrcol', (12 - $formCol)); break;//Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formInput_2.php'; break;//Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formInput_3.php'; break;//Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formInput_4.php'; break;//No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formInput_5.php'; break;//Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formInput', $formAlign, $formCol);
 
             /************************************/
 			//Se agregan datos
@@ -781,38 +959,191 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo que al llenar datos muestra opciones ya alojadas en la BBDD.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 3); 'InputClass' => Clase
+	 *                      extra; 'Icon' => Icono a mostrar; 'arrData' => Datos recibidos;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formInputDatalist([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 1,
+	 *     'InputClass'      => '',
+	 *     'Icon'            => '',
+	 *     'arrData'         => '',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
+	public function formInputDatalist($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder      = $Options['Placeholder'];
+		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
+		$name             = $Options['Name'];
+		$arrData          = $Options['arrData'];
+		$FormAling        = $Options['FormAling'] ?? 1;
+		$FormCol          = $Options['FormCol'] ?? 8;
+		$identificador    = $Options['Id'] ?? $name;
+		$value            = $Options['Value'] ?? '';
+		$required         = $Options['Required'] ?? 1;
+		$InputClass       = $Options['InputClass'] ?? '';
+		$Icono            = $Options['Icon'] ?? '';
+		$dataPops         = $Options['dataPops'] ?? '';
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'FormAling' => range(1, 5),
+			'FormCol'   => range(0, 12)
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $FormAling, 'name' => 'FormAling', 'label' => '$FormAling'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol']
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			// Variables vacias
+			$input_1 = $input_2 = $input_3 = '';
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:$requerido = '';                    break;//Si el dato no es requerido
+				case 2:$requerido = 'required="required"'; break;//Si el dato es requerido
+				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
+			}
+
+            /************************************/
+			//Verifico si se utiliza el icono
+			if (!empty($Icono)&&$Icono!='') {
+				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$this->_scapeValue($Icono).'"></i></span>';
+                $input_2 = 'aria-describedby="basic-addon1"';
+                $input_3 = '</div>';
+			}
+
+			/************************************/
+			//Verifico
+			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
+
+			/************************************/
+			//generacion del input
+			$formRoute = $this->_resolveFormRoute('formInputDatalist', $FormAling, $FormCol);
+
+			/************************************/
+			//Se genera input
+			$dataList = $this->_inputDatalist($name, $arrData);
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath($formRoute);
+			$this->TemplateRender->assign('nameID',           $nameID);
+			$this->TemplateRender->assign('name',             $name);
+			$this->TemplateRender->assign('placeholder',      $placeholder);
+			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
+			$this->TemplateRender->assign('FormCol',          $FormCol);
+			$this->TemplateRender->assign('value',            $value);
+			$this->TemplateRender->assign('requerido',        $requerido);
+			$this->TemplateRender->assign('InputClass',       $InputClass);
+			$this->TemplateRender->assign('input_1',          $input_1);
+			$this->TemplateRender->assign('input_2',          $input_2);
+			$this->TemplateRender->assign('input_3',          $input_3);
+			$this->TemplateRender->assign('dataList',         $dataList);
+			$this->TemplateRender->assign('dataPopover',      $dataPopover);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input que solo permite el ingreso de numeros, permite valores decimales y
+	 * numeros negativos, agregando botones en ambos lados, que aumentan o disminuyen los valores
+	 * ingresados, en los rangos preestablecido.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Min' => Valor Minimo; 'Max' => Valor Maximo; 'Step' => Valores de
+	 *                      avance o retroceso; 'Ndecimal' => numero de decimales; 'Required' => Si
+	 *                      input es requerido (1 al 3); 'DataInfo' => Informacion a mostrar debajo
+	 *                      de un input; 'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formNumberSpinner([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Min'             => '',
+	 *     'Max'             => '',
+	 *     'Step'            => '',
+	 *     'Ndecimal'        => '',
+	 *     'Required'        => 1,
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formNumberSpinner($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input que solo permite el ingreso de numeros,
-		* permite valores decimales y numeros negativos, agregando botones
-		* en ambos lados, que aumentan o disminuyen los valores ingresados,
-		* en los rangos preestablecido
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formNumberSpinner($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Min'             => '',                    //Valor Minimo
-		*		'Max'             => '',                    //Valor Maximo
-		*		'Step'            => '',                    //Valores de avance o retroceso
-		*		'Ndecimal'        => '',                    //numero de decimales
-		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -827,6 +1158,7 @@ class UIFormInputs {
 		$identificador    = $Options['Id'] ?? $name;
 		$value            = $Options['Value'] ?? '';
 		$required         = $Options['Required'] ?? 1;
+		$DataInfo         = $Options['DataInfo'] ?? '';
 		$dataPops         = $Options['dataPops'] ?? '';
 
 		//Definir opciones válidas
@@ -882,18 +1214,13 @@ class UIFormInputs {
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$valor           = ($value != 0) ? str_replace(',', '.', $value) : '';
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formInputNumberSpinner_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break;//Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formInputNumberSpinner_2.php'; break;//Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formInputNumberSpinner_3.php'; break;//Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formInputNumberSpinner_4.php'; break;//No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formInputNumberSpinner_5.php'; break;//Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formInputNumberSpinner', $FormAling, $FormCol);
 
 			/************************************/
 			//Se agregan datos
@@ -909,6 +1236,7 @@ class UIFormInputs {
 			$this->TemplateRender->assign('max',              $max);
 			$this->TemplateRender->assign('step',             $step);
 			$this->TemplateRender->assign('ndecimal',         $ndecimal);
+			$this->TemplateRender->assign('dataInfo',         $dataInfo);
 			$this->TemplateRender->assign('dataPopover',      $dataPopover);
 
 			/************************************/
@@ -922,35 +1250,44 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input dentro del cual se selecciona la hora que se desea ingresar, el
+	 * selector de hora aparece al presionar dentro del input, una vez seleccionada la hora esta
+	 * sera traspasada al input.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 3); 'Position' => Posicion del
+	 *                      popup (1 o 2); 'Icon' => Icono a mostrar; 'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formTime([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'Position'        => '',
+	 *     'Icon'            => '',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formTime($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input dentro del cual se selecciona la hora que se
-		* desea ingresar, el selector de hora aparece al presionar dentro del
-		* input, una vez seleccionada la hora esta sera traspasada al input
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formTime($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 3)
-		*		'Position'        => '',                    //Posicion del popup (1 o 2)
-		*		'Icon'            => '',                    //Icono a mostrar
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -1009,7 +1346,7 @@ class UIFormInputs {
             /************************************/
 			//Verifico si se utiliza el icono
 			if (!empty($Icono)&&$Icono!='') {
-				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
+				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$this->_scapeValue($Icono).'"></i></span>';
                 $input_2 = 'aria-describedby="basic-addon1"';
                 $input_3 = '</div>';
 			}
@@ -1017,8 +1354,8 @@ class UIFormInputs {
 			/************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//Posicion de la burbuja
@@ -1027,13 +1364,7 @@ class UIFormInputs {
 
 			/************************************/
 			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formTime_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break;//Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formTime_2.php'; break;//Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formTime_3.php'; break;//Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formTime_4.php'; break;//No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formTime_5.php'; break;//Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formTime', $FormAling, $FormCol);
 
 			/************************************/
 			//Se agregan datos
@@ -1062,772 +1393,40 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
-	public function formCheckbox($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo checkbox
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formCheckbox($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',              //Nombre a mostrar
-		*		'Name'        => 'Nombre',              //Nombre del input
-		*		'Id'          => 'Identificador',       //Identificador del input
-		*		'Value'       => 'asd',                 //Valor del input
-		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
-		*		'Color'       => '',                    //Color a mostrar
-		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'    => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
-		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$color         = $Options['Color'] ?? 1;
-		$DataInfo      = $Options['DataInfo'] ?? '';
-		$dataPops      = $Options['dataPops'] ?? '';
-
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'color'     => range(1, 6),
-			'FormCol'   => range(0, 12),
-		];
-
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $color,     'name' => 'color',     'label' => '$color'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
-		];
-
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
-				case 2:  $requerido = 'required="required"'; $requerido_div = 'required';  break;//Si el dato es requerido
-				case 3:  $requerido = 'disabled';            $requerido_div = '';          break;//Si el dato esta desactivado
-				default: $requerido = '';                    $requerido_div = '';          break;
-			}
-
-			/************************************/
-			//Si el tab correspondiente esta seleccionado
-			$check = (isset($value) && $value == 2) ? 'checked' : '';
-			$valor = '2';
-
-			/************************************/
-			//Selecciono el tipo de mensaje
-			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
-			$tipo    = $options[$color-1];
-
-			/************************************/
-			//Verifico
-			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
-
-			/************************************/
-			//Se genera input
-			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
-			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', ($FormCol==12 ? '' : $placeholder));
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('formInput',   $formInput);
-			$this->TemplateRender->assign('dataInfo',    $dataInfo);
-			$this->TemplateRender->assign('dataPopover', $dataPopover);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formCheckboxActive($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo checkbox en base a datos de la base de
-		* datos, que lleva por defecto opciones activas
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formCheckboxActive($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'Color'       => '',              //Color a mostrar
-		*		'arrData'     => '',              //Datos a recorrer
-		*	];
-		*===================================================================================================================
-		*/
-
-		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$color         = $Options['Color'] ?? 1;
-
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'color'     => range(1, 6),
-			'FormCol'   => range(0, 12)
-		];
-
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $color,     'name' => 'color',     'label' => '$color'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
-		];
-
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-
-			/************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
-				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
-				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
-				default: $requerido = '';          $requerido_div = '';  break;
-			}
-
-			/************************************/
-			//Selecciono el tipo de mensaje
-			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
-			$tipo    = $options[$color-1];
-
-			/************************************/
-			//vars
-			$arrValTab = array_map('trim', explode(",", $value));
-
-			/************************************/
-			$y         = 1;
-			$formInput = '';
-			// Recorro
-			foreach ( $arrData as $select ) {
-				/************************************/
-				//Si el tab correspondiente esta seleccionado
-				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
-				$valor = '2';
-				/************************************/
-				//generacion del input
-				$formInput .= $this->checkInputGen($select['Nombre'],$name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
-				//sumo
-				$y++;
-			}
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBoxActive_1.php');
-			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('formInput',   $formInput);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formRadio($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo radio
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formRadio($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',              //Nombre a mostrar
-		*		'Name'        => 'Nombre',              //Nombre del input
-		*		'Id'          => 'Identificador',       //Identificador del input
-		*		'Value'       => 'asd',                 //Valor del input
-		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
-		*		'Color'       => '',                    //Color a mostrar
-		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'    => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
-
-		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$color         = $Options['Color'] ?? 1;
-		$DataInfo      = $Options['DataInfo'] ?? '';
-		$dataPops      = $Options['dataPops'] ?? '';
-
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'color'     => range(1, 6),
-			'FormCol'   => range(0, 12)
-		];
-
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $color,     'name' => 'color',     'label' => '$color'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
-		];
-
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
-				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
-				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
-				default: $requerido = '';          $requerido_div = '';  break;
-			}
-
-			/************************************/
-			//Si el tab correspondiente esta seleccionado
-			$check = (isset($value) && $value == 2) ? 'checked' : '';
-			$valor = '2';
-
-			/************************************/
-			//Selecciono el tipo de mensaje
-			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
-			$tipo    = $options[$color-1];
-
-			/************************************/
-			//Verifico
-			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
-
-			/************************************/
-			//Se genera input
-			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
-			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('formInput',   $formInput);
-			$this->TemplateRender->assign('dataInfo',    $dataInfo);
-			$this->TemplateRender->assign('dataPopover', $dataPopover);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formRadioActive($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo radio en base a datos de la base de
-		* datos, que lleva por defecto opciones activas
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formRadioActive($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'Color'       => '',              //Color a mostrar
-		*		'arrData'     => '',              //Datos a recorrer
-		*	];
-		*===================================================================================================================
-		*/
-
-		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$color         = $Options['Color'] ?? 1;
-
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'color'     => range(1, 6),
-			'FormCol'   => range(0, 12),
-		];
-
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $color,     'name' => 'color',     'label' => '$color'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
-		];
-
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-
-			/************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
-				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
-				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
-				default: $requerido = '';          $requerido_div = '';  break;
-			}
-
-			/************************************/
-			//Selecciono el tipo de mensaje
-			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
-			$tipo    = $options[$color-1];
-
-			/************************************/
-			//vars
-			$arrValTab = array_map('trim', explode(",", $value));
-
-			/************************************/
-			$y         = 1;
-			$formInput = '';
-			// Recorro
-			foreach ( $arrData as $select ) {
-				/************************************/
-				//Si el tab correspondiente esta seleccionado
-				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
-				$valor = '2';
-				/************************************/
-				//generacion del input
-				$formInput .= $this->checkInputGen($select['Nombre'],$name, $nameID.'_'.$select['ID'], $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
-				//sumo
-				$y++;
-			}
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBoxActive_1.php');
-			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('formInput',   $formInput);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formSwitch($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo switch
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSwitch($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',              //Nombre a mostrar
-		*		'Name'        => 'Nombre',              //Nombre del input
-		*		'Id'          => 'Identificador',       //Identificador del input
-		*		'Value'       => 'asd',                 //Valor del input
-		*		'Required'    => 1,                     //Si input es requerido (1 al 3)
-		*		'Color'       => '',                    //Color a mostrar
-		*		'DataInfo'    => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'    => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
-
-		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$color         = $Options['Color'] ?? 1;
-		$DataInfo      = $Options['DataInfo'] ?? '';
-		$dataPops      = $Options['dataPops'] ?? '';
-
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'color'     => range(1, 6),
-			'FormCol'   => range(0, 12)
-		];
-
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $color,     'name' => 'color',     'label' => '$color'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
-		];
-
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
-				case 2:  $requerido = 'required="required"'; $requerido_div = 'required';  break;//Si el dato es requerido
-				case 3:  $requerido = 'disabled';            $requerido_div = '';          break;//Si el dato esta desactivado
-				default: $requerido = '';                    $requerido_div = '';          break;
-			}
-
-			/************************************/
-			//Si el tab correspondiente esta seleccionado
-			$check = (isset($value) && $value == 2) ? 'checked' : '';
-			$valor = '2';
-
-			/************************************/
-			//Verifico
-			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
-
-			/************************************/
-			//Selecciono el tipo de mensaje
-			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
-			$tipo    = $options[$color-1];
-
-			/************************************/
-			//Si el valor es 0
-			$extracol = ((12 - $FormCol) != 0) ? '<label class="col-form-label col-sm-'.(12 - $FormCol).'">'.$placeholder.'</label>' : '';
-
-			/************************************/
-			//Se genera input
-			$formInput = $this->checkInputGen($placeholder,$name, $nameID, $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formSwitch_1.php');
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('extracol',    $extracol);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('formInput',   $formInput);
-			$this->TemplateRender->assign('dataInfo',    $dataInfo);
-			$this->TemplateRender->assign('dataPopover', $dataPopover);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formSwitchActive($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo switch en base a datos de la base de
-		* datos, que lleva por defecto opciones activas
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSwitchActive($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,               //Columnas del formulario (0 al 12)
-		*		'Placeholder' => 'Nombre',        //Nombre a mostrar
-		*		'Name'        => 'Nombre',        //Nombre del input
-		*		'Id'          => 'Identificador', //Identificador del input
-		*		'Value'       => 'asd',           //Valor del input
-		*		'Required'    => 1,               //Si input es requerido (1 al 3)
-		*		'Color'       => '',              //Color a mostrar
-		*		'arrData'     => '',              //Datos a recorrer
-		*	];
-		*===================================================================================================================
-		*/
-
-		/**********************  Definiciones   **********************/
-		$placeholder   = $Options['Placeholder'];
-		$name          = $Options['Name'];
-		$arrData       = $Options['arrData'];
-		$FormCol       = $Options['FormCol'] ?? 8;
-		$identificador = $Options['Id'] ?? $name;
-		$value         = $Options['Value'] ?? '';
-		$required      = $Options['Required'] ?? 1;
-		$color         = $Options['Color'] ?? 1;
-
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'color'     => range(1, 6),
-			'FormCol'   => range(0, 12)
-		];
-
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $color,     'name' => 'color',     'label' => '$color'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
-		];
-
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-
-			/************************************/
-			//Verifico si nombre viene de un array
-			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
-				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
-				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
-				default: $requerido = '';          $requerido_div = '';  break;
-			}
-
-			/************************************/
-			//Selecciono el tipo de mensaje
-			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
-			$tipo    = $options[$color-1];
-
-			/************************************/
-			//vars
-			$arrValTab = array_map('trim', explode(",", $value));
-
-			/************************************/
-			$y         = 1;
-			$formInput = '';
-			// Recorro
-			foreach ( $arrData as $select ) {
-				/************************************/
-				//Si el tab correspondiente esta seleccionado
-				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
-				$valor = '2';
-				/************************************/
-				//generacion del input
-				$formInput .= $this->checkInputGen($select['Nombre'], $name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
-				//sumo
-				$y++;
-			}
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formSwitchActive_1.php');
-			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
-			$this->TemplateRender->assign('nameID',      $nameID);
-			$this->TemplateRender->assign('placeholder', $placeholder);
-			$this->TemplateRender->assign('FormCol',     $FormCol);
-			$this->TemplateRender->assign('formInput',   $formInput);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo text.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 3); 'dataPops' => Popup con
+	 *                      info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formTextarea([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formTextarea($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo text
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formTextarea($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 3)
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -1878,18 +1477,12 @@ class UIFormInputs {
             /************************************/
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formTextBox_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break;//Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formTextBox_2.php'; break;//Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formTextBox_3.php'; break;//Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formTextBox_4.php'; break;//No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formTextBox_5.php'; break;//Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formTextBox', $FormAling, $FormCol);
 
 			/************************************/
 			//Se agregan datos
@@ -1914,32 +1507,41 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un editor de texto completo.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'Tipo' => Tipo de input (1
+	 *                      al 3); 'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formCKEditor([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'Tipo'            => 2,
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formCKEditor($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un editor de texto completo
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formCKEditor($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'Tipo'            => 2,                     //Tipo de input (1 al 3)
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -1986,18 +1588,12 @@ class UIFormInputs {
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$requerido       = ($required === 2) ? 'required="required"' : '';
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formCKEditor_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formCKEditor_2.php'; break; //Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formCKEditor_3.php'; break; //Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formCKEditor_4.php'; break;//No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formCKEditor_5.php'; break; //Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formCKEditor', $FormAling, $FormCol);
 
 			/************************************/
 			//Se agregan datos
@@ -2022,33 +1618,829 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo checkbox.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'Placeholder' => Nombre a mostrar; 'Name' =>
+	 *                      Nombre del input; 'Id' => Identificador del input; 'Value' => Valor del
+	 *                      input; 'Required' => Si input es requerido (1 al 3); 'Color' => Color a
+	 *                      mostrar; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formCheckbox([
+	 *     'FormCol'     => 8,
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'Id'          => 'Identificador',
+	 *     'Value'       => 'asd',
+	 *     'Required'    => 1,
+	 *     'Color'       => '',
+	 *     'DataInfo'    => 'Lorem ipsum dolor',
+	 *     'dataPops'    => [],
+	 * ]);
+	 * ```
+	 */
+	public function formCheckbox($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder   = $Options['Placeholder'];
+		$name          = $Options['Name'];
+		$FormCol       = $Options['FormCol'] ?? 8;
+		$identificador = $Options['Id'] ?? $name;
+		$value         = $Options['Value'] ?? '';
+		$required      = $Options['Required'] ?? 1;
+		$color         = $Options['Color'] ?? 1;
+		$DataInfo      = $Options['DataInfo'] ?? '';
+		$dataPops      = $Options['dataPops'] ?? '';
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'color'     => range(1, 6),
+			'FormCol'   => range(0, 12),
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $color,     'name' => 'color',     'label' => '$color'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
+		];
+
+		// Validaciones numéricas y enteras
+		$fieldsToCheck = [
+			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
+			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
+				case 2:  $requerido = 'required="required"'; $requerido_div = 'required';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';            $requerido_div = '';          break;//Si el dato esta desactivado
+				default: $requerido = '';                    $requerido_div = '';          break;
+			}
+
+			/************************************/
+			//Si el tab correspondiente esta seleccionado
+			$check = (isset($value) && $value == 2) ? 'checked' : '';
+			$valor = '2';
+
+			/************************************/
+			//Selecciono el tipo de mensaje
+			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
+			$tipo    = $options[$color-1];
+
+			/************************************/
+			//Verifico
+			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
+
+			/************************************/
+			//Se genera input
+			$formInput = $this->_checkInputGen($placeholder,$name, $nameID, $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
+			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
+			$this->TemplateRender->assign('nameID',      $nameID);
+			$this->TemplateRender->assign('placeholder', ($FormCol==12 ? '' : $placeholder));
+			$this->TemplateRender->assign('FormCol',     $FormCol);
+			$this->TemplateRender->assign('formInput',   $formInput);
+			$this->TemplateRender->assign('dataInfo',    $dataInfo);
+			$this->TemplateRender->assign('dataPopover', $dataPopover);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo checkbox en base a datos de la base de datos, que lleva por
+	 * defecto opciones activas.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'Placeholder' => Nombre a mostrar; 'Name' =>
+	 *                      Nombre del input; 'Id' => Identificador del input; 'Value' => Valor del
+	 *                      input; 'Required' => Si input es requerido (1 al 3); 'Color' => Color a
+	 *                      mostrar; 'arrData' => Datos a recorrer.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formCheckboxActive([
+	 *     'FormCol'     => 8,
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'Id'          => 'Identificador',
+	 *     'Value'       => 'asd',
+	 *     'Required'    => 1,
+	 *     'Color'       => '',
+	 *     'arrData'     => '',
+	 * ]);
+	 * ```
+	 */
+	public function formCheckboxActive($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder   = $Options['Placeholder'];
+		$name          = $Options['Name'];
+		$arrData       = $Options['arrData'];
+		$FormCol       = $Options['FormCol'] ?? 8;
+		$identificador = $Options['Id'] ?? $name;
+		$value         = $Options['Value'] ?? '';
+		$required      = $Options['Required'] ?? 1;
+		$color         = $Options['Color'] ?? 1;
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'color'     => range(1, 6),
+			'FormCol'   => range(0, 12)
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $color,     'name' => 'color',     'label' => '$color'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			//Verifico si nombre viene de un array
+			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
+			}
+
+			/************************************/
+			//Selecciono el tipo de mensaje
+			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
+			$tipo    = $options[$color-1];
+
+			/************************************/
+			//vars
+			$arrValTab = array_map('trim', explode(",", $value));
+
+			/************************************/
+			$y         = 1;
+			$formInput = '';
+			// Recorro
+			foreach ( $arrData as $select ) {
+				/************************************/
+				//Si el tab correspondiente esta seleccionado
+				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
+				$valor = '2';
+				/************************************/
+				//generacion del input
+				$formInput .= $this->_checkInputGen($select['Nombre'],$name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo, 'checkbox', $valor, $check, $requerido, $requerido_div);
+				//sumo
+				$y++;
+			}
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBoxActive_1.php');
+			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
+			$this->TemplateRender->assign('nameID',      $nameID);
+			$this->TemplateRender->assign('placeholder', $placeholder);
+			$this->TemplateRender->assign('FormCol',     $FormCol);
+			$this->TemplateRender->assign('formInput',   $formInput);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo radio.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'Placeholder' => Nombre a mostrar; 'Name' =>
+	 *                      Nombre del input; 'Id' => Identificador del input; 'Value' => Valor del
+	 *                      input; 'Required' => Si input es requerido (1 al 3); 'Color' => Color a
+	 *                      mostrar; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formRadio([
+	 *     'FormCol'     => 8,
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'Id'          => 'Identificador',
+	 *     'Value'       => 'asd',
+	 *     'Required'    => 1,
+	 *     'Color'       => '',
+	 *     'DataInfo'    => 'Lorem ipsum dolor',
+	 *     'dataPops'    => [],
+	 * ]);
+	 * ```
+	 */
+	public function formRadio($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder   = $Options['Placeholder'];
+		$name          = $Options['Name'];
+		$FormCol       = $Options['FormCol'] ?? 8;
+		$identificador = $Options['Id'] ?? $name;
+		$value         = $Options['Value'] ?? '';
+		$required      = $Options['Required'] ?? 1;
+		$color         = $Options['Color'] ?? 1;
+		$DataInfo      = $Options['DataInfo'] ?? '';
+		$dataPops      = $Options['dataPops'] ?? '';
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'color'     => range(1, 6),
+			'FormCol'   => range(0, 12)
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $color,     'name' => 'color',     'label' => '$color'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
+		];
+
+		// Validaciones numéricas y enteras
+		$fieldsToCheck = [
+			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
+			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
+			}
+
+			/************************************/
+			//Si el tab correspondiente esta seleccionado
+			$check = (isset($value) && $value == 2) ? 'checked' : '';
+			$valor = '2';
+
+			/************************************/
+			//Selecciono el tipo de mensaje
+			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
+			$tipo    = $options[$color-1];
+
+			/************************************/
+			//Verifico
+			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
+
+			/************************************/
+			//Se genera input
+			$formInput = $this->_checkInputGen($placeholder,$name, $nameID, $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBox_1.php');
+			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
+			$this->TemplateRender->assign('nameID',      $nameID);
+			$this->TemplateRender->assign('placeholder', $placeholder);
+			$this->TemplateRender->assign('FormCol',     $FormCol);
+			$this->TemplateRender->assign('formInput',   $formInput);
+			$this->TemplateRender->assign('dataInfo',    $dataInfo);
+			$this->TemplateRender->assign('dataPopover', $dataPopover);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo radio en base a datos de la base de datos, que lleva por defecto
+	 * opciones activas.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'Placeholder' => Nombre a mostrar; 'Name' =>
+	 *                      Nombre del input; 'Id' => Identificador del input; 'Value' => Valor del
+	 *                      input; 'Required' => Si input es requerido (1 al 3); 'Color' => Color a
+	 *                      mostrar; 'arrData' => Datos a recorrer.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formRadioActive([
+	 *     'FormCol'     => 8,
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'Id'          => 'Identificador',
+	 *     'Value'       => 'asd',
+	 *     'Required'    => 1,
+	 *     'Color'       => '',
+	 *     'arrData'     => '',
+	 * ]);
+	 * ```
+	 */
+	public function formRadioActive($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder   = $Options['Placeholder'];
+		$name          = $Options['Name'];
+		$arrData       = $Options['arrData'];
+		$FormCol       = $Options['FormCol'] ?? 8;
+		$identificador = $Options['Id'] ?? $name;
+		$value         = $Options['Value'] ?? '';
+		$required      = $Options['Required'] ?? 1;
+		$color         = $Options['Color'] ?? 1;
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'color'     => range(1, 6),
+			'FormCol'   => range(0, 12),
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $color,     'name' => 'color',     'label' => '$color'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			//Verifico si nombre viene de un array
+			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
+			}
+
+			/************************************/
+			//Selecciono el tipo de mensaje
+			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
+			$tipo    = $options[$color-1];
+
+			/************************************/
+			//vars
+			$arrValTab = array_map('trim', explode(",", $value));
+
+			/************************************/
+			$y         = 1;
+			$formInput = '';
+			// Recorro
+			foreach ( $arrData as $select ) {
+				/************************************/
+				//Si el tab correspondiente esta seleccionado
+				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
+				$valor = '2';
+				/************************************/
+				//generacion del input
+				$formInput .= $this->_checkInputGen($select['Nombre'],$name, $nameID.'_'.$select['ID'], $tipo, 'radio', $valor, $check, $requerido, $requerido_div);
+				//sumo
+				$y++;
+			}
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formCheckRadioBoxActive_1.php');
+			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
+			$this->TemplateRender->assign('nameID',      $nameID);
+			$this->TemplateRender->assign('placeholder', $placeholder);
+			$this->TemplateRender->assign('FormCol',     $FormCol);
+			$this->TemplateRender->assign('formInput',   $formInput);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo switch.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'Placeholder' => Nombre a mostrar; 'Name' =>
+	 *                      Nombre del input; 'Id' => Identificador del input; 'Value' => Valor del
+	 *                      input; 'Required' => Si input es requerido (1 al 3); 'Color' => Color a
+	 *                      mostrar; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSwitch([
+	 *     'FormCol'     => 8,
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'Id'          => 'Identificador',
+	 *     'Value'       => 'asd',
+	 *     'Required'    => 1,
+	 *     'Color'       => '',
+	 *     'DataInfo'    => 'Lorem ipsum dolor',
+	 *     'dataPops'    => [],
+	 * ]);
+	 * ```
+	 */
+	public function formSwitch($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder   = $Options['Placeholder'];
+		$name          = $Options['Name'];
+		$FormCol       = $Options['FormCol'] ?? 8;
+		$identificador = $Options['Id'] ?? $name;
+		$value         = $Options['Value'] ?? '';
+		$required      = $Options['Required'] ?? 1;
+		$color         = $Options['Color'] ?? 1;
+		$DataInfo      = $Options['DataInfo'] ?? '';
+		$dataPops      = $Options['dataPops'] ?? '';
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'color'     => range(1, 6),
+			'FormCol'   => range(0, 12)
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $color,     'name' => 'color',     'label' => '$color'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
+		];
+
+		// Validaciones numéricas y enteras
+		$fieldsToCheck = [
+			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
+			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:  $requerido = '';                    $requerido_div = '';          break;//Si el dato no es requerido
+				case 2:  $requerido = 'required="required"'; $requerido_div = 'required';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';            $requerido_div = '';          break;//Si el dato esta desactivado
+				default: $requerido = '';                    $requerido_div = '';          break;
+			}
+
+			/************************************/
+			//Si el tab correspondiente esta seleccionado
+			$check = (isset($value) && $value == 2) ? 'checked' : '';
+			$valor = '2';
+
+			/************************************/
+			//Verifico
+			$nameID      = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+			$dataInfo    = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
+
+			/************************************/
+			//Selecciono el tipo de mensaje
+			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
+			$tipo    = $options[$color-1];
+
+			/************************************/
+			//Si el valor es 0
+			$extracol = ((12 - $FormCol) != 0) ? '<label class="col-form-label col-sm-'.(12 - $FormCol).'">'.$placeholder.'</label>' : '';
+
+			/************************************/
+			//Se genera input
+			$formInput = $this->_checkInputGen($placeholder,$name, $nameID, $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formSwitch_1.php');
+			$this->TemplateRender->assign('nameID',      $nameID);
+			$this->TemplateRender->assign('extracol',    $extracol);
+			$this->TemplateRender->assign('FormCol',     $FormCol);
+			$this->TemplateRender->assign('formInput',   $formInput);
+			$this->TemplateRender->assign('dataInfo',    $dataInfo);
+			$this->TemplateRender->assign('dataPopover', $dataPopover);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo switch en base a datos de la base de datos, que lleva por defecto
+	 * opciones activas.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'Placeholder' => Nombre a mostrar; 'Name' =>
+	 *                      Nombre del input; 'Id' => Identificador del input; 'Value' => Valor del
+	 *                      input; 'Required' => Si input es requerido (1 al 3); 'Color' => Color a
+	 *                      mostrar; 'arrData' => Datos a recorrer.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSwitchActive([
+	 *     'FormCol'     => 8,
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'Id'          => 'Identificador',
+	 *     'Value'       => 'asd',
+	 *     'Required'    => 1,
+	 *     'Color'       => '',
+	 *     'arrData'     => '',
+	 * ]);
+	 * ```
+	 */
+	public function formSwitchActive($Options){
+
+		/**********************  Definiciones   **********************/
+		$placeholder   = $Options['Placeholder'];
+		$name          = $Options['Name'];
+		$arrData       = $Options['arrData'];
+		$FormCol       = $Options['FormCol'] ?? 8;
+		$identificador = $Options['Id'] ?? $name;
+		$value         = $Options['Value'] ?? '';
+		$required      = $Options['Required'] ?? 1;
+		$color         = $Options['Color'] ?? 1;
+
+		//Definir opciones válidas
+		$validOptions = [
+			'required'  => range(1, 3),
+			'color'     => range(1, 6),
+			'FormCol'   => range(0, 12)
+		];
+
+		//Opciones a validar
+		$optionsToCheck = [
+			['value' => $required,  'name' => 'required',  'label' => '$required'],
+			['value' => $color,     'name' => 'color',     'label' => '$color'],
+			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol'],
+		];
+
+		/**********************  Validaciones   **********************/
+		//Definicion de errores
+		$errorn = 0;
+		$alerts = '';
+
+		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
+		$errorn += $dataReturn['nErrors'];
+		$alerts .= $dataReturn['alerts'];
+
+		/********************** Si todo esta ok **********************/
+		//Ejecucion si no hay errores
+		if($errorn==0){
+
+			/************************************/
+			//Verifico si nombre viene de un array
+			$nameID = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
+
+			/************************************/
+			//Valido si es requerido
+			switch ($required) {
+				case 1:  $requerido = '';          $requerido_div = '';  break;//Si el dato no es requerido
+				case 2:  $requerido = '';          $requerido_div = '';  break;//Si el dato es requerido
+				case 3:  $requerido = 'disabled';  $requerido_div = '';  break;//Si el dato esta desactivado
+				default: $requerido = '';          $requerido_div = '';  break;
+			}
+
+			/************************************/
+			//Selecciono el tipo de mensaje
+			$options = ['default', 'primary', 'success', 'danger', 'warning', 'info'];
+			$tipo    = $options[$color-1];
+
+			/************************************/
+			//vars
+			$arrValTab = array_map('trim', explode(",", $value));
+
+			/************************************/
+			$y         = 1;
+			$formInput = '';
+			// Recorro
+			foreach ( $arrData as $select ) {
+				/************************************/
+				//Si el tab correspondiente esta seleccionado
+				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
+				$valor = '2';
+				/************************************/
+				//generacion del input
+				$formInput .= $this->_checkInputGen($select['Nombre'], $name.'_'.$select['ID'], $nameID.'_'.$select['ID'], $tipo.' form-switch', 'checkbox', $valor, $check, $requerido, $requerido_div);
+				//sumo
+				$y++;
+			}
+
+			/************************************/
+			//Se agregan datos
+			$this->TemplateRender->templatePath('../app/templates/Forms/formSwitchActive_1.php');
+			$this->TemplateRender->assign('otrcol',      (12 - $FormCol));
+			$this->TemplateRender->assign('nameID',      $nameID);
+			$this->TemplateRender->assign('placeholder', $placeholder);
+			$this->TemplateRender->assign('FormCol',     $FormCol);
+			$this->TemplateRender->assign('formInput',   $formInput);
+
+			/************************************/
+			//Imprimir dato
+			echo $this->TemplateRender->render();
+
+		}else{
+
+			/************************************/
+			//Imprimir dato
+			echo $alerts;
+
+		}
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'arrData' => Datos
+	 *                      recibidos; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelect([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'arrData'         => '',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelect($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelect($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData'         => '',                    //Datos recibidos
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2077,22 +2469,12 @@ class UIFormInputs {
 			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol']
 		];
 
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
 		/**********************  Validaciones   **********************/
 		//Definicion de errores
 		$errorn = 0;
 		$alerts = '';
 
 		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2104,46 +2486,60 @@ class UIFormInputs {
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
-			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//Imprimir dato
-			echo $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
+			echo $this->_selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, con un filtro.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'selectProperties' =>
+	 *                      Permite agregar propiedades dentro del elemento; 'arrData' => Datos
+	 *                      recibidos; 'BASE' => Ruta base del sistema; 'DataInfo' => Informacion a
+	 *                      mostrar debajo de un input; 'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectFilter([
+	 *     'FormAling'        => 1,
+	 *     'FormCol'          => 8,
+	 *     'Placeholder'      => 'Nombre',
+	 *     'PlaceholderIcon'  => 'ri-database-2-line',
+	 *     'Name'             => 'Nombre',
+	 *     'Id'               => 'Identificador',
+	 *     'Value'            => 'asd',
+	 *     'Required'         => 2,
+	 *     'selectProperties' => '',
+	 *     'arrData'          => '',
+	 *     'BASE'             => 'http://google.cl',
+	 *     'DataInfo'         => 'Lorem ipsum dolor',
+	 *     'dataPops'         => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectFilter($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* con un filtro
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectFilter($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'        => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'          => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'      => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon'  => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'             => 'Nombre',              //Nombre del input
-		*		'Id'               => 'Identificador',       //Identificador del input
-		*		'Value'            => 'asd',                 //Valor del input
-		*		'Required'         => 2,                     //Si input es requerido (1 al 2)
-		*		'selectProperties' => '',                    //Permite agregar propiedades dentro del elemento
-		*		'arrData'          => '',                    //Datos recibidos
-		*		'BASE'             => 'http://google.cl',    //Ruta base del sistema
-		*		'DataInfo'         => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'         => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2174,22 +2570,12 @@ class UIFormInputs {
 			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol']
 		];
 
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
 		/**********************  Validaciones   **********************/
 		//Definicion de errores
 		$errorn = 0;
 		$alerts = '';
 
 		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2201,12 +2587,12 @@ class UIFormInputs {
 			//Verifico
 			$nameID            = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties .= ($required === 2) ? 'required="required"' : '';
-			$dataInfo          = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover       = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$dataInfo          = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
+			$input = $this->_selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2216,36 +2602,50 @@ class UIFormInputs {
 			echo $input;
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, agrupando los
+	 * valores.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'arrData' => Datos
+	 *                      recibidos; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectGroup([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'arrData'         => '',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectGroup($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* agrupando los valores
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectGroup($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData'         => '',                    //Datos recibidos
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2274,22 +2674,12 @@ class UIFormInputs {
 			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol']
 		];
 
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
 		/**********************  Validaciones   **********************/
 		//Definicion de errores
 		$errorn = 0;
 		$alerts = '';
 
 		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2301,45 +2691,59 @@ class UIFormInputs {
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
-			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//Imprimir dato
-			echo $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
+			echo $this->_selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, agrupando los
+	 * valores, con filtro.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'arrData' => Datos
+	 *                      recibidos; 'BASE' => Ruta base del sistema; 'DataInfo' => Informacion a
+	 *                      mostrar debajo de un input; 'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectGroupFilter([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'arrData'         => '',
+	 *     'BASE'            => 'http://google.cl',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectGroupFilter($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* agrupando los valores, con filtro
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectGroupFilter($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData'         => '',                    //Datos recibidos
-		*		'BASE'            => 'http://google.cl',    //Ruta base del sistema
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2369,22 +2773,12 @@ class UIFormInputs {
 			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol']
 		];
 
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value, 'method' => 'validarNumero',  'label' => '$value', 'msg' => 'no es un numero'],
-			['value' => $value, 'method' => 'validarEntero',  'label' => '$value', 'msg' => 'no es un numero entero'],
-		];
-
 		/**********************  Validaciones   **********************/
 		//Definicion de errores
 		$errorn = 0;
 		$alerts = '';
 
 		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, $placeholder, 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2396,12 +2790,12 @@ class UIFormInputs {
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = ($required === 2) ? 'required="required"' : '';
-			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
+			$input = $this->_selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, 'select2_Main', $dataInfo, $dataPopover);
 
 			//validacion si es requerido
 			$input .= ($required === 2) ? '<style>#div_'.$nameID.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2411,36 +2805,50 @@ class UIFormInputs {
 			echo $input;
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, con la opcion de
+	 * seleccionar varios elementos.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'arrData' => Datos
+	 *                      recibidos; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectMultiple([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'arrData'         => '',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectMultiple($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* con la opcion de seleccionar varios elementos
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectMultiple($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData'         => '',                    //Datos recibidos
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2486,17 +2894,17 @@ class UIFormInputs {
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : ''); // Configura propiedades para select multiple de forma compacta
-			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			$input = $this->selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
+			$input = $this->_selectInputGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 			//ejecuto script
 			$input .= '
 			<script>
 				$(document).ready(function() {
-					$("#'.$nameID.'").select2();
+					$("#'.$this->_escapeJs($nameID).'").select2();
 				});
 			</script>';
 
@@ -2505,36 +2913,50 @@ class UIFormInputs {
 			echo $input;
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, con la opcion de
+	 * seleccionar varios elementos, con filtros.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'arrData' => Datos
+	 *                      recibidos; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectMultipleGroup([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'arrData'         => '',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectMultipleGroup($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* con la opcion de seleccionar varios elementos, con filtros
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectMultipleGroup($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData'         => '',                    //Datos recibidos
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2580,17 +3002,17 @@ class UIFormInputs {
 			//Verifico
 			$nameID           = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$selectProperties = 'multiple="multiple"' . (($required === 2) ? ' required="required"' : ''); // Configura propiedades para select multiple de forma compacta
-			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover      = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$dataInfo         = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			$input = $this->selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
+			$input = $this->_selectInputGroupGen($FormAling, $FormCol, $placeholder, $PlaceholderIcon, $name, $nameID, $value, $selectProperties, $arrData, '', $dataInfo, $dataPopover);
 			//ejecuto script
 			$input .= '
 			<script>
 				$(document).ready(function() {
-					$("#'.$nameID.'").select2();
+					$("#'.$this->_escapeJs($nameID).'").select2();
 				});
 			</script>';
 
@@ -2599,45 +3021,64 @@ class UIFormInputs {
 			echo $input;
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, dependiente uno de
+	 * otro.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling1' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol1' => Columnas del
+	 *                      formulario (0 al 12); 'Placeholder1' => Nombre a mostrar;
+	 *                      'PlaceholderIcon1' => Icono a mostrar al lado izquierdo Nombre a
+	 *                      mostrar; 'Name1' => Nombre del input; 'Id1' => Identificador del input;
+	 *                      'Value1' => Valor del input; 'Required1' => Si input es requerido (1 al
+	 *                      2); 'arrData1' => Datos recibidos; 'dataPops1' => Popup con info;
+	 *                      'FormAling2' => Alineacion del formulario (1 al 5); 'FormCol2' =>
+	 *                      Columnas del formulario (0 al 12); 'Placeholder2' => Nombre a mostrar;
+	 *                      'PlaceholderIcon2' => Icono a mostrar al lado izquierdo Nombre a
+	 *                      mostrar; 'Name2' => Nombre del input; 'Id2' => Identificador del input;
+	 *                      'Value2' => Valor del input; 'Required2' => Si input es requerido (1 al
+	 *                      2); 'arrData2' => Datos recibidos; 'dataPops2' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectDepend([
+	 *     'FormAling1'       => 1,
+	 *     'FormCol1'         => 8,
+	 *     'Placeholder1'     => 'Nombre',
+	 *     'PlaceholderIcon1' => 'ri-database-2-line',
+	 *     'Name1'            => 'Nombre',
+	 *     'Id1'              => 'Identificador',
+	 *     'Value1'           => 'asd',
+	 *     'Required1'        => 2,
+	 *     'arrData1'         => '',
+	 *     'dataPops1'        => [],
+	 *     'FormAling2'       => 1,
+	 *     'FormCol2'         => 8,
+	 *     'Placeholder2'     => 'Nombre',
+	 *     'PlaceholderIcon2' => 'ri-database-2-line',
+	 *     'Name2'            => 'Nombre',
+	 *     'Id2'              => 'Identificador',
+	 *     'Value2'           => 'asd',
+	 *     'Required2'        => 2,
+	 *     'arrData2'         => '',
+	 *     'dataPops2'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectDepend($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* dependiente uno de otro
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectDepend($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling1'       => 1,                    //Alineacion del formulario (1 al 5)
-		*		'FormCol1'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder1'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon1' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name1'            => 'Nombre',              //Nombre del input
-		*		'Id1'              => 'Identificador',       //Identificador del input
-		*		'Value1'           => 'asd',                 //Valor del input
-		*		'Required1'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData1'         => '',                    //Datos recibidos
-		*		'dataPops1'        => array,                 //Popup con info
-		*		'FormAling2'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol2'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder2'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon2' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name2'            => 'Nombre',              //Nombre del input
-		*		'Id2'              => 'Identificador',       //Identificador del input
-		*		'Value2'           => 'asd',                 //Valor del input
-		*		'Required2'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData2'         => '',                    //Datos recibidos
-		*		'dataPops2'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder1      = $Options['Placeholder1'];
@@ -2681,24 +3122,12 @@ class UIFormInputs {
 			['value' => $FormCol2,   'name' => 'FormCol2',   'label' => '$FormCol2',    'placeholder' => $placeholder2]
 		];
 
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value1, 'method' => 'validarNumero',  'label' => '$value1', 'msg' => 'no es un numero',          'placeholder' => $placeholder1],
-			['value' => $value1, 'method' => 'validarEntero',  'label' => '$value1', 'msg' => 'no es un numero entero',   'placeholder' => $placeholder2],
-			['value' => $value2, 'method' => 'validarNumero',  'label' => '$value2', 'msg' => 'no es un numero',          'placeholder' => $placeholder1],
-			['value' => $value2, 'method' => 'validarEntero',  'label' => '$value2', 'msg' => 'no es un numero entero',   'placeholder' => $placeholder2],
-		];
-
 		/**********************  Validaciones   **********************/
 		//Definicion de errores
 		$errorn = 0;
 		$alerts = '';
 
 		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, '', 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2717,55 +3146,75 @@ class UIFormInputs {
 
 			/************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '', '', $dataPopover1);
-			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
-			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
+			$input  = $this->_selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, '', '', $dataPopover1);
+			$input .= $this->_selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
+			$input .= $this->_selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			/************************************/
 			//Imprimir dato
 			echo $input;
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select en base a datos de la base de datos, dependiente uno de
+	 * otro, con filtros.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling1' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol1' => Columnas del
+	 *                      formulario (0 al 12); 'Placeholder1' => Nombre a mostrar;
+	 *                      'PlaceholderIcon1' => Icono a mostrar al lado izquierdo Nombre a
+	 *                      mostrar; 'Name1' => Nombre del input; 'Id1' => Identificador del input;
+	 *                      'Value1' => Valor del input; 'Required1' => Si input es requerido (1 al
+	 *                      2); 'arrData1' => Datos recibidos; 'dataPops1' => Popup con info;
+	 *                      'FormAling2' => Alineacion del formulario (1 al 5); 'FormCol2' =>
+	 *                      Columnas del formulario (0 al 12); 'Placeholder2' => Nombre a mostrar;
+	 *                      'PlaceholderIcon2' => Icono a mostrar al lado izquierdo Nombre a
+	 *                      mostrar; 'Name2' => Nombre del input; 'Id2' => Identificador del input;
+	 *                      'Value2' => Valor del input; 'Required2' => Si input es requerido (1 al
+	 *                      2); 'arrData2' => Datos recibidos; 'dataPops2' => Popup con info; 'BASE'
+	 *                      => Ruta base del sistema.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectDependFilter([
+	 *     'FormAling1'       => 1,
+	 *     'FormCol1'         => 8,
+	 *     'Placeholder1'     => 'Nombre',
+	 *     'PlaceholderIcon1' => 'ri-database-2-line',
+	 *     'Name1'            => 'Nombre',
+	 *     'Id1'              => 'Identificador',
+	 *     'Value1'           => 'asd',
+	 *     'Required1'        => 2,
+	 *     'arrData1'         => '',
+	 *     'dataPops1'        => [],
+	 *     'FormAling2'       => 1,
+	 *     'FormCol2'         => 8,
+	 *     'Placeholder2'     => 'Nombre',
+	 *     'PlaceholderIcon2' => 'ri-database-2-line',
+	 *     'Name2'            => 'Nombre',
+	 *     'Id2'              => 'Identificador',
+	 *     'Value2'           => 'asd',
+	 *     'Required2'        => 2,
+	 *     'arrData2'         => '',
+	 *     'dataPops2'        => [],
+	 *     'BASE'             => 'http://google.cl',
+	 * ]);
+	 * ```
+	 */
 	public function formSelectDependFilter($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select en base a datos de la base de datos,
-		* dependiente uno de otro, con filtros
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectDependFilter($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling1'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol1'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder1'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon1' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name1'            => 'Nombre',              //Nombre del input
-		*		'Id1'              => 'Identificador',       //Identificador del input
-		*		'Value1'           => 'asd',                 //Valor del input
-		*		'Required1'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData1'         => '',                    //Datos recibidos
-		*		'dataPops1'        => array,                 //Popup con info
-		*		'FormAling2'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol2'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder2'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon2' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name2'            => 'Nombre',              //Nombre del input
-		*		'Id2'              => 'Identificador',       //Identificador del input
-		*		'Value2'           => 'asd',                 //Valor del input
-		*		'Required2'        => 2,                     //Si input es requerido (1 al 2)
-		*		'arrData2'         => '',                    //Datos recibidos
-		*		'dataPops2'        => array,                 //Popup con info
-		*		'BASE'             => 'http://google.cl',    //Ruta base del sistema
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder1      = $Options['Placeholder1'];
@@ -2810,24 +3259,12 @@ class UIFormInputs {
 			['value' => $FormCol2,   'name' => 'FormCol2',   'label' => '$FormCol2',    'placeholder' => $placeholder2]
 		];
 
-		// Validaciones numéricas y enteras
-		$fieldsToCheck = [
-			['value' => $value1, 'method' => 'validarNumero',  'label' => '$value1', 'msg' => 'no es un numero',          'placeholder' => $placeholder1],
-			['value' => $value1, 'method' => 'validarEntero',  'label' => '$value1', 'msg' => 'no es un numero entero',   'placeholder' => $placeholder2],
-			['value' => $value2, 'method' => 'validarNumero',  'label' => '$value2', 'msg' => 'no es un numero',          'placeholder' => $placeholder1],
-			['value' => $value2, 'method' => 'validarEntero',  'label' => '$value2', 'msg' => 'no es un numero entero',   'placeholder' => $placeholder2],
-		];
-
 		/**********************  Validaciones   **********************/
 		//Definicion de errores
 		$errorn = 0;
 		$alerts = '';
 
 		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, '', 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
-
-		$dataReturn = $this->DataValidations->checkData('', $fieldsToCheck, '', 2);
 		$errorn += $dataReturn['nErrors'];
 		$alerts .= $dataReturn['alerts'];
 
@@ -2846,9 +3283,9 @@ class UIFormInputs {
 
 			/************************************/
 			//generacion del input
-			$input  = $this->selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main', '', $dataPopover1);
-			$input .= $this->selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
-			$input .= $this->selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
+			$input  = $this->_selectInputGen($FormAling1, $FormCol1, $placeholder1, $placeholderIcon1, $name1, $nameID1, $value1, $selectProperties1, $arrData1, 'select2_Main', '', $dataPopover1);
+			$input .= $this->_selectInputEmpty($FormAling2, $FormCol2, $placeholder2, $placeholderIcon2, $name2, $nameID2, $selectProperties2, $dataPopover2);
+			$input .= $this->_selectInputScript($arrData2, $value2, $nameID1, $nameID2, $FormAling2);
 
 			//validacion si es requerido
 			$input .= ($required1 === 2) ? '<style>#div_'.$nameID1.' .select2-container .select2-selection--single {background:url('.$BASE.'/img/required.png) no-repeat 5px center !important;background-color: #fff !important;}</style>' : '';
@@ -2859,35 +3296,49 @@ class UIFormInputs {
 			echo $input;
 
 		}else{
+
+			/************************************/
+			//Imprimir dato
 			echo $alerts;
+
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input select que trae los paises.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'BASE' => Ruta base del
+	 *                      sistema; 'DataInfo' => Informacion a mostrar debajo de un input;
+	 *                      'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectCountry([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'BASE'            => 'http://google.cl',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectCountry($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input select que trae los paises
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectCountry($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'BASE'            => 'http://google.cl',    //Ruta base del sistema
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -2943,9 +3394,9 @@ class UIFormInputs {
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$requerido       = ($required === 2) ? 'required="required"' : '';
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//Se agregan los paises
@@ -3148,13 +3599,7 @@ class UIFormInputs {
 
 			/************************************/
 			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formSelectCountry_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formSelectCountry_2.php'; break; //Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formSelectCountry_3.php'; break; //Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formSelectCountry_4.php'; break; //No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formSelectCountry_5.php'; break; //Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formSelectCountry', $FormAling, $FormCol);
 			/*******************************************/
 			// Variables
 			$selectedx = 'selected="selected"';
@@ -3196,34 +3641,44 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo select que contiene numeros enteros secuenciales.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormAling' =>
+	 *                      Alineacion del formulario (1 al 5); 'FormCol' => Columnas del formulario
+	 *                      (0 al 12); 'Placeholder' => Nombre a mostrar; 'PlaceholderIcon' => Icono
+	 *                      a mostrar al lado izquierdo Nombre a mostrar; 'Name' => Nombre del
+	 *                      input; 'Id' => Identificador del input; 'Value' => Valor del input;
+	 *                      'Required' => Si input es requerido (1 al 2); 'ValorInicio' => Valor
+	 *                      Inicio; 'ValorFin' => Valor Fin; 'DataInfo' => Informacion a mostrar
+	 *                      debajo de un input; 'dataPops' => Popup con info.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formSelectnAuto([
+	 *     'FormAling'       => 1,
+	 *     'FormCol'         => 8,
+	 *     'Placeholder'     => 'Nombre',
+	 *     'PlaceholderIcon' => 'ri-database-2-line',
+	 *     'Name'            => 'Nombre',
+	 *     'Id'              => 'Identificador',
+	 *     'Value'           => 'asd',
+	 *     'Required'        => 2,
+	 *     'ValorInicio'     => '',
+	 *     'ValorFin'        => '',
+	 *     'DataInfo'        => 'Lorem ipsum dolor',
+	 *     'dataPops'        => [],
+	 * ]);
+	 * ```
+	 */
 	public function formSelectnAuto($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo select que contiene numeros enteros secuenciales
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formSelectnAuto($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 2,                     //Si input es requerido (1 al 2)
-		*		'ValorInicio'     => '',                    //Valor Inicio
-		*		'ValorFin'        => '',                    //Valor Fin
-		*		'DataInfo'        => 'Lorem ipsum dolor',   //Informacion a mostrar debajo de un input
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder      = $Options['Placeholder'];
@@ -3284,19 +3739,13 @@ class UIFormInputs {
 			//Verifico
 			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
 			$requerido       = ($required === 2) ? 'required="required"' : '';
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$DataInfo.'</p>' : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
+			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$this->_scapeValue($PlaceholderIcon)."'></i> " : '';
+			$dataInfo        = (!empty($DataInfo)&&$DataInfo!='') ? '<p class="formHelp text-muted">'.$this->_scapeValue($DataInfo).'</p>' : '';
+			$dataPopover = $this->_buildDataPopover($dataPops);
 
 			/************************************/
 			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formSelectNAuto_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formSelectNAuto_2.php'; break; //Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formSelectNAuto_3.php'; break; //Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formSelectNAuto_4.php'; break; //No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formSelectNAuto_5.php'; break; //Floating Labels Form
-			}
+			$formRoute = $this->_resolveFormRoute('formSelectNAuto', $FormAling, $FormCol);
 			/*******************************************/
 			// Variables
 			$selectedx = 'selected="selected"';
@@ -3334,27 +3783,31 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo upload, condicionado a la cantidad y al tipo de archivo.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'Placeholder' => Nombre
+	 *                      a mostrar; 'Name' => Nombre del input; 'MaxFiles' => Numero de Archivos;
+	 *                      'TypeFiles' => Tipos de archivos a permitir.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formUploadMultiple([
+	 *     'Placeholder' => 'Nombre',
+	 *     'Name'        => 'Nombre',
+	 *     'MaxFiles'    => 2,
+	 *     'TypeFiles'   => '"jpg", "png", "gif", "jpeg"',
+	 * ]);
+	 * ```
+	 */
 	public function formUploadMultiple($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo upload, condicionado a la cantidad y al
-		* tipo de archivo
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formUploadMultiple($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'Placeholder' => 'Nombre',                      //Nombre a mostrar
-		*		'Name'        => 'Nombre',                      //Nombre del input
-		*		'MaxFiles'    => 2,                             //Numero de Archivos
-		*		'TypeFiles'   => '"jpg", "png", "gif", "jpeg"'  //Tipos de archivos a permitir
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$placeholder   = $Options['Placeholder'];
@@ -3412,30 +3865,77 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input tipo subida de imagen, con un popup que selecciona un area activa, la
+	 * recorta y la entrega para su guardado.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'Name' => Nombre del
+	 *                      input; 'URL' => URL a redireccionar; 'ExtraData' => Datos extras aparte
+	 *                      de la imagen.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formUploadIMG([
+	 *     'Name'      => 'Nombre',
+	 *     'URL'       => 'URL',
+	 *     'ExtraData' => 'ExtraData',
+	 * ]);
+	 * ```
+	 */
+	public function formUploadIMG($Options){
+
+		/**********************  Definiciones   **********************/
+		$name      = $Options['Name'];
+		$URL       = $Options['URL'];
+		$ExtraData = $Options['ExtraData'];
+
+		/********************** Si todo esta ok **********************/
+		//Se agregan datos
+		$this->TemplateRender->templatePath('../app/templates/Forms/formUploadImage_1.php');
+		$this->TemplateRender->assign('name',      $name);
+		$this->TemplateRender->assign('URL',       $URL);
+		$this->TemplateRender->assign('ExtraData', $ExtraData);
+
+		/************************************/
+		//Imprimir dato
+		echo $this->TemplateRender->render();
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input check que desactiva el boton submit a menos que sea marcado, tambien
+	 * agrega un enlace que permite que sea leido.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'NameID' => Identificador; 'Color' => Color
+	 *                      input; 'Inicio' => Texto Inicio; 'Fin' => Texto Fin; 'Link' => Enlace;
+	 *                      'NombreBoton' => Nombre del boton.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formTermsAndConditions([
+	 *     'FormCol'     => 8,
+	 *     'NameID'      => 'NameID',
+	 *     'Color'       => 'Color',
+	 *     'Inicio'      => 'Inicio',
+	 *     'Fin'         => 'Fin',
+	 *     'Link'        => 'Link',
+	 *     'NombreBoton' => '',
+	 * ]);
+	 * ```
+	 */
 	public function formTermsAndConditions($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input check que desactiva el boton submit a menos que
-		* sea marcado, tambien agrega un enlace que permite que sea leido
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formTermsAndConditions($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,         //Columnas del formulario (0 al 12)
-		*		'NameID'      => 'NameID',  //Identificador
-		*		'Color'       => 'Color',   //Color input
-		*		'Inicio'      => 'Inicio',  //Texto Inicio
-		*		'Fin'         => 'Fin',     //Texto Fin
-		*		'Link'        => 'Link',    //Enlace
-		*		'NombreBoton' => '',        //Nombre del boton
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$FormCol     = $Options['FormCol'] ?? 8;
@@ -3499,28 +3999,32 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
-	/*******************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Permite crear un input check que desactiva el boton submit a menos que sea marcado.
+	 *
+	 * @param array $Options Arreglo asociativo con las opciones del widget: 'FormCol' => Columnas
+	 *                      del formulario (0 al 12); 'NameID' => Identificador; 'Color' => Color
+	 *                      input; 'Text' => Texto; 'NombreBoton' => Nombre del boton.
+	 *
+	 * @return void Imprime el HTML del widget o las alertas de validacion.
+	 *
+	 * @example
+	 * ```php
+	 * $Form = new UIFormInputs();
+	 * $Form->formConditionalSubmit([
+	 *     'FormCol'     => 8,
+	 *     'NameID'      => 'NameID',
+	 *     'Color'       => 'Color',
+	 *     'Text'        => 'Text',
+	 *     'NombreBoton' => '',
+	 * ]);
+	 * ```
+	 */
 	public function formConditionalSubmit($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input check que desactiva el boton submit a menos que
-		* sea marcado
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formConditionalSubmit($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormCol'     => 8,         //Columnas del formulario (0 al 12)
-		*		'NameID'      => 'NameID',  //Identificador
-		*		'Color'       => 'Color',   //Color input
-		*		'Text'        => 'Text',    //Texto
-		*		'NombreBoton' => '',        //Nombre del boton
-		*	];
-		*===================================================================================================================
-		*/
 
 		/**********************  Definiciones   **********************/
 		$FormCol     = $Options['FormCol'] ?? 8;
@@ -3580,233 +4084,126 @@ class UIFormInputs {
 			echo $alerts;
 
 		}
+
 	}
+
+
+    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Privados                                                   */
+	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	public function formInputDatalist($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo que al llenar datos muestra opciones ya
-		* alojadas en la BBDD
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formInputDatalist($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'FormAling'       => 1,                     //Alineacion del formulario (1 al 5)
-		*		'FormCol'         => 8,                     //Columnas del formulario (0 al 12)
-		*		'Placeholder'     => 'Nombre',              //Nombre a mostrar
-		*		'PlaceholderIcon' => 'ri-database-2-line',  //Icono a mostrar al lado izquierdo Nombre a mostrar
-		*		'Name'            => 'Nombre',              //Nombre del input
-		*		'Id'              => 'Identificador',       //Identificador del input
-		*		'Value'           => 'asd',                 //Valor del input
-		*		'Required'        => 1,                     //Si input es requerido (1 al 3)
-		*		'InputClass'      => '',                    //Clase extra
-		*		'Icon'            => '',                    //Icono a mostrar
-		*		'arrData'         => '',                    //Datos recibidos
-		*		'dataPops'        => array,                 //Popup con info
-		*	];
-		*===================================================================================================================
-		*/
+	/******************************************************************************/
+    /**
+     * Escapa un valor para inserción segura en atributos o texto HTML.
+     *
+     * @param mixed $valor Valor a escapar (se convierte a string).
+     *
+     * @return string Valor escapado con htmlspecialchars (ENT_QUOTES, UTF-8).
+     *
+     * @example
+     * ```php
+     * echo $this->_scapeValue($valor); // valor con comillas y etiquetas neutralizadas
+     * ```
+     */
+    private function _scapeValue($valor): string {
+        return htmlspecialchars((string)$valor, ENT_QUOTES, 'UTF-8');
+    }
 
-		/**********************  Definiciones   **********************/
-		$placeholder      = $Options['Placeholder'];
-		$PlaceholderIcon  = $Options['PlaceholderIcon'] ?? '';
-		$name             = $Options['Name'];
-		$arrData          = $Options['arrData'];
-		$FormAling        = $Options['FormAling'] ?? 1;
-		$FormCol          = $Options['FormCol'] ?? 8;
-		$identificador    = $Options['Id'] ?? $name;
-		$value            = $Options['Value'] ?? '';
-		$required         = $Options['Required'] ?? 1;
-		$InputClass       = $Options['InputClass'] ?? '';
-		$Icono            = $Options['Icon'] ?? '';
-		$dataPops         = $Options['dataPops'] ?? '';
+    /******************************************************************************/
+    /**
+     * Escapa un valor para incrustarlo en literales JavaScript embebidos en HTML.
+     *
+     * Escapa contrabarras y comillas (no introduce entidades HTML, por lo que el
+     * contenido con etiquetas intencionales se conserva al renderizarse) y neutraliza
+     * el cierre prematuro de </script>. Elimina saltos de línea que romperían el
+     * literal JS de una sola línea.
+     *
+     * @param mixed $valor Valor a escapar (se convierte a string).
+     *
+     * @return string Valor seguro para interpolar dentro de un literal JS.
+     *
+     * @example
+     * ```php
+     * $js = 'var x = "'.$this->_escapeJs($valor).'";';
+     * ```
+     */
+    private function _escapeJs($valor): string {
+        // Escapa contrabarras primero para no invalidar los escapes posteriores
+        $escapeado = str_replace('\\', '\\\\', (string)$valor);
+        // Escapa comillas simples y dobles para no romper el literal JS
+        $escapeado = str_replace(["'", '"'], ["\\'", '\\"'], $escapeado);
+        // Neutraliza el cierre de </script> conservando el valor en el HTML resultante
+        $escapeado = str_ireplace('</script', '<\/script', $escapeado);
+        // Elimina saltos de línea que romperían el literal JS de una sola línea
+        return str_replace(["\r", "\n"], ' ', $escapeado);
+    }
 
-		//Definir opciones válidas
-		$validOptions = [
-			'required'  => range(1, 3),
-			'FormAling' => range(1, 5),
-			'FormCol'   => range(0, 12)
-		];
+    /******************************************************************************/
+    /**
+     * Construye el HTML del icono popover (tooltip) de un campo de formulario.
+     *
+     * Centraliza el patrón repetido en los métodos de la clase y escapa los datos
+     * de $dataPops para evitar inyección de atributos HTML (XSS).
+     *
+     * @param array|string $dataPops Popover: 'icon', 'style', 'position', 'content' (opcional).
+     *
+     * @return string HTML del icono popover o cadena vacía si no hay datos.
+     *
+     * @example
+     * ```php
+     * $dataPopover = $this->_buildDataPopover($dataPops);
+     * ```
+     */
+    private function _buildDataPopover($dataPops): string {
+        // Sin datos de popover (vacío o no-array) no se genera marca
+        if (empty($dataPops) || !is_array($dataPops)) {
+            return '';
+        }
 
-		//Opciones a validar
-		$optionsToCheck = [
-			['value' => $required,  'name' => 'required',  'label' => '$required'],
-			['value' => $FormAling, 'name' => 'FormAling', 'label' => '$FormAling'],
-			['value' => $FormCol,   'name' => 'FormCol',   'label' => '$FormCol']
-		];
+        // Escapado de cada valor insertado en atributos HTML
+        $icono     = $this->_scapeValue($dataPops['icon']     ?? '');
+        $estilo    = $this->_scapeValue($dataPops['style']    ?? '');
+        $posicion  = $this->_scapeValue($dataPops['position'] ?? '');
+        $contenido = $this->_scapeValue($dataPops['content']  ?? '');
 
-		/**********************  Validaciones   **********************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
+        // Marca HTML del icono popover/tooltip
+        return ' <i class="'.$icono.' text-'.$estilo.'" data-bs-toggle="tooltip" data-bs-placement="'.$posicion.'" title="'.$contenido.'"></i>';
+    }
 
-		$dataReturn = $this->DataValidations->checkData($validOptions, $optionsToCheck, $placeholder, 1);
-		$errorn += $dataReturn['nErrors'];
-		$alerts .= $dataReturn['alerts'];
+    /******************************************************************************/
+    /**
+     * Resuelve la ruta de plantilla de formulario según la alineación declarada.
+     *
+     * Centraliza el switch ($FormAling) duplicado en los métodos de la clase:
+     * construye la ruta base + sufijo y asigna 'otrcol' en el caso 1 (Horizontal Form).
+     *
+     * @param string $Prefix    Nombre base de la plantilla (ej: 'formTime').
+     * @param mixed  $FormAling Alineación del formulario (1 al 5).
+     * @param mixed  $FormCol   Columnas del formulario (para el cálculo de 'otrcol').
+     *
+     * @return string Ruta de la plantilla seleccionada ('' si la alineación no es válida).
+     *
+     * @example
+     * ```php
+     * $formRoute = $this->_resolveFormRoute('formTime', $FormAling, $FormCol);
+     * ```
+     */
+    private function _resolveFormRoute(string $Prefix, $FormAling, $FormCol): string {
+        // Ruta por defecto vacía si la alineación está fuera de rango
+        $formRoute = '';
 
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
+        // Selección de la plantilla según la alineación declarada
+        switch ($FormAling) {
+            case 1: $formRoute = '../app/templates/Forms/'.$Prefix.'_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
+            case 2: $formRoute = '../app/templates/Forms/'.$Prefix.'_2.php'; break; //Vertical Form
+            case 3: $formRoute = '../app/templates/Forms/'.$Prefix.'_3.php'; break; //Multi Columns Form
+            case 4: $formRoute = '../app/templates/Forms/'.$Prefix.'_4.php'; break; //No Labels Form
+            case 5: $formRoute = '../app/templates/Forms/'.$Prefix.'_5.php'; break; //Floating Labels Form
+        }
 
-			/************************************/
-			// Variables vacias
-			$input_1 = $input_2 = $input_3 = '';
-
-			/************************************/
-			//Valido si es requerido
-			switch ($required) {
-				case 1:$requerido = '';                    break;//Si el dato no es requerido
-				case 2:$requerido = 'required="required"'; break;//Si el dato es requerido
-				case 3:$requerido = 'disabled';            break;//Si el dato esta desactivado
-			}
-
-            /************************************/
-			//Verifico si se utiliza el icono
-			if (!empty($Icono)&&$Icono!='') {
-				$input_1 = '<div class="input-group"><span class="input-group-text" id="basic-addon1"><i class="'.$Icono.'"></i></span>';
-                $input_2 = 'aria-describedby="basic-addon1"';
-                $input_3 = '</div>';
-			}
-
-			/************************************/
-			//Verifico
-			$nameID          = (strpos($identificador, '[]') !== false) ? str_replace('[]', '', $identificador) . '_' . uniqid() : $identificador;
-			$placeholderIcon = (!empty($PlaceholderIcon)&&$PlaceholderIcon!='') ? "<i class='".$PlaceholderIcon."'></i> " : '';
-			$dataPopover     = (!empty($dataPops)&&$dataPops!='') ? ' <i class="'.$dataPops['icon'].' text-'.$dataPops['style'].'" data-bs-toggle="tooltip" data-bs-placement="'.$dataPops['position'].'" title="'.$dataPops['content'].'"></i>' : '';
-
-			/************************************/
-			//generacion del input
-			switch ($FormAling) {
-				case 1: $formRoute = '../app/templates/Forms/formInputDatalist_1.php'; $this->TemplateRender->assign('otrcol', (12 - $FormCol)); break; //Horizontal Form
-				case 2: $formRoute = '../app/templates/Forms/formInputDatalist_2.php'; break; //Vertical Form
-				case 3: $formRoute = '../app/templates/Forms/formInputDatalist_3.php'; break; //Multi Columns Form
-				case 4: $formRoute = '../app/templates/Forms/formInputDatalist_4.php'; break; //No Labels Form
-				case 5: $formRoute = '../app/templates/Forms/formInputDatalist_5.php'; break; //Floating Labels Form
-			}
-
-			/************************************/
-			//Se genera input
-			$dataList = $this->inputDatalist($name, $arrData);
-
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath($formRoute);
-			$this->TemplateRender->assign('nameID',           $nameID);
-			$this->TemplateRender->assign('name',             $name);
-			$this->TemplateRender->assign('placeholder',      $placeholder);
-			$this->TemplateRender->assign('placeholderIcon',  $placeholderIcon);
-			$this->TemplateRender->assign('FormCol',          $FormCol);
-			$this->TemplateRender->assign('value',            $value);
-			$this->TemplateRender->assign('requerido',        $requerido);
-			$this->TemplateRender->assign('InputClass',       $InputClass);
-			$this->TemplateRender->assign('input_1',          $input_1);
-			$this->TemplateRender->assign('input_2',          $input_2);
-			$this->TemplateRender->assign('input_3',          $input_3);
-			$this->TemplateRender->assign('dataList',         $dataList);
-			$this->TemplateRender->assign('dataPopover',      $dataPopover);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formDetails($arrData){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un elemento details que despliega informacion
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formDetails($arrData);
-		*
-		*=================================================    Parametros   =================================================
-		*	$arrData = [
-		*		'ID'      => 'Nombre',  //Nombre del input
-		*		'Nombre'  => 'URL',     //URL a redireccionar
-		*	]
-		*===================================================================================================================
-		*/
-
-		/********************************************************/
-		//Definicion de errores
-		$errorn = 0;
-		$alerts = '';
-
-		/********************** Si todo esta ok **********************/
-		//Ejecucion si no hay errores
-		if($errorn==0){
-			/************************************/
-			// Variables vacias
-			$dataDetails = '';
-			// Recorro
-			foreach ( $arrData as $select ) {$dataDetails .= '<details><summary>'.$select['ID'].'</summary><p>'.$this->DataText->tituloMenu($select['Nombre']).'</p></details>';}
-			/************************************/
-			//Se agregan datos
-			$this->TemplateRender->templatePath('../app/templates/Forms/formDetails_1.php');
-			$this->TemplateRender->assign('dataDetails', $dataDetails);
-
-			/************************************/
-			//Imprimir dato
-			echo $this->TemplateRender->render();
-
-		}else{
-
-			/************************************/
-			//Imprimir dato
-			echo $alerts;
-
-		}
-	}
-	/*******************************************************************************************************************/
-	public function formUploadIMG($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		* Permite crear un input tipo subida de imagen, con un popup que selecciona
-		* un area activa, la recorta y la entrega para su guardado
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		* 	$Form->formUploadIMG($Options);
-		*
-		*=================================================    Parametros   =================================================
-		*	$Options = [
-		*		'Name'      => 'Nombre',     //Nombre del input
-		*		'URL'       => 'URL',        //URL a redireccionar
-		*		'ExtraData' => 'ExtraData',  //Datos extras aparte de la imagen
-		*	]
-		*===================================================================================================================
-		*/
-
-		/**********************  Definiciones   **********************/
-		$name      = $Options['Name'];
-		$URL       = $Options['URL'];
-		$ExtraData = $Options['ExtraData'];
-
-		/********************** Si todo esta ok **********************/
-		//Se agregan datos
-		$this->TemplateRender->templatePath('../app/templates/Forms/formUploadImage_1.php');
-		$this->TemplateRender->assign('name',      $name);
-		$this->TemplateRender->assign('URL',       $URL);
-		$this->TemplateRender->assign('ExtraData', $ExtraData);
-
-		/************************************/
-		//Imprimir dato
-		echo $this->TemplateRender->render();
-
-	}
-
-
+        return $formRoute;
+    }
 
 
 }

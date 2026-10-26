@@ -6,18 +6,21 @@ class FunctionsServerClient {
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
-     * Obtiene la dirección IP real del cliente que se conecta al servidor.
+     * Obtiene la dirección IP del cliente que se conecta al servidor.
      *
      * Analiza diversas cabeceras HTTP para identificar la IP de origen, considerando
      * casos donde el cliente está tras un proxy o balanceador de carga. Valida que
-     * la IP sea pública, excluyendo rangos privados o reservados.
+     * la IP sea válida (IPv4 o IPv6), aceptando también rangos privados o reservados
+     * (necesario para entornos LAN/desarrollo donde REMOTE_ADDR es, p. ej., 127.0.0.1
+     * o 192.168.x.x). Si ninguna cabecera produce una IP válida, se hace fallback a
+     * $_SERVER['REMOTE_ADDR'] crudo.
      *
-     * @return string|bool Retorna la IP del cliente en formato string o false si no se detecta una IP pública válida.
+     * @return string|bool Retorna la IP del cliente en formato string o false si no se detecta ninguna IP válida.
 	 *
 	 * @example
 	 * ```php
@@ -43,26 +46,36 @@ class FunctionsServerClient {
                 // Procesa las cabeceras que pueden contener múltiples IPs (separadas por comas)
                 foreach (explode(',', $_SERVER[$header]) as $ip) {
                     $ip = trim($ip);
-                    // Aplica validación de filtro para asegurar que la IP es válida y no es de rango reservado
-                    if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_RES_RANGE)) {
+                    // Aplica validación de formato (IPv4 o IPv6), aceptando también rangos privados/reservados
+                    if (filter_var($ip, FILTER_VALIDATE_IP)) {
                         return $ip;
                     }
                 }
             }
         }
 
+        /********************** Fallback a REMOTE_ADDR **********************/
+        // Si ninguna cabecera produjo una IP válida, se intenta con REMOTE_ADDR crudo
+        if (!empty($_SERVER['REMOTE_ADDR'])) {
+            $ip = trim($_SERVER['REMOTE_ADDR']);
+            if (filter_var($ip, FILTER_VALIDATE_IP)) {
+                return $ip;
+            }
+        }
+
         /********************** Retorno datos  **********************/
-        // No se encontró una IP pública válida en ninguna de las cabeceras analizadas
+        // No se encontró una IP válida en ninguna de las cabeceras ni en REMOTE_ADDR
         return false;
 
     }
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
      * Versión alternativa para la obtención de IP con soporte para cabeceras específicas.
      *
      * Permite forzar la lectura de una cabecera particular o realizar un barrido
-     * exhaustivo por claves comunes de clusters y proxies, validando formato IPv4.
+     * exhaustivo por claves comunes de clusters y proxies, validando formato IPv4
+     * (acepta también rangos privados/reservados, coherente con getClientIp).
      *
      * @param string|null $headerContainingIPAddress Nombre de la cabecera específica a consultar.
      *
@@ -100,8 +113,8 @@ class FunctionsServerClient {
             // Fragmenta y valida cada segmento de la cabecera
             foreach (explode(',', $_SERVER[$key]) as $ip) {
                 $ip = trim($ip);
-                // Validación estricta: debe ser IPv4 y no pertenecer a rangos privados o reservados
-                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 | FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+                // Validación de formato IPv4 (acepta también rangos privados/reservados)
+                if (filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false) {
                     return $ip;
                 }
             }
@@ -112,7 +125,7 @@ class FunctionsServerClient {
 
     }
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
      * Identifica el navegador web utilizado por el cliente.
      *
@@ -188,7 +201,7 @@ class FunctionsServerClient {
 
     }
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
      * Determina el sistema operativo (SO) del cliente conectado.
      *
@@ -293,5 +306,141 @@ class FunctionsServerClient {
 
     }
 
+	/******************************************************************************/
+    /**
+     * Obtiene el idioma del cliente basado en cabeceras HTTP o acepta header.
+     * * Analiza las cabeceras Accept-Language para determinar el idioma preferido.
+     *
+     * @return string|null Idioma detectado (ej: 'en', 'es') o null si no se detecta.
+     *
+     * @example
+     * ```php
+     * $ServerClient->getLanguage();
+     * // Devuelve 'es' si el navegador acepta español
+     * ```
+     *
+     */
+    public function getLanguage(): ?string {
+
+        /********************** Si todo esta ok **********************/
+        // Prioridad de cabeceras para deteccion de idioma
+        $langHeaders = [
+            'HTTP_ACCEPT_LANGUAGE',
+            'HTTP_ACCEPT',
+        ];
+
+        foreach ($langHeaders as $header) {
+            if (!empty($_SERVER[$header])) {
+                // Tomamos la primera parte antes de la coma (preferencia principal)
+                $lang = trim(explode(',', $_SERVER[$header])[0]);
+                // Extraemos el codigo de idioma (dos o tres letras)
+                if (preg_match('/^[a-z]{2,3}(?:-[a-z]{2})?$/i', $lang, $matches)) {
+                    return strtolower($matches[0]);
+                }
+                // Si tiene formato idioma-pais, solo devolvemos el idioma
+                if (preg_match('/^[a-z]{2,3}/i', $lang, $matches)) {
+                    return strtolower($matches[0]);
+                }
+            }
+        }
+
+        /********************** Retorno datos **********************/
+        return null;
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Detecta si el cliente es un robot (bot) conocido.
+     * * Analiza la cadena HTTP_USER_AGENT en busca de identificadores de bots conocidos.
+     * * Los bots incluyen crawlers, scrapers y agentes de automatización.
+     *
+     * @return bool True si se detecta un bot, false en caso contrario.
+     *
+     * @example
+     * ```php
+     * $ServerClient->esBot();
+     * // Devuelve true si el User-Agent es de Googlebot, Bingbot, etc.
+     * ```
+     *
+     */
+    public function esBot(): bool {
+
+        // Obtiene el User Agent del servidor
+        $userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        // Lista de identificadores de bots conocidos
+        $botSignatures = [
+            'Googlebot',
+            'Bingbot',
+            'Slurp',
+            'DuckDuckBot',
+            'Baidu',
+            'Yandex',
+            'Applebot',
+            'AhaBot',
+            'Exabot',
+            'DotBot',
+            'jahia',
+            ' Gesicht',
+            'rogerbot',
+            'megaindex',
+            'WebMeUp',
+            'Webshrinker',
+        ];
+
+        // Convertimos a minúsculas para comparaci贸n insensible a mayúscuslas
+        $userAgentLower = strtolower($userAgent);
+
+        foreach ($botSignatures as $bot) {
+            if (strpos($userAgentLower, strtolower($bot)) !== false) {
+                return true;
+            }
+        }
+
+        /********************** Retorno datos **********************/
+        return false;
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Detecta si el usuario está accediendo desde un dispositivo móvil.
+     * * Analiza la cadena HTTP_USER_AGENT del navegador en busca de palabras clave
+     * comunes de sistemas operativos y navegadores móviles.
+     *
+     * @return bool True si se detecta un dispositivo móvil o tablet.
+	 *
+	 * @example
+	 * ```php
+	 * $ServerClient->validarDispositivoMovil(); // Devuelve true si el User-Agent corresponde a un móvil o tablet
+	 * ```
+	 *
+     */
+    public function validarDispositivoMovil(): bool {
+
+        // Obtiene el User Agent del servidor
+        $userAgent = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
+
+        /********************** Si todo esta ok **********************/
+        // Lista de palabras clave para identificar plataformas móviles
+        $movilKeywords = [
+            'android', 'iphone', 'ipod', 'ipad', 'blackberry', 'windows phone',
+            'opera mini', 'opera mobi', 'mobile', 'silk', 'kindle', 'webos',
+            'palm', 'symbian', 'fennec', 'maemo', 'nokia', 'htc', 'samsung',
+            'lg', 'motorola', 'tablet', 'playbook'
+        ];
+
+        /********************** Retorno datos  **********************/
+        foreach ($movilKeywords as $keyword) {
+            if (strpos($userAgent, $keyword) !== false) {
+                return true;
+            }
+        }
+
+        /**********************  Retorno datos  **********************/
+        return false;
+
+    }
 
 }

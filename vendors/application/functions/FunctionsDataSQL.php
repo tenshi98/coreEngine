@@ -6,11 +6,11 @@ class FunctionsDataSQL {
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Valida credenciales de conexión a un servidor MySQL y comprueba permisos de usuario.
      * * Intenta establecer conexión y, según el tipo solicitado ('admin' o 'basic'),
      * realiza pruebas de creación/eliminación de bases de datos o manipulación de tablas temporales.
@@ -26,7 +26,10 @@ class FunctionsDataSQL {
 	 *
 	 * @example
 	 * ```php
-	 * $DataSQL->validateCredentials($host, $username, $password);
+	 * $DataSQL = new FunctionsDataSQL();
+	 * $DataSQL->validateCredentials('localhost', 'root', 'secreto', 3306, 'utf8mb4', 'admin');
+	 * // devuelve ['status' => 'success', 'success' => true, 'message' => 'Usuario ADMIN validado correctamente']
+	 * // o, si falla, ['status' => 'access_denied', 'success' => false, 'message' => 'Usuario o contraseña incorrectos']
 	 * ```
 	 *
      */
@@ -38,12 +41,12 @@ class FunctionsDataSQL {
 
         /**********************  Validaciones   **********************/
         // Validación de existencia de todos los parámetros obligatorios
-        if (($missing = $this->assertRequiredParams($params)) !== null) {
+        if (($missing = $this->_assertRequiredParams($params)) !== null) {
             return $missing;
         }
 
         // Validación de rango de puerto TCP estándar
-        if (!$this->validatePort($port)) {
+        if (!$this->_validatePort($port)) {
             return [
                 'status'  => 'invalid_port',
                 'success' => false,
@@ -61,7 +64,7 @@ class FunctionsDataSQL {
         }
 
         // Validación de formato de host (hostname, IPv4 o IPv6) para evitar inyección en el DSN
-        if (!$this->validateHost($host)) {
+        if (!$this->_validateHost($host)) {
             return [
                 'status'  => 'invalid_host',
                 'success' => false,
@@ -70,7 +73,7 @@ class FunctionsDataSQL {
         }
 
         // Validación de charset contra la lista de permitidos para evitar inyección en el DSN
-        if (!$this->validateCharset($charset)) {
+        if (!$this->_validateCharset($charset)) {
             return [
                 'status'  => 'invalid_charset',
                 'success' => false,
@@ -83,7 +86,7 @@ class FunctionsDataSQL {
 
             // Intento de instanciación de conexión SQL (DSN construido con parámetros ya validados)
             $DBConn = new DB\SQL(
-                $this->buildDsn($host, (int)$port, $charset),
+                $this->_buildDsn($host, (int)$port, $charset),
                 $username,
                 $password,
                 [\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;']
@@ -222,8 +225,8 @@ class FunctionsDataSQL {
 
     }
 
-    /************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Valida la disponibilidad y el formato de un nombre para una base de datos.
      * * Comprueba restricciones de longitud, caracteres permitidos, nombres reservados
      * y consulta al servidor si el nombre ya se encuentra en uso.
@@ -239,6 +242,10 @@ class FunctionsDataSQL {
 	 *
 	 * @example
 	 * ```php
+	 * $DataSQL = new FunctionsDataSQL();
+	 * $DataSQL->validateDatabase('localhost', 'root', 'secreto', 3306, 'utf8mb4', 'mi_base');
+	 * // devuelve ['status' => 'valid', 'success' => true, 'message' => 'Nombre válido y disponible']
+	 * // o, si ya existe, ['status' => 'database_exists', 'success' => false, 'message' => 'Ya existe una base de datos con ese nombre']
 	 * ```
 	 *
      */
@@ -247,12 +254,12 @@ class FunctionsDataSQL {
         /**********************  Validaciones   **********************/
         // Validación de existencia de todos los parámetros obligatorios
         $params = compact('host', 'username', 'password', 'port', 'charset', 'dbName');
-        if (($missing = $this->assertRequiredParams($params)) !== null) {
+        if (($missing = $this->_assertRequiredParams($params)) !== null) {
             return $missing;
         }
 
         // Validación de rango de puerto TCP estándar (misma regla que validateCredentials)
-        if (!$this->validatePort($port)) {
+        if (!$this->_validatePort($port)) {
             return [
                 'status'  => 'invalid_port',
                 'success' => false,
@@ -261,7 +268,7 @@ class FunctionsDataSQL {
         }
 
         // Validación de formato de host (hostname, IPv4 o IPv6) para evitar inyección en el DSN
-        if (!$this->validateHost($host)) {
+        if (!$this->_validateHost($host)) {
             return [
                 'status'  => 'invalid_host',
                 'success' => false,
@@ -270,7 +277,7 @@ class FunctionsDataSQL {
         }
 
         // Validación de charset contra la lista de permitidos para evitar inyección en el DSN
-        if (!$this->validateCharset($charset)) {
+        if (!$this->_validateCharset($charset)) {
             return [
                 'status'  => 'invalid_charset',
                 'success' => false,
@@ -316,7 +323,7 @@ class FunctionsDataSQL {
 
             // Establecimiento de conexión para consulta remota
             $DBConn = new DB\SQL(
-                $this->buildDsn($host, (int)$port, $charset),
+                $this->_buildDsn($host, (int)$port, $charset),
                 $username,
                 $password,
                 array(\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8;')
@@ -353,56 +360,8 @@ class FunctionsDataSQL {
         }
     }
 
-    /************************************************************************************************************/
-	/**
-     * Verifica la existencia y accesibilidad de un archivo en el sistema de archivos local.
-     *
-     * @param string $PathFile Ruta absoluta o relativa al archivo.
-     *
-     * @return array Resultado con claves 'success', 'message' y 'path'.
-	 *
-	 * @example
-	 * ```php
-	 * $DataSQL->validatePathFile('Path');
-	 * ```
-	 *
-     */
-    public function validatePathFile($PathFile): array {
-
-        /**********************  Validaciones   **********************/
-        // Comprobación de parámetro obligatorio
-        if ($PathFile === null || trim((string)$PathFile) === '') {
-            return ['success' => false,'message' => 'No hay datos en $PathFile'];
-        }
-
-        // Verificación de existencia física en el disco
-        if (!file_exists($PathFile)) {
-            return [
-                'success' => false,
-                'message' => 'Archivo no encontrado',
-                'path'    => $PathFile
-            ];
-        }
-
-        // Verificación de permisos de lectura para el proceso actual
-        if (!is_readable($PathFile)) {
-            return [
-                'success' => false,
-                'message' => 'Archivo no es legible',
-                'path'    => $PathFile
-            ];
-        }
-
-        /**********************  Retorno datos  **********************/
-        return [
-            'success' => true,
-            'message' => 'Archivo válido',
-            'path'    => $PathFile
-        ];
-    }
-
-    /************************************************************************************************************/
-	/**
+	/******************************************************************************/
+    /**
      * Valida una query SQL MySQL con distintos niveles de seguridad.
      *
      * CAPAS DE VALIDACIÓN (en orden de ejecución):
@@ -429,13 +388,18 @@ class FunctionsDataSQL {
      *     @type array    $allowed    Tipos de query permitidos (usado en strict).
      *                                Default: ['SELECT','INSERT','UPDATE','DELETE'].
      *     @type array    $deny       Keywords/tipos siempre bloqueados sin importar el modo.
-     *                                Default: [].
+     *                                Default: ['REPLACE', 'DROP', 'ALTER', 'CREATE', 'TRUNCATE'].
      *     @type bool     $single     Si true, bloquea múltiples sentencias separadas por ';'.
      *                                Default: true.
      *     @type int      $max_length Longitud máxima permitida de la query en caracteres.
      *                                Default: 10000.
      *     @type array    $tables     Whitelist de tablas permitidas en FROM (vacío = sin restricción).
      *                                Default: [].
+     *     @type array    $blacklist_tables  Tablas sensibles restringidas por control contextual
+     *                                (bloqueo de modificaciones directas y SELECT sin JOIN).
+     *                                Default: [].
+     *     @type array    $sensitive_columns Columnas prohibidas en las tablas sensibles.
+     *                                Default: ['password', 'passwd', 'token'].
      * }
      *
      * @return array {
@@ -443,6 +407,19 @@ class FunctionsDataSQL {
      *     @type string|null $error  Mensaje de error legible, null si válida.
      *     @type string|null $type   Tipo detectado (SELECT, INSERT, etc.), null si no detectado.
      * }
+     *
+     * @example
+     * ```php
+     * $DataSQL = new FunctionsDataSQL();
+     * $DataSQL->validateSQL('SELECT * FROM clientes WHERE id = 1');
+     * // devuelve ['valid' => true, 'error' => null, 'type' => 'SELECT']
+     *
+     * $DataSQL->validateSQL('SELECT * FROM clientes WHERE id = 1 OR 1=1');
+     * // devuelve ['valid' => false, 'error' => 'Posible inyección SQL: condición numérica tautológica', 'type' => 'SELECT']
+     *
+     * $DataSQL->validateSQL('DROP TABLE clientes', ['mode' => 'strict']);
+     * // devuelve ['valid' => false, 'error' => "Tipo 'DROP' está en la lista de denegación", 'type' => 'DROP']
+     * ```
      */
     public function validateSQL(string $query, array $options = []): array {
         // =========================================================================
@@ -470,7 +447,7 @@ class FunctionsDataSQL {
         // de C subyacentes a PHP/MySQL y se usa para evadir filtros de texto.
         // Ejemplo de ataque: "SELECT *\0 FROM users-- "
         // =========================================================================
-        if (($err = $this->checkNullBytes($query)) !== null) {
+        if (($err = $this->_checkNullBytes($query)) !== null) {
             return $fail($err);
         }
 
@@ -479,7 +456,7 @@ class FunctionsDataSQL {
         // Previene DoS por queries gigantes que disparen backtracking catastrófico
         // en los regex posteriores (ReDoS) o saturen memoria.
         // =========================================================================
-        if (($err = $this->checkMaxLength($query, $maxLength)) !== null) {
+        if (($err = $this->_checkMaxLength($query, $maxLength)) !== null) {
             return $fail($err);
         }
 
@@ -495,7 +472,7 @@ class FunctionsDataSQL {
         //   d) rtrim ';'         — el punto y coma final es ruido para la
         //      detección de múltiples sentencias.
         // =========================================================================
-        $query = $this->normalizeQuery($query);
+        $query = $this->_normalizeQuery($query);
 
         if ($query === '') {
             return $fail('Query vacía');
@@ -523,7 +500,7 @@ class FunctionsDataSQL {
         //   \"  dentro de "..."
         //   \`  dentro de `...`
         // =========================================================================
-        $sanitized = $this->extractSqlLiterals($query);
+        $sanitized = $this->_extractSqlLiterals($query);
 
         // =========================================================================
         // [5] MÚLTIPLES SENTENCIAS
@@ -531,7 +508,7 @@ class FunctionsDataSQL {
         // Se analiza sobre $sanitized para que un ';' dentro de un literal
         // ('val;ue') no dispare un falso positivo.
         // =========================================================================
-        if (($err = $this->checkMultipleStatements($sanitized, $single)) !== null) {
+        if (($err = $this->_checkMultipleStatements($sanitized, $single)) !== null) {
             return $fail($err);
         }
 
@@ -540,7 +517,7 @@ class FunctionsDataSQL {
         // Solo acepta los verbos SQL reconocidos al inicio de la query.
         // Cualquier otra cosa (o query vacía post-normalización) es inválida.
         // =========================================================================
-        $type = $this->detectQueryType($sanitized);
+        $type = $this->_detectQueryType($sanitized);
         if ($type === null) {
             return $fail('Tipo de query no reconocido');
         }
@@ -551,7 +528,7 @@ class FunctionsDataSQL {
         // absoluta independiente del modo activo.
         // Ejemplo: ['DROP', 'TRUNCATE'] bloqueará esos tipos siempre.
         // =========================================================================
-        if (($err = $this->checkDenyList($type, $deny)) !== null) {
+        if (($err = $this->_checkDenyList($type, $deny)) !== null) {
             return $fail($err, $type);
         }
 
@@ -571,12 +548,12 @@ class FunctionsDataSQL {
         // =========================================================================
 
         // 8a — Timing/blind
-        if (($err = $this->checkTimingFunctions($sanitized)) !== null) {
+        if (($err = $this->_checkTimingFunctions($sanitized)) !== null) {
             return $fail($err, $type);
         }
 
         // 8b — Encoding/ofuscación
-        if (($err = $this->checkEncodingFunctions($sanitized)) !== null) {
+        if (($err = $this->_checkEncodingFunctions($sanitized)) !== null) {
             return $fail($err, $type);
         }
 
@@ -589,7 +566,7 @@ class FunctionsDataSQL {
         //      de la query sanitizada (no solo como tipo principal).
         //      Esto bloquea, p.ej., un SELECT que contenga DROP en una subquery.
         // =========================================================================
-        if (($err = $this->checkStrictMode($mode, $type, $allowed, $deny, $sanitized)) !== null) {
+        if (($err = $this->_checkStrictMode($mode, $type, $allowed, $deny, $sanitized)) !== null) {
             return $fail($err, $type);
         }
 
@@ -607,7 +584,7 @@ class FunctionsDataSQL {
         // Control C — SELECT con operaciones destructivas fuera de subqueries:
         //   Cubre inyecciones directas en el cuerpo del SELECT.
         // =========================================================================
-        if (($err = $this->checkSafeMode($mode, $type, $sanitized)) !== null) {
+        if (($err = $this->_checkSafeMode($mode, $type, $sanitized)) !== null) {
             return $fail($err, $type);
         }
 
@@ -626,7 +603,7 @@ class FunctionsDataSQL {
         //   globalmente en [8], se repite aquí como documentación explícita
         //   del contrato del modo paranoid).
         // =========================================================================
-        if (($err = $this->checkParanoidMode($mode, $type, $sanitized)) !== null) {
+        if (($err = $this->_checkParanoidMode($mode, $type, $sanitized)) !== null) {
             return $fail($err, $type);
         }
 
@@ -636,7 +613,7 @@ class FunctionsDataSQL {
         // (p.ej. "SELECT 1", "SELECT version()").
         // Se evalúa sobre $sanitized para ignorar 'FROM' dentro de literales.
         // =========================================================================
-        if (($err = $this->checkSelectWithoutFrom($type, $sanitized)) !== null) {
+        if (($err = $this->_checkSelectWithoutFrom($type, $sanitized)) !== null) {
             return $fail($err, $type);
         }
 
@@ -655,7 +632,7 @@ class FunctionsDataSQL {
         //   E) IS NOT NULL incondicional   : OR id IS NOT NULL (siempre true si hay filas)
         // =========================================================================
 
-        if (($err = $this->checkTautologies($sanitized)) !== null) {
+        if (($err = $this->_checkTautologies($sanitized)) !== null) {
             return $fail($err, $type);
         }
 
@@ -669,7 +646,7 @@ class FunctionsDataSQL {
         // Para queries con múltiples tablas (JOIN, subqueries) se recomienda
         // usar esto solo en modo paranoid donde JOIN/subqueries ya están bloqueados.
         // =========================================================================
-        if (($err = $this->checkTableWhitelist($type, $sanitized, $tables)) !== null) {
+        if (($err = $this->_checkTableWhitelist($type, $sanitized, $tables)) !== null) {
             return $fail($err, $type);
         }
         // =========================================================================
@@ -687,19 +664,18 @@ class FunctionsDataSQL {
         //   'blacklist_tables'  => ['users'],
         //   'sensitive_columns' => ['password', 'passwd', 'token']
         // =========================================================================
-        if (($err = $this->checkSensitiveTables($type, $sanitized, $blacklistTables, $sensitiveColumns)) !== null) {
+        if (($err = $this->_checkSensitiveTables($type, $sanitized, $blacklistTables, $sensitiveColumns)) !== null) {
             return $fail($err, $type);
         }
-
-                    
 
         // =========================================================================
         // Query válida
         // =========================================================================
         return ['valid' => true, 'error' => null, 'type' => $type];
+
     }
 
-
+	/******************************************************************************/
     /**
      * Procesa una cadena SQL que contiene sentencias CREATE TABLE y genera una representación
      * simplificada de las tablas con sus columnas.
@@ -718,7 +694,13 @@ class FunctionsDataSQL {
      *
      * @return string Representación simplificada de las tablas y sus columnas, separadas por saltos de línea
      *
-     * @throws \Exception No lanza excepciones explícitas; depende de la validez estructural del SQL de entrada
+     * @example
+     * ```php
+     * $DataSQL = new FunctionsDataSQL();
+     * $sql = "CREATE TABLE clientes (id INT PRIMARY KEY, nombre VARCHAR(50), email VARCHAR(100))";
+     * $DataSQL->minifyCreateTable($sql);
+     * // devuelve 'clientes (id, nombre, email)'
+     * ```
      */
     public function minifyCreateTable($sql) {
         // Inicializa el arreglo que almacenará el resultado final
@@ -831,10 +813,13 @@ class FunctionsDataSQL {
             $result[] = $tableName . ' (' . implode(', ', $columns) . ')';
         }
 
+        /**********************  Retorno datos  **********************/
         // Retorna todas las tablas procesadas separadas por saltos de línea
         return implode("\n", $result);
+
     }
 
+    /******************************************************************************/
     /**
      * Genera una representación simplificada de tablas y sus columnas a partir de un arreglo estructurado.
      *
@@ -854,7 +839,15 @@ class FunctionsDataSQL {
      *
      * @return string Cadena de texto con una tabla por línea y sus columnas listadas entre paréntesis
      *
-     * @throws \Exception No lanza excepciones explícitamente, pero depende de la estructura correcta del arreglo de entrada
+     * @example
+     * ```php
+     * $DataSQL = new FunctionsDataSQL();
+     * $arrTables = [
+     *     ['table' => 'clientes', 'data' => 'id INT, nombre VARCHAR(50), email VARCHAR(100)'],
+     * ];
+     * $DataSQL->minifyArrayTables($arrTables);
+     * // devuelve 'clientes (id, nombre, email)'
+     * ```
      */
     public function minifyArrayTables(array $arrTables): string {
         // Inicializa el arreglo que almacenará el resultado final
@@ -895,15 +888,18 @@ class FunctionsDataSQL {
             $result[] = $tableName . ' (' . implode(', ', $columns) . ')';
         }
 
+        /**********************  Retorno datos  **********************/
         // Une todas las representaciones de tablas en una sola cadena separada por saltos de línea
         return implode("\n", $result);
+
     }
 
     /*******************************************************************************************************************/
-    /*                                                                                                                 */
-    /*                                              Metodos Internos                                                   */
-    /*                                                                                                                 */
-    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Privados                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+    /******************************************************************************/
     // Charsets permitidos para la construcción del DSN (evita inyección de parámetros).
     private const ALLOWED_CHARSETS = [
         'armscii8', 'ascii', 'big5', 'binary', 'cp1250', 'cp1251', 'cp1256', 'cp1257',
@@ -914,7 +910,7 @@ class FunctionsDataSQL {
         'utf8mb3', 'utf8mb4',
     ];
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Verifica que todos los parámetros obligatorios tengan valor (no nulo ni vacío).
      * * Unifica la validación de parámetros usada por validateCredentials y validateDatabase.
@@ -922,8 +918,18 @@ class FunctionsDataSQL {
      * @param array $params Pares nombre => valor a verificar.
      *
      * @return array|null Array de error ('missing_param') si falta algún parámetro, o null si todos están presentes.
+     *
+     * @example
+     * ```php
+     * $this->_assertRequiredParams(['host' => 'localhost', 'password' => '']);
+     * // devuelve ['status' => 'missing_param', 'success' => false, 'message' => 'No hay datos en $password']
+     *
+     * $this->_assertRequiredParams(['host' => 'localhost', 'password' => 'secreto']);
+     * // devuelve null
+     * ```
      */
-    private function assertRequiredParams(array $params): ?array {
+    private function _assertRequiredParams(array $params): ?array {
+
         foreach ($params as $name => $value) {
             if ($value === null || $value === '' || (is_string($value) && trim($value) === '')) {
                 return [
@@ -933,22 +939,33 @@ class FunctionsDataSQL {
                 ];
             }
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Valida que el puerto sea un entero dentro del rango TCP válido (1-65535).
      *
      * @param string|int $port Puerto de conexión.
      *
      * @return bool True si el puerto es válido.
+     *
+     * @example
+     * ```php
+     * $this->_validatePort(3306);     // true
+     * $this->_validatePort('70000');  // false
+     * ```
      */
-    private function validatePort($port): bool {
+    private function _validatePort($port): bool {
+
+        /**********************  Retorno datos  **********************/
         return is_numeric($port) && (int)$port >= 1 && (int)$port <= 65535;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Valida el formato del host (hostname/FQDN, IPv4 o IPv6).
      * * Bloquea caracteres que permitirían alterar el DSN (por ejemplo ';', '=', espacios).
@@ -956,32 +973,51 @@ class FunctionsDataSQL {
      * @param string $host Host de conexión.
      *
      * @return bool True si el host tiene un formato aceptable.
+     *
+     * @example
+     * ```php
+     * $this->_validateHost('db.local');      // true
+     * $this->_validateHost('192.168.1.10');  // true
+     * $this->_validateHost('host;dbname=x'); // false
+     * ```
      */
-    private function validateHost($host): bool {
+    private function _validateHost($host): bool {
+
         // IPv4 o IPv6
         if (filter_var($host, FILTER_VALIDATE_IP) !== false) {
             return true;
         }
+        /**********************  Retorno datos  **********************/
         // Hostname/FQDN (RFC 1123). Se admite '_' por compatibilidad con nombres internos de contenedores.
         return (bool) preg_match(
             '/^(?=.{1,253}$)[a-zA-Z0-9_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?(?:\.[a-zA-Z0-9_](?:[a-zA-Z0-9_-]*[a-zA-Z0-9_])?)*$/',
             (string)$host
         );
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Valida el charset contra la lista de permitidos (ALLOWED_CHARSETS).
      *
      * @param string $charset Juego de caracteres de la conexión.
      *
      * @return bool True si el charset está permitido.
+     *
+     * @example
+     * ```php
+     * $this->_validateCharset('utf8mb4');   // true
+     * $this->_validateCharset('no_existe'); // false
+     * ```
      */
-    private function validateCharset($charset): bool {
+    private function _validateCharset($charset): bool {
+
+        /**********************  Retorno datos  **********************/
         return in_array(strtolower(trim((string)$charset)), self::ALLOWED_CHARSETS, true);
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Construye el DSN de conexión MySQL a partir de parámetros ya validados.
      * * Centraliza la construcción para reutilizarla en validateCredentials y validateDatabase.
@@ -991,45 +1027,106 @@ class FunctionsDataSQL {
      * @param string $charset Charset validado.
      *
      * @return string DSN listo para PDO/DB\SQL.
+     *
+     * @example
+     * ```php
+     * $this->_buildDsn('localhost', 3306, 'utf8mb4');
+     * // devuelve 'mysql:host=localhost;port=3306;charset=utf8mb4'
+     * ```
      */
-    private function buildDsn(string $host, int $port, string $charset): string {
+    private function _buildDsn(string $host, int $port, string $charset): string {
+
+        /**********************  Retorno datos  **********************/
         return 'mysql:host=' . $host . ';port=' . $port . ';charset=' . $charset;
+
     }
 
-    /*******************************************************************************************************************/
-    /*                                                                                                                 */
-    /*                                        Capas privadas de validateSQL                                            */
-    /*                                                                                                                 */
-    /*******************************************************************************************************************/
-    /** [1] Detecta null bytes (\0) usados para truncar el análisis o evadir filtros de texto. */
-    private function checkNullBytes(string $query): ?string {
+	/******************************************************************************/
+    /**
+     * [1] Detecta null bytes (\0) usados para truncar el análisis o evadir filtros de texto.
+     *
+     * @param string $query Query a analizar.
+     *
+     * @return string|null Mensaje de error si la query contiene caracteres nulos, o null si está limpia.
+     *
+     * @example
+     * ```php
+     * $this->_checkNullBytes('SELECT * FROM clientes'); // null
+     * $this->_checkNullBytes("SELECT *\0 FROM users");  // 'Query contiene caracteres nulos'
+     * ```
+     */
+    private function _checkNullBytes(string $query): ?string {
+
+        /**********************  Retorno datos  **********************/
         return str_contains($query, "\0") ? 'Query contiene caracteres nulos' : null;
+
     }
 
-    /** [2] Verifica que la query no exceda la longitud máxima (evita ReDoS/DoS). */
-    private function checkMaxLength(string $query, int $maxLength): ?string {
+    /******************************************************************************/
+    /**
+     * [2] Verifica que la query no exceda la longitud máxima (evita ReDoS/DoS).
+     *
+     * @param string $query     Query a analizar.
+     * @param int    $maxLength Longitud máxima permitida en caracteres.
+     *
+     * @return string|null Mensaje de error si la query excede $maxLength, o null si cabe.
+     *
+     * @example
+     * ```php
+     * $this->_checkMaxLength('SELECT * FROM clientes', 10000); // null
+     * $this->_checkMaxLength(str_repeat('a', 10001), 10000);  // 'Query excede el límite de 10000 caracteres'
+     * ```
+     */
+    private function _checkMaxLength(string $query, int $maxLength): ?string {
+
+        /**********************  Retorno datos  **********************/
         return strlen($query) > $maxLength ? "Query excede el límite de {$maxLength} caracteres" : null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [3] Normaliza la query: trim, elimina comentarios de línea y bloque, colapsa
      * espacios y elimina el ';' final.
+     *
+     * @param string $query Query original (con comentarios, espacios sobrantes y ';' final).
+     *
+     * @return string Query normalizada: sin comentarios, con un solo espacio entre tokens y sin ';' final.
+     *
+     * @example
+     * ```php
+     * $this->_normalizeQuery('  SELECT * FROM clientes ; '); // 'SELECT * FROM clientes'
+     * $this->_normalizeQuery('SELECT 1 -- comentario');      // 'SELECT 1'
+     * ```
      */
-    private function normalizeQuery(string $query): string {
+    private function _normalizeQuery(string $query): string {
+
         $query = trim($query);
-        $query = preg_replace('/(--[^\n]*$)|(#[^\n]*$)/m', '', $query); // comentarios de línea
+        $query = preg_replace('/(--[^\n]*$)|(#[^\n]*$)/m', '', $query);  // comentarios de línea
         $query = preg_replace('/\/\*.*?\*\//s', '', $query);             // comentarios de bloque
         $query = preg_replace('/\s+/', ' ', $query);                     // colapsar whitespace
+        /**********************  Retorno datos  **********************/
         return rtrim($query, '; ');
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [4] Reemplaza cada literal string ('...', "...", `...`) por un placeholder
      * neutral __STR_N__ para que los regex de seguridad no analicen su contenido.
+     *
+     * @param string $query Query con literales entre comillas simples, dobles o backticks.
+     *
+     * @return string Query con cada literal reemplazado por un placeholder __STR_N__.
+     *
+     * @example
+     * ```php
+     * $this->_extractSqlLiterals("SELECT * FROM users WHERE name = 'DROP TABLE x'");
+     * // 'SELECT * FROM users WHERE name = __STR_0__'
+     * ```
      */
-    private function extractSqlLiterals(string $query): string {
+    private function _extractSqlLiterals(string $query): string {
+
         $literals  = [];
         $sanitized = preg_replace_callback(
             "/'(?:[^'\\\\]|\\\\.)*'|\"(?:[^\"\\\\]|\\\\.)*\"|`(?:[^`\\\\]|\\\\.)*`/",
@@ -1040,56 +1137,156 @@ class FunctionsDataSQL {
             },
             $query
         );
+        /**********************  Retorno datos  **********************/
         return $sanitized;
+
     }
 
-    /** [5] Bloquea múltiples sentencias separadas por ';' cuando $single es true. */
-    private function checkMultipleStatements(string $sanitized, bool $single): ?string {
+    /******************************************************************************/
+    /**
+     * [5] Bloquea múltiples sentencias separadas por ';' cuando $single es true.
+     *
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     * @param bool   $single    Si true, cualquier ';' con contenido posterior bloquea la query.
+     *
+     * @return string|null Mensaje de error si hay múltiples sentencias y $single es true, o null si es válida.
+     *
+     * @example
+     * ```php
+     * $this->_checkMultipleStatements('SELECT 1; DROP TABLE clientes', true); // 'Múltiples sentencias no permitidas'
+     * $this->_checkMultipleStatements('SELECT * FROM clientes', true);        // null
+     * ```
+     */
+    private function _checkMultipleStatements(string $sanitized, bool $single): ?string {
+
         if ($single && preg_match('/;.+\S/', $sanitized)) {
             return 'Múltiples sentencias no permitidas';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /** [6] Detecta el verbo SQL inicial. Retorna el tipo en mayúsculas o null si no se reconoce. */
-    private function detectQueryType(string $sanitized): ?string {
+    /******************************************************************************/
+    /**
+     * [6] Detecta el verbo SQL inicial. Retorna el tipo en mayúsculas o null si no se reconoce.
+     *
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Tipo de query en mayúsculas (SELECT, INSERT, UPDATE, DELETE, REPLACE, DROP, ALTER, CREATE, TRUNCATE) o null si no se reconoce.
+     *
+     * @example
+     * ```php
+     * $this->_detectQueryType('SELECT * FROM clientes'); // 'SELECT'
+     * $this->_detectQueryType('MERGE INTO clientes');    // null
+     * ```
+     */
+    private function _detectQueryType(string $sanitized): ?string {
+
         $knownTypes = 'SELECT|INSERT|UPDATE|DELETE|REPLACE|DROP|ALTER|CREATE|TRUNCATE';
         if (!preg_match('/^(' . $knownTypes . ')\b/i', $sanitized, $match)) {
             return null;
         }
+        /**********************  Retorno datos  **********************/
         return strtoupper($match[1]);
+
     }
 
-    /** [7] Lista deny global (independiente del modo). */
-    private function checkDenyList(string $type, array $deny): ?string {
+    /******************************************************************************/
+    /**
+     * [7] Lista deny global (independiente del modo).
+     *
+     * @param string $type Tipo de query detectado (en mayúsculas).
+     * @param array  $deny Keywords/tipos siempre bloqueados.
+     *
+     * @return string|null Mensaje de error si $type está en $deny, o null si no lo está.
+     *
+     * @example
+     * ```php
+     * $this->_checkDenyList('DROP', ['DROP', 'TRUNCATE']);   // "Tipo 'DROP' está en la lista de denegación"
+     * $this->_checkDenyList('SELECT', ['DROP', 'TRUNCATE']); // null
+     * ```
+     */
+    private function _checkDenyList(string $type, array $deny): ?string {
+
         if (!empty($deny) && in_array($type, $deny, true)) {
             return "Tipo '$type' está en la lista de denegación";
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /** [8a] Detecta funciones de timing/blind SQLi (SLEEP, BENCHMARK, etc.). */
-    private function checkTimingFunctions(string $sanitized): ?string {
+    /******************************************************************************/
+    /**
+     * [8a] Detecta funciones de timing/blind SQLi (SLEEP, BENCHMARK, etc.).
+     *
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si detecta funciones de timing (SLEEP, BENCHMARK, WAIT FOR DELAY, PG_SLEEP), o null si no hay.
+     *
+     * @example
+     * ```php
+     * $this->_checkTimingFunctions('SELECT * FROM clientes WHERE id = SLEEP(5)'); // 'Query contiene funciones de timing prohibidas'
+     * $this->_checkTimingFunctions('SELECT * FROM clientes WHERE id = 1');        // null
+     * ```
+     */
+    private function _checkTimingFunctions(string $sanitized): ?string {
+
         if (preg_match('/\b(SLEEP|BENCHMARK|WAIT\s+FOR\s+DELAY|PG_SLEEP)\s*\(/i', $sanitized)) {
             return 'Query contiene funciones de timing prohibidas';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /** [8b] Detecta funciones de encoding/ofuscación (CHAR, HEX, UNHEX, etc.). */
-    private function checkEncodingFunctions(string $sanitized): ?string {
+    /******************************************************************************/
+    /**
+     * [8b] Detecta funciones de encoding/ofuscación (CHAR, HEX, UNHEX, etc.).
+     *
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si detecta funciones de encoding/ofuscación (CHAR, HEX, UNHEX, ASCII, ORD, CONV, BIN), o null si no hay.
+     *
+     * @example
+     * ```php
+     * $this->_checkEncodingFunctions('SELECT * FROM clientes WHERE id = CHAR(49,32,79,82)'); // 'Query contiene funciones de encoding/ofuscación prohibidas'
+     * $this->_checkEncodingFunctions('SELECT * FROM clientes WHERE id = 1');                 // null
+     * ```
+     */
+    private function _checkEncodingFunctions(string $sanitized): ?string {
+
         if (preg_match('/\b(CHAR|HEX|UNHEX|ASCII|ORD|CONV|BIN)\s*\(/i', $sanitized)) {
             return 'Query contiene funciones de encoding/ofuscación prohibidas';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [9a] Modo strict: el tipo debe estar en $allowed y ninguna keyword de $deny
      * puede aparecer en cualquier posición de la query.
+     *
+     * @param string $mode      Modo de seguridad activo (solo aplica si es 'strict').
+     * @param string $type      Tipo de query detectado (en mayúsculas).
+     * @param array  $allowed   Tipos de query permitidos en modo strict.
+     * @param array  $deny      Keywords siempre bloqueadas, en cualquier posición.
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si el modo es strict y la query infringe sus reglas, o null en caso contrario.
+     *
+     * @example
+     * ```php
+     * $this->_checkStrictMode('strict', 'SELECT', ['SELECT'], ['DROP'], 'SELECT * FROM clientes'); // null
+     * $this->_checkStrictMode('strict', 'DELETE', ['SELECT'], ['DROP'], 'DELETE FROM clientes');
+     * // "Tipo 'DELETE' no permitido en modo strict"
+     * ```
      */
-    private function checkStrictMode(string $mode, string $type, array $allowed, array $deny, string $sanitized): ?string {
+    private function _checkStrictMode(string $mode, string $type, array $allowed, array $deny, string $sanitized): ?string {
+
         if ($mode !== 'strict') {
             return null;
         }
@@ -1101,15 +1298,35 @@ class FunctionsDataSQL {
                 return "Keyword '$kw' no permitida en modo strict";
             }
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [9b] Modo safe: sin mezcla de operaciones destructivas, sin subqueries
      * destructivas y sin verbos peligrosos en el cuerpo de un SELECT.
+     *
+     * @param string $mode      Modo de seguridad activo (solo aplica si es 'safe').
+     * @param string $type      Tipo de query detectado (en mayúsculas).
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si el modo es safe y la query infringe sus reglas, o null en caso contrario.
+     *
+     * @example
+     * ```php
+     * $this->_checkSafeMode('safe', 'SELECT', 'SELECT * FROM clientes WHERE id = 1'); // null
+     *
+     * $this->_checkSafeMode('safe', 'DROP', 'DROP TABLE clientes; TRUNCATE clientes');
+     * // 'Query mezcla múltiples operaciones peligrosas: DROP, TRUNCATE'
+     *
+     * $this->_checkSafeMode('safe', 'SELECT', 'SELECT * FROM clientes WHERE id IN (SELECT id FROM logs) AND 1=1; DELETE FROM clientes');
+     * // 'Subquery contiene operación destructiva'
+     * ```
      */
-    private function checkSafeMode(string $mode, string $type, string $sanitized): ?string {
+    private function _checkSafeMode(string $mode, string $type, string $sanitized): ?string {
+
         if ($mode !== 'safe') {
             return null;
         }
@@ -1133,14 +1350,34 @@ class FunctionsDataSQL {
         if ($type === 'SELECT' && preg_match('/\b(UPDATE|DELETE|INSERT|DROP)\b/i', $sanitized)) {
             return 'SELECT contiene operaciones peligrosas';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [9c] Modo paranoid: solo SELECT plano, sin subqueries, UNION, JOIN ni INTO.
+     *
+     * @param string $mode      Modo de seguridad activo (solo aplica si es 'paranoid').
+     * @param string $type      Tipo de query detectado (en mayúsculas).
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si el modo es paranoid y la query no es un SELECT plano, o null en caso contrario.
+     *
+     * @example
+     * ```php
+     * $this->_checkParanoidMode('paranoid', 'SELECT', 'SELECT nombre FROM clientes WHERE id = 1'); // null
+     *
+     * $this->_checkParanoidMode('paranoid', 'SELECT', 'SELECT * FROM a WHERE id IN (SELECT id FROM b)');
+     * // 'Modo paranoid no permite subqueries'
+     *
+     * $this->_checkParanoidMode('paranoid', 'DELETE', 'DELETE FROM clientes');
+     * // "Modo paranoid solo permite SELECT, se recibió 'DELETE'"
+     * ```
      */
-    private function checkParanoidMode(string $mode, string $type, string $sanitized): ?string {
+    private function _checkParanoidMode(string $mode, string $type, string $sanitized): ?string {
+
         if ($mode !== 'paranoid') {
             return null;
         }
@@ -1162,23 +1399,55 @@ class FunctionsDataSQL {
         if (preg_match('/\b(?:' . $forbiddenClauses . ')\b/i', $sanitized)) {
             return 'Modo paranoid no permite UNION, JOIN ni INTO';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /** [10] Un SELECT sin FROM es inválido (sospechoso). */
-    private function checkSelectWithoutFrom(string $type, string $sanitized): ?string {
+    /******************************************************************************/
+    /**
+     * [10] Un SELECT sin FROM es inválido (sospechoso).
+     *
+     * @param string $type      Tipo de query detectado (en mayúsculas).
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si es un SELECT sin FROM, o null en caso contrario.
+     *
+     * @example
+     * ```php
+     * $this->_checkSelectWithoutFrom('SELECT', 'SELECT 1');        // 'SELECT sin FROM (posible query inválida)'
+     * $this->_checkSelectWithoutFrom('SELECT', 'SELECT * FROM t'); // null
+     * ```
+     */
+    private function _checkSelectWithoutFrom(string $type, string $sanitized): ?string {
+
         if ($type === 'SELECT' && !preg_match('/\bFROM\b/i', $sanitized)) {
             return 'SELECT sin FROM (posible query inválida)';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [11] Tautologías anti OR 1=1 y variantes (numérica, identificadores,
      * booleana, comparación numérica e IS NOT NULL).
+     *
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     *
+     * @return string|null Mensaje de error si detecta una tautología (OR 1=1, OR x=x, OR true, OR 2>1, OR id IS NOT NULL), o null si no hay.
+     *
+     * @example
+     * ```php
+     * $this->_checkTautologies('SELECT * FROM clientes WHERE id = 1 OR 1=1');
+     * // 'Posible inyección SQL: condición numérica tautológica'
+     *
+     * $this->_checkTautologies('SELECT * FROM clientes WHERE id = 1'); // null
+     * ```
      */
-    private function checkTautologies(string $sanitized): ?string {
+    private function _checkTautologies(string $sanitized): ?string {
+
         // A — OR/AND con número igual a sí mismo: OR 1=1, AND 2=2
         if (preg_match('/\b(?:OR|AND)\b\s*[\'"]?\d+[\'"]?\s*=\s*[\'"]?\d+[\'"]?/i', $sanitized)) {
             return 'Posible inyección SQL: condición numérica tautológica';
@@ -1199,11 +1468,31 @@ class FunctionsDataSQL {
         if (preg_match('/\b(?:OR|AND)\b\s*\w+\s+IS\s+NOT\s+NULL/i', $sanitized)) {
             return 'Posible inyección SQL: condición IS NOT NULL sospechosa';
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /** [12] Whitelist de tablas: la primera tabla del FROM debe estar permitida. */
-    private function checkTableWhitelist(string $type, string $sanitized, array $tables): ?string {
+    /******************************************************************************/
+    /**
+     * [12] Whitelist de tablas: la primera tabla del FROM debe estar permitida.
+     *
+     * @param string $type      Tipo de query detectado (en mayúsculas).
+     * @param string $sanitized Query con literales ya reemplazados por placeholders.
+     * @param array  $tables    Whitelist de tablas permitidas (vacío = sin restricción).
+     *
+     * @return string|null Mensaje de error si la primera tabla del FROM no está en la whitelist (o no se detecta), o null si está permitida.
+     *
+     * @example
+     * ```php
+     * $this->_checkTableWhitelist('SELECT', 'SELECT * FROM clientes', ['clientes']); // null
+     *
+     * $this->_checkTableWhitelist('SELECT', 'SELECT * FROM usuarios', ['clientes']);
+     * // "Tabla 'usuarios' no está en la whitelist de tablas permitidas"
+     * ```
+     */
+    private function _checkTableWhitelist(string $type, string $sanitized, array $tables): ?string {
+
         if (empty($tables)) {
             return null;
         }
@@ -1215,16 +1504,45 @@ class FunctionsDataSQL {
         if (!in_array($targetTable, $allowedTables, true)) {
             return "Tabla '$targetTable' no está en la whitelist de tablas permitidas";
         }
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * [13] Blacklist de tablas sensibles y columnas sensibles (control contextual):
      * bloquea modificaciones directas, SELECT directo sin JOIN y acceso a columnas
      * sensibles (con o sin alias), permitiendo JOIN controlado.
+     *
+     * @param string $type             Tipo de query detectado (en mayúsculas).
+     * @param string $sanitized        Query con literales ya reemplazados por placeholders.
+     * @param array  $blacklistTables  Tablas sensibles restringidas (vacío = sin restricción).
+     * @param array  $sensitiveColumns Columnas prohibidas en las tablas sensibles.
+     *
+     * @return string|null Mensaje de error si la query toca una tabla o columna sensible, o null si no hay conflicto.
+     *
+     * @example
+     * ```php
+     * $this->_checkSensitiveTables(
+     *     'SELECT',
+     *     'SELECT u.password FROM users u JOIN orders o ON o.user_id = u.id',
+     *     ['users'],
+     *     ['password', 'token']
+     * );
+     * // "Acceso a columna sensible 'users.password' mediante alias 'u' no permitido"
+     *
+     * $this->_checkSensitiveTables(
+     *     'SELECT',
+     *     'SELECT o.total FROM orders o JOIN users u ON u.id = o.user_id',
+     *     ['users'],
+     *     ['password']
+     * );
+     * // null
+     * ```
      */
-    private function checkSensitiveTables(string $type, string $sanitized, array $blacklistTables, array $sensitiveColumns): ?string {
+    private function _checkSensitiveTables(string $type, string $sanitized, array $blacklistTables, array $sensitiveColumns): ?string {
+
         if (empty($blacklistTables)) {
             return null;
         }
@@ -1306,8 +1624,11 @@ class FunctionsDataSQL {
             }
         }
 
+        /**********************  Retorno datos  **********************/
         return null;
+
     }
+
 
 
 

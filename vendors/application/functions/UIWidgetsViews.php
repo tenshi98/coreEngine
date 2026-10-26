@@ -27,22 +27,22 @@
  * Catalogo de claves de cada fila de $arrData (comun a table_v1 ... table_v7):
  *   Theme_color  string  'summary-theme-color-1' | '-2' | '-3'                                   (default 'summary-theme-color-1')
  *   Icon         string  clase del icono (ej: 'bi bi-bank'); '' = sin icono                      (default '')
- *   Icon_color   int     1..61   -> mapa colorsText() / colorsBackgroundBTN()                    (default 23  text-color-red)
+ *   Icon_color   int     1..61   -> mapa _colorsText() / _colorsBackgroundBTN()                    (default 23  text-color-red)
  *   Title        string  rotulo del dato; '' = fila sin titulo                                   (default '')
- *   Title_color  int     1..61   -> mapa colorsText()                                            (default 17  text-muted)
+ *   Title_color  int     1..61   -> mapa _colorsText()                                            (default 17  text-muted)
  *   Text         string  valor del dato                                                          (default '')
- *   Text_color   int     1..61   -> mapa colorsText()                                            (default 17  text-muted)
+ *   Text_color   int     1..61   -> mapa _colorsText()                                            (default 17  text-muted)
  *   Text_copy    string  si trae valor se agrega el boton copiar al portapapeles                 (default '')
  *   Value        int     0..100; lo usa table_v5 (barra de progreso)                             (default 100)
  *   Value_color  string  'bg-empty'|'bg-success'|'bg-info'|'bg-warning'|'bg-danger'              (default 'bg-empty')
  *
- * Catalogo de colores (mapas internos colorsText / colorsBackgroundBTN / colorsBG / colorsTitle):
+ * Catalogo de colores (mapas internos _colorsText / _colorsBackgroundBTN / _colorsBG / _colorsTitle):
  *   1..16    colores base del sistema        (text-base-color01 ... text-base-color16)
  *   17..22   utilitarios Bootstrap/MDB       (text-muted, text-primary, text-warning, text-danger, ...)
  *   23..41   paleta solida                   (text-color-red, ...-light, ...-dark, text-color-white)
  *   42..61   paleta MDB                      (text-color-red-text ... text-color-grey-text)
- *   colorsBG   1..103 fondos (standart, pastel, lighten-1 y rgba-*-slight/light/strong)
- *   colorsTitle 1..39 usa los MISMOS nombres de 23..61 numerados 1..39 (1 => text-color-red, 39 => text-color-grey-text)
+ *   _colorsBG   1..103 fondos (standart, pastel, lighten-1 y rgba-*-slight/light/strong)
+ *   _colorsTitle 1..39 usa los MISMOS nombres de 23..61 numerados 1..39 (1 => text-color-red, 39 => text-color-grey-text)
  */
 class UIWidgetsViews {
 
@@ -51,7 +51,7 @@ class UIWidgetsViews {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $DataValidations;
 
@@ -85,8 +85,7 @@ class UIWidgetsViews {
 	private const FIELDS_CARD  = ['Theme_color', 'Icon', 'Icon_color', 'Title', 'Title_color', 'Text', 'Text_color', 'Text_copy'];  // table_v6
 	private const FIELDS_STAT  = ['Theme_color', 'Title', 'Title_color', 'Text', 'Text_color'];                                     // table_v7
 
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
 	/**
 	 * Crea las instancias que la clase necesita (el validador de datos) al construir el objeto.
 	 *
@@ -104,10 +103,10 @@ class UIWidgetsViews {
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+    /******************************************************************************/
 	/**
 	 * Normaliza y valida la configuracion comun de todos los bloques de datos (table_v1 ... table_v7).
 	 * * Es el unico punto de validacion de las tablas: resuelve el valor por defecto de cada opcion
@@ -241,10 +240,12 @@ class UIWidgetsViews {
 		$Return['nErrors'] = $errorn;
 		$Return['alerts']  = $alerts;
 
+		/**********************  Retorno datos  **********************/
 		return $Return;
 
 	}
-	/************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime una lista de filas "titulo : valor" con icono por fila y boton de copiado opcional.
 	 * * Usa table_common() para normalizar y validar los datos: si hay errores imprime las alertas
@@ -289,7 +290,7 @@ class UIWidgetsViews {
 						$input.= '
 						<div class="row">
 							<div class="'.$this->_colClass($dataReturn['TituloCol']).' label ">
-								<i class="'.$Icon.'"></i> <span class="'.$this->colorsText($row['Title_color']).'">'.$row['Title'].'</span>
+								<i class="'.$Icon.'"></i> <span class="'.$this->_colorsText($row['Title_color']).'">'.$row['Title'].'</span>
 							</div>
 							<div class="'.$this->_colClass($dataReturn['internalCol']).'">'.$this->_valueField($row, 9).'
 							</div>
@@ -310,16 +311,19 @@ class UIWidgetsViews {
 			// Cierro
 			$input.= '</div>';
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
-	/************************************************************************************************************/
-	/**
+
+    /******************************************************************************/
+    /**
 	 * Imprime una lista de tarjetas "titulo + valor" (icono y boton de copiado opcionales).
 	 * * Usa table_common() para normalizar y validar los datos; ante errores imprime las alertas.
 	 *
@@ -359,7 +363,7 @@ class UIWidgetsViews {
 						$input.= '
 						<div class="data-card-list-item">
 							<i class="'.$Icon.'"></i>
-							<strong class="'.$this->colorsText($row['Title_color']).'">'.$row['Title'].'</strong>'.$this->_valueField($row, 8).'
+							<strong class="'.$this->_colorsText($row['Title_color']).'">'.$row['Title'].'</strong>'.$this->_valueField($row, 8).'
 						</div>';
 						// Se aumenta contador
 						$count++;
@@ -368,19 +372,22 @@ class UIWidgetsViews {
 				$input.= '</div>';
 			$input.= '</div>';
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
-	/************************************************************************************************************/
-	/**
+
+    /******************************************************************************/
+    /**
 	 * Imprime una lista de metadatos con el icono dentro de un boton y el valor debajo del rotulo.
 	 * * Usa table_common() para normalizar y validar los datos; ante errores imprime las alertas.
-	 * * El icono se pinta con colorsBackgroundBTN() y sin color de texto.
+	 * * El icono se pinta con _colorsBackgroundBTN() y sin color de texto.
 	 *
 	 * @param array $arrData Filas con las claves del catalogo (ver cabecera de la clase).
 	 * @param array $Options 'Cols' (1..6) e 'internalCol' (1..11).
@@ -417,11 +424,11 @@ class UIWidgetsViews {
 						// Se genera input
 						$input.= '
 						<div class="meta-list__item">
-							<div class="btn '.$this->colorsBackgroundBTN($row['Icon_color']).'">
+							<div class="btn '.$this->_colorsBackgroundBTN($row['Icon_color']).'">
 								<i class="'.$Icon.'"></i>
 							</div>
 							<div>
-								<div class="meta-list__label '.$this->colorsText($row['Title_color']).'">'.$row['Title'].'</div>'.$this->_valueField($row, 9, 'div', 'meta-list__value').'
+								<div class="meta-list__label '.$this->_colorsText($row['Title_color']).'">'.$row['Title'].'</div>'.$this->_valueField($row, 9, 'div', 'meta-list__value').'
 							</div>
 						</div>';
 						// Se aumenta contador
@@ -431,16 +438,19 @@ class UIWidgetsViews {
 				$input.= '</div>';
 			$input.= '</div>';
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
-	/************************************************************************************************************/
-	/**
+
+    /******************************************************************************/
+    /**
 	 * Imprime una lista compacta de pares clave/valor (sin icono).
 	 * * Usa table_common() para normalizar y validar los datos; ante errores imprime las alertas.
 	 *
@@ -478,7 +488,7 @@ class UIWidgetsViews {
 						// Se genera input
 						$input.= '
 						<div class="meta-row">
-							<span class="meta-row__key '.$this->colorsText($row['Title_color']).'">'.$row['Title'].'</span>'.$this->_valueField($row, 8, 'span', 'meta-row__val').'
+							<span class="meta-row__key '.$this->_colorsText($row['Title_color']).'">'.$row['Title'].'</span>'.$this->_valueField($row, 8, 'span', 'meta-row__val').'
 						</div>';
 						// Se aumenta contador
 						$count++;
@@ -487,16 +497,19 @@ class UIWidgetsViews {
 				$input.= '</div>';
 			$input.= '</div>';
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
-	/************************************************************************************************************/
-	/**
+
+    /******************************************************************************/
+    /**
 	 * Imprime una lista de barras de progreso animadas (rotulo + valor 0..100).
 	 * * Usa table_common() para normalizar y validar los datos; ante errores imprime las alertas.
 	 * * Es la unica vista que usa 'Value' (porcentaje) y 'Value_color' (bg-* del progress-bar).
@@ -534,7 +547,7 @@ class UIWidgetsViews {
 					// Se genera input
 					$input.= '
 					<div class="skill-bar">
-						<div class="skill-bar__top '.$this->colorsText($row['Title_color']).'">
+						<div class="skill-bar__top '.$this->_colorsText($row['Title_color']).'">
 							<span>'.$row['Title'].'</span>
 							<span>'.$row['Value'].'</span>
 						</div>
@@ -548,16 +561,19 @@ class UIWidgetsViews {
 			// Cierro
 			$input.= '</div>';
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
-	/************************************************************************************************************/
-	/**
+
+    /******************************************************************************/
+    /**
 	 * Imprime una ficha resumen por columna (icono + rotulo + valor) con borde de tema.
 	 * * Usa table_common() para normalizar y validar los datos; ante errores imprime las alertas.
 	 * * Saca el bloque de columna completa, por lo que puede invocarse dentro de un <div class="row">.
@@ -598,11 +614,11 @@ class UIWidgetsViews {
 					<div class="summary-item '.$row['Theme_color'].'">';
 						//Verifico si se envian datos para el icono
 						if($row['Icon'] != ''){
-							$input.= '<div class="summary-icon"><i class="'.$row['Icon'].' '.$this->colorsText($row['Icon_color']).'"></i></div>';
+							$input.= '<div class="summary-icon"><i class="'.$row['Icon'].' '.$this->_colorsText($row['Icon_color']).'"></i></div>';
 						}
 						$input.= '
 						<div class="summary-content">
-							<span class="summary-label '.$this->colorsText($row['Title_color']).'">'.$row['Title'].'</span>'.$this->_valueField($row, 8, 'span', 'field-value', 'summary-field', 'summary-value').'
+							<span class="summary-label '.$this->_colorsText($row['Title_color']).'">'.$row['Title'].'</span>'.$this->_valueField($row, 8, 'span', 'field-value', 'summary-field', 'summary-value').'
 						</div>
 					</div>
 				</div>';
@@ -610,16 +626,19 @@ class UIWidgetsViews {
 				$count++;
 			}
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
-	/************************************************************************************************************/
-	/**
+
+    /******************************************************************************/
+    /**
 	 * Imprime una ficha de estadistica (valor grande sobre rotulo) con borde de tema, sin icono.
 	 * * Usa table_common() para normalizar y validar los datos; ante errores imprime las alertas.
 	 * * OJO: el rotulo se toma de 'Text' y el valor destacado de 'Title' (orden invertido respecto
@@ -660,8 +679,8 @@ class UIWidgetsViews {
 				<div class="'.$this->_colClass($dataReturn['div_col']).'">
 					<div class="summary-item '.$row['Theme_color'].'">
 						<div class="summary-content summary-stat">
-							<span class="summary-label '.$this->colorsText($row['Text_color']).'">'.$row['Text'].'</span>
-							<span class="summary-value '.$this->colorsText($row['Title_color']).'">'.$row['Title'].'</span>
+							<span class="summary-label '.$this->_colorsText($row['Text_color']).'">'.$row['Text'].'</span>
+							<span class="summary-value '.$this->_colorsText($row['Title_color']).'">'.$row['Title'].'</span>
 						</div>
 					</div>
 				</div>';
@@ -669,16 +688,120 @@ class UIWidgetsViews {
 				$count++;
 			}
 
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $input;
         }else{
+			/**********************  Retorno datos  **********************/
 			// Imprimir dato
 			echo $alerts;
 		}
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
+    /**
+	 * Genera una tabla HTML estilizada con Bootstrap a partir de un arreglo de datos.
+	 *
+	 * Este método construye dinámicamente un componente visual compuesto por:
+	 * - Un contenedor tipo "card"
+	 * - Un encabezado con título y botón de exportación a Excel
+	 * - Una tabla responsive con encabezados y filas generadas desde los datos
+	 *
+	 * Características principales:
+	 * - Si el arreglo está vacío, retorna un mensaje de advertencia
+	 * - Genera un ID único para la tabla (utilizado para exportación)
+	 * - Usa las claves del primer elemento como encabezados de la tabla
+	 * - Escapa los valores para prevenir inyección HTML
+	 *
+	 * @param array $data Arreglo de datos donde cada elemento representa una fila asociativa
+	 *                    (clave => valor). Todas las filas deben compartir las mismas claves.
+	 *
+	 * @return string HTML completo del componente Bootstrap con la tabla generada
+	 *
+	 * @throws \Exception No lanza excepciones explícitas; depende de la estructura del arreglo de entrada
+	 *
+	 * @example
+	 * ```php
+	 * $WidgetsViews = new UIWidgetsViews();
+	 * $WidgetsViews->arrayToBootstrapTable([
+	 *     ['Nombre' => 'Ana',   'Cargo' => 'Admin'],
+	 *     ['Nombre' => 'Luis',  'Cargo' => 'Vendedor'],
+	 * ]);
+	 * // devuelve el HTML de la card con la tabla y el botón 'Exportar a Excel'
+	 * ```
+	 */
+	public function arrayToBootstrapTable(array $data) {
+		// Valida si el arreglo de datos está vacío
+		if (empty($data)) {
+			// Se Instancia
+			$WidgetsCommon = new UIWidgetsCommon();
+			// Mensaje
+			$Btn_Text = 'No hay datos disponibles.';
+			// Mostrar alerta
+			return $WidgetsCommon->alertPostData(5, 4, 'bi bi-exclamation-triangle-fill', 0, $Btn_Text);
+		}
+
+		// Genera un identificador único para la tabla
+		$tableId  = 'table_' . uniqid();
+
+		// Genera un nombre de archivo basado en fecha y hora para exportación
+		$fileName = 'detalle_' . date('Ymd_His');
+
+		// Obtiene los encabezados a partir de las claves del primer elemento del arreglo
+		$headers = array_keys(reset($data));
+
+		// Inicializa el contenedor principal tipo card
+		$html  = '<div class="card card-custom mb-3 shadow-sm">';
+
+		// Construye el encabezado del card con título y botón de exportación
+		$html .= '<div class="card-header d-flex justify-content-between align-items-center">';
+		$html .= '<span>Tabla de datos</span>';
+		$html .= '<button type="button" class="btn btn-sm btn-success" onclick="exportTableToExcel(\'' . $tableId . '\', \'' . $fileName . '\')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>';
+		$html .= '</div>';
+
+		// Inicia el contenedor responsive para la tabla
+		$html .= '<div class="table-responsive">';
+
+		// Abre la tabla con el ID generado
+		$html .= '<table id="' . $tableId . '" class="table table-borderless mb-0">';
+
+		// Construye la sección THEAD con los encabezados
+		$html .= '<thead class="table-light"><tr>';
+		foreach ($headers as $header) {
+			// Aplica formato al encabezado y escapa el contenido
+			$html .= '<th scope="col">' . htmlspecialchars(ucfirst($header)) . '</th>';
+		}
+		$html .= '</tr></thead>';
+
+		// Construye la sección TBODY con los datos
+		$html .= '<tbody>';
+		foreach ($data as $row) {
+			$html .= '<tr>';
+
+			// Recorre cada encabezado para mantener consistencia en columnas
+			foreach ($headers as $header) {
+				// Obtiene el valor correspondiente o asigna vacío si no existe
+				$value = isset($row[$header]) ? $row[$header] : '';
+
+				// Escapa el valor antes de insertarlo en la celda
+				$html .= '<td>' . htmlspecialchars($value) . '</td>';
+			}
+
+			$html .= '</tr>';
+		}
+		$html .= '</tbody>';
+
+		// Cierra la tabla y los contenedores
+		$html .= '</table></div></div>';
+
+		/**********************  Retorno datos  **********************/
+		// Retorna el HTML generado
+		return $html;
+
+	}
+
+	/******************************************************************************/
 	/**
 	 * Imprime el retrato del usuario con borde y esquinas redondeadas.
 	 * * Si $Image viene vacio usa la imagen por defecto del sistema ($BASE.'/img/picture-img.jpg').
@@ -695,10 +818,13 @@ class UIWidgetsViews {
 	 * ```
 	 */
 	public function imgPortrait_1($BASE, $MainPathUrl, $Image): void {
+
 		//Se delega en el retrato comun agregando el borde
 		$this->_imgPortrait($BASE, $MainPathUrl, $Image, 'square-border-3');
+
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime el retrato del usuario con esquinas redondeadas (sin borde).
 	 * * Si $Image viene vacio usa la imagen por defecto del sistema ($BASE.'/img/picture-img.jpg').
@@ -715,11 +841,13 @@ class UIWidgetsViews {
 	 * ```
 	 */
 	public function imgPortrait_2($BASE, $MainPathUrl, $Image): void {
+
 		//Se delega en el retrato comun sin el borde
 		$this->_imgPortrait($BASE, $MainPathUrl, $Image);
+
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Normaliza y valida la configuracion comun de los titulos (tittle_v2, tittle_v3 y tittle_v4).
 	 * * Resuelve los colores por defecto y delega la verificacion en checkData() (motor 1).
@@ -778,18 +906,20 @@ class UIWidgetsViews {
 		$Return['nErrors'] = $errorn;
 		$Return['alerts']  = $alerts;
 
+		/**********************  Retorno datos  **********************/
 		// Retorno datos
 		return $Return;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
-	 * Imprime un titulo simple con la etiqueta HTML indicada y color del catalogo colorsTitle().
+	 * Imprime un titulo simple con la etiqueta HTML indicada y color del catalogo _colorsTitle().
 	 * * No pasa por tittle_common(): valida 'Type' y 'TextColor' por separado (motor 1).
 	 *
 	 * @param string $Text Texto del titulo.
 	 * @param string $Type Etiqueta HTML: 'h1', 'h2', 'h3', 'h4', 'h5', 'p' o 'strong'.
-	 * @param int $TextColor Color 1..39 del catalogo colorsTitle() (default 3 text-color-red-dark).
+	 * @param int $TextColor Color 1..39 del catalogo _colorsTitle() (default 3 text-color-red-dark).
 	 *
 	 * @return void Imprime la etiqueta con la clase 'box-title' o las alertas de validacion.
 	 *
@@ -824,19 +954,20 @@ class UIWidgetsViews {
 		/********************** Si todo esta ok **********************/
         // Ejecucion si no hay errores
         if($errorn==0){
-			echo '<'.$Type.' class="box-title '.$this->colorsTitle($TextColor).'">'.$Text.'</'.$Type.'>';
+			echo '<'.$Type.' class="box-title '.$this->_colorsTitle($TextColor).'">'.$Text.'</'.$Type.'>';
 		}else{
 			echo $alerts;
 		}
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime un titulo de seccion (summary-title-1) a todo el ancho.
 	 * * Valida el color a traves de tittle_common() (1..61) y usa el valor normalizado para pintar.
 	 *
 	 * @param string $Text Texto del titulo.
-	 * @param int $TextColor Color 1..61 del catalogo colorsText() (default 20 text-color-mdb-text).
+	 * @param int $TextColor Color 1..61 del catalogo _colorsText() (default 20 text-color-mdb-text).
 	 *
 	 * @return void Imprime el HTML del titulo o las alertas de validacion.
 	 *
@@ -860,20 +991,21 @@ class UIWidgetsViews {
         if($errorn==0){
 			echo '
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                <div class="summary-title-1 '.$this->colorsText($dataReturn['Text_color']).'">'.$Text.'</div>
+                <div class="summary-title-1 '.$this->_colorsText($dataReturn['Text_color']).'">'.$Text.'</div>
             </div>';
 		}else{
 			echo $alerts;
 		}
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime un titulo de seccion alternativo (summary-title-2) a todo el ancho.
 	 * * Valida el color a traves de tittle_common() (1..61) y usa el valor normalizado para pintar.
 	 *
 	 * @param string $Text Texto del titulo.
-	 * @param int $TextColor Color 1..61 del catalogo colorsText() (default 20 text-color-mdb-text).
+	 * @param int $TextColor Color 1..61 del catalogo _colorsText() (default 20 text-color-mdb-text).
 	 *
 	 * @return void Imprime el HTML del titulo o las alertas de validacion.
 	 *
@@ -897,25 +1029,26 @@ class UIWidgetsViews {
         if($errorn==0){
 			echo '
 			<div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
-                <div class="summary-title-2 '.$this->colorsText($dataReturn['Text_color']).'">'.$Text.'</div>
+                <div class="summary-title-2 '.$this->_colorsText($dataReturn['Text_color']).'">'.$Text.'</div>
             </div>';
 		}else{
 			echo $alerts;
 		}
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime el encabezado de un registro: titulo, identificador y, opcionalmente, un icono.
 	 * * Valida los colores a traves de tittle_common(); el icono solo se imprime si viene informado.
 	 *
 	 * @param string $Title Titulo del registro (obligatorio).
 	 * @param string $Text Identificador o dato secundario del registro (opcional).
-	 * @param int $Title_color Color 1..61 del catalogo colorsText() (default 17 text-muted).
-	 * @param int $Text_color Color 1..61 del catalogo colorsText() (default 17 text-muted).
+	 * @param int $Title_color Color 1..61 del catalogo _colorsText() (default 17 text-muted).
+	 * @param int $Text_color Color 1..61 del catalogo _colorsText() (default 17 text-muted).
 	 * @param string $Icon Clase del icono (ej: 'bi bi-bell'); '' = sin icono.
 	 * @param int $Icon_color Color 1..61 del icono (default 17 text-muted).
-	 * @param int $Icon_bg_color Fondo 1..103 del icono, via colorsBG() (default 43 bkg-grey-lighten-1).
+	 * @param int $Icon_bg_color Fondo 1..103 del icono, via _colorsBG() (default 43 bkg-grey-lighten-1).
 	 *
 	 * @return void Imprime el HTML del encabezado o las alertas de validacion.
 	 *
@@ -946,16 +1079,16 @@ class UIWidgetsViews {
 					//Verifico siexiste el icono
 					if($Icon != ''){
 						echo '
-						<span class="record-header-icon '.$this->colorsBG($dataReturn['Icon_bg_color']).'">
-							<i class="'.$Icon.' '.$this->colorsText($dataReturn['Icon_color']).'"></i>
+						<span class="record-header-icon '.$this->_colorsBG($dataReturn['Icon_bg_color']).'">
+							<i class="'.$Icon.' '.$this->_colorsText($dataReturn['Icon_color']).'"></i>
 						</span>';
 					}
 					echo '
 					<div>
-						<h2 class="record-title '.$this->colorsText($dataReturn['Title_color']).'">'.$Title.'</h2>';
+						<h2 class="record-title '.$this->_colorsText($dataReturn['Title_color']).'">'.$Title.'</h2>';
 						// Verifico
 						if($Text != ''){
-							echo '<p class="record-id '.$this->colorsText($dataReturn['Text_color']).'">'.$Text.'</p>';
+							echo '<p class="record-id '.$this->_colorsText($dataReturn['Text_color']).'">'.$Text.'</p>';
 						}
 						echo '
 					</div>
@@ -967,7 +1100,7 @@ class UIWidgetsViews {
 
 	}
 
-    /************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Normaliza y valida la configuracion comun de los encabezados de perfil (headerProfile).
 	 * * Resuelve los colores por defecto y delega la verificacion en checkData() (motor 1).
@@ -1023,11 +1156,13 @@ class UIWidgetsViews {
 		$Return['nErrors'] = $errorn;
 		$Return['alerts']  = $alerts;
 
+		/**********************  Retorno datos  **********************/
 		// Retorno datos
 		return $Return;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime la cabecera de perfil: imagen de fondo, avatar y datos (rotulo, nombre y descripcion).
 	 * * Valida los colores a traves de header_common(); si $IMG viene vacio usa la imagen por defecto.
@@ -1036,9 +1171,9 @@ class UIWidgetsViews {
 	 * @param string $SubTitle Titulo principal (ej: el nombre).
 	 * @param string $Text Texto descriptivo bajo el titulo.
 	 * @param string $IMG Ruta de la imagen de fondo y del avatar; vacio => imagen por defecto.
-	 * @param int $Title_color Color 1..61 del catalogo colorsText() (default 17 text-muted).
-	 * @param int $SubTitle_color Color 1..61 del catalogo colorsText() (default 17 text-muted).
-	 * @param int $Text_color Color 1..61 del catalogo colorsText() (default 17 text-muted).
+	 * @param int $Title_color Color 1..61 del catalogo _colorsText() (default 17 text-muted).
+	 * @param int $SubTitle_color Color 1..61 del catalogo _colorsText() (default 17 text-muted).
+	 * @param int $Text_color Color 1..61 del catalogo _colorsText() (default 17 text-muted).
 	 *
 	 * @return void Imprime el HTML de la cabecera o las alertas de validacion.
 	 *
@@ -1082,9 +1217,9 @@ class UIWidgetsViews {
 					</div>
 					<!-- Información -->
 					<div class="profile-heading">
-						<h2 class="eyebrow '.$this->colorsText($dataReturn['Title_color']).'">'.$Title.'</h2>
-						<h1 class="'.$this->colorsText($dataReturn['SubTitle_color']).'">'.$SubTitle.'</h1>
-						<p class="'.$this->colorsText($dataReturn['Text_color']).'">'.$Text.'</p>
+						<h2 class="eyebrow '.$this->_colorsText($dataReturn['Title_color']).'">'.$Title.'</h2>
+						<h1 class="'.$this->_colorsText($dataReturn['SubTitle_color']).'">'.$SubTitle.'</h1>
+						<p class="'.$this->_colorsText($dataReturn['Text_color']).'">'.$Text.'</p>
 					</div>
 				</div>
 			</div>';
@@ -1094,97 +1229,12 @@ class UIWidgetsViews {
 
 	}
 
-	/************************************************************************************************************/
-	/**
-	 * Genera una tabla HTML estilizada con Bootstrap a partir de un arreglo de datos.
-	 *
-	 * Este método construye dinámicamente un componente visual compuesto por:
-	 * - Un contenedor tipo "card"
-	 * - Un encabezado con título y botón de exportación a Excel
-	 * - Una tabla responsive con encabezados y filas generadas desde los datos
-	 *
-	 * Características principales:
-	 * - Si el arreglo está vacío, retorna un mensaje de advertencia
-	 * - Genera un ID único para la tabla (utilizado para exportación)
-	 * - Usa las claves del primer elemento como encabezados de la tabla
-	 * - Escapa los valores para prevenir inyección HTML
-	 *
-	 * @param array $data Arreglo de datos donde cada elemento representa una fila asociativa
-	 *                    (clave => valor). Todas las filas deben compartir las mismas claves.
-	 *
-	 * @return string HTML completo del componente Bootstrap con la tabla generada
-	 *
-	 * @throws \Exception No lanza excepciones explícitas; depende de la estructura del arreglo de entrada
-	 */
-	public function arrayToBootstrapTable(array $data) {
-		// Valida si el arreglo de datos está vacío
-		if (empty($data)) {
-			return '<div class="alert alert-warning">No hay datos disponibles</div>';
-		}
-
-		// Genera un identificador único para la tabla
-		$tableId  = 'table_' . uniqid();
-
-		// Genera un nombre de archivo basado en fecha y hora para exportación
-		$fileName = 'detalle_' . date('Ymd_His');
-
-		// Obtiene los encabezados a partir de las claves del primer elemento del arreglo
-		$headers = array_keys(reset($data));
-
-		// Inicializa el contenedor principal tipo card
-		$html  = '<div class="card card-custom mb-3 shadow-sm">';
-
-		// Construye el encabezado del card con título y botón de exportación
-		$html .= '<div class="card-header d-flex justify-content-between align-items-center">';
-		$html .= '<span>Tabla de datos</span>';
-		$html .= '<button type="button" class="btn btn-sm btn-success" onclick="exportTableToExcel(\'' . $tableId . '\', \'' . $fileName . '\')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>';
-		$html .= '</div>';
-
-		// Inicia el contenedor responsive para la tabla
-		$html .= '<div class="table-responsive">';
-
-		// Abre la tabla con el ID generado
-		$html .= '<table id="' . $tableId . '" class="table table-borderless mb-0">';
-
-		// Construye la sección THEAD con los encabezados
-		$html .= '<thead class="table-light"><tr>';
-		foreach ($headers as $header) {
-			// Aplica formato al encabezado y escapa el contenido
-			$html .= '<th scope="col">' . htmlspecialchars(ucfirst($header)) . '</th>';
-		}
-		$html .= '</tr></thead>';
-
-		// Construye la sección TBODY con los datos
-		$html .= '<tbody>';
-		foreach ($data as $row) {
-			$html .= '<tr>';
-
-			// Recorre cada encabezado para mantener consistencia en columnas
-			foreach ($headers as $header) {
-				// Obtiene el valor correspondiente o asigna vacío si no existe
-				$value = isset($row[$header]) ? $row[$header] : '';
-
-				// Escapa el valor antes de insertarlo en la celda
-				$html .= '<td>' . htmlspecialchars($value) . '</td>';
-			}
-
-			$html .= '</tr>';
-		}
-		$html .= '</tbody>';
-
-		// Cierra la tabla y los contenedores
-		$html .= '</table></div></div>';
-
-		// Retorna el HTML generado
-		return $html;
-	}
-
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                              Metodos Internos                                                   */
+	/*                                              Metodos Privados                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Resuelve el valor de una opcion dentro de un arreglo (o su default si no viene informada).
 	 * * Se considera "sin dato" cuando la clave no existe, es nula, o es una cadena vacia o de espacios.
@@ -1220,7 +1270,8 @@ class UIWidgetsViews {
 		return $Value;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Compone la clase de columna de Bootstrap para los seis breakpoints usados en el sistema.
 	 *
@@ -1239,7 +1290,8 @@ class UIWidgetsViews {
 		return 'col-xs-12 col-sm-12 col-md-'.$Cols.' col-lg-'.$Cols.' col-xl-'.$Cols.' col-xxl-'.$Cols;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Compone la clase del icono de una fila, aplicando el icono por defecto cuando no viene informado.
 	 *
@@ -1260,10 +1312,11 @@ class UIWidgetsViews {
 		$Icon = ($Row['Icon'] != '') ? $Row['Icon'] : self::DEFAULT_ICON;
 
 		/**********************  Retorno datos  **********************/
-		return ($withColor) ? $Icon.' '.$this->colorsText($Row['Icon_color']) : $Icon;
+		return ($withColor) ? $Icon.' '.$this->_colorsText($Row['Icon_color']) : $Icon;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Compone el bloque "valor" de una fila, con el boton de copiado cuando el dato trae 'Text_copy'.
 	 * * Unifica el bloque que estaba duplicado en table_v1 (dos veces), table_v2, table_v3, table_v4
@@ -1293,7 +1346,7 @@ class UIWidgetsViews {
 		$t2 = str_repeat("\t", $Indent + 2);
 		// Clase del valor cuando no hay boton y color de texto del dato
 		$classPlain = ($classPlain === null) ? $class : $classPlain;
-		$colorText  = $this->colorsText($Row['Text_color']);
+		$colorText  = $this->_colorsText($Row['Text_color']);
 
 		/**********************  Verificaciones   **********************/
 		// Clase del valor en cada caso (sin doble espacio cuando no hay clase base)
@@ -1320,10 +1373,12 @@ class UIWidgetsViews {
 		$input .= '
 '.$t0.'</span>';
 
+		/**********************  Retorno datos  **********************/
 		return $input;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Imprime el retrato cuadrado del usuario (avatar), con la imagen por defecto cuando no hay dato.
 	 *
@@ -1348,11 +1403,12 @@ class UIWidgetsViews {
 		$ImgClass = trim('square-rounded-2 '.$ExtraClass).' w-100 mb-2';
 
 		/**********************  Retorno datos  **********************/
-		// IMprimo
+		// Imprimo
 		echo '<img src="'.$UserIMG.'" alt="Profile" class="'.$ImgClass.'">';
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Mapa de colores de texto segun identificador (catalogo usado por casi todo el archivo).
 	 * * 1..16 colores base del sistema, 17..22 utilitarios Bootstrap/MDB, 23..41 paleta solida
@@ -1364,11 +1420,11 @@ class UIWidgetsViews {
 	 *
 	 * @example
 	 * ```php
-	 * $this->colorsText(17); // 'text-muted'
-	 * $this->colorsText(23); // 'text-color-red'
+	 * $this->_colorsText(17); // 'text-muted'
+	 * $this->_colorsText(23); // 'text-color-red'
 	 * ```
 	 */
-	private function colorsText($idColor): string {
+	private function _colorsText($idColor): string {
 
 		$arrColorClass = [
 			1  => 'text-base-color01',
@@ -1448,7 +1504,8 @@ class UIWidgetsViews {
 		return $arrColorClass[$idColor] ?? '';
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Mapa de botones con contorno (btn-outline-bkg-*) segun el color del icono.
 	 * * Se usa en table_v3 para el boton redondo que contiene el icono.
@@ -1459,10 +1516,10 @@ class UIWidgetsViews {
 	 *
 	 * @example
 	 * ```php
-	 * $this->colorsBackgroundBTN(12); // 'btn-outline-bkg-deep-orange-darken'
+	 * $this->_colorsBackgroundBTN(12); // 'btn-outline-bkg-deep-orange-darken'
 	 * ```
 	 */
-	private function colorsBackgroundBTN($idColor): string {
+	private function _colorsBackgroundBTN($idColor): string {
 
 		$arrColorClass = [
 			1  => 'btn-outline-bkg-grey-darken',
@@ -1542,7 +1599,8 @@ class UIWidgetsViews {
 		return $arrColorClass[$idColor] ?? '';
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
 	 * Mapa de fondos (bg-*, bkg-* y rgba-*) segun identificador, usado en tittle_v4 para el icono.
 	 * * 1..7 colores standart, 8..20 pastel, 21..24 pastel oscuro, 25..43 bkg-*-lighten-1 y
@@ -1554,10 +1612,10 @@ class UIWidgetsViews {
 	 *
 	 * @example
 	 * ```php
-	 * $this->colorsBG(43); // 'bkg-grey-lighten-1'
+	 * $this->_colorsBG(43); // 'bkg-grey-lighten-1'
 	 * ```
 	 */
-	private function colorsBG($idColor): string {
+	private function _colorsBG($idColor): string {
 
 		$arrColorClass = [
 			1   => 'bg-standart-purple',
@@ -1671,11 +1729,12 @@ class UIWidgetsViews {
 		return $arrColorClass[$idColor] ?? '';
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
 	/**
-	 * Mapa de colores de titulo (1..39) que reutiliza los MISMOS nombres de colorsText() 23..61.
-	 * * Es decir: colorsTitle(1) === colorsText(23) (text-color-red) y colorsTitle(39) ===
-	 * colorsText(61) (text-color-grey-text). Se mantiene el mapa explicito por legibilidad.
+	 * Mapa de colores de titulo (1..39) que reutiliza los MISMOS nombres de _colorsText() 23..61.
+	 * * Es decir: _colorsTitle(1) === _colorsText(23) (text-color-red) y _colorsTitle(39) ===
+	 * _colorsText(61) (text-color-grey-text). Se mantiene el mapa explicito por legibilidad.
 	 *
 	 * @param int $idColor Identificador 1..39 (tittle_v1 lo valida antes de pintar).
 	 *
@@ -1683,10 +1742,10 @@ class UIWidgetsViews {
 	 *
 	 * @example
 	 * ```php
-	 * $this->colorsTitle(20); // 'text-color-mdb-text' (equivale a colorsText(42))
+	 * $this->_colorsTitle(20); // 'text-color-mdb-text' (equivale a _colorsText(42))
 	 * ```
 	 */
-	private function colorsTitle($idColor): string {
+	private function _colorsTitle($idColor): string {
 
 		$arrColorClass = [
 			1 => 'text-color-red',
@@ -1742,4 +1801,6 @@ class UIWidgetsViews {
 		return $arrColorClass[$idColor] ?? '';
 
 	}
+
+
 }

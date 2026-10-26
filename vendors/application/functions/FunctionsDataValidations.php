@@ -6,112 +6,11 @@ class FunctionsDataValidations {
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
-	/**
-     * Valida si una cadena de texto corresponde a un RUT chileno válido.
-     * * El proceso incluye la limpieza de puntos, validación de formato mediante expresiones
-     * regulares y el cálculo del dígito verificador utilizando el algoritmo del Módulo 11.
-     *
-     * @param string $Data El RUT a validar (ej: '12.345.678-9' o '12345678-9').
-     *
-     * @return bool True si el RUT es válido, false en caso contrario.
-	 *
-	 * @example
-	 * ```php
-	 * $DataValidations->validarRut('10.569.874-5');
-	 * ```
-	 *
-     */
-    public function validarRut($Data): bool {
-
-        /********************** Validaciones Iniciales **********************/
-        if ($Data === null || trim((string)$Data) === '' || $Data == '0') {
-            return false;
-        }
-
-        /********************** Limpieza y Formateo **********************/
-        // Elimina puntos para normalizar la cadena
-        $rut = str_replace('.', '', $Data);
-
-        // Verifica longitud mínima (un RUT válido tiene al menos 3 caracteres: 1-k)
-        if (empty($rut) || strlen($rut) < 3) {
-            return false;
-        }
-
-        // Separa la parte numérica del guion y dígito verificador
-        $parteNumerica = str_replace(substr($rut, -2, 2), '', $rut);
-
-        // Valida que la parte izquierda sean solo dígitos
-        if (!preg_match("/^[0-9]*$/", $parteNumerica)) {
-            return false;
-        }
-
-        $guionYVerificador = substr($rut, -2, 2);
-
-        // El formato debe terminar estrictamente en "-X" donde X es 0-9 o K
-        if (strlen($guionYVerificador) != 2 || !preg_match('/(^[-]{1}+[0-9kK]).{0}$/', $guionYVerificador)) {
-            return false;
-        }
-
-        /********************** Algoritmo Módulo 11 **********************/
-        // Prepara la cadena eliminando guiones y puntos para el cálculo
-        $rutV   = preg_replace('/[\.\-]/i', '', $rut);
-        $dv     = substr($rutV, -1);
-        $numero = substr($rutV, 0, strlen($rutV) - 1);
-
-        $i      = 2;
-        $suma   = 0;
-
-        // Multiplicación por serie 2,3,4,5,6,7 y suma
-        foreach (array_reverse(str_split($numero)) as $v) {
-            if ($i == 8) { $i = 2; }
-            $suma += $v * $i;
-            ++$i;
-        }
-
-        // Cálculo del dígito esperado
-        $dvr = 11 - ($suma % 11);
-        if ($dvr == 11) { $dvr = 0; }
-        if ($dvr == 10) { $dvr = 'K'; }
-
-        /********************** Retorno de Datos **********************/
-        // Compara el dígito calculado con el ingresado
-        return ($dvr == strtoupper($dv));
-    }
-
-	/************************************************************************************************************/
-	/**
-     * Valida si una cadena de texto tiene un formato de correo electrónico válido.
-     * * Utiliza el filtro nativo de PHP FILTER_VALIDATE_EMAIL, que cumple con
-     * gran parte de los estándares RFC.
-     *
-     * @param string $Data Correo electrónico a validar.
-     *
-     * @return bool True si el formato es correcto.
-	 *
-	 * @example
-	 * ```php
-	 * $DataValidations->validarEmail('asd@asd.cl'); //Devuelve true
-	 * $DataValidations->validarEmail('asd@asd');    //Devuelve false
-	 * ```
-	 *
-     */
-    public function validarEmail($Data): bool {
-
-        /**********************  Validaciones   **********************/
-        if ($Data === null || trim((string)$Data) === '') {
-            return false;
-        }
-
-        /********************** Retorno de Datos **********************/
-        return (bool) filter_var($Data, FILTER_VALIDATE_EMAIL);
-    }
-
-	/************************************************************************************************************/
-	/**
+	/******************************************************************************/
+    /**
      * Valida si el dato ingresado es un valor numérico.
      * * Acepta números enteros, decimales (usando punto o coma) y valores negativos.
      *
@@ -121,10 +20,10 @@ class FunctionsDataValidations {
 	 *
 	 * @example
 	 * ```php
-	 * $DataValidations->validarNumero(25);     //Devuelve true
-	 * $DataValidations->validarNumero('25');   //Devuelve true (acepta numeros como string)
-	 * $DataValidations->validarNumero('12,5'); //Devuelve true (normaliza la coma decimal)
-	 * $DataValidations->validarNumero('abc');  //Devuelve false
+	 * $DataValidations->validarNumero(25);     // Devuelve true
+	 * $DataValidations->validarNumero('25');   // Devuelve true (acepta numeros como string)
+	 * $DataValidations->validarNumero('12,5'); // Devuelve true (normaliza la coma decimal)
+	 * $DataValidations->validarNumero('abc');  // Devuelve false
 	 * ```
 	 *
      */
@@ -141,76 +40,142 @@ class FunctionsDataValidations {
 
         /********************** Retorno de Datos **********************/
         return is_numeric($number);
+
     }
 
-	/************************************************************************************************************/
-	/**
-     * Valida si una cadena corresponde al formato de una patente vehicular chilena.
-     * * Soporta tanto el formato antiguo (AA-1234) como el formato nuevo (BB-CC-12),
-     * validando que no se utilicen vocales en el formato nuevo según la norma.
+    /******************************************************************************/
+    /**
+     * Valida si el dato ingresado es un número entero.
+     * * A diferencia de is_int(), esta función permite validar números que vienen
+     * como strings (común en formularios) siempre que no contengan decimales.
      *
-     * @param string $Data Patente a validar.
+     * @param mixed $Data Dato a validar.
      *
-     * @return bool True si cumple con el patrón RegEx.
+     * @return bool True si es un número entero.
 	 *
 	 * @example
 	 * ```php
-	 * $DataValidations->ValidarPatente('AU1825');  //Devuelve true
-	 * $DataValidations->ValidarPatente('512369');  //Devuelve false
+	 * $DataValidations->validarEntero(16);     // Devuelve true
+	 * $DataValidations->validarEntero('16');   // Devuelve true (acepta enteros como string)
+	 * $DataValidations->validarEntero('16.5'); // Devuelve false (tiene decimales)
+	 * $DataValidations->validarEntero('-16');  // Devuelve false (no admite signo, usar validarEnteroConSigno)
 	 * ```
 	 *
      */
-    public function ValidarPatente($Data): bool {
+    public function validarEntero($Data): bool {
 
-        /**********************  Validaciones   **********************/
+        /********************** Validaciones   **********************/
         if ($Data === null || trim((string)$Data) === '') {
             return false;
         }
 
-        /********************** Limpieza **********************/
-        $patente = str_replace("-", "", $Data);
+        /********************** Si todo esta ok **********************/
+        /********************** Retorno datos  **********************/
+        // is_numeric asegura que sea un número, ctype_digit asegura que no tenga decimales ni signos
+        return (is_numeric($Data)) ? ctype_digit(strval($Data)) : false;
 
-        // RegEx para:
-        // 1. Formato Antiguo: 2 letras + 4 números
-        // 2. Formato Nuevo: 4 consonantes (sin vocales) + 2 números
-        $regex = '/^[a-z]{2}[\.\- ]?[0-9]{2}[\.\- ]?[0-9]{2}|[b-d,f-h,j-l,p,r-t,v-z]{2}[\-\. ]?[b-d,f-h,j-l,p,r-t,v-z]{2}[\.\- ]?[0-9]{2}$/i';
-
-        /********************** Retorno de Datos **********************/
-        return (bool) preg_match($regex, $patente);
     }
 
-	/************************************************************************************************************/
-	/**
-     * Valida si una cadena de texto es una URL con formato válido.
+    /******************************************************************************/
+    /**
+     * Valida si el dato ingresado es un número entero que admite signo.
+     * * A diferencia de validarEntero(), acepta un signo '-' o '+' al inicio, ya que
+     * muchos formularios requieren enteros bajo cero (temperaturas, saldos, ajustes).
+     * * Sigue rechazando decimales y texto.
      *
-     * @param string $Data URL a validar.
+     * @param mixed $Data Dato a validar.
      *
-     * @return bool True si es una URL válida (incluyendo protocolo).
-	 *
-	 * @example
-	 * ```php
-	 * $DataValidations->validarURL('https://www.google.cl'); //Devuelve true
-	 * $DataValidations->validarURL('https://www.  SSS  ');   //Devuelve false
-	 * ```
-	 *
+     * @return bool True si es un número entero con o sin signo.
+     *
+     * @example
+     * ```php
+     * $DataValidations->validarEnteroConSigno('-16'); // Devuelve true
+     * $DataValidations->validarEnteroConSigno('16');  // Devuelve true
+     * $DataValidations->validarEnteroConSigno('1.5'); // Devuelve false
+     * ```
+     *
      */
-    public function validarURL($Data): bool {
+    public function validarEnteroConSigno($Data): bool {
 
-        /**********************  Validaciones   **********************/
+        /********************** Validaciones   **********************/
         if ($Data === null || trim((string)$Data) === '') {
             return false;
         }
 
-        /********************** Limpieza **********************/
+        /********************** Retorno datos  **********************/
+        // Solo dígitos, con un signo opcional al inicio
+        return (bool) preg_match('/^[+-]?[0-9]+$/', trim((string)$Data));
+
+    }
+
+	/******************************************************************************/
+    /**
+     * Valida si una cadena corresponde a una fecha real según un formato específico.
+     *
+     * ✔ Soporta validación estricta usando DateTime
+     * ✔ Detecta errores y warnings internos de parsing
+     * ✔ Evita fechas inválidas como 2023-02-31
+     * ✔ Elimina espacios en blanco que puedan invalidar la comparación
+     *
+     * @param string $Data   Cadena de fecha a validar
+     * @param string $format Formato esperado (por defecto 'Y-m-d')
+     *
+     * @return bool True si la fecha es válida y coincide exactamente con el formato
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarFecha('1900-01-01');          // Devuelve true
+	 * $DataValidations->validarFecha('1900-01-01', 'Y-m-d'); // Devuelve true
+     * $DataValidations->validarFecha('a');                   // Devuelve false
+	 * ```
+	 *
+     */
+    public function validarFecha($Data, $format = 'Y-m-d'): bool {
+
+        /**********************  Validaciones   **********************/
+        // Limpia espacios en blanco al inicio y final
+        // (muy común cuando los datos vienen de formularios o BD)
+        // - Evita string vacío
+        // - Evita fechas "nulas" típicas de BD
+        if ($Data === null || trim((string)$Data) === '' || $Data === '0000-00-00') {
+            return false;
+        }
+
         $Data = trim($Data);
 
-        /********************** Retorno de Datos **********************/
-        return $Data !== '' && filter_var($Data, FILTER_VALIDATE_URL) !== false;
+        /********************** Si todo esta ok **********************/
+        // No se modifica la zona horaria global: la validación usa el formato
+        // con '!' (resetea a época) y compara texto contra texto, por lo que
+        // es independiente de la zona configurada en el bootstrap de la app.
+        // Intenta crear un objeto DateTime a partir del formato dado
+        $d = DateTime::createFromFormat('!' . $format, $Data);
+
+        // Si no se pudo crear el objeto, la fecha es inválida
+        if (!$d) {
+            return false;
+        }
+
+        // Obtiene errores y advertencias del último parsing
+        // DateTime puede crear objetos incluso con datos incorrectos,
+        // por lo que es necesario validar estos errores manualmente
+        $errors = DateTime::getLastErrors();
+
+        // Si hay warnings o errores, la fecha no es válida
+        if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
+            return false;
+        }
+
+        /********************** Retorno datos  **********************/
+        // Validación final estricta:
+        // Compara la fecha formateada con la original
+        // Esto evita casos como:
+        // '2023-02-31' → se convierte en '2023-03-03'
+        return $d->format($format) === $Data;
 
     }
 
-	/************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Valida si una cadena representa una hora válida en formato H:M o H:M:S.
      * * Permite un rango de horas extendido (hasta 999) útil para cronómetros o
      * sumatoria de tiempos, validando que los minutos y segundos no excedan de 59.
@@ -221,8 +186,8 @@ class FunctionsDataValidations {
 	 *
 	 * @example
 	 * ```php
-	 * $DataValidations->validarHora('16:24:00'); //Devuelve true
-	 * $DataValidations->validarHora(16);         //Devuelve false
+	 * $DataValidations->validarHora('16:24:00'); // Devuelve true
+	 * $DataValidations->validarHora(16);         // Devuelve false
 	 * ```
 	 *
      */
@@ -260,179 +225,454 @@ class FunctionsDataValidations {
 
         /********************** Retorno de Datos **********************/
         return false;
+
     }
 
-	/************************************************************************************************************/
-	/**
-     * Valida si una cadena corresponde a una fecha real según un formato específico.
+	/******************************************************************************/
+    /**
+     * Valida si una cadena de texto corresponde a un RUT chileno válido.
+     * * El proceso incluye la limpieza de puntos, validación de formato mediante expresiones
+     * regulares y el cálculo del dígito verificador utilizando el algoritmo del Módulo 11.
      *
-     * ✔ Soporta validación estricta usando DateTime
-     * ✔ Detecta errores y warnings internos de parsing
-     * ✔ Evita fechas inválidas como 2023-02-31
-     * ✔ Elimina espacios en blanco que puedan invalidar la comparación
+     * @param string $Data El RUT a validar (ej: '12.345.678-9' o '12345678-9').
      *
-     * @param string $Data   Cadena de fecha a validar
-     * @param string $format Formato esperado (por defecto 'Y-m-d')
-     *
-     * @return bool True si la fecha es válida y coincide exactamente con el formato
+     * @return bool True si el RUT es válido, false en caso contrario.
 	 *
 	 * @example
 	 * ```php
-	 * $DataValidations->validarFecha('1900-01-01');          //Devuelve true
-	 * $DataValidations->validarFecha('1900-01-01', 'Y-m-d'); //Devuelve true
-     * $DataValidations->validarFecha('a');                   //Devuelve false
+	 * $DataValidations->validarRut('12.345.678-5'); // Devuelve true
+	 * $DataValidations->validarRut('10.569.874-5'); // Devuelve false (dígito verificador incorrecto)
 	 * ```
 	 *
      */
-    public function validarFecha($Data, $format = 'Y-m-d'): bool {
+    public function validarRut($Data): bool {
+
+        /********************** Validaciones Iniciales **********************/
+        if ($Data === null || trim((string)$Data) === '' || $Data == '0') {
+            return false;
+        }
+
+        /********************** Limpieza y Formateo **********************/
+        // Elimina puntos para normalizar la cadena
+        $rut = str_replace('.', '', $Data);
+
+        // Verifica longitud mínima (un RUT válido tiene al menos 3 caracteres: 1-k)
+        if (empty($rut) || strlen($rut) < 3) {
+            return false;
+        }
+
+        // Separa la parte numérica del guion y dígito verificador
+        $parteNumerica = substr($rut, 0, -2);
+
+        // Valida que la parte izquierda sean solo dígitos
+        if (!preg_match("/^[0-9]*$/", $parteNumerica)) {
+            return false;
+        }
+
+        $guionYVerificador = substr($rut, -2, 2);
+
+        // El formato debe terminar estrictamente en "-X" donde X es 0-9 o K
+        if (strlen($guionYVerificador) != 2 || !preg_match('/(^[-]{1}+[0-9kK]).{0}$/', $guionYVerificador)) {
+            return false;
+        }
+
+        /********************** Algoritmo Módulo 11 **********************/
+        // Prepara la cadena eliminando guiones y puntos para el cálculo
+        $rutV   = preg_replace('/[\.\-]/i', '', $rut);
+        $dv     = substr($rutV, -1);
+        $numero = substr($rutV, 0, strlen($rutV) - 1);
+
+        $i      = 2;
+        $suma   = 0;
+
+        // Multiplicación por serie 2,3,4,5,6,7 y suma
+        foreach (array_reverse(str_split($numero)) as $v) {
+            if ($i == 8) { $i = 2; }
+            $suma += $v * $i;
+            ++$i;
+        }
+
+        // Cálculo del dígito esperado
+        $dvr = 11 - ($suma % 11);
+        if ($dvr == 11) { $dvr = 0; }
+        if ($dvr == 10) { $dvr = 'K'; }
+
+        /********************** Retorno de Datos **********************/
+        // Compara el dígito calculado con el ingresado
+        return ($dvr == strtoupper($dv));
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida si una cadena corresponde al formato de una patente vehicular chilena.
+     * * Soporta tanto el formato antiguo (AA-1234) como el formato nuevo (BB-CC-12),
+     * validando que no se utilicen vocales en el formato nuevo según la norma.
+     *
+     * @param string $Data Patente a validar.
+     *
+     * @return bool True si cumple con el patrón RegEx.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->ValidarPatente('AU1825');  // Devuelve true
+	 * $DataValidations->ValidarPatente('512369');  // Devuelve false
+	 * ```
+	 *
+     */
+    public function ValidarPatente($Data): bool {
 
         /**********************  Validaciones   **********************/
-        // Limpia espacios en blanco al inicio y final
-        // (muy común cuando los datos vienen de formularios o BD)
-        // - Evita string vacío
-        // - Evita fechas "nulas" típicas de BD
-        if ($Data === null || trim((string)$Data) === '' || $Data === '0000-00-00') {
+        if ($Data === null || trim((string)$Data) === '') {
             return false;
         }
 
+        /********************** Limpieza **********************/
+        $patente = str_replace("-", "", $Data);
+
+        // RegEx para:
+        // 1. Formato Antiguo: 2 letras + 4 números
+        // 2. Formato Nuevo: 4 consonantes (sin vocales) + 2 números
+        $regex = '/^(?:[a-z]{2}[\.\- ]?[0-9]{2}[\.\- ]?[0-9]{2}|[b-df-hj-lpr-tv-z]{2}[\.\- ]?[b-df-hj-lpr-tv-z]{2}[\.\- ]?[0-9]{2})$/i';
+
+        /********************** Retorno de Datos **********************/
+        return (bool) preg_match($regex, $patente);
+
+    }
+
+	/******************************************************************************/
+    /**
+     * Valida si una cadena de texto tiene un formato de correo electrónico válido.
+     * * Utiliza el filtro nativo de PHP FILTER_VALIDATE_EMAIL, que cumple con
+     * gran parte de los estándares RFC.
+     *
+     * @param string $Data Correo electrónico a validar.
+     *
+     * @return bool True si el formato es correcto.
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarEmail('asd@asd.cl'); // Devuelve true
+	 * $DataValidations->validarEmail('asd@asd');    // Devuelve false
+	 * ```
+	 *
+     */
+    public function validarEmail($Data): bool {
+
+        /**********************  Validaciones   **********************/
+        if ($Data === null || trim((string)$Data) === '') {
+            return false;
+        }
+
+        /********************** Retorno de Datos **********************/
+        return (bool) filter_var($Data, FILTER_VALIDATE_EMAIL);
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida si una cadena de texto es una URL con formato válido.
+     *
+     * @param string $Data URL a validar.
+     *
+     * @return bool True si es una URL válida (incluyendo protocolo).
+	 *
+	 * @example
+	 * ```php
+	 * $DataValidations->validarURL('https://www.google.cl'); // Devuelve true
+	 * $DataValidations->validarURL('https://www.  SSS  ');   // Devuelve false
+	 * ```
+	 *
+     */
+    public function validarURL($Data): bool {
+
+        /**********************  Validaciones   **********************/
+        if ($Data === null || trim((string)$Data) === '') {
+            return false;
+        }
+
+        /********************** Limpieza **********************/
         $Data = trim($Data);
 
-        /********************** Si todo esta ok **********************/
-        // Se establece zona horaria
-        date_default_timezone_set('UTC');
-        date_default_timezone_set('America/Santiago');
-        // Intenta crear un objeto DateTime a partir del formato dado
-        $d = DateTime::createFromFormat('!' . $format, $Data);
-
-        // Si no se pudo crear el objeto, la fecha es inválida
-        if (!$d) {
-            return false;
-        }
-
-        // Obtiene errores y advertencias del último parsing
-        // DateTime puede crear objetos incluso con datos incorrectos,
-        // por lo que es necesario validar estos errores manualmente
-        $errors = DateTime::getLastErrors();
-
-        // Si hay warnings o errores, la fecha no es válida
-        if ($errors !== false && ($errors['warning_count'] > 0 || $errors['error_count'] > 0)) {
-            return false;
-        }
-
-        /********************** Retorno datos  **********************/
-        // Validación final estricta:
-        // Compara la fecha formateada con la original
-        // Esto evita casos como:
-        // '2023-02-31' → se convierte en '2023-03-03'
-        return $d->format($format) === $Data;
+        /********************** Retorno de Datos **********************/
+        return $Data !== '' && filter_var($Data, FILTER_VALIDATE_URL) !== false;
 
     }
 
-	/************************************************************************************************************/
-	/**
-     * Valida si el dato ingresado es un número entero.
-     * * A diferencia de is_int(), esta función permite validar números que vienen
-     * como strings (común en formularios) siempre que no contengan decimales.
+    /******************************************************************************/
+    /**
+     * Valida que una URL externa sea segura de consumir desde el servidor (defensa SSRF).
      *
-     * @param mixed $Data Dato a validar.
+     * Comprueba formato de URL, esquema HTTP/HTTPS y que el host resuelva únicamente a
+     * direcciones IP públicas: bloquea loopback, rangos privados/reservados, link-local
+     * (metadata de nube), CGNAT y hostnames internos (localhost, *.local, *.internal,
+     * metadata.google.internal). Si el host no resuelve, se rechaza (fail-closed).
      *
-     * @return bool True si es un número entero.
-	 *
-	 * @example
-	 * ```php
-	 * $DataValidations->validarEntero(16);     //Devuelve true
-	 * $DataValidations->validarEntero('16');   //Devuelve true (acepta enteros como string)
-	 * $DataValidations->validarEntero('16.5'); //Devuelve false (tiene decimales)
-	 * $DataValidations->validarEntero('-16');  //Devuelve false (no admite signo, usar validarEnteroConSigno)
-	 * ```
-	 *
+     * Limitación documentada: la validación resuelve el host una sola vez; no protege
+     * contra DNS rebinding (una segunda resolución distinta dentro de la petición).
+     *
+     * @param string $Url URL a validar.
+     *
+     * @return array ['success' => true] si es segura; ['success' => false, 'error' => motivo] si no lo es.
+     *
+     * @example
+     * ```php
+     * $check = $this->validarUrlExterna('https://api.ejemplo.com/datos');
+     * // ['success' => true] o ['success' => false, 'error' => 'El host destino apunta a una red interna o reservada']
+     * ```
      */
-    public function validarEntero($Data): bool {
+    public function validarUrlExterna(string $Url): array {
 
-        /********************** Validaciones   **********************/
-        if ($Data === null || trim((string)$Data) === '') {
-            return false;
+        // Formato general de la URL
+        if (!filter_var(trim($Url), FILTER_VALIDATE_URL)) {
+            return ['success' => false, 'error' => 'La URL ingresada no es válida'];
         }
 
-        /********************** Si todo esta ok **********************/
-        /********************** Retorno datos  **********************/
-        // is_numeric asegura que sea un número, ctype_digit asegura que no tenga decimales ni signos
-        return (is_numeric($Data)) ? ctype_digit(strval($Data)) : false;
-
-    }
-
-/************************************************************************************************************/
-/**
-     * Valida si el dato ingresado es un número entero que admite signo.
-     * * A diferencia de validarEntero(), acepta un signo '-' o '+' al inicio, ya que
-     * muchos formularios requieren enteros bajo cero (temperaturas, saldos, ajustes).
-     * * Sigue rechazando decimales y texto.
-     *
-     * @param mixed $Data Dato a validar.
-     *
-     * @return bool True si es un número entero con o sin signo.
- *
- * @example
- * ```php
- * $DataValidations->validarEnteroConSigno('-16'); //Devuelve true
- * $DataValidations->validarEnteroConSigno('16');  //Devuelve true
- * $DataValidations->validarEnteroConSigno('1.5'); //Devuelve false
- * ```
- *
-     */
-    public function validarEnteroConSigno($Data): bool {
-
-        /********************** Validaciones   **********************/
-        if ($Data === null || trim((string)$Data) === '') {
-            return false;
+        // Solo se permiten esquemas HTTP/HTTPS
+        $esquema = strtolower((string) parse_url(trim($Url), PHP_URL_SCHEME));
+        if (!in_array($esquema, ['http', 'https'], true)) {
+            return ['success' => false, 'error' => 'Solo se permiten esquemas HTTP/HTTPS'];
         }
 
-        /********************** Retorno datos  **********************/
-        // Solo dígitos, con un signo opcional al inicio
-        return (bool) preg_match('/^[+-]?[0-9]+$/', trim((string)$Data));
+        // Host de destino declarado en la URL
+        $host = (string) parse_url(trim($Url), PHP_URL_HOST);
+        if ($host === '') {
+            return ['success' => false, 'error' => 'La URL no contiene un host válido'];
+        }
 
-    }
+        // Hostnames internos o de metadata bloqueados por defecto
+        $hostLower  = strtolower($host);
+        $bloqueados = ['localhost', 'metadata.google.internal', 'metadata.goog', 'instance-data'];
+        if (in_array($hostLower, $bloqueados, true) || str_ends_with($hostLower, '.localhost') || str_ends_with($hostLower, '.local') || str_ends_with($hostLower, '.internal')) {
+            return ['success' => false, 'error' => 'El host destino está bloqueado por seguridad'];
+        }
 
-	/************************************************************************************************************/
-	/**
-     * Detecta si el usuario está accediendo desde un dispositivo móvil.
-     * * Analiza la cadena HTTP_USER_AGENT del navegador en busca de palabras clave
-     * comunes de sistemas operativos y navegadores móviles.
-     *
-     * @return bool True si se detecta un dispositivo móvil o tablet.
-	 *
-	 * @example
-	 * ```php
-	 * $DataValidations->validarDispositivoMovil();
-	 * ```
-	 *
-     */
-    public function validarDispositivoMovil(): bool {
-
-        // Obtiene el User Agent del servidor
-        $userAgent = strtolower($_SERVER['HTTP_USER_AGENT'] ?? '');
-
-        /********************** Si todo esta ok **********************/
-        // Lista de palabras clave para identificar plataformas móviles
-        $movilKeywords = [
-            'android', 'iphone', 'ipod', 'ipad', 'blackberry', 'windows phone',
-            'opera mini', 'opera mobi', 'mobile', 'silk', 'kindle', 'webos',
-            'palm', 'symbian', 'fennec', 'maemo', 'nokia', 'htc', 'samsung',
-            'lg', 'motorola', 'tablet', 'playbook'
-        ];
-
-        /********************** Retorno datos  **********************/
-        foreach ($movilKeywords as $keyword) {
-            if (strpos($userAgent, $keyword) !== false) {
-                return true;
+        // Resuelve el host a direcciones IP para evaluar los rangos (los literales IP no requieren DNS)
+        if (filter_var($host, FILTER_VALIDATE_IP)) {
+            $ips = [$host];
+        } else {
+            $ips = gethostbynamel($host);
+            if ($ips === false || empty($ips)) {
+                return ['success' => false, 'error' => 'No se pudo resolver el host destino'];
             }
         }
-        return false;
+
+        // Bloquea IPs privadas, reservadas, link-local (metadata de nube) y rangos CGNAT
+        foreach ($ips as $ip) {
+            $publica = filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE);
+            $esCgnat = (bool) preg_match('/^100\.(6[4-9]|[7-9][0-9]|1[01][0-9]|12[0-7])\./', $ip);
+            if ($publica === false || $esCgnat) {
+                return ['success' => false, 'error' => 'El host destino apunta a una red interna o reservada'];
+            }
+        }
+
+        /********************** Retorno datos  **********************/
+        return ['success' => true];
 
     }
 
-	/************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
+     * Valida si un número está dentro de un rango especificado.
+     * * Si $Min > $Max, lanza error de configuración.
+     * * Por defecto, el rango es inclusivo ($Inclusivo = true).
+     * * Si el valor no es numérico, retorna mensaje de error.
+     *
+     * @param int|float $Valor Valor a validar.
+     * @param int|float $Min Límite inferior del rango.
+     * @param int|float $Max Límite superior del rango.
+     * @param bool $Inclusivo Si true, los límites se incluyen; si false, se excluyen.
+     *
+     * @return true|string True si el valor está dentro del rango, o un mensaje de error string en caso contrario.
+     *
+     * @example
+     * ```php
+     * $DataValidations->validarRangoNumerico(5, 1, 10); // Devuelve true
+     * $DataValidations->validarRangoNumerico(0, 1, 10); // Devuelve 'El valor 0 está fuera del rango [1, 10]'
+     * $DataValidations->validarRangoNumerico(5, 10, 1);   // Devuelve 'Configuración de rango inválida: Min > Max'
+     * ```
+     *
+     */
+    public function validarRangoNumerico($Valor, $Min, $Max, $Inclusivo = true): ?string {
+
+        /********************** Validaciones   **********************/
+        if ($Min > $Max) {
+            return 'Configuración de rango inválida: Min > Max';
+        }
+
+        if (!is_numeric($Valor)) {
+            return 'El valor '.$Valor.' no es un número';
+        }
+
+        /********************** Normalización **********************/
+        $Valor = (float) $Valor;
+        $Min   = (float) $Min;
+        $Max   = (float) $Max;
+
+        /********************** Evaluación **********************/
+        if ($Inclusivo) {
+            $resultado = ($Valor >= $Min && $Valor <= $Max);
+        } else {
+            $resultado = ($Valor > $Min && $Valor < $Max);
+        }
+
+        /********************** Retorno datos **********************/
+        return $resultado ? true : 'El valor '.$Valor.' no está en el rango ['.$Min.', '.$Max.']';
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida si una fecha u hora es posterior a la fecha/hora actual.
+     * * Por defecto, "hoy" se considera inválido a menos que $IncluirHoy sea true.
+     * * Acepta cualquier formato válido para `strtotime`.
+     * * Si $IncluirHoy es false y la fecha es exactamente "ahora", retorna error.
+     *
+     * @param string $Fecha   Cadena de fecha/hora a validar (ej: '2024-01-15 10:30:00').
+     * @param bool $IncluirHoy Si true, fechas exactamente igual a "ahora" son válidas; si false, son inválidas.
+     *
+     * @return true|string True si la fecha es futura (o hoy con $IncluirHoy=true), o un mensaje de error string.
+     *
+     * @example
+     * ```php
+     * $DataValidations->validarFechaFutura('2025-01-01'); // Devuelve true
+     * $DataValidations->validarFechaFutura('2023-01-01', false); // Devuelve 'La fecha ya ha pasado o es de hoy'
+     * $DataValidations->validarFechaFutura('today');      // Devuelve true o mensaje según $IncluirHoy
+     * ```
+     *
+     */
+    public function validarFechaFutura($Fecha, $IncluirHoy = false): ?string {
+
+        /********************** Validaciones   **********************/
+        if ($Fecha === null || trim((string)$Fecha) === '') {
+            return 'El valor no es una fecha válida';
+        }
+
+        /********************** Parseo **********************/
+        $tiempoActual = time();
+        $fechaParsed  = strtotime($Fecha);
+
+        if ($fechaParsed === false) {
+            return 'No se pudo parsear la fecha: '.$Fecha;
+        }
+
+        /********************** Evaluación **********************/
+        if ($IncluirHoy) {
+            $resultado = $fechaParsed >= $tiempoActual;
+        } else {
+            $resultado = $fechaParsed > $tiempoActual;
+        }
+
+        /********************** Retorno datos **********************/
+        return $resultado ? true : 'La fecha '.$Fecha.' no es futura (o es de hoy)';
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida si una cadena es un JSON sintácticamente correcto.
+     * * Usa `json_decode` y `json_last_error()` para determinar la validez.
+     * * Caso especial: el string "null" se considera JSON válido (es un valor JSON válido).
+     * * El string vacío "" se considera inválido.
+     * * No valida la semántica del contenido, solo la sintaxis.
+     *
+     * @param string $Json Cadena de texto a validar como JSON.
+     *
+     * @return true|string True si es JSON válido, o un mensaje de error string.
+     *
+     * @example
+     * ```php
+     * $DataValidations->validarJSON('{"key": "value"}'); // Devuelve true
+     * $DataValidations->validarJSON('no es json');       // Devuelve 'El JSON no es válido: syntax error'
+     * $DataValidations->validarJSON('');                 // Devuelve 'El JSON no es válido: cadena vacía'
+     * $DataValidations->validarJSON('null');             // Devuelve true (null es JSON válido)
+     * ```
+     *
+     */
+    public function validarJSON($Json): ?string {
+
+        /********************** Validaciones   **********************/
+        if ($Json === null || trim((string)$Json) === '') {
+            return 'El JSON no es válido: cadena vacía';
+        }
+
+        /********************** Decodificación **********************/
+        $resultado = json_decode($Json);
+        $errores   = json_last_error();
+
+        /********************** Manejo de errores **********************/
+        if ($errores !== JSON_ERROR_NONE) {
+            $mensajesError = [
+                JSON_ERROR_DEPTH   => 'profundidad excesiva',
+                JSON_ERROR_CTRL_CHAR => 'caracteres de control inválidos',
+                JSON_ERROR_SYNTAX  => 'error de sintaxis',
+                JSON_ERROR_UTF8    => 'error de codificación UTF-8',
+            ];
+            $mensaje = $mensajesError[$errores] ?? 'error desconocido ('.$errores.')';
+            return 'El JSON no es válido: '.$mensaje;
+        }
+
+        /********************** Caso "null" **********************/
+        if ($resultado === null && $Json !== 'null') {
+            return 'El JSON no es válido: resultado nulo inesperado';
+        }
+
+        /********************** Retorno datos **********************/
+        return true;
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida cada correo electrónico de una lista separada por un delimitador.
+     * * Cada token de la lista pasa a `validarEmail()` individualmente.
+     * * Un correo inválido genera una alerta nombrando el token.
+     * * Si la lista está vacía o no hay tokens, retorna error.
+     * * Permite separador personalizado (default: ',').
+     *
+     * @param string $Correos   Cadena de correos separados por el delimitador.
+     * @param string $Separador Caracter separador (por defecto ',').
+     *
+     * @return true|string True si todos los correos son válidos, o un mensaje de error string nombrando el token inválido.
+     *
+     * @example
+     * ```php
+     * $DataValidations->validarCorreosLista('a@a.cl,b@b.cl'); // Devuelve true
+     * $DataValidations->validarCorreosLista('a@a.cl,inválido'); // Devuelve 'El correo inválido (inválido) en la lista de correos'
+     * $DataValidations->validarCorreosLista(''); // Devuelve 'La lista de correos está vacía'
+     * ```
+     *
+     */
+    public function validarCorreosLista($Correos, $Separador = ','): ?string {
+
+        /********************** Validaciones   **********************/
+        if ($Correos === null || trim((string)$Correos) === '') {
+            return 'La lista de correos está vacía';
+        }
+
+        /********************** Tokenización **********************/
+        $tokens = array_map('trim', explode($Separador, $Correos));
+
+        /********************** Validación de cada token **********************/
+        foreach ($tokens as $indice => $token) {
+
+            if ($token === '') { continue; }
+
+            /********************** Llamada a validarEmail **********************/
+            $resultado = filter_var($token, FILTER_VALIDATE_EMAIL);
+
+            if ($resultado === false) {
+                return 'El correo inválido ('.$token.') en la lista de correos';
+            }
+        }
+
+        /********************** Retorno datos **********************/
+        return true;
+
+    }
+
+    /******************************************************************************/
+    /**
      * Valida que una cadena de texto tenga al menos una cantidad mínima de caracteres.
      *
      * @param string $oracion Texto a validar.
@@ -442,8 +682,8 @@ class FunctionsDataValidations {
 	 *
 	 * @example
 	 * ```php
-	 * 	$DataValidations->validarLargoMinimo('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve true
-	 * 	$DataValidations->validarLargoMinimo('Lorem', 10); //Devuelve false
+	 * 	$DataValidations->validarLargoMinimo('Lorem ipsum dolor sit amet, consectetur', 10); // Devuelve true
+	 * 	$DataValidations->validarLargoMinimo('Lorem', 10); // Devuelve false
 	 * ```
 	 *
      */
@@ -464,8 +704,8 @@ class FunctionsDataValidations {
 
     }
 
-	/************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Valida que una cadena de texto no exceda una cantidad máxima de caracteres.
      *
      * @param string $oracion Texto a validar.
@@ -475,8 +715,8 @@ class FunctionsDataValidations {
 	 *
 	 * @example
 	 * ```php
-	 * 	$DataValidations->validarLargoMaximo('Lorem', 10); //Devuelve true
-	 * 	$DataValidations->validarLargoMaximo('Lorem ipsum dolor sit amet, consectetur', 10); //Devuelve false
+	 * 	$DataValidations->validarLargoMaximo('Lorem', 10); // Devuelve true
+	 * 	$DataValidations->validarLargoMaximo('Lorem ipsum dolor sit amet, consectetur', 10); // Devuelve false
 	 * ```
 	 *
      */
@@ -496,8 +736,8 @@ class FunctionsDataValidations {
 
     }
 
-	/************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Valida que el dato sea un texto (dato simple) apto para imprimirse o concatenarse en HTML.
      * * Acepta cualquier valor escalar (texto, número o booleano) y los valores vacíos; rechaza
      * arreglos y objetos, que son los que provocan el aviso "Array to string conversion" al
@@ -511,9 +751,9 @@ class FunctionsDataValidations {
 	 *
 	 * @example
 	 * ```php
-	 * 	$DataValidations->validarTextoPlano('usuario@empresa.com'); //Devuelve true
-	 * 	$DataValidations->validarTextoPlano(25);                   //Devuelve true (los números son datos simples)
-	 * 	$DataValidations->validarTextoPlano(['a', 'b']);           //Devuelve false
+	 * 	$DataValidations->validarTextoPlano('usuario@empresa.com'); // Devuelve true
+	 * 	$DataValidations->validarTextoPlano(25);                    // Devuelve true (los números son datos simples)
+	 * 	$DataValidations->validarTextoPlano(['a', 'b']);            // Devuelve false
 	 * ```
 	 *
      */
@@ -529,8 +769,8 @@ class FunctionsDataValidations {
 
     }
 
-	/************************************************************************************************************/
-	/**
+	/******************************************************************************/
+    /**
      * Valida conjuntos de datos o variables individuales según diferentes reglas de negocio.
      * * Permite centralizar la validación de opciones, ejecución de métodos dinámicos
      * o validaciones básicas de tipos, generando alertas visuales mediante UIWidgetsCommon.
@@ -1021,13 +1261,13 @@ class FunctionsDataValidations {
 
     }
 
-	/*******************************************************************************************************************/
+    /*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                              Metodos Internos                                                   */
+	/*                                              Metodos Privados                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Determina si un valor pertenece a una lista de opciones permitidas.
      * * La comparación es ESTRICTA (el tipo de dato importa), pero además se acepta la
      * equivalencia texto/número: '3' pertenece a range(1, 7) y 3 pertenece a ['1', '3'].
@@ -1043,10 +1283,10 @@ class FunctionsDataValidations {
 	 *
 	 * @example
 	 * ```php
-	 * $DataValidations->_checkDataInOptions('3', range(1, 7)); //Devuelve true (equivalencia texto/número)
-	 * $DataValidations->_checkDataInOptions(3, range(1, 7));   //Devuelve true
-	 * $DataValidations->_checkDataInOptions(9, range(1, 7));   //Devuelve false
-	 * $DataValidations->_checkDataInOptions(true, [1]);        //Devuelve false (los booleanos no se normalizan)
+	 * $DataValidations->_checkDataInOptions('3', range(1, 7)); // Devuelve true (equivalencia texto/número)
+	 * $DataValidations->_checkDataInOptions(3, range(1, 7));   // Devuelve true
+	 * $DataValidations->_checkDataInOptions(9, range(1, 7));   // Devuelve false
+	 * $DataValidations->_checkDataInOptions(true, [1]);        // Devuelve false (los booleanos no se normalizan)
 	 * ```
 	 *
      */
@@ -1072,8 +1312,8 @@ class FunctionsDataValidations {
 
     }
 
-	/************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Determina si un valor debe considerarse "sin dato" dentro de checkData().
      * * Se usa para que los campos opcionales no disparen errores por venir vacíos.
      * * OJO: los valores 0 y '0' NO se consideran vacíos, porque son datos válidos.
@@ -1081,13 +1321,23 @@ class FunctionsDataValidations {
      * @param mixed $Data Valor a revisar.
      *
      * @return bool True si el valor es nulo o una cadena vacía o de solo espacios.
+     *
+     * @example
+     * ```php
+     * $this->_checkDataIsEmpty('');    // Devuelve true
+     * $this->_checkDataIsEmpty('0');   // Devuelve false (el cero es un dato válido)
+     * $this->_checkDataIsEmpty(null);  // Devuelve true
+     * ```
      */
     private function _checkDataIsEmpty($Data): bool {
+
+        /**********************  Retorno datos  **********************/
         return ($Data === null || (is_string($Data) && trim($Data) === ''));
+
     }
 
-	/************************************************************************************************************/
-	/**
+    /******************************************************************************/
+    /**
      * Compone el texto estándar de las alertas generadas por checkData().
      * * El marcador de posición propio del elemento tiene prioridad sobre el general.
      * * Si no hay ningún marcador disponible, el mensaje se emite sin contexto.
@@ -1100,6 +1350,12 @@ class FunctionsDataValidations {
      * @param bool $showValue Si el valor fallido se muestra entre paréntesis.
      *
      * @return string Mensaje listo para ser usado como alerta.
+     *
+     * @example
+     * ```php
+     * $this->_checkDataAlert('El valor ingresado', 'abc', '', 'Precio', 'no es un número');
+     * // Devuelve 'El valor ingresado (abc) en <strong>Precio</strong> no es un número'
+     * ```
      */
     private function _checkDataAlert($subject, $value, $itemPlaceholder, $globalPlaceholder, $detail, $showValue = true): string {
 
@@ -1115,5 +1371,6 @@ class FunctionsDataValidations {
         return $subject.$valueTx.$context.' '.$detail;
 
     }
+
 
 }

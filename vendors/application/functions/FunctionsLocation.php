@@ -9,22 +9,31 @@ class FunctionsLocation {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $DataValidations;
 
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
+    /**
+	 * Inicializa la instancia con el componente de validaciones requerido.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $Location = new FunctionsLocation();
+	 * ```
+	 */
 	public function __construct() {
 		$this->DataValidations = new FunctionsDataValidations();
 	}
 
     /*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
     /**
      * Calcula la distancia entre dos puntos geográficos utilizando la fórmula de Haversine.
      * * Esta función determina la distancia en línea recta sobre la superficie de una esfera
@@ -40,7 +49,7 @@ class FunctionsLocation {
 	 *
 	 * @example
 	 * ```php
-	 * $Location->calcularDistancia(-40.807289, -72.634907, -42.176560, -73.425923);
+	 * $Location->calcularDistancia(-40.807289, -72.634907, -42.176560, -73.425923); // Devuelve aprox. 165.9 (kilómetros)
 	 * ```
 	 *
      */
@@ -88,9 +97,10 @@ class FunctionsLocation {
 
         /********************** Retorno datos  **********************/
         return (float)$d;
+
     }
 
-    /************************************************************************************************************/
+	/******************************************************************************/
     /**
      * Obtiene coordenadas y dirección formateada desde la API de Geocoding de Google Maps.
      * * Convierte una dirección de texto plano en datos geográficos (Latitud y Longitud)
@@ -99,7 +109,8 @@ class FunctionsLocation {
      * @param string $address Dirección completa a consultar (ej: "Av. Siempreviva 742, Springfield").
      * @param string $ApiKey  Llave de API autorizada por Google Cloud Console.
      *
-     * @return array|bool Arreglo con [lat, lng, formatted_address] o false si falla.
+     * @return array|bool|string Arreglo con [lat, lng, formatted_address]; false si falla la consulta;
+     *                           mensaje de error si falta la dirección o la ApiKey.
 	 *
 	 * @example
 	 * ```php
@@ -130,6 +141,13 @@ class FunctionsLocation {
         $addressEnc          = urlencode($address);
         $googleMapUrl        = "https://maps.googleapis.com/maps/api/geocode/json?address=".$addressEnc."&key=".$ApiKey;
 
+        // Defensa SSRF: valida que el destino no apunte a redes internas o reservadas
+        $validacionUrl = $this->DataValidations->validarUrlExterna($googleMapUrl);
+        if($validacionUrl['success'] === false){
+            error_log('[FunctionsLocation::getGeocodeData] '.$validacionUrl['error']);
+            return false;
+        }
+
         // Consumo del servicio vía HTTP GET
         $geocodeResponseData = file_get_contents($googleMapUrl);
         $responseData        = json_decode($geocodeResponseData, true);
@@ -156,24 +174,27 @@ class FunctionsLocation {
             error_log("Google Geocode ERROR: {$responseData['status']}");
             return false;
         }
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Realiza geocodificación de una dirección utilizando el servicio gratuito Nominatim (OpenStreetMap).
      * * Incluye una fase de limpieza de texto para normalizar abreviaciones comunes en
      * direcciones de habla hispana (Nº, Av.) y cumple con las políticas de uso de
      * Nominatim mediante la definición de un User-Agent.
      *
-     * @param string $street Dirección o calle a geocodificar.
+     * @param string $ubicacion Dirección o calle a geocodificar.
      *
-     * @return array|bool Diccionario con 'lat', 'lon' y 'display_name', o false si no hay resultados.
-	 *
-	 * @example
-	 * ```php
-	 *
-	 * ```
-	 *
+     * @return array|bool|string Diccionario con 'lat', 'lon' y 'display_name'; false si no hay
+     *                           resultados; mensaje de error si el dato viene vacío.
+     *
+     * @example
+     * ```php
+     * $Location->geocodeAddress('Av. Vicuña Mackenna 1234, Osorno');
+     * // Devuelve ['lat' => ..., 'lon' => ..., 'display_name' => ...] o false si no hay resultados
+     * ```
+     *
      */
     public function geocodeAddress($ubicacion) {
 
@@ -198,10 +219,19 @@ class FunctionsLocation {
         ];
         $context = stream_context_create($opts);
 
-        // Ejecución de la consulta a la API de OpenStreetMap
+        // Defensa SSRF: valida que el destino no apunte a redes internas o reservadas
+        $validacionUrl = $this->DataValidations->validarUrlExterna($url);
+        if($validacionUrl['success'] === false){
+            error_log('[FunctionsLocation::geocodeAddress] '.$validacionUrl['error']);
+            return false;
+        }
+
+        // Ejecución de la consulta a la API de OpenStreetMap (el error real queda registrado en el log)
         $response = @file_get_contents($url, false, $context);
 
         if ($response === false) {
+            $errorRed = error_get_last();
+            error_log('[FunctionsLocation::geocodeAddress] ' . ($errorRed['message'] ?? 'Sin respuesta de Nominatim'));
             return false;
         }
 
@@ -217,10 +247,12 @@ class FunctionsLocation {
             ];
         }
 
+        /**********************  Retorno datos  **********************/
         return false;
+
     }
 
-    /************************************************************************************************************/
+	/******************************************************************************/
     /**
      * Normaliza una dirección chilena para facilitar su comparación.
      *
@@ -238,8 +270,15 @@ class FunctionsLocation {
      * "Pje. Las Rosas N° 25, Block B"
      *   -> "PASAJE LAS ROSAS 25 BLOCK B"
      *
-     * @param string $ubicacion
-     * @return string
+     * @param string $Ubicacion Dirección a normalizar.
+     *
+     * @return string Dirección normalizada en mayúsculas y sin tildes; cadena vacía si el dato viene vacío.
+     *
+     * @example
+     * ```php
+     * $Location->normalizarDirecciones('Av. Vicuña Mackenna N° 1234'); // Devuelve 'AVENIDA VICUNA MACKENNA 1234'
+     * $Location->normalizarDirecciones('Pje. Las Rosas N° 25, Block B'); // Devuelve 'PASAJE LAS ROSAS 25 BLOCK B'
+     * ```
      */
     public function normalizarDirecciones(string $Ubicacion): string {
         // ---------------------------------------------------------------------
@@ -628,17 +667,233 @@ class FunctionsLocation {
 
         $Ubicacion = trim($Ubicacion, " .-\t\n\r\0\x0B");
 
+        /**********************  Retorno datos  **********************/
         return $Ubicacion;
+
     }
 
+	/******************************************************************************/
+    /**
+     * Geocodificación inversa utilizando la API de Google Maps.
+     * * Recibe latitud y longitud directamente (en vez de dirección de texto)
+     * y devuelve los datos geográficos formateados. Es un espejo de `getGeocodeData`
+     * cambiando el parámetro de entrada de `address` a `latlng`.
+     *
+     * @param float $lat   Latitud del punto (debe estar en [-90, 90]).
+     * @param float $lng   Longitud del punto (debe estar en [-180, 180]).
+     * @param string $ApiKey Llave de API de Google Cloud Console.
+     *
+     * @return array|bool|string Arreglo con [lat, lng, formatted_address]; false si falla la consulta;
+     *                         false si status ≠ OK (con error_log).
+     *
+     * @example
+     * ```php
+     * $Location->getGeocodeDataInverso(-33.4489, -70.6693, 'TU_API_KEY');
+     * // Devuelve [lat, lng, formatted_address] o false si falla
+     * ```
+     *
+     */
+    public function getGeocodeDataInverso($lat, $lng, $ApiKey): array|bool|string {
 
+        /********************** Validaciones   **********************/
+        if ($lat === null || trim((string)$lat) === '' || $lat < -90 || $lat > 90) {
+            return 'No ha ingresado coordenadas válidas';
+        }
+        if ($lng === null || trim((string)$lng) === '' || $lng < -180 || $lng > 180) {
+            return 'No ha ingresado coordenadas longitud válidas';
+        }
+        if ($ApiKey === null || trim((string)$ApiKey) === '') {
+            return 'No ha ingresado una ApiKey';
+        }
 
-	/*******************************************************************************************************************/
+        /********************** Si todo esta ok **********************/
+        // Preparación de la lat/lng para URL
+        $latEnc  = urlencode($lat);
+        $lngEnc  = urlencode($lng);
+        $googleMapUrl = "https://maps.googleapis.com/maps/api/geocode/json?latlng=".$latEnc.",".$lngEnc."&key=".$ApiKey;
+
+        // Defensa SSRF: valida que el destino no apunte a redes internas o reservadas
+        $validacionUrl = $this->DataValidations->validarUrlExterna($googleMapUrl);
+        if($validacionUrl['success'] === false){
+            error_log('[FunctionsLocation::getGeocodeDataInverso] '.$validacionUrl['error']);
+            return false;
+        }
+
+        // Consumo del servicio vía HTTP GET (el error real queda registrado en el log)
+        $geocodeResponseData = @file_get_contents($googleMapUrl);
+        if ($geocodeResponseData === false) {
+            $errorRed = error_get_last();
+            error_log('[FunctionsLocation::getGeocodeDataInverso] ' . ($errorRed['message'] ?? 'Sin respuesta de Google Geocode'));
+            return false;
+        }
+
+        $responseData = json_decode($geocodeResponseData, true);
+
+        /********************** Retorno datos  **********************/
+        // Verificación del estado de respuesta de Google (respuesta no JSON => error controlado)
+        if (!is_array($responseData)) {
+            error_log("Google Geocode Inverso ERROR: respuesta sin JSON válido");
+            return false;
+        }
+
+        if(($responseData['status'] ?? '') == 'OK') {
+
+            $latitude         = $responseData['results'][0]['geometry']['location']['lat'] ?? null;
+            $longitude        = $responseData['results'][0]['geometry']['location']['lng'] ?? null;
+            $formattedAddress = $responseData['results'][0]['formatted_address'] ?? null;
+
+            // Retorno de datos si la geometría y la dirección existen
+            if($latitude && $longitude && $formattedAddress) {
+                return [
+                    $latitude,
+                    $longitude,
+                    $formattedAddress
+                ];
+            }
+            return false;
+        } else {
+            // Log de error en caso de que el status sea diferente a OVER_QUERY_LIMIT, REQUEST_DENIED, etc.
+            error_log("Google Geocode Inverso ERROR: " . ($responseData['status'] ?? 'sin status'));
+            return false;
+        }
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Formatea unas coordenadas lat/lng a una cadena de texto con el número
+     * de decimales especificado.
+     * * Resultado en formato: "-33.448900, -70.669300"
+     * * Si los decimales son 0, no incluye separador decimal.
+     * * Valida que las coordenadas estén dentro de rangos geográficos válidos.
+     *
+     * @param float $Lat   Latitud a formatear.
+     * @param float $Long  Longitud a formatear.
+     * @param int $Decimales Número de decimales a mostrar (0 a 8, por defecto 6).
+     *
+     * @return string|string-error Cadena con las coordenadas formateadas, o un mensaje de error si las coordenadas son inválidas.
+     *
+     * @example
+     * ```php
+     * $Location->formatoCoordenada(-33.4489, -70.6693, 6); // Devuelve "-33.448900, -70.669300"
+     * $Location->formatoCoordenada(-33.4489, -70.6693, 0); // Devuelve "-33, -70"
+     * $Location->formatoCoordenada(91, -70);            // Devuelve 'Latitud debe estar en [-90, 90]'
+     * ```
+     *
+     */
+    public function formatoCoordenada($Lat, $Long, $Decimales = 6): ?string {
+
+        /********************** Validaciones   **********************/
+        if (!is_numeric($Lat) || !is_numeric($Long)) {
+            return 'Ambas coordenadas deben ser valores numéricos';
+        }
+        $Lat = (float) $Lat;
+        $Long = (float) $Long;
+
+        if ($Lat < -90 || $Lat > 90) {
+            return 'Latitud debe estar en [-90, 90]';
+        }
+        if ($Long < -180 || $Long > 180) {
+            return 'Longitud debe estar en [-180, 180]';
+        }
+
+        /********************** Formateo **********************/
+        // Asegurar que $Decimales sea un entero válido
+        $Decimales = (int) $Decimales;
+        if ($Decimales < 0) { $Decimales = 0; }
+        if ($Decimales > 8) { $Decimales = 8; }
+
+        /********************** Retorno datos **********************/
+        // Formato: "lat, lng" con el número especificado de decimales
+        $formato = sprintf('%.' . $Decimales . 'F, %.' . $Decimales . 'F', $Lat, $Long);
+        return $formato;
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Valida que las coordenadas geográficas (lat/long) estén dentro
+     * de los rangos geográficos permitidos.
+     * * Latitud debe estar en el rango [-90, 90].
+     * * Longitud debe estar en el rango [-180, 180].
+     * * Acepta valores numéricos y strings numéricos.
+     *
+     * @param mixed $Lat  Latitud a validar (número o string numérico).
+     * @param mixed $Long Longitud a validar (número o string numérico).
+     *
+     * @return true|string True si las coordenadas son válidas, o un mensaje de error string nombrando el campo.
+     *
+     * @example
+     * ```php
+     * $Location->coordenadasValidas(-33.4489, -70.6693); // Devuelve true
+     * $Location->coordenadasValidas(91, -70);            // Devuelve 'Latitud debe estar en [-90, 90]'
+     * $Location->coordenadasValidas('abc', -70);         // Devuelve 'Latitud debe ser un número'
+     * ```
+     *
+     */
+    public function coordenadasValidas($Lat, $Long): ?string {
+
+        /********************** Validaciones   **********************/
+        // Normalizar a números si vienen como strings
+        if (is_string($Lat)) {
+            if (!is_numeric($Lat)) {
+                return 'Latitud debe ser un número';
+            }
+            $Lat = (float) $Lat;
+        } else {
+            $Lat = (float) $Lat;
+        }
+
+        if (is_string($Long)) {
+            if (!is_numeric($Long)) {
+                return 'Longitud debe ser un número';
+            }
+            $Long = (float) $Long;
+        } else {
+            $Long = (float) $Long;
+        }
+
+        /********************** Validación de rangos **********************/
+        $errores = [];
+
+        if ($Lat < -90 || $Lat > 90) {
+            $errores[] = 'Latitud debe estar en [-90, 90]';
+        }
+        if ($Long < -180 || $Long > 180) {
+            $errores[] = 'Longitud debe estar en [-180, 180]';
+        }
+
+        /********************** Retorno datos **********************/
+        if (empty($errores)) {
+            return true;
+        }
+        // Retornar el primer error encontrado
+        return $errores[0];
+
+    }
+
+    /*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                              Metodos Internos                                                   */
+	/*                                              Metodos Privados                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
+    /******************************************************************************/
+    /**
+	 * Valida que un dato corresponda a un valor numérico (coordenada geográfica).
+	 * * Rechaza valores nulos y cadenas vacías; el resto se delega en
+	 * FunctionsDataValidations::validarNumero().
+	 *
+	 * @param mixed  $Data Valor a validar (ej: '-40.807289').
+	 * @param string $Name Nombre del campo para componer el mensaje de error.
+	 *
+	 * @return true|string True si el valor es numérico; mensaje de error en caso contrario.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_validateValue('-40.807289', 'latitude1'); // Devuelve true
+	 * $this->_validateValue('abc', 'latitude1');        // Devuelve 'El dato ingresado en latitude1 no es un numero (abc)'
+	 * ```
+	 */
 	private function _validateValue($Data, $Name){
 
 		/**********************  Validaciones   **********************/
@@ -658,100 +913,5 @@ class FunctionsLocation {
 
 
 
-}
-
-/************************************************************************************************************/
-class subpointLocation {
-    /*
-    *=================================================     Detalles    =================================================
-    *
-    * Permite verificar si punto de georeferencia se ubica dentro de una geocerca referenciada
-    *
-    *=================================================    Modo de uso  =================================================
-    *
-    * 	//se ejecuta codigo
-    * 	//Se crea geocerca
-    * 	$polygon = array();
-    * 	array_push( $polygon,-37.085118 -72.739278 );//Punto 1
-    * 	array_push( $polygon,-37.281183 -72.832662 );//Punto 2
-    * 	array_push( $polygon,-37.267195 -71.992208 );//Punto 3
-    * 	array_push( $polygon,-36.858664 -71.964742 );//Punto 4
-    * 	array_push( $polygon,-37.085118 -72.739278 );//Se cierra figura
-    * 	//se verifica si se esta dentro
-    * 	$pointLocation = new subpointLocation();
-    * 	//$c_chek =  $pointLocation->pointInPolygon(-40.807289 -72.634907, $polygon);
-    * 	$c_chek =  $pointLocation->pointInPolygon($point, $polygon);
-    * 	if($c_chek=='inside'){
-    *
-    * 	}
-    *
-    *=================================================    Parametros   =================================================
-    * @input   object   $polygon   Geocerca definida
-    * @input   string   $point     Latitud y longitus separado por un espacio
-    * @return  string
-    *===================================================================================================================
-    */
-    var $pointOnVertex = true; // Check if the point sits exactly on one of the vertices?
-
-    function pointLocation() {
-        //Nada de momento
-    }
-
-    function pointInPolygon($point, $polygon, $pointOnVertex = true) {
-        $this->pointOnVertex = $pointOnVertex;
-
-        // Transform string coordinates into arrays with x and y values
-        $point = $this->pointStringToCoordinates($point);
-        $vertices = array();
-        foreach ($polygon as $vertex) {
-            $vertices[] = $this->pointStringToCoordinates($vertex);
-        }
-
-        // Check if the point sits exactly on a vertex
-        if ($this->pointOnVertex == true and $this->pointOnVertex($point, $vertices) == true) {
-            return "vertex";
-        }
-
-        // Check if the point is inside the polygon or on the boundary
-        $intersections = 0;
-        $vertices_count = count($vertices);
-
-        for ($i=1; $i < $vertices_count; $i++) {
-            $vertex1 = $vertices[$i-1];
-            $vertex2 = $vertices[$i];
-            if ($vertex1['y'] == $vertex2['y'] and $vertex1['y'] == $point['y'] and $point['x'] > min($vertex1['x'], $vertex2['x']) and $point['x'] < max($vertex1['x'], $vertex2['x'])) { // Check if point is on an horizontal polygon boundary
-                return "boundary";
-            }
-            if ($point['y'] > min($vertex1['y'], $vertex2['y']) and $point['y'] <= max($vertex1['y'], $vertex2['y']) and $point['x'] <= max($vertex1['x'], $vertex2['x']) and $vertex1['y'] != $vertex2['y']) {
-                $xinters = ($point['y'] - $vertex1['y']) * ($vertex2['x'] - $vertex1['x']) / ($vertex2['y'] - $vertex1['y']) + $vertex1['x'];
-                if ($xinters == $point['x']) { // Check if point is on the polygon boundary (other than horizontal)
-                    return "boundary";
-                }
-                if ($vertex1['x'] == $vertex2['x'] || $point['x'] <= $xinters) {
-                    $intersections++;
-                }
-            }
-        }
-        // If the number of edges we passed through is odd, then it's in the polygon.
-        if ($intersections % 2 != 0) {
-            return "inside";
-        } else {
-            return "outside";
-        }
-    }
-
-    function pointOnVertex($point, $vertices) {
-        foreach($vertices as $vertex) {
-            if ($point == $vertex) {
-                return true;
-            }
-        }
-
-    }
-
-    function pointStringToCoordinates($pointString) {
-        $coordinates = explode(" ", $pointString);
-        return array("x" => $coordinates[0], "y" => $coordinates[1]);
-    }
 
 }

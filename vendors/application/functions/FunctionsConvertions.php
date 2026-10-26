@@ -9,27 +9,34 @@ class FunctionsConvertions {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $DataValidations;
 
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
+	/**
+	 * Instancia las dependencias internas de la clase de conversiones.
+	 *
+	 * Carga FunctionsDataValidations para validar números, enteros y horas
+	 * antes de aplicar cada conversión solicitada.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $Convertions = new FunctionsConvertions();
+	 * ```
+	 */
 	public function __construct() {
 		$this->DataValidations = new FunctionsDataValidations();
 	}
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/*******************************************************************************************************************/
-	/*                                                                                                                 */
-	/*                                              Funciones  Horas                                                   */
-	/*                                                                                                                 */
-	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Convierte un valor numérico decimal (representando horas) al formato de tiempo HH:MM:00.
 	 *
@@ -42,9 +49,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->numero2horas('');  //Devuelve Sin datos ingresados
-	 * $Convertions->numero2horas('a'); //Devuelve El dato ingresado no es un numero
-	 * $Convertions->numero2horas(1.5); //Devuelve 01:30:00
+	 * $Convertions->numero2horas('');  // Devuelve Sin datos ingresados
+	 * $Convertions->numero2horas('a'); // Devuelve El dato ingresado no es un numero
+	 * $Convertions->numero2horas(1.5); // Devuelve 01:30:00
 	 * ```
 	 *
 	 */
@@ -72,7 +79,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Convierte una cantidad total de minutos en un string con formato de tiempo HH:MM:00.
 	 *
@@ -82,9 +89,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->minutos2horas('');  //Devuelve Sin datos ingresados
-	 * $Convertions->minutos2horas('a'); //Devuelve El dato ingresado no es un numero
-	 * $Convertions->minutos2horas(65);  //Devuelve 01:05:00
+	 * $Convertions->minutos2horas('');  // Devuelve Sin datos ingresados
+	 * $Convertions->minutos2horas('a'); // Devuelve El dato ingresado no es un numero
+	 * $Convertions->minutos2horas(65);  // Devuelve 01:05:00
 	 * ```
 	 *
 	 */
@@ -109,7 +116,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Convierte una cantidad total de segundos en un string con formato de tiempo completo HH:MM:SS.
 	 *
@@ -119,9 +126,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->segundos2horas('');   //Devuelve Sin datos ingresados
-	 * $Convertions->segundos2horas('a');  //Devuelve El dato ingresado no es un numero
-	 * $Convertions->segundos2horas(3600); //Devuelve 01:00:00
+	 * $Convertions->segundos2horas('');   // Devuelve Sin datos ingresados
+	 * $Convertions->segundos2horas('a');  // Devuelve El dato ingresado no es un numero
+	 * $Convertions->segundos2horas(3600); // Devuelve 01:00:00
 	 * ```
 	 *
 	 */
@@ -149,7 +156,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Transforma una cadena de tiempo en formato "H:i:s" a la cantidad total de minutos representados.
 	 *
@@ -159,9 +166,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->horas2minutos('');         //Devuelve Sin datos ingresados
-	 * $Convertions->horas2minutos('a');        //Devuelve El dato ingresado no es una hora
-	 * $Convertions->horas2minutos('01:05:00'); //Devuelve 65
+	 * $Convertions->horas2minutos('');         // Devuelve Sin datos ingresados
+	 * $Convertions->horas2minutos('a');        // Devuelve El dato ingresado no es una hora
+	 * $Convertions->horas2minutos('01:05:00'); // Devuelve 65
 	 * ```
 	 *
 	 */
@@ -188,7 +195,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Transforma una cadena de tiempo en formato "H:i:s" a la cantidad total de segundos representados.
 	 *
@@ -198,9 +205,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->horas2segundos('');         //Devuelve Sin datos ingresados
-	 * $Convertions->horas2segundos('a');        //Devuelve El dato ingresado no es una hora
-	 * $Convertions->horas2segundos('00:30:00'); //Devuelve 1800
+	 * $Convertions->horas2segundos('');         // Devuelve Sin datos ingresados
+	 * $Convertions->horas2segundos('a');        // Devuelve El dato ingresado no es una hora
+	 * $Convertions->horas2segundos('00:30:00'); // Devuelve 1800
 	 * ```
 	 *
 	 */
@@ -227,7 +234,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Transforma una cadena de tiempo en formato "H:i:s" a su representación numérica decimal.
 	 *
@@ -237,9 +244,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->horas2decimales('');         //Devuelve Sin datos ingresados
-	 * $Convertions->horas2decimales('a');        //Devuelve El dato ingresado no es una hora
-	 * $Convertions->horas2decimales('01:30:00'); //Devuelve 1.5
+	 * $Convertions->horas2decimales('');         // Devuelve Sin datos ingresados
+	 * $Convertions->horas2decimales('a');        // Devuelve El dato ingresado no es una hora
+	 * $Convertions->horas2decimales('01:30:00'); // Devuelve 1.5
 	 * ```
 	 *
 	 */
@@ -266,14 +273,7 @@ class FunctionsConvertions {
 
 	}
 
-
-
-	/*******************************************************************************************************************/
-	/*                                                                                                                 */
-	/*                                              Funciones  Fechas                                                  */
-	/*                                                                                                                 */
-	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Convierte la abreviatura de un mes (3 letras) a su nombre completo en español.
 	 *
@@ -283,9 +283,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->devolverMes('');    //Devuelve Sin datos ingresados
-	 * $Convertions->devolverMes('a');   //Devuelve Dato fuera de parámetros esperados
-	 * $Convertions->devolverMes('ene'); //Devuelve Enero
+	 * $Convertions->devolverMes('');    // Devuelve Sin datos ingresados
+	 * $Convertions->devolverMes('a');   // Devuelve Dato fuera de parámetros esperados
+	 * $Convertions->devolverMes('ene'); // Devuelve Enero
 	 * ```
 	 *
 	 */
@@ -320,7 +320,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Traduce un índice numérico (1-12) al nombre completo del mes correspondiente.
 	 *
@@ -330,10 +330,10 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->numero2mes('');  //Devuelve Sin datos ingresados
-	 * $Convertions->numero2mes('a'); //Devuelve El dato ingresado no es un numero
-	 * $Convertions->numero2mes(25);  //Devuelve Numero fuera de parámetros esperados
-	 * $Convertions->numero2mes(1);   //Devuelve Enero
+	 * $Convertions->numero2mes('');  // Devuelve Sin datos ingresados
+	 * $Convertions->numero2mes('a'); // Devuelve El dato ingresado no es un numero
+	 * $Convertions->numero2mes(25);  // Devuelve Numero fuera de parámetros esperados
+	 * $Convertions->numero2mes(1);   // Devuelve Enero
 	 * ```
 	 *
 	 */
@@ -357,7 +357,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Traduce un índice numérico (1-12) a la abreviatura de 3 letras del mes.
 	 *
@@ -367,10 +367,10 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->numero2mesCorto('');  //Devuelve Sin datos ingresados
-	 * $Convertions->numero2mesCorto('a'); //Devuelve El dato ingresado no es un numero
-	 * $Convertions->numero2mesCorto(25);  //Devuelve Numero fuera de parámetros esperados
-	 * $Convertions->numero2mesCorto(1);   //Devuelve Ene
+	 * $Convertions->numero2mesCorto('');  // Devuelve Sin datos ingresados
+	 * $Convertions->numero2mesCorto('a'); // Devuelve El dato ingresado no es un numero
+	 * $Convertions->numero2mesCorto(25);  // Devuelve Numero fuera de parámetros esperados
+	 * $Convertions->numero2mesCorto(1);   // Devuelve Ene
 	 * ```
 	 *
 	 */
@@ -394,7 +394,7 @@ class FunctionsConvertions {
 
 	}
 
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Convierte un número de día (1-7) en su nombre correspondiente en español.
 	 *
@@ -404,10 +404,10 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->numeroNombreDia('');  //Devuelve Sin datos ingresados
-	 * $Convertions->numeroNombreDia('a'); //Devuelve El dato ingresado no es un numero
-	 * $Convertions->numeroNombreDia(25);  //Devuelve Numero fuera de parámetros esperados
-	 * $Convertions->numeroNombreDia(3);   //Devuelve Miercoles
+	 * $Convertions->numeroNombreDia('');  // Devuelve Sin datos ingresados
+	 * $Convertions->numeroNombreDia('a'); // Devuelve El dato ingresado no es un numero
+	 * $Convertions->numeroNombreDia(25);  // Devuelve Numero fuera de parámetros esperados
+	 * $Convertions->numeroNombreDia(3);   // Devuelve Miercoles
 	 * ```
 	 *
 	 */
@@ -418,8 +418,8 @@ class FunctionsConvertions {
 		$dataVal = $this->_validateInteger($numero, 'numero');
 		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
 		if ($dataVal !== true) { return $dataVal; }
-		// Control de rango permitido para la semana (nota: el código permite técnicamente hasta el índice 8 antes de fallar)
-		if($numero<0 || $numero>8){return 'Numero fuera de parámetros esperados';}
+		// Control de rango permitido para la semana (1=Lunes ... 7=Domingo)
+		if($numero<1 || $numero>7){return 'Numero fuera de parámetros esperados';}
 
 		/**********************  Definiciones   **********************/
 		// Definición secuencial de los días de la semana iniciando en Lunes
@@ -431,13 +431,67 @@ class FunctionsConvertions {
 
 	}
 
+	/******************************************************************************/
+	/**
+	 * Convierte el nombre de un mes en español a su número de calendario.
+	 *
+	 * Acepta la forma completa ("marzo") o la abreviada ("mar"), sin distinción
+	 * de mayúsculas, espacios sobrantes ni tildes. Incluye la variante chilena
+	 * "setiembre" como sinónimo de septiembre.
+	 *
+	 * @param string $Mes Nombre o abreviatura del mes a convertir.
+	 *
+	 * @return int|string Número del mes (1 a 12); mensaje de error si no es un mes reconocido.
+	 *
+	 * @example
+	 * ```php
+	 * $Convertions->mes2Numero('marzo'); // Devuelve 3
+	 * $Convertions->mes2Numero('SETIEMBRE'); // Devuelve 9
+	 * $Convertions->mes2Numero('undécimo'); // Devuelve El dato ingresado no es un mes (undécimo)
+	 * ```
+	 *
+	 */
+	public function mes2Numero(string $Mes): int|string {
 
-	/*******************************************************************************************************************/
-	/*                                                                                                                 */
-	/*                                              Funciones  Valores                                                 */
-	/*                                                                                                                 */
-	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+        /**********************  Validaciones   **********************/
+		// Se verifica que el dato no esté vacío ni sea nulo
+		if ($Mes === null || trim((string)$Mes) === '') {
+			return 'Sin datos ingresados en Mes';
+		}
+
+		/********************** Si todo esta ok **********************/
+		// Lista de meses completos en minúsculas (incluye la variante chilena setiembre)
+		$Meses = [
+			'enero' => 1, 'febrero' => 2, 'marzo' => 3, 'abril' => 4,
+			'mayo' => 5, 'junio' => 6, 'julio' => 7, 'agosto' => 8,
+			'septiembre' => 9, 'setiembre' => 9, 'octubre' => 10,
+			'noviembre' => 11, 'diciembre' => 12,
+		];
+
+		// Lista de formas abreviadas de tres letras
+		$Abreviaturas = [
+			'ene' => 1, 'feb' => 2, 'mar' => 3, 'abr' => 4, 'may' => 5, 'jun' => 6,
+			'jul' => 7, 'ago' => 8, 'sep' => 9, 'set' => 9, 'oct' => 10, 'nov' => 11, 'dic' => 12,
+		];
+
+		// Normalización: minúsculas, sin puntos y sin tildes (iconv cuando está disponible)
+		$Clave = strtolower(trim((string)$Mes));
+		$Clave = str_replace('.', '', $Clave);
+		if (function_exists('iconv')) {
+			$Clave = (string)iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $Clave);
+		}
+
+		/**********************  Retorno datos  **********************/
+		// Búsqueda por nombre completo y, en su defecto, por la forma abreviada
+		if (isset($Meses[$Clave])) { return $Meses[$Clave]; }
+		if (isset($Abreviaturas[$Clave])) { return $Abreviaturas[$Clave]; }
+
+		// Ninguna coincidencia: se informa el dato recibido
+		return 'El dato ingresado no es un mes ('.$Mes.')';
+
+	}
+
+	/******************************************************************************/
 	/**
 	 * Transforma un valor numérico decimal en una representación de cadena con formato de porcentaje.
 	 *
@@ -451,9 +505,9 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->porcentaje('');   //Devuelve Sin datos ingresados
-	 * $Convertions->porcentaje('a');  //Devuelve El dato ingresado no es un numero
-	 * $Convertions->porcentaje(0.65); //Devuelve 65%
+	 * $Convertions->porcentaje('');   // Devuelve Sin datos ingresados
+	 * $Convertions->porcentaje('a');  // Devuelve El dato ingresado no es un numero
+	 * $Convertions->porcentaje(0.65); // Devuelve 65 %
 	 * ```
 	 *
 	 */
@@ -472,14 +526,7 @@ class FunctionsConvertions {
 
 	}
 
-
-
-	/*******************************************************************************************************************/
-	/*                                                                                                                 */
-	/*                                              Funciones  Textos                                                  */
-	/*                                                                                                                 */
-	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
 	 * Convierte un valor numérico a su representación literal en palabras (español).
 	 * * La función descompone el número en bloques (miles, millones, mil millones) y utiliza
@@ -492,10 +539,10 @@ class FunctionsConvertions {
 	 *
 	 * @example
 	 * ```php
-	 * $Convertions->numeroApalabras('');    //Devuelve Sin datos ingresados
-	 * $Convertions->numeroApalabras('a');   //Devuelve El dato ingresado no es un numero
-	 * $Convertions->numeroApalabras(1200);  //Devuelve mil doscientos
-	 * $Convertions->numeroApalabras(-15);   //Devuelve menos quince
+	 * $Convertions->numeroApalabras('');    // Devuelve Sin datos ingresados
+	 * $Convertions->numeroApalabras('a');   // Devuelve El dato ingresado no es un numero
+	 * $Convertions->numeroApalabras(1200);  // Devuelve uno mil doscientos
+	 * $Convertions->numeroApalabras(-15);   // Devuelve menos quince
 	 * ```
 	 *
 	 */
@@ -629,16 +676,87 @@ class FunctionsConvertions {
 
 		/********************** Retorno datos  **********************/
 		return $resultado;
+
 	}
 
+	/******************************************************************************/
+	/**
+	 * Convierte un número entero a su representación en números romanos.
+	 *
+	 * Aplica la notación romana clásica estándar sobre los símbolos M, D, C,
+	 * L, X, V e I (incluyendo las formas subtractivas CM, CD, XC, XL, IX, IV).
+	 * El rango soportado va del 1 al 3999.
+	 *
+	 * @param mixed $Numero Entero a convertir (entre 1 y 3999).
+	 *
+	 * @return string Número romano en mayúsculas; mensaje de error si el dato no es válido.
+	 *
+	 * @example
+	 * ```php
+	 * $Convertions->numero2Romanos(2026); // Devuelve MMXXVI
+	 * $Convertions->numero2Romanos(4);    // Devuelve IV
+	 * $Convertions->numero2Romanos(0);    // Devuelve Numero fuera de parámetros esperados
+	 * ```
+	 *
+	 */
+	public function numero2Romanos($Numero): string{
+
+        /**********************  Validaciones   **********************/
+		// Ejecuta la validación interna: el dato debe ser numérico no vacío
+		$dataVal = $this->_validateInteger($Numero, 'Numero');
+		// Si la validación devuelve un valor distinto a true, se retorna el error/resultado de la validación
+		if ($dataVal !== true) { return $dataVal; }
+		// Control de rango permitido para la notación romana clásica
+		if($Numero<1 || $Numero>3999){return 'Numero fuera de parámetros esperados';}
+
+		/********************** Si todo esta ok **********************/
+		// Tabla de símbolos en orden descendente con sus valores, incluidas las formas restas
+		$Simbolos = [
+			1000 => 'M', 900 => 'CM', 500 => 'D', 400 => 'CD',
+			100 => 'C', 90 => 'XC', 50 => 'L', 40 => 'XL',
+			10 => 'X', 9 => 'IX', 5 => 'V', 4 => 'IV', 1 => 'I',
+		];
+		// Acumulador de la representación romana resultante
+		$Romanos = '';
+
+		// Recorre la tabla y agrega cada símbolo mientras el valor lo permita
+		foreach ($Simbolos as $Valor => $Simbolo) {
+			while ($Numero >= $Valor) {
+				$Romanos .= $Simbolo;
+				$Numero   = (int)$Numero - $Valor;
+			}
+		}
+
+		/**********************  Retorno datos  **********************/
+		return $Romanos;
+
+	}
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                              Metodos Internos                                                   */
+	/*                                              Metodos Privados                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
+	/**
+	 * Valida que el dato recibido sea un valor numérico no vacío.
+	 *
+	 * Devuelve true cuando el dato es numérico; si está vacío o es nulo retorna
+	 * 'Sin datos ingresados en <Nombre>' y si no es numérico retorna el mensaje
+	 * de error correspondiente junto con el nombre del campo.
+	 *
+	 * @param mixed  $Data Dato a validar (número o cadena numérica).
+	 * @param string $Name Nombre del campo usado en los mensajes de error.
+	 *
+	 * @return true|string true si el dato es numérico o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_validateValue(1500.85, 'valor'); // Devuelve true
+	 * $this->_validateValue('a', 'valor');     // Devuelve 'El dato ingresado en valor no es un numero (a)'
+	 * $this->_validateValue('', 'valor');      // Devuelve 'Sin datos ingresados en valor'
+	 * ```
+	 */
 	private function _validateValue($Data, $Name){
 
 		/**********************  Validaciones   **********************/
@@ -655,7 +773,26 @@ class FunctionsConvertions {
 		return true;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Valida que el dato recibido sea un número entero no vacío.
+	 *
+	 * Comprueba que el dato no esté vacío, que sea numérico y que sea entero;
+	 * en caso contrario retorna el mensaje de error con el nombre del campo.
+	 *
+	 * @param mixed  $Data Dato a validar (entero o cadena numérica entera).
+	 * @param string $Name Nombre del campo usado en los mensajes de error.
+	 *
+	 * @return true|string true si el dato es entero o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_validateInteger(65, 'nMinutos');  // Devuelve true
+	 * $this->_validateInteger('a', 'nMinutos'); // Devuelve 'El dato ingresado en nMinutos no es un numero (a)'
+	 * $this->_validateInteger('', 'nMinutos');  // Devuelve 'Sin datos ingresados en nMinutos'
+	 * ```
+	 */
 	private function _validateInteger($Data, $Name){
 
 		/**********************  Validaciones   **********************/
@@ -672,7 +809,28 @@ class FunctionsConvertions {
 		return true;
 
 	}
-    /************************************************************************************************************/
+
+	/******************************************************************************/
+	/**
+	 * Valida que el dato recibido sea una hora no vacía.
+	 *
+	 * Verifica mediante FunctionsDataValidations que la cadena cumpla el formato
+	 * de hora (H:MM[:SS] con minutos de 00 a 59, p. ej. '13:05' o '01:05:00');
+	 * si el dato está vacío o no es una hora, retorna el mensaje de error con
+	 * el nombre del campo.
+	 *
+	 * @param mixed  $Data Hora a validar (ej: '01:05:00').
+	 * @param string $Name Nombre del campo usado en los mensajes de error.
+	 *
+	 * @return true|string true si la hora es válida o mensaje de error.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_validateHour('01:05:00', 'horas'); // Devuelve true
+	 * $this->_validateHour('aa', 'horas');       // Devuelve 'El dato ingresado en horas no es una hora (aa)'
+	 * $this->_validateHour('', 'horas');         // Devuelve 'Sin datos ingresados en horas'
+	 * ```
+	 */
 	private function _validateHour($Data, $Name){
 
 		/**********************  Validaciones   **********************/
@@ -689,6 +847,7 @@ class FunctionsConvertions {
 		return true;
 
 	}
+
 
 
 }

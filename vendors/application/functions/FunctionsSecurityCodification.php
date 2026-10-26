@@ -6,10 +6,10 @@ class FunctionsSecurityCodification {
 
     /*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
     /**
      * Codifica un texto utilizando el algoritmo AES-128-CTR para hacerlo ilegible.
      * * Permite el uso de una llave personalizada (passkey). Si no se proporciona, utiliza
@@ -60,15 +60,172 @@ class FunctionsSecurityCodification {
 
         /********************** Retorno datos  **********************/
         return ['success' => true, 'data' => $encryption];
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
-     * Decodifica un texto previamente cifrado con el método simpleEncode.
-     * * Revierte la sanitización Base64 URL-safe (RFC 4648), extrae el IV que viaja al inicio
-     * de los datos y aplica el proceso inverso de AES-128-CTR utilizando la misma llave con
-     * la que fue cifrado.
+     * Codifica un dato utilizando Base64 URL-safe (RFC 4648).
+     * * Reemplaza '+' por '-' y '/' por '_', y elimina el relleno '=' final.
+     * * Utilizado para transmitir datos codificados en URLs de forma segura.
      *
+     * @param string $Data Dato a codificar.
+     *
+     * @return array Datos codificados en Base64 URL-safe.
+     *
+     * @example
+     * ```php
+     * $Codification->base64UrlEncode('datos sensibles');
+     * // Devuelve ['success' => true, 'data' => 'c2FtcGxlIgBpbnNlcnQ']
+     * ```
+     *
+     */
+    public function base64UrlEncode($Data): array {
+
+        /********************** Validaciones   **********************/
+        if ($Data === null || trim((string)$Data) === '') {
+            return ['success' => false, 'error' => 'Sin datos ingresados'];
+        }
+
+        /********************** Codificacion **********************/
+        $base64 = base64_encode($Data);
+        // Sanitización URL-safe: '+' -> '-' y '/' -> '_', eliminando '=' final
+        $urlSafe = rtrim(strtr($base64, '+/', '-_'), '=');
+
+        /********************** Retorno datos **********************/
+        return ['success' => true, 'data' => $urlSafe];
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Decodifica un dato que fue codificado con base64UrlEncode.
+     * * Invierte la sanitización Base64 URL-safe: '-' -> '+' y '_' -> '/'
+     * * Agrega el relleno '=' necesario para una decodificación válida.
+     *
+     * @param string $Data Dato codificado en Base64 URL-safe.
+     *
+     * @return array Datos decodificados originales.
+     *
+     * @example
+     * ```php
+     * $Codification->base64UrlDecode('c2FtcGxlIgBpbnNlcnQ');
+     * // Devuelve ['success' => true, 'data' => 'datos sensibles']
+     * ```
+     *
+     */
+    public function base64UrlDecode($Data): array {
+
+        /********************** Validaciones   **********************/
+        if ($Data === null || trim((string)$Data) === '') {
+            return ['success' => false, 'error' => 'Sin datos ingresados'];
+        }
+
+        /********************** Decodificación **********************/
+        // Reversión de la sanitización URL-safe
+        $base64 = strtr($Data, '-_', '+/');
+        // Agrega el relleno '=' necesario
+        $base64 .= str_repeat('=', (4 - strlen($base64) % 4) % 4);
+
+        /********************** Retorno datos **********************/
+        $decoded = base64_decode($base64);
+        if ($decoded === false) {
+            return ['success' => false, 'error' => 'Datos inválidos para decodificar'];
+        }
+        return ['success' => true, 'data' => $decoded];
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Genera una firma digital (hash) para un dato utilizando hash_equals
+     * para comparacion segura contra ataques de tiempo (timing attacks).
+     * * Firma el dato concatenando un identificador unico y aplicando SHA-256.
+     * * El resultado incluye la firma y los datos necesarios para verificar.
+     *
+     * @param string $Dato El dato a firmar.
+     * @param string $Clave Secreta o llave para la firma.
+     *
+     * @return array Estructura con la firma generada y los datos firmados.
+     *
+     * @example
+     * ```php
+     * $Codification->firmarDato('datos importantes', 'mi_clave_secreta');
+     * // Devuelve ['success' => true, 'data' => ['firma' => '...', 'dato' => '...']]
+     * ```
+     *
+     */
+    public function firmarDato($Dato, $Clave): array {
+
+        /********************** Validaciones   **********************/
+        if ($Dato === null || trim((string)$Dato) === '') {
+            return ['success' => false, 'error' => 'Sin datos para firmar'];
+        }
+        if ($Clave === null || trim((string)$Clave) === '') {
+            return ['success' => false, 'error' => 'Sin clave para firmar'];
+        }
+
+        /********************** Generacion de firma **********************/
+        // Genera un identificador unico para esta firma (timestamp + random)
+        $identificador = uniqid('', true);
+        $datosParaHash = $Dato . '|' . $identificador . '|' . $Clave;
+        $firma = hash_hmac('sha256', $datosParaHash, $Clave);
+
+        /********************** Retorno datos **********************/
+        return ['success' => true, 'data' => [
+            'firma' => $firma,
+            'identificador' => $identificador,
+            'dato' => $Dato
+        ]];
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Verifica si una firma digital es válida para un dato dado.
+     * * Utiliza hash_equals para comparacion constante en el tiempo, protegiendo
+     * contra ataques de tiempo (timing attacks).
+     * * Compara la firma almacenada con la firma calculada actualmentre.
+     *
+     * @param string $Dato El dato original (debe coincidir con el usado para firmar).
+     * @param array $FirmaEstructura Estructura que contiene 'firma' e 'identificador' generada por firmarDato().
+     * @param string $Clave La clave secreta utilizada originalmente para firmar.
+     *
+     * @return bool True si la firma es válida, False en caso contrario.
+     *
+     * @example
+     * ```php
+     * $resultado = $Codification->verificarFirma('datos importantes', ['firma' => $firma, 'identificador' => $id], 'mi_clave_secreta');
+     * // Devuelve true si la firma es valida, false en caso contrario
+     * ```
+     *
+     */
+    public function verificarFirma($Dato, $FirmaEstructura, $Clave): bool {
+
+        /********************** Validaciones   **********************/
+        if ($Dato === null || trim((string)$Dato) === '') {
+            return false;
+        }
+        if ($FirmaEstructura === null || !is_array($FirmaEstructura)) {
+            return false;
+        }
+        if ($Clave === null || trim((string)$Clave) === '') {
+            return false;
+        }
+
+        /********************** Calculacion de firma **********************/
+        $identificador = $FirmaEstructura['identificador'] ?? '';
+        $datosParaHash = $Dato . '|' . $identificador . '|' . $Clave;
+        $firmaCalculada = hash_hmac('sha256', $datosParaHash, $Clave);
+
+        /********************** Comparacion segura **********************/
+        // Utiliza hash_equals para comparacion constante en el tiempo
+        return hash_equals($firmaCalculada, $FirmaEstructura['firma']);
+
+    }
+
+    /******************************************************************************/
+    /**
      * @param string $string Texto codificado que se desea recuperar.
      * @param string $passkey (Opcional) Llave de cifrado utilizada originalmente.
      *
@@ -113,38 +270,10 @@ class FunctionsSecurityCodification {
 
         /********************** Retorno datos  **********************/
         return ['success' => true, 'data' => $decryption];
+
     }
 
-    /************************************************************************************************************/
-    /**
-     * Genera un hash SHA-256 basado en un identificador pseudoaleatorio seguro.
-     *
-     * Esta función genera una cadena de 32 bytes criptográficamente seguros mediante random_bytes,
-     * la convierte a representación hexadecimal y posteriormente aplica un algoritmo de hash SHA-256
-     * sobre dicha cadena para devolver una huella digital única de 64 caracteres.
-     *
-     * @return array Cadena de 64 caracteres hexadecimales correspondiente al hash SHA-256 del identificador.
-     * @throws Exception Si no se encuentra una fuente de entropía suficiente para la generación de bytes aleatorios.
-     *
-     * @example
-     * ```php
-     * $codification = new Codification();
-     * $hash =$codification->generateServerSpecificHash();
-     * // Devuelve una cadena similar a: '421aa90e079fa326b6494f812ad13e792e34f... (64 caracteres)'
-     * ```
-     */
-    public function generateServerSpecificHash(): array {
-
-        /********************** Si todo esta ok **********************/
-        // Genera 32 bytes aleatorios criptográficamente seguros y los convierte a formato hexadecimal (64 caracteres)
-        $identifier = bin2hex(random_bytes(32));
-
-        /********************** Retorno datos  **********************/
-        // Genera y retorna el resumen criptográfico SHA-256 del identificador binario convertido
-        return ['success' => true, 'data' => hash('sha256', $identifier)];
-    }
-
-    /************************************************************************************************************/
+	/******************************************************************************/
     /**
      * Realiza operaciones de cifrado y descifrado utilizando el algoritmo AES-256-CBC.
      * * A diferencia del método "simple", este utiliza una llave de 256 bits. Genera un
@@ -235,6 +364,38 @@ class FunctionsSecurityCodification {
 
         /********************** Retorno datos  **********************/
         return ['success' => false, 'error' => 'Registro inválido'];
+
     }
+
+	/******************************************************************************/
+    /**
+     * Genera un hash SHA-256 basado en un identificador pseudoaleatorio seguro.
+     *
+     * Esta función genera una cadena de 32 bytes criptográficamente seguros mediante random_bytes,
+     * la convierte a representación hexadecimal y posteriormente aplica un algoritmo de hash SHA-256
+     * sobre dicha cadena para devolver una huella digital única de 64 caracteres.
+     *
+     * @return array Cadena de 64 caracteres hexadecimales correspondiente al hash SHA-256 del identificador.
+     * @throws Exception Si no se encuentra una fuente de entropía suficiente para la generación de bytes aleatorios.
+     *
+     * @example
+     * ```php
+     * $codification = new Codification();
+     * $hash =$codification->generateServerSpecificHash();
+     * // Devuelve una cadena similar a: '421aa90e079fa326b6494f812ad13e792e34f... (64 caracteres)'
+     * ```
+     */
+    public function generateServerSpecificHash(): array {
+
+        /********************** Si todo esta ok **********************/
+        // Genera 32 bytes aleatorios criptográficamente seguros y los convierte a formato hexadecimal (64 caracteres)
+        $identifier = bin2hex(random_bytes(32));
+
+        /********************** Retorno datos  **********************/
+        // Genera y retorna el resumen criptográfico SHA-256 del identificador binario convertido
+        return ['success' => true, 'data' => hash('sha256', $identifier)];
+
+    }
+
 
 }

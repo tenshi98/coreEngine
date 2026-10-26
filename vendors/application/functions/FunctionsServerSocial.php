@@ -9,22 +9,34 @@ class FunctionsServerSocial {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $DataNumbers;
 
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
+	/**
+	 * Instancia las dependencias internas de la clase social.
+	 *
+	 * Carga FunctionsDataNumbers para normalizar los números telefónicos
+	 * antes de enviarlos a la API de WhatsApp.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $ServerSocial = new FunctionsServerSocial();
+	 * ```
+	 */
 	public function __construct() {
 		$this->DataNumbers = new FunctionsDataNumbers();
 	}
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	/**
      * Gestiona el envío de mensajes de WhatsApp utilizando plantillas (Templates) a través de la API 1msg.io.
      *
@@ -39,7 +51,10 @@ class FunctionsServerSocial {
 	 *
 	 * @example
 	 * ```php
-	 *
+	 * $Config = ['Token' => 'tk', 'InstanceId' => 'inst', 'namespace' => 'ns', 'template' => 'saludo', 'Type' => 1];
+	 * $Body   = ['Phone' => '+56912345678', 'Titulo' => 'Hola', 'Mensaje' => 'Bienvenido'];
+	 * $ServerSocial->sendWhatsappTemplate($Config, $Body);
+	 * // devuelve ['success' => true, 'data' => ...] o ['success' => false, 'error' => ...]
 	 * ```
 	 *
      */
@@ -132,8 +147,12 @@ class FunctionsServerSocial {
             /*********************************************************/
             // Tipo 1000: Reservado para futuras implementaciones
             case 1000:
-                //otra
-                break;
+                return ['success' => false, 'error' => 'El Type 1000 está reservado y no es soportado'];
+
+            /*********************************************************/
+            // Cualquier otro Type no soportado se rechaza con un error controlado
+            default:
+                return ['success' => false, 'error' => 'El Type de plantilla no es soportado: ' . (string)($Config['Type'] ?? '')];
 
         }
         // Conversión del arreglo de datos a formato JSON para el cuerpo de la petición
@@ -143,6 +162,11 @@ class FunctionsServerSocial {
         // Configuración de la petición HTTP mediante cURL hacia el endpoint de la instancia
         $url = 'https://api.1msg.io/'.$Config['InstanceId'].'/sendTemplate';
         $ch = curl_init($url);
+
+        // Timeouts explícitos: evita que una API externa lenta o caída cuelgue el worker PHP
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 15);
+
         curl_setopt($ch, CURLOPT_POSTFIELDS, $data_string);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type:application/json'));
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -165,9 +189,10 @@ class FunctionsServerSocial {
             curl_close($ch);
             return ['success' => false, 'error' => $th->getMessage(), 'code' => $th->getCode()];
         }
+
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
 	/**
      * Reformatea texto con etiquetas HTML básicas a un formato compatible con WhatsApp.
      *
@@ -180,7 +205,8 @@ class FunctionsServerSocial {
 	 *
 	 * @example
 	 * ```php
-	 *
+	 * $ServerSocial->formatWhatsappText('Hola <br/> <strong>mundo</strong>');
+	 * // devuelve 'Hola //  *mundo*'
 	 * ```
 	 *
      */
@@ -191,8 +217,16 @@ class FunctionsServerSocial {
         $Texto = str_replace(
             ['<br/>', '<br>', '</br>', '<strong>', '</strong>'],
             [' // ',  ' // ', ' // ',   '*',         '*'],
-            $Texto
+            (string)$Texto
         );
+
+        // Elimina cualquier otra etiqueta HTML restante (saneo de contenido entrante)
+        $Texto = trim(strip_tags($Texto));
+
+        // Limita el largo del texto para no exceder los parámetros de plantilla de WhatsApp
+        if (mb_strlen($Texto) > 1024) {
+            $Texto = mb_substr($Texto, 0, 1024);
+        }
 
         /********************** Retorno datos  **********************/
         return $Texto;

@@ -9,53 +9,67 @@ class UIWidgetsMaps {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $Alertas;
     const buscar     = ['Nº', 'nº', ' n ', "'", 'Av.', 'av.'];
     const reemplazar = ['',   '',   '',   '',  'Avenida', 'Avenida'];
 
-
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
+	/**
+	 * Crea la instancia de UIWidgetsCommon que la clase usa para imprimir las alertas de
+	 * validación.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $UIWidgetsMaps = new UIWidgetsMaps();
+	 * ```
+	 */
 	public function __construct() {
 		$this->Alertas = new UIWidgetsCommon();
 	}
 
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
+    /******************************************************************************/
+	/**
+	 * Despliega un mapa desde una latitud y longitud entregadas, se genera un infowindow en
+	 * el marcador centrado (Google Maps).
+	 *
+	 * Claves obligatorias de $Options: 'Latitud', 'Longitud', 'Titulo', 'IDGoogle' y
+	 * 'MapTypeId' (1 ROADMAP | 2 SATELLITE | 3 HYBRID | 4 TERRAIN). Opcionales: 'SubTitulo',
+	 * 'Contenido' (default: el título), 'zoom_map' (15), 'BASE' e 'ID_Cont' (id generado si
+	 * falta). Si falta una obligatoria o $MapTypeId está fuera de catálogo imprime una alerta
+	 * y detiene la ejecución (exit).
+	 *
+	 * @param array $Options Arreglo con las opciones del mapa (ver detalle).
+	 *
+	 * @return void Imprime el HTML/JS del mapa con su infowindow.
+	 *
+	 * @example
+	 * ```php
+	 * $UIWidgetsMaps = new UIWidgetsMaps();
+	 * $Options = [
+	 *     'Latitud'   => -33.45,            // Latitud de la ubicación
+	 *     'Longitud'  => -70.66,            // Longitud de la ubicación
+	 *     'Titulo'    => 'Casa',            // Título del InfoWindow
+	 *     'SubTitulo' => 'mi casa',         // SubTítulo del InfoWindow
+	 *     'Contenido' => 'descripcion de la casa', // Contenido del InfoWindow
+	 *     'IDGoogle'  => 'xxKeyGooglexx',   // API de Google Maps
+	 *     'zoom_map'  => 15,                // Zoom del mapa
+	 *     'MapTypeId' => 1,                 // Tipo de mapa (1..4)
+	 *     'BASE'      => 'https://mi-sitio.cl', // Ruta base del sistema
+	 *     'ID_Cont'   => 'div_1',           // ID del div donde se dibuja el html
+	 * ];
+	 * $UIWidgetsMaps->GMaps_from_gps($Options); // imprime el mapa
+	 * ```
+	 */
     public function GMaps_from_gps($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Despliega un mapa desde una latitud y longitud entregadas, se genera un infowindow en el marcador centrado
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		*   $Options = [
-		*		'Latitud'    => -77.5,                    //Latitud de la ubicacion
-		*		'Longitud'   => -33.6,                    //Longitud de la ubicacion
-		*		'Titulo'     => 'Casa',                   //Titulo del InfoWindow
-		*		'SubTitulo'  => 'mi casa',                //SubTitulo del InfoWindow
-		*		'Contenido'  => 'descripcion de la casa', //Contenido del InfoWindow
-		*		'IDGoogle'   => 'xxKeyGooglexx',          //API de Google Maps
-		*		'zoom_map'   => 15,                       //Zoom del mapa
-		*		'MapTypeId'  => 1,                        //Tipo de mapa
-		*		'BASE'       => 'http://google.cl',       //Ruta base del sistema
-		*		'ID_Cont'    => 'div_1',                  //ID del div donde se dibuja el html
-		*	];
-		* 	$UIWidgetsMaps->GMaps_from_gps($Options);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   array   $Options    array con los datos
-		* @return  string
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
 		//se definen las opciones disponibles
@@ -77,7 +91,16 @@ class UIWidgetsMaps {
 		$zoom_map   = $Options['zoom_map'] ?? 15;
 		$MapTypeId  = $Options['MapTypeId'] ?? 1;
 		$BASE       = $Options['BASE'];
-		$ID_Cont    = $Options['ID_Cont'] ?? 'div_map_'.uniqid();
+		$ID_Cont    = preg_replace('/[^A-Za-z0-9_\-]/', '', (string)($Options['ID_Cont'] ?? '')) ?: 'div_map_'.uniqid();
+
+		// Escapado de valores insertados en literales JS (evita rotura de string / XSS)
+		$Titulo     = $this->_escapeJs($Titulo);
+		$SubTitulo  = $this->_escapeJs($SubTitulo);
+		$Contenido  = $this->_escapeJs($Contenido);
+		$BASE       = $this->_escapeJs($BASE);
+
+		// Valida el formato de la clave de Google Maps (previene inyección de atributos/HTML en el <script src>)
+		if (!preg_match('/^[A-Za-z0-9_\-]{10,128}$/', (string)$IDGoogle)) { echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La API de Google Maps tiene un formato inválido.'); exit; }
 
 		/********************** Si todo esta ok **********************/
         //Se selecciona el tipo
@@ -207,38 +230,43 @@ class UIWidgetsMaps {
         </script>
         <div id="'.$ID_Cont.'" style="width:100%; height:500px"></div>';
 
-        /**********************/
+        /**********************  Retorno datos  **********************/
         //devuelvo
         echo $mapa;
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
+	/**
+	 * Despliega un mapa desde una dirección (geocodificación en cliente), se genera un
+	 * infowindow en el marcador centrado (Google Maps).
+	 *
+	 * Claves obligatorias de $Options: 'Ubicacion', 'IDGoogle' y 'MapTypeId' (1 ROADMAP |
+	 * 2 SATELLITE | 3 HYBRID | 4 TERRAIN). Opcionales: 'Contenido' (default: la dirección),
+	 * 'zoom_map' (15), 'BASE' e 'ID_Cont' (id generado si falta). La dirección se limpia con
+	 * las constantes de la clase (reemplaza 'Av.'/'Nº' por 'Avenida'). Si falta una obligatoria
+	 * o $MapTypeId está fuera de catálogo imprime una alerta y detiene la ejecución (exit).
+	 *
+	 * @param array $Options Arreglo con las opciones del mapa (ver detalle).
+	 *
+	 * @return void Imprime el HTML/JS del mapa geocodificando la dirección.
+	 *
+	 * @example
+	 * ```php
+	 * $UIWidgetsMaps = new UIWidgetsMaps();
+	 * $Options = [
+	 *     'Ubicacion' => 'los lirios 455',       // Dirección de la ubicación
+	 *     'Contenido' => 'descripcion de la casa', // Contenido del InfoWindow
+	 *     'IDGoogle'  => 'xxKeyGooglexx',        // API de Google Maps
+	 *     'zoom_map'  => 15,                     // Zoom del mapa
+	 *     'MapTypeId' => 1,                      // Tipo de mapa (1..4)
+	 *     'BASE'      => 'https://mi-sitio.cl',  // Ruta base del sistema
+	 *     'ID_Cont'   => 'div_1',                // ID del div donde se dibuja el html
+	 * ];
+	 * $UIWidgetsMaps->GMaps_from_direccion($Options); // imprime el mapa
+	 * ```
+	 */
     public function GMaps_from_direccion($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Despliega un mapa desde una ubicacion entregada, se genera un infowindow en el marcador centrado
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		*   $Options = [
-		*		'Ubicacion'  => 'los lirios 455',         //Direccion de la ubicacion
-		*		'Contenido'  => 'descripcion de la casa', //Contenido del InfoWindow
-		*		'IDGoogle'   => 'xxKeyGooglexx',          //API de Google Maps
-		*		'zoom_map'   => 15,                       //Zoom del mapa
-		*		'MapTypeId'  => 1,                        //Tipo de mapa
-		*		'BASE'       => 'http://google.cl',       //Ruta base del sistema
-		*		'ID_Cont'    => 'div_1',                  //ID del div donde se dibuja el html
-		*	];
-		* 	$UIWidgetsMaps->GMaps_from_direccion($Options);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   array   $Options    array con los datos
-		* @return  string
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
 		//se definen las opciones disponibles
@@ -258,7 +286,15 @@ class UIWidgetsMaps {
 		$zoom_map   = $Options['zoom_map'] ?? 15;
 		$MapTypeId  = $Options['MapTypeId'] ?? 1;
 		$BASE       = $Options['BASE'];
-		$ID_Cont    = $Options['ID_Cont'] ?? 'div_map_'.uniqid();
+		$ID_Cont    = preg_replace('/[^A-Za-z0-9_\-]/', '', (string)($Options['ID_Cont'] ?? '')) ?: 'div_map_'.uniqid();
+
+		// Escapado de valores insertados en literales JS (evita rotura de string / XSS)
+		$Ubicacion  = $this->_escapeJs($Ubicacion);
+		$Contenido  = $this->_escapeJs($Contenido);
+		$BASE       = $this->_escapeJs($BASE);
+
+		// Valida el formato de la clave de Google Maps (previene inyección de atributos/HTML en el <script src>)
+		if (!preg_match('/^[A-Za-z0-9_\-]{10,128}$/', (string)$IDGoogle)) { echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La API de Google Maps tiene un formato inválido.'); exit; }
 
 		/********************** Si todo esta ok **********************/
         //Se selecciona el tipo
@@ -406,39 +442,45 @@ class UIWidgetsMaps {
         </script>
         <div id="'.$ID_Cont.'" style="width:100%; height:500px"></div>';
 
-        /**********************/
+        /**********************  Retorno datos  **********************/
         //devuelvo
         echo $mapa;
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
+	/**
+	 * Despliega un mapa desde dos direcciones entregadas, genera un infowindow en el marcador
+	 * de ambas ubicaciones y ajusta los límites del mapa para que ambas sean visibles
+	 * (Google Maps).
+	 *
+	 * Claves obligatorias de $Options: 'Ubicacion_1', 'Ubicacion_2', 'IDGoogle' y 'MapTypeId'
+	 * (1 ROADMAP | 2 SATELLITE | 3 HYBRID | 4 TERRAIN). Opcionales: 'Contenido' (texto único
+	 * usado en ambos infowindows; default: la dirección respectiva), 'zoom_map' (15), 'BASE' e
+	 * 'ID_Cont' (id generado si falta). Las direcciones se limpian con las constantes de la
+	 * clase (reemplaza 'Av.'/'Nº' por 'Avenida'). Si falta una obligatoria o $MapTypeId está
+	 * fuera de catálogo imprime una alerta y detiene la ejecución (exit).
+	 *
+	 * @param array $Options Arreglo con las opciones del mapa (ver detalle).
+	 *
+	 * @return void Imprime el HTML/JS del mapa con los dos marcadores.
+	 *
+	 * @example
+	 * ```php
+	 * $UIWidgetsMaps = new UIWidgetsMaps();
+	 * $Options = [
+	 *     'Ubicacion_1' => 'los lirios 455',   // Dirección de la ubicación 1
+	 *     'Ubicacion_2' => 'ahumada 700',      // Dirección de la ubicación 2
+	 *     'Contenido'   => 'descripcion',      // Contenido del InfoWindow (ambos)
+	 *     'IDGoogle'    => 'xxKeyGooglexx',    // API de Google Maps
+	 *     'zoom_map'    => 15,                 // Zoom del mapa
+	 *     'MapTypeId'   => 1,                  // Tipo de mapa (1..4)
+	 *     'BASE'        => 'https://mi-sitio.cl', // Ruta base del sistema
+	 * ];
+	 * $UIWidgetsMaps->GMaps_from_ubicacion_mixta($Options); // imprime el mapa
+	 * ```
+	 */
     public function GMaps_from_ubicacion_mixta($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Despliega un mapa desde dos ubicaciones entregadas, se genera un infowindow en el marcador de ambas ubicaciones
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		* 	//se imprime input
-		*   $Options = [
-		*		'Ubicacion_1'  => 'los lirios 455',         //Direccion de la ubicacion
-		*		'Contenido_1'  => 'descripcion de la casa', //Contenido del InfoWindow
-		*		'Ubicacion_2'  => 'los lirios 455',         //Direccion de la ubicacion
-		*		'Contenido_2'  => 'descripcion de la casa', //Contenido del InfoWindow
-		*		'IDGoogle'     => 'xxKeyGooglexx',          //API de Google Maps
-		*		'zoom_map'     => 15,                       //Zoom del mapa
-		*		'MapTypeId'    => 1,                        //Tipo de mapa
-		*		'BASE'         => 'http://google.cl',       //Ruta base del sistema
-		*	];
-		* 	$UIWidgetsMaps->GMaps_from_ubicacion_mixta($Options);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   array   $Options    array con los datos
-		* @return  string
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
 		//se definen las opciones disponibles
@@ -461,7 +503,17 @@ class UIWidgetsMaps {
 		$zoom_map    = $Options['zoom_map'] ?? 15;
 		$MapTypeId   = $Options['MapTypeId'] ?? 1;
 		$BASE        = $Options['BASE'];
-		$ID_Cont     = $Options['ID_Cont'] ?? 'div_map_'.uniqid();
+		$ID_Cont     = preg_replace('/[^A-Za-z0-9_\-]/', '', (string)($Options['ID_Cont'] ?? '')) ?: 'div_map_'.uniqid();
+
+		// Escapado de valores insertados en literales JS (evita rotura de string / XSS)
+		$Ubicacion_1 = $this->_escapeJs($Ubicacion_1);
+		$Ubicacion_2 = $this->_escapeJs($Ubicacion_2);
+		$Contenido_1 = $this->_escapeJs($Contenido_1);
+		$Contenido_2 = $this->_escapeJs($Contenido_2);
+		$BASE        = $this->_escapeJs($BASE);
+
+		// Valida el formato de la clave de Google Maps (previene inyección de atributos/HTML en el <script src>)
+		if (!preg_match('/^[A-Za-z0-9_\-]{10,128}$/', (string)$IDGoogle)) { echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'La API de Google Maps tiene un formato inválido.'); exit; }
 
 		/********************** Si todo esta ok **********************/
         //Se selecciona el tipo
@@ -746,77 +798,62 @@ class UIWidgetsMaps {
         </script>
         <div id="'.$ID_Cont.'" style="width:100%; height:500px"></div>';
 
-        /**********************/
+        /**********************  Retorno datos  **********************/
         //devuelvo
         echo $mapa;
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
+	/**
+	 * Despliega un mapa Leaflet desde una latitud y longitud entregadas, con soporte para
+	 * marcadores, polígonos, círculos, polilíneas, rectángulos, heatmap y marcador arrastrable.
+	 *
+	 * Claves obligatorias de $Options: 'Latitud' y 'Longitud' (si faltan imprime alerta y
+	 * hace exit). Opcionales con su default: 'ID_Map' (id generado), 'Zoom' (13),
+	 * 'attribution' (&copy; Todos los derechos reservados), 'defaultLayer' (OpenStreetMap),
+	 * 'scrollWheelZoom' (true), 'events' (false) y 'ConfMode' (1).
+	 *
+	 * Formatos de los arreglos auxiliares (índices y colores 1..6 según catálogo interno):
+	 * - 'arrMarkers': [lat, lng, iconExName (ej. 'A1'), iconFill, contentHtml, content].
+	 * - 'arrPolygon': [[[lat, lng], ...], color, popup].
+	 * - 'arrCircles': [lat, lng, color, radius (m), popup].
+	 * - 'arrPolyLine': [[[lat, lng], ...], color].
+	 * - 'arrRectangle': [[[lat, lng], ...], color, popup].
+	 * - 'arrHeatMap': [lat, lng, intensidad].
+	 * - 'dragabbleMarker' (bool) + 'dragabbleFormItems' ('idLat,idLng'): marcadores
+	 *   arrastrables que actualizan dos inputs al soltarlos.
+	 * - 'ConfMode': 1 = capas + escala, 2 = capas base/extra + opacidad, 3 = mapa estático,
+	 *   4 = zoom/arrastre sin scroll ni doble click.
+	 *
+	 * @param array $Options Arreglo con las opciones del mapa (ver detalle).
+	 *
+	 * @return void Imprime el HTML/JS del mapa Leaflet.
+	 *
+	 * @example
+	 * ```php
+	 * $UIWidgetsMaps = new UIWidgetsMaps();
+	 * $Options = [
+	 *     'Latitud'        => -33.45,           // Latitud de la ubicación
+	 *     'Longitud'       => -70.66,           // Longitud de la ubicación
+	 *     'ID_Map'         => 'map',            // ID del div donde se dibuja el html
+	 *     'Zoom'           => 13,               // Zoom del mapa
+	 *     'attribution'    => '&copy; Test',    // Pie de página del mapa
+	 *     'arrMarkers'     => $arrMarkers,      // Array con los marcadores
+	 *     'arrPolygon'     => $arrPolygon,      // Array con los polígonos
+	 *     'arrCircles'     => $arrCircles,      // Array con los círculos
+	 *     'arrPolyLine'    => $arrPolyLine,     // Array con las líneas
+	 *     'arrRectangle'   => $arrRectangle,    // Array con los rectángulos
+	 *     'arrHeatMap'     => $arrHeatMap,      // Array con los puntos de calor
+	 *     'events'         => true,             // Marcador al hacer click en el mapa
+	 *     'ConfMode'       => 1,                // Modo del mapa (1..4)
+	 *     'defaultLayer'   => 'OpenStreetMap',  // Layer a mostrar en la carga
+	 *     'scrollWheelZoom' => true,            // Scroll del mouse
+	 * ];
+	 * $UIWidgetsMaps->leaFletMap_from_gps($Options); // imprime el mapa
+	 * ```
+	 */
     public function leaFletMap_from_gps($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Despliega un mapa desde una latitud y longitud entregadas, se genera un infowindow en el marcador centrado
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-        *
-        *    // Variable para los circulos
-        *    $arrMarkers = [
-        *        [-33.4389, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 1.'],
-        *        [-33.4589, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 2.'],
-        *        [-33.4789, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 3.'],
-        *        [-33.4989, -70.6993, '<b>Santiago de Chile</b><br>I am a marker 4.'],
-        *    ];
-        *
-        *   // Variable para los poligonos
-		*   $arrPolygon = [
-        *        [[[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]], 'I am a polygon 1.'],
-        *        [[[-33.465072090022645, -70.74491500854494], [-33.47681399959164, -70.74457168579103], [-33.46750651907221, -70.72465896606447]], 'I am a polygon 2.'],
-        *        [[[-33.49012911778188, -70.72105407714845], [-33.494853345110236, -70.72156906127931], [-33.49356494503731, -70.71075439453126], [-33.48483195034282, -70.7102394104004]], 'I am a polygon 3.'],
-        *    ];
-        *
-        *    // Variable para los circulos
-		*   $arrCircles = [
-        *        [-33.4389, -70.6593, 1, 500, 'I am a circle 1.'],
-        *        [-33.4589, -70.6593, 1, 500, 'I am a circle 2.'],
-        *        [-33.4789, -70.6593, 1, 500, 'I am a circle 3.'],
-        *        [-33.4989, -70.6593, 1, 500, 'I am a circle 4.'],
-        *    ];
-        *
-        *   // Variable para las lineas
-		*   $arrPolyLine = [
-        *        [[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]],
-        *        [[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]],
-        *        [[-33.4499, -70.6993], [-33.4439, -70.7193], [-33.4519, -70.7393]],
-        *    ];
-        *
-		* 	//se imprime input
-		*   $Options = [
-        *        'Latitud'          => -77.5,          //Latitud de la ubicacion
-        *        'Longitud'         => -33.6,          //Longitud de la ubicacion
-        *        'ID_Map'           => 'map',          //ID del div donde se dibuja el html
-        *        'Zoom'             => 13,             //Zoom del mapa
-        *        'attribution'      => '&copy; Test',  //Pie de pagina del mapa
-        *        'arrMarkers'       => $arrMarkers,    //array con los marcadores
-        *        'arrPolygon'       => $arrPolygon,    //array con los poligonos
-        *        'arrCircles'       => $arrCircles,    //array con los circulos
-        *        'arrPolyLine'      => $arrPolyLine,   //array con las lineas
-        *        'arrRectangle'     => $arrRectangle,  //array con los rectangulos
-        *        'arrHeatMap'       => $arrHeatMap,    //array con los puntos de calor
-        *        'events'           => true,           //Si se ejecuta algo al hacer click (revisar)
-        *        'ConfMode'         => 1,              //Modo del mapa
-        *        'defaultLayer'     => 'defaultLayer', //Layer a mostrar en la carga
-        *        'scrollWheelZoom'  => true,           //Scrool del mouse
-        *    ];
-		* 	$UIWidgetsMaps->leaFletMap_from_gps($Options);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   array   $Options    array con los datos
-		* @return  string
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
 		if ($Options['Latitud'] === null || trim((string)$Options['Latitud']) === '') {   echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la Latitud.');  exit;}
@@ -1033,13 +1070,13 @@ class UIWidgetsMaps {
                 foreach ($arrMarkers as $item) {
                     //Se agrega elemento
                     $mapa .= '{
-                        lat: '.$item[0].',
-                        lng: '.$item[1].',
-                        iconExName: "'.$item[2].'",
-                        iconFill: "'.$item[3].'",
-                        contentHtml: "'.$item[4].'",
-                        content: "'.$item[5].'",
-                    },';
+'                        . '    lat: ' . (is_numeric($item[0] ?? null) ? $item[0] : 0) . ',
+'                        . '    lng: ' . (is_numeric($item[1] ?? null) ? $item[1] : 0) . ',
+'                        . '    iconExName: "' . $this->_escapeJs($item[2] ?? '') . '",
+'                        . '    iconFill: "' . $this->_escapeJs($item[3] ?? '') . '",
+'                        . '    contentHtml: "' . $this->_escapeJs($item[4] ?? '') . '",
+'                        . '    content: "' . $this->_escapeJs($item[5] ?? '') . '",
+'                        . '},';
                 }
                 $mapa .= '];';
 
@@ -1440,7 +1477,7 @@ class UIWidgetsMaps {
                     $mapa .= "], {".$type."}).addTo(".$ID_Map.");";
                     //Popup
                     if(isset($poly[2])&&$poly[2]!=''){
-                        $mapa .= $ID_polygon.".bindPopup('".$poly[2]."');";
+                        $mapa .= $ID_polygon.".bindPopup('".$this->_escapeJs($poly[2])."');";
                     }
                 }
             }
@@ -1461,7 +1498,7 @@ class UIWidgetsMaps {
                     }).addTo(".$ID_Map.");";
                     //Popup
                     if(isset($item[4])&&$item[4]!=''){
-                        $mapa .= $ID_circle.".bindPopup('".$item[4]."');";
+                        $mapa .= $ID_circle.".bindPopup('".$this->_escapeJs($item[4])."');";
                     }
                 }
             }
@@ -1507,7 +1544,7 @@ class UIWidgetsMaps {
                     var ".$ID_rectangle." = L.rectangle(bounds_".$ID_rectangle.", {".$color." weight: 1}).addTo(".$ID_Map.");";
                     //Popup
                     if(isset($poly[2])&&$poly[2]!=''){
-                        $mapa .= $ID_rectangle.".bindPopup('".$poly[2]."');";
+                        $mapa .= $ID_rectangle.".bindPopup('".$this->_escapeJs($poly[2])."');";
                     }
                 }
             }
@@ -1554,35 +1591,41 @@ class UIWidgetsMaps {
             ".$ID_Map.".setView([".$Latitud.", ".$Longitud."], ".$Zoom.");
         </script>";
 
-        /**********************/
+        /**********************  Retorno datos  **********************/
         //devuelvo
         echo $mapa;
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
+	/**
+	 * Despliega un mapa Leaflet geocodificando una lista de direcciones (una o más) y
+	 * delegando el render en leaFletMap_from_gps().
+	 *
+	 * Clave obligatoria de $Options: 'arrDirecciones' (arreglo con una o más direcciones;
+	 * sin datos válidos imprime alerta). Cada elemento: [direccion, iconExName ('A'),
+	 * iconFill ('#FF5722'), contentHtml (icono por defecto), content (la dirección)]. Las
+	 * direcciones se limpian con las constantes de la clase y se geocodifican con
+	 * FunctionsLocation::geocodeAddress(). Opcionales: 'ID_Map', 'Zoom' (13) y 'attribution',
+	 * que se reenvían al mapa Leaflet.
+	 *
+	 * @param array $Options Arreglo con las opciones (ver detalle).
+	 *
+	 * @return void Imprime el mapa Leaflet con un marcador por dirección geocodificada.
+	 *
+	 * @example
+	 * ```php
+	 * $UIWidgetsMaps = new UIWidgetsMaps();
+	 * $Options = [
+	 *     'ID_Map'         => 'map_1',           // ID del div donde se dibuja el html
+	 *     'Zoom'           => 13,                // Zoom del mapa
+	 *     'attribution'    => '&copy; Test',     // Pie de página del mapa
+	 *     'arrDirecciones' => $arrDirecciones,   // Array con las direcciones
+	 * ];
+	 * $UIWidgetsMaps->leaFletMap_from_direccion($Options); // imprime el mapa
+	 * ```
+	 */
     public function leaFletMap_from_direccion($Options){
-		/*
-		*=================================================     Detalles    =================================================
-		*
-		* Despliega un mapa desde una ubicacion entregada, se genera un infowindow en el marcador centrado
-		*
-		*=================================================    Modo de uso  =================================================
-		*
-		*   //se imprime input
-        *    $Options = [
-        *        'ID_Map'         => 'map_1',            //ID del div donde se dibuja el html
-        *        'Zoom'           => 13,                 //Zoom del mapa
-        *        'attribution'    => '&copy; Test',      //Pie de pagina del mapa
-        *        'arrDirecciones' => $arrDirecciones,    //array con las direcciones
-        *    ];
-		* 	$UIWidgetsMaps->leaFletMap_from_direccion($Options);
-		*
-		*=================================================    Parametros   =================================================
-		* @input   array   $Options    array con los datos
-		* @return  string
-		*===================================================================================================================
-		*/
 
         /**********************  Validaciones   **********************/
         if (empty($Options['arrDirecciones']) || !is_array($Options['arrDirecciones'])) {
@@ -1636,6 +1679,42 @@ class UIWidgetsMaps {
         }else{
             echo $this->Alertas->alertPostData(4, 4, 'exclamation-circle', 1, 'Las ubicaciones entregadas estan incorrectas o no existen.');
         }
+
+    }
+
+
+    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Privados                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+	/******************************************************************************/
+    /**
+     * Escapa un valor para incrustarlo en literales JavaScript embebidos en HTML.
+     *
+     * Escapa contrabarras y comillas (sin introducir entidades HTML, por lo que el
+     * contenido con etiquetas intencionales se conserva al renderizarse) y neutraliza
+     * el cierre prematuro de </script>. Elimina los saltos de línea que romperían el
+     * literal JS de una sola línea.
+     *
+     * @param mixed $valor Valor a escapar (se convierte a string).
+     *
+     * @return string Valor seguro para interpolar dentro de un literal JS.
+     *
+     * @example
+     * ```php
+     * $js = 'var x = "'.$this->_escapeJs($valor).'";';
+     * ```
+     */
+    private function _escapeJs($valor): string {
+        // Escapa contrabarras primero para no invalidar los escapes posteriores
+        $escapeado = str_replace('\\', '\\\\', (string)$valor);
+        // Escapa comillas simples y dobles para no romper el literal JS
+        $escapeado = str_replace(["'", '"'], ["\\'", '\\"'], $escapeado);
+        // Neutraliza el cierre de </script> conservando el valor en el HTML resultante
+        $escapeado = str_ireplace('</script', '<\/script', $escapeado);
+        // Elimina saltos de línea que romperían el literal JS de una sola línea
+        return str_replace(["\r", "\n"], ' ', $escapeado);
     }
 
 }

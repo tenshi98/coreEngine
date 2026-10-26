@@ -9,22 +9,34 @@ class FunctionsSecurityPasswords {
 	/*                                                 Instancias                                                      */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
 	//Definiciones
 	private $DataValidations;
 
-	/************************************************************************************************************/
-	//Instancias
+	/******************************************************************************/
+	/**
+	 * Instancia las dependencias internas de la clase de contraseñas.
+	 *
+	 * Carga FunctionsDataValidations para validar enteros y booleanos
+	 * recibidos como parámetros de generación y hash.
+	 *
+	 * @return void
+	 *
+	 * @example
+	 * ```php
+	 * $SecurityPasswords = new FunctionsSecurityPasswords();
+	 * ```
+	 */
 	public function __construct() {
 		$this->DataValidations = new FunctionsDataValidations();
 	}
 
     /*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                                  Metodos                                                        */
+	/*                                              Metodos Publicos                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-	/************************************************************************************************************/
+	/******************************************************************************/
     /**
      * Genera una contraseña aleatoria de longitud específica y tipo (numérico o alfanumérico).
      * * Utiliza un pool de caracteres basado en el tipo seleccionado, mezcla el contenido
@@ -37,8 +49,8 @@ class FunctionsSecurityPasswords {
 	 *
 	 * @example
 	 * ```php
-	 * $SecurityPasswords->generarPassword(10,'numerico');     //Devuelve valores numeros aleatoreos
-	 * $SecurityPasswords->generarPassword(10,'alfanumerico'); //Devuelve valores alfanumerico aleatoreos
+	 * $SecurityPasswords->generarPassword(10,'numerico');     // Devuelve valores numeros aleatoreos
+	 * $SecurityPasswords->generarPassword(10,'alfanumerico'); // Devuelve valores alfanumerico aleatoreos
 	 * ```
 	 *
      */
@@ -84,7 +96,7 @@ class FunctionsSecurityPasswords {
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Genera una cadena de caracteres aleatorios con opciones avanzadas de personalización.
      * * Permite omitir caracteres visualmente ambiguos (como 'O' y '0'), incluir símbolos
@@ -95,18 +107,18 @@ class FunctionsSecurityPasswords {
      * @param bool $incluirSimbolos Si es true, añade caracteres especiales (solo si lecturaAmigable es false).
      * @param bool $sinDuplicados Si es true, asegura que cada carácter aparezca solo una vez.
      *
-     * @return string Cadena aleatoria generada.
+     * @return array Resultado con la cadena aleatoria en 'data' (['success' => true, 'data' => string]) o error en 'error'.
      * @throws LengthException Si se solicita una longitud mayor a los caracteres únicos disponibles sin duplicados.
 	 *
 	 * @example
 	 * ```php
-	 * $SecurityPasswords->caracteresRandom(16, true,  false, false);  //Devuelve valores aleatoreos
-	 * $SecurityPasswords->caracteresRandom(16, true,  true,  false);  //Devuelve valores aleatoreos
-	 * $SecurityPasswords->caracteresRandom(16, true,  true,  true);   //Devuelve valores aleatoreos
-	 * $SecurityPasswords->caracteresRandom(16, false, true,  false);  //Devuelve valores aleatoreos
-	 * $SecurityPasswords->caracteresRandom(16, false, true,  true);   //Devuelve valores aleatoreos
-	 * $SecurityPasswords->caracteresRandom(16, false, false, true);   //Devuelve valores aleatoreos
-	 * $SecurityPasswords->caracteresRandom(16, true,  false, true);   //Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, true,  false, false);  // Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, true,  true,  false);  // Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, true,  true,  true);   // Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, false, true,  false);  // Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, false, true,  true);   // Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, false, false, true);   // Devuelve valores aleatoreos
+	 * $SecurityPasswords->caracteresRandom(16, true,  false, true);   // Devuelve valores aleatoreos
 	 * ```
 	 *
      */
@@ -166,7 +178,7 @@ class FunctionsSecurityPasswords {
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Genera un token aleatorio codificado en formato hexadecimal.
      * * Utiliza la librería OpenSSL para generar bytes pseudo-aleatorios seguros,
@@ -178,7 +190,7 @@ class FunctionsSecurityPasswords {
 	 *
 	 * @example
 	 * ```php
-	 * $SecurityPasswords->tokenBin2Hex(25); //Devuelve valores aleatoreos
+	 * $SecurityPasswords->tokenBin2Hex(25); // Devuelve valores aleatoreos
 	 * ```
 	 *
      */
@@ -200,19 +212,21 @@ class FunctionsSecurityPasswords {
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Crea un hash de alta seguridad para contraseñas utilizando el algoritmo BCRYPT.
      * * Implementa un factor de costo (work factor) de 12, optimizado para el hardware actual,
      * lo que dificulta ataques de fuerza bruta.
      *
      * @param string $Texto La contraseña o cadena en texto plano a procesar.
+     * @param int $costo Factor de costo BCRYPT (por defecto: 12; 2^n iteraciones).
      *
      * @return array El hash generado en la clave 'data' (o el error en 'error'), listo para almacenar.
 	 *
 	 * @example
 	 * ```php
-	 * $SecurityPasswords->password_hash(25);
+	 * $SecurityPasswords->hashCreate('MiClave123');
+	 * // devuelve ['success' => true, 'data' => '$2y$12$...'] o ['success' => false, 'error' => 'Sin datos ingresados en Texto']
 	 * ```
 	 *
      */
@@ -240,7 +254,7 @@ class FunctionsSecurityPasswords {
 
     }
 
-    /************************************************************************************************************/
+    /******************************************************************************/
     /**
      * Verifica si una cadena en texto plano coincide con un hash previamente generado.
      * * Es resistente a ataques de tiempo (timing attacks) y detecta automáticamente
@@ -253,7 +267,9 @@ class FunctionsSecurityPasswords {
 	 *
 	 * @example
 	 * ```php
-	 * $SecurityPasswords->hashVerify(25, 'asdqwe');
+	 * $hash = FunctionsSecurityPasswords::hashCreate('MiClave123')['data'];
+	 * FunctionsSecurityPasswords::hashVerify('MiClave123', $hash); // devuelve true
+	 * FunctionsSecurityPasswords::hashVerify('OtraClave', $hash);  // devuelve false
 	 * ```
 	 *
      */
@@ -275,13 +291,29 @@ class FunctionsSecurityPasswords {
 
     }
 
-
 	/*******************************************************************************************************************/
 	/*                                                                                                                 */
-	/*                                              Metodos Internos                                                   */
+	/*                                              Metodos Privados                                                   */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-    /************************************************************************************************************/
+    /******************************************************************************/
+	/**
+	 * Valida que el dato recibido sea un entero positivo no vacío.
+	 *
+	 * Comprueba que el valor no sea nulo, vacío ni cero y que sea reconocido
+	 * como número entero por FunctionsDataValidations.
+	 *
+	 * @param mixed $Data Valor a validar (ej: 10, '15').
+	 * @param string $Name Nombre del campo recibido, usado en el mensaje de error (ej: 'longitud').
+	 *
+	 * @return bool|string true si es un entero válido; mensaje de error (string) si no lo es.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_validateInteger(10, 'longitud'); // devuelve true
+	 * $this->_validateInteger(0, 'longitud');  // devuelve 'Sin datos ingresados en longitud'
+	 * ```
+	 */
 	private function _validateInteger($Data, $Name){
 
 		/**********************  Validaciones   **********************/
@@ -299,7 +331,24 @@ class FunctionsSecurityPasswords {
 		return true;
 
 	}
-    /************************************************************************************************************/
+
+    /******************************************************************************/
+	/**
+	 * Valida que el dato recibido sea un booleano no vacío.
+	 *
+	 * Comprueba que el valor no sea nulo, cadena vacía y que sea de tipo bool.
+	 *
+	 * @param mixed $Data Valor a validar (true/false).
+	 * @param string $Name Nombre del campo recibido, usado en el mensaje de error (ej: 'lecturaAmigable').
+	 *
+	 * @return bool|string true si es un booleano válido; mensaje de error (string) si no lo es.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_validateBool(true, 'lecturaAmigable');  // devuelve true
+	 * $this->_validateBool('si', 'lecturaAmigable');  // devuelve 'El dato ingresado en lecturaAmigable esta fuera de parámetros esperados'
+	 * ```
+	 */
 	private function _validateBool($Data, $Name){
 
 		/**********************  Validaciones   **********************/
