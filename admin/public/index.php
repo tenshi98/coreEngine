@@ -77,6 +77,18 @@ $f3 = require_once('../../vendors/fatfree/base.php'); //Base
 $f3->set('AUTOLOAD',$Autoload);                       //Autoload
 
 /**********************************************************************************************************************************/
+/*                                            Vida de la sesion PHP (alineada)                                                     */
+/**********************************************************************************************************************************/
+// La cookie "Sesion_tk" (re-autenticacion contra BD) dura 1 dia, pero la sesion
+// PHP usada por F3/CSRF tenia la vida por defecto de PHP (gc_maxlifetime=24 min
+// y cookie de sesion, borrada por los navegadores moviles al cambiar de red/app).
+// Esa diferencia provocaba que SessionService::check() reconstruyera la sesion
+// (nuevo ID, token CSRF nuevo) mientras el navegador seguia enviando el anterior -> 419.
+// Se alambra ambas vidas a 1 dia para que coincidan con TokenExpires (1 dia).
+ini_set('session.gc_maxlifetime', 86400);
+$f3->set('JAR.lifetime', 86400); // aplica session_set_cookie_params ANTES de session_start()
+
+/**********************************************************************************************************************************/
 /*                                                       Sesion Usuario                                                           */
 /**********************************************************************************************************************************/
 // Establecer la zona horaria predeterminada a usar.
@@ -103,9 +115,14 @@ $UserSesion   = (!$f3->get('SESSION.TokenUser') || !$f3->get('SESSION.TokenExpir
 if($UserSesion===true){
 
     // Se registran las Rutas
-    require_once __DIR__ . '/../app/utils/userAdmin.php';             // Rutas de los administradores
-    require_once __DIR__ . '/../app/utils/userData.php';              // Rutas de los usuarios normales
-    require_once __DIR__ . '/../app/utils/sistemaFuncionalidad.php';  // Funcionalidad del sistema
+    if ((int) $f3->get('SESSION.DataInfo.PasswordForzarCambio') === 1) {
+        // Debe cambiar su password inicial: solo Mi Usuario y cierre de sesion
+        require_once __DIR__ . '/../app/utils/userPasswordForzada.php';
+    } else {
+        require_once __DIR__ . '/../app/utils/userAdmin.php';             // Rutas de los administradores
+        require_once __DIR__ . '/../app/utils/userData.php';              // Rutas de los usuarios normales
+        require_once __DIR__ . '/../app/utils/sistemaFuncionalidad.php';  // Funcionalidad del sistema
+    }
 
     // Numero de conexiones maximas por minuto
     $userId       = $f3->get('SESSION.DataInfo.UserID');
