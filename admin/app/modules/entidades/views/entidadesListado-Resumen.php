@@ -65,7 +65,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'Nombre',    'Name' => 'RepLegalNombre',   'Id' => 'Edit_RepLegalNombre',   'Value' => ($data['rowData']['RepLegalNombre'] ?? ''), 'Required' => 1]);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 11, 'Placeholder' => 'Rut',       'Name' => 'RepLegalRut',      'Id' => 'Edit_RepLegalRut',      'Value' => ($data['rowData']['RepLegalRut'] ?? ''),    'Required' => 1,'Icon' => 'bi bi-person-circle']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 2,  'Placeholder' => 'Email',     'Name' => 'RepLegalEmail',    'Id' => 'Edit_RepLegalEmail',    'Value' => ($data['rowData']['RepLegalEmail'] ?? ''),  'Required' => 1,'Icon' => 'bx bx-mail-send']);
-                                $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
+                                $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Celular',   'Name' => 'RepLegalFono1',    'Id' => 'Edit_RepLegalFono1',    'Value' => ($data['rowData']['RepLegalFono1'] ?? ''), 'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder' => 'Teléfono',  'Name' => 'RepLegalFono2',    'Id' => 'Edit_RepLegalFono2',    'Value' => ($data['rowData']['RepLegalFono2'] ?? ''), 'Required' => 1,'Icon' => 'bi bi-telephone-fill']);
 
@@ -79,7 +79,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                                 $data['Fnc_FormInputs']->formSelect([  'Placeholder' => 'Estado',  'Name' => 'idEstado',   'Id' => 'Edit_idEstado',  'Value'  => ($data['rowData']['idEstado'] ?? ''), 'Required' => 2,'arrData' => $data['arrEstado']]);
                                 //permite la modificacion de la contraseña en caso de ser utilizada
                                 if($data['UserData']["entidadesListadoUsoPassword"]==2){
-                                    $data['Fnc_FormInputs']->formPostData(1, 4, 'exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
+                                    $data['Fnc_FormInputs']->formPostData(1, 4, 'bi bi-exclamation-circle', 0, '<strong>Contraseña: </strong> permite modificar arbitrariamente la contraseña.');
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 3,  'Placeholder' => 'Contraseña',   'Name' => 'password',   'Id' => 'Edit_password',  'Value'  => '','Required' => 1,'Icon' => 'bi bi-key']);
                                 }
                                 //Se verifica
@@ -230,7 +230,10 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                                             echo '</div>';
 
                                             //datos ocultos
-                                            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad','Value' => $data['rowData']['idEntidad'],'Required' => 2]);
+                                            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad',     'Value' => $data['rowData']['idEntidad'],     'Required' => 2]);
+                                            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',      'Value' => $data['rowData']['idEstado'],      'Required' => 2]);
+                                            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipo',        'Value' => $data['rowData']['idTipo'],        'Required' => 2]);
+                                            $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idTipoEntidad', 'Value' => $data['rowData']['idTipoEntidad'], 'Required' => 2]);
                                             ?>
                                             <div class="d-grid gap-2 d-md-flex justify-content-md-center pt-4">
                                                 <button type="submit" class="btn btn-success"><i class="bx bx-save"></i> Guardar Cambios</button>

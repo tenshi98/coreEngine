@@ -27,26 +27,38 @@
 <div class="modal-body">
 
     <?php
+    $Theme_color = 'summary-theme-color-2';
     $arrData1 = [
-        ['Icon' => '','Titulo' => 'Nombre',        'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'Email',         'Texto' => $data['rowData']['Email']],
-        ['Icon' => '','Titulo' => 'Rut',           'Texto' => $data['rowData']['Rut']],
-        ['Icon' => '','Titulo' => 'Celular',       'Texto' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono1'])],
-        ['Icon' => '','Titulo' => 'Teléfono',      'Texto' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono2'])],
-        ['Icon' => '','Titulo' => 'Estado',        'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',    'Icon_color' => 10,'Title' => 'Nombre',        'Text' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Email',         'Text' => $data['rowData']['Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Email']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Rut',           'Text' => $data['rowData']['Rut']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-phone',        'Icon_color' => 10,'Title' => 'Celular',       'Text' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono1']), 'Text_color' => 26, 'Text_copy' => $data['rowData']['Fono1']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone',    'Icon_color' => 10,'Title' => 'Teléfono',      'Text' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono2']), 'Text_color' => 26, 'Text_copy' => $data['rowData']['Fono2']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',        'Icon_color' => 10,'Title' => 'Estado',        'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
     ];
     $arrData2 = [
-        ['Icon' => '','Titulo' => 'Ciudad',        'Texto' => $data['rowData']['Ciudad']],
-        ['Icon' => '','Titulo' => 'Comuna',        'Texto' => $data['rowData']['Comuna']],
-        ['Icon' => '','Titulo' => 'Direccion',     'Texto' => $data['rowData']['Direccion']],
-        ['Icon' => '','Titulo' => 'Tipo Contacto', 'Texto' => $data['rowData']['TipoContacto']],
-        ['Icon' => '','Titulo' => 'Cargo',         'Texto' => $data['rowData']['Cargo']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-lines-fill', 'Icon_color' => 10,'Title' => 'Tipo Contacto', 'Text' => $data['rowData']['TipoContacto']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-briefcase',         'Icon_color' => 10,'Title' => 'Cargo',         'Text' => $data['rowData']['Cargo']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',           'Icon_color' => 10,'Title' => 'Ciudad',        'Text' => $data['rowData']['Ciudad']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',           'Icon_color' => 10,'Title' => 'Comuna',        'Text' => $data['rowData']['Comuna']],
+    ];
+    $arrData3 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-fill',          'Icon_color' => 10,'Title' => 'Direccion',     'Text' => $data['rowData']['Direccion']],
     ];
     // Imprimo resultados
-    echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData1, 8);
-    echo '<h5 class="box-title text-color-red-dark">Otros Datos</h5>';
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData2, 8);
+    echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+    echo '</div>';
+
+    echo $data['Fnc_WidgetsViews']->tittle_v2('Otros Datos', 23);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+        $OptionsTable['Cols'] = 1;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData3, $OptionsTable);
+    echo '</div>';
     ?>
 
 </div>

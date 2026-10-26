@@ -11,6 +11,7 @@ class entidadesListadoContactos extends ControllerBase {
     private $FormInputs;
     private $Codification;
     private $WidgetsCommon;
+    private $WidgetsViews;
     private $DataNumbers;
 
     /*******************************************************************/
@@ -26,6 +27,7 @@ class entidadesListadoContactos extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
 		$this->DataNumbers    = new FunctionsDataNumbers();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
@@ -288,6 +290,7 @@ class entidadesListadoContactos extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon' => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'   => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
@@ -477,10 +480,14 @@ class entidadesListadoContactos extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idEntidad,Nombre,ApellidoPat,ApellidoMat,Email,Rut,Fono1,Fono2,idCiudad,idComuna,Direccion,idTipoContacto,Cargo,idEstado',
-            'required'  => 'idEntidad,Nombre,ApellidoPat',
+            'required'  => 'idEntidad,Nombre,ApellidoPat,idEstado',
             'unique'    => '',
             'encode'    => '',
             'table'     => 'entidades_listado_contactos',
@@ -492,10 +499,14 @@ class entidadesListadoContactos extends ControllerBase {
         $Response = $this->Base_insert($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -520,6 +531,10 @@ class entidadesListadoContactos extends ControllerBase {
         $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idContacto,idEntidad,Nombre,ApellidoPat,ApellidoMat,Email,Rut,Fono1,Fono2,idCiudad,idComuna,Direccion,idTipoContacto,Cargo,idEstado',
@@ -536,10 +551,14 @@ class entidadesListadoContactos extends ControllerBase {
         $Response = $this->Base_update($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -563,6 +582,10 @@ class entidadesListadoContactos extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataDelete);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => '',
@@ -577,10 +600,14 @@ class entidadesListadoContactos extends ControllerBase {
         $Response = $this->Base_delete($xParams);
 
         /************************************/
-        // Si falla la la ejecucion, se muestra alerta
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
+
+        /************************************/
+        // Confirmar transacción
+        $this->Base_transactionCommit();
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -597,20 +624,29 @@ class entidadesListadoContactos extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email',
-            'ValidarNumero'             => 'idEntidad,idCiudad,idComuna,idTipoContacto,idEstado,Fono1,Fono2',
-            'ValidarEntero'             => 'idEntidad,idCiudad,idComuna,idTipoContacto,idEstado',
-            'ValidarRut'                => 'Rut',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => '',
-            'ValidarHora'               => '',
-            'ValidarURL'                => '',
-            'ValidarLargoMinimo'        => 'Email,Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Email,Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email',
+            'ValidarNumero'              => 'idEntidad,idCiudad,idComuna,idTipoContacto,idEstado,Fono1,Fono2',
+            'ValidarEntero'              => 'idEntidad,idCiudad,idComuna,idTipoContacto,idEstado',
+            'ValidarRut'                 => 'Rut',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Email,Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Rut'         => 15,
+                'Fono1'       => 15,
+                'Fono2'       => 15,
+                'Email'       => 255,
+                'Nombre'      => 255,
+                'ApellidoPat' => 255,
+                'ApellidoMat' => 255,
+                'Direccion'   => 255,
+                'Cargo'       => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,Direccion,Cargo',
             'ValidarEspaciosVacios'     => 'Email',
             'ValidarMayusculas'         => 'Email',

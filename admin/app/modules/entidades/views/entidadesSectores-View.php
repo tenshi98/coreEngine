@@ -26,10 +26,14 @@
 </div>
 <div class="modal-body">
     <?php
+    $Theme_color = 'summary-theme-color-2';
     $arrData = [
-        ['Icon' => '','Titulo' => 'Nombre',    'Texto' => $data['rowData']['Nombre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',    'Text' => $data['rowData']['Nombre']],
     ];
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData, $OptionsTable);
+    echo '</div>';
     ?>
 </div>
 <?php

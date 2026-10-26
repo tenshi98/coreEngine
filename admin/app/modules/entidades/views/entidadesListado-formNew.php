@@ -49,13 +49,12 @@
                     $data['Fnc_FormInputs']->formSelectFilter([            'Placeholder'  => 'Sector',     'Name'  => 'idSector',   'Value'  => '','Required'  => 1,'selectProperties' => 'data-dropdown-parent="#newFormModal"','arrData' => $data['arrSector'], 'BASE' => $BASE]);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 2,   'Placeholder'  => 'Email',      'Name'  => 'Email',      'Value'  => '','Required'  => 1,'Icon' => 'bx bx-mail-send']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 11,  'Placeholder'  => 'Rut',        'Name'  => 'Rut',        'Value'  => '','Required'  => 1,'Icon' => 'bi bi-person-circle']);
-                    $data['Fnc_FormInputs']->formPostData(4, 4, 'exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
+                    $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-circle', 0, 'Considerar que todos los números telefónicos ingresados deben iniciar con el +56');
                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,   'Placeholder'  => 'Celular',    'Name'  => 'Fono1',      'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,   'Placeholder'  => 'Teléfono',   'Name'  => 'Fono2',      'Value'  => '','Required'  => 1,'Icon' => 'bi bi-telephone-fill']);
 
                     //datos ocultos
                     $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1,      'Required' => 2]); // Activo
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'password', 'Value' => '1234', 'Required' => 2]); //password por defecto
 
                     ?>
                 </div>

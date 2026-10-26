@@ -27,16 +27,24 @@
 <div class="modal-body">
 
     <?php
-    $arrData = [
-        ['Icon' => '','Titulo' => 'Nombre',            'Texto' => $data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'Fecha Vencimiento', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FVencimiento'])],
-        ['Icon' => '','Titulo' => 'Observación',       'Texto' => $data['rowData']['Observacion']],
+    $Theme_color = 'summary-theme-color-2';
+    $arrData1 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',      'Icon_color' => 10,'Title' => 'Nombre',            'Text' => $data['rowData']['Nombre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event', 'Icon_color' => 10,'Title' => 'Fecha Vencimiento', 'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FVencimiento'])],
     ];
-    echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData, 8);
+    $arrData2 = [
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text', 'Icon_color' => 10,'Title' => 'Observación',       'Text' => $data['rowData']['Observacion']],
+    ];
+    echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+        $OptionsTable['Cols'] = 1;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+    echo '</div>';
 
     echo '<h5 class="box-title text-color-red-dark">Previsualización</h5>';
-    $data['Fnc_WidgetsCommon']->previewDocs($BASE, 'upload', $data['rowData']['NombreArchivo']);
+    $data['Fnc_WidgetsPreview']->previewDocs($BASE, 'upload', $data['rowData']['NombreArchivo']);
 
     ?>
 

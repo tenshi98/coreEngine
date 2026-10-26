@@ -27,25 +27,32 @@
 <div class="modal-body">
 
     <?php
+    $Theme_color = 'summary-theme-color-2';
     $arrData1 = [
-        ['Icon' => '','Titulo' => 'Nombre',                 'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']],
-        ['Icon' => '','Titulo' => 'Fecha Nacimiento',       'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FNacimiento'])],
-        ['Icon' => '','Titulo' => 'Sexo',                   'Texto' => $data['rowData']['Sexo']],
-        ['Icon' => '','Titulo' => 'Parentesco',             'Texto' => $data['rowData']['Parentesco']],
-        ['Icon' => '','Titulo' => 'Estado',                 'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',        'Icon_color' => 10,'Title' => 'Nombre',            'Text' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].' '.$data['rowData']['Nombre']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-heart',   'Icon_color' => 10,'Title' => 'Fecha Nacimiento',  'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FNacimiento'])],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-gender-ambiguous', 'Icon_color' => 10,'Title' => 'Sexo',              'Text' => $data['rowData']['Sexo']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-people',           'Icon_color' => 10,'Title' => 'Parentesco',        'Text' => $data['rowData']['Parentesco']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',            'Icon_color' => 10,'Title' => 'Estado',            'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
     ];
     $arrData2 = [
-        ['Icon' => '','Titulo' => 'Estudios',               'Texto' => $data['rowData']['Estudios']],
-        ['Icon' => '','Titulo' => 'Estado Estudio',         'Texto' => $data['rowData']['EstadoEstudio']],
-        ['Icon' => '','Titulo' => 'Observaciones Estudio',  'Texto' => $data['rowData']['ObsEstudios']],
-        ['Icon' => '','Titulo' => 'Fecha Vigencia',         'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVigencia'])],
-        ['Icon' => '','Titulo' => 'Fecha Vencimiento',      'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVencimiento'])],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-journal-text',    'Icon_color' => 10,'Title' => 'Estudios',               'Text' => $data['rowData']['Estudios']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-clipboard-check', 'Icon_color' => 10,'Title' => 'Estado Estudio',         'Text' => $data['rowData']['EstadoEstudio']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text',  'Icon_color' => 10,'Title' => 'Observaciones Estudio',  'Text' => $data['rowData']['ObsEstudios']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event',  'Icon_color' => 10,'Title' => 'Fecha Vigencia',         'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVigencia'])],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event',  'Icon_color' => 10,'Title' => 'Fecha Vencimiento',      'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaVencimiento'])],
     ];
     // Imprimo resultados
-    echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData1, 8);
-    echo '<h5 class="box-title text-color-red-dark">Datos Académicos</h5>';
-    $data['Fnc_WidgetsCommon']->responsiveTable($arrData2, 8);
+    echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData1, $OptionsTable);
+    echo '</div>';
+    echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Académicos', 23);
+    echo '<div class="row">';
+        $OptionsTable['Cols'] = 2;
+        echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
+    echo '</div>';
 
     ?>
 

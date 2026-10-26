@@ -54,70 +54,95 @@
             echo '</div>';
         } ?>
     </div>
-    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10">
+    <div class="col-xs-12 col-sm-12 col-md-7 col-lg-8 col-xl-9 col-xxl-10 record-attachment">
         <?php
+        // Color
+        $Theme_color = 'summary-theme-color-2';
         //selecciona
         switch ($data['rowData']['idTipoEntidad']) {
             //Persona Natural
             case 1:
                 $arrData_1 = [
-                    ['Icon' => '','Titulo' => 'Tipo',             'Texto' => $data['rowData']['Tipo']],
-                    ['Icon' => '','Titulo' => 'Tipo Entidad',     'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',           'Texto' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']],
-                    ['Icon' => '','Titulo' => 'Nick',             'Texto' => $data['rowData']['Nick']],
-                    ['Icon' => '','Titulo' => 'Fecha Nacimiento', 'Texto' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FNacimiento'])],
-                    ['Icon' => '','Titulo' => 'Sexo',             'Texto' => $data['rowData']['Sexo']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tag',              'Icon_color' => 10,'Title' => 'Tipo',             'Text' => $data['rowData']['Tipo']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',         'Icon_color' => 10,'Title' => 'Tipo Entidad',     'Text' => $data['rowData']['TipoEntidad']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',        'Icon_color' => 10,'Title' => 'Nombre',           'Text' => $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-at',               'Icon_color' => 10,'Title' => 'Nick',             'Text' => $data['rowData']['Nick']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-heart',   'Icon_color' => 10,'Title' => 'Fecha Nacimiento', 'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FNacimiento'])],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-gender-ambiguous', 'Icon_color' => 10,'Title' => 'Sexo',             'Text' => $data['rowData']['Sexo']],
                 ];
                 break;
             //Empresas
             case 2:
                 $arrData_1 = [
-                    ['Icon' => '','Titulo' => 'Tipo',         'Texto' => $data['rowData']['Tipo']],
-                    ['Icon' => '','Titulo' => 'Tipo Entidad', 'Texto' => $data['rowData']['TipoEntidad']],
-                    ['Icon' => '','Titulo' => 'Nombre',       'Texto' => $data['rowData']['RazonSocial']],
-                    ['Icon' => '','Titulo' => 'Nick',         'Texto' => $data['rowData']['Nick']],
-                    ['Icon' => '','Titulo' => 'Web',          'Texto' => $data['rowData']['Web']],
-                    ['Icon' => '','Titulo' => 'Giro',         'Texto' => $data['rowData']['Giro']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tag',       'Icon_color' => 10,'Title' => 'Tipo',         'Text' => $data['rowData']['Tipo']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',  'Icon_color' => 10,'Title' => 'Tipo Entidad', 'Text' => $data['rowData']['TipoEntidad']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',       'Text' => $data['rowData']['RazonSocial']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-at',        'Icon_color' => 10,'Title' => 'Nick',         'Text' => $data['rowData']['Nick']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-globe',     'Icon_color' => 10,'Title' => 'Web',          'Text' => $data['rowData']['Web']],
+                    ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-briefcase', 'Icon_color' => 10,'Title' => 'Giro',         'Text' => $data['rowData']['Giro']],
                 ];
                 break;
         }
         $arrData_2 = [
-            ['Icon' => '','Titulo' => 'Rut',        'Texto' => $data['rowData']['Rut']],
-            ['Icon' => '','Titulo' => 'Email',      'Texto' => $data['rowData']['Email']],
-            ['Icon' => '','Titulo' => 'Celular',    'Texto' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono1'])],
-            ['Icon' => '','Titulo' => 'Teléfono',   'Texto' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono2'])],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Rut',        'Text' => $data['rowData']['Rut']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-phone',        'Icon_color' => 10,'Title' => 'Celular',    'Text' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono1']), 'Text_color' => 26, 'Text_copy' => $data['rowData']['Fono1']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone',    'Icon_color' => 10,'Title' => 'Teléfono',   'Text' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['Fono2']), 'Text_color' => 26, 'Text_copy' => $data['rowData']['Fono2']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-power',        'Icon_color' => 10,'Title' => 'Estado',     'Text' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
         ];
         $arrData_3 = [
-            ['Icon' => '','Titulo' => 'Ciudad',      'Texto' => $data['rowData']['Ciudad']],
-            ['Icon' => '','Titulo' => 'Comuna',      'Texto' => $data['rowData']['Comuna']],
-            ['Icon' => '','Titulo' => 'Dirección',   'Texto' => $data['rowData']['Direccion']],
-            ['Icon' => '','Titulo' => 'Sector',      'Texto' => $data['rowData']['Sector']],
-            ['Icon' => '','Titulo' => 'Estado',      'Texto' => '<span class="badge-sp1 badge-sp1-'.$data['rowData']['EstadoColor'].'">'.$data['rowData']['Estado'].'</span>'],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Email',      'Text' => $data['rowData']['Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Email']],
         ];
         $arrData_4 = [
-            ['Icon' => '','Titulo' => 'Nombre',    'Texto' => $data['rowData']['RepLegalNombre']],
-            ['Icon' => '','Titulo' => 'Rut',       'Texto' => $data['rowData']['RepLegalRut']],
-            ['Icon' => '','Titulo' => 'Email',     'Texto' => $data['rowData']['RepLegalEmail']],
-            ['Icon' => '','Titulo' => 'Celular',   'Texto' => $data['rowData']['RepLegalFono1']],
-            ['Icon' => '','Titulo' => 'Teléfono',  'Texto' => $data['rowData']['RepLegalFono2']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',  'Icon_color' => 10,'Title' => 'Sector',      'Text' => $data['rowData']['Sector']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',  'Icon_color' => 10,'Title' => 'Ciudad',      'Text' => $data['rowData']['Ciudad']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',  'Icon_color' => 10,'Title' => 'Comuna',      'Text' => $data['rowData']['Comuna']],
         ];
         $arrData_5 = [
-            ['Icon' => '','Titulo' => 'X',          'Texto' => $data['rowData']['Social_X']],
-            ['Icon' => '','Titulo' => 'Facebook',   'Texto' => $data['rowData']['Social_Facebook']],
-            ['Icon' => '','Titulo' => 'Instagram',  'Texto' => $data['rowData']['Social_Instagram']],
-            ['Icon' => '','Titulo' => 'Linkedin',   'Texto' => $data['rowData']['Social_Linkedin']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-fill', 'Icon_color' => 10,'Title' => 'Dirección',   'Text' => $data['rowData']['Direccion']],
+        ];
+        $arrData_6 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',    'Icon_color' => 10,'Title' => 'Nombre',    'Text' => $data['rowData']['RepLegalNombre']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Email',     'Text' => $data['rowData']['RepLegalEmail'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['RepLegalEmail']],
+        ];
+        $arrData_7 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Rut',       'Text' => $data['rowData']['RepLegalRut']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-phone',        'Icon_color' => 10,'Title' => 'Celular',   'Text' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['RepLegalFono1']), 'Text_color' => 26, 'Text_copy' => $data['rowData']['RepLegalFono1']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-telephone',    'Icon_color' => 10,'Title' => 'Teléfono',  'Text' => $data['Fnc_DataNumbers']->formatPhone($data['rowData']['RepLegalFono2']), 'Text_color' => 26, 'Text_copy' => $data['rowData']['RepLegalFono2']],
+        ];
+        $arrData_8 = [
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-twitter-x', 'Icon_color' => 10,'Title' => 'X',          'Text' => $data['rowData']['Social_X'],         'Text_color' => 26, 'Text_copy' => $data['rowData']['Social_X']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-facebook',  'Icon_color' => 10,'Title' => 'Facebook',   'Text' => $data['rowData']['Social_Facebook'],  'Text_color' => 26, 'Text_copy' => $data['rowData']['Social_Facebook']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-instagram', 'Icon_color' => 10,'Title' => 'Instagram',  'Text' => $data['rowData']['Social_Instagram'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Social_Instagram']],
+            ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-linkedin',  'Icon_color' => 10,'Title' => 'Linkedin',   'Text' => $data['rowData']['Social_Linkedin'],  'Text_color' => 26, 'Text_copy' => $data['rowData']['Social_Linkedin']],
         ];
 
-        echo '<h5 class="box-title text-color-red-dark">Datos Básicos</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_1, 8);
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_2, 8);
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_3, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Datos Básicos', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_1, $OptionsTable);
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_2, $OptionsTable);
+            $OptionsTable['Cols'] = 1;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_3, $OptionsTable);
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_4, $OptionsTable);
+            $OptionsTable['Cols'] = 1;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_5, $OptionsTable);
+        echo '</div>';
 
-        echo '<h5 class="box-title text-color-red-dark">Representante Legal</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_4, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Representante Legal', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 2;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_6, $OptionsTable);
+            $OptionsTable['Cols'] = 3;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_7, $OptionsTable);
+        echo '</div>';
 
-        echo '<h5 class="box-title text-color-red-dark">Social</h5>';
-        $data['Fnc_WidgetsCommon']->responsiveTable($arrData_5, 8);
+        echo $data['Fnc_WidgetsViews']->tittle_v2('Social', 23);
+        echo '<div class="row">';
+            $OptionsTable['Cols'] = 1;
+            echo $data['Fnc_WidgetsViews']->table_v6($arrData_8, $OptionsTable);
+        echo '</div>';
 
         ?>
     </div>

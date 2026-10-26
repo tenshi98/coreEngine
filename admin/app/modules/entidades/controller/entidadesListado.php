@@ -14,6 +14,7 @@ class entidadesListado extends ControllerBase {
     private $DataNumbers;
     private $WidgetsCommon;
 
+    private $WidgetsViews;
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -29,6 +30,7 @@ class entidadesListado extends ControllerBase {
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
+		$this->WidgetsViews  = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -635,6 +637,7 @@ class entidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
@@ -883,6 +886,7 @@ class entidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
@@ -997,6 +1001,7 @@ class entidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'  => $this->WidgetsViews,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
@@ -1023,6 +1028,12 @@ class entidadesListado extends ControllerBase {
     // Insertar
     /*******************************************************************/
     public function Insert(){
+
+        /************************************/
+        // Password inicial por defecto: se fuerza el cambio en el primer ingreso
+        $_POST['password']             = '1234';
+        $_POST['PasswordForzarCambio'] = 1;
+        $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
 
         /************************************/
         // Se genera el chequeo
@@ -1100,7 +1111,7 @@ class entidadesListado extends ControllerBase {
         /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,Latitud,Longitud',
+            'data'      => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,Latitud,Longitud,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'idEstado,idTipo,idTipoEntidad,password',
             'unique'    => 'Rut,Email',
             'encode'    => 'password',
@@ -1115,7 +1126,7 @@ class entidadesListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1215,9 +1226,16 @@ class entidadesListado extends ControllerBase {
         }
 
         /************************************/
+        // Si se cambia la password, se fuerza el cambio en el primer ingreso
+        if(isset($_POST['password'])&&$_POST['password']!=''){
+            $_POST['PasswordForzarCambio'] = 1;
+            $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,Latitud,Longitud',
+            'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,Latitud,Longitud,PasswordForzarCambio,PasswordUltimoCambio',
             'required'  => 'idEntidad,idEstado,idTipo,idTipoEntidad',
             'unique'    => 'Rut,Email',
             'encode'    => 'password',
@@ -1244,7 +1262,7 @@ class entidadesListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1289,8 +1307,7 @@ class entidadesListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->Base_transactionRollback();
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1316,8 +1333,7 @@ class entidadesListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->Base_transactionRollback();
-                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error']);
+                    $this->failOperation($respDelRel);
                 }
             }
         }
@@ -1364,7 +1380,7 @@ class entidadesListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            $this->failOperation($Response);
         }
 
         /************************************/
@@ -1382,20 +1398,44 @@ class entidadesListado extends ControllerBase {
     private function dataCheck($POST){
         // Variables
         $DataChecking = [
-            'emptyData'                 => '',
-            'encode'                    => '',
-            'ValidarEmail'              => 'Email,RepLegalEmail',
-            'ValidarNumero'             => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna,Fono1,Fono2,RepLegalFono1,RepLegalFono2',
-            'ValidarEntero'             => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna',
-            'ValidarRut'                => 'Rut,RepLegalRut',
-            'ValidarPatente'            => '',
-            'ValidarFecha'              => 'FNacimiento',
-            'ValidarHora'               => '',
-            'ValidarURL'                => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarLargoMinimo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre,password',
-            'ValidarLargoMinimoN'       => 3,
-            'ValidarLargoMaximo'        => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre,password',
-            'ValidarLargoMaximoN'       => 255,
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => 'Email,RepLegalEmail',
+            'ValidarNumero'              => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna,Fono1,Fono2,RepLegalFono1,RepLegalFono2,Latitud,Longitud',
+            'ValidarEntero'              => 'idEstado,idSector,idSexo,idTipo,idTipoEntidad,idCiudad,idComuna',
+            'ValidarRut'                 => 'Rut,RepLegalRut',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => 'FNacimiento',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
+            'ValidarLargoMinimo'         => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre,password',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Rut'              => 15,
+                'RepLegalRut'      => 15,
+                'Fono1'            => 15,
+                'Fono2'            => 15,
+                'RepLegalFono1'    => 15,
+                'RepLegalFono2'    => 15,
+                'Web'              => 255,
+                'Social_X'         => 255,
+                'Social_Facebook'  => 255,
+                'Social_Instagram' => 255,
+                'Social_Linkedin'  => 255,
+                'Agent_Transp'     => 240,
+                'IP_Client'        => 120,
+                'Email'            => 255,
+                'RepLegalEmail'    => 255,
+                'Nombre'           => 255,
+                'ApellidoPat'      => 255,
+                'ApellidoMat'      => 255,
+                'RazonSocial'      => 255,
+                'Nick'             => 255,
+                'Direccion'        => 255,
+                'Giro'             => 255,
+                'RepLegalNombre'   => 255,
+                'password'         => 255,
+            ],
             'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
             'ValidarEspaciosVacios'     => 'Email,RepLegalEmail,Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,password',
             'ValidarMayusculas'         => 'Email,RepLegalEmail',

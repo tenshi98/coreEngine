@@ -36,7 +36,6 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idObservaciones', 'Value' => $data['rowData']['idObservaciones'],       'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEntidad',       'Value' => $data['rowData']['idEntidad'],             'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion',   'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">

@@ -81,7 +81,7 @@ class entidadesInstaller extends ControllerInstaller {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($xTable['status'] === false) {
-                    // Se revierte la transaccion
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
@@ -93,16 +93,18 @@ class entidadesInstaller extends ControllerInstaller {
         // Verifico si existe
         if($arrOptimizations){
             // Recorro los datos
-            foreach ($arrOptimizations as $opt) {
+            foreach ($arrOptimizations as $query) {
                 /************************************/
                 // Preparo los datos
-                $xParams      = ['query' => $opt['optimization']];
+                $xParams      = ['query' => $query];
                 // Ejecuto la query
                 $ResponseExec = $this->Base_queryExecute($xParams);
                 /************************************/
                 // Si falla la la ejecucion, se muestra alerta
                 if ($ResponseExec['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
@@ -112,14 +114,14 @@ class entidadesInstaller extends ControllerInstaller {
         /*                 SE GENERAN LAS RUTAS                */
         /*******************************************************/
         $arrPermisos[] = [
-            'idPermisosCat'  => '1',                                 // Administración
-            'idEstado'       => '1',                                 // Activo
-            'idTipo'         => '1',                                 // Crud Normal
-            'Nombre'         => 'Entidades - Sectores',      // Nombre de la transaccion
-            'Descripcion'    => 'Permite administrar los sectores',  // Descripcion de la transaccion
-            'idLevelLimit'   => '4',                                 // Ver / Editar / Crear / Borrar
-            'RutaWeb'        => 'administracion/entidades/sectores', // Ruta web de la transaccion
-            'RutaController' => 'entidadesSectores',                 // Controlador de la transaccion
+            'idPermisosCat'  => '10',                                   // Administración
+            'idEstado'       => '1',                                    // Activo
+            'idTipo'         => '1',                                    // Crud Normal
+            'Nombre'         => 'Entidades - Sectores',                 // Nombre de la transaccion
+            'Descripcion'    => 'Permite administrar los sectores',     // Descripcion de la transaccion
+            'idLevelLimit'   => '4',                                    // Ver / Editar / Crear / Borrar
+            'RutaWeb'        => 'mantencionSistema/entidades/sectores', // Ruta web de la transaccion
+            'RutaController' => 'entidadesSectores',                    // Controlador de la transaccion
         ];
         $arrPermisos[] = [
             'idPermisosCat'  => '1',                                 // Administración
@@ -188,14 +190,14 @@ class entidadesInstaller extends ControllerInstaller {
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/sectores/listAll',      'RutaController' => 'entidadesSectores->listAll',     'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/sectores/search',       'RutaController' => 'entidadesSectores->UpdateList',  'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/sectores/updateList',   'RutaController' => 'entidadesSectores->UpdateList',  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/sectores/view/@id',     'RutaController' => 'entidadesSectores->View',        'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/sectores/getID/@id',    'RutaController' => 'entidadesSectores->GetID',       'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/sectores',              'RutaController' => 'entidadesSectores->Insert',      'Descripcion' => 'Crear Información',                             'idLevelLimit' => 3, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/sectores/update',       'RutaController' => 'entidadesSectores->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'entidadesSectores'],
-                ['idMetodo' => 3, 'RutaWeb' => 'administracion/entidades/sectores',              'RutaController' => 'entidadesSectores->Delete',      'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 4, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/entidades/sectores/listAll',      'RutaController' => 'entidadesSectores->listAll',     'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/entidades/sectores/search',       'RutaController' => 'entidadesSectores->UpdateList',  'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/entidades/sectores/updateList',   'RutaController' => 'entidadesSectores->UpdateList',  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/entidades/sectores/view/@id',     'RutaController' => 'entidadesSectores->View',        'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 1, 'RutaWeb' => 'mantencionSistema/entidades/sectores/getID/@id',    'RutaController' => 'entidadesSectores->GetID',       'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/entidades/sectores',              'RutaController' => 'entidadesSectores->Insert',      'Descripcion' => 'Crear Información',                             'idLevelLimit' => 3, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 2, 'RutaWeb' => 'mantencionSistema/entidades/sectores/update',       'RutaController' => 'entidadesSectores->Update',      'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'entidadesSectores'],
+                ['idMetodo' => 3, 'RutaWeb' => 'mantencionSistema/entidades/sectores',              'RutaController' => 'entidadesSectores->Delete',      'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 4, 'Controller' => 'entidadesSectores'],
             ],
             2 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/listAll',                       'RutaController' => 'entidadesListado->listAll',                  'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'entidadesListado'],
@@ -275,7 +277,7 @@ class entidadesInstaller extends ControllerInstaller {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'entidades_listado',
-            'data'       => '`idEntidad` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`idSector` int(10) unsigned NULL DEFAULT NULL,`idSexo` int(10) unsigned NULL DEFAULT NULL,`idTipo` int(10) unsigned NOT NULL,`idTipoEntidad` int(10) unsigned NOT NULL,`password` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RazonSocial` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Nick` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Web` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Giro` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalNombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalRut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalEmail` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_X` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Facebook` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Instagram` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Linkedin` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`Latitud` double DEFAULT NULL,`Longitud` double DEFAULT NULL',
+            'data'       => '`idEntidad` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`idSector` int(10) unsigned NULL DEFAULT NULL,`idSexo` int(10) unsigned NULL DEFAULT NULL,`idTipo` int(10) unsigned NOT NULL,`idTipoEntidad` int(10) unsigned NOT NULL,`password` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoPat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`ApellidoMat` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RazonSocial` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Nick` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Rut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`idCiudad` int(10) unsigned NULL DEFAULT NULL,`idComuna` int(10) unsigned NULL DEFAULT NULL,`Direccion` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FNacimiento` date NULL DEFAULT NULL,`Email` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Fono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Web` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Giro` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalNombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalRut` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalEmail` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono1` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`RepLegalFono2` varchar(15) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_X` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Facebook` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Instagram` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Social_Linkedin` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`IP_Client` varchar(120) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Agent_Transp` varchar(240) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Ultimo_acceso` date NULL DEFAULT NULL,`Latitud` double DEFAULT NULL,`Longitud` double DEFAULT NULL,`PasswordForzarCambio` tinyint(3) unsigned NOT NULL DEFAULT 0,`PasswordUltimoCambio` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idEntidad',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -299,7 +301,7 @@ class entidadesInstaller extends ControllerInstaller {
         ];
         $arrTables[] = [
             'table'      => 'entidades_listado_observaciones',
-            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idEntidad` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL',
+            'data'       => '`idObservaciones` int(10) unsigned NOT NULL AUTO_INCREMENT,`idUsuario` int(10) unsigned NOT NULL,`idEntidad` int(10) unsigned NOT NULL,`Observacion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`FechaCreacion` date NOT NULL,`idUsuarioEdicion` int(10) unsigned NULL DEFAULT NULL,`FechaEdicion` datetime NULL DEFAULT NULL',
             'primaryKey' => 'idObservaciones',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -321,20 +323,16 @@ class entidadesInstaller extends ControllerInstaller {
     /*******************************************************************/
     public function optimizeTables(){
 
-        /************************************/
-        // Variables
-        $arrOptimizations = array();
-
         /*******************************************************/
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
-        $arrOptimizations[] = [
-            'optimization' => 'ALTER TABLE entidades_listado ADD INDEX idx_entidades_estado (idEstado),ADD INDEX idx_entidades_sector (idSector),ADD INDEX idx_entidades_sexo (idSexo),ADD INDEX idx_entidades_tipo (idTipo),ADD INDEX idx_entidades_tipo_entidad (idTipoEntidad),ADD INDEX idx_entidades_ciudad (idCiudad),ADD INDEX idx_entidades_comuna (idComuna),ADD INDEX idx_entidades_rut (Rut),ADD INDEX idx_entidades_email (Email),ADD INDEX idx_entidades_nick (Nick),ADD INDEX idx_entidades_nombre (Nombre),ADD INDEX idx_entidades_ultimo_acceso (Ultimo_acceso),ADD INDEX idx_entidades_estado_tipo (idEstado, idTipo),ADD INDEX idx_entidades_estado_tipo_entidad (idEstado, idTipo, idTipoEntidad);',
-            'optimization' => 'ALTER TABLE entidades_listado_cargas ADD INDEX idx_cargas_entidad (idEntidad),ADD INDEX idx_cargas_estado (idEstado),ADD INDEX idx_cargas_sexo (idSexo),ADD INDEX idx_cargas_parentesco (idParentesco),ADD INDEX idx_cargas_estudios (idEstudios),ADD INDEX idx_cargas_estado_estudio (idEstadoEstudio),ADD INDEX idx_cargas_vigencia (FechaVigencia),ADD INDEX idx_cargas_vencimiento (FechaVencimiento),ADD INDEX idx_cargas_entidad_estado (idEntidad, idEstado);',
-            'optimization' => 'ALTER TABLE entidades_listado_contactos ADD INDEX idx_contactos_entidad (idEntidad),ADD INDEX idx_contactos_email (Email),ADD INDEX idx_contactos_rut (Rut),ADD INDEX idx_contactos_ciudad (idCiudad),ADD INDEX idx_contactos_comuna (idComuna),ADD INDEX idx_contactos_tipo (idTipoContacto),ADD INDEX idx_contactos_estado (idEstado),ADD INDEX idx_contactos_entidad_estado (idEntidad, idEstado),ADD INDEX idx_contactos_entidad_tipo (idEntidad, idTipoContacto);',
-            'optimization' => 'ALTER TABLE entidades_listado_documentos ADD INDEX idx_documentos_entidad (idEntidad),ADD INDEX idx_documentos_vencimiento (FVencimiento),ADD INDEX idx_documentos_entidad_vencimiento (idEntidad, FVencimiento);',
-            'optimization' => 'ALTER TABLE entidades_listado_observaciones ADD INDEX idx_observaciones_entidad (idEntidad),ADD INDEX idx_observaciones_usuario (idUsuario),ADD INDEX idx_observaciones_fecha (FechaCreacion),ADD INDEX idx_observaciones_entidad_fecha (idEntidad, FechaCreacion);',
-            'optimization' => 'ALTER TABLE entidades_sectores ADD INDEX idx_sectores_nombre (Nombre);',
+        $arrOptimizations = [
+            'ALTER TABLE entidades_listado ADD INDEX IF NOT EXISTS idx_entidades_estado (idEstado),ADD INDEX IF NOT EXISTS idx_entidades_sector (idSector),ADD INDEX IF NOT EXISTS idx_entidades_sexo (idSexo),ADD INDEX IF NOT EXISTS idx_entidades_tipo (idTipo),ADD INDEX IF NOT EXISTS idx_entidades_tipo_entidad (idTipoEntidad),ADD INDEX IF NOT EXISTS idx_entidades_ciudad (idCiudad),ADD INDEX IF NOT EXISTS idx_entidades_comuna (idComuna),ADD INDEX IF NOT EXISTS idx_entidades_rut (Rut),ADD INDEX IF NOT EXISTS idx_entidades_email (Email),ADD INDEX IF NOT EXISTS idx_entidades_nick (Nick),ADD INDEX IF NOT EXISTS idx_entidades_nombre (Nombre),ADD INDEX IF NOT EXISTS idx_entidades_ultimo_acceso (Ultimo_acceso),ADD INDEX IF NOT EXISTS idx_entidades_estado_tipo (idEstado, idTipo),ADD INDEX IF NOT EXISTS idx_entidades_estado_tipo_entidad (idEstado, idTipo, idTipoEntidad);',
+            'ALTER TABLE entidades_listado_cargas ADD INDEX IF NOT EXISTS idx_cargas_entidad (idEntidad),ADD INDEX IF NOT EXISTS idx_cargas_estado (idEstado),ADD INDEX IF NOT EXISTS idx_cargas_sexo (idSexo),ADD INDEX IF NOT EXISTS idx_cargas_parentesco (idParentesco),ADD INDEX IF NOT EXISTS idx_cargas_estudios (idEstudios),ADD INDEX IF NOT EXISTS idx_cargas_estado_estudio (idEstadoEstudio),ADD INDEX IF NOT EXISTS idx_cargas_vigencia (FechaVigencia),ADD INDEX IF NOT EXISTS idx_cargas_vencimiento (FechaVencimiento),ADD INDEX IF NOT EXISTS idx_cargas_entidad_estado (idEntidad, idEstado);',
+            'ALTER TABLE entidades_listado_contactos ADD INDEX IF NOT EXISTS idx_contactos_entidad (idEntidad),ADD INDEX IF NOT EXISTS idx_contactos_email (Email),ADD INDEX IF NOT EXISTS idx_contactos_rut (Rut),ADD INDEX IF NOT EXISTS idx_contactos_ciudad (idCiudad),ADD INDEX IF NOT EXISTS idx_contactos_comuna (idComuna),ADD INDEX IF NOT EXISTS idx_contactos_tipo (idTipoContacto),ADD INDEX IF NOT EXISTS idx_contactos_estado (idEstado),ADD INDEX IF NOT EXISTS idx_contactos_entidad_estado (idEntidad, idEstado),ADD INDEX IF NOT EXISTS idx_contactos_entidad_tipo (idEntidad, idTipoContacto);',
+            'ALTER TABLE entidades_listado_documentos ADD INDEX IF NOT EXISTS idx_documentos_entidad (idEntidad),ADD INDEX IF NOT EXISTS idx_documentos_vencimiento (FVencimiento),ADD INDEX IF NOT EXISTS idx_documentos_entidad_vencimiento (idEntidad, FVencimiento);',
+            'ALTER TABLE entidades_listado_observaciones ADD INDEX IF NOT EXISTS idx_observaciones_entidad (idEntidad),ADD INDEX IF NOT EXISTS idx_observaciones_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_observaciones_fecha (FechaCreacion),ADD INDEX IF NOT EXISTS idx_observaciones_entidad_fecha (idEntidad, FechaCreacion);',
+            'ALTER TABLE entidades_sectores ADD INDEX IF NOT EXISTS idx_sectores_nombre (Nombre);',
         ];
 
         /************************************/
