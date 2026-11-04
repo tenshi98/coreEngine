@@ -59,6 +59,10 @@ class productosInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -83,6 +87,10 @@ class productosInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -104,11 +112,19 @@ class productosInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*                 SE GENERAN LAS RUTAS                */
@@ -143,19 +159,38 @@ class productosInstaller extends ControllerInstaller {
             'RutaWeb'        => 'administracion/productos/listado',           // Ruta web de la transaccion
             'RutaController' => 'productosListado',                           // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -197,6 +232,9 @@ class productosInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
@@ -222,7 +260,7 @@ class productosInstaller extends ControllerInstaller {
             3 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/listAll',                         'RutaController' => 'productosListado->listAll',                   'Descripcion' => 'Listar Toda la Información',                      'idLevelLimit' => 1, 'Controller' => 'productosListado'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/listado/search',                          'RutaController' => 'productosListado->UpdateList',                'Descripcion' => 'Filtrar datos',                                   'idLevelLimit' => 1, 'Controller' => 'productosListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/updateList',                      'RutaController' => 'productosListado->UpdateList',                'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'productosListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/updateList',                      'RutaController' => 'productosListado->UpdateList',                'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 1, 'Controller' => 'productosListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/view/@id',                        'RutaController' => 'productosListado->View',                      'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 1, 'Controller' => 'productosListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/resumen/@id',                     'RutaController' => 'productosListado->Resumen',                   'Descripcion' => 'Mostrar Resúmen',                                 'idLevelLimit' => 2, 'Controller' => 'productosListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/resumenUpdate/@id',               'RutaController' => 'productosListado->ResumenUpdate',             'Descripcion' => 'Mostrar información',                             'idLevelLimit' => 2, 'Controller' => 'productosListado'],
@@ -239,7 +277,7 @@ class productosInstaller extends ControllerInstaller {
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/productos/listado/observaciones',                   'RutaController' => 'productosListadoObservaciones->Delete',       'Descripcion' => 'Borrar dato y archivos',                          'idLevelLimit' => 2, 'Controller' => 'productosListadoObservaciones'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/documentos/new/@id',              'RutaController' => 'productosListadoDocumentos->New',             'Descripcion' => 'Mostrar modal nuevo',                             'idLevelLimit' => 2, 'Controller' => 'productosListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/documentos/updateList/@id',       'RutaController' => 'productosListadoDocumentos->UpdateList',      'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'productosListadoDocumentos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/documentos/view/@id',             'RutaController' => 'productosListadoDocumentos->View',            'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 2, 'Controller' => 'productosListadoDocumentos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/documentos/view/@id',             'RutaController' => 'productosListadoDocumentos->View',            'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 1, 'Controller' => 'productosListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/productos/listado/documentos/getID/@id',            'RutaController' => 'productosListadoDocumentos->GetID',           'Descripcion' => 'Información para el formulario edición',          'idLevelLimit' => 2, 'Controller' => 'productosListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/listado/documentos',                      'RutaController' => 'productosListadoDocumentos->Insert',          'Descripcion' => 'Crear Información',                               'idLevelLimit' => 2, 'Controller' => 'productosListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/productos/listado/documentos/update',               'RutaController' => 'productosListadoDocumentos->Update',          'Descripcion' => 'Editar por post (modificar y subir archivos)',    'idLevelLimit' => 2, 'Controller' => 'productosListadoDocumentos'],
@@ -256,11 +294,11 @@ class productosInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
-        $RutaController  = '"productosCategorias"';
-        $RutaController .= ',"productosTipos"';
-        $RutaController .= ',"productosListado"';
-        $RutaController .= ',"productosListadoDocumentos"';
-        $RutaController .= ',"productosListadoObservaciones"';
+        $RutaController  = 'productosCategorias';
+        $RutaController .= ',productosTipos';
+        $RutaController .= ',productosListado';
+        $RutaController .= ',productosListadoDocumentos';
+        $RutaController .= ',productosListadoObservaciones';
 
         /************************************/
         // Retorno los datos

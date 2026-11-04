@@ -29,8 +29,8 @@ class productosListadoDocumentos extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
-		$this->WidgetsPreview  = new UIWidgetsPreview();
+		$this->WidgetsViews   = new UIWidgetsViews();
+		$this->WidgetsPreview = new UIWidgetsPreview();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -44,8 +44,15 @@ class productosListadoDocumentos extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ProductoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ProductoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -72,6 +79,7 @@ class productosListadoDocumentos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -104,8 +112,15 @@ class productosListadoDocumentos extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ProductoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ProductoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -166,8 +181,15 @@ class productosListadoDocumentos extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $DocumentosID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($DocumentosID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -194,6 +216,7 @@ class productosListadoDocumentos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -201,10 +224,10 @@ class productosListadoDocumentos extends ControllerBase {
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
-                'Fnc_WidgetsCommon' => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsCommon'  => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'   => $this->WidgetsViews,
                 'Fnc_WidgetsPreview' => $this->WidgetsPreview,
-                'Fnc_DataDate'      => $this->DataDate,
+                'Fnc_DataDate'       => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
                 'rowData'       => $rowData['data'],
             ];
@@ -228,8 +251,15 @@ class productosListadoDocumentos extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $DocumentosID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($DocumentosID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -256,6 +286,7 @@ class productosListadoDocumentos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -291,8 +322,10 @@ class productosListadoDocumentos extends ControllerBase {
     public function Insert(){
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
         /************************************/
         // Se inicia la transacción
@@ -319,6 +352,9 @@ class productosListadoDocumentos extends ControllerBase {
                 ],
             ]
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -327,12 +363,28 @@ class productosListadoDocumentos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -353,10 +405,6 @@ class productosListadoDocumentos extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -371,6 +419,9 @@ class productosListadoDocumentos extends ControllerBase {
             'where'     => 'idDocumentos',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -379,12 +430,28 @@ class productosListadoDocumentos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -428,12 +495,28 @@ class productosListadoDocumentos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
