@@ -3,15 +3,27 @@
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
 class ControllerWeb {
-    // Variables
+    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                                 Instancias                                                      */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+	/************************************************************************************************************/
+	//Definiciones
     private $mailSender;
 
+    /************************************************************************************************************/
+	//Instancias
     public function __construct($mailSender){
         $this->mailSender = $mailSender;
     }
 
-    /******************************************************************************/
-    /************************************************************************************************************/
+    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                                  Metodos                                                        */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+	/************************************************************************************************************/
     /**
      * Procesa y envía un correo electrónico utilizando el protocolo SMTP.
      *
@@ -131,14 +143,33 @@ class ControllerWeb {
         return ($result) ? $result : false;
     }
 
-    /******************************************************************************/
-    /******************************************************************************/
+    /************************************************************************************************************/
+    /**
+     * Traduce la ruta del sistema de archivos de un controlador a su ruta de vista correspondiente.
+     *
+     * Esta función asume una arquitectura de carpetas basada en convenciones donde las rutas
+     * contienen los directorios "controller" y "views". Realiza una manipulación de strings
+     * para extraer la ruta relativa desde el nombre de la aplicación y sustituir el
+     * segmento de lógica por el de presentación.
+     *
+     * @param string $directorio El path absoluto o relativo completo del archivo del controlador.
+     * @param string $aplicacion El nombre o segmento de la aplicación que sirve como punto de anclaje.
+     *
+     * @return string La ruta transformada hacia el directorio de vistas.
+     */
     protected function returnRutaVista($directorio, $aplicacion){
-        //Generar ubicacion de las vistas
+
+        /********************** Si todo esta ok **********************/
+        // Localiza la posición de la aplicación en el path y extrae la ruta a partir de ese punto
         $rutaController = substr($directorio, strpos($directorio, $aplicacion)); //se obtiene la ruta del controlador
+
+        // Reemplaza la subcadena "controller" por "views" para apuntar al directorio de plantillas
         $rutaVista      = str_replace("controller", "views", $rutaController);   //se obtiene la ruta a la vista
 
+        /**********************  Retorno datos  **********************/
+        // Devuelve la cadena de texto con la ruta final hacia la vista
         return $rutaVista;
+
     }
 
 }

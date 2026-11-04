@@ -30,7 +30,6 @@ class ControllerBase {
 	/*                                                  Metodos                                                        */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
-
     /************************************************************************************************************/
     /**
      * Punto de entrada central de seguridad (hook de Fat-Free Framework).
@@ -465,52 +464,6 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
-     * Inicia una transacción explícita sobre la conexión de base de datos.
-     *
-     * Debe usarse cuando una operación involucra escrituras (Insert/Update/Delete) en más de
-     * una tabla y todas deben aplicarse de forma atómica (todo o nada). Los Base_insert/
-     * Base_update/Base_delete llamados después de este método, sin indicar 'newBDConn',
-     * participan automáticamente de la misma transacción porque reutilizan $this->DBConn.
-     *
-     * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
-     * @return array ['status' => bool, 'error' => string] (error solo presente si status es false)
-     *
-	 * @example
-	 * ```php
-	 * $this->Base_transactionBegin();
-     *
-     * $respReserva = $this->Base_insert($xParamsReserva);
-     * if ($respReserva['status'] === false) { $this->Base_transactionRollback(); return $respReserva; }
-     *
-     * foreach ($recursos as $recurso) {
-     *     $respRecurso = $this->Base_insert($xParamsRecurso);
-     *     if ($respRecurso['status'] === false) { $this->Base_transactionRollback(); return $respRecurso; }
-     * }
-     *
-     * $respHistorial = $this->Base_insert($xParamsHistorial);
-     * if ($respHistorial['status'] === false) { $this->Base_transactionRollback(); return $respHistorial; }
-     *
-     * $this->Base_transactionCommit();
-     * return ['status' => true, 'data' => $respReserva['data']];
-	 * ```
-	 *
-     */
-    protected function Base_transactionBegin(array $params = []){
-
-        /**********************     Valores     **********************/
-        $DBConn = $params['newBDConn'] ?? $this->DBConn;
-
-        /**********************  Ejecutar  **********************/
-        try {
-            $DBConn->beginTransaction();
-            return ['status' => true];
-        } catch (Exception $e) {
-            return ['status' => false, 'error' => 'No se pudo iniciar la transacción: '.$e->getMessage()];
-        }
-    }
-
-    /************************************************************************************************************/
-    /**
      * Bloquea (SELECT ... FOR UPDATE) una o mas filas dentro de la transaccion activa,
      * para serializar escrituras concurrentes sobre datos compartidos (partes "lee y escribe"
      * que de otro modo perderian actualizaciones entre si: controles de unicidad,
@@ -585,7 +538,62 @@ class ControllerBase {
             }
             return ['status' => true, 'data' => $result['data']];
         } catch (Exception $e) {
-            return ['status' => false, 'error' => $e->getMessage()];
+            return ['status' => false, 'error' => $e->getMessage() ?? ''];
+        }
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Inicia una transacción explícita sobre la conexión de base de datos.
+     *
+     * Debe usarse cuando una operación involucra escrituras (Insert/Update/Delete) en más de
+     * una tabla y todas deben aplicarse de forma atómica (todo o nada). Los Base_insert/
+     * Base_update/Base_delete llamados después de este método, sin indicar 'newBDConn',
+     * participan automáticamente de la misma transacción porque reutilizan $this->DBConn.
+     *
+     * @param array $params Puede incluir 'newBDConn' para operar sobre una conexión distinta a la por defecto.
+     * @return array ['status' => bool, 'error' => string] (error solo presente si status es false)
+     *
+	 * @example
+	 * ```php
+	 * $this->Base_transactionBegin();
+     *
+     * $respReserva = $this->Base_insert($xParamsReserva);
+     * if ($respReserva['status'] === false) { $this->Base_transactionRollback(); return $respReserva; }
+     *
+     * foreach ($recursos as $recurso) {
+     *     $respRecurso = $this->Base_insert($xParamsRecurso);
+     *     if ($respRecurso['status'] === false) { $this->Base_transactionRollback(); return $respRecurso; }
+     * }
+     *
+     * $respHistorial = $this->Base_insert($xParamsHistorial);
+     * if ($respHistorial['status'] === false) { $this->Base_transactionRollback(); return $respHistorial; }
+     *
+     * $ResponseCommit = $this->Base_transactionCommit();
+     *
+     * // Si falla la la ejecucion, se revierte de inmediato
+     * if ($ResponseCommit['status'] === false) {
+     *     // Se revierte la transaccion activa (no-op si no hay transaccion)
+     *     $this->Base_transactionRollback();
+     *     // Se reporta el error
+     *     Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+     * }
+     *
+     * return ['status' => true, 'data' => $respReserva['data']];
+	 * ```
+	 *
+     */
+    protected function Base_transactionBegin(array $params = []){
+
+        /**********************     Valores     **********************/
+        $DBConn = $params['newBDConn'] ?? $this->DBConn;
+
+        /**********************  Ejecutar  **********************/
+        try {
+            $DBConn->beginTransaction();
+            return ['status' => true];
+        } catch (Exception $e) {
+            return ['status' => false, 'error' => 'No se pudo iniciar la transacción: '.$e->getMessage()];
         }
     }
 
@@ -637,60 +645,6 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
-     * Revierte la transaccion activa y responde segun el origen del fallo de una operacion de escritura.
-     *
-     * Clasificacion de la respuesta:
-     * - checkingData/unique (array de mensajes) -> 400 "Registro inválido" con el array en data.
-     * - Excepcion SQL (logError: generico en 'error', firma 'QueryBuilder Error' en
-     *   'internal_error'/'data') -> 500 "Error al operar con la Base de Datos" con el
-     *   mensaje generico en data (sin fugas de SQL).
-     * - required/archivos/'Query Error' de Base_* -> 400 con el mensaje original.
-     *
-     * Es seguro llamarla sin transaccion activa: Base_transactionRollback() es no-op en ese caso.
-     *
-     * @param array $Response Respuesta con forma ['status' => false, 'error' => string|array, ...]
-     * @return void Termina la ejecucion via Response::error
-     *
-	 * @example
-     * ```php
-     * $Response = $this->Base_insert($xParams);
-     * if ($Response['status'] === false) { $this->failOperation($Response); }
-     *
-     * $this->Base_transactionCommit();
-     * Response::success($NuevoID);
-     * ```
-     */
-    protected function failOperation(array $Response){
-
-        /**********************  Revertir  **********************/
-        // Se revierte la transaccion activa (no-op si no hay transaccion)
-        $this->Base_transactionRollback();
-
-        /**********************  Origen del fallo  **********************/
-        // Mensaje devuelto por Base_*/QueryBuilder
-        $error  = $Response['error'] ?? '';
-        // Detalle tecnico: Base_* lo expone en 'data'; queryExecute directo en 'internal_error'
-        $detail = $Response['internal_error'] ?? ($Response['data'] ?? '');
-
-        /**********************  Errores de formato  **********************/
-        // checkingData/unique: array de mensajes -> 400 con el array tal cual
-        if (is_array($error)) {
-            Response::error('Registro inválido', 400, $error);
-        }
-
-        /**********************  Excepcion SQL  **********************/
-        // logError() emite el generico en 'error' y 'QueryBuilder Error: ...' en internal_error/data
-        if ((is_string($error) && str_contains($error, 'Se produjo un error al procesar la solicitud'))
-         || (is_string($detail) && str_contains($detail, 'QueryBuilder Error'))) {
-            Response::error('Error al operar con la Base de Datos', 500, $error);
-        }
-
-        /**********************  Reglas de validacion / archivos  **********************/
-        Response::error(($error !== '' ? $error : 'Registro inválido'), 400);
-    }
-
-    /************************************************************************************************************/
-    /**
      * Si ya hay una transacción activa (ej. llamada desde Update() de partidas),
      * no abrimos una nueva ni hacemos commit/rollback propio: el llamador controla el ciclo..
      *
@@ -732,10 +686,11 @@ class ControllerBase {
         $DBConn    = $params['newBDConn'] ?? $this->DBConn;
         $showQuery = $params['showQuery'] ?? false;
         $singleRow = $params['singleRow'] ?? false;
+        $params    = $params['params'] ?? [];
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
-        return $this->queryBuilder->queryExecute($query, $DBConn, $showQuery, $singleRow);
+        return $this->queryBuilder->queryExecute($query, $DBConn, $showQuery, $singleRow, $params);
     }
 
     /************************************************************************************************************/
@@ -1201,7 +1156,7 @@ class ControllerBase {
                     // Recorre los campos configurados para el filtro.
                     foreach ($arrWhere as $field) {
                         // Verifica que el campo tenga un valor no vacío en POST.
-                        if (!empty($_POST[$field])) {
+                        if (isset($_POST[$field]) && $_POST[$field] !== '') {
                             // Agrega la condición SQL utilizando un parámetro preparado.
                             $parts[]  = $Transx.'.'.$field.' = ?';
                             $params[] = $_POST[$field];
@@ -1214,10 +1169,10 @@ class ControllerBase {
                     // Recorre los campos configurados para la búsqueda.
                     foreach ($arrWhere as $field) {
                         // Verifica que el campo tenga un valor no vacío en POST.
-                        if (!empty($_POST[$field])) {
+                        if (isset($_POST[$field]) && $_POST[$field] !== '') {
                             // Agrega comodines al valor para realizar una coincidencia parcial.
-                            $parts[]  = $Transx.'.'.$field.' LIKE ?';
-                            $params[] = '%'.$_POST[$field].'%';
+                            $parts[]  = $Transx.'.'.$field.' LIKE %?%';
+                            $params[] = $_POST[$field];
                         }
                     }
                     break;
@@ -1229,7 +1184,7 @@ class ControllerBase {
                         // Descompone la configuración en campo, parámetro inicial y parámetro final.
                         $arrData = $this->CommonData->parseDataSeparator($field);
                         // Verifica que ambos extremos del rango tengan valores en POST.
-                        if (!empty($_POST[$arrData[1]]) && !empty($_POST[$arrData[2]])) {
+                        if (isset($_POST[$arrData[1]],$_POST[$arrData[2]]) && $_POST[$arrData[1]] !== '' && $_POST[$arrData[2]] !== '') {
                             // Agrega la condición BETWEEN con dos parámetros preparados.
                             $parts[]  = $Transx.'.'.$arrData[0].' BETWEEN ? AND ?';
                             $params[] = $_POST[$arrData[1]];
@@ -1323,35 +1278,6 @@ class ControllerBase {
 
         // Retorna vacio por defecto
         return '';
-    }
-
-    /************************************************************************************************************/
-    /**
-     * Realiza la limpieza y saneamiento de una cadena de texto para prevenir ataques básicos y errores de formato.
-     *
-     * Esta función aplica tres niveles de procesamiento: elimina espacios en blanco residuales,
-     * remueve escapes de barras invertidas y convierte caracteres especiales en entidades
-     * HTML para prevenir la ejecución de scripts (XSS) al renderizar los datos.
-     *
-     * @param string $Data La cadena de texto original que se desea procesar.
-     *
-     * @return string La cadena procesada y saneada.
-     */
-    private function clearData($Data){
-
-        /********************** Si todo esta ok **********************/
-        // Elimina espacios en blanco u otros caracteres del principio y final de la cadena
-        $Data = trim($Data);
-
-        // Quita las barras invertidas de una cadena con comillas escapadas
-        $Data = stripslashes($Data);
-
-        // Convierte caracteres especiales (como <, >, &, ", ') en entidades HTML
-        $Data = htmlspecialchars($Data);
-
-        /**********************  Retorno datos  **********************/
-        // Retorna el valor final una vez aplicados todos los filtros de seguridad y formato
-        return $Data;
     }
 
     /************************************************************************************************************/

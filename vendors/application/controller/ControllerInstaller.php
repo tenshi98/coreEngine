@@ -27,6 +27,22 @@ class ControllerInstaller {
 	/*                                                  Metodos                                                        */
 	/*                                                                                                                 */
 	/*******************************************************************************************************************/
+    /************************************************************************************************************/
+    /**
+     * Obtiene la conexión activa a la base de datos.
+     *
+     * Retorna la instancia de conexión almacenada en la propiedad DBConn
+     * de la clase.
+     *
+     * @return mixed Conexión utilizada para interactuar con la base de datos.
+     */
+    protected function getDBConn(){
+
+        // Retorna la conexión almacenada en la propiedad de la clase.
+        return $this->DBConn;
+
+    }
+
 	/************************************************************************************************************/
     /**
      * Ejecuta una consulta para obtener un conjunto de múltiples registros de la base de datos.
@@ -170,7 +186,16 @@ class ControllerInstaller {
      * $respHistorial = $this->Base_insert($xParamsHistorial);
      * if ($respHistorial['status'] === false) { $this->Base_transactionRollback(); return $respHistorial; }
      *
-     * $this->Base_transactionCommit();
+     * $ResponseCommit = $this->Base_transactionCommit();
+     *
+     * // Si falla la la ejecucion, se revierte de inmediato
+     * if ($ResponseCommit['status'] === false) {
+     *     // Se revierte la transaccion activa (no-op si no hay transaccion)
+     *     $this->Base_transactionRollback();
+     *     // Se reporta el error
+     *     Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+     * }
+     *
      * return ['status' => true, 'data' => $respReserva['data']];
 	 * ```
 	 *
@@ -278,10 +303,11 @@ class ControllerInstaller {
         $DBConn    = $params['newBDConn'] ?? $this->DBConn;
         $showQuery = $params['showQuery'] ?? false;
         $singleRow = $params['singleRow'] ?? false;
+        $params    = $params['params'] ?? [];
 
         /**********************  Retorno datos  **********************/
         //devuelvo resultados
-        return $this->queryBuilder->queryExecute($query, $DBConn, $showQuery, $singleRow);
+        return $this->queryBuilder->queryExecute($query, $DBConn, $showQuery, $singleRow, $params);
     }
 
     /************************************************************************************************************/
@@ -391,7 +417,17 @@ class ControllerInstaller {
      * @throws No se declara una excepción explícita. Los errores de operación
      *         de base de datos son reportados mediante Response::error().
      */
-    protected function Base_installModule(array $arrPermisos){
+    protected function Base_installModule(array $arrPermisos, $NewDBConn = null){
+
+        /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $NewDBConn ?? $this->getDBConn();
+
+        /************************************/
+        // Se inicia la transacción solo si corresponde
+        if($NewDBConn === null){
+            $this->Base_transactionBegin(['newBDConn' => $DBConn]);
+        }
 
         /************************************/
         // Variable
@@ -420,7 +456,7 @@ class ControllerInstaller {
             // Si falla la ejecucion, se revierte de inmediato
             if ($permisosID['status'] === false) {
                 // Se revierte la transaccion activa (no-op si no hay transaccion)
-                $this->Base_transactionRollback();
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
                 // Se reporta el error
                 Response::error('Error al operar con la Base de Datos', 500, $permisosID['error']);
             }
@@ -458,7 +494,7 @@ class ControllerInstaller {
                     // Si falla la ejecucion, se revierte de inmediato
                     if ($rutaID['status'] === false) {
                         // Se revierte la transaccion activa (no-op si no hay transaccion)
-                        $this->Base_transactionRollback();
+                        $this->Base_transactionRollback(['newBDConn' => $DBConn]);
                         // Se reporta el error
                         Response::error('Error al operar con la Base de Datos', 500, $rutaID['error']);
                     }
@@ -510,13 +546,18 @@ class ControllerInstaller {
         /*******************************************************/
         /*             SE CONSULTAN LOS PERMISOS               */
         /*******************************************************/
+
+        /************************************/
+        // Se obtiene la cadena con el formato correcto
+        $controllers  = implode(',', array_map(fn($valor) => '"' . trim($valor) . '"',explode(',', $RutaController)));
+
         /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idPermisos',
             'table'   => 'core_permisos_listado',
             'join'    => '',
-            'where'   => 'RutaController IN ('.$RutaController.')',
+            'where'   => 'RutaController IN ('.$controllers.')',
             'params'  => [],
             'group'   => '',
             'having'  => '',
@@ -547,8 +588,8 @@ class ControllerInstaller {
         // Se arman las querys
         $arrPermDel   = array();
         $arrPermDel[] = 'DELETE FROM `usuarios_listado_permisos` WHERE idPermisos IN (0 '.$subQuery.')';
-        $arrPermDel[] = 'DELETE FROM `core_permisos_listado` WHERE RutaController IN ('.$RutaController.')';
-        $arrPermDel[] = 'DELETE FROM `core_permisos_listado_rutas` WHERE Controller IN ('.$RutaController.')';
+        $arrPermDel[] = 'DELETE FROM `core_permisos_listado` WHERE RutaController IN ('.$controllers.')';
+        $arrPermDel[] = 'DELETE FROM `core_permisos_listado_rutas` WHERE Controller IN ('.$controllers.')';
 
         /************************************/
         // Verifico si existe
@@ -565,7 +606,7 @@ class ControllerInstaller {
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($Response['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
-                    $this->Base_transactionRollback();
+                    $this->Base_transactionRollback();return $sql;
                     // Se reporta el error
                     return false;
                 }
@@ -576,7 +617,7 @@ class ControllerInstaller {
         /*              SE ELIMINAN LAS TABLAS                 */
         /*******************************************************/
         // Verifico si hay datos
-        if(empty($listTables)){
+        if(!empty($listTables)){
             // Se crea variable
             $arrTableDel = array();
             // Recorro
@@ -609,7 +650,16 @@ class ControllerInstaller {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -640,13 +690,20 @@ class ControllerInstaller {
         }
 
         /************************************/
+        // Se genera la query con parámetros vinculados para prevenir injeción SQL
+        // Se divide la ruta por comas para manejar tanto un controlador como múltiples
+        $controllers  = explode(',', $RutaController);
+        $placeholders = implode(',', array_fill(0, count($controllers), '?'));
+        $params       = array_map('trim', $controllers);
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idRutas',
             'table'   => 'core_permisos_listado_rutas',
             'join'    => '',
-            'where'   => 'Controller IN ('.$RutaController.')',
-            'params'  => [],
+            'where'   => 'Controller IN ('.$placeholders.')',
+            'params'  => $params,
             'group'   => '',
             'having'  => '',
             'order'   => ''
@@ -662,10 +719,12 @@ class ControllerInstaller {
 
     }
 
-    /******************************************************************************/
-    /*                             Métodos privados                               */
-    /******************************************************************************/
-    /*******************************************************************/
+    /*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Métodos privados                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+	/*******************************************************************/
     // Se validan los datos
     /*******************************************************************/
     private function dataCheck_1($POST){
