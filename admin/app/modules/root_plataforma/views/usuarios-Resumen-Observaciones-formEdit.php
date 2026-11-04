@@ -31,12 +31,12 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
     <div class="modal-body">
         <?php
         //se dibujan los inputs
+        $data['Fnc_FormInputs']->formInput([ 'FormType' => 1, 'Placeholder' => 'Fecha Creacion', 'Name' => 'FechaCreacionFake',  'Id' => 'FechaCreacionFake',   'Value' => ($data['rowData']['FechaCreacion'] ? $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion']) : ''), 'Required' => 3]);
         $data['Fnc_FormInputs']->formTextarea(['Placeholder' => 'Observacion','Name' => 'Observacion', 'Id' => 'Edit_Observacion', 'Value' => ($data['rowData']['Observacion'] ?? ''),'Required' => 2]);
 
         //datos ocultos
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idObservaciones', 'Value' => $data['rowData']['idObservaciones'],       'Required' => 2]);
         $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idUsuario',       'Value' => $data['rowData']['idUsuario'],             'Required' => 2]);
-        $data['Fnc_FormInputs']->formInputHidden(['Name' => 'FechaCreacion',   'Value' => $data['Fnc_ServerServer']->fechaActual(),  'Required' => 2]);
         ?>
     </div>
     <div class="modal-footer">

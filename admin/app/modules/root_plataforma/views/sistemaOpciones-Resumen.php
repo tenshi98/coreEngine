@@ -41,7 +41,7 @@
                                 $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder'  => 'Tema',       'Name'  => 'Sistema_idTema',    'Value'  => ($data['rowData']['Sistema_idTema'] ?? ''),    'Required'  => 2, 'arrData'  => $data['arrTemas'], 'BASE' => $BASE]);
 
                                 //Se condiciona el uso de Whatsapp
-                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                if($data['UserData']["sistemaUsoWhatsapp"] === 2){
                                     $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => ($data['rowData']['Sistema_NotiWhatsapp'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
                                 }
@@ -131,12 +131,12 @@
                                     case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => ($data['rowData']['Config_API_GoogleMaps'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
                                 }
                                 //Se condiciona el uso de Whatsapp
-                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                if($data['UserData']["sistemaUsoWhatsapp"] === 2){
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => ($data['rowData']['Config_WhatsappToken'] ?? ''),      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => ($data['rowData']['Config_WhatsappInstanceId'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                 }
                                 //Se condiciona el uso de IA
-                                if($data['UserData']["Config_IA_Uso"]==2){
+                                if($data['UserData']["Config_IA_Uso"] === 2){
                                     //se dibujan los inputs
                                     $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Uso de IA', 'Clase' => 'box-title text-color-red-dark']);
                                     $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Provider',     'Name' => 'Config_IA_Provider',   'Value' => ($data['rowData']['Config_IA_Provider'] ?? ''), 'Required' => 1, 'arrData'  => $data['arrIAProvider'], 'BASE' => $BASE]);

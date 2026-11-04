@@ -225,7 +225,9 @@ $arrData = [
                                     foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
                                             <td><?php echo $crud['FechaCreacion']; ?></td>
-                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?></td>
+                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?>
+                                                <?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></small><?php } ?>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 <?php } ?>
@@ -242,18 +244,22 @@ $arrData = [
                                 <article class="observacion-item">
                                     <p class="observacion-item-meta"><?php echo '<strong>'.$crud['Usuario'].'</strong> '.$crud['FechaCreacion']; ?></p>
                                     <p class="observacion-item-texto"><?php echo $crud['Observacion']; ?></p>
+                                    <?php if(!empty($crud['FechaEdicion'])){ ?><p class="observacion-item-meta">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></p><?php } ?>
                                 </article>
                                 <article class="observacion-item observacion-success-border-left">
                                     <p class="observacion-item-meta"><?php echo '<strong>'.$crud['Usuario'].'</strong> '.$crud['FechaCreacion']; ?></p>
                                     <p class="observacion-item-texto"><?php echo $crud['Observacion']; ?></p>
+                                    <?php if(!empty($crud['FechaEdicion'])){ ?><p class="observacion-item-meta">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></p><?php } ?>
                                 </article>
                                 <article class="observacion-item observacion-danger-border-left observacion-danger-border">
                                     <p class="observacion-item-meta"><?php echo '<strong>'.$crud['Usuario'].'</strong> '.$crud['FechaCreacion']; ?></p>
                                     <p class="observacion-item-texto"><?php echo $crud['Observacion']; ?></p>
+                                    <?php if(!empty($crud['FechaEdicion'])){ ?><p class="observacion-item-meta">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></p><?php } ?>
                                 </article>
                                 <article class="observacion-item observacion-danger-border-left observacion-danger-border observacion-danger-title">
                                     <p class="observacion-item-meta"><?php echo '<strong>'.$crud['Usuario'].'</strong> '.$crud['FechaCreacion']; ?></p>
                                     <p class="observacion-item-texto"><?php echo $crud['Observacion']; ?></p>
+                                    <?php if(!empty($crud['FechaEdicion'])){ ?><p class="observacion-item-meta">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></p><?php } ?>
                                 </article>
                             <?php } ?>
                         <?php } ?>
@@ -270,13 +276,13 @@ $arrData = [
                                     <div class="timeline-item__dot"></div>
                                     <div class="timeline-item__date"><?php echo $crud['FechaCreacion']; ?></div>
                                     <p class="timeline-item__text"><?php echo $crud['Observacion']; ?></p>
-                                    <div class="timeline-item__author"><?php echo $crud['Usuario']; ?></div>
+                                    <div class="timeline-item__author"><?php echo $crud['Usuario']; ?><?php if(!empty($crud['FechaEdicion'])){ ?> - Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?><?php } ?></div>
                                 </div>
                                 <div class="timeline-item timeline-danger">
                                     <div class="timeline-item__dot"></div>
                                     <div class="timeline-item__date"><?php echo $crud['FechaCreacion']; ?></div>
                                     <p class="timeline-item__text"><?php echo $crud['Observacion']; ?></p>
-                                    <div class="timeline-item__author"><?php echo $crud['Usuario']; ?></div>
+                                    <div class="timeline-item__author"><?php echo $crud['Usuario']; ?><?php if(!empty($crud['FechaEdicion'])){ ?> - Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?><?php } ?></div>
                                 </div>
                             <?php } ?>
                         <?php } ?>
@@ -296,7 +302,7 @@ $arrData = [
                                             <span class="timeline-card__author"><?php echo $crud['Usuario']; ?></span>
                                             <span class="timeline-card__date"><?php echo $crud['FechaCreacion']; ?></span>
                                         </div>
-                                        <div class="timeline-card__text"><?php echo $crud['Observacion']; ?></div>
+                                        <div class="timeline-card__text"><?php echo $crud['Observacion']; ?><?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></small><?php } ?></div>
                                     </div>
                                 </div>
                             <?php } ?>
@@ -315,7 +321,7 @@ $arrData = [
                                             <span class="timeline-card__author"><?php echo $crud['Usuario']; ?></span>
                                             <span class="timeline-card__date"><?php echo $crud['FechaCreacion']; ?></span>
                                         </div>
-                                        <div class="timeline-card__text"><?php echo $crud['Observacion']; ?></div>
+                                        <div class="timeline-card__text"><?php echo $crud['Observacion']; ?><?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></small><?php } ?></div>
                                     </div>
                                 </div>
                             <?php } ?>
@@ -339,7 +345,7 @@ $arrData = [
                                             <span class="tl-sep">·</span>
                                             <span class="tl-date"><?php echo $crud['FechaCreacion']; ?></span>
                                         </div>
-                                        <div class="tl-text"><?php echo $crud['Observacion']; ?></div>
+                                        <div class="tl-text"><?php echo $crud['Observacion']; ?><?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $crud['FechaEdicion']; ?></small><?php } ?></div>
                                     </div>
                                 </div>
                             <?php } ?>

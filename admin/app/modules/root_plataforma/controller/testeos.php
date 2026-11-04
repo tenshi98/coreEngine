@@ -1392,7 +1392,8 @@ class testeos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Result['status'] === false) {
-            $this->failOperation($Result);
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Result['error'] ?? '');
         }
 
         /***************************************/

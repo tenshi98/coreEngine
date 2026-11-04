@@ -338,9 +338,13 @@ class coreWidgets extends ControllerBase {
             'data'    => '
                 core_test_crud_observaciones.Observacion,
                 core_test_crud_observaciones.FechaCreacion,
-                usuarios_listado.Nombre AS Usuario',
+                core_test_crud_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
             'table'   => 'core_test_crud_observaciones',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = core_test_crud_observaciones.idUsuario',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
             'where'   => 'core_test_crud_observaciones.idCrud = ?',
             'params'  => [1],
             'group'   => '',

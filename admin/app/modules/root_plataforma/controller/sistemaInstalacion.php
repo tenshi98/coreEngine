@@ -216,7 +216,7 @@ class sistemaInstalacion extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if(is_array($arrModules) && $arrRutas['status']){
+        if(is_array($arrModules) && $arrRutas['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -318,7 +318,7 @@ class sistemaInstalacion extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if(is_array($arrModules) && $arrRutas['status']){
+        if(is_array($arrModules) && $arrRutas['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [

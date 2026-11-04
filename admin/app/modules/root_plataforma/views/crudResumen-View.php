@@ -47,7 +47,9 @@
                                     // Recorro
                                     foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
-                                            <td><?php echo $crud['Observacion']; ?></td>
+                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?>
+                                                <?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $data['Fnc_DataDate']->fechaEstandar(substr($crud['FechaEdicion'], 0, 10)); ?></small><?php } ?>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 <?php }else{
@@ -62,7 +64,7 @@
     </div>
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

@@ -14,8 +14,8 @@ class permisosListado extends ControllerBase {
     private $Codification;
     private $CommonData;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -32,7 +32,7 @@ class permisosListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->CommonData     = new FunctionsCommonData();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -189,7 +189,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrPermisos['status'] && $arrPermisosCat['status'] && $arrEstados['status'] && $arrTipos['status'] && $arrLevelLimit['status'] && $arrMetodo['status'] && $arrObjetivo['status']){
+        if($arrPermisos['status'] === true && $arrPermisosCat['status'] === true && $arrEstados['status'] === true && $arrTipos['status'] === true && $arrLevelLimit['status'] === true && $arrMetodo['status'] === true && $arrObjetivo['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -329,8 +329,15 @@ class permisosListado extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $PermisosID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PermisosID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -396,7 +403,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrRutas['status']){
+        if($rowData['status'] === true && $arrRutas['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -460,6 +467,7 @@ class permisosListado extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrRutas['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -491,8 +499,15 @@ class permisosListado extends ControllerBase {
     public function Resumen($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $PermisosID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PermisosID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -672,7 +687,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrRutas['status'] && $arrPermisosCat['status'] && $arrEstados['status'] && $arrTipos['status'] && $arrLevelLimit['status'] && $arrMetodo['status'] && $arrObjetivo['status']){
+        if($rowData['status'] === true && $arrRutas['status'] === true && $arrPermisosCat['status'] === true && $arrEstados['status'] === true && $arrTipos['status'] === true && $arrLevelLimit['status'] === true && $arrMetodo['status'] === true && $arrObjetivo['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -720,8 +735,15 @@ class permisosListado extends ControllerBase {
     public function ResumenUpdate($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $PermisosID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PermisosID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -786,7 +808,7 @@ class permisosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrRutas['status']){
+        if($rowData['status'] === true && $arrRutas['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -824,8 +846,14 @@ class permisosListado extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         //Consulta de la ruta de la categoría
@@ -847,7 +875,14 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowData['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowData['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
 
         /************************************/
@@ -857,10 +892,6 @@ class permisosListado extends ControllerBase {
                 ['message' => 'No existe la categoría de permiso: '.$_POST['idPermisosCat'].'.']
             ]);
         }
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -884,6 +915,9 @@ class permisosListado extends ControllerBase {
             'table'     => 'core_permisos_listado',
             'Post'      => $newPermiso
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -892,7 +926,14 @@ class permisosListado extends ControllerBase {
         /************************************/
         //Si falla la reserva principal, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -1326,7 +1367,10 @@ class permisosListado extends ControllerBase {
                 /************************************/
                 //Si falla la reserva principal, se revierte de inmediato
                 if ($ResponseInsert['status'] === false) {
-                    $this->failOperation($ResponseInsert);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseInsert['error'] ?? '');
                 }
             }
         }
@@ -1343,14 +1387,27 @@ class permisosListado extends ControllerBase {
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, encripta y envía con código 200 (OK)
         $DataID = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
+        // Se verifica
         if (!$this->isValidDecrypted($DataID, 'text')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
         Response::success($DataID['data']);
 
     }
@@ -1368,8 +1425,8 @@ class permisosListado extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -1382,6 +1439,9 @@ class permisosListado extends ControllerBase {
             'where'     => 'idPermisos',
             'Post'      => $_POST,
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -1390,14 +1450,37 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         //Se actualizan los permisos al crear uno nuevo
         $ResponsePermisos = $this->updatePermisos($f3);
         if($ResponsePermisos['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error($ResponsePermisos['message'], $ResponsePermisos['code'], $ResponsePermisos['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/
@@ -1442,7 +1525,14 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -1462,7 +1552,10 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($ResponseDelRutas['status'] === false) {
-            $this->failOperation($ResponseDelRutas);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseDelRutas['error'] ?? '');
         }
 
         /************************************/
@@ -1477,7 +1570,16 @@ class permisosListado extends ControllerBase {
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -1563,7 +1665,7 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($arrMenu['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrMenu['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrMenu['error'] ?? ''];
         }
 
         /************************************/
@@ -1592,7 +1694,7 @@ class permisosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($arrPermisos['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrPermisos['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrPermisos['error'] ?? ''];
         }
 
         /************************************/

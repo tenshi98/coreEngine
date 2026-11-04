@@ -83,7 +83,11 @@
                     if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
                         // Recorro
                         foreach($data['arrObservaciones'] as $crud){
-                             echo '<tr><td>'.$crud['Observacion'].'</td></tr>';
+                             echo '<tr><td><strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion'];
+                             if(!empty($crud['FechaEdicion'])){
+                                 echo '<br><small class="text-muted">Editado por '.$crud['UsuarioEdicion'].' el '.$data['Fnc_DataDate']->fechaEstandar(substr($crud['FechaEdicion'], 0, 10)).'</small>';
+                             }
+                             echo '</td></tr>';
                         }
                     }else{
                         echo '<tr><td>No se encontraron entradas</td></tr>';
