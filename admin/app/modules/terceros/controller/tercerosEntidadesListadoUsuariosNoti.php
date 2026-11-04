@@ -36,8 +36,15 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['idUsuario'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $UsuarioID  = $this->Codification->encryptDecrypt('decrypt', $params['idUsuario']);
+        // Se verifica
         if (!$this->isValidDecrypted($UsuarioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -85,7 +92,7 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrPermisos['status']){
+        if($rowData['status'] === true && $arrPermisos['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -182,9 +189,15 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
                                 $TipoNotiID = $this->Codification->encryptDecrypt('encrypt',$permisos['idTipoNoti']);
                                 // Se verifica
                                 if (!$this->isValidDecrypted($UsuarioID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 if (!$this->isValidDecrypted($TipoNotiID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 // Se borran los datos
@@ -207,7 +220,10 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
                                 $respDel = $this->Base_delete($xParams);
                                 // Si falla la ejecucion, se revierte de inmediato
                                 if ($respDel['status'] === false) {
-                                    $this->failOperation($respDel);
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
+                                    Response::error('Error al operar con la Base de Datos', 500, $respDel['error'] ?? '');
                                 }
                                 break;
                         }
@@ -236,9 +252,6 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
             // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
             if ($rowsPermisosNuevos){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck_1('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idUsuario,idTipoNoti',
@@ -246,20 +259,36 @@ class tercerosEntidadesListadoUsuariosNoti extends ControllerBase {
                     'table'     => 'terceros_entidades_listado_usuarios_noti',
                     'rows'      => $rowsPermisosNuevos
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck_1('');
                 // Preparo los datos
                 $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
                 $respIns = $this->Base_insertMultiple($xParams);
+                /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respIns['status'] === false) {
-                    $this->failOperation($respIns);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respIns['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo true con código 200 (OK)

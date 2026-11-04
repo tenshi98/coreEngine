@@ -48,38 +48,6 @@
         //Se envian los datos al formulario
         UpdateContentId(Div, URL, Options);
     }
-    /************************************/
-    function listTableDataDel(ID, Dato) {
-        Swal.fire({
-            title: "Borrar Dato",
-            text: "Esta a punto de eliminar el dato " + Dato + ", ¿Desea continuar?",
-            icon: "warning",
-            confirmButtonColor: "#81A1C1",
-            confirmButtonText: "<i class='bi bi-check-circle'></i> Si, borrar",
-            showCancelButton: true,
-            cancelButtonText: "<i class='bi bi-x-circle'></i> Cancelar",
-            cancelButtonColor: "#EA5757",
-            reverseButtons: true,
-        }).then((result2) => {
-            if (result2.isConfirmed) {
-                //Cargo el loader
-                $('#PDloader').show();
-                //Ejecuto
-                let Metodo      = 'DELETE';
-                let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess']; ?>';
-                let Informacion = {"idEntidad": ID};
-                const Options     = {
-                    UpdateDiv : [
-                        {Div:'#listTableData', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>', refreshTbl:'true'}
-                    ],
-                    showNoti:'Dato Borrado Correctamente',
-                    closeObject:'#PDloader',
-                };
-                //Se envian los datos al formulario
-                SendDataForms(Metodo, Direccion, Informacion, Options);
-            }
-        });
-    }
     /*********************************************************************/
     /*                      FORMULARIO DE BUSQUEDA                       */
     /*********************************************************************/

@@ -37,7 +37,7 @@
                             //Si existen permisos a las maquinas
                             if(isset($data['MainViewData']['Count_Maquinas'])&&$data['MainViewData']['Count_Maquinas']!=0){
                                 echo '<button type="button" onclick="tabUsuariosEditMaq(\''.$idEntidad['data'].'\', \''.$encryptedId['data'].'\')"    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Permisos Máquinas"><i class="bi bi-gear-fill"></i></button>';
-                                if($data['UserData']["maquinasListadoNotificaciones"]==2){
+                                if($data['UserData']["maquinasListadoNotificaciones"] === 2){
                                     echo '<button type="button" onclick="tabUsuariosEditNoti(\''.$idEntidad['data'].'\', \''.$encryptedId['data'].'\')"    class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Notificaciones"><i class="bi bi-whatsapp"></i></button>';
                                 }
                             } ?>

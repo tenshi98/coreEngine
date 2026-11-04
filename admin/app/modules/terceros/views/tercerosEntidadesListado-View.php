@@ -27,14 +27,14 @@
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100 active" id="view_tab_1" data-bs-toggle="tab" data-bs-target="#tab_id_1" type="button" role="tab" aria-controls="tab_id_1" aria-selected="true"><i class="bi bi-card-list"></i> Datos Básicos</button></li>
-        <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>     <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_2" data-bs-toggle="tab" data-bs-target="#tab_id_2" type="button" role="tab" aria-controls="tab_id_2" aria-selected="false" tabindex="-1"><i class="bi bi-currency-dollar"></i> Planes</button></li><?php } ?>
-        <?php if($data['UserData']["entidadesListadoUsoUsuarios"]==2){ ?>   <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_3" data-bs-toggle="tab" data-bs-target="#tab_id_3" type="button" role="tab" aria-controls="tab_id_3" aria-selected="false" tabindex="-1"><i class="bi bi-person"></i> Usuarios</button></li><?php } ?>
+        <?php if($data['UserData']["entidadesListadoUsoPlanes"] === 2){ ?>     <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_2" data-bs-toggle="tab" data-bs-target="#tab_id_2" type="button" role="tab" aria-controls="tab_id_2" aria-selected="false" tabindex="-1"><i class="bi bi-currency-dollar"></i> Planes</button></li><?php } ?>
+        <?php if($data['UserData']["entidadesListadoUsoUsuarios"] === 2){ ?>   <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_3" data-bs-toggle="tab" data-bs-target="#tab_id_3" type="button" role="tab" aria-controls="tab_id_3" aria-selected="false" tabindex="-1"><i class="bi bi-person"></i> Usuarios</button></li><?php } ?>
     </ul>
     <div class="tab-content pt-2" id="tabId_560_Content">
         <div class="tab-pane fade active show" id="tab_id_1" role="tabpanel" aria-labelledby="view_tab_1">
             <?php require_once('tercerosEntidadesListado-Resumen-Update.php'); ?>
         </div>
-        <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>
+        <?php if($data['UserData']["entidadesListadoUsoPlanes"] === 2){ ?>
             <div class="tab-pane fade" id="tab_id_2" role="tabpanel" aria-labelledby="view_tab_2">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -65,7 +65,7 @@
                 </div>
             </div>
         <?php } ?>
-        <?php if($data['UserData']["entidadesListadoUsoUsuarios"]==2){ ?>
+        <?php if($data['UserData']["entidadesListadoUsoUsuarios"] === 2){ ?>
             <div class="tab-pane fade" id="tab_id_3" role="tabpanel" aria-labelledby="view_tab_3">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -99,7 +99,7 @@
     </div>
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

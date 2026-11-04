@@ -31,7 +31,7 @@
         //Si existen permisos a las maquinas
         if(isset($data['MainViewData']['Count_Maquinas'])&&$data['MainViewData']['Count_Maquinas']!=0){
             echo '<li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100"        id="view_tab_2" data-bs-toggle="tab" data-bs-target="#tab_id_2" type="button" role="tab" aria-controls="tab_id_2" aria-selected="false" tabindex="-1"><i class="bi bi-gear-fill"></i> Permisos Máquinas</button></li>';
-            if($data['UserData']["maquinasListadoNotificaciones"]==2){
+            if($data['UserData']["maquinasListadoNotificaciones"] === 2){
                 echo '<li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100"    id="view_tab_3" data-bs-toggle="tab" data-bs-target="#tab_id_3" type="button" role="tab" aria-controls="tab_id_3" aria-selected="false" tabindex="-1"><i class="bi bi-whatsapp"></i> Permisos Notificaciones</button></li>';
             }
         } ?>
@@ -111,7 +111,7 @@
 
             <?php
             //Si existen permisos de notificaciones
-            if($data['UserData']["maquinasListadoNotificaciones"]==2){ ?>
+            if($data['UserData']["maquinasListadoNotificaciones"] === 2){ ?>
                 <div class="tab-pane fade" id="tab_id_3" role="tabpanel" aria-labelledby="view_tab_3">
                     <div class="row">
                         <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -142,7 +142,7 @@
     </div>
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

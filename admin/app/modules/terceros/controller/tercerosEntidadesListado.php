@@ -29,7 +29,7 @@ class tercerosEntidadesListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
 		$this->DataNumbers    = new FunctionsDataNumbers();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
@@ -187,7 +187,7 @@ class tercerosEntidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrTipoEntidad['status'] && $arrSexo['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrSector['status'] && $arrEstado['status']){
+        if($arrList['status'] === true && $arrTipoEntidad['status'] === true && $arrSexo['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrSector['status'] === true && $arrEstado['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -328,20 +328,28 @@ class tercerosEntidadesListado extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($EntidadID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
+                entidades_listado.idEntidad,
                 entidades_listado.Nombre,
                 entidades_listado.ApellidoPat,
                 entidades_listado.ApellidoMat,
@@ -350,12 +358,9 @@ class tercerosEntidadesListado extends ControllerBase {
                 entidades_listado.Direccion_img,
                 entidades_listado.idTipoEntidad,
 
-                core_sexo.Nombre AS Sexo,
                 core_tipos_entidades.Nombre AS TipoEntidad',
             'table'   => 'entidades_listado',
-            'join'    => '
-                LEFT JOIN core_sexo                ON core_sexo.idSexo                    = entidades_listado.idSexo
-                LEFT JOIN core_tipos_entidades     ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
+            'join'    => 'LEFT JOIN core_tipos_entidades ON core_tipos_entidades.idTipoEntidad = entidades_listado.idTipoEntidad',
             'where'   => 'entidades_listado.idEntidad = ?',
             'params'  => [$EntidadID['data']],
             'group'   => '',
@@ -369,7 +374,7 @@ class tercerosEntidadesListado extends ControllerBase {
 
         /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["entidadesListadoUsoPlanes"]==2){
+        if($arrUserData["entidadesListadoUsoPlanes"] === 2){
             /************************************/
             // Se genera la query
             $query = [
@@ -403,7 +408,7 @@ class tercerosEntidadesListado extends ControllerBase {
 
         /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["entidadesListadoUsoUsuarios"]==2){
+        if($arrUserData["entidadesListadoUsoUsuarios"] === 2){
             /************************************/
             // Se genera la query
             $query = [
@@ -436,7 +441,7 @@ class tercerosEntidadesListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrPlanes['status'] && $arrUsuarios['status']){
+        if($rowData['status'] === true && $arrPlanes['status'] === true && $arrUsuarios['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -473,8 +478,15 @@ class tercerosEntidadesListado extends ControllerBase {
     public function Resumen($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($EntidadID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -492,12 +504,9 @@ class tercerosEntidadesListado extends ControllerBase {
                 entidades_listado.Direccion_img,
                 entidades_listado.idTipoEntidad,
 
-                core_sexo.Nombre AS Sexo,
                 core_tipos_entidades.Nombre AS TipoEntidad',
             'table'   => 'entidades_listado',
-            'join'    => '
-                LEFT JOIN core_sexo                ON core_sexo.idSexo                    = entidades_listado.idSexo
-                LEFT JOIN core_tipos_entidades     ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
+            'join'    => 'LEFT JOIN core_tipos_entidades ON core_tipos_entidades.idTipoEntidad = entidades_listado.idTipoEntidad',
             'where'   => 'entidades_listado.idEntidad = ?',
             'params'  => [$EntidadID['data']],
             'group'   => '',
@@ -528,7 +537,7 @@ class tercerosEntidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
@@ -549,219 +558,7 @@ class tercerosEntidadesListado extends ControllerBase {
         }
     }
 
-    /*******************************************************************/
-    // Resumen Actualizar
-    /*******************************************************************/
-    public function ResumenUpdate($f3, $params){
 
-        /************************************/
-        // Se obtiene el ID
-        $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
-        if (!$this->isValidDecrypted($EntidadID, 'id')) {
-            Response::error('Registro inválido', 400);
-        }
 
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                entidades_listado.idEntidad,
-                entidades_listado.Nombre,
-                entidades_listado.ApellidoPat,
-                entidades_listado.ApellidoMat,
-                entidades_listado.RazonSocial,
-                entidades_listado.Nick,
-                entidades_listado.Direccion_img,
-                entidades_listado.idTipoEntidad,
-
-                core_sexo.Nombre AS Sexo,
-                core_tipos_entidades.Nombre AS TipoEntidad',
-            'table'   => 'entidades_listado',
-            'join'    => '
-                LEFT JOIN core_sexo                ON core_sexo.idSexo                    = entidades_listado.idSexo
-                LEFT JOIN core_tipos_entidades     ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad',
-            'where'   => 'entidades_listado.idEntidad = ?',
-            'params'  => [$EntidadID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
-
-        /*******************************************************************/
-        /*                         Imprimir Datos                          */
-        /*******************************************************************/
-        // Si hay resultados
-        if ($rowData['status'] === true) {
-            /************************************/
-            // Datos enviados a la pagina
-            $f3->data = [
-                /*===========  Datos del usuario ===========*/
-                'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-                /*===========   Funcionalidad   ===========*/
-                'Fnc_DataDate'         => $this->DataDate,
-                'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
-                'Fnc_DataNumbers'      => $this->DataNumbers,
-                /*=========== Datos Consultados ===========*/
-                'rowData'          => $rowData['data'],
-            ];
-
-            /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Update.php');
-        /************************************/
-        // Si no hay resultados
-        } else {
-            // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData]);
-            // Despliegue de errores
-            $this->showError(2, $f3, $result);
-        }
-    }
-
-    /******************************************************************************/
-    /*                                  DATOS                                     */
-    /******************************************************************************/
-
-    /*******************************************************************/
-    // Editar por put (solo modificar datos)
-    // Editar por post (modificar y subir archivos)
-    /*******************************************************************/
-    public function Update(){
-
-        /************************************/
-        // Validación del método HTTP
-        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-            Response::error('Error en el Request Method', 405);
-        }
-
-        /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
-        // Si se cambia la password, se fuerza el cambio en el primer ingreso
-        if(isset($_POST['password'])&&$_POST['password']!=''){
-            $_POST['PasswordForzarCambio'] = 1;
-            $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
-        }
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'      => 'idEntidad,idEstado,idSector,idSexo,idTipo,idTipoEntidad,password,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Rut,idCiudad,idComuna,Direccion,FNacimiento,Email,Fono1,Fono2,Web,Giro,RepLegalNombre,RepLegalRut,RepLegalEmail,RepLegalFono1,RepLegalFono2,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin,IP_Client,Agent_Transp,Ultimo_acceso,PasswordForzarCambio,PasswordUltimoCambio',
-            'required'  => 'idEntidad,idEstado,idTipo,idTipoEntidad',
-            'unique'    => 'Rut,Email,Fono1,Fono2',
-            'encode'    => 'password',
-            'table'     => 'entidades_listado',
-            'where'     => 'idEntidad',
-            'Post'      => $_POST,
-            'files'     => [
-                [
-                    'Identificador' => 'Direccion_img',
-                    'SubCarpeta'    => '',
-                    'NombreArchivo' => '',
-                    'SufijoArchivo' => 'EntidadIMG_',
-                    'ValidarTipo'   => 'image',
-                    'ValidarPeso'   => 10,
-                    'Base64'        => true
-                ],
-            ]
-        ];
-        // Preparo los datos
-        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
-        // Ejecuto la query
-        $Response = $this->Base_update($xParams);
-
-        /************************************/
-        // Si falla la ejecucion, se revierte de inmediato
-        if ($Response['status'] === false) {
-            $this->failOperation($Response);
-        }
-
-        /************************************/
-        // Confirmar transacción
-        $this->Base_transactionCommit();
-
-        /************************************/
-        // Devuelvo $Response con código 200 (OK)
-        Response::success($Response['data']);
-
-    }
-
-    /******************************************************************************/
-    /*                             Métodos privados                               */
-    /******************************************************************************/
-    /*******************************************************************/
-    // Se validan los datos
-    /*******************************************************************/
-    private function dataCheck($POST){
-        // Variables
-        $DataChecking = [
-            'emptyData'                  => '',
-            'encode'                     => '',
-            'ValidarEmail'               => 'Email,RepLegalEmail',
-            'ValidarNumero'              => 'Fono1,Fono2,RepLegalFono1,RepLegalFono2',
-            'ValidarEntero'              => 'idEstado,idCiudad,idComuna,idSector,idSexo,idTipo,idTipoEntidad',
-            'ValidarRut'                 => 'Rut,RepLegalRut',
-            'ValidarPatente'             => '',
-            'ValidarFecha'               => 'FNacimiento',
-            'ValidarHora'                => '',
-            'ValidarURL'                 => 'Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarLargoMinimo'         => 'Email,RepLegalEmail,Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
-            'ValidarLargoMinimoN'        => 3,
-            'ValidarLargoMaximoPorCampo' => [
-                'Rut'              => 15,
-                'RepLegalRut'      => 15,
-                'Fono1'            => 15,
-                'Fono2'            => 15,
-                'RepLegalFono1'    => 15,
-                'RepLegalFono2'    => 15,
-                'Social_X'         => 255,
-                'Social_Facebook'  => 255,
-                'Social_Instagram' => 255,
-                'Social_Linkedin'  => 255,
-                'Agent_Transp'     => 240,
-                'IP_Client'        => 120,
-                'Web'              => 255,
-                'Email'            => 255,
-                'RepLegalEmail'    => 255,
-                'Nombre'           => 255,
-                'ApellidoPat'      => 255,
-                'ApellidoMat'      => 255,
-                'RazonSocial'      => 255,
-                'Nick'             => 255,
-                'Direccion'        => 255,
-                'Giro'             => 255,
-                'RepLegalNombre'   => 255,
-            ],
-            'ValidarPalabrasCensuradas' => 'Nombre,ApellidoPat,ApellidoMat,RazonSocial,Nick,Direccion,Giro,RepLegalNombre',
-            'ValidarEspaciosVacios'     => 'Email,RepLegalEmail,Web,Social_X,Social_Facebook,Social_Instagram,Social_Linkedin',
-            'ValidarMayusculas'         => 'Email,RepLegalEmail',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => 'Email,RepLegalEmail',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
-        ];
-        // Retorno los datos
-        return $DataChecking;
-    }
 
 }

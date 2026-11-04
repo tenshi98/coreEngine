@@ -5,18 +5,35 @@
 
 // Se obtiene el ID
 $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idEntidad']);
+// Se obtiene el nombre o la razón social
+switch ($data['rowData']['idTipoEntidad']) {
+    case 1: $Entidad_2  = $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']; break; //Persona Natural
+    case 2: $Entidad_2  = $data['rowData']['RazonSocial']; break;                                                                     //Empresas
+}
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
-
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Entidades';
+        $SubTitle       = 'Resumen de la Entidad '.($Entidad_2 ?? '');
+        $Text           = 'Información general y datos asociados a la Entidad';
+        $IMG            = $BASE.'/img/img-backgrounds/Entidades_2.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
                 <li class="nav-item flex-fill"><button class="nav-link w-100 active" data-bs-toggle="tab" data-bs-target="#resumen"><i class="bi bi-card-list"></i> Resumen</button></li>
-                <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
-                <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>     <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-planes"    onclick="tabPlanesLoadList()"><i class="bi bi-currency-dollar"></i> Planes</button></li><?php } ?>
-                <?php if($data['UserData']["entidadesListadoUsoUsuarios"]==2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-usuarios"  onclick="tabUsuariosLoadList()"><i class="bi bi-person"></i> Usuarios</button></li><?php } ?>
-                <?php if($data['UserData']["entidadesListadoUsoMaquinas"]==2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-maquinas"  onclick="tabMaquinasLoadList()"><i class="bi bi-gear-fill"></i> Máquinas</button></li><?php } ?>
+                <?php if($data['UserData']["entidadesListadoUsoPlanes"] === 2){ ?>     <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-planes"    onclick="tabPlanesLoadList()"><i class="bi bi-currency-dollar"></i> Planes</button></li><?php } ?>
+                <?php if($data['UserData']["entidadesListadoUsoUsuarios"] === 2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-usuarios"  onclick="tabUsuariosLoadList()"><i class="bi bi-person"></i> Usuarios</button></li><?php } ?>
+                <?php if($data['UserData']["entidadesListadoUsoMaquinas"] === 2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-maquinas"  onclick="tabMaquinasLoadList()"><i class="bi bi-gear-fill"></i> Máquinas</button></li><?php } ?>
             </ul>
             <div class="tab-content pt-2">
 
@@ -24,21 +41,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     <?php require_once('tercerosEntidadesListado-Resumen-Update.php'); ?>
                 </div>
 
-                <div class="tab-pane fade" id="resumen-edit">
-
-                    asd
-
-                </div>
-
-                <?php
-                // Se obtiene el nombre o la razón social
-                switch ($data['rowData']['idTipoEntidad']) {
-                    case 1: $Entidad_2  = $data['rowData']['ApellidoPat'].' '.$data['rowData']['ApellidoMat'].', '.$data['rowData']['Nombre']; break; //Persona Natural
-                    case 2: $Entidad_2  = $data['rowData']['RazonSocial']; break;                                                                     //Empresas
-                }
-                ?>
-
-                <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>
+                <?php if($data['UserData']["entidadesListadoUsoPlanes"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-planes">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -53,7 +56,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </div>
                 <?php } ?>
 
-                <?php if($data['UserData']["entidadesListadoUsoUsuarios"]==2){ ?>
+                <?php if($data['UserData']["entidadesListadoUsoUsuarios"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-usuarios">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -68,7 +71,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </div>
                 <?php } ?>
 
-                <?php if($data['UserData']["entidadesListadoUsoMaquinas"]==2){ ?>
+                <?php if($data['UserData']["entidadesListadoUsoMaquinas"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-maquinas">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -96,44 +99,9 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
 <div class="clearfix"></div>
 
 <script>
-    /*********************************************************************/
-    /*                      EJECUCION DE LA LOGICA                       */
-    /*********************************************************************/
-    /************************************/
-    $("#FormEditData").submit(function(e) {
-        //Se validan los datos de los formularios
-        var validatorResult = validator.checkAll(this);
-        //verifico el resultado
-        if(validatorResult.valid===false){
-            return !!validatorResult.valid;
-        }else{
-            // Si ya se está ejecutando, salimos
-            if (ejecutandoForm.valor) return;
-            //Cambio los valores
-            ejecutandoForm.valor = true;
-            //Ejecucion normal
-            e.preventDefault();
-            //Cargo el loader
-            $('#PDloader').show();
-            //Ejecuto
-            let Metodo      = 'POST';
-            let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/update'; ?>';
-            let Informacion = $("#FormEditData").serialize();
-            const Options     = {
-                UpdateDiv : [
-                    {Div:'#resumen', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumenUpdate/'.$DataID['data']; ?>'},
-                ],
-                showNoti:'Datos Editados Correctamente',
-                triggerTab:'.nav-tabs button[data-bs-target="#resumen"]',
-                closeObject:'#PDloader',
-                changeValForm: ejecutandoForm,
-            };
-            //Se envian los datos al formulario
-            SendDataForms(Metodo, Direccion, Informacion, Options);
-        }
-    });
 
-    <?php if($data['UserData']["entidadesListadoUsoPlanes"]==2){ ?>
+
+    <?php if($data['UserData']["entidadesListadoUsoPlanes"] === 2){ ?>
         /*********************************************************************/
         /*                             PLANES                                */
         /*********************************************************************/
@@ -234,7 +202,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         }
     <?php } ?>
 
-    <?php if($data['UserData']["entidadesListadoUsoUsuarios"]==2){ ?>
+    <?php if($data['UserData']["entidadesListadoUsoUsuarios"] === 2){ ?>
         /*********************************************************************/
         /*                              USUARIOS                             */
         /*********************************************************************/
@@ -363,7 +331,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         }
     <?php } ?>
 
-    <?php if($data['UserData']["entidadesListadoUsoMaquinas"]==2){ ?>
+    <?php if($data['UserData']["entidadesListadoUsoMaquinas"] === 2){ ?>
         /*********************************************************************/
         /*                            MAQUINAS                               */
         /*********************************************************************/

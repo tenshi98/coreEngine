@@ -12,8 +12,8 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     private $Codification;
     private $DataDate;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -28,7 +28,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -42,8 +42,15 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($EntidadID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -87,7 +94,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTipoUsuario['status']){
+        if($rowData['status'] === true && $arrTipoUsuario['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -121,14 +128,22 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
-        // Se llaman los datos
-        $arrMenu  = $f3->get('SESSION.arrMenu');
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
         /************************************/
         // Se obtiene el ID
         $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($EntidadID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se llaman los datos
+        $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /************************************/
         // Se genera la query
@@ -162,7 +177,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         ];
         // Se asignan datos a buscar
         $menuCounters = [
-            'Externalizacion Servicios' => [
+            'Externalización Servicios' => [
                 'Clientes - Opciones Extras' => 'Count_Maquinas',
             ],
         ];
@@ -177,11 +192,12 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             }
         }
 
+
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrUsuarios['status'] && is_array($MainViewData)){
+        if($arrUsuarios['status'] === true && is_array($MainViewData)){
 
             /************************************/
             // Datos enviados a la pagina
@@ -216,15 +232,24 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $UsuarioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($UsuarioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
+
+        /************************************/
         //Se llaman los datos
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
@@ -306,7 +331,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             $TempData                      = $this->Base_GetList($xParams);
             $MainViewData['Data_Maquinas'] = $TempData['data'];
             /************************************/
-            if($arrUserData["maquinasListadoNotificaciones"]==2){
+            if($arrUserData["maquinasListadoNotificaciones"] === 2){
                 /************************************/
                 // Se genera la query
                 $query = [
@@ -332,7 +357,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && is_array($MainViewData)){
+        if($rowData['status'] === true && is_array($MainViewData)){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -367,8 +392,15 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $UsuarioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($UsuarioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -430,7 +462,7 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTipoUsuario['status'] && $arrEstado['status']){
+        if($rowData['status'] === true && $arrTipoUsuario['status'] === true && $arrEstado['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -468,14 +500,20 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
     public function Insert(){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Password inicial por defecto: se fuerza el cambio en el primer ingreso
         $_POST['password']             = '1234';
         $_POST['PasswordForzarCambio'] = 1;
         $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -487,25 +525,39 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             'table'     => 'terceros_entidades_listado_usuarios',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
         // Ejecuto la query
         $Response = $this->Base_insert($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -526,15 +578,15 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
         // Si se cambia la password, se fuerza el cambio en el primer ingreso
         if(isset($_POST['password'])&&$_POST['password']!=''){
             $_POST['PasswordForzarCambio'] = 1;
             $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
         }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -547,25 +599,39 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             'where'     => 'idUsuario',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -609,12 +675,28 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
