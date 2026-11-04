@@ -15,8 +15,8 @@ class cotizacionListado extends ControllerBase {
     private $ServerServer;
     private $CommonData;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -34,7 +34,7 @@ class cotizacionListado extends ControllerBase {
 		$this->ServerServer   = new FunctionsServerServer();
 		$this->CommonData     = new FunctionsCommonData();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -141,7 +141,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrEntidades['status'] && $arrProductos['status'] && $arrServicios['status']){
+        if($arrList['status'] === true && $arrEntidades['status'] === true && $arrProductos['status'] === true && $arrServicios['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -278,8 +278,15 @@ class cotizacionListado extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $CotizacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($CotizacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -384,7 +391,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status']){
+        if($rowData['status'] === true && $arrItems['status'] === true && $arrProductos['status'] === true && $arrServicios['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -423,8 +430,15 @@ class cotizacionListado extends ControllerBase {
     public function Printer($f3, $params, $Imprimir){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $CotizacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($CotizacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -561,7 +575,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $rowSistema['status'] && $arrItems['status'] && $arrProductos['status'] && $arrServicios['status']){
+        if($rowData['status'] === true && $rowSistema['status'] === true && $arrItems['status'] === true && $arrProductos['status'] === true && $arrServicios['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -601,8 +615,15 @@ class cotizacionListado extends ControllerBase {
     public function Resumen($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $CotizacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($CotizacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -664,7 +685,7 @@ class cotizacionListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrEntidades['status']){
+        if($rowData['status'] === true && $arrEntidades['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -707,8 +728,15 @@ class cotizacionListado extends ControllerBase {
     public function ResumenUpdate($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $CotizacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($CotizacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -751,6 +779,7 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -788,6 +817,12 @@ class cotizacionListado extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Usuario creador
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
@@ -808,45 +843,6 @@ class cotizacionListado extends ControllerBase {
         }
 
         /************************************/
-        // Variables
-        $x_ValorTotal     = 0;
-        $x_TotalItems     = 0;
-        $x_TotalProductos = 0;
-        $x_TotalServicios = 0;
-        /************************************/
-        // Items
-        if(isset($ndata_1)&&$ndata_1!=0){
-            // Recorro los items
-            for($j1 = 0; $j1 < $ndata_1; $j1++){
-                $x_ValorTotal = (isset($_POST['Item_ValorTotal'][$j1])) ? $x_ValorTotal + $_POST['Item_ValorTotal'][$j1] : $x_ValorTotal;
-                $x_TotalItems = (isset($_POST['Item_ValorTotal'][$j1])) ? $x_TotalItems + $_POST['Item_ValorTotal'][$j1] : $x_TotalItems;
-            }
-        }
-        // Productos
-        if(isset($ndata_2)&&$ndata_2!=0){
-            // Recorro los items
-            for($j1 = 0; $j1 < $ndata_2; $j1++){
-                $x_ValorTotal     = (isset($_POST['Producto_ValorTotal'][$j1])) ? $x_ValorTotal + $_POST['Producto_ValorTotal'][$j1] : $x_ValorTotal;
-                $x_TotalProductos = (isset($_POST['Producto_ValorTotal'][$j1])) ? $x_TotalProductos + $_POST['Producto_ValorTotal'][$j1] : $x_TotalProductos;
-            }
-        }
-        // Servicios
-        if(isset($ndata_3)&&$ndata_3!=0){
-            // Recorro los items
-            for($j1 = 0; $j1 < $ndata_3; $j1++){
-                $x_ValorTotal     = (isset($_POST['Servicio_ValorTotal'][$j1])) ? $x_ValorTotal + $_POST['Servicio_ValorTotal'][$j1] : $x_ValorTotal;
-                $x_TotalServicios = (isset($_POST['Servicio_ValorTotal'][$j1])) ? $x_TotalServicios + $_POST['Servicio_ValorTotal'][$j1] : $x_TotalServicios;
-            }
-        }
-
-        /************************************/
-        // Se generan datos
-        $_POST['ValorNeto']       = ($x_ValorTotal/1.19);
-        $_POST['IVA']             = $x_ValorTotal - ($x_ValorTotal/1.19);
-        $_POST['ValorTotal']      = $x_ValorTotal;
-        $_POST['TotalItems']      = $x_TotalItems;
-        $_POST['TotalProductos']  = $x_TotalProductos;
-        $_POST['TotalServicios']  = $x_TotalServicios;
         // Verifico si existe
         if(isset($_POST['Creacion_fecha'])&&$_POST['Creacion_fecha']!=''){
             $_POST['Creacion_Semana']  = $this->DataDate->fecha2NSemana($_POST['Creacion_fecha']);
@@ -879,7 +875,14 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -905,9 +908,6 @@ class cotizacionListado extends ControllerBase {
             // Si hay datos marcados, se insertan todos en una sola sentencia
             if ($rowsItems){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck_2('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idCotizacion,Item,Number,ValorTotal',
@@ -915,6 +915,9 @@ class cotizacionListado extends ControllerBase {
                     'table'     => 'cotizacion_listado_items',
                     'rows'      => $rowsItems
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck_2('');
                 // Preparo los datos
                 $xParams   = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
@@ -922,7 +925,14 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respItems['status'] === false) {
-                    $this->failOperation($respItems);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respItems['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respItems['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respItems['error'] ?? '');
                 }
             }
         }
@@ -950,9 +960,6 @@ class cotizacionListado extends ControllerBase {
             // Si hay datos marcados, se insertan todos en una sola sentencia
             if ($rowsProductos){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck_2('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idCotizacion,idProducto,Number,ValorTotal',
@@ -960,6 +967,9 @@ class cotizacionListado extends ControllerBase {
                     'table'     => 'cotizacion_listado_productos',
                     'rows'      => $rowsProductos
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck_2('');
                 // Preparo los datos
                 $xParams      = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
@@ -967,7 +977,14 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respProductos['status'] === false) {
-                    $this->failOperation($respProductos);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respProductos['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respProductos['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respProductos['error'] ?? '');
                 }
             }
         }
@@ -995,9 +1012,6 @@ class cotizacionListado extends ControllerBase {
             // Si hay datos marcados, se insertan todos en una sola sentencia
             if ($rowsServicios){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck_2('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idCotizacion,idServicio,Number,ValorTotal',
@@ -1005,6 +1019,9 @@ class cotizacionListado extends ControllerBase {
                     'table'     => 'cotizacion_listado_servicios',
                     'rows'      => $rowsServicios
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck_2('');
                 // Preparo los datos
                 $xParams       = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
@@ -1012,21 +1029,54 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respServicios['status'] === false) {
-                    $this->failOperation($respServicios);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respServicios['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respServicios['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respServicios['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
+
+        /************************************/
+        // Se actualizan los datos de la factura
+        $ResponseCotizacion = $this->updateCotizacion(4, $Response['data'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, encripta y envía con código 200 (OK)
         $DataID = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
+        // Se verifica
         if (!$this->isValidDecrypted($DataID, 'text')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
         Response::success($DataID['data']);
 
     }
@@ -1046,6 +1096,10 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Usuario creador
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Verifico si existe
@@ -1077,7 +1131,40 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Se confirma la transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
+
+        /************************************/
+        // Se actualizan los datos de la factura
+        $ResponseCotizacion = $this->updateCotizacion(4, $Response['data'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
         }
 
         /************************************/
@@ -1122,7 +1209,14 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -1147,14 +1241,30 @@ class cotizacionListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->failOperation($respDelRel);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respDelRel['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respDelRel['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -1167,6 +1277,7 @@ class cotizacionListado extends ControllerBase {
     /******************************************************************************/
     /*******************************************************************/
     // Borrar archivos
+    // es intencionalmente un no-op mientras las cotizaciones no manejen archivos
     /*******************************************************************/
     public function delFiles(){
 
@@ -1178,7 +1289,7 @@ class cotizacionListado extends ControllerBase {
 
         /************************************/
         // Las cotizaciones no almacenan archivos propios
-        Response::success();
+        Response::success('Las cotizaciones no almacenan archivos propios');
 
     }
 
@@ -1197,7 +1308,8 @@ class cotizacionListado extends ControllerBase {
 
         /************************************/
         // Se abre cadena
-        $Data = 'cotizacion_listado.idCotizacion';
+        $Data = 'cotizacion_listado.idCotizacion,';
+        $Params = [$CotizacionID,$CotizacionID];
 
         /************************************/
         // Se cambia la query dependiendo de el tipo
@@ -1205,26 +1317,35 @@ class cotizacionListado extends ControllerBase {
             /************************************/
             // Items
             case 1:
-                $Data .= ',
+                $Data .= '
                 cotizacion_listado.TotalProductos,
                 cotizacion_listado.TotalServicios,
-                (SELECT SUM(ValorTotal) FROM cotizacion_listado_items     WHERE idCotizacion='.$CotizacionID.') AS TotalItems';
+                (SELECT SUM(ValorTotal) FROM cotizacion_listado_items WHERE idCotizacion = ?) AS TotalItems';
                 break;
             /************************************/
             // Productos
             case 2:
-                $Data .= ',
+                $Data .= '
                 cotizacion_listado.TotalItems,
                 cotizacion_listado.TotalServicios,
-                (SELECT SUM(ValorTotal) FROM cotizacion_listado_productos WHERE idCotizacion='.$CotizacionID.') AS TotalProductos';
+                (SELECT SUM(ValorTotal) FROM cotizacion_listado_productos WHERE idCotizacion = ?) AS TotalProductos';
                 break;
             /************************************/
             // Servicios
             case 3:
-                $Data .= ',
+                $Data .= '
                 cotizacion_listado.TotalItems,
                 cotizacion_listado.TotalProductos,
-                (SELECT SUM(ValorTotal) FROM cotizacion_listado_servicios WHERE idCotizacion='.$CotizacionID.') AS TotalServicios';
+                (SELECT SUM(ValorTotal) FROM cotizacion_listado_servicios WHERE idCotizacion = ?) AS TotalServicios';
+                break;
+            /************************************/
+            // Todos
+            case 4:
+                $Data .= '
+                (SELECT SUM(ValorTotal) FROM cotizacion_listado_items     WHERE idCotizacion = ?) AS TotalItems,
+                (SELECT SUM(ValorTotal) FROM cotizacion_listado_productos WHERE idCotizacion = ?) AS TotalProductos,
+                (SELECT SUM(ValorTotal) FROM cotizacion_listado_servicios WHERE idCotizacion = ?) AS TotalServicios';
+                $Params = [$CotizacionID,$CotizacionID,$CotizacionID,$CotizacionID];
                 break;
         }
 
@@ -1239,10 +1360,10 @@ class cotizacionListado extends ControllerBase {
         // de la misma cotización (evita lost update en los totales).
         $lock = $this->lockRowsForUpdate('cotizacion_listado', 'idCotizacion', [$CotizacionID], $DBConn);
         if ($lock['status'] === false) {
-            if($NewDBConn === null){
-                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            }
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error']];
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error'] ?? ''];
         }
 
         /************************************/
@@ -1252,7 +1373,7 @@ class cotizacionListado extends ControllerBase {
             'table'   => 'cotizacion_listado',
             'join'    => '',
             'where'   => 'idCotizacion = ?',
-            'params'  => [$CotizacionID],
+            'params'  => $Params,
             'group'   => '',
             'having'  => '',
             'order'   => ''
@@ -1265,8 +1386,10 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($rowData['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error'] ?? ''];
         }
 
         /************************************/
@@ -1304,14 +1427,27 @@ class cotizacionListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
         // Confirmar transacción solo si corresponde
         if($NewDBConn === null){
-            $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+            /************************************/
+            // Confirmar transacción
+            $ResponseCommit = $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+
+            /************************************/
+            // Si falla la la ejecucion, se revierte de inmediato
+            if ($ResponseCommit['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                // Se reporta el error
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+            }
         }
 
         /************************************/

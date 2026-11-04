@@ -1253,4 +1253,75 @@ class cotizacionListadoTesting extends ControllerBase {
 
     }
 
+    /******************************************************************************/
+    /*                   COHERENCIA DE NIVELES (LISTADO / FILTRO)                 */
+    /******************************************************************************/
+    /**
+     * Verifica que el boton "Quitar Filtro" de la vista de listado (visible para todo usuario,
+     * sin guarda de nivel) no llame a una ruta `updateList` que exija mas nivel que la ruta
+     * `listAll` que sirve la pantalla: un usuario con menos nivel no tiene la ruta registrada
+     * en el router (404) y podria filtrar con `search` pero no quitar el filtro.
+     *
+     * @return array Resultado por caso
+     */
+    public function coherenciaNivelesListadoTest(){
+
+        $results = [];
+        $vista   = __DIR__.'/../views/cotizacionListado-List.php';
+        $fuente  = is_file($vista) ? (string)file_get_contents($vista) : '';
+
+        /*====================================*/
+        // La vista llama a updateList desde deleteFilter() y el boton no tiene guarda de nivel
+        /*====================================*/
+        $usaUpdateList = preg_match('/function deleteFilter.*?\/updateList/s', $fuente) === 1;
+        $results['quitar_filtro_usa_updatelist'] = $usaUpdateList
+            ? 'OK' : 'FALLO: la vista cotizacionListado-List.php ya no refresca con updateList desde deleteFilter()';
+
+        /*====================================*/
+        // Nivel de listAll y de updateList por cada ruta base del controlador
+        /*====================================*/
+        $niveles = $this->nivelesListadoRutas('cotizacionListado');
+        $results['rutas_listado_leidas'] = !empty($niveles)
+            ? 'OK' : 'FALLO: no se encontraron rutas listAll/updateList de cotizacionListado en el instalador';
+
+        foreach ($niveles as $base => $n) {
+            if (!isset($n['listAll'], $n['updateList'])) {
+                continue;
+            }
+            $results['quitar_filtro_'.str_replace('/', '_', $base)] = $n['updateList'] <= $n['listAll']
+                ? 'OK'
+                : 'FALLO: '.$base.'/updateList exige nivel '.$n['updateList'].' pero '.$base.'/listAll es nivel '.$n['listAll'].'; el boton "Quitar Filtro" devuelve 404 a un usuario de nivel '.$n['listAll'];
+        }
+
+        /************************************/
+        // Retorno los datos
+        return $results;
+
+    }
+
+    /*******************************************************************/
+    // Niveles (idLevelLimit) de las rutas GET listAll y updateList de un controlador,
+    // leidos del fuente del instalador. Formato: [ruta base => ['listAll' => n, 'updateList' => n]]
+    /*******************************************************************/
+    private function nivelesListadoRutas(string $controlador): array{
+        $niveles = [];
+        foreach (glob(__DIR__.'/../installer/*Installer.php') ?: [] as $instalador) {
+            foreach (preg_split('/\r\n|\r|\n/', (string)file_get_contents($instalador)) as $linea) {
+                if (!str_contains($linea, "'".$controlador.'->')) {
+                    continue;
+                }
+                if (preg_match("/'idMetodo'\s*=>\s*1\s*,\s*'RutaWeb'\s*=>\s*'([^']+)'.*?'idLevelLimit'\s*=>\s*'?(\d+)'?/", $linea, $m) !== 1) {
+                    continue;
+                }
+                foreach (['listAll', 'updateList'] as $accion) {
+                    if (str_ends_with($m[1], '/'.$accion)) {
+                        $niveles[substr($m[1], 0, -strlen($accion) - 1)][$accion] = (int)$m[2];
+                    }
+                }
+            }
+        }
+
+        return $niveles;
+    }
+
 }

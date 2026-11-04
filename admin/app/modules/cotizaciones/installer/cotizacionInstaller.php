@@ -92,6 +92,10 @@ class cotizacionInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -116,6 +120,10 @@ class cotizacionInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -137,11 +145,19 @@ class cotizacionInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*                 SE GENERAN LAS RUTAS                */
@@ -166,19 +182,38 @@ class cotizacionInstaller extends ControllerInstaller {
             'RutaWeb'        => 'cotizacionListado/informe/busqueda/listado', // Ruta web de la transaccion
             'RutaController' => 'informeCotizacion',                          // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -220,12 +255,15 @@ class cotizacionInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/ventas/listado/listAll',                    'RutaController' => 'cotizacionListado->listAll',                'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'cotizacionListado'],
                 ['idMetodo' => 2, 'RutaWeb' => 'cotizacionListado/ventas/listado/search',                     'RutaController' => 'cotizacionListado->UpdateList',             'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'cotizacionListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/ventas/listado/updateList',                 'RutaController' => 'cotizacionListado->UpdateList',             'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'cotizacionListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/ventas/listado/updateList',                 'RutaController' => 'cotizacionListado->UpdateList',             'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 1, 'Controller' => 'cotizacionListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/ventas/listado/view/@id',                   'RutaController' => 'cotizacionListado->View',                   'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'cotizacionListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/ventas/listado/print/@id',                  'RutaController' => 'cotizacionListado->Print',                  'Descripcion' => 'Pantalla imprimir',                              'idLevelLimit' => 1, 'Controller' => 'cotizacionListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'cotizacionListado/ventas/listado/noPrint/@id',                'RutaController' => 'cotizacionListado->noPrint',                'Descripcion' => 'Pantalla para visualizar documento',             'idLevelLimit' => 1, 'Controller' => 'cotizacionListado'],
@@ -274,11 +312,11 @@ class cotizacionInstaller extends ControllerInstaller {
         // Incluye los sub-recursos: Base_uninstallModule() borra
         // core_permisos_listado_rutas WHERE Controller IN (esta lista), asi que
         // omitirlos dejaria sus rutas huerfanas al desinstalar el modulo
-        $RutaController  = '"cotizacionListado"';
-        $RutaController .= ',"cotizacionListadoItems"';
-        $RutaController .= ',"cotizacionListadoProductos"';
-        $RutaController .= ',"cotizacionListadoServicios"';
-        $RutaController .= ',"informeCotizacion"';
+        $RutaController  = 'cotizacionListado';
+        $RutaController .= ',cotizacionListadoItems';
+        $RutaController .= ',cotizacionListadoProductos';
+        $RutaController .= ',cotizacionListadoServicios';
+        $RutaController .= ',informeCotizacion';
 
         /************************************/
         // Retorno los datos
