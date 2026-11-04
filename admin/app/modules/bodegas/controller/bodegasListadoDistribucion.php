@@ -54,8 +54,15 @@ class bodegasListadoDistribucion extends ControllerBase {
     public function Estructura($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (bodega propietaria)
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -130,8 +137,15 @@ class bodegasListadoDistribucion extends ControllerBase {
     public function Mapa($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (bodega propietaria)
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -231,6 +245,7 @@ class bodegasListadoDistribucion extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrMapa['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -264,8 +279,15 @@ class bodegasListadoDistribucion extends ControllerBase {
     public function Visual($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (bodega propietaria)
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -413,6 +435,7 @@ class bodegasListadoDistribucion extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrMapa['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -446,8 +469,15 @@ class bodegasListadoDistribucion extends ControllerBase {
     public function Posicion($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $PosicionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PosicionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -508,6 +538,7 @@ class bodegasListadoDistribucion extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -542,8 +573,15 @@ class bodegasListadoDistribucion extends ControllerBase {
     public function Posiciones($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (bodega propietaria)
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -582,6 +620,7 @@ class bodegasListadoDistribucion extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrPosicion['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -620,8 +659,8 @@ class bodegasListadoDistribucion extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -633,25 +672,39 @@ class bodegasListadoDistribucion extends ControllerBase {
             'where'     => 'idPosicion',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)

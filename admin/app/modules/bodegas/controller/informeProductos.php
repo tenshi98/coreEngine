@@ -46,8 +46,8 @@ class informeProductos extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
-            $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+        if($arrUserData["usuariosPermisosBodegas"] === 2 && $arrUserData['UserType'] != 1){
+            $X_join   = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
             $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
             $X_params = [1, $arrUserData['UserID']];
         // Si se permite junto con la creacion de tareas
@@ -92,29 +92,44 @@ class informeProductos extends ControllerBase {
         // Ejecuto la query
         $arrProductos = $this->Base_GetList($xParams);
 
-        /************************************/
-        // Datos enviados a la pagina
-        $f3->data = [
-            /*=========== Datos de la Pagina ===========*/
-            'PageTitle'       => 'Stock Productos',
-            'PageDescription' => 'Stock Productos.',
-            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
-            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-            'TableTitle'      => 'Stock Productos',
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $this->getUserData($f3),
-            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_FormInputs'   => $this->FormInputs,
-            'Fnc_Codification' => $this->Codification,
-            /*=========== Datos Consultados ===========*/
-            'arrBodegas'     => $arrBodegas['data'],
-            'arrProductos'   => $arrProductos['data'],
-        ];
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if ($arrBodegas['status'] === true && $arrProductos['status'] === true) {
 
+            /************************************/
+            // Datos enviados a la pagina
+            $f3->data = [
+                /*=========== Datos de la Pagina ===========*/
+                'PageTitle'       => 'Stock Productos',
+                'PageDescription' => 'Stock Productos.',
+                'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+                'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+                'TableTitle'      => 'Stock Productos',
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_FormInputs'   => $this->FormInputs,
+                'Fnc_Codification' => $this->Codification,
+                /*=========== Datos Consultados ===========*/
+                'arrBodegas'     => $arrBodegas['data'],
+                'arrProductos'   => $arrProductos['data'],
+            ];
+
+            /************************************/
+            // Se instancia la vista
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
         /************************************/
-        // Se instancia la vista
-        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-List.php');
+        // Si no hay resultados
+        } else {
+            // Busco errores de la consulta
+            $result = $this->mergeResponses([$arrBodegas,$arrProductos]);
+            // Despliegue de errores
+            $this->showError(2, $f3, $result);
+        }
+
     }
 
     /*******************************************************************/
@@ -162,7 +177,7 @@ class informeProductos extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+        if($arrUserData["usuariosPermisosBodegas"] === 2 && $arrUserData['UserType'] != 1){
             $X_join         = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
             $whereInt1     .= ' AND bodegas_listado_permisos_usuarios.idUsuario = ?';
             $whereParams1[] = $arrUserData['UserID'];
@@ -224,7 +239,7 @@ class informeProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrBodegas['status'] && $arrStocks['status']){
+        if($arrBodegas['status'] === true && $arrStocks['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -261,20 +276,28 @@ class informeProductos extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['idProducto'], $params['idBodegas'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $ProductoID = $this->Codification->encryptDecrypt('decrypt', $params['idProducto']);
+        // Se verifica
         if (!$this->isValidDecrypted($ProductoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         $BodegasID  = $this->Codification->encryptDecrypt('decrypt', $params['idBodegas']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /************************************/
         // Se genera la query
@@ -329,7 +352,7 @@ class informeProductos extends ControllerBase {
         $DataWhere = 'bodegas_movimientos_productos.idProducto = ? AND bodegas_movimientos_productos.idBodegas = ?';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -365,7 +388,7 @@ class informeProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowProducto['status'] && $rowBodega['status'] && $arrStocks['status']){
+        if($rowProducto['status'] === true && $rowBodega['status'] === true && $arrStocks['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -402,35 +425,34 @@ class informeProductos extends ControllerBase {
     public function Print($f3, $params){
 
         /************************************/
-        // Se obtiene el ID
-        $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
-        if (!$this->isValidDecrypted($KanbanID, 'id')) {
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
+        // Se obtiene el ID producto
+        $productId = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
+        if (!$this->isValidDecrypted($productId, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
-        // Se genera la query
+        // Se genera la query - PRODUCTO STOCK (SEGURO)
+        // Ya no consulta kanban_tareas, kanban_tareas_tareas, kanban_tareas_participantes
         $query = [
             'data'    => '
-                kanban_tareas.idKanban,
-                kanban_tareas.idEstadoCierre,
-                core_prioridades.Nombre AS PrioridadNombre,
-                core_prioridades.Color AS PrioridadColor,
-                kanban_tareas.Fecha,
-                kanban_tareas.Titulo,
-                kanban_tareas.Descripcion,
-                core_estados_cierre.Nombre AS EstadoCierreNombre,
-                core_estados_cierre.Color AS EstadoCierreColor,
-                kanban_estados.Nombre AS KanbanEstado,
-                core_estados_colores.Nombre AS KanbanColor',
-            'table'   => 'kanban_tareas',
-            'join'    => '
-                LEFT JOIN core_prioridades        ON core_prioridades.idPrioridad          = kanban_tareas.idPrioridad
-                LEFT JOIN kanban_estados          ON kanban_estados.idKanbanEstado         = kanban_tareas.idKanbanEstado
-                LEFT JOIN core_estados_cierre     ON core_estados_cierre.idEstadoCierre    = kanban_tareas.idEstadoCierre
-                LEFT JOIN core_estados_colores    ON core_estados_colores.idColor          = kanban_estados.idColor',
-            'where'   => 'kanban_tareas.idKanban = ?',
-            'params'  => [$KanbanID['data']],
+                bodegas_productos_stocks.idStock,
+                bodegas_productos_stocks.idProducto,
+                productos.Titulo AS ProductoNombre,
+                productos.Codigo AS ProductoCodigo,
+                bodegas_productos_stocks.cantidad AS StockActual,
+                bodegas_productos_stocks.cantidad_minima AS StockMinimo',
+            'table'   => 'bodegas_productos_stocks',
+            'join'    =>'LEFT JOIN productos ON productos.idProducto = bodegas_productos_stocks.idProducto',
+            'where'   => 'bodegas_productos_stocks.idProducto = ?',
+            'params'  => [$productId['data']],
             'group'   => '',
             'having'  => '',
             'order'   => ''
@@ -441,57 +463,10 @@ class informeProductos extends ControllerBase {
         $rowData = $this->Base_GetByID($xParams);
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                kanban_tareas_tareas.idTareas,
-                kanban_tareas_tareas.Tarea,
-                core_estados_trabajos.Nombre AS EstadoNombre,
-                core_estados_trabajos.Color AS EstadoColor,
-                core_estados_trabajos.Icon AS EstadoIcon,
-                kanban_trabajos.Nombre AS Trabajo',
-            'table'   => 'kanban_tareas_tareas',
-            'join'    => '
-                LEFT JOIN core_estados_trabajos  ON core_estados_trabajos.idEstadoTrabajo = kanban_tareas_tareas.idEstadoTrabajo
-                LEFT JOIN kanban_trabajos        ON kanban_trabajos.idTrabajo             = kanban_tareas_tareas.idTrabajo',
-            'where'   => 'kanban_tareas_tareas.idKanban = ?',
-            'params'  => [$KanbanID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'kanban_tareas_tareas.Tarea ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrTareas = $this->Base_GetList($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                kanban_tareas_participantes.idParticipantes,
-                usuarios_listado.Nombre AS UsuarioNombre,
-                usuarios_listado.Direccion_img AS UsuarioImg',
-            'table'   => 'kanban_tareas_participantes',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = kanban_tareas_participantes.idUsuario',
-            'where'   => 'kanban_tareas_participantes.idKanban = ?',
-            'params'  => [$KanbanID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'usuarios_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams          = ['query' => $query];
-        // Ejecuto la query
-        $arrParticipantes = $this->Base_GetList($xParams);
-
-        /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
+        if($rowData['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -505,8 +480,6 @@ class informeProductos extends ControllerBase {
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
-                'arrTareas'        => $arrTareas['data'],
-                'arrParticipantes' => $arrParticipantes['data'],
             ];
 
             /************************************/
@@ -516,7 +489,7 @@ class informeProductos extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData,$arrTareas,$arrParticipantes]);
+            $result = $rowData;
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }

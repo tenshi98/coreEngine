@@ -73,7 +73,7 @@
     </div>
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

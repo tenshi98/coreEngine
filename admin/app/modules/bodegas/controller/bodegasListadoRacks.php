@@ -27,8 +27,8 @@ class bodegasListadoRacks extends ControllerBase {
     private $Codification;
     private $DataDate;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*=========== Limites de dimension del rack ===========*/
     const NIVELES_MAX         = 50;
     const POSICIONES_MAX      = 50;
@@ -48,7 +48,7 @@ class bodegasListadoRacks extends ControllerBase {
         $this->Codification   = new FunctionsSecurityCodification();
         $this->DataDate       = new FunctionsDataDate();
         $this->WidgetsCommon  = new UIWidgetsCommon();
-        $this->WidgetsViews  = new UIWidgetsViews();
+        $this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -62,8 +62,15 @@ class bodegasListadoRacks extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (pasillo propietario)
         $PasilloID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PasilloID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -120,6 +127,7 @@ class bodegasListadoRacks extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -156,8 +164,15 @@ class bodegasListadoRacks extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (pasillo propietario)
         $PasilloID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PasilloID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -231,8 +246,15 @@ class bodegasListadoRacks extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $RackID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($RackID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -280,6 +302,7 @@ class bodegasListadoRacks extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -313,8 +336,15 @@ class bodegasListadoRacks extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $RackID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($RackID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -372,13 +402,14 @@ class bodegasListadoRacks extends ControllerBase {
         /************************************/
         // Candidatos a rack gemelo (pasillo doble); se excluye al propio rack
         $idPasilloRack = (int)($rowData['data']['idPasillo'] ?? 0);
-        $arrGemelo = ($idPasilloRack > 0) ? $this->getRacksCandidatos($idPasilloRack, (int)$RackID['data']) : [];
+        $arrGemelo     = ($idPasilloRack > 0) ? $this->getRacksCandidatos($idPasilloRack, (int)$RackID['data']) : [];
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -417,6 +448,12 @@ class bodegasListadoRacks extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Se validan las dimensiones del rack
         $Niveles         = (int)($_POST['Niveles'] ?? 0);
         $PosicionesNivel = (int)($_POST['PosicionesPorNivel'] ?? 0);
@@ -438,10 +475,6 @@ class bodegasListadoRacks extends ControllerBase {
         $idGemelo = $this->validarGemelo($_POST['idRackEnfrentado'] ?? null, $Pasillo['idPasillo']);
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -455,13 +488,25 @@ class bodegasListadoRacks extends ControllerBase {
             'table'     => 'bodegas_racks',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
         $Response = $this->Base_insert($xParams);
+
+        /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
         $idRack = (int)$Response['data'];
 
@@ -481,13 +526,23 @@ class bodegasListadoRacks extends ControllerBase {
             'table'    => 'bodegas_niveles',
             'rows'     => $rowsNiveles
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
         $Response = $this->Base_insertMultiple($xParams);
+
+        /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -503,13 +558,23 @@ class bodegasListadoRacks extends ControllerBase {
             'order'   => 'Nivel ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams    = ['query' => $query];
         // Ejecuto la query
         $arrNiveles = $this->Base_GetList($xParams);
+
+        /************************************/
         // Si falla la la ejecucion o no hay niveles, se revierte de inmediato
         if ($arrNiveles['status'] === false || count($arrNiveles['data']) !== $Niveles) {
-            $this->failOperation($arrNiveles);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($arrNiveles['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $arrNiveles['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $arrNiveles['error'] ?? '');
         }
 
         /************************************/
@@ -532,13 +597,23 @@ class bodegasListadoRacks extends ControllerBase {
             'table'    => 'bodegas_posiciones',
             'rows'     => $rowsPosiciones
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
         $Response = $this->Base_insertMultiple($xParams);
+
+        /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -549,7 +624,16 @@ class bodegasListadoRacks extends ControllerBase {
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -569,6 +653,10 @@ class bodegasListadoRacks extends ControllerBase {
         }
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // La bodega y la zona se resuelven desde el pasillo, nunca desde el cliente
         $Pasillo = $this->getPasillo($_POST['idPasillo'] ?? '');
         if ($Pasillo === null) {
@@ -578,13 +666,39 @@ class bodegasListadoRacks extends ControllerBase {
         $_POST['idBodegas']  = $Pasillo['idBodegas'];
 
         /************************************/
-        // Rack gemelo propuesto (pasillo doble); no puede enfrentarse a si mismo
-        $idRackEditado = (int)($_POST['idRack'] ?? 0);
-        $idGemelo      = $this->validarGemelo($_POST['idRackEnfrentado'] ?? null, $Pasillo['idPasillo'], $idRackEditado);
+        // Validar que idRack pertenece a este idPasillo
+        // Obtener el rack actual para verificar su pasillo
+        $queryRackCheck = [
+            'data'  => 'idRack,idPasillo',
+            'table' => 'bodegas_racks',
+            'where' => 'idRack',
+            'Post'  => ['idRack' => $_POST['idRack'] ?? null]
+        ];
+        // Preparo los datos
+        $xParamsRackCheck = ['query' => $queryRackCheck];
+        // Ejecuto la query
+        $ResponseRackCheck = $this->Base_GetByID($xParamsRackCheck);
 
+        // Se valida
+        if ($ResponseRackCheck['status'] === false || empty($ResponseRackCheck['data'])) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Rack no encontrado', 404);
+        }
+
+        // Validar que el rack pertenece al pasillo actual
+        if ($ResponseRackCheck['data']['idPasillo'] != $Pasillo['idPasillo']) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('El rack no pertenece a este pasillo', 400);
+        }
+
+        $idRackEditado = (int)($_POST['idRack'] ?? 0);
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Rack gemelo propuesto (pasillo doble); no puede enfrentarse a si mismo
+        $idGemelo      = $this->validarGemelo($_POST['idRackEnfrentado'] ?? null, $Pasillo['idPasillo'], $idRackEditado);
 
         /************************************
          * Niveles y PosicionesPorNivel quedan fuera del SET: describen la
@@ -599,6 +713,9 @@ class bodegasListadoRacks extends ControllerBase {
             'where'     => 'idRack',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -607,12 +724,38 @@ class bodegasListadoRacks extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
-        // Se enlaza el rack gemelo (simetrico); en Update no hay transaccion activa
-        $this->aplicarEnfrentado($idRackEditado, $idGemelo);
+        // Se enlaza el rack gemelo (simetrico) dentro de la transaccion activa
+        $aplicoEnfrentado = $this->aplicarEnfrentado($idRackEditado, $idGemelo);
+        if ($aplicoEnfrentado === false) {
+            // Se revierte la transaccion activa si aplicarEnfrentado falló
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al enlazar el rack gemelo', 500);
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -638,6 +781,7 @@ class bodegasListadoRacks extends ControllerBase {
         /************************************/
         // Se descifra y valida el identificador
         $RackID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idRack'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($RackID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -648,48 +792,99 @@ class bodegasListadoRacks extends ControllerBase {
         $this->Base_transactionBegin();
 
         /************************************/
-        // Se desvincula el rack gemelo (ambos sentidos) antes de borrar
-        $Response = $this->queryExecuteRaw(
-            'UPDATE bodegas_racks SET idRackEnfrentado = NULL
-              WHERE idRack = ? OR idRackEnfrentado = ?',
-            [$idRack, $idRack]
-        );
+        // Si se envia correctamente se actualizan registros
+        // Se arma la query
+        $ActionSQL = 'UPDATE bodegas_racks SET idRackEnfrentado = NULL WHERE idRack = ? OR idRackEnfrentado = ?';
+        /************************************/
+        // Preparo los datos
+        $xParams = [
+            'query'     => $ActionSQL,
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'singleRow' => false,
+            'params'    => [$idRack, $idRack],
+        ];
+        // Ejecuto la query
+        $Response = $this->Base_queryExecute($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Se anulan las referencias de las posiciones en los movimientos
-        $Response = $this->queryExecuteRaw(
-            'UPDATE bodegas_movimientos_productos SET idPosicion = NULL
+        // Se arma la query
+        $ActionSQL = 'UPDATE bodegas_movimientos_productos SET idPosicion = NULL
               WHERE idPosicion IN (
                     SELECT bodegas_posiciones.idPosicion FROM bodegas_posiciones
                      WHERE bodegas_posiciones.idNivel IN (
                            SELECT bodegas_niveles.idNivel FROM bodegas_niveles
-                            WHERE bodegas_niveles.idRack = ?))',
-            [$idRack]
-        );
+                            WHERE bodegas_niveles.idRack = ?))';
+        /************************************/
+        // Preparo los datos
+        $xParams = [
+            'query'     => $ActionSQL,
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'singleRow' => false,
+            'params'    => [$idRack],
+        ];
+        // Ejecuto la query
+        $Response = $this->Base_queryExecute($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Se borra la estructura del rack (de lo mas specifico a lo general)
         $arrDel = [
-            'DELETE FROM bodegas_posiciones WHERE idNivel IN (
-                 SELECT bodegas_niveles.idNivel FROM bodegas_niveles
-                  WHERE bodegas_niveles.idRack = ?)',
+            'DELETE FROM bodegas_posiciones WHERE idNivel IN (SELECT bodegas_niveles.idNivel FROM bodegas_niveles WHERE bodegas_niveles.idRack = ?)',
             'DELETE FROM bodegas_niveles WHERE idRack = ?',
         ];
         // Recorro los datos
         foreach ($arrDel as $sentencia) {
             /************************************/
-            // Se genera la query
-            $Response = $this->queryExecuteRaw($sentencia, [$idRack]);
+            // Preparo los datos
+            $xParams = [
+                'query'     => $sentencia,
+                'newBDConn' => $this->getDBConn(),
+                'showQuery' => false,
+                'singleRow' => false,
+                'params'    => [$idRack],
+            ];
+            // Ejecuto la query
+            $Response = $this->Base_queryExecute($xParams);
+
             /************************************/
-            // Si falla la la ejecucion, se revierte de inmediato
+            // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                $this->failOperation($Response);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se diferencian los errores de validación de los de base de datos
+                if (is_array($Response['error'] ?? null)) {
+                    Response::error('Datos inválidos', 400, $Response['error']);
+                }
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
         }
 
@@ -710,12 +905,28 @@ class bodegasListadoRacks extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -726,22 +937,6 @@ class bodegasListadoRacks extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /*******************************************************************/
-    // Ejecuta SQL crudo con parametros bindeados (cascada de borrado)
-    /*******************************************************************/
-    private function queryExecuteRaw(string $sql, array $params = []){
-
-        /************************************
-         * ControllerBase::$queryBuilder es privado y Base_queryExecute no admite
-         * parametros bindeados, por lo que se instancia un QueryBuilder propio
-         * sobre la misma conexion: asi participa de la transaccion activa.
-         */
-        $QueryBuilder = new QueryBuilder();
-        /************************************/
-        // Ejecuto la query
-        return $QueryBuilder->queryExecute($sql, $this->getDBConn(), false, false, $params);
-    }
-
     /*******************************************************************/
     // Devuelve los datos del pasillo padre o null si no existe
     /*******************************************************************/
@@ -809,8 +1004,20 @@ class bodegasListadoRacks extends ControllerBase {
     // Escribe idRackEnfrentado en crudo (dentro de la transaccion activa)
     /*******************************************************************/
     private function setRackEnfrentadoRaw(int $idRack, ?int $valor) {
-        $sql = 'UPDATE bodegas_racks SET idRackEnfrentado = ' . ($valor === null ? 'NULL' : (int)$valor) . ' WHERE idRack = ' . (int)$idRack;
-        return $this->queryExecuteRaw($sql, []);
+
+        /************************************/
+        // Preparo los datos
+        $sql     = 'UPDATE bodegas_racks SET idRackEnfrentado = ' . ($valor === null ? 'NULL' : (int)$valor) . ' WHERE idRack = ?';
+        $xParams = [
+            'query'     => $sql,
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'singleRow' => false,
+            'params'    => [$idRack],
+        ];
+        // Ejecuto la query
+        return $this->Base_queryExecute($xParams);
+
     }
 
     /*******************************************************************/
@@ -821,19 +1028,41 @@ class bodegasListadoRacks extends ControllerBase {
         if ($actual === $nuevo) {
             return true;
         }
-        // Se desvincula el gemelo anterior
+        // Se desvincula el gemelo anterior: normalizar ambos sentidos (idRack → actual y actual → idRack)
         if ($actual !== null) {
-            $this->setRackEnfrentadoRaw($actual, null);
+            // Romper el enlace en ambos sentidos: idRack ya no enfrenta actual, actual ya no enfrenta idRack
+            if ($this->setRackEnfrentadoRaw($idRack, null) === false) {
+                return false;
+            }
+            if ($this->setRackEnfrentadoRaw($actual, null) === false) {
+                return false;
+            }
         }
-        // Se prepara el nuevo gemelo (libera su vinculo previo si lo tenia)
+        // Se prepara el nuevo gemelo: liberar su vinculo previo en ambos sentidos si lo tiene
         if ($nuevo !== null) {
             $previo = $this->getRackEnfrentado($nuevo);
+            // Si el gemelo previo existe y no es el rack actual, romper ese enlace en ambos sentidos
             if ($previo !== null && $previo !== $idRack) {
-                $this->setRackEnfrentadoRaw($previo, null);
+                if ($this->setRackEnfrentadoRaw($nuevo, null) === false) {
+                    return false;
+                }
+                if ($this->setRackEnfrentadoRaw($previo, null) === false) {
+                    return false;
+                }
             }
-            $this->setRackEnfrentadoRaw($nuevo, $idRack);
+            // Establecer el nuevo enlace en ambos sentidos: idRack ↔ nuevo
+            if ($this->setRackEnfrentadoRaw($nuevo, $idRack) === false) {
+                return false;
+            }
+            if ($this->setRackEnfrentadoRaw($idRack, $nuevo) === false) {
+                return false;
+            }
+        } else {
+            // Si nuevo es null, asegurarse de que idRack quede sin gemelo
+            if ($this->setRackEnfrentadoRaw($idRack, null) === false) {
+                return false;
+            }
         }
-        $this->setRackEnfrentadoRaw($idRack, $nuevo);
         return true;
     }
 
@@ -846,10 +1075,12 @@ class bodegasListadoRacks extends ControllerBase {
             return null;
         }
         if (!is_numeric($idGemelo) || (int)$idGemelo === 0) {
+            // Se reporta el error
             Response::error('Rack gemelo inválido', 400);
         }
         $id = (int)$idGemelo;
         if ($id === $idRackExcluir) {
+            // Se reporta el error
             Response::error('Un rack no puede enfrentarse a sí mismo', 400);
         }
         $query = [
@@ -865,9 +1096,11 @@ class bodegasListadoRacks extends ControllerBase {
         $xParams = ['query' => $query];
         $Row = $this->Base_GetByID($xParams);
         if ($Row['status'] !== true || empty($Row['data'])) {
+            // Se reporta el error
             Response::error('Rack gemelo inválido', 400);
         }
         if ((int)$Row['data']['idPasillo'] !== $idPasillo) {
+            // Se reporta el error
             Response::error('El rack gemelo debe pertenecer al mismo pasillo', 400);
         }
         return $id;

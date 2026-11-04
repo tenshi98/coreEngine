@@ -40,87 +40,17 @@ class bodegasListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                bodegas_listado.idBodegas,
-                bodegas_listado.Codigo,
-                bodegas_listado.Nombre,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor',
-            'table'   => 'bodegas_listado',
-            'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = bodegas_listado.idEstado',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'bodegas_listado.idEstado ASC, bodegas_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $arrList = $this->Base_GetList($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idEstado AS ID,Nombre',
-            'table'   => 'core_estados',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrEstado = $this->Base_GetList($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCiudad AS ID,Nombre',
-            'table'   => 'core_ubicacion_ciudad',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrCiudad = $this->Base_GetList($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
-            'table'   => 'core_ubicacion_comunas',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrComuna = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $arrList   = $this->getDataList('idBodegas!=0');
+        $arrEstado = $this->getEstados();
+        $arrCiudad = $this->getCiudad();
+        $arrComuna = $this->getComunas();
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrEstado['status'] && $arrCiudad['status'] && $arrComuna['status']){
+        if($arrList['status'] === true && $arrEstado['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -185,27 +115,8 @@ class bodegasListado extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                bodegas_listado.idBodegas,
-                bodegas_listado.Codigo,
-                bodegas_listado.Nombre,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor',
-            'table'   => 'bodegas_listado',
-            'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = bodegas_listado.idEstado',
-            'where'   => $whereInt,
-            'params'  => $whereParams,
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'bodegas_listado.idEstado ASC, bodegas_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $arrList = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $arrList     = $this->getDataList($whereInt, $whereParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -246,67 +157,29 @@ class bodegasListado extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                bodegas_listado.Codigo,
-                bodegas_listado.Nombre,
-                bodegas_listado.Direccion,
-                bodegas_listado.Direccion_img,
-
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor,
-                core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna',
-            'table'   => 'bodegas_listado',
-            'join'    => '
-                LEFT JOIN core_estados             ON core_estados.idEstado               = bodegas_listado.idEstado
-                LEFT JOIN core_ubicacion_ciudad    ON core_ubicacion_ciudad.idCiudad      = bodegas_listado.idCiudad
-                LEFT JOIN core_ubicacion_comunas   ON core_ubicacion_comunas.idComuna     = bodegas_listado.idComuna',
-            'where'   => 'bodegas_listado.idBodegas = ?',
-            'params'  => [$BodegasID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                bodegas_listado_observaciones.Observacion,
-                bodegas_listado_observaciones.FechaCreacion,
-                usuarios_listado.Nombre AS Usuario',
-            'table'   => 'bodegas_listado_observaciones',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = bodegas_listado_observaciones.idUsuario',
-            'where'   => 'bodegas_listado_observaciones.idBodegas = ?',
-            'params'  => [$BodegasID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'bodegas_listado_observaciones.idObservaciones ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams          = ['query' => $query];
-        // Ejecuto la query
-        $arrObservaciones = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $rowData          = $this->getDataDetail($BodegasID['data']);
+        $arrObservaciones = $this->getDataDetailObs($BodegasID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrObservaciones['status']){
+        if($rowData['status'] === true && $arrObservaciones['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -340,104 +213,31 @@ class bodegasListado extends ControllerBase {
     public function Resumen($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                bodegas_listado.idBodegas,
-                bodegas_listado.Codigo,
-                bodegas_listado.Nombre,
-                bodegas_listado.Direccion,
-                bodegas_listado.Direccion_img,
-                bodegas_listado.idEstado,
-                bodegas_listado.idCiudad,
-                bodegas_listado.idComuna,
-
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor,
-                core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna',
-            'table'   => 'bodegas_listado',
-            'join'    => '
-                LEFT JOIN core_estados             ON core_estados.idEstado               = bodegas_listado.idEstado
-                LEFT JOIN core_ubicacion_ciudad    ON core_ubicacion_ciudad.idCiudad      = bodegas_listado.idCiudad
-                LEFT JOIN core_ubicacion_comunas   ON core_ubicacion_comunas.idComuna     = bodegas_listado.idComuna',
-            'where'   => 'bodegas_listado.idBodegas = ?',
-            'params'  => [$BodegasID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idEstado AS ID,Nombre',
-            'table'   => 'core_estados',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrEstado = $this->Base_GetList($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCiudad AS ID,Nombre',
-            'table'   => 'core_ubicacion_ciudad',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrCiudad = $this->Base_GetList($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
-            'table'   => 'core_ubicacion_comunas',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams   = ['query' => $query];
-        // Ejecuto la query
-        $arrComuna = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $rowData   = $this->getDataDetail($BodegasID['data']);
+        $arrEstado = $this->getEstados();
+        $arrCiudad = $this->getCiudad();
+        $arrComuna = $this->getComunas();
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrEstado['status'] && $arrCiudad['status'] && $arrComuna['status']){
+        if($rowData['status'] === true && $arrEstado['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -480,46 +280,29 @@ class bodegasListado extends ControllerBase {
     public function ResumenUpdate($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                bodegas_listado.Codigo,
-                bodegas_listado.Nombre,
-                bodegas_listado.Direccion,
-                bodegas_listado.Direccion_img,
-
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor,
-                core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna',
-            'table'   => 'bodegas_listado',
-            'join'    => '
-                LEFT JOIN core_estados             ON core_estados.idEstado               = bodegas_listado.idEstado
-                LEFT JOIN core_ubicacion_ciudad    ON core_ubicacion_ciudad.idCiudad      = bodegas_listado.idCiudad
-                LEFT JOIN core_ubicacion_comunas   ON core_ubicacion_comunas.idComuna     = bodegas_listado.idComuna',
-            'where'   => 'bodegas_listado.idBodegas = ?',
-            'params'  => [$BodegasID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
+        // Se obtienen los datos
+        $rowData   = $this->getDataDetail($BodegasID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -547,6 +330,183 @@ class bodegasListado extends ControllerBase {
     }
 
     /******************************************************************************/
+    /*                            CONSULTAS INTERNAS                              */
+    /******************************************************************************/
+    /*******************************************************************/
+    // Se obtiene la lista
+    /*******************************************************************/
+    private function getDataList($filter, $params = []){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                bodegas_listado.idBodegas,
+                bodegas_listado.Codigo,
+                bodegas_listado.Nombre,
+                core_estados.Nombre AS Estado,
+                core_estados.Color AS EstadoColor',
+            'table'   => 'bodegas_listado',
+            'join'    => 'LEFT JOIN core_estados ON core_estados.idEstado = bodegas_listado.idEstado',
+            'where'   => $filter,
+            'params'  => $params,
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'bodegas_listado.idEstado ASC, bodegas_listado.Nombre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getDataDetail($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                bodegas_listado.idBodegas,
+                bodegas_listado.Codigo,
+                bodegas_listado.Nombre,
+                bodegas_listado.Direccion,
+                bodegas_listado.Direccion_img,
+                bodegas_listado.idEstado,
+                bodegas_listado.idCiudad,
+                bodegas_listado.idComuna,
+
+                core_estados.Nombre AS Estado,
+                core_estados.Color AS EstadoColor,
+                core_ubicacion_ciudad.Nombre AS Ciudad,
+                core_ubicacion_comunas.Nombre AS Comuna',
+            'table'   => 'bodegas_listado',
+            'join'    => '
+                LEFT JOIN core_estados             ON core_estados.idEstado               = bodegas_listado.idEstado
+                LEFT JOIN core_ubicacion_ciudad    ON core_ubicacion_ciudad.idCiudad      = bodegas_listado.idCiudad
+                LEFT JOIN core_ubicacion_comunas   ON core_ubicacion_comunas.idComuna     = bodegas_listado.idComuna',
+            'where'   => 'bodegas_listado.idBodegas = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetByID($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getDataDetailObs($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                bodegas_listado_observaciones.Observacion,
+                bodegas_listado_observaciones.FechaCreacion,
+                bodegas_listado_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
+            'table'   => 'bodegas_listado_observaciones',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = bodegas_listado_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = bodegas_listado_observaciones.idUsuarioEdicion',
+            'where'   => 'bodegas_listado_observaciones.idBodegas = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'bodegas_listado_observaciones.idObservaciones ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getEstados(){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idEstado AS ID,Nombre',
+            'table'   => 'core_estados',
+            'join'    => '',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'Nombre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams   = ['query' => $query];
+        // Ejecuto la query
+        return $this->Base_GetList($xParams);
+
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getCiudad(){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idCiudad AS ID,Nombre',
+            'table'   => 'core_ubicacion_ciudad',
+            'join'    => '',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'Nombre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams   = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getComunas(){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idComuna AS ID1, idCiudad AS ID2, Nombre',
+            'table'   => 'core_ubicacion_comunas',
+            'join'    => '',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'Nombre ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams   = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+
+    }
+
+    /******************************************************************************/
     /*                                  DATOS                                     */
     /******************************************************************************/
     /*******************************************************************/
@@ -555,11 +515,13 @@ class bodegasListado extends ControllerBase {
     public function Insert(){
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
         /************************************/
-        // Se inicia la transacción (registro + codigo correlativo)
+        // Se inicia la transacción
         $this->Base_transactionBegin();
 
         /************************************/
@@ -572,6 +534,9 @@ class bodegasListado extends ControllerBase {
             'table'     => 'bodegas_listado',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -580,7 +545,14 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
         $idBodegas = (int)$Response['data'];
 
@@ -599,27 +571,50 @@ class bodegasListado extends ControllerBase {
             'where'     => 'idBodegas',
             'Post'      => ['idBodegas' => $idBodegas, 'Codigo' => $Codigo]
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck(['idBodegas' => $idBodegas, 'Codigo' => $Codigo]);
         // Preparo los datos
-        $xParams  = ['DataCheck' => $this->dataCheck(['idBodegas' => $idBodegas, 'Codigo' => $Codigo]), 'query' => $query];
+        $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, encripta y envía con código 200 (OK)
         $DataID = $this->Codification->encryptDecrypt('encrypt', $idBodegas);
+        // Se verifica
         if (!$this->isValidDecrypted($DataID, 'text')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
         Response::success($DataID['data']);
 
     }
@@ -637,8 +632,8 @@ class bodegasListado extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -662,6 +657,9 @@ class bodegasListado extends ControllerBase {
                 ],
             ]
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -670,7 +668,27 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/
@@ -697,6 +715,7 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Se descifra y valida el identificador
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idBodegas'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -705,20 +724,74 @@ class bodegasListado extends ControllerBase {
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
-        /************************************
-         * Se anulan las referencias de las posiciones de la bodega en los
+        /************************************/
+        // Bloquear borrado si hay stock o movimientos
+        /************************************/
+        // Verifico si hay movimientos de entrada/salida en bodegas_movimientos
+        $queryMovements = [
+            'query'     => 'SELECT COUNT(*) as cnt FROM bodegas_movimientos WHERE idBodegasIngreso = ? OR idBodegasEgreso = ?',
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'params'    => [(int)$BodegasID['data'], (int)$BodegasID['data']]
+        ];
+        $ResponseMovements = $this->Base_queryExecute($queryMovements);
+
+        /************************************/
+        // Validacion
+        if ($ResponseMovements['status'] === false || $ResponseMovements['data'][0]['cnt'] > 0) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('No se puede borrar la bodega: existen movimientos registrados', 409);
+        }
+
+        /************************************/
+        // Verifico si hay stock en bodegas_productos_stocks
+        $queryStock = [
+            'query'     => 'SELECT COUNT(*) as cnt FROM bodegas_productos_stocks WHERE Cantidad_idBodegas_1 > 0 OR Cantidad_idBodegas_2 > 0 OR Cantidad_idBodegas_3 > 0 OR Cantidad_idBodegas_4 > 0 OR Cantidad_idBodegas_5 > 0',
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false
+        ];
+        $ResponseStock = $this->Base_queryExecute($queryStock);
+
+        /************************************/
+        // Validacion
+        if ($ResponseStock['status'] === false || $ResponseStock['data'][0]['cnt'] > 0) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('No se puede borrar la bodega: existe stock registrado', 409);
+        }
+
+        /************************************/
+         /* Se anulan las referencias de las posiciones de la bodega en los
          * movimientos: `bodegas_movimientos_productos` conserva el historial
          * y solo pierde la ubicacion fisica que deja de existir.
          */
-        $Response = $this->queryExecuteRaw(
-            'UPDATE bodegas_movimientos_productos SET idPosicion = NULL
-              WHERE idPosicion IN (
-                    SELECT bodegas_posiciones.idPosicion FROM bodegas_posiciones
-                     WHERE bodegas_posiciones.idBodegas = ?)',
-            [(int)$BodegasID['data']]
-        );
+        // Consulta
+        $ActionSQL = 'UPDATE bodegas_movimientos_productos SET idPosicion = NULL WHERE idPosicion IN (SELECT bodegas_posiciones.idPosicion FROM bodegas_posiciones WHERE bodegas_posiciones.idBodegas = ?)';
+        // Preparo los datos
+        $xParams = [
+            'query'     => $ActionSQL,
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'singleRow' => false,
+            'params'    => [(int)$BodegasID['data']],
+        ];
+        // Ejecuto la query
+        $Response = $this->Base_queryExecute($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -738,7 +811,14 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -767,14 +847,30 @@ class bodegasListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->failOperation($respDelRel);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respDelRel['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respDelRel['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -798,6 +894,10 @@ class bodegasListado extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataPut);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => 'Direccion_img',
@@ -814,7 +914,27 @@ class bodegasListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/
@@ -826,21 +946,6 @@ class bodegasListado extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /*******************************************************************/
-    // Ejecuta SQL crudo con parametros bindeados (borrado en cascada)
-    /*******************************************************************/
-    private function queryExecuteRaw(string $sql, array $params = []){
-
-        /************************************
-         * ControllerBase::$queryBuilder es privado y Base_queryExecute no admite
-         * parametros bindeados, por lo que se instancia un QueryBuilder propio
-         * sobre la misma conexion: asi participa de la transaccion activa.
-         */
-        $QueryBuilder = new QueryBuilder();
-        /************************************/
-        // Ejecuto la query
-        return $QueryBuilder->queryExecute($sql, $this->getDBConn(), false, false, $params);
-    }
 
     /*******************************************************************/
     // Se validan los datos

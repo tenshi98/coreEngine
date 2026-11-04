@@ -34,7 +34,7 @@
                         <tr>
                             <?php
                             //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-                            if($data['UserData']["gestionDocumentosUsoBodega"]==2){
+                            if($data['UserData']["gestionDocumentosUsoBodega"] === 2){
                                 echo '<th scope="col">Documento</th>';
                             } ?>
                             <th scope="col">Doc Mov</th>
@@ -57,7 +57,7 @@
                                 <tr>
                                     <?php
                                     //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-                                    if($data['UserData']["gestionDocumentosUsoBodega"]==2){
+                                    if($data['UserData']["gestionDocumentosUsoBodega"] === 2){
                                         //Si existe documento relacionado
                                         if(isset($crud['idTipo'])&&$crud['idTipo']!=''){
                                             switch ($crud['idTipo']) {
@@ -101,7 +101,7 @@
                             <?php } ?>
                         <?php }else{
                             //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-                            $ncols = ($data['UserData']["gestionDocumentosUsoBodega"]==2) ? 6 : 5;
+                            $ncols = ($data['UserData']["gestionDocumentosUsoBodega"] === 2) ? 6 : 5;
                             // Imprime
                             echo '<tr><td colspan="'.$ncols.'">No se encontraron entradas</td></tr>';
                         } ?>
@@ -113,7 +113,7 @@
 
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

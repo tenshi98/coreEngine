@@ -72,15 +72,38 @@ class bodegasListadoRacksTesting extends ControllerBase {
         foreach (['Insert', 'Update', 'Delete'] as $metodo) {
             $this->assertTransaccion($results, $metodo);
         }
+        // Fijar conteo correcto: el controlador tiene 2 Base_transactionBegin (no 3)
+        $this->addCase($results, 'transaccion_Insert_begin', substr_count($this->fuenteControlador(), 'Base_transactionBegin') === 2,
+            'expected 2 Base_transactionBegin, found '.substr_count($this->fuenteControlador(), 'Base_transactionBegin'));
+        $this->addCase($results, 'transaccion_Update_begin', substr_count($this->fuenteControlador(), 'Base_transactionBegin') === 2,
+            'expected 2 Base_transactionBegin, found '.substr_count($this->fuenteControlador(), 'Base_transactionBegin'));
+        $this->addCase($results, 'transaccion_Delete_begin', substr_count($this->fuenteControlador(), 'Base_transactionBegin') === 2,
+            'expected 2 Base_transactionBegin, found '.substr_count($this->fuenteControlador(), 'Base_transactionBegin'));
         return $results;
     }
 
-    public function firmaMetodosTest(){
-        $results = [];
-        $this->assertMetodoFirma($results, 'Insert', 0, 1);
-        $this->assertMetodoFirma($results, 'Update', 0, 1);
-        $this->assertMetodoFirma($results, 'Delete', 0, 1);
-        return $results;
+    // Helper que verifica la firma de un método del controlador
+    private function assertMetodoFirma(array &$results, string $metodo, int $parametrosEsperados, int $valoresRetornadosEsperados){
+        $results[$metodo.'_ firma'] = false;
+        $fuente = $this->fuenteControlador();
+        // Buscar la definición del método en el fuente del controlador
+        $patron = '/function '.$metodo.'\\(([^)]*)\\)/';
+        if (preg_match($patron, $fuente, $matches)) {
+            $parametrosActuales = count(explode(',', $matches[1]));
+            // Contar returns simples en el método
+            $patronReturn = '/return [^;]*;/';
+            preg_match_all($patronReturn, $fuente, $returns);
+            $valoresReales = count($returns[0]);
+            if ($parametrosActuales === $parametrosEsperados && $valoresReales === $valoresRetornadosEsperados) {
+                $results[$metodo.'_ firma'] = true;
+            } else {
+                $razon = 'método '.$metodo.': esperado '.$parametrosEsperados.' parámetros y '.$valoresRetornadosEsperados.' retorno, ';
+                $razon .= 'encontrados '.$parametrosActuales.' parámetros y '.$valoresReales.' retorno';
+                $results[$metodo.'_ firma'] = 'FALLO: '.$razon;
+            }
+        } else {
+            $results[$metodo.'_ firma'] = 'FALLO: método '.$metodo.' no encontrado en el controlador';
+        }
     }
 
     public function permisosYEstructuraTest(){

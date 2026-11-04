@@ -90,8 +90,8 @@ class bodegasWidgets extends ControllerBase {
             // Se instancia
             $arrUserData = $this->getUserData($f3);
             // Se verifica si se tiene el permiso para visualizar el dato
-            if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
-                $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
+            if($arrUserData["usuariosPermisosBodegas"] === 2 && $arrUserData['UserType'] != 1){
+                $X_join   = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
                 $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
                 $X_params = [1, $arrUserData['UserID']];
             // Si se permite junto con la creacion de tareas

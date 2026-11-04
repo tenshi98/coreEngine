@@ -78,6 +78,10 @@ class bodegasInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -102,6 +106,10 @@ class bodegasInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -123,11 +131,19 @@ class bodegasInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*            SEMBRADO DE LOS CATALOGOS                */
@@ -149,6 +165,10 @@ class bodegasInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
@@ -208,19 +228,38 @@ class bodegasInstaller extends ControllerInstaller {
             'RutaWeb'        => 'gestionBodegas/productos/listado',                            // Ruta web de la transaccion
             'RutaController' => 'informeProductos',                                            // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -262,12 +301,15 @@ class bodegasInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/listAll',                             'RutaController' => 'bodegasListado->listAll',                     'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/bodegas/listado/search',                              'RutaController' => 'bodegasListado->UpdateList',                  'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/updateList',                          'RutaController' => 'bodegasListado->UpdateList',                  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/updateList',                          'RutaController' => 'bodegasListado->UpdateList',                  'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/view/@id',                            'RutaController' => 'bodegasListado->View',                        'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/resumen/@id',                         'RutaController' => 'bodegasListado->Resumen',                     'Descripcion' => 'Mostrar Resúmen',                               'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/bodegas/listado/resumenUpdate/@id',                   'RutaController' => 'bodegasListado->ResumenUpdate',               'Descripcion' => 'Mostrar información',                           'idLevelLimit' => 2, 'Controller' => 'bodegasListado'],
@@ -313,7 +355,7 @@ class bodegasInstaller extends ControllerInstaller {
             2 => [
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/listAll',                    'RutaController' => 'bodegasMovimiento->listAll_1',               'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 2, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/search',                     'RutaController' => 'bodegasMovimiento->UpdateList_1',            'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
-                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/updateList',                 'RutaController' => 'bodegasMovimiento->UpdateList_1',            'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
+                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/updateList',                 'RutaController' => 'bodegasMovimiento->UpdateList_1',            'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/view/@id',                   'RutaController' => 'bodegasMovimiento->View_1',                  'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/resumen/@id',                'RutaController' => 'bodegasMovimiento->Resumen_1',               'Descripcion' => 'Mostrar Resúmen',                               'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/ingresos/listado/resumenUpdate/@id',          'RutaController' => 'bodegasMovimiento->ResumenUpdate_1',         'Descripcion' => 'Mostrar información',                           'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
@@ -331,7 +373,7 @@ class bodegasInstaller extends ControllerInstaller {
             3 => [
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/egresos/listado/listAll',                     'RutaController' => 'bodegasMovimiento->listAll_2',              'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 2, 'RutaWeb' =>  'gestionBodegas/egresos/listado/search',                      'RutaController' => 'bodegasMovimiento->UpdateList_2',           'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
-                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/egresos/listado/updateList',                  'RutaController' => 'bodegasMovimiento->UpdateList_2',           'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
+                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/egresos/listado/updateList',                  'RutaController' => 'bodegasMovimiento->UpdateList_2',           'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/egresos/listado/view/@id',                    'RutaController' => 'bodegasMovimiento->View_2',                 'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/egresos/listado/resumen/@id',                 'RutaController' => 'bodegasMovimiento->Resumen_2',              'Descripcion' => 'Mostrar Resúmen',                                'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/egresos/listado/resumenUpdate/@id',           'RutaController' => 'bodegasMovimiento->ResumenUpdate_2',        'Descripcion' => 'Mostrar información',                            'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
@@ -349,7 +391,7 @@ class bodegasInstaller extends ControllerInstaller {
             4 => [
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/listAll',                    'RutaController' => 'bodegasMovimiento->listAll_3',               'Descripcion' => 'Listar Toda la Información',                     'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 2, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/search',                     'RutaController' => 'bodegasMovimiento->UpdateList_3',            'Descripcion' => 'Filtrar datos',                                  'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
-                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/updateList',                 'RutaController' => 'bodegasMovimiento->UpdateList_3',            'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
+                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/updateList',                 'RutaController' => 'bodegasMovimiento->UpdateList_3',            'Descripcion' => 'Actualizar Lista',                               'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/view/@id',                   'RutaController' => 'bodegasMovimiento->View_3',                  'Descripcion' => 'Mostrar Detallado',                              'idLevelLimit' => 1, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/resumen/@id',                'RutaController' => 'bodegasMovimiento->Resumen_3',               'Descripcion' => 'Mostrar Resúmen',                                'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/traspaso/listado/resumenUpdate/@id',          'RutaController' => 'bodegasMovimiento->ResumenUpdate_3',         'Descripcion' => 'Mostrar información',                            'idLevelLimit' => 2, 'Controller' => 'bodegasMovimiento'],
@@ -381,16 +423,16 @@ class bodegasInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
-        $RutaController  = '"bodegasListado"';
-        $RutaController .= ',"bodegasListadoObservaciones"';
-        $RutaController .= ',"bodegasListadoZonas"';
-        $RutaController .= ',"bodegasListadoPasillos"';
-        $RutaController .= ',"bodegasListadoRacks"';
-        $RutaController .= ',"bodegasListadoDistribucion"';
-        $RutaController .= ',"bodegasMovimientoIngreso"';
-        $RutaController .= ',"bodegasMovimientoEgreso"';
-        $RutaController .= ',"bodegasMovimientoTraspaso"';
-        $RutaController .= ',"informeProductos"';
+        $RutaController  = 'bodegasListado';
+        $RutaController .= ',bodegasListadoObservaciones';
+        $RutaController .= ',bodegasListadoZonas';
+        $RutaController .= ',bodegasListadoPasillos';
+        $RutaController .= ',bodegasListadoRacks';
+        $RutaController .= ',bodegasListadoDistribucion';
+        $RutaController .= ',bodegasMovimientoIngreso';
+        $RutaController .= ',bodegasMovimientoEgreso';
+        $RutaController .= ',bodegasMovimientoTraspaso';
+        $RutaController .= ',informeProductos';
 
         /************************************/
         // Retorno los datos
@@ -519,6 +561,7 @@ class bodegasInstaller extends ControllerInstaller {
             'ALTER TABLE bodegas_posiciones ADD INDEX IF NOT EXISTS idx_bposiciones_estado (idEstadoPosicion),ADD INDEX IF NOT EXISTS idx_bposiciones_bodega_estado (idBodegas, idEstadoPosicion),ADD UNIQUE INDEX IF NOT EXISTS uk_bposiciones_bodega_codigo (idBodegas, Codigo),ADD UNIQUE INDEX IF NOT EXISTS uk_bposiciones_nivel_numero (idNivel, Numero);',
             'ALTER TABLE bodegas_zonas_tipos ADD UNIQUE INDEX IF NOT EXISTS uk_bzonatipos_nombre (Nombre);',
             'ALTER TABLE bodegas_posiciones_estados ADD UNIQUE INDEX IF NOT EXISTS uk_bposestado_nombre (Nombre);',
+            'ALTER TABLE bodegas_productos_stocks ADD UNIQUE INDEX IF NOT EXISTS uk_stocks_producto (idProducto);',
         ];
 
         /************************************/

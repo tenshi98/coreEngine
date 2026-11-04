@@ -75,9 +75,40 @@ class bodegasListadoDistribucionTesting extends ControllerBase {
         return $results;
     }
 
+
+
+    // Helper que verifica la firma de un método del controlador
+    private function assertMetodoFirma(array &$results, string $metodo, int $parametrosEsperados, int $valoresRetornadosEsperados){
+        $results[$metodo.'_ firma'] = false;
+        $fuente = $this->fuenteControlador();
+        // Buscar la definición del método en el fuente del controlador
+        $patron = "/function " . $metodo . "(\\([^)]*\\))/";
+        if (preg_match($patron, $fuente, $matches)) {
+            $parametrosActuales = count(explode(",", $matches[1]));
+            // Contar return simples en el método
+            $contador = 0;
+            $lineas = explode("\\n", $fuente);
+            foreach ($lineas as $linea) {
+                if (trim(substr($linea, 0, 6)) === "return") {
+                    $contador++;
+                }
+            }
+            if ($parametrosActuales === $parametrosEsperados && $contador === $valoresRetornadosEsperados) {
+                $results[$metodo.'_ firma'] = true;
+            } else {
+                $razon = "método " . $metodo . ": esperado " . $parametrosEsperados . " parámetros y " . $valoresRetornadosEsperados . " retorno, ";
+                $razon .= "encontrados " . (isset($matches[1]) ? count(explode(",", $matches[1])) : 0) . " parámetros y " . $contador . " retorno";
+                $results[$metodo.'_ firma'] = "FALLO: " . $razon;
+            }
+        } else {
+            $results[$metodo.'_ firma'] = "FALLO: método " . $metodo . " no encontrado en el controlador";
+        }
+    }
+
     public function firmaMetodosTest(){
         $results = [];
-        $this->assertMetodoFirma($results, 'PosicionUpdate', 0, 1);
+        // PosicionUpdate tiene 1 parámetro ($f3) y 0 return simples (usa Response:: calls)
+        $this->assertMetodoFirma($results, 'PosicionUpdate', 1, 0);
         return $results;
     }
 

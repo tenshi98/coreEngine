@@ -71,11 +71,7 @@ class bodegasMovimiento extends ControllerBase {
 
         /************************************/
         // Se verifica movimiento
-        switch ($idTipoIngreso) {
-            case 1: $tsrxName = 'bodegasMovimientoIngreso';  $TipoMov = 'Ingresos a';    break;//Ingreso
-            case 2: $tsrxName = 'bodegasMovimientoEgreso';   $TipoMov = 'Egresos a';     break;//Egreso
-            case 3: $tsrxName = 'bodegasMovimientoTraspaso'; $TipoMov = 'Traspasos de';  break;//Traspaso
-        }
+        $TipoDocs = $this->TipoIngreso($idTipoIngreso);
 
         /************************************/
         // Se genera la query
@@ -108,7 +104,7 @@ class bodegasMovimiento extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+        if($arrUserData["usuariosPermisosBodegas"] === 2 && $arrUserData['UserType'] != 1){
             $X_join   = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
             $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
             $X_params = [1, $arrUserData['UserID']];
@@ -176,20 +172,20 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrBodegas['status'] && $arrProductos['status'] && $arrDocumentos['status']){
+        if($arrList['status'] === true && $arrBodegas['status'] === true && $arrProductos['status'] === true && $arrDocumentos['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
-                'PageTitle'       => $TipoMov.' Bodegas',
-                'PageDescription' => $TipoMov.' Bodegas.',
+                'PageTitle'       => $TipoDocs['TipoMov'].' Bodegas',
+                'PageDescription' => $TipoDocs['TipoMov'].' Bodegas.',
                 'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
                 'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-                'TableTitle'      => $TipoMov.' Bodegas',
+                'TableTitle'      => $TipoDocs['TipoMov'].' Bodegas',
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
+                'UserAccess'    => $this->getArrLevel($f3, $TipoDocs['tsrxName']),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
@@ -225,11 +221,7 @@ class bodegasMovimiento extends ControllerBase {
 
         /************************************/
         // Se verifica movimiento
-        switch ($idTipoIngreso) {
-            case 1: $tsrxName = 'bodegasMovimientoIngreso';  $TipoMov = 'Ingresos a';    break;//Ingreso
-            case 2: $tsrxName = 'bodegasMovimientoEgreso';   $TipoMov = 'Egresos a';     break;//Egreso
-            case 3: $tsrxName = 'bodegasMovimientoTraspaso'; $TipoMov = 'Traspasos de';  break;//Traspaso
-        }
+        $TipoDocs = $this->TipoIngreso($idTipoIngreso);
 
         /************************************/
         // Variables
@@ -302,10 +294,10 @@ class bodegasMovimiento extends ControllerBase {
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
-                'TableTitle'      => $TipoMov.' Bodegas',
+                'TableTitle'      => $TipoDocs['TipoMov'].' Bodegas',
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
+                'UserAccess'    => $this->getArrLevel($f3, $TipoDocs['tsrxName']),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
@@ -333,23 +325,26 @@ class bodegasMovimiento extends ControllerBase {
     public function View($f3, $params, $idTipoIngreso){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MovimientoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
+
+        /************************************/
         // Se verifica movimiento
-        switch ($idTipoIngreso) {
-            case 1: $tsrxName = 'bodegasMovimientoIngreso'; break;//Ingreso
-            case 2: $tsrxName = 'bodegasMovimientoEgreso';break;//Egreso
-            case 3: $tsrxName = 'bodegasMovimientoTraspaso';break;//Traspaso
-        }
+        $TipoDocs = $this->TipoIngreso($idTipoIngreso);
 
         /************************************/
         // Se crean cadenas
@@ -371,7 +366,7 @@ class bodegasMovimiento extends ControllerBase {
         LEFT JOIN usuarios_listado            ON usuarios_listado.idUsuario            = bodegas_movimientos.idUsuario';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -430,13 +425,13 @@ class bodegasMovimiento extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrProductos['status']){
+        if($rowData['status'] === true && $arrProductos['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
+                'UserAccess'    => $this->getArrLevel($f3, $TipoDocs['tsrxName']),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_Codification'     => $this->Codification,
@@ -466,23 +461,26 @@ class bodegasMovimiento extends ControllerBase {
     public function Resumen($f3, $params, $idTipoIngreso){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MovimientoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
+
+        /************************************/
         // Se verifica movimiento
-        switch ($idTipoIngreso) {
-            case 1: $tsrxName = 'bodegasMovimientoIngreso'; break;//Ingreso
-            case 2: $tsrxName = 'bodegasMovimientoEgreso';break;//Egreso
-            case 3: $tsrxName = 'bodegasMovimientoTraspaso';break;//Traspaso
-        }
+        $TipoDocs = $this->TipoIngreso($idTipoIngreso);
 
         /************************************/
         // Se crean cadenas
@@ -507,7 +505,7 @@ class bodegasMovimiento extends ControllerBase {
         LEFT JOIN usuarios_listado            ON usuarios_listado.idUsuario            = bodegas_movimientos.idUsuario';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -540,6 +538,7 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -550,7 +549,7 @@ class bodegasMovimiento extends ControllerBase {
                 'PageKeywords'     => ConfigAPP::SOFTWARE['SoftwareName'],
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
+                'UserAccess'    => $this->getArrLevel($f3, $TipoDocs['tsrxName']),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_FormInputs'       => $this->FormInputs,
                 'Fnc_DataDate'         => $this->DataDate,
@@ -580,23 +579,26 @@ class bodegasMovimiento extends ControllerBase {
     public function ResumenUpdate($f3, $params, $idTipoIngreso){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MovimientoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
+
+        /************************************/
         // Se verifica movimiento
-        switch ($idTipoIngreso) {
-            case 1: $tsrxName = 'bodegasMovimientoIngreso'; break;//Ingreso
-            case 2: $tsrxName = 'bodegasMovimientoEgreso';break;//Egreso
-            case 3: $tsrxName = 'bodegasMovimientoTraspaso';break;//Traspaso
-        }
+        $TipoDocs = $this->TipoIngreso($idTipoIngreso);
 
         /************************************/
         // Se crean cadenas
@@ -618,7 +620,7 @@ class bodegasMovimiento extends ControllerBase {
         LEFT JOIN usuarios_listado            ON usuarios_listado.idUsuario            = bodegas_movimientos.idUsuario';
 
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
             $DataQuery .= '
             ,bodegas_movimientos.idFacturacion
             ,facturacion_listado.N_Doc
@@ -651,12 +653,13 @@ class bodegasMovimiento extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
                 'UserData'      => $this->getUserData($f3),
-                'UserAccess'    => $this->getArrLevel($f3, $tsrxName),
+                'UserAccess'    => $this->getArrLevel($f3, $TipoDocs['tsrxName']),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsViews'     => $this->WidgetsViews,
@@ -686,6 +689,12 @@ class bodegasMovimiento extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Usuario creador
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
@@ -712,9 +721,13 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si es un ID numérico, encripta y envía con código 200 (OK)
         $DataID = $this->Codification->encryptDecrypt('encrypt', $Response['data']['data']);
+        // Se verifica
         if (!$this->isValidDecrypted($DataID, 'text')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
         Response::success($DataID['data']);
 
     }
@@ -736,8 +749,8 @@ class bodegasMovimiento extends ControllerBase {
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck_1($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -750,6 +763,9 @@ class bodegasMovimiento extends ControllerBase {
             'where'     => 'idMovimiento',
             'Post'      => $_POST,
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck_1($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -758,7 +774,27 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/
@@ -803,6 +839,7 @@ class bodegasMovimiento extends ControllerBase {
     /******************************************************************************/
     /*******************************************************************/
     // Borrar archivos
+    // es intencionalmente un no-op mientras las cotizaciones no manejen archivos
     /*******************************************************************/
     public function delFiles(){
 
@@ -814,7 +851,7 @@ class bodegasMovimiento extends ControllerBase {
 
         /************************************/
         // Los movimientos no almacenan archivos propios
-        Response::success();
+        Response::success('Los movimientos no almacenan archivos propios');
 
     }
 
@@ -916,7 +953,9 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($lockProd['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
             return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockProd['error'] ?? ''];
         }
 
@@ -948,8 +987,10 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+                // Se reporta el error
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
             }
 
             /*******************************************************/
@@ -972,7 +1013,9 @@ class bodegasMovimiento extends ControllerBase {
                     $chainx_1 .= ',bodegas_productos_stocks.Cantidad_idBodegas_' . $idBodegaEgreso . ' AS Cantidad_2';
                     break;
                 default:
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    // Se reporta el error
                     return ['code' => 400, 'message' => 'Tipo de movimiento inválido'];
 
             }
@@ -1008,8 +1051,10 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($arrStocks['status'] === false){
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+                // Se reporta el error
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrStocks['error'] ?? ''];
             }
 
             /*******************************************************/
@@ -1067,7 +1112,9 @@ class bodegasMovimiento extends ControllerBase {
                         ];
                         $insProdMov = $this->insertarProductoMovimiento($arrTareas, $DBConn);
                         if($insProdMov['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $insProdMov;
                         }
 
@@ -1080,7 +1127,9 @@ class bodegasMovimiento extends ControllerBase {
                         // Actualizar / crear stock
                         $guardarStock = $this->guardarStock( $arrProdStock[$idProducto]['idStocks'], $idProducto, $idBodegaIngreso, $nuevoStock, $DBConn);
                         if($guardarStock['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $guardarStock;
                         }
 
@@ -1105,7 +1154,9 @@ class bodegasMovimiento extends ControllerBase {
                         ];
                         $insProdMov = $this->insertarProductoMovimiento($arrTareas, $DBConn);
                         if($insProdMov['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $insProdMov;
                         }
 
@@ -1116,7 +1167,9 @@ class bodegasMovimiento extends ControllerBase {
                         /************************************/
                         // Validar stock suficiente
                         if ($cantidad > $stockActual) {
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return ['code' => 400, 'message' => 'Stock insuficiente para el producto ' . $arrProdStock[$idProducto]['Nombre'] . ' ('.$stockActual.' Actual)'];
                         }
                         $nuevoStock = $stockActual - $cantidad;
@@ -1125,7 +1178,9 @@ class bodegasMovimiento extends ControllerBase {
                         // Actualizar / crear stock
                         $guardarStock = $this->guardarStock( $arrProdStock[$idProducto]['idStocks'], $idProducto, $idBodegaEgreso, $nuevoStock, $DBConn);
                         if($guardarStock['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $guardarStock;
                         }
 
@@ -1143,7 +1198,9 @@ class bodegasMovimiento extends ControllerBase {
 
                         /* Cantidad_2 corresponde a la bodega de egreso/origen. */
                         if ($cantidad > $stockOrigen) {
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return ['code' => 400, 'message' => 'Stock insuficiente para realizar el traspaso del producto '. $arrProdStock[$idProducto]['Nombre'] . ' ('.$stockOrigen.' Actual)'];
                         }
 
@@ -1158,7 +1215,9 @@ class bodegasMovimiento extends ControllerBase {
                         ];
                         $insProdMov = $this->insertarProductoMovimiento($arrTareas, $DBConn);
                         if($insProdMov['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $insProdMov;
                         }
 
@@ -1173,7 +1232,9 @@ class bodegasMovimiento extends ControllerBase {
                         ];
                         $insProdMov = $this->insertarProductoMovimiento($arrTareas, $DBConn);
                         if($insProdMov['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $insProdMov;
                         }
 
@@ -1187,7 +1248,9 @@ class bodegasMovimiento extends ControllerBase {
                         // Actualizar stock
                         $guardarStockTraspaso = $this->guardarStockTraspaso($arrProdStock[$idProducto]['idStocks'], $idProducto, $idBodegaIngreso, $nuevoStockDestino, $idBodegaEgreso, $nuevoStockOrigen, $DBConn);
                         if($guardarStockTraspaso['code'] != 200){
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return $guardarStockTraspaso;
                         }
 
@@ -1207,7 +1270,18 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Confirmar transacción solo si corresponde
             if($NewDBConn === null){
-                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+                /************************************/
+                // Confirmar transacción
+                $ResponseCommit = $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+
+                /************************************/
+                // Si falla la la ejecucion, se revierte de inmediato
+                if ($ResponseCommit['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    // Se reporta el error
+                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+                }
             }
 
             /************************************/
@@ -1218,8 +1292,10 @@ class bodegasMovimiento extends ControllerBase {
 
             /************************************/
             // Se revierte toda la operación ante cualquier error
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage()];
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage() ?? ''];
 
         }
 
@@ -1247,6 +1323,7 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Se obtiene el ID real del movimiento
             $MovimientoID = $this->Codification->encryptDecrypt('decrypt', $PostData['idMovimiento']);
+            // Se verifica
             if (!$this->isValidDecrypted($MovimientoID, 'id')) {
                 return ['code' => 400, 'message' => 'Registro inválido.'];
             }
@@ -1257,7 +1334,9 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($lockMov['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                // Se reporta el error
                 return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lockMov['error'] ?? ''];
             }
 
@@ -1273,8 +1352,8 @@ class bodegasMovimiento extends ControllerBase {
                     bodegas_movimientos_productos.idProducto,
                     bodegas_movimientos_productos.Number
                 ',
-                'table' => 'bodegas_movimientos',
-                'join' => 'LEFT JOIN bodegas_movimientos_productos ON bodegas_movimientos_productos.idMovimiento = bodegas_movimientos.idMovimiento',
+                'table'  => 'bodegas_movimientos',
+                'join'   => 'LEFT JOIN bodegas_movimientos_productos ON bodegas_movimientos_productos.idMovimiento = bodegas_movimientos.idMovimiento',
                 'where'  => 'bodegas_movimientos.idMovimiento = ?',
                 'params' => [$MovimientoID['data']],
                 'group'  => '',
@@ -1290,8 +1369,10 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($arrProductos['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrProductos['error']];
+                // Se reporta el error
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrProductos['error'] ?? ''];
             }
 
             /************************************/
@@ -1318,19 +1399,17 @@ class bodegasMovimiento extends ControllerBase {
                     switch ((int)$producto['idEstadoIngreso']) {
                         /************************************/
                         // Ingreso
-                        case 1: $columnasStock[] = 'Cantidad_idBodegas_' . $idIngreso . ' AS Cantidad_1'; break;
+                        case 1: $columnasStock[] = 'Cantidad_idBodegas_' . $idIngreso . ' AS Cantidad_ingreso'; break;
                         /************************************/
                         // Egreso
-                        case 2: $columnasStock[] = 'Cantidad_idBodegas_' . $idEgreso . ' AS Cantidad_1'; break;
+                        case 2: $columnasStock[] = 'Cantidad_idBodegas_' . $idEgreso . ' AS Cantidad_egreso'; break;
                         /************************************/
-                        // Traspaso
-                        case 3:
-                            $columnasStock[] = 'Cantidad_idBodegas_' . $idIngreso . ' AS Cantidad_1';
-                            $columnasStock[] = 'Cantidad_idBodegas_' . $idEgreso . ' AS Cantidad_2';
-                            break;
+                        // Se elimina case 3 (traspaso) - el manejo ahora usa case 1 y case 2 individuales
                         /************************************/
                         default:
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return ['code' => 400, 'message' => 'Estado de movimiento no válido: ' . $producto['idEstadoIngreso']];
 
                     }
@@ -1340,8 +1419,12 @@ class bodegasMovimiento extends ControllerBase {
                 * Se eliminan columnas repetidas.
                 * Esto es importante cuando existen varios productos
                 * o movimientos utilizando las mismas bodegas.
+                *
+                * array_unique eliminado: los aliases ahora son únicos por definición
+                * (Cantidad_ingreso vs Cantidad_egreso), por lo que no es necesario
+                * colapsar columnas. Esto evita que se pierda información de qué bodega
+                * corresponde a cada columna en operaciones de traspaso.
                 */
-                $columnasStock = array_unique($columnasStock);
                 $ElementsIDs   = array_values($ElementsIDs);
 
                 /************************************/
@@ -1369,8 +1452,10 @@ class bodegasMovimiento extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($arrStocks['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrStocks['error']];
+                    // Se reporta el error
+                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $arrStocks['error'] ?? ''];
                 }
 
                 /************************************/
@@ -1382,15 +1467,11 @@ class bodegasMovimiento extends ControllerBase {
                     $idProducto = (int)$stock['idProducto'];
 
                     $arrProdStock[$idProducto] = [
-                        'idStocks'   => $stock['idStocks'],
-                        'Cantidad_1' => $stock['Cantidad_1']
+                        'idStocks'         => $stock['idStocks'],
+                        'Cantidad_ingreso' => $stock['Cantidad_ingreso'] ?? null,
+                        'Cantidad_egreso'  => $stock['Cantidad_egreso'] ?? null,
                     ];
-
-                    if (isset($stock['Cantidad_2']) && $stock['Cantidad_2'] !== '') {
-                        $arrProdStock[$idProducto]['Cantidad_2'] = $stock['Cantidad_2'];
-                    }
                 }
-
 
                 /************************************/
                 // Se revierten los efectos del movimiento sobre el stock
@@ -1405,7 +1486,9 @@ class bodegasMovimiento extends ControllerBase {
                     * reconstruir correctamente el movimiento.
                     */
                     if (!isset($arrProdStock[$idProducto]) || empty($arrProdStock[$idProducto]['idStocks'])) {
+                        // Se revierte la transaccion activa (no-op si no hay transaccion)
                         $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                        // Se reporta el error
                         return ['code' => 400, 'message' => 'No existe stock para el producto: ' . $idProducto];
                     }
 
@@ -1424,7 +1507,7 @@ class bodegasMovimiento extends ControllerBase {
                         case 1:
 
                             $campoStock    = 'Cantidad_idBodegas_' . $idIngreso;
-                            $nuevaCantidad = $arrProdStock[$idProducto]['Cantidad_1'] - $cantidad;
+                            $nuevaCantidad = $arrProdStock[$idProducto]['Cantidad_ingreso'] - $cantidad;
 
                             $arrTareas = [
                                 'idStocks'    => $idStocks,
@@ -1434,7 +1517,9 @@ class bodegasMovimiento extends ControllerBase {
                             // Se actualiza el stock actual
                             $actualizarStock = $this->actualizarStock($arrTareas, $campoStock, $DBConn);
                             if($actualizarStock['code'] != 200){
+                                // Se revierte la transaccion activa (no-op si no hay transaccion)
                                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                                // Se reporta el error
                                 return $actualizarStock;
                             }
 
@@ -1442,7 +1527,7 @@ class bodegasMovimiento extends ControllerBase {
                             * Se actualiza el valor en memoria por si el
                             * mismo producto aparece más de una vez.
                             */
-                            $arrProdStock[$idProducto]['Cantidad_1'] = $nuevaCantidad;
+                            $arrProdStock[$idProducto]['Cantidad_egreso'] = $nuevaCantidad;
 
                             break;
 
@@ -1453,7 +1538,7 @@ class bodegasMovimiento extends ControllerBase {
                         case 2:
 
                             $campoStock    = 'Cantidad_idBodegas_' . $idEgreso;
-                            $nuevaCantidad = $arrProdStock[$idProducto]['Cantidad_1'] + $cantidad;
+                            $nuevaCantidad = $arrProdStock[$idProducto]['Cantidad_egreso'] + $cantidad;
 
                             $arrTareas = [
                                 'idStocks'  => $idStocks,
@@ -1463,14 +1548,16 @@ class bodegasMovimiento extends ControllerBase {
                             // Se actualiza el stock actual
                             $actualizarStock = $this->actualizarStock($arrTareas, $campoStock, $DBConn);
                             if($actualizarStock['code'] != 200){
+                                // Se revierte la transaccion activa (no-op si no hay transaccion)
                                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                                // Se reporta el error
                                 return $actualizarStock;
                             }
 
                             /*
                             * Se actualiza el valor en memoria.
                             */
-                            $arrProdStock[$idProducto]['Cantidad_1'] = $nuevaCantidad;
+                            $arrProdStock[$idProducto]['Cantidad_egreso'] = $nuevaCantidad;
 
                             break;
 
@@ -1484,8 +1571,8 @@ class bodegasMovimiento extends ControllerBase {
 
                             $campoIngreso         = 'Cantidad_idBodegas_' . $idIngreso;
                             $campoEgreso          = 'Cantidad_idBodegas_' . $idEgreso;
-                            $nuevaCantidadIngreso = $arrProdStock[$idProducto]['Cantidad_1'] + $cantidad;
-                            $cantidadEgreso       = $arrProdStock[$idProducto]['Cantidad_2'] ?? 0;
+                            $nuevaCantidadIngreso = $arrProdStock[$idProducto]['Cantidad_ingreso'] + $cantidad;
+                            $cantidadEgreso       = $arrProdStock[$idProducto]['Cantidad_egreso'] ?? 0;
                             $nuevaCantidadEgreso  = $cantidadEgreso - $cantidad;
 
                             $arrTareas = [
@@ -1497,21 +1584,25 @@ class bodegasMovimiento extends ControllerBase {
                             // Se actualiza el stock actual
                             $actualizarStock = $this->actualizarStock($arrTareas, $campoIngreso . ',' . $campoEgreso, $DBConn);
                             if($actualizarStock['code'] != 200){
+                                // Se revierte la transaccion activa (no-op si no hay transaccion)
                                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                                // Se reporta el error
                                 return $actualizarStock;
                             }
 
                             /*
                             * Se actualizan los valores en memoria.
                             */
-                            $arrProdStock[$idProducto]['Cantidad_1'] = $nuevaCantidadIngreso;
-                            $arrProdStock[$idProducto]['Cantidad_2'] = $nuevaCantidadEgreso;
+                            $arrProdStock[$idProducto]['Cantidad_ingreso'] = $nuevaCantidadIngreso;
+                            $arrProdStock[$idProducto]['Cantidad_egreso']  = $nuevaCantidadEgreso;
 
                             break;
 
                         /************************************/
                         default:
+                            // Se revierte la transaccion activa (no-op si no hay transaccion)
                             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                            // Se reporta el error
                             return ['code' => 400, 'message' => 'Estado de movimiento no válido: ' . $estado];
 
                     }
@@ -1536,8 +1627,10 @@ class bodegasMovimiento extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $respDelRel['error']];
+                    // Se reporta el error
+                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $respDelRel['error'] ?? ''];
                 }
             }
 
@@ -1558,14 +1651,27 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+                // Se reporta el error
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
             }
 
             /************************************/
             // Confirmar transacción solo si corresponde
             if($NewDBConn === null){
-                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+                /************************************/
+                // Confirmar transacción
+                $ResponseCommit = $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+
+                /************************************/
+                // Si falla la la ejecucion, se revierte de inmediato
+                if ($ResponseCommit['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    // Se reporta el error
+                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+                }
             }
 
             /************************************/
@@ -1576,8 +1682,10 @@ class bodegasMovimiento extends ControllerBase {
 
             /************************************/
             // Se revierte toda la operación ante cualquier error
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage()];
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $e->getMessage() ?? ''];
 
         }
 
@@ -1610,7 +1718,7 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
@@ -1663,7 +1771,7 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
             }
 
             /************************************/
@@ -1702,7 +1810,7 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
@@ -1756,7 +1864,7 @@ class bodegasMovimiento extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
             }
 
             /************************************/
@@ -1796,7 +1904,7 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
@@ -1832,7 +1940,7 @@ class bodegasMovimiento extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion
         if ($Response['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
@@ -1956,6 +2064,23 @@ class bodegasMovimiento extends ControllerBase {
         ];
         // Retorno los datos
         return $DataChecking;
+    }
+
+    /*******************************************************************/
+    // Tipo de documento
+    /*******************************************************************/
+    private function TipoIngreso($idTipoIngreso){
+        // Variable vacia
+        $arrData['tsrxName'] = '';
+        $arrData['TipoMov']  = '';
+        // Se verifica movimiento
+        switch ($idTipoIngreso) {
+            case 1: $arrData['tsrxName'] = 'bodegasMovimientoIngreso';  $arrData['TipoMov'] = 'Ingresos a';    break;//Ingreso
+            case 2: $arrData['tsrxName'] = 'bodegasMovimientoEgreso';   $arrData['TipoMov'] = 'Egresos a';     break;//Egreso
+            case 3: $arrData['tsrxName'] = 'bodegasMovimientoTraspaso'; $arrData['TipoMov'] = 'Traspasos de';  break;//Traspaso
+        }
+        // Retorno datos
+        return $arrData;
     }
 
 }

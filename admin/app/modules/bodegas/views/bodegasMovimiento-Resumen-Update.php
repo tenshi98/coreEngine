@@ -47,7 +47,7 @@
 
         /*****************************************/
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso y Verifico si existe
-        if($data['UserData']["gestionDocumentosUsoBodega"]==2&&isset($data['rowData']['idFacturacion'])&&$data['rowData']['idFacturacion']!=0){
+        if($data['UserData']["gestionDocumentosUsoBodega"] === 2 && isset($data['rowData']['idFacturacion']) && $data['rowData']['idFacturacion'] != 0){
 
             /*****************************************/
             // Se obtiene el ID

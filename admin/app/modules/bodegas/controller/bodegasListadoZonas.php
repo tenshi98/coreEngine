@@ -24,8 +24,8 @@ class bodegasListadoZonas extends ControllerBase {
     private $Codification;
     private $DataDate;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -41,7 +41,7 @@ class bodegasListadoZonas extends ControllerBase {
         $this->Codification   = new FunctionsSecurityCodification();
         $this->DataDate       = new FunctionsDataDate();
         $this->WidgetsCommon  = new UIWidgetsCommon();
-        $this->WidgetsViews  = new UIWidgetsViews();
+        $this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -55,8 +55,15 @@ class bodegasListadoZonas extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (bodega propietaria)
         $BodegasID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($BodegasID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -119,6 +126,7 @@ class bodegasListadoZonas extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true && $arrZonaTipo['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -155,8 +163,15 @@ class bodegasListadoZonas extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ZonaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ZonaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -199,6 +214,7 @@ class bodegasListadoZonas extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -232,8 +248,15 @@ class bodegasListadoZonas extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ZonaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ZonaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -304,6 +327,7 @@ class bodegasListadoZonas extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true && $arrZonaTipo['status'] === true && $arrEstado['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -342,11 +366,14 @@ class bodegasListadoZonas extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
-        /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
         // Se genera la query
@@ -358,6 +385,9 @@ class bodegasListadoZonas extends ControllerBase {
             'table'     => 'bodegas_zonas',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -366,14 +396,31 @@ class bodegasListadoZonas extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
-        // Si es un ID numérico, se envía con código 200 (OK)
-        /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
         Response::success($Response['data']);
 
     }
@@ -384,17 +431,48 @@ class bodegasListadoZonas extends ControllerBase {
     public function Update($f3){
 
         /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-        /************************************/
         // Validación del método HTTP
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::error('Error en el Request Method', 405);
         }
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+
+        /************************************/
+        // Derivar idBodegas desde el servidor, no desde POST
+        // Se obtiene la zona actual para validar su bodega actual
+        $queryCheck = [
+            'data'  => 'idBodegas',
+            'table' => 'bodegas_zonas',
+            'where' => 'idZona',
+            'Post'  => ['idZona' => $_POST['idZona'] ?? null]
+        ];
+        /************************************/
         // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
+        // Preparo los datos
+        $xParamsCheck = ['query' => $queryCheck];
+        // Ejecuto la query
+        $ResponseCheck = $this->Base_GetByID($xParamsCheck);
+
+        /************************************/
+        // Valido
+        if ($ResponseCheck['status'] === false || empty($ResponseCheck['data'])) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Zona no encontrada', 404);
+        }
+
+        /************************************/
+        // Validar que idBodegas provenga del servidor (de la zona actual)
+        // Si el cliente quiere cambiar de bodega, se debe manejar cascade transaccional
+        $CurrentZone = $ResponseCheck['data'];
+        // Usamos la bodega actual de la zona, no la enviada desde el cliente
+        $_POST['idBodegas'] = $CurrentZone['idBodegas'];
 
         /************************************/
         // Se genera la query
@@ -415,11 +493,28 @@ class bodegasListadoZonas extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
+
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -445,6 +540,7 @@ class bodegasListadoZonas extends ControllerBase {
         /************************************/
         // Se descifra y valida el identificador
         $ZonaID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idZona'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($ZonaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -456,8 +552,8 @@ class bodegasListadoZonas extends ControllerBase {
 
         /************************************/
         // Se anulan las referencias de las posiciones en los movimientos
-        $Response = $this->queryExecuteRaw(
-            'UPDATE bodegas_movimientos_productos SET idPosicion = NULL
+        // Consulta
+        $ActionSQL = 'UPDATE bodegas_movimientos_productos SET idPosicion = NULL
               WHERE idPosicion IN (
                     SELECT bodegas_posiciones.idPosicion FROM bodegas_posiciones
                      WHERE bodegas_posiciones.idNivel IN (
@@ -466,11 +562,29 @@ class bodegasListadoZonas extends ControllerBase {
                                   SELECT bodegas_racks.idRack FROM bodegas_racks
                                    WHERE bodegas_racks.idPasillo IN (
                                          SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos
-                                          WHERE bodegas_pasillos.idZona = ?))))',
-            [$idZona]
-        );
+                                          WHERE bodegas_pasillos.idZona = ?))))';
+        // Preparo los datos
+        $xParams = [
+            'query'     => $ActionSQL,
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'singleRow' => false,
+            'params'    => [$idZona],
+        ];
+        // Ejecuto la query
+        $Response = $this->Base_queryExecute($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -478,33 +592,38 @@ class bodegasListadoZonas extends ControllerBase {
         // Cada sentencia filtra sobre la tabla padre, por lo que ninguna se
         // referencia a si misma dentro de su propia subconsulta.
         $arrDel = [
-            'DELETE FROM bodegas_posiciones WHERE idNivel IN (
-                 SELECT bodegas_niveles.idNivel FROM bodegas_niveles
-                  WHERE bodegas_niveles.idRack IN (
-                        SELECT bodegas_racks.idRack FROM bodegas_racks
-                         WHERE bodegas_racks.idPasillo IN (
-                               SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos
-                                WHERE bodegas_pasillos.idZona = ?)))',
-            'DELETE FROM bodegas_niveles WHERE idRack IN (
-                 SELECT bodegas_racks.idRack FROM bodegas_racks
-                  WHERE bodegas_racks.idPasillo IN (
-                        SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos
-                         WHERE bodegas_pasillos.idZona = ?))',
-            'DELETE FROM bodegas_racks WHERE idPasillo IN (
-                 SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos
-                  WHERE bodegas_pasillos.idZona = ?)',
+            'DELETE FROM bodegas_posiciones WHERE idNivel IN (SELECT bodegas_niveles.idNivel FROM bodegas_niveles WHERE bodegas_niveles.idRack IN (SELECT bodegas_racks.idRack FROM bodegas_racks WHERE bodegas_racks.idPasillo IN (SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos WHERE bodegas_pasillos.idZona = ?)))',
+            'DELETE FROM bodegas_niveles WHERE idRack IN (SELECT bodegas_racks.idRack FROM bodegas_racks WHERE bodegas_racks.idPasillo IN (SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos WHERE bodegas_pasillos.idZona = ?))',
+            'DELETE FROM bodegas_racks WHERE idPasillo IN (SELECT bodegas_pasillos.idPasillo FROM bodegas_pasillos WHERE bodegas_pasillos.idZona = ?)',
             'DELETE FROM bodegas_pasillos WHERE idZona = ?',
         ];
         // Recorro los datos
         foreach ($arrDel as $sentencia) {
             /************************************/
-            // Se genera la query
-            $Response = $this->queryExecuteRaw($sentencia, [$idZona]);
+            // Preparo los datos
+            $xParams = [
+                'query'     => $sentencia,
+                'newBDConn' => $this->getDBConn(),
+                'showQuery' => false,
+                'singleRow' => false,
+                'params'    => [$idZona],
+            ];
+            // Ejecuto la query
+            $Response = $this->Base_queryExecute($xParams);
+
             /************************************/
-            // Si falla la la ejecucion, se revierte de inmediato
+            // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                $this->failOperation($Response);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se diferencian los errores de validación de los de base de datos
+                if (is_array($Response['error'] ?? null)) {
+                    Response::error('Datos inválidos', 400, $Response['error']);
+                }
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
+
         }
 
         /************************************/
@@ -524,12 +643,28 @@ class bodegasListadoZonas extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -540,21 +675,6 @@ class bodegasListadoZonas extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /*******************************************************************/
-    // Ejecuta SQL crudo con parametros bindeados (cascada de borrado)
-    /*******************************************************************/
-    private function queryExecuteRaw(string $sql, array $params = []){
-
-        /************************************
-         * ControllerBase::$queryBuilder es privado y Base_queryExecute no admite
-         * parametros bindeados, por lo que se instancia un QueryBuilder propio
-         * sobre la misma conexion: asi participa de la transaccion activa.
-         */
-        $QueryBuilder = new QueryBuilder();
-        /************************************/
-        // Ejecuto la query
-        return $QueryBuilder->queryExecute($sql, $this->getDBConn(), false, false, $params);
-    }
 
     /*******************************************************************/
     // Se validan los datos

@@ -7,14 +7,13 @@
 $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idBodegas']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
-
     <div class="card">
 
         <?php
         // Datos
         $Title          = 'Resumen Bodega';
         $SubTitle       = 'Resumen de la Bodega '.($data['rowData']['Nombre'] ?? '');
-        $Text           = 'Información general y datos asociados a la bodega';
+        $Text           = 'Información general y datos asociados a la Bodega';
         $IMG            = $BASE.'/img/img-backgrounds/Bodegas_1.jpg';
         $Title_color    = 25;
         $SubTitle_color = 17;

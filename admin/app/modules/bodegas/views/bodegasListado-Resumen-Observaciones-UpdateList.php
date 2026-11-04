@@ -22,7 +22,8 @@
                 $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idObservaciones']); ?>
                 <tr>
                     <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
-                    <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?>
+                    <td>
+                        <?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?>
                         <?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $data['Fnc_DataDate']->fechaEstandar(substr($crud['FechaEdicion'], 0, 10)); ?></small><?php } ?>
                     </td>
                     <td>
