@@ -68,7 +68,7 @@ $RandName = 'rand_'.rand(1, 999999);
                     <div id="div_Bodegas">
                         <?php
                         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-                        if($data['UserData']["gestionDocumentosUsoBodega"]==2){
+                        if($data['UserData']["gestionDocumentosUsoBodega"] === 2){
                             // Se verifica movimiento
                             switch ($data['idTipo']) {
                                 /************************************/

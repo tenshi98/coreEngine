@@ -53,15 +53,22 @@ class gestionDocumentosProductos extends ControllerBase {
     public function New($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($FacturacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -85,7 +92,7 @@ class gestionDocumentosProductos extends ControllerBase {
         $arrUserData = $this->getUserData($f3);
 
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["usuariosPermisosBodegas"]==2 && $arrUserData['UserType'] != 1){
+        if($arrUserData["usuariosPermisosBodegas"] === 2 && $arrUserData['UserType'] != 1){
             $X_join  = 'INNER JOIN bodegas_listado_permisos_usuarios ON bodegas_listado_permisos_usuarios.idBodegas = bodegas_listado.idBodegas';
             $X_where  = 'bodegas_listado.idEstado = ? AND bodegas_listado_permisos_usuarios.idUsuario = ?';
             $X_params = [1, $arrUserData['UserID']];
@@ -135,7 +142,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrBodegas['status'] && $arrProductos['status']){
+        if($rowData['status'] === true && $arrBodegas['status'] === true && $arrProductos['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -171,15 +178,22 @@ class gestionDocumentosProductos extends ControllerBase {
     public function UpdateList($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($FacturacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -231,7 +245,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrProductos['status']){
+        if($rowData['status'] === true && $arrProductos['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -267,15 +281,22 @@ class gestionDocumentosProductos extends ControllerBase {
     public function GetID($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -312,6 +333,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -346,6 +368,12 @@ class gestionDocumentosProductos extends ControllerBase {
     // Insertar
     /*******************************************************************/
     public function Insert($f3){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
         /************************************/
         // Se le entregan los datos
@@ -463,13 +491,16 @@ class gestionDocumentosProductos extends ControllerBase {
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
             // Se reporta el error
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
         // Se actualizan los datos de la factura
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(2, $PostData['idFacturacion'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
         if($ResponseGestionDoc['code'] != 200){
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
@@ -480,7 +511,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         //Movimiento de bodegas
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
 
             /************************************/
             // Datos del movimiento
@@ -536,7 +567,16 @@ class gestionDocumentosProductos extends ControllerBase {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+        }
 
         /************************************/
         // Retorno los datos
@@ -584,13 +624,16 @@ class gestionDocumentosProductos extends ControllerBase {
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
             // Se reporta el error
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
         // Se actualizan los datos de la factura
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(2, $PostData['idFacturacion'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
         if($ResponseGestionDoc['code'] != 200){
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
@@ -601,7 +644,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         //Movimiento de bodegas
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
 
             /************************************/
             // Datos del movimiento
@@ -662,7 +705,16 @@ class gestionDocumentosProductos extends ControllerBase {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+        }
 
         /************************************/
         // Retorno los datos
@@ -682,6 +734,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         // Se obtiene el ID
         $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $PostData['idExistencia']);
+        // Se verifica
         if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
             return ['code' => 400, 'message' => 'Registro inválido'];
         }
@@ -712,8 +765,12 @@ class gestionDocumentosProductos extends ControllerBase {
         if ($rowFacturacion['status'] === false) {
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowFacturacion['error'] ?? null)) {
+                return ['code' => 400, 'message' => 'Datos inválidos', 'error' => $rowFacturacion['error'] ?? ''];
+            }
             // Se reporta el error
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowFacturacion['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowFacturacion['error'] ?? ''];
         }
 
         /************************************/
@@ -736,13 +793,16 @@ class gestionDocumentosProductos extends ControllerBase {
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
             // Se reporta el error
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
         // Se actualizan los datos de la factura
         $gestionDocumentos  = new gestionDocumentos();
         $ResponseGestionDoc = $gestionDocumentos->updateFact(2, $rowFacturacion['data']['idFacturacion'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
         if($ResponseGestionDoc['code'] != 200){
             // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback();
@@ -753,7 +813,7 @@ class gestionDocumentosProductos extends ControllerBase {
         /************************************/
         //Movimiento de bodegas
         //permite la interaccion con la bodega, para generar documentos de ingreso o egreso
-        if($arrUserData["gestionDocumentosUsoBodega"]==2){
+        if($arrUserData["gestionDocumentosUsoBodega"] === 2){
 
             /************************************/
             // Datos del movimiento
@@ -784,6 +844,7 @@ class gestionDocumentosProductos extends ControllerBase {
             /************************************/
             // Productos
             $ExistenciaID = $this->Codification->encryptDecrypt('encrypt', $rowMovimiento['data']['idExistencia']);
+            // Se verifica
             if (!$this->isValidDecrypted($ExistenciaID, 'text')) {
                 // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback();
@@ -810,7 +871,16 @@ class gestionDocumentosProductos extends ControllerBase {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+        }
 
         /************************************/
         // Retorno los datos

@@ -52,15 +52,22 @@ class gestionDocumentosGuias extends ControllerBase {
     public function New($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($FacturacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -101,7 +108,7 @@ class gestionDocumentosGuias extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrGuias['status']){
+        if($rowData['status'] === true && $arrGuias['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -136,15 +143,22 @@ class gestionDocumentosGuias extends ControllerBase {
     public function UpdateList($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($FacturacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -193,7 +207,7 @@ class gestionDocumentosGuias extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrGuias['status']){
+        if($rowData['status'] === true && $arrGuias['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -233,6 +247,12 @@ class gestionDocumentosGuias extends ControllerBase {
     public function Insert(){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -257,7 +277,14 @@ class gestionDocumentosGuias extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -273,7 +300,16 @@ class gestionDocumentosGuias extends ControllerBase {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -299,6 +335,7 @@ class gestionDocumentosGuias extends ControllerBase {
         /************************************/
         // Se obtiene el ID
         $ExistenciaID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idExistencia']);
+        // Se verifica
         if (!$this->isValidDecrypted($ExistenciaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -327,7 +364,14 @@ class gestionDocumentosGuias extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
-            $this->failOperation($rowFacturacion);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowFacturacion['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowFacturacion['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error'] ?? '');
         }
 
         /************************************/
@@ -347,7 +391,14 @@ class gestionDocumentosGuias extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -363,7 +414,16 @@ class gestionDocumentosGuias extends ControllerBase {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)

@@ -57,15 +57,22 @@ class gestionDocumentosPagos extends ControllerBase {
     public function New($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($FacturacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -106,7 +113,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrDocumentoPago['status']){
+        if($rowData['status'] === true && $arrDocumentoPago['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -142,15 +149,22 @@ class gestionDocumentosPagos extends ControllerBase {
     public function UpdateList($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $FacturacionID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($FacturacionID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -199,7 +213,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrPagos['status']){
+        if($rowData['status'] === true && $arrPagos['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -236,15 +250,22 @@ class gestionDocumentosPagos extends ControllerBase {
     public function GetID($f3, $params, $idTipo){
 
         /************************************/
-        // Se verifica movimiento
-        $tsrxName = $this->tsrxName($idTipo);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $PagoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PagoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se verifica movimiento
+        $tsrxName = $this->tsrxName($idTipo);
 
         /************************************/
         // Se genera la query
@@ -292,7 +313,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrDocumentoPago['status']){
+        if($rowData['status'] === true && $arrDocumentoPago['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -329,6 +350,12 @@ class gestionDocumentosPagos extends ControllerBase {
     // Insertar
     /*******************************************************************/
     public function Insert($f3){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
         /************************************/
         // Usuario creador
@@ -393,7 +420,14 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowData['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowData['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
 
         /************************************/
@@ -435,7 +469,14 @@ class gestionDocumentosPagos extends ControllerBase {
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                $this->failOperation($Response);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se diferencian los errores de validación de los de base de datos
+                if (is_array($Response['error'] ?? null)) {
+                    Response::error('Datos inválidos', 400, $Response['error']);
+                }
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
 
             /************************************/
@@ -453,7 +494,16 @@ class gestionDocumentosPagos extends ControllerBase {
 
             /************************************/
             // Confirmar transacción
-            $this->Base_transactionCommit();
+            $ResponseCommit = $this->Base_transactionCommit();
+
+            /************************************/
+            // Si falla la la ejecucion, se revierte de inmediato
+            if ($ResponseCommit['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+            }
 
             /************************************/
             // Devuelvo $Response con código 200 (OK)
@@ -481,6 +531,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Se obtiene el ID
         $PagoID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idPago']);
+        // Se verifica
         if (!$this->isValidDecrypted($PagoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -509,7 +560,14 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowFacturacion['status'] === false) {
-            $this->failOperation($rowFacturacion);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowFacturacion['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowFacturacion['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowFacturacion['error'] ?? '');
         }
 
         /************************************/
@@ -529,7 +587,14 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -547,7 +612,16 @@ class gestionDocumentosPagos extends ControllerBase {
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -572,7 +646,7 @@ class gestionDocumentosPagos extends ControllerBase {
         // pago del mismo documento. El llamador gestiona la transacción.
         $lock = $this->lockRowsForUpdate('facturacion_listado', 'idFacturacion', [(int)$FacturacionID], $DBConn);
         if ($lock['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error'] ?? ''];
         }
 
         /************************************/
@@ -598,7 +672,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowData['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error'] ?? ''];
         }
 
         /************************************/
@@ -636,7 +710,7 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
         }
 
         /************************************/
@@ -665,10 +739,10 @@ class gestionDocumentosPagos extends ControllerBase {
         // del mismo documento ante pagos concurrentes.
         $lock = $this->lockRowsForUpdate('facturacion_listado', 'idFacturacion', [(int)$Data['idFacturacion']], $DBConn);
         if ($lock['status'] === false) {
-            if($NewDBConn === null){
-                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            }
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error']];
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $lock['error'] ?? ''];
         }
 
         /************************************/
@@ -694,67 +768,88 @@ class gestionDocumentosPagos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($rowData['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error']];
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowData['error'] ?? ''];
         }
 
         /************************************/
         // Se verifica que el monto sea numerico antes de compararlo
         if(isset($Data['MontoPagado'])&&!is_numeric($Data['MontoPagado'])){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
             return ['code' => 500, 'message' => 'El monto ingresado no es un número válido'];
         }
 
         /************************************/
         //Se verifica si el monto es superior al valor del documento
         if(isset($rowData['data']['ValorTotal'], $Data['MontoPagado'])&&$rowData['data']['ValorTotal']<($rowData['data']['MontoPagado']+$Data['MontoPagado'])){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
             $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
             return ['code' => 500, 'message' => 'Ha ingresado un monto superior al valor total del documento'];
-        }else{
-            /************************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
-                'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'facturacion_listado_pagos',
-                'Post'      => $Data
-            ];
-            /************************************/
-            // Se genera el chequeo
-            $dataCheck_1 = $this->dataCheck_1($Data);
-            // Preparo los datos
-            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query, 'newBDConn' => $DBConn];
-            // Ejecuto la query
-            $Response = $this->Base_insert($xParams);
-
-            /************************************/
-            // Si falla la ejecucion, se revierte de inmediato
-            if ($Response['status'] === false) {
-                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error']];
-            }
-
-            /************************************/
-            // Se actualiza el estado de la factura
-            $ResponsePago = $this->updatePago($Data['idFacturacion'], $DBConn);
-            if($ResponsePago['code'] != 200){
-                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                return $ResponsePago;
-            }
-
-            /************************************/
-            // Confirmar transacción solo si corresponde
-            if($NewDBConn === null){
-                $this->Base_transactionCommit(['newBDConn' => $DBConn]);
-            }
-
-            /************************************/
-            // Si es un ID numérico, se envía con código 200 (OK)
-            return ['code' => 200, 'data' => $Response];
-
         }
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idFacturacion,idUsuario,idDocumentoPago,N_Doc,MontoPagado,FechaPago',
+            'required'  => 'idFacturacion,idUsuario,idDocumentoPago,MontoPagado,FechaPago',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'facturacion_listado_pagos',
+            'Post'      => $Data
+        ];
+        /************************************/
+        // Se genera el chequeo
+        $dataCheck_1 = $this->dataCheck_1($Data);
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query, 'newBDConn' => $DBConn];
+        // Ejecuto la query
+        $Response = $this->Base_insert($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
+            return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
+        }
+
+        /************************************/
+        // Se actualiza el estado de la factura
+        $ResponsePago = $this->updatePago($Data['idFacturacion'], $DBConn);
+        if($ResponsePago['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+            // Se reporta el error
+            return $ResponsePago;
+        }
+
+        /************************************/
+        // Confirmar transacción solo si corresponde
+        if($NewDBConn === null){
+            /************************************/
+            // Confirmar transacción
+            $ResponseCommit = $this->Base_transactionCommit(['newBDConn' => $DBConn]);
+
+            /************************************/
+            // Si falla la la ejecucion, se revierte de inmediato
+            if ($ResponseCommit['status'] === false) {
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                // Se reporta el error
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $ResponseCommit['error'] ?? ''];
+            }
+        }
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        return ['code' => 200, 'data' => $Response];
+
     }
 
     /******************************************************************************/
