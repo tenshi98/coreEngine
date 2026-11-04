@@ -7,8 +7,21 @@
 $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idUsuario']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="300" data-aos-offset="200" data-aos-duration="500">
-
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Usuarios';
+        $SubTitle       = 'Resumen del Usuario '.($data['rowData']['Nombre'] ?? '');
+        $Text           = 'Información general y datos asociados al Usuario';
+        $IMG            = $BASE.'/img/img-backgrounds/Usuarios_1.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -17,8 +30,8 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos"><i class="bi bi-exclamation-diamond"></i> Permisos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs" onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
-                <?php if($data['UserData']["usuariosPermisosBodegas"]==2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos-bodegas"><i class="bi bi-file-text"></i> Permisos Bodegas</button></li><?php } ?>
-                <?php if($data['UserData']["usuariosPermisosMaquinas"]==2){ ?>  <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos-maquinas"><i class="bi bi-file-text"></i> Permisos Maquinas</button></li><?php } ?>
+                <?php if($data['UserData']["usuariosPermisosBodegas"] === 2){ ?>   <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos-bodegas"><i class="bi bi-file-text"></i> Permisos Bodegas</button></li><?php } ?>
+                <?php if($data['UserData']["usuariosPermisosMaquinas"] === 2){ ?>  <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-permisos-maquinas"><i class="bi bi-file-text"></i> Permisos Maquinas</button></li><?php } ?>
             </ul>
             <div class="tab-content pt-2">
 
@@ -137,7 +150,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </div>
                 </div>
 
-                <?php if($data['UserData']["usuariosPermisosBodegas"]==2){ ?>
+                <?php if($data['UserData']["usuariosPermisosBodegas"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-permisos-bodegas">
                         <h4 class="title_h4 box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -151,7 +164,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </div>
                 <?php } ?>
 
-                <?php if($data['UserData']["usuariosPermisosMaquinas"]==2){ ?>
+                <?php if($data['UserData']["usuariosPermisosMaquinas"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-permisos-maquinas">
                         <h4 class="title_h4 box-title text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">

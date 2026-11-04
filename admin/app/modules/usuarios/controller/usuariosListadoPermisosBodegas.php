@@ -46,11 +46,11 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
             'data'    => '
                 idBodegas,
                 idBodegas AS ID,
-                (SELECT COUNT(idPermisoUsuario) FROM bodegas_listado_permisos_usuarios WHERE idBodegas = ID AND idUsuario = '.$_POST['idUsuario'].' LIMIT 1) AS cuentaPerms',
+                (SELECT COUNT(idPermisoUsuario) FROM bodegas_listado_permisos_usuarios WHERE idBodegas = ID AND idUsuario = ? LIMIT 1) AS cuentaPerms',
             'table'   => 'bodegas_listado',
             'join'    => '',
             'where'   => 'idEstado = ?',
-            'params'  => [1],
+            'params'  => [$_POST['idUsuario'], 1],
             'group'   => '',
             'having'  => '',
             'order'   => 'idBodegas ASC',
@@ -93,9 +93,15 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
                                 $BodegasID  = $this->Codification->encryptDecrypt('encrypt',$permisos['idBodegas']);
                                 // Se verifica
                                 if (!$this->isValidDecrypted($UsuarioID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 if (!$this->isValidDecrypted($BodegasID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 // Se borran los datos
@@ -118,7 +124,10 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
                                 $respDel = $this->Base_delete($xParams);
                                 // Si falla la ejecucion, se revierte de inmediato
                                 if ($respDel['status'] === false) {
-                                    $this->failOperation($respDel);
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
+                                    Response::error('Error al operar con la Base de Datos', 500, $respDel['error'] ?? '');
                                 }
                                 break;
                         }
@@ -148,9 +157,6 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
             // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
             if ($rowsPermisosNuevos){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idUsuario,idBodegas,fechaCreacion',
@@ -158,20 +164,36 @@ class usuariosListadoPermisosBodegas extends ControllerBase {
                     'table'     => 'bodegas_listado_permisos_usuarios',
                     'rows'      => $rowsPermisosNuevos
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck('');
                 // Preparo los datos
                 $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
                 $respIns = $this->Base_insertMultiple($xParams);
+                /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respIns['status'] === false) {
-                    $this->failOperation($respIns);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respIns['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo true con código 200 (OK)

@@ -13,8 +13,8 @@ class usuariosListadoObs extends ControllerBase {
     private $ServerServer;
     private $DataDate;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -30,7 +30,7 @@ class usuariosListadoObs extends ControllerBase {
 		$this->ServerServer   = new FunctionsServerServer();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -44,8 +44,15 @@ class usuariosListadoObs extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $UsuarioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($UsuarioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -72,6 +79,7 @@ class usuariosListadoObs extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -105,8 +113,15 @@ class usuariosListadoObs extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $UsuarioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($UsuarioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -118,14 +133,18 @@ class usuariosListadoObs extends ControllerBase {
                 usuarios_listado_observaciones.idObservaciones,
                 usuarios_listado_observaciones.Observacion,
                 usuarios_listado_observaciones.FechaCreacion,
-                usuarios_listado.Nombre AS Usuario',
+                usuarios_listado_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
             'table'   => 'usuarios_listado_observaciones',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = usuarios_listado_observaciones.idUsuarioCreador',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = usuarios_listado_observaciones.idUsuarioCreador
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = usuarios_listado_observaciones.idUsuarioEdicion',
             'where'   => 'usuarios_listado_observaciones.idUsuario = ?',
             'params'  => [$UsuarioID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'usuarios_listado_observaciones.idUsuario ASC',
+            'order'   => 'usuarios_listado_observaciones.idObservaciones ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
         // Preparo los datos
@@ -171,8 +190,15 @@ class usuariosListadoObs extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ObservacionesID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ObservacionesID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -183,9 +209,13 @@ class usuariosListadoObs extends ControllerBase {
             'data'    => '
                 usuarios_listado_observaciones.Observacion,
                 usuarios_listado_observaciones.FechaCreacion,
-                usuarios_listado.Nombre AS Usuario',
+                usuarios_listado_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
             'table'   => 'usuarios_listado_observaciones',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = usuarios_listado_observaciones.idUsuarioCreador',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = usuarios_listado_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = usuarios_listado_observaciones.idUsuarioEdicion',
             'where'   => 'usuarios_listado_observaciones.idObservaciones = ?',
             'params'  => [$ObservacionesID['data']],
             'group'   => '',
@@ -202,6 +232,7 @@ class usuariosListadoObs extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -235,8 +266,15 @@ class usuariosListadoObs extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ObservacionesID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ObservacionesID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -263,6 +301,7 @@ class usuariosListadoObs extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -300,12 +339,14 @@ class usuariosListadoObs extends ControllerBase {
     public function Insert($f3){
 
         /************************************/
-        // Usuario creador
-        $_POST['idUsuarioCreador'] = $f3->get('SESSION.DataInfo.UserID');
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Usuario creador
+        $_POST['idUsuarioCreador'] = $f3->get('SESSION.DataInfo.UserID');
 
         /************************************/
         // Se inicia la transacción
@@ -321,6 +362,9 @@ class usuariosListadoObs extends ControllerBase {
             'table'     => 'usuarios_listado_observaciones',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -329,12 +373,28 @@ class usuariosListadoObs extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -355,12 +415,9 @@ class usuariosListadoObs extends ControllerBase {
         }
 
         /************************************/
-        // Usuario creador
-        $_POST['idUsuarioCreador'] = $f3->get('SESSION.DataInfo.UserID');
-
-        /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Usuario y fecha de la edicion (se conservan el autor y la fecha de creacion)
+        $_POST['idUsuarioEdicion'] = $f3->get('SESSION.DataInfo.UserID');
+        $_POST['FechaEdicion']     = date('Y-m-d H:i:s');
 
         /************************************/
         // Se inicia la transacción
@@ -369,14 +426,17 @@ class usuariosListadoObs extends ControllerBase {
         /************************************/
         // Se genera la query
         $query = [
-            'data'      => 'idObservaciones,idUsuarioCreador,idUsuario,Observacion,FechaCreacion',
-            'required'  => 'idObservaciones,idUsuarioCreador,idUsuario,Observacion,FechaCreacion',
+            'data'      => 'idObservaciones,Observacion,idUsuarioEdicion,FechaEdicion',
+            'required'  => 'idObservaciones,Observacion,idUsuarioEdicion,FechaEdicion',
             'unique'    => '',
             'encode'    => '',
             'table'     => 'usuarios_listado_observaciones',
             'where'     => 'idObservaciones',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -385,12 +445,28 @@ class usuariosListadoObs extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -434,12 +510,28 @@ class usuariosListadoObs extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)

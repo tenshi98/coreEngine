@@ -46,11 +46,11 @@ class usuariosListadoPermisos extends ControllerBase {
             'data'    => '
                 idPermisos,
                 idPermisos AS ID,
-                (SELECT idLevelLimit FROM usuarios_listado_permisos WHERE idPermisos = ID AND idUsuario = '.$_POST['idUsuario'].' LIMIT 1) AS level',
+                (SELECT idLevelLimit FROM usuarios_listado_permisos WHERE idPermisos = ID AND idUsuario = ? LIMIT 1) AS level',
             'table'   => 'core_permisos_listado',
             'join'    => '',
             'where'   => 'idEstado = ?',
-            'params'  => [1],
+            'params'  => [$_POST['idUsuario'], 1],
             'group'   => '',
             'having'  => '',
             'order'   => 'idPermisos ASC',
@@ -93,9 +93,15 @@ class usuariosListadoPermisos extends ControllerBase {
                                 $PermisosID = $this->Codification->encryptDecrypt('encrypt',$permisos['idPermisos']);
                                 // Se verifica
                                 if (!$this->isValidDecrypted($UsuarioID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 if (!$this->isValidDecrypted($PermisosID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 // Se borran los datos
@@ -118,7 +124,10 @@ class usuariosListadoPermisos extends ControllerBase {
                                 $respDel = $this->Base_delete($xParams);
                                 // Si falla la ejecucion, se revierte de inmediato
                                 if ($respDel['status'] === false) {
-                                    $this->failOperation($respDel);
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
+                                    Response::error('Error al operar con la Base de Datos', 500, $respDel['error'] ?? '');
                                 }
                                 break;
                         }
@@ -171,7 +180,10 @@ class usuariosListadoPermisos extends ControllerBase {
                                 $respUpd = $this->Base_update($xParams);
                                 // Si falla la ejecucion, se revierte de inmediato
                                 if ($respUpd['status'] === false) {
-                                    $this->failOperation($respUpd);
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
+                                    Response::error('Error al operar con la Base de Datos', 500, $respUpd['error'] ?? '');
                                 }
                                 break;
                         }
@@ -183,9 +195,6 @@ class usuariosListadoPermisos extends ControllerBase {
             // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
             if ($rowsPermisosNuevos){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idUsuario,idPermisos,idLevelLimit,fechaCreacion',
@@ -193,20 +202,36 @@ class usuariosListadoPermisos extends ControllerBase {
                     'table'     => 'usuarios_listado_permisos',
                     'rows'      => $rowsPermisosNuevos
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck('');
                 // Preparo los datos
                 $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
                 $respIns = $this->Base_insertMultiple($xParams);
+                /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respIns['status'] === false) {
-                    $this->failOperation($respIns);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respIns['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo true con código 200 (OK)

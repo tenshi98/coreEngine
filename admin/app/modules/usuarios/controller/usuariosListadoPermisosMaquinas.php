@@ -46,11 +46,11 @@ class usuariosListadoPermisosMaquinas extends ControllerBase {
             'data'    => '
                 idMaquina,
                 idMaquina AS ID,
-                (SELECT COUNT(idPermisoUsuario) FROM maquinas_listado_permisos_usuarios WHERE idMaquina = ID AND idUsuario = '.$_POST['idUsuario'].' LIMIT 1) AS cuentaPerms',
+                (SELECT COUNT(idPermisoUsuario) FROM maquinas_listado_permisos_usuarios WHERE idMaquina = ID AND idUsuario = ? LIMIT 1) AS cuentaPerms',
             'table'   => 'maquinas_listado',
             'join'    => '',
             'where'   => 'idEstado = ?',
-            'params'  => [1],
+            'params'  => [$_POST['idUsuario'], 1],
             'group'   => '',
             'having'  => '',
             'order'   => 'idMaquina ASC',
@@ -93,9 +93,15 @@ class usuariosListadoPermisosMaquinas extends ControllerBase {
                                 $MaquinaID  = $this->Codification->encryptDecrypt('encrypt',$permisos['idMaquina']);
                                 // Se verifica
                                 if (!$this->isValidDecrypted($UsuarioID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 if (!$this->isValidDecrypted($MaquinaID, 'text')) {
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
                                     Response::error('Registro inválido', 400);
                                 }
                                 // Se borran los datos
@@ -118,7 +124,10 @@ class usuariosListadoPermisosMaquinas extends ControllerBase {
                                 $respDel = $this->Base_delete($xParams);
                                 // Si falla la ejecucion, se revierte de inmediato
                                 if ($respDel['status'] === false) {
-                                    $this->failOperation($respDel);
+                                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                                    $this->Base_transactionRollback();
+                                    // Se reporta el error
+                                    Response::error('Error al operar con la Base de Datos', 500, $respDel['error'] ?? '');
                                 }
                                 break;
                         }
@@ -148,9 +157,6 @@ class usuariosListadoPermisosMaquinas extends ControllerBase {
             // Si hay recursos nuevos marcados, se insertan todos en una sola sentencia
             if ($rowsPermisosNuevos){
                 /************************************/
-                // Se genera el chequeo
-                $DataCheck = $this->dataCheck('');
-                /************************************/
                 // Se genera la query
                 $query = [
                     'data'      => 'idUsuario,idMaquina,fechaCreacion',
@@ -158,20 +164,36 @@ class usuariosListadoPermisosMaquinas extends ControllerBase {
                     'table'     => 'maquinas_listado_permisos_usuarios',
                     'rows'      => $rowsPermisosNuevos
                 ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck('');
                 // Preparo los datos
                 $xParams = ['DataCheck' => $DataCheck, 'query' => $query];
                 // Ejecuto la query
                 $respIns = $this->Base_insertMultiple($xParams);
+                /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respIns['status'] === false) {
-                    $this->failOperation($respIns);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respIns['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo true con código 200 (OK)
