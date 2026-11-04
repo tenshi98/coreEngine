@@ -59,6 +59,10 @@ class entidadesInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -83,6 +87,10 @@ class entidadesInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -104,11 +112,19 @@ class entidadesInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*                 SE GENERAN LAS RUTAS                */
@@ -133,19 +149,38 @@ class entidadesInstaller extends ControllerInstaller {
             'RutaWeb'        => 'administracion/entidades/listado',  // Ruta web de la transaccion
             'RutaController' => 'entidadesListado',                  // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -187,6 +222,9 @@ class entidadesInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
@@ -202,7 +240,7 @@ class entidadesInstaller extends ControllerInstaller {
             2 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/listAll',                       'RutaController' => 'entidadesListado->listAll',                  'Descripcion' => 'Listar Toda la Información',                    'idLevelLimit' => 1, 'Controller' => 'entidadesListado'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/listado/search',                        'RutaController' => 'entidadesListado->UpdateList',               'Descripcion' => 'Filtrar datos',                                 'idLevelLimit' => 1, 'Controller' => 'entidadesListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/updateList',                    'RutaController' => 'entidadesListado->UpdateList',               'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'entidadesListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/updateList',                    'RutaController' => 'entidadesListado->UpdateList',               'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 1, 'Controller' => 'entidadesListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/exportar',                      'RutaController' => 'entidadesListado->export',                   'Descripcion' => 'Listar Todas las entidades para exportarlas',   'idLevelLimit' => 3, 'Controller' => 'entidadesListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/view/@id',                      'RutaController' => 'entidadesListado->View',                     'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'entidadesListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/resumen/@id',                   'RutaController' => 'entidadesListado->Resumen',                  'Descripcion' => 'Mostrar Resúmen',                               'idLevelLimit' => 2, 'Controller' => 'entidadesListado'],
@@ -234,7 +272,7 @@ class entidadesInstaller extends ControllerInstaller {
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/entidades/listado/contactos',                     'RutaController' => 'entidadesListadoContactos->Delete',          'Descripcion' => 'Borrar dato y archivos',                        'idLevelLimit' => 2, 'Controller' => 'entidadesListadoContactos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/documentos/new/@id',            'RutaController' => 'entidadesListadoDocumentos->New',            'Descripcion' => 'Mostrar modal nuevo',                           'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/documentos/updateList/@id',     'RutaController' => 'entidadesListadoDocumentos->UpdateList',     'Descripcion' => 'Actualizar Lista',                              'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/documentos/view/@id',           'RutaController' => 'entidadesListadoDocumentos->View',           'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/documentos/view/@id',           'RutaController' => 'entidadesListadoDocumentos->View',           'Descripcion' => 'Mostrar Detallado',                             'idLevelLimit' => 1, 'Controller' => 'entidadesListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/entidades/listado/documentos/getID/@id',          'RutaController' => 'entidadesListadoDocumentos->GetID',          'Descripcion' => 'Información para el formulario edición',        'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/listado/documentos',                    'RutaController' => 'entidadesListadoDocumentos->Insert',         'Descripcion' => 'Crear Información',                             'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/entidades/listado/documentos/update',             'RutaController' => 'entidadesListadoDocumentos->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)',  'idLevelLimit' => 2, 'Controller' => 'entidadesListadoDocumentos'],
@@ -251,12 +289,12 @@ class entidadesInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
-        $RutaController  = '"entidadesSectores"';
-        $RutaController .= ',"entidadesListado"';
-        $RutaController .= ',"entidadesListadoObservaciones"';
-        $RutaController .= ',"entidadesListadoCargas"';
-        $RutaController .= ',"entidadesListadoContactos"';
-        $RutaController .= ',"entidadesListadoDocumentos"';
+        $RutaController  = 'entidadesSectores';
+        $RutaController .= ',entidadesListado';
+        $RutaController .= ',entidadesListadoObservaciones';
+        $RutaController .= ',entidadesListadoCargas';
+        $RutaController .= ',entidadesListadoContactos';
+        $RutaController .= ',entidadesListadoDocumentos';
 
         /************************************/
         // Retorno los datos

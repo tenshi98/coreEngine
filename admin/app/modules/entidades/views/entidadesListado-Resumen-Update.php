@@ -60,8 +60,9 @@
         $Theme_color = 'summary-theme-color-2';
         //selecciona
         switch ($data['rowData']['idTipoEntidad']) {
-            //Persona Natural
-            case 1:
+            /***********************/
+            case 1: // Persona Natural
+            case 3: // Trabajador
                 $arrData_1 = [
                     ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tag',              'Icon_color' => 10,'Title' => 'Tipo',             'Text' => $data['rowData']['Tipo']],
                     ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',         'Icon_color' => 10,'Title' => 'Tipo Entidad',     'Text' => $data['rowData']['TipoEntidad']],
@@ -71,8 +72,8 @@
                     ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-gender-ambiguous', 'Icon_color' => 10,'Title' => 'Sexo',             'Text' => $data['rowData']['Sexo']],
                 ];
                 break;
-            //Empresas
-            case 2:
+            /***********************/
+            case 2: // Empresas
                 $arrData_1 = [
                     ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-tag',       'Icon_color' => 10,'Title' => 'Tipo',         'Text' => $data['rowData']['Tipo']],
                     ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-building',  'Icon_color' => 10,'Title' => 'Tipo Entidad', 'Text' => $data['rowData']['TipoEntidad']],

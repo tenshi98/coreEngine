@@ -101,8 +101,9 @@
         if (Search_idTipoEntidad != "") {
             //selecciono
             switch (Search_idTipoEntidad) {
-                //Persona Natural
-                case '1':
+                /***********************/
+                case '1': // Persona Natural
+                case '3': // Trabajador
                     document.getElementById('div_Search_Nombre').style.display       = '';
                     document.getElementById('div_Search_ApellidoPat').style.display  = '';
                     document.getElementById('div_Search_ApellidoMat').style.display  = '';
@@ -111,8 +112,8 @@
                     document.getElementById('div_Search_FNacimiento').style.display  = '';
                     document.getElementById('div_Search_RazonSocial').style.display  = 'none';
                     break;
-                //Empresas
-                case '2':
+                /***********************/
+                case '2': //Empresas
                     document.getElementById('div_Search_Nombre').style.display       = 'none';
                     document.getElementById('div_Search_ApellidoPat').style.display  = 'none';
                     document.getElementById('div_Search_ApellidoMat').style.display  = 'none';

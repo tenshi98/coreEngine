@@ -125,16 +125,8 @@
         if (idTipo != "") {
             //selecciono
             switch (idTipo) {
-                // Trabajadores
-                case '3':
-                    seleccionarOpcionYBloquear('idTipoEntidad', 1, 0);
-                    break;
-
-
-                //el resto
-                default:
-                    reestablecerSelect('idTipoEntidad');
-                    break;
+                case '3': seleccionarOpcionYBloquear('idTipoEntidad', 1, 0); break; // Trabajadores
+                default: reestablecerSelect('idTipoEntidad'); break;                // El resto
             }
         //si el select esta vacio
         }else{
@@ -150,8 +142,9 @@
         if (idTipoEntidad != "") {
             //selecciono
             switch (idTipoEntidad) {
-                //Persona Natural
-                case '1':
+                /***********************/
+                case '1': // Persona Natural
+                case '3': // Trabajador
                     document.getElementById("Nombre").required                = true;
                     document.getElementById("ApellidoPat").required           = true;
                     document.getElementById("RazonSocial").required           = false;
@@ -162,8 +155,8 @@
                     document.getElementById('div_FNacimiento').style.display  = '';
                     document.getElementById('div_RazonSocial').style.display  = 'none';
                     break;
-                //Empresas
-                case '2':
+                /***********************/
+                case '2': //Empresas
                     document.getElementById("Nombre").required                = false;
                     document.getElementById("ApellidoPat").required           = false;
                     document.getElementById("RazonSocial").required           = true;
@@ -174,6 +167,7 @@
                     document.getElementById('div_FNacimiento').style.display  = 'none';
                     document.getElementById('div_RazonSocial').style.display  = '';
                     break;
+                /***********************/
                 //el resto
                 default:
                     document.getElementById("Nombre").required                = false;

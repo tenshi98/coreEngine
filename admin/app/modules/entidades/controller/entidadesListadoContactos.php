@@ -27,7 +27,7 @@ class entidadesListadoContactos extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
 		$this->DataNumbers    = new FunctionsDataNumbers();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
@@ -42,8 +42,15 @@ class entidadesListadoContactos extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($EntidadID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -106,7 +113,7 @@ class entidadesListadoContactos extends ControllerBase {
         $tipo = 2;
         if ($rowData['status'] === true) {
             //filtro para los trabajadores
-            $tipo = ($rowData['data']['idTipo'] == 3) ? 1 : 2;
+            $tipo = ($rowData['data']['idTipo'] === 3) ? 1 : 2;
         }
         // Se genera la query
         $query = [
@@ -129,7 +136,7 @@ class entidadesListadoContactos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTipoContacto['status']){
+        if($rowData['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrTipoContacto['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -165,8 +172,15 @@ class entidadesListadoContactos extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $EntidadID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($EntidadID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -235,8 +249,15 @@ class entidadesListadoContactos extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ContactoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ContactoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -282,6 +303,7 @@ class entidadesListadoContactos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -315,8 +337,15 @@ class entidadesListadoContactos extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ContactoID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ContactoID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -395,7 +424,7 @@ class entidadesListadoContactos extends ControllerBase {
         $tipo = 2;
         if ($rowData['status'] === true) {
             //filtro para los trabajadores
-            $tipo = ($rowData['data']['idTipo'] == 3) ? 1 : 2;
+            $tipo = ($rowData['data']['idTipo'] === 3) ? 1 : 2;
         }
         // Se genera la query
         $query = [
@@ -436,7 +465,7 @@ class entidadesListadoContactos extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrTipoContacto['status'] && $arrEstado['status']){
+        if($rowData['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrTipoContacto['status'] === true && $arrEstado['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -476,8 +505,10 @@ class entidadesListadoContactos extends ControllerBase {
     public function Insert(){
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
 
         /************************************/
         // Se inicia la transacción
@@ -493,6 +524,9 @@ class entidadesListadoContactos extends ControllerBase {
             'table'     => 'entidades_listado_contactos',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -501,12 +535,28 @@ class entidadesListadoContactos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -527,10 +577,6 @@ class entidadesListadoContactos extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -545,6 +591,9 @@ class entidadesListadoContactos extends ControllerBase {
             'where'     => 'idContacto',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -553,12 +602,28 @@ class entidadesListadoContactos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -602,12 +667,28 @@ class entidadesListadoContactos extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
