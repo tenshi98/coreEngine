@@ -102,8 +102,8 @@ class UserRepository {
 
         // Se agrega respuesta
         $arrData = [
-            'idUsuario' => $UsuarioID,
-            'password'  => $NewPasswords,
+            'idUsuario'            => $UsuarioID,
+            'password'             => $NewPasswords,
             'PasswordForzarCambio' => 0,
             'PasswordUltimoCambio' => date('Y-m-d H:i:s'),
         ];
@@ -351,7 +351,7 @@ class UserRepository {
             'table'  => 'core_sistemas',
             'join'   => '',
             'where'  => 'idSistema = ?',
-            'params'  => [1],
+            'params' => [1],
             'group'  => '',
             'having' => '',
             'order'  => ''
@@ -452,7 +452,7 @@ class UserRepository {
             'table'  => 'core_sistemas',
             'join'   => '',
             'where'  => 'idSistema = ?',
-            'params'  => [1],
+            'params' => [1],
             'group'  => '',
             'having' => '',
             'order'  => ''

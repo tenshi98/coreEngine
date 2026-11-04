@@ -835,9 +835,9 @@ class AuthenticationService {
             return ['code' => 500, 'message' => 'No se ha podido generar el enlace de recuperación'];
         }
         // Token en claro solo viaja en el correo; en BD va su hash sha256
-        $TokenClear     = $Token['data'];
-        $TokenHash      = hash('sha256', $TokenClear);
-        $FechaCreacion  = date('Y-m-d H:i:s');
+        $TokenClear      = $Token['data'];
+        $TokenHash       = hash('sha256', $TokenClear);
+        $FechaCreacion   = date('Y-m-d H:i:s');
         $FechaExpiracion = date('Y-m-d H:i:s', time() + (self::RESET_EXPIRY_MINUTES * 60));
 
         /************************************/

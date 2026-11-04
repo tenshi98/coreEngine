@@ -58,7 +58,7 @@ class UserSessionDataService {
             'table'  => 'usuarios_accesos',
             'join'   => '',
             'where'  => 'token = ? AND expiration_date > NOW() AND idEstado = ? AND idTipoAcceso = ?',
-            'params'  => [$cookieToken, 1, 1],
+            'params' => [$cookieToken, 1, 1],
             'group'  => '',
             'having' => '',
             'order'  => 'token DESC'
