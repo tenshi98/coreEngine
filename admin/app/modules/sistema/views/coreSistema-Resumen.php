@@ -5,8 +5,21 @@
 
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
-
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Plataforma';
+        $SubTitle       = 'Resumen de la Plataforma '.($data['rowData']['Sistema_Nombre'] ?? '');
+        $Text           = 'Información general y datos asociados a la Plataforma';
+        $IMG            = $BASE.'/img/img-backgrounds/Campanas_5.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
@@ -39,7 +52,7 @@
                                 $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder'  => 'Dirección', 'Name'  => 'Sistema_Direccion', 'Value'  => ($data['rowData']['Sistema_Direccion'] ?? ''), 'Required'  => 1,'Icon' => 'bi bi-geo-alt-fill']);
 
                                 //Se condiciona el uso de Whatsapp
-                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                if($data['UserData']["sistemaUsoWhatsapp"] === 2){
                                     $data['Fnc_FormInputs']->formPostData(4, 4, 'bi bi-exclamation-circle', 0, 'El numero debe ingresarse iniciando con 56, sin el simbolo + y sin espacios ni separaciones');
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 4,  'Placeholder'  => 'Fono Noti Whatsapp',  'Name' => 'Sistema_NotiWhatsapp',  'Value' => ($data['rowData']['Sistema_NotiWhatsapp'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-telephone-fill']);
                                 }
@@ -130,12 +143,12 @@
                                     case 1:$data['Fnc_FormInputs']->formInput(['FormType' => 1, 'Placeholder' => 'API GoogleMaps', 'Name' => 'Config_API_GoogleMaps', 'Value' => ($data['rowData']['Config_API_GoogleMaps'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']); break;
                                 }
                                 //Se condiciona el uso de Whatsapp
-                                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                                if($data['UserData']["sistemaUsoWhatsapp"] === 2){
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Token',       'Name' => 'Config_WhatsappToken',       'Value' => ($data['rowData']['Config_WhatsappToken'] ?? ''),      'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Whatsapp Instance Id', 'Name' => 'Config_WhatsappInstanceId',  'Value' => ($data['rowData']['Config_WhatsappInstanceId'] ?? ''), 'Required' => 1, 'Icon' => 'bi bi-puzzle']);
                                 }
                                 //Se condiciona el uso de IA
-                                if($data['UserData']["Config_IA_Uso"]==2){
+                                if($data['UserData']["Config_IA_Uso"] === 2){
                                     $data['Fnc_FormInputs']->formTittle(['Tipo' => 4,'Texto' => 'Uso de IA', 'Clase' => 'box-title text-color-red-dark']);
                                     $data['Fnc_FormInputs']->formSelectFilter([           'Placeholder' => 'Provider',     'Name' => 'Config_IA_Provider',   'Value' => ($data['rowData']['Config_IA_Provider'] ?? ''), 'Required' => 1, 'arrData'  => $data['arrIAProvider'], 'BASE' => $BASE]);
                                     $data['Fnc_FormInputs']->formInput(['FormType' => 1,  'Placeholder' => 'API Key',      'Name' => 'Config_IA_ApiKey',     'Value' => ($data['rowData']['Config_IA_ApiKey'] ?? ''),   'Required' => 1, 'Icon' => 'bi bi-puzzle']);

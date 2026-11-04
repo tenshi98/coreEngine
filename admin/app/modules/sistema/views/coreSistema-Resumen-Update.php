@@ -59,15 +59,15 @@
         /**************************************/
         $Theme_color = 'summary-theme-color-2';
         $arrData_1   = [];
-        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text', 'Icon_color' => 10,'Title' => 'Nombre',     'Text' => $data['rowData']['Sistema_Nombre']];
-        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope', 'Icon_color' => 10,'Title' => 'Email',      'Text' => $data['rowData']['Sistema_Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Sistema_Email']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-card-text',    'Icon_color' => 10,'Title' => 'Nombre',     'Text' => $data['rowData']['Sistema_Nombre']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-envelope',     'Icon_color' => 10,'Title' => 'Email',      'Text' => $data['rowData']['Sistema_Email'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Sistema_Email']];
         $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-person-vcard', 'Icon_color' => 10,'Title' => 'Rut',        'Text' => $data['rowData']['Sistema_Rut']];
-        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt', 'Icon_color' => 10,'Title' => 'Ciudad',     'Text' => $data['rowData']['Ciudad']];
-        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt', 'Icon_color' => 10,'Title' => 'Comuna',     'Text' => $data['rowData']['Comuna']];
-        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-fill', 'Icon_color' => 10,'Title' => 'Direccion',  'Text' => $data['rowData']['Sistema_Direccion']];
-        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-palette', 'Icon_color' => 10,'Title' => 'Tema',       'Text' => $data['rowData']['Tema']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',      'Icon_color' => 10,'Title' => 'Ciudad',     'Text' => $data['rowData']['Ciudad']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-alt',      'Icon_color' => 10,'Title' => 'Comuna',     'Text' => $data['rowData']['Comuna']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-geo-fill',     'Icon_color' => 10,'Title' => 'Direccion',  'Text' => $data['rowData']['Sistema_Direccion']];
+        $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-palette',      'Icon_color' => 10,'Title' => 'Tema',       'Text' => $data['rowData']['Tema']];
         //Se condiciona el uso de Whatsapp
-        if($data['UserData']["sistemaUsoWhatsapp"]==2){
+        if($data['UserData']["sistemaUsoWhatsapp"] === 2){
             $arrData_1[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-phone', 'Icon_color' => 10,'Title' => 'Fono Noti Whatsapp',  'Text' => $data['rowData']['Sistema_NotiWhatsapp'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Sistema_NotiWhatsapp']];
         }
         /**************************************/
@@ -93,7 +93,7 @@
             case 1:$arrData_4[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key', 'Icon_color' => 10, 'Title' => 'Config API GoogleMaps', 'Text' => $data['rowData']['Config_API_GoogleMaps']];break;
         }
         //Se condiciona el uso de Whatsapp
-        if($data['UserData']["sistemaUsoWhatsapp"]==2){
+        if($data['UserData']["sistemaUsoWhatsapp"] === 2){
             $arrData_4[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key',  'Icon_color' => 10,'Title' => 'Config Whatsapp Token',        'Text' => $data['rowData']['Config_WhatsappToken']];
             $arrData_4[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-gear', 'Icon_color' => 10,'Title' => 'Config Whatsapp Instance Id',  'Text' => $data['rowData']['Config_WhatsappInstanceId']];
         }
@@ -111,7 +111,7 @@
         /**************************************/
         $arrData_5   = [];
         //Se condiciona el uso de IA
-        if($data['UserData']["Config_IA_Uso"]==2){
+        if($data['UserData']["Config_IA_Uso"] === 2){
             $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-robot',          'Icon_color' => 10,'Title' => 'Provider',             'Text' => $data['rowData']['IAProvider']];
             $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-key',            'Icon_color' => 10,'Title' => 'API Key',              'Text' => $data['rowData']['Config_IA_ApiKey']];
             $arrData_5[] = ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-cpu',            'Icon_color' => 10,'Title' => 'API Model',            'Text' => $data['rowData']['Config_IA_Model']];

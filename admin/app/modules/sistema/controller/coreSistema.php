@@ -27,7 +27,7 @@ class coreSistema extends ControllerBase {
         $this->controllerName = 'coreSistema';
 		$this->FormInputs     = new UIFormInputs();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->Codification   = new FunctionsSecurityCodification();
@@ -105,7 +105,7 @@ class coreSistema extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrIAProvider['status']){
+        if($rowData['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrIAProvider['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -159,6 +159,7 @@ class coreSistema extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -169,7 +170,7 @@ class coreSistema extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 'Fnc_WidgetsMaps'      => new UIWidgetsMaps(),
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
@@ -218,6 +219,7 @@ class coreSistema extends ControllerBase {
             /************************************/
             // Widgets descubiertos combinados con el orden guardado (los nuevos quedan al final)
             $merged = WidgetsOrderService::merge(WidgetsOrderService::discover(), $rowData['data']['Config_Principal_Widgets'] ?? null);
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -231,7 +233,7 @@ class coreSistema extends ControllerBase {
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'arrWidgets'       => $merged['items'],
                 'isConfigured'     => $merged['configured'],
@@ -348,8 +350,8 @@ class coreSistema extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         //Si hay datos
@@ -409,7 +411,7 @@ class coreSistema extends ControllerBase {
             //Se hace la busqueda de lat y long por su direccion
             $result = $fncLocation->geocodeAddress($Ubicacion);
             // Si hay resultados se guarda
-            if ($result) {
+            if (is_array($result) && isset($result['lat'], $result['lon'])) {
                 //Se guarda el ultimo dato
                 $_POST['Latitud']  = $result['lat'];
                 $_POST['Longitud'] = $result['lon'];
@@ -438,25 +440,39 @@ class coreSistema extends ControllerBase {
                 ],
             ]
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -480,6 +496,10 @@ class coreSistema extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataPut);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => 'Sistema_IMGLogo',
@@ -490,23 +510,34 @@ class coreSistema extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['query' => $query];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
         // Ejecuto la query
         $Response = $this->Base_delFiles($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -526,6 +557,10 @@ class coreSistema extends ControllerBase {
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::error('Error en el Request Method', 405);
         }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Restablecer orden por defecto: '[]' (el query builder ignora valores vacios)
@@ -589,23 +624,34 @@ class coreSistema extends ControllerBase {
         ];
         // Preparo los datos
         $xParams  = ['DataCheck' => [], 'query' => $query, 'novalidate' => true];
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
         // Ejecuto la query
         $Response = $this->Base_update($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
