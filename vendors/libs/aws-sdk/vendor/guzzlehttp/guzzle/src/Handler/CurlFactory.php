@@ -527,7 +527,7 @@ class CurlFactory implements CurlFactoryInterface
         // Retry no more than 3 times before giving up.
         if (!isset($easy->options['_curl_retries'])) {
             $easy->options['_curl_retries'] = 1;
-        } elseif ($easy->options['_curl_retries'] == 2) {
+        } elseif ($easy->options['_curl_retries'] === 2) {
             $ctx['error'] = 'The cURL request was retried 3 times '
                 . 'and did not succeed. The most likely reason for the failure '
                 . 'is that cURL was unable to rewind the body of the request '
