@@ -62,7 +62,7 @@ class ConfigAPP{
          * Numero maximo de registros sin paginar
          * Por defecto 1000 antes de paginar
          **********************************************************************/
-        'N_MaxItems'              => 2000,
+        'N_MaxItems'              => 2500,
 
         /***********************************************************************
          * Seguridad
