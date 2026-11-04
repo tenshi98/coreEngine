@@ -12,8 +12,8 @@ class serviciosListado extends ControllerBase {
     private $Codification;
     private $DataDate;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -28,7 +28,7 @@ class serviciosListado extends ControllerBase {
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -106,7 +106,7 @@ class serviciosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrEstado['status'] && $arrCategoria['status']){
+        if($arrList['status'] === true && $arrEstado['status'] === true && $arrCategoria['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -233,15 +233,22 @@ class serviciosListado extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
-        // Se instancia
-        $arrUserData = $this->getUserData($f3);
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
 
         /************************************/
         // Se obtiene el ID
         $ServicioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ServicioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se instancia
+        $arrUserData = $this->getUserData($f3);
 
         /************************************/
         // Se genera la query
@@ -275,7 +282,7 @@ class serviciosListado extends ControllerBase {
 
         /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["serviciosListadoVerDocumentos"]==2){
+        if($arrUserData["serviciosListadoVerDocumentos"] === 2){
             /************************************/
             // Se genera la query
             $query = [
@@ -305,9 +312,13 @@ class serviciosListado extends ControllerBase {
             'data'    => '
                 servicios_listado_observaciones.Observacion,
                 servicios_listado_observaciones.FechaCreacion,
-                usuarios_listado.Nombre AS Usuario',
+                servicios_listado_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
             'table'   => 'servicios_listado_observaciones',
-            'join'    => 'LEFT JOIN usuarios_listado ON usuarios_listado.idUsuario = servicios_listado_observaciones.idUsuario',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = servicios_listado_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = servicios_listado_observaciones.idUsuarioEdicion',
             'where'   => 'servicios_listado_observaciones.idServicio = ?',
             'params'  => [$ServicioID['data']],
             'group'   => '',
@@ -324,7 +335,7 @@ class serviciosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrDocumentos['status'] && $arrObservaciones['status']){
+        if($rowData['status'] === true && $arrDocumentos['status'] === true && $arrObservaciones['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -361,8 +372,15 @@ class serviciosListado extends ControllerBase {
     public function Resumen($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ServicioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ServicioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -439,7 +457,7 @@ class serviciosListado extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrEstado['status'] && $arrCategoria['status']){
+        if($rowData['status'] === true && $arrEstado['status'] === true && $arrCategoria['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -482,8 +500,15 @@ class serviciosListado extends ControllerBase {
     public function ResumenUpdate($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ServicioID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ServicioID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -523,6 +548,7 @@ class serviciosListado extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -532,7 +558,7 @@ class serviciosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
             ];
@@ -559,8 +585,14 @@ class serviciosListado extends ControllerBase {
     public function Insert(){
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -572,6 +604,9 @@ class serviciosListado extends ControllerBase {
             'table'     => 'servicios_listado',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -580,15 +615,39 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/
         // Si es un ID numérico, encripta y envía con código 200 (OK)
         $DataID = $this->Codification->encryptDecrypt('encrypt', $Response['data']);
+        // Se verifica
         if (!$this->isValidDecrypted($DataID, 'text')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Devuelvo $Response con código 200 (OK)
         Response::success($DataID['data']);
 
     }
@@ -606,8 +665,8 @@ class serviciosListado extends ControllerBase {
         }
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -631,6 +690,9 @@ class serviciosListado extends ControllerBase {
                 ],
             ]
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -639,7 +701,27 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/
@@ -684,7 +766,14 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -708,14 +797,30 @@ class serviciosListado extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->failOperation($respDelRel);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respDelRel['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respDelRel['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -739,6 +844,10 @@ class serviciosListado extends ControllerBase {
         parse_str(file_get_contents("php://input"),$dataPut);
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'files'       => 'Direccion_img',
@@ -755,7 +864,27 @@ class serviciosListado extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
         }
 
         /************************************/

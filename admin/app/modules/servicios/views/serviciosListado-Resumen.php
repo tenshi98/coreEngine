@@ -7,15 +7,28 @@
 $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idServicio']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
-
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Servicios';
+        $SubTitle       = 'Resumen del Servicio '.($data['rowData']['Nombre'] ?? '');
+        $Text           = 'Información general y datos asociados al Servicio';
+        $IMG            = $BASE.'/img/img-backgrounds/Servicios_2.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
                 <li class="nav-item flex-fill"><button class="nav-link w-100 active" data-bs-toggle="tab" data-bs-target="#resumen"><i class="bi bi-card-list"></i> Resumen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
-                <?php if($data['UserData']["serviciosListadoVerDocumentos"]==2){ ?>
+                <?php if($data['UserData']["serviciosListadoVerDocumentos"] === 2){ ?>
                     <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-documentos" onclick="tabDocumentosLoadList()"><i class="bi bi-file-text"></i> Documentos</button></li>
                 <?php } ?>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs" onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
@@ -98,7 +111,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     <?php } ?>
                 </div>
 
-                <?php if($data['UserData']["serviciosListadoVerDocumentos"]==2){ ?>
+                <?php if($data['UserData']["serviciosListadoVerDocumentos"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -212,7 +225,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         });
     }
 
-    <?php if($data['UserData']["serviciosListadoVerDocumentos"]==2){ ?>
+    <?php if($data['UserData']["serviciosListadoVerDocumentos"] === 2){ ?>
         /*********************************************************************/
         /*                            DOCUMENTOS                             */
         /*********************************************************************/
