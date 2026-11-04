@@ -38,7 +38,7 @@ if(isset($data['UserData']['UserType'])&&$data['UserData']['UserType']==1){ ?>
                     case 3: echo '<li><a href="'.$BASE.'/Core/testeos/send_SendingBlue"> <i class="ri-mail-open-line  text-color-green-dark"></i> Envío Correo SendingBlue</a></li>';break;
                 }
                 //Se condiciona el uso de Whatsapp
-                if($data['UserData']["sistemaUsoWhatsapp"]==2){
+                if($data['UserData']["sistemaUsoWhatsapp"] === 2){
                     echo '<li><a href="'.$BASE.'/Core/testeos/send_Whatsapp">       <i class="bi bi-whatsapp     text-color-green-dark"></i> Envío Mensaje Whatsapp</a></li>';
                 } ?>
                 <li class="divider"></li>
