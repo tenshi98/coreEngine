@@ -203,7 +203,18 @@ class main extends ControllerBase {
                 // Se reporta el error
                 error_log('[coreEngine][principal] No se pudo guardar el orden de widgets: ' . ($saved['error'] ?? ''));
             } else {
-                $this->Base_transactionCommit();
+                /************************************/
+                // Confirmar transacción
+                $ResponseCommit = $this->Base_transactionCommit();
+
+                /************************************/
+                // Si falla la la ejecucion, se revierte de inmediato
+                if ($ResponseCommit['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+                }
             }
         }
 

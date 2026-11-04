@@ -12,8 +12,8 @@ class miUsuario extends ControllerBase {
     private $DataDate;
     private $DataNumbers;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -28,7 +28,7 @@ class miUsuario extends ControllerBase {
 		$this->DataDate       = new FunctionsDataDate();
 		$this->DataNumbers    = new FunctionsDataNumbers();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -241,7 +241,7 @@ class miUsuario extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrCiudad['status'] && $arrComuna['status'] && $arrPosicion['status']){
+        if($rowData['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrPosicion['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -270,7 +270,6 @@ class miUsuario extends ControllerBase {
             /************************************/
             // Se instancia la vista
             $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/miUsuario-data.php');
-
         /************************************/
         // Si no hay resultados
         } else {
@@ -279,7 +278,6 @@ class miUsuario extends ControllerBase {
             // Despliegue de errores
             $this->showError(1, $f3, $result);
         }
-
     }
 
     /*******************************************************************/
@@ -394,6 +392,7 @@ class miUsuario extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -433,11 +432,22 @@ class miUsuario extends ControllerBase {
         }
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Usuario creador
         $_POST['idUsuario'] = $f3->get('SESSION.DataInfo.UserID');
 
         //Verifico si esta haciendo un cambio de contraseña
         if(isset($_POST['oldPassword'], $_POST['rePassword'])&&$_POST['oldPassword']!=''&&$_POST['rePassword']!=''){
+
+            /************************************/
+            // Se verifica que la nueva password y la repeticion sean iguales
+            if($_POST['password']!=$_POST['rePassword']){
+                Response::error('Las contraseñas no coinciden', 500);
+            }
+
             /************************************/
             // Se genera la query
             $query = [
@@ -470,21 +480,13 @@ class miUsuario extends ControllerBase {
             if($checkPassword!=true){
                 Response::error('Error al ingresar las contraseñas', 500);
             }
-            /************************************/
-            // Se verifica que la nueva password y la repeticion sean iguales
-            if($_POST['password']!=$_POST['rePassword']){
-                Response::error('Las contraseñas no coinciden', 500);
-            }
+
             /************************************/
             // Cambio de contraseña valido: se levanta el cambio forzado y se registra la fecha
             $_POST['PasswordForzarCambio'] = 0;
             $_POST['PasswordUltimoCambio'] = date('Y-m-d H:i:s');
 
         }
-
-        /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
 
         /************************************/
         // Se genera la query
@@ -508,31 +510,43 @@ class miUsuario extends ControllerBase {
                 ],
             ]
         ];
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams        = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
         $ResponseSesion = $this->Base_update($xParams);
+
         /************************************/
-        // Se asume que $Response contendrá un array de errores/datos, un true o algún otro valor.
-        if ($ResponseSesion['status'] === true) {
-            /************************************/
-            // Se cargan las clases
-            $authenticationService = new AuthenticationService();
-            $sessionService        = new SessionService();
-            $Client                = new FunctionsServerClient();
-            //Se actualiza la sesion del usuario
-            $authenticationService->updateSession($f3, $_POST['idUsuario'], $sessionService, $Client);
-            // Se confirma la transacción
-            $this->Base_transactionCommit();
-            // Devuelvo $Response con código 200 (OK)
-            Response::success($ResponseSesion['data']);
-        } else {
-            // Si falla la ejecucion, se revierte de inmediato
-            $this->failOperation($ResponseSesion);
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($ResponseSesion['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseSesion['error'] ?? '');
         }
+
+        /************************************/
+        // Se cargan las clases
+        $authenticationService = new AuthenticationService();
+        $sessionService        = new SessionService();
+        $Client                = new FunctionsServerClient();
+        //Se actualiza la sesion del usuario
+        $authenticationService->updateSession($f3, $_POST['idUsuario'], $sessionService, $Client);
+        // Se confirma la transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
+        // Devuelvo $Response con código 200 (OK)
+        Response::success($ResponseSesion['data']);
 
     }
 
@@ -571,12 +585,28 @@ class miUsuario extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Se cargan las clases
