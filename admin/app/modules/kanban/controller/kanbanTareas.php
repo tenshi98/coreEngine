@@ -122,7 +122,7 @@ class kanbanTareas extends ControllerBase {
 
         /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["KanbanTareasAdminTabIndepend"]==2){
+        if($arrUserData["KanbanTareasAdminTabIndepend"] === 2){
             $arrColores['status']   = true;
             $arrColores['data']     = [];
             $arrCierre['status']    = true;
@@ -204,7 +204,7 @@ class kanbanTareas extends ControllerBase {
 
         /************************************/
         // Se verifica si se tiene el permiso para visualizar el dato
-        if($arrUserData["KanbanTareasUsoTareas"]==2){
+        if($arrUserData["KanbanTareasUsoTareas"] === 2){
             /************************************/
             // Se genera la query
             $query = [
@@ -232,7 +232,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrTareas['status'] && $arrColores['status'] && $arrPrioridad['status'] && $arrCierre['status'] && $arrEstadoCierre['status'] && $arrUsuarios['status'] && $arrTrabajos['status']){
+        if($arrList['status'] === true && $arrTareas['status'] === true && $arrColores['status'] === true && $arrPrioridad['status'] === true && $arrCierre['status'] === true && $arrEstadoCierre['status'] === true && $arrUsuarios['status'] === true && $arrTrabajos['status'] === true){
 
             /************************************/
             //Se agrupan los menus
@@ -383,7 +383,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrList['status'] && $arrTareas['status'] && $arrPrioridad['status'] && $arrEstadoCierre['status']){
+        if($arrList['status'] === true && $arrTareas['status'] === true && $arrPrioridad['status'] === true && $arrEstadoCierre['status'] === true){
 
             //Se agrupan los menus
             $arrTareasNew = $this->CommonData->agruparPorClave ($arrTareas['data'], 'ID' );
@@ -525,8 +525,15 @@ class kanbanTareas extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -637,7 +644,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status'] && $arrHistorial['status']){
+        if($rowData['status'] === true && $arrTareas['status'] === true && $arrParticipantes['status'] === true && $arrHistorial['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -675,8 +682,15 @@ class kanbanTareas extends ControllerBase {
     public function Print($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -764,7 +778,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
+        if($rowData['status'] === true && $arrTareas['status'] === true && $arrParticipantes['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -801,8 +815,15 @@ class kanbanTareas extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -849,7 +870,7 @@ class kanbanTareas extends ControllerBase {
                 'table'   => 'core_estados_cierre',
                 'join'    => '',
                 'where'   => '',
-            'params'  => [],
+                'params'  => [],
                 'group'   => '',
                 'having'  => '',
                 'order'   => 'idEstadoCierre ASC',
@@ -887,7 +908,7 @@ class kanbanTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrPrioridad['status'] && $arrEstadoCierre['status']){
+        if($rowData['status'] === true && $arrPrioridad['status'] === true && $arrEstadoCierre['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -945,161 +966,185 @@ class kanbanTareas extends ControllerBase {
         // Generacion de errores
         if($ndata_2==0) {
             Response::error('No hay Participantes en la tarea', 400);
-        }else{
-
-            /************************************/
-            // Se inicia la transacción
-            $this->Base_transactionBegin();
-
-            /************************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
-                'required'  => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'kanban_tareas',
-                'Post'      => $_POST
-            ];
-            /************************************/
-            // Se genera el chequeo
-            $dataCheck_1 = $this->dataCheck_1($_POST);
-            // Preparo los datos
-            $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
-            // Ejecuto la query
-            $Response = $this->Base_insert($xParams);
-
-            /************************************/
-            // Si falla la ejecucion, se revierte de inmediato
-            if ($Response['status'] === false) {
-                $this->failOperation($Response);
-            }
-
-            /************************************/
-            // Recorro las tareas ingresadas
-            if(isset($ndata_1)&&$ndata_1!=0){
-                // Se acumulan las filas a insertar para evitar un INSERT por cada tarea (N+1)
-                $rowsTareas = [];
-                // Recorro los datos
-                for($j1 = 0; $j1 < $ndata_1; $j1++){
-                    /************************************/
-                    // Se agrega respuesta
-                    $rowsTareas[] = [
-                        'idKanban'         => $Response['data'],                //idKanban
-                        'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
-                        'idEstadoTrabajo'  => 1,                                //Estado abierto
-                        'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
-                    ];
-                }
-
-                /************************************/
-                // Si hay datos marcados, se insertan todos en una sola sentencia
-                if ($rowsTareas){
-                    /************************************/
-                    // Se genera el chequeo
-                    $DataCheck = $this->dataCheck_2('');
-                    /************************************/
-                    // Se genera la query
-                    $query = [
-                        'data'      => 'idKanban,Tarea,idEstadoTrabajo,idTrabajo',
-                        'required'  => 'idKanban,Tarea,idEstadoTrabajo',
-                        'table'     => 'kanban_tareas_tareas',
-                        'rows'      => $rowsTareas
-                    ];
-                    // Preparo los datos
-                    $xParams    = ['DataCheck' => $DataCheck, 'query' => $query];
-                    // Ejecuto la query
-                    $respTareas = $this->Base_insertMultiple($xParams);
-                    /************************************/
-                    // Si falla la ejecucion, se revierte de inmediato
-                    if ($respTareas['status'] === false) {
-                        $this->failOperation($respTareas);
-                    }
-                }
-            }
-            /************************************/
-            // Recorro las tareas ingresadas
-            if(isset($ndata_2)&&$ndata_2!=0){
-                // Se acumulan las filas a insertar para evitar un INSERT por cada participante (N+1)
-                $rowsParticipantes = [];
-                // Recorro los datos
-                for($j2 = 0; $j2 < $ndata_2; $j2++){
-                    /************************************/
-                    // Se agrega respuesta
-                    $rowsParticipantes[] = [
-                        'idKanban'  => $Response['data'],             //idKanban
-                        'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
-                    ];
-                }
-
-                /************************************/
-                // Si hay datos marcados, se insertan todos en una sola sentencia
-                if ($rowsParticipantes){
-                    /************************************/
-                    // Se genera el chequeo
-                    $DataCheck = $this->dataCheck_2('');
-                    /************************************/
-                    // Se genera la query
-                    $query = [
-                        'data'      => 'idKanban,idUsuario',
-                        'required'  => 'idKanban,idUsuario',
-                        'table'     => 'kanban_tareas_participantes',
-                        'rows'      => $rowsParticipantes
-                    ];
-                    // Preparo los datos
-                    $xParams           = ['DataCheck' => $DataCheck, 'query' => $query];
-                    // Ejecuto la query
-                    $respParticipantes = $this->Base_insertMultiple($xParams);
-                    /************************************/
-                    // Si falla la ejecucion, se revierte de inmediato
-                    if ($respParticipantes['status'] === false) {
-                        $this->failOperation($respParticipantes);
-                    }
-                }
-            }
-
-            /************************************/
-            //Se agrega historial
-            $arrTareas = [
-                'idKanban'    => $Response['data'],       //idKanban
-                'idUsuario'   => $_POST['idUsuario'],     //Usuario creador
-                'Descripcion' => 'Tarea Creada',          //Descripcion
-                'Fecha'       => $this->ServerServer->fechaActual(),  //Fecha actual (servidor)
-                'Hora'        => $this->ServerServer->horaActual(),   //Hora actual (servidor)
-            ];
-            /************************************/
-            // Se genera la query
-            $query = [
-                'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
-                'unique'    => '',
-                'encode'    => '',
-                'table'     => 'kanban_tareas_historial',
-                'Post'      => $arrTareas
-            ];
-            /************************************/
-            // Se genera el chequeo
-            $dataCheck_3 = $this->dataCheck_3($arrTareas);
-            // Preparo los datos
-            $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query];
-            // Ejecuto la query
-            $xInsert = $this->Base_insert($xParams);
-
-            /************************************/
-            // Si falla la ejecucion, se revierte de inmediato
-            if ($xInsert['status'] === false) {
-                $this->failOperation($xInsert);
-            }
-
-            /************************************/
-            // Se confirma la transacción
-            $this->Base_transactionCommit();
-
-            /************************************/
-            // Si es un ID numérico, se envía con código 200 (OK)
-            Response::success($Response['data']);
-
         }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
+            'required'  => 'idKanbanEstado,idEstadoCierre,idPrioridad,idUsuario,Fecha,Titulo,Descripcion,FechaCreacion',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'kanban_tareas',
+            'Post'      => $_POST
+        ];
+        /************************************/
+        // Se genera el chequeo
+        $dataCheck_1 = $this->dataCheck_1($_POST);
+        // Preparo los datos
+        $xParams  = ['DataCheck' => $dataCheck_1, 'query' => $query];
+        // Ejecuto la query
+        $Response = $this->Base_insert($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Recorro las tareas ingresadas
+        if(isset($ndata_1)&&$ndata_1!=0){
+            // Se acumulan las filas a insertar para evitar un INSERT por cada tarea (N+1)
+            $rowsTareas = [];
+            // Recorro los datos
+            for($j1 = 0; $j1 < $ndata_1; $j1++){
+                /************************************/
+                // Se agrega respuesta
+                $rowsTareas[] = [
+                    'idKanban'         => $Response['data'],                //idKanban
+                    'Tarea'            => $_POST['Tarea'][$j1],             //Tarea
+                    'idEstadoTrabajo'  => 1,                                //Estado abierto
+                    'idTrabajo'        => $_POST['idTrabajo'][$j1] ?? '',   //idTrabajo si existe
+                ];
+            }
+
+            /************************************/
+            // Si hay datos marcados, se insertan todos en una sola sentencia
+            if ($rowsTareas){
+                /************************************/
+                // Se genera la query
+                $query = [
+                    'data'      => 'idKanban,Tarea,idEstadoTrabajo,idTrabajo',
+                    'required'  => 'idKanban,Tarea,idEstadoTrabajo',
+                    'table'     => 'kanban_tareas_tareas',
+                    'rows'      => $rowsTareas
+                ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck_2('');
+                // Preparo los datos
+                $xParams    = ['DataCheck' => $DataCheck, 'query' => $query];
+                // Ejecuto la query
+                $respTareas = $this->Base_insertMultiple($xParams);
+                /************************************/
+                // Si falla la ejecucion, se revierte de inmediato
+                if ($respTareas['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respTareas['error'] ?? '');
+                }
+            }
+        }
+        /************************************/
+        // Recorro las tareas ingresadas
+        if(isset($ndata_2)&&$ndata_2!=0){
+            // Se acumulan las filas a insertar para evitar un INSERT por cada participante (N+1)
+            $rowsParticipantes = [];
+            // Recorro los datos
+            for($j2 = 0; $j2 < $ndata_2; $j2++){
+                /************************************/
+                // Se agrega respuesta
+                $rowsParticipantes[] = [
+                    'idKanban'  => $Response['data'],             //idKanban
+                    'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
+                ];
+            }
+
+            /************************************/
+            // Si hay datos marcados, se insertan todos en una sola sentencia
+            if ($rowsParticipantes){
+                /************************************/
+                // Se genera la query
+                $query = [
+                    'data'      => 'idKanban,idUsuario',
+                    'required'  => 'idKanban,idUsuario',
+                    'table'     => 'kanban_tareas_participantes',
+                    'rows'      => $rowsParticipantes
+                ];
+                /************************************/
+                // Se genera el chequeo
+                $DataCheck = $this->dataCheck_2('');
+                // Preparo los datos
+                $xParams           = ['DataCheck' => $DataCheck, 'query' => $query];
+                // Ejecuto la query
+                $respParticipantes = $this->Base_insertMultiple($xParams);
+                /************************************/
+                // Si falla la ejecucion, se revierte de inmediato
+                if ($respParticipantes['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respParticipantes['error'] ?? '');
+                }
+            }
+        }
+
+        /************************************/
+        //Se agrega historial
+        $arrTareas = [
+            'idKanban'    => $Response['data'],       //idKanban
+            'idUsuario'   => $_POST['idUsuario'],     //Usuario creador
+            'Descripcion' => 'Tarea Creada',          //Descripcion
+            'Fecha'       => $this->ServerServer->fechaActual(),  //Fecha actual (servidor)
+            'Hora'        => $this->ServerServer->horaActual(),   //Hora actual (servidor)
+        ];
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'      => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+            'required'  => 'idKanban,idUsuario,Descripcion,Fecha,Hora',
+            'unique'    => '',
+            'encode'    => '',
+            'table'     => 'kanban_tareas_historial',
+            'Post'      => $arrTareas
+        ];
+        /************************************/
+        // Se genera el chequeo
+        $dataCheck_3 = $this->dataCheck_3($arrTareas);
+        // Preparo los datos
+        $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query];
+        // Ejecuto la query
+        $xInsert = $this->Base_insert($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($xInsert['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error'] ?? '');
+        }
+
+        /************************************/
+        // Se confirma la transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
+
+        /************************************/
+        // Si es un ID numérico, se envía con código 200 (OK)
+        Response::success($Response['data']);
+
     }
 
     /*******************************************************************/
@@ -1144,7 +1189,14 @@ class kanbanTareas extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -1166,6 +1218,15 @@ class kanbanTareas extends ControllerBase {
         $arrPrioridad = $this->Base_GetList($xParams);
 
         /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($arrPrioridad['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $arrPrioridad['error'] ?? '');
+        }
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idEstadoCierre AS ID,Nombre',
@@ -1182,6 +1243,15 @@ class kanbanTareas extends ControllerBase {
         $xParams         = ['query' => $query];
         // Ejecuto la query
         $arrEstadoCierre = $this->Base_GetList($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($arrEstadoCierre['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $arrEstadoCierre['error'] ?? '');
+        }
 
         /************************************/
         // Variables
@@ -1243,14 +1313,26 @@ class kanbanTareas extends ControllerBase {
             /************************************/
             // Si falla el historial, se revierte tambien el cambio de la tarea
             if ($xInsert['status'] === false) {
-                $this->failOperation($xInsert);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $xInsert['error'] ?? '');
             }
 
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -1268,6 +1350,18 @@ class kanbanTareas extends ControllerBase {
         // Validación del método HTTP
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
             Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Se no existe el ID
+        if (!isset($_POST['idKanban'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
+        // Se no existe el ID
+        if (!isset($_POST['idKanbanEstado'])) {
+            Response::error('Registro ID inexistente', 400);
         }
 
         /************************************/
@@ -1290,6 +1384,10 @@ class kanbanTareas extends ControllerBase {
         $idUsuario = $f3->get('SESSION.DataInfo.UserID');
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'idKanbanEstado',
@@ -1309,9 +1407,19 @@ class kanbanTareas extends ControllerBase {
         /************************************/
         // Si falla la lectura o la tarea no existe
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowData['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowData['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         if (empty($rowData['data'])) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
             Response::error('Registro inválido', 400);
         }
 
@@ -1349,17 +1457,24 @@ class kanbanTareas extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         //Se agrega historial (usuario de la sesion, fecha y hora del servidor)
         $arrTareas = [
-            'idKanban'    => $Response['data'],                 //idKanban
-            'idUsuario'   => $idUsuario,                        //Usuario (sesion)
-            'Descripcion' => 'Tarea Actualizada de tablero',    //Descripcion
-            'Fecha'       => $this->ServerServer->fechaActual(),//Fecha actual (servidor)
-            'Hora'        => $this->ServerServer->horaActual(), //Hora actual (servidor)
+            'idKanban'    => $Response['data'],                 // idKanban
+            'idUsuario'   => $idUsuario,                        // Usuario (sesion)
+            'Descripcion' => 'Tarea Actualizada de tablero',    // Descripcion
+            'Fecha'       => $this->ServerServer->fechaActual(),// Fecha actual (servidor)
+            'Hora'        => $this->ServerServer->horaActual(), // Hora actual (servidor)
         ];
         /************************************/
         // Se genera la query
@@ -1376,7 +1491,35 @@ class kanbanTareas extends ControllerBase {
         $dataCheck_3 = $this->dataCheck_3($arrTareas);
         // Preparo los datos
         $xParams = ['DataCheck' => $dataCheck_3, 'query' => $query, 'novalidate' => true];
-        $this->Base_insert($xParams);
+        // Ejecuto la query
+        $Response = $this->Base_insert($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se muestra alerta
+        if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
+
         /************************************/
         // Devuelvo $Response con código 200 (OK)
         Response::success($Response['data']);
@@ -1419,7 +1562,14 @@ class kanbanTareas extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -1444,14 +1594,30 @@ class kanbanTareas extends ControllerBase {
                 /************************************/
                 // Si falla la ejecucion, se revierte de inmediato
                 if ($respDelRel['status'] === false) {
-                    $this->failOperation($respDelRel);
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($respDelRel['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $respDelRel['error']);
+                    }
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $respDelRel['error'] ?? '');
                 }
             }
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)

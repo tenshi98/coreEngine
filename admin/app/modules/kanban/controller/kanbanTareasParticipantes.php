@@ -38,8 +38,15 @@ class kanbanTareasParticipantes extends ControllerBase {
     public function NewData($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -81,11 +88,11 @@ class kanbanTareasParticipantes extends ControllerBase {
 
         /************************************/
         // Se filtran los ya existentes
-        $ElementsIDs = [0];
+        $ElementsIDs = [];
         if ($arrExistentes['status'] === true) {
             // Obtiene los identificadores de las campañas existentes y los agrega
             // a la lista de valores.
-            $ElementsIDs = array_merge($ElementsIDs, array_column($arrExistentes['data'], 'idUsuario'));
+            $ElementsIDs = array_map('intval', array_column($arrExistentes['data'], 'idUsuario'));
         }
         // Se generan los placeholders necesarios para vincular posteriormente
         // cada identificador mediante parámetros preparados.
@@ -113,7 +120,8 @@ class kanbanTareasParticipantes extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrUsuarios['status']){
+        if($rowData['status'] === true && $arrUsuarios['status'] === true){
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -185,9 +193,7 @@ class kanbanTareasParticipantes extends ControllerBase {
                 'idUsuario' => $_POST['idParticipante'][$j2], //Participantes
             ];
         }
-        /************************************/
-        // Se genera el chequeo (se valida cada fila)
-        $dataCheck_1 = $this->dataCheck_1('');
+
         /************************************/
         // Se genera la query
         $query = [
@@ -196,14 +202,21 @@ class kanbanTareasParticipantes extends ControllerBase {
             'table'     => 'kanban_tareas_participantes',
             'rows'      => $rowsParticipantes
         ];
+        /************************************/
+        // Se genera el chequeo (se valida cada fila)
+        $dataCheck_1 = $this->dataCheck_1('');
         // Preparo los datos
         $xParams = ['DataCheck' => $dataCheck_1, 'query' => $query];
         // Ejecuto la query
         $respParticipantes = $this->Base_insertMultiple($xParams);
+
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($respParticipantes['status'] === false) {
-            $this->failOperation($respParticipantes);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $respParticipantes['error'] ?? '');
         }
 
         /************************************/
@@ -230,16 +243,30 @@ class kanbanTareasParticipantes extends ControllerBase {
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
         // Preparo los datos
         $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
+        // Ejecuto la query
         $xInsert = $this->Base_insert($xParams);
+
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($xInsert['status'] === false) {
-            $this->failOperation($xInsert);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $xInsert['error'] ?? '');
         }
 
         /************************************/
         // Se confirma la transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         //devuelvo el ultimo id
@@ -265,13 +292,19 @@ class kanbanTareasParticipantes extends ControllerBase {
         /************************************/
         // Se obtienen y validan los ID (antes de tocar la Base de Datos)
         $ParticipantesID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idParticipantes'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($ParticipantesID, 'id')) {
             Response::error('Registro inválido', 400);
         }
         $KanbanDelID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idKanbanDel'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanDelID, 'id')) {
             Response::error('Registro inválido', 400);
         }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query
@@ -293,7 +326,14 @@ class kanbanTareasParticipantes extends ControllerBase {
         /************************************/
         // Si falla la ejecucion o el participante no existe
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowData['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowData['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         if (empty($rowData['data'])) {
             Response::error('Registro inválido', 400);
@@ -316,7 +356,14 @@ class kanbanTareasParticipantes extends ControllerBase {
         /************************************/
         // Si falla la la ejecucion, se muestra alerta
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         //Se agrega historial (usuario de la sesion, fecha y hora del servidor)
@@ -341,8 +388,34 @@ class kanbanTareasParticipantes extends ControllerBase {
         // Se genera el chequeo
         $dataCheck_2 = $this->dataCheck_2($arrTareas);
         // Preparo los datos
-        $xParams = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
-        $this->Base_insert($xParams);
+        $xParams  = ['DataCheck' => $dataCheck_2, 'query' => $query, 'novalidate' => true];
+        $Response = $this->Base_insert($xParams);
+
+        /************************************/
+        // Si falla la ejecucion, se revierte de inmediato
+        if ($Response['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+        }
+
+        /************************************/
+        // Confirmar transacción
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
         /************************************/
         // Devuelvo $Response con código 200 (OK)
         Response::success($Response['data']);
@@ -377,7 +450,8 @@ class kanbanTareasParticipantes extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, la tarea no existe o esta cerrada
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         if (empty($rowData['data'])) {
             Response::error('Registro inválido', 400);

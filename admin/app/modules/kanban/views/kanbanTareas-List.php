@@ -14,7 +14,7 @@
                         <?php echo $data['TableTitle']; ?>
                         <?php if($data['UserAccess']['LevelAccess']>=3){
                             // Se verifica si se tiene el permiso para visualizar el dato
-                            if($data['UserData']["KanbanTareasAdminTabIndepend"]==2){ ?>
+                            if($data['UserData']["KanbanTareasAdminTabIndepend"] === 2){ ?>
                                 <div class="d-grid gap-2 d-md-flex justify-content-md-end">
                                     <?php if(is_array($data['arrList'])){ ?>
                                         <button type="button" class="btn btn-success"   data-bs-toggle="modal" data-bs-target="#newFormModal"><i class="bi bi-file-earmark"></i> Crear Tarea</button>

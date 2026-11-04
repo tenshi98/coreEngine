@@ -81,7 +81,7 @@ class informeTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($arrPrioridad['status'] && $arrEstadoCierre['status']){
+        if($arrPrioridad['status'] === true && $arrEstadoCierre['status'] === true){
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -219,8 +219,15 @@ class informeTareas extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -331,7 +338,7 @@ class informeTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status'] && $arrHistorial['status']){
+        if($rowData['status'] === true && $arrTareas['status'] === true && $arrParticipantes['status'] === true && $arrHistorial['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina
@@ -369,8 +376,15 @@ class informeTareas extends ControllerBase {
     public function Print($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $KanbanID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($KanbanID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -458,7 +472,7 @@ class informeTareas extends ControllerBase {
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if($rowData['status'] && $arrTareas['status'] && $arrParticipantes['status']){
+        if($rowData['status'] === true && $arrTareas['status'] === true && $arrParticipantes['status'] === true){
 
             /************************************/
             // Datos enviados a la pagina

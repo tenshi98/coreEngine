@@ -52,7 +52,7 @@
                         <tbody>
                             <?php
                             //Se verifica si se permite usar tareas especificas
-                            if($data['UserData']["KanbanTareasUsoTareas"]==2){ ?>
+                            if($data['UserData']["KanbanTareasUsoTareas"] === 2){ ?>
                                 <?php foreach ($data['arrTareas'] as $task){ ?>
                                     <tr>
                                         <td><?php echo $task['Trabajo'].'<br> - '.$task['Tarea'];?></td>

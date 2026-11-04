@@ -97,7 +97,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                                         <tbody>
                                             <?php
                                             //Se verifica si se permite usar tareas especificas
-                                            if($data['UserData']["KanbanTareasUsoTareas"]==2){ ?>
+                                            if($data['UserData']["KanbanTareasUsoTareas"] === 2){ ?>
                                                 <?php foreach ($data['arrTareas'] as $task){
                                                     // Variables
                                                     $encryptedTareas = $data['Fnc_Codification']->encryptDecrypt('encrypt', $task['idTareas']);
@@ -228,7 +228,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
 
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

@@ -31,7 +31,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         <?php
         //se dibujan los inputs
         //Se verifica si se permite usar tareas especificas
-        if($data['UserData']["KanbanTareasUsoTareas"]==2){
+        if($data['UserData']["KanbanTareasUsoTareas"] === 2){
             $data['Fnc_FormInputs']->formSelect([ 'Placeholder' => 'Trabajo Especifico', 'Name' => 'idTrabajo', 'Value' => ($data['rowData']['idTrabajo'] ?? ''),'Required' => 2,'arrData' => $data['arrTrabajos']]);
             $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Old_idTrabajo', 'Value' => ($data['rowData']['idTrabajo'] ?? ''),'Required' => 2]);
         }

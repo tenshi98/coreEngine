@@ -90,7 +90,7 @@ $RandName = 'rand_'.rand(1, 999999);
 		</div>
         <?php
         //Se verifica si se permite usar tareas especificas
-        if($data['UserData']["KanbanTareasUsoTareas"]==2){ ?>
+        if($data['UserData']["KanbanTareasUsoTareas"] === 2){ ?>
             <div class="clearfix"></div>
             <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
                 <div class="form-group">

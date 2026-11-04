@@ -71,6 +71,10 @@ class kanbanTareasInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -95,6 +99,10 @@ class kanbanTareasInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -116,11 +124,19 @@ class kanbanTareasInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*                 SE GENERAN LAS RUTAS                */
@@ -165,19 +181,38 @@ class kanbanTareasInstaller extends ControllerInstaller {
             'RutaWeb'        => 'administracion/kanban/trabajos',                          // Ruta web de la transaccion
             'RutaController' => 'kanbanTrabajos',                                          // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -219,6 +254,9 @@ class kanbanTareasInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
@@ -282,13 +320,13 @@ class kanbanTareasInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
-        $RutaController  = '"kanbanTareas"';
-        $RutaController .= ',"kanbanEstados"';
-        $RutaController .= ',"kanbanTareasTareas"';
-        $RutaController .= ',"kanbanTareasParticipantes"';
-        $RutaController .= ',"informeTareas"';
-        $RutaController .= ',"kanbanTableros"';
-        $RutaController .= ',"kanbanTrabajos"';
+        $RutaController  = 'kanbanTareas';
+        $RutaController .= ',kanbanEstados';
+        $RutaController .= ',kanbanTareasTareas';
+        $RutaController .= ',kanbanTareasParticipantes';
+        $RutaController .= ',informeTareas';
+        $RutaController .= ',kanbanTableros';
+        $RutaController .= ',kanbanTrabajos';
 
         /************************************/
         // Retorno los datos
