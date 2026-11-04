@@ -1850,7 +1850,7 @@ class UIFormInputs {
 			foreach ( $arrData as $select ) {
 				/************************************/
 				//Si el tab correspondiente esta seleccionado
-				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
+				$check = (isset($arrValTab[$y]) && $arrValTab[$y] === 2) ? 'checked' : '';
 				$valor = '2';
 				/************************************/
 				//generacion del input
@@ -2111,7 +2111,7 @@ class UIFormInputs {
 			foreach ( $arrData as $select ) {
 				/************************************/
 				//Si el tab correspondiente esta seleccionado
-				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
+				$check = (isset($arrValTab[$y]) && $arrValTab[$y] === 2) ? 'checked' : '';
 				$valor = '2';
 				/************************************/
 				//generacion del input
@@ -2375,7 +2375,7 @@ class UIFormInputs {
 			foreach ( $arrData as $select ) {
 				/************************************/
 				//Si el tab correspondiente esta seleccionado
-				$check = (isset($arrValTab[$y]) && $arrValTab[$y] == 2) ? 'checked' : '';
+				$check = (isset($arrValTab[$y]) && $arrValTab[$y] === 2) ? 'checked' : '';
 				$valor = '2';
 				/************************************/
 				//generacion del input
