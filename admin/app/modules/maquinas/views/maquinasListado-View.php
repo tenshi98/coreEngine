@@ -27,7 +27,7 @@
 <div class="modal-body">
     <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100 active" id="view_tab_1" data-bs-toggle="tab" data-bs-target="#tab_id_1" type="button" role="tab" aria-controls="tab_id_1" aria-selected="true"><i class="bi bi-card-list"></i> Datos Básicos</button></li>
-        <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
+        <?php if($data['UserData']["maquinasListadoVerDocumentos"] === 2){ ?>
             <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_4" data-bs-toggle="tab" data-bs-target="#tab_id_4" type="button" role="tab" aria-controls="tab_id_4" aria-selected="false" tabindex="-1"><i class="bi bi-file-text"></i> Documentos</button></li>
         <?php } ?>
         <li class="nav-item flex-fill" role="presentation"><button class="nav-link w-100" id="view_tab_5" data-bs-toggle="tab" data-bs-target="#tab_id_5" type="button" role="tab" aria-controls="tab_id_5" aria-selected="false" tabindex="-1"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
@@ -36,7 +36,7 @@
         <div class="tab-pane fade active show" id="tab_id_1" role="tabpanel" aria-labelledby="view_tab_1">
             <?php require_once('maquinasListado-Resumen-Update.php'); ?>
         </div>
-        <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
+        <?php if($data['UserData']["maquinasListadoVerDocumentos"] === 2){ ?>
             <div class="tab-pane fade" id="tab_id_4" role="tabpanel" aria-labelledby="view_tab_4">
                 <div class="row">
                     <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12">
@@ -86,7 +86,9 @@
                                     foreach($data['arrObservaciones'] as $crud){ ?>
                                         <tr>
                                             <td style="width: 100px;"><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
-                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?></td>
+                                            <td><?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?>
+                                                <?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $data['Fnc_DataDate']->fechaEstandar(substr($crud['FechaEdicion'], 0, 10)); ?></small><?php } ?>
+                                            </td>
                                         </tr>
                                     <?php } ?>
                                 <?php }else{
@@ -101,7 +103,7 @@
     </div>
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

@@ -10,10 +10,10 @@ class maquinasListadoComponentes extends ControllerBase {
     private $controllerName;
     private $FormInputs;
     private $Codification;
-    private $DataDate;
     private $WidgetsCommon;
     private $WidgetsViews;
     private $WidgetsPreview;
+    private $QueryBuilder;
 
     /*******************************************************************/
     // Constructor
@@ -27,10 +27,10 @@ class maquinasListadoComponentes extends ControllerBase {
         $this->controllerName = 'maquinasListado';
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
-		$this->DataDate       = new FunctionsDataDate();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
-		$this->WidgetsPreview  = new UIWidgetsPreview();
+		$this->WidgetsViews   = new UIWidgetsViews();
+		$this->WidgetsPreview = new UIWidgetsPreview();
+        $this->WidgetsPreview = new QueryBuilder();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -44,8 +44,15 @@ class maquinasListadoComponentes extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -67,25 +74,15 @@ class maquinasListadoComponentes extends ControllerBase {
         // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
+        /************************************/
+        // Catálogo de tareas (fallo de BD → página de error)
+        $Catalogo = $this->getCatalogoTareas();
+
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if ($rowData['status'] === true) {
-            /************************************/
-            // Máquina inexistente (enlace obsoleto)
-            if (empty($rowData['data'])) {
-                $this->showError(2, $f3, ['errors' => ['Registro inválido'], 'data' => []]);
-                return;
-            }
-
-            /************************************/
-            // Catálogo de tareas (fallo de BD → página de error)
-            $Catalogo = $this->getCatalogoTareas();
-            if ($Catalogo['status'] !== true) {
-                $this->showError(2, $f3, $this->mergeResponses([$Catalogo]));
-                return;
-            }
+        if ($rowData['status'] === true && $Catalogo['status'] === true) {
 
             /************************************/
             // Datos enviados a la pagina
@@ -108,7 +105,7 @@ class maquinasListadoComponentes extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData]);
+            $result = $this->mergeResponses([$rowData,$Catalogo]);
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
@@ -120,8 +117,15 @@ class maquinasListadoComponentes extends ControllerBase {
     public function NewSub($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID (idPadre cifrado)
         $PadreID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($PadreID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -144,21 +148,13 @@ class maquinasListadoComponentes extends ControllerBase {
         $rowData = $this->Base_GetByID($xParams);
 
         /************************************/
-        // Si falla la consulta se despliega el error
-        if ($rowData['status'] === false) {
-            $result = $this->mergeResponses([$rowData]);
-            $this->showError(2, $f3, $result);
-            return;
-        }
-
-        /************************************/
         // Padre inexistente
         if (empty($rowData['data'])) {
             Response::error('Registro inválido', 400);
         }
 
         /************************************/
-        // RN-001: los subcomponentes no pueden exceder el nivel 5
+        // los subcomponentes no pueden exceder el nivel 5
         if ((int)$rowData['data']['Nivel'] >= 5) {
             Response::error('No se permite exceder los 5 niveles de profundidad', 400);
         }
@@ -169,28 +165,38 @@ class maquinasListadoComponentes extends ControllerBase {
         /************************************/
         // Catálogo de tareas (fallo de BD → página de error)
         $Catalogo = $this->getCatalogoTareas();
-        if ($Catalogo['status'] !== true) {
-            $this->showError(2, $f3, $this->mergeResponses([$Catalogo]));
-            return;
+
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if ($rowData['status'] === true && $Catalogo['status'] === true) {
+
+            /************************************/
+            // Datos enviados a la pagina
+            $f3->data = [
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_FormInputs'   => $this->FormInputs,
+                'Fnc_Codification' => $this->Codification,
+                /*=========== Datos Consultados ===========*/
+                'rowData'    => $rowData['data'],
+                'arrTareas'  => $Catalogo['data'],
+            ];
+
+            /************************************/
+            // Se instancia la vista
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Componentes-formNewSub.php');
+        /************************************/
+        // Si no hay resultados
+        } else {
+            // Busco errores de la consulta
+            $result = $this->mergeResponses([$rowData,$Catalogo]);
+            // Despliegue de errores
+            $this->showError(2, $f3, $result);
         }
-
-        /************************************/
-        // Datos enviados a la pagina
-        $f3->data = [
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $this->getUserData($f3),
-            'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_FormInputs'   => $this->FormInputs,
-            'Fnc_Codification' => $this->Codification,
-            /*=========== Datos Consultados ===========*/
-            'rowData'    => $rowData['data'],
-            'arrTareas'  => $Catalogo['data'],
-        ];
-
-        /************************************/
-        // Se instancia la vista
-        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Componentes-formNewSub.php');
     }
 
     /*******************************************************************/
@@ -199,8 +205,15 @@ class maquinasListadoComponentes extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -269,8 +282,15 @@ class maquinasListadoComponentes extends ControllerBase {
     public function Hijos($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ComponenteID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ComponenteID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -339,8 +359,15 @@ class maquinasListadoComponentes extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ComponenteID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ComponenteID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -377,30 +404,17 @@ class maquinasListadoComponentes extends ControllerBase {
         // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
+        /************************************/
+        // Ruta jerárquica y tareas del componente (fallo de BD → página de error)
+        $Ruta      = $this->getRutaJerarquica($ComponenteID['data']);
+        $TareasSel = $this->getTareasComponente($ComponenteID['data']);
+
+
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if ($rowData['status'] === true) {
-            /************************************/
-            // Componente inexistente (enlace obsoleto)
-            if (empty($rowData['data'])) {
-                $this->showError(2, $f3, ['errors' => ['Registro inválido'], 'data' => []]);
-                return;
-            }
-
-            /************************************/
-            // Ruta jerárquica y tareas del componente (fallo de BD → página de error)
-            $Ruta = $this->getRutaJerarquica($ComponenteID['data']);
-            if ($Ruta['status'] !== true) {
-                $this->showError(2, $f3, $this->mergeResponses([$Ruta]));
-                return;
-            }
-            $TareasSel = $this->getTareasComponente($ComponenteID['data']);
-            if ($TareasSel['status'] !== true) {
-                $this->showError(2, $f3, $this->mergeResponses([$TareasSel]));
-                return;
-            }
+        if ($rowData['status'] === true && $Ruta['status'] === true && $TareasSel['status'] === true) {
 
             /************************************/
             // Datos enviados a la pagina
@@ -409,10 +423,10 @@ class maquinasListadoComponentes extends ControllerBase {
                 'UserData'      => $this->getUserData($f3),
                 'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
                 /*===========   Funcionalidad   ===========*/
-                'Fnc_WidgetsCommon' => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsCommon'  => $this->WidgetsCommon,
+                'Fnc_WidgetsViews'   => $this->WidgetsViews,
                 'Fnc_WidgetsPreview' => $this->WidgetsPreview,
-                'Fnc_Codification'  => $this->Codification,
+                'Fnc_Codification'   => $this->Codification,
                 /*=========== Datos Consultados ===========*/
                 'rowData'      => $rowData['data'],
                 'arrRuta'      => $Ruta['data'],
@@ -426,7 +440,7 @@ class maquinasListadoComponentes extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData]);
+            $result = $this->mergeResponses([$rowData,$Ruta,$TareasSel]);
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
@@ -438,8 +452,15 @@ class maquinasListadoComponentes extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID
         $ComponenteID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($ComponenteID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -461,30 +482,16 @@ class maquinasListadoComponentes extends ControllerBase {
         // Ejecuto la query
         $rowData = $this->Base_GetByID($xParams);
 
+        /************************************/
+        // Catálogo de tareas y selección previa (fallo de BD → página de error)
+        $Catalogo  = $this->getCatalogoTareas();
+        $TareasSel = $this->getTareasComponente($ComponenteID['data']);
+
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
-        if ($rowData['status'] === true) {
-            /************************************/
-            // Componente inexistente (enlace obsoleto)
-            if (empty($rowData['data'])) {
-                $this->showError(2, $f3, ['errors' => ['Registro inválido'], 'data' => []]);
-                return;
-            }
-
-            /************************************/
-            // Catálogo de tareas y selección previa (fallo de BD → página de error)
-            $Catalogo = $this->getCatalogoTareas();
-            if ($Catalogo['status'] !== true) {
-                $this->showError(2, $f3, $this->mergeResponses([$Catalogo]));
-                return;
-            }
-            $TareasSel = $this->getTareasComponente($ComponenteID['data']);
-            if ($TareasSel['status'] !== true) {
-                $this->showError(2, $f3, $this->mergeResponses([$TareasSel]));
-                return;
-            }
+        if ($rowData['status'] === true && $Catalogo['status'] === true && $TareasSel['status'] === true) {
 
             /************************************/
             // Datos enviados a la pagina
@@ -508,7 +515,7 @@ class maquinasListadoComponentes extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $this->mergeResponses([$rowData]);
+            $result = $this->mergeResponses([$rowData,$Catalogo,$TareasSel]);
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
@@ -521,6 +528,16 @@ class maquinasListadoComponentes extends ControllerBase {
     // Insertar
     /*******************************************************************/
     public function Insert(){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
 
         /************************************/
         // RN-001/RN-003: se resuelve el padre (si existe) para calcular
@@ -548,7 +565,10 @@ class maquinasListadoComponentes extends ControllerBase {
             /************************************/
             // Error de BD
             if ($rowData['status'] === false) {
-                $this->failOperation($rowData);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
             }
 
             /************************************/
@@ -577,14 +597,6 @@ class maquinasListadoComponentes extends ControllerBase {
         $_POST['NoUtilizable'] = (($_POST['NoUtilizable'] ?? '') == 2) ? 1 : 0;
 
         /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
-
-        /************************************/
         // Se genera la query
         $query = [
             'data'      => 'idMaquina,idPadre,Nivel,NoUtilizable,Nombre,Codigo,Marca,Modelo,CodigoSaf,Numero,AnioFabricacion,Serie',
@@ -605,6 +617,9 @@ class maquinasListadoComponentes extends ControllerBase {
                 ],
             ]
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -613,7 +628,14 @@ class maquinasListadoComponentes extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -627,12 +649,28 @@ class maquinasListadoComponentes extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Si es un ID numérico, se envía con código 200 (OK)
@@ -657,6 +695,10 @@ class maquinasListadoComponentes extends ControllerBase {
         $_POST['NoUtilizable'] = (($_POST['NoUtilizable'] ?? '') == 2) ? 1 : 0;
 
         /************************************/
+        // Se inicia la transacción
+        $this->Base_transactionBegin();
+
+        /************************************/
         // El componente debe existir (si no, se evitarían filas pivote
         // huérfanas en maquinas_componentes_tareas_rel)
         $query = [
@@ -675,20 +717,19 @@ class maquinasListadoComponentes extends ControllerBase {
         $rowData = $this->Base_GetByID($xParams);
         // Error de BD
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($rowData['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $rowData['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         // Componente inexistente
         if (empty($rowData['data'])) {
             Response::error('Registro inválido', 400);
         }
-
-        /************************************/
-        // Se genera el chequeo
-        $DataCheck = $this->dataCheck($_POST);
-
-        /************************************/
-        // Se inicia la transacción
-        $this->Base_transactionBegin();
 
         /************************************/
         // Se genera la query (sin idPadre/Nivel: sin reparenting en v1;
@@ -702,6 +743,9 @@ class maquinasListadoComponentes extends ControllerBase {
             'where'     => 'idComponentes',
             'Post'      => $_POST
         ];
+        /************************************/
+        // Se genera el chequeo
+        $DataCheck = $this->dataCheck($_POST);
         // Preparo los datos
         $xParams  = ['DataCheck' => $DataCheck, 'query' => $query];
         // Ejecuto la query
@@ -710,20 +754,42 @@ class maquinasListadoComponentes extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // RN-007: se eliminan las relaciones previas del componente
-        $Response = $this->queryExecuteRaw(
-            'DELETE FROM maquinas_componentes_tareas_rel WHERE idComponente = ?',
-            [(int)$_POST['idComponentes']]
-        );
+        // Consulta
+        $ActionSQL = 'DELETE FROM maquinas_componentes_tareas_rel WHERE idComponente = ?';
+        // Preparo los datos
+        $xParams = [
+            'query'     => $ActionSQL,
+            'newBDConn' => $this->getDBConn(),
+            'showQuery' => false,
+            'singleRow' => false,
+            'params'    => [(int)$_POST['idComponentes']],
+        ];
+        // Ejecuto la query
+        $Response = $this->Base_queryExecute($xParams);
 
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
@@ -733,12 +799,28 @@ class maquinasListadoComponentes extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -764,6 +846,7 @@ class maquinasListadoComponentes extends ControllerBase {
         /************************************/
         // Se obtiene el ID
         $ComponenteID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idComponentes'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($ComponenteID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -776,8 +859,10 @@ class maquinasListadoComponentes extends ControllerBase {
         // RN-004: BFS del subárbol (ids + archivos)
         $Subarbol = $this->getSubarbol((int)$ComponenteID['data']);
         if ($Subarbol['status'] !== true) {
-            // Error de BD durante el recorrido: se revierte sin borrar nada
-            $this->failOperation($Subarbol);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Subarbol['error'] ?? '');
         }
         $arrNodos = $Subarbol['data'];
         $arrIds   = array_map('intval', array_column($arrNodos, 'idComponentes'));
@@ -791,15 +876,30 @@ class maquinasListadoComponentes extends ControllerBase {
 
             /************************************/
             // Se eliminan las relaciones de tareas del subárbol
-            $Response = $this->queryExecuteRaw(
-                'DELETE FROM maquinas_componentes_tareas_rel WHERE idComponente IN ('.$strIds.')',
-                $arrIds
-            );
+            // Consulta
+            $ActionSQL = 'DELETE FROM maquinas_componentes_tareas_rel WHERE idComponente IN ('.$strIds.')';
+            // Preparo los datos
+            $xParams = [
+                'query'     => $ActionSQL,
+                'newBDConn' => $this->getDBConn(),
+                'showQuery' => false,
+                'singleRow' => false,
+                'params'    => $arrIds,
+            ];
+            // Ejecuto la query
+            $Response = $this->Base_queryExecute($xParams);
 
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                $this->failOperation($Response);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se diferencian los errores de validación de los de base de datos
+                if (is_array($Response['error'] ?? null)) {
+                    Response::error('Datos inválidos', 400, $Response['error']);
+                }
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
 
             /************************************/
@@ -826,28 +926,56 @@ class maquinasListadoComponentes extends ControllerBase {
                     /************************************/
                     // Si falla la ejecucion, se revierte de inmediato
                     if ($ResponseDel['status'] === false) {
-                        $this->failOperation($ResponseDel);
+                        // Se revierte la transaccion activa (no-op si no hay transaccion)
+                        $this->Base_transactionRollback();
+                        // Se reporta el error
+                        Response::error('Error al operar con la Base de Datos', 500, $ResponseDel['error'] ?? '');
                     }
                 }
             }
 
             /************************************/
             // Se eliminan los nodos del subárbol
-            $Response = $this->queryExecuteRaw(
-                'DELETE FROM maquinas_listado_componentes WHERE idComponentes IN ('.$strIds.')',
-                $arrIds
-            );
+            // Consulta
+            $ActionSQL = 'DELETE FROM maquinas_listado_componentes WHERE idComponentes IN ('.$strIds.')';
+            // Preparo los datos
+            $xParams = [
+                'query'     => $ActionSQL,
+                'newBDConn' => $this->getDBConn(),
+                'showQuery' => false,
+                'singleRow' => false,
+                'params'    => $arrIds,
+            ];
+            // Ejecuto la query
+            $Response = $this->Base_queryExecute($xParams);
 
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
             if ($Response['status'] === false) {
-                $this->failOperation($Response);
+                // Se revierte la transaccion activa (no-op si no hay transaccion)
+                $this->Base_transactionRollback();
+                // Se diferencian los errores de validación de los de base de datos
+                if (is_array($Response['error'] ?? null)) {
+                    Response::error('Datos inválidos', 400, $Response['error']);
+                }
+                // Se reporta el error
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
             }
+
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Devuelvo $Response con código 200 (OK)
@@ -858,52 +986,6 @@ class maquinasListadoComponentes extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
-    /*******************************************************************/
-    // Se validan los datos
-    /*******************************************************************/
-    private function dataCheck($POST){
-        // Variables
-        $DataChecking = [
-            'emptyData'                  => '',
-            'encode'                     => '',
-            'ValidarEmail'               => '',
-            'ValidarNumero'              => 'idMaquina,idPadre,AnioFabricacion',
-            'ValidarEntero'              => 'idMaquina,idPadre,AnioFabricacion,NoUtilizable',
-            'ValidarRut'                 => '',
-            'ValidarPatente'             => '',
-            'ValidarFecha'               => '',
-            'ValidarHora'                => '',
-            'ValidarURL'                 => '',
-            'ValidarLargoMinimo'         => 'Nombre',
-            'ValidarLargoMinimoN'        => 3,
-            'ValidarLargoMaximoPorCampo' => [
-                'Numero'    => 100,
-                'Nombre'    => 255,
-                'Codigo'    => 255,
-                'Marca'     => 255,
-                'Modelo'    => 255,
-                'CodigoSaf' => 255,
-                'Serie'     => 255,
-            ],
-            'ValidarPalabrasCensuradas' => 'Nombre,Codigo,Marca,Modelo,CodigoSaf,Serie',
-            'ValidarEspaciosVacios'     => '',
-            'ValidarMayusculas'         => '',
-            'ValidarCoincidencias'      => '',
-            'ValidarDominioEmail'       => '',
-            'ValidarPasswordSegura'     => '',
-            'ValidarFechaRango'         => '',
-            'ValidarEdadMinima'         => '',
-            'ValidarJSON'               => '',
-            'ValidarUUID'               => '',
-            'ValidarIP'                 => '',
-            'ValidarSoloAlfanumerico'   => '',
-            'ValidarSoloLetras'         => '',
-            'Post'                      => $POST,
-        ];
-        // Retorno los datos
-        return $DataChecking;
-    }
-
     /*******************************************************************/
     // Catálogo de tareas (orden de visualización)
     /*******************************************************************/
@@ -1103,19 +1185,50 @@ class maquinasListadoComponentes extends ControllerBase {
     }
 
     /*******************************************************************/
-    // Ejecuta SQL crudo con parametros bindeados (pivote y subárbol)
+    // Se validan los datos
     /*******************************************************************/
-    private function queryExecuteRaw(string $sql, array $params = []){
-
-        /************************************
-         * ControllerBase::$queryBuilder es privado y Base_queryExecute no admite
-         * parametros bindeados, por lo que se instancia un QueryBuilder propio
-         * sobre la misma conexion: asi participa de la transaccion activa.
-         */
-        $QueryBuilder = new QueryBuilder();
-        /************************************/
-        // Ejecuto la query
-        return $QueryBuilder->queryExecute($sql, $this->getDBConn(), false, false, $params);
+    private function dataCheck($POST){
+        // Variables
+        $DataChecking = [
+            'emptyData'                  => '',
+            'encode'                     => '',
+            'ValidarEmail'               => '',
+            'ValidarNumero'              => 'idMaquina,idPadre,AnioFabricacion',
+            'ValidarEntero'              => 'idMaquina,idPadre,AnioFabricacion,NoUtilizable',
+            'ValidarRut'                 => '',
+            'ValidarPatente'             => '',
+            'ValidarFecha'               => '',
+            'ValidarHora'                => '',
+            'ValidarURL'                 => '',
+            'ValidarLargoMinimo'         => 'Nombre',
+            'ValidarLargoMinimoN'        => 3,
+            'ValidarLargoMaximoPorCampo' => [
+                'Numero'    => 100,
+                'Nombre'    => 255,
+                'Codigo'    => 255,
+                'Marca'     => 255,
+                'Modelo'    => 255,
+                'CodigoSaf' => 255,
+                'Serie'     => 255,
+            ],
+            'ValidarPalabrasCensuradas' => 'Nombre,Codigo,Marca,Modelo,CodigoSaf,Serie',
+            'ValidarEspaciosVacios'     => '',
+            'ValidarMayusculas'         => '',
+            'ValidarCoincidencias'      => '',
+            'ValidarDominioEmail'       => '',
+            'ValidarPasswordSegura'     => '',
+            'ValidarFechaRango'         => '',
+            'ValidarEdadMinima'         => '',
+            'ValidarJSON'               => '',
+            'ValidarUUID'               => '',
+            'ValidarIP'                 => '',
+            'ValidarSoloAlfanumerico'   => '',
+            'ValidarSoloLetras'         => '',
+            'Post'                      => $POST,
+        ];
+        // Retorno los datos
+        return $DataChecking;
     }
+
 
 }

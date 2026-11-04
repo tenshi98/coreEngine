@@ -11,8 +11,8 @@ class maquinasListadoSensores extends ControllerBase {
     private $FormInputs;
     private $Codification;
     private $WidgetsCommon;
-
     private $WidgetsViews;
+
     /*******************************************************************/
     // Constructor
     /*******************************************************************/
@@ -27,7 +27,7 @@ class maquinasListadoSensores extends ControllerBase {
 		$this->FormInputs     = new UIFormInputs();
 		$this->Codification   = new FunctionsSecurityCodification();
 		$this->WidgetsCommon  = new UIWidgetsCommon();
-		$this->WidgetsViews  = new UIWidgetsViews();
+		$this->WidgetsViews   = new UIWidgetsViews();
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -41,8 +41,15 @@ class maquinasListadoSensores extends ControllerBase {
     public function New($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID de la máquina
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -58,6 +65,7 @@ class maquinasListadoSensores extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($rowData['status'] === true && $arrCatalog['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -94,8 +102,15 @@ class maquinasListadoSensores extends ControllerBase {
     public function UpdateList($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID de la máquina
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -143,8 +158,15 @@ class maquinasListadoSensores extends ControllerBase {
     public function View($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID de la máquina
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -183,8 +205,15 @@ class maquinasListadoSensores extends ControllerBase {
     public function GetID($f3, $params){
 
         /************************************/
+        // Se no existe el ID
+        if (!isset($params['id'])) {
+            Response::error('Registro ID inexistente', 400);
+        }
+
+        /************************************/
         // Se obtiene el ID de la máquina
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $params['id']);
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -205,6 +234,7 @@ class maquinasListadoSensores extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrCatalog['status'] === true) {
+
             /************************************/
             // Datos enviados a la pagina
             $f3->data = [
@@ -245,6 +275,12 @@ class maquinasListadoSensores extends ControllerBase {
     public function Insert(){
 
         /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
         // Se genera el chequeo
         $DataCheck = $this->dataCheck($_POST);
 
@@ -257,7 +293,7 @@ class maquinasListadoSensores extends ControllerBase {
         $MaquinaID   = $_POST['idMaquina'];
         $rowData     = $this->getMaquina($MaquinaID);
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         $arrSensores = $this->sensorDecode($rowData['data']['Sensores'] ?? '');
 
@@ -298,7 +334,7 @@ class maquinasListadoSensores extends ControllerBase {
         $MaquinaID   = $_POST['idMaquina'];
         $rowData     = $this->getMaquina($MaquinaID);
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         $arrSensores = $this->sensorDecode($rowData['data']['Sensores'] ?? '');
 
@@ -337,6 +373,7 @@ class maquinasListadoSensores extends ControllerBase {
         /************************************/
         // Se obtiene el ID de la máquina
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $dataDelete['idMaquina'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -345,7 +382,7 @@ class maquinasListadoSensores extends ControllerBase {
         // Se obtiene la máquina y sus sensores actuales
         $rowData     = $this->getMaquina($MaquinaID['data']);
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         $arrSensores = $this->sensorDecode($rowData['data']['Sensores'] ?? '');
 
@@ -383,6 +420,7 @@ class maquinasListadoSensores extends ControllerBase {
         /************************************/
         // Se obtiene el ID de la máquina
         $MaquinaID = $this->Codification->encryptDecrypt('decrypt', $_POST['idMaquina'] ?? '');
+        // Se verifica
         if (!$this->isValidDecrypted($MaquinaID, 'id')) {
             Response::error('Registro inválido', 400);
         }
@@ -396,7 +434,7 @@ class maquinasListadoSensores extends ControllerBase {
         // Se obtiene la máquina y sus sensores actuales
         $rowData     = $this->getMaquina($MaquinaID['data']);
         if ($rowData['status'] === false) {
-            $this->failOperation($rowData);
+            Response::error('Error al operar con la Base de Datos', 500, $rowData['error'] ?? '');
         }
         $arrSensores = $this->sensorDecode($rowData['data']['Sensores'] ?? '');
 
@@ -497,7 +535,7 @@ class maquinasListadoSensores extends ControllerBase {
         // Se obtienen los catálogos
         $arrCatalog = $this->getCatalogos();
         if ($arrCatalog['status'] === false) {
-            $this->failOperation($arrCatalog);
+            Response::error('Error al operar con la Base de Datos', 500, $arrCatalog['error'] ?? '');
         }
 
         /************************************/
@@ -688,12 +726,28 @@ class maquinasListadoSensores extends ControllerBase {
         /************************************/
         // Si falla la ejecucion, se revierte de inmediato
         if ($Response['status'] === false) {
-            $this->failOperation($Response);
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se diferencian los errores de validación de los de base de datos
+            if (is_array($Response['error'] ?? null)) {
+                Response::error('Datos inválidos', 400, $Response['error']);
+            }
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
         }
 
         /************************************/
         // Confirmar transacción
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
+        }
 
         /************************************/
         // Retorno la respuesta
@@ -763,8 +817,8 @@ class maquinasListadoSensores extends ControllerBase {
             'emptyData'                  => '',
             'encode'                     => '',
             'ValidarEmail'               => '',
-            'ValidarNumero'              => 'idGrupo,idSubGrupo,idUniMed,idEstado',
-            'ValidarEntero'              => 'idGrupo,idSubGrupo,idUniMed,idEstado',
+            'ValidarNumero'              => 'idMaquina,idGrupo,idSubGrupo,idUniMed,idEstado',
+            'ValidarEntero'              => 'idMaquina,idGrupo,idSubGrupo,idUniMed,idEstado',
             'ValidarRut'                 => '',
             'ValidarPatente'             => '',
             'ValidarFecha'               => '',

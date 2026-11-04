@@ -32,7 +32,7 @@
             echo $data['Fnc_WidgetsViews']->table_v6($arrData2, $OptionsTable);
         echo '</div>';
 
-        if($data['UserData']["maquinasListadoTelemetria"]==2){
+        if($data['UserData']["maquinasListadoTelemetria"] === 2){
             $arrData_2 = [
                 ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-phone',         'Icon_color' => 10,'Title' => 'SIM - Numero Telefónico',    'Text' => $data['rowData']['Sim_Num_Tel'], 'Text_color' => 26, 'Text_copy' => $data['rowData']['Sim_Num_Tel']],
                 ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-sim',           'Icon_color' => 10,'Title' => 'SIM - Compañia',             'Text' => $data['rowData']['Sim_Compania']],

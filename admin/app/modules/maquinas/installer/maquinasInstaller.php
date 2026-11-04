@@ -59,6 +59,10 @@ class maquinasInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -83,6 +87,10 @@ class maquinasInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -104,11 +112,19 @@ class maquinasInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*            SEMBRADO DE LOS CATALOGOS                */
@@ -130,6 +146,10 @@ class maquinasInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
@@ -169,19 +189,38 @@ class maquinasInstaller extends ControllerInstaller {
             'RutaWeb'        => 'mantencionSistema/maquinas/sensores/subgrupos',      // Ruta web de la transaccion
             'RutaController' => 'maquinasSensoresSubgrupos',                       // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -223,12 +262,15 @@ class maquinasInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/listAll',                         'RutaController' => 'maquinasListado->listAll',                   'Descripcion' => 'Listar Toda la Información',                      'idLevelLimit' => 1, 'Controller' => 'maquinasListado'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/search',                          'RutaController' => 'maquinasListado->UpdateList',                'Descripcion' => 'Filtrar datos',                                   'idLevelLimit' => 1, 'Controller' => 'maquinasListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/updateList',                      'RutaController' => 'maquinasListado->UpdateList',                'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'maquinasListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/updateList',                      'RutaController' => 'maquinasListado->UpdateList',                'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 1, 'Controller' => 'maquinasListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/view/@id',                        'RutaController' => 'maquinasListado->View',                      'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 1, 'Controller' => 'maquinasListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/resumen/@id',                     'RutaController' => 'maquinasListado->Resumen',                   'Descripcion' => 'Mostrar Resúmen',                                 'idLevelLimit' => 2, 'Controller' => 'maquinasListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/resumenUpdate/@id',               'RutaController' => 'maquinasListado->ResumenUpdate',             'Descripcion' => 'Mostrar información',                             'idLevelLimit' => 2, 'Controller' => 'maquinasListado'],
@@ -245,7 +287,7 @@ class maquinasInstaller extends ControllerInstaller {
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/maquinas/listado/observaciones',                   'RutaController' => 'maquinasListadoObservaciones->Delete',       'Descripcion' => 'Borrar dato y archivos',                          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoObservaciones'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/documentos/new/@id',              'RutaController' => 'maquinasListadoDocumentos->New',             'Descripcion' => 'Mostrar modal nuevo',                             'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/documentos/updateList/@id',       'RutaController' => 'maquinasListadoDocumentos->UpdateList',      'Descripcion' => 'Actualizar Lista',                                'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/documentos/view/@id',             'RutaController' => 'maquinasListadoDocumentos->View',            'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/documentos/view/@id',             'RutaController' => 'maquinasListadoDocumentos->View',            'Descripcion' => 'Mostrar Detallado',                               'idLevelLimit' => 1, 'Controller' => 'maquinasListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/maquinas/listado/documentos/getID/@id',            'RutaController' => 'maquinasListadoDocumentos->GetID',           'Descripcion' => 'Información para el formulario edición',          'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/documentos',                      'RutaController' => 'maquinasListadoDocumentos->Insert',          'Descripcion' => 'Crear Información',                               'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/maquinas/listado/documentos/update',               'RutaController' => 'maquinasListadoDocumentos->Update',          'Descripcion' => 'Editar por post (modificar y subir archivos)',    'idLevelLimit' => 2, 'Controller' => 'maquinasListadoDocumentos'],
@@ -309,14 +351,14 @@ class maquinasInstaller extends ControllerInstaller {
         // Incluye los controladores de las rutas (columna Controller): Base_uninstallModule()
         // borra core_permisos_listado_rutas WHERE Controller IN (esta lista), asi que
         // omitirlos dejaria sus rutas huerfanas al desinstalar el modulo
-        $RutaController  = '"maquinasListado"';
-        $RutaController .= ',"maquinasListadoDocumentos"';
-        $RutaController .= ',"maquinasListadoObservaciones"';
-        $RutaController .= ',"maquinasListadoComponentes"';
-        $RutaController .= ',"maquinasListadoSensores"';
-        $RutaController .= ',"maquinasListadoAlarmas"';
-        $RutaController .= ',"maquinasSensoresGrupos"';
-        $RutaController .= ',"maquinasSensoresSubgrupos"';
+        $RutaController  = 'maquinasListado';
+        $RutaController .= ',maquinasListadoDocumentos';
+        $RutaController .= ',maquinasListadoObservaciones';
+        $RutaController .= ',maquinasListadoComponentes';
+        $RutaController .= ',maquinasListadoSensores';
+        $RutaController .= ',maquinasListadoAlarmas';
+        $RutaController .= ',maquinasSensoresGrupos';
+        $RutaController .= ',maquinasSensoresSubgrupos';
 
         /************************************/
         // Retorno los datos
@@ -337,7 +379,7 @@ class maquinasInstaller extends ControllerInstaller {
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'maquinas_listado',
-            'data'       => '`idMaquina` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Sim_Num_Tel` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Sim_Compania` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`TiempoFueraLinea` time NULL DEFAULT NULL,`idTab` int(10) unsigned NULL DEFAULT NULL,`id_Geo` int(10) unsigned NULL DEFAULT NULL,`id_Sensores` int(10) unsigned NULL DEFAULT NULL,`idBackup` int(10) unsigned NULL DEFAULT NULL,`NregBackup` int(10) unsigned NULL DEFAULT NULL,`idAlertaTemprana` int(10) unsigned NULL DEFAULT NULL,`AlertaTemprCritica` time NULL DEFAULT NULL,`AlertaTemprNormal` time NULL DEFAULT NULL,`Sensores` longtext CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'data'       => '`idMaquina` int(10) unsigned NOT NULL AUTO_INCREMENT,`idEstado` int(10) unsigned NOT NULL,`Nombre` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`CodIdentificador` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Descripcion` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL,`Direccion_img` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Sim_Num_Tel` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Sim_Compania` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`TiempoFueraLinea` time NULL DEFAULT NULL,`idTab` int(10) unsigned NULL DEFAULT NULL,`id_Geo` int(10) unsigned NULL DEFAULT NULL,`id_Sensores` int(10) unsigned NULL DEFAULT NULL,`idBackup` int(10) unsigned NULL DEFAULT NULL,`NregBackup` int(10) unsigned NULL DEFAULT NULL,`idAlertaTemprana` int(10) unsigned NULL DEFAULT NULL,`AlertaTemprCritica` time NULL DEFAULT NULL,`AlertaTemprNormal` time NULL DEFAULT NULL,`Sensores` longtext CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Alarmas` longtext CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
             'primaryKey' => 'idMaquina',
             'comentario' => 'Creado desde el Instalador',
         ];
@@ -405,7 +447,7 @@ class maquinasInstaller extends ControllerInstaller {
         /*            SE GENERAN LAS OPTIMIZACIONES            */
         /*******************************************************/
         $arrOptimizations = [
-            'ALTER TABLE maquinas_listado ADD INDEX IF NOT EXISTS idx_maquina_estado (idEstado),ADD INDEX IF NOT EXISTS idx_maquina_tab (idTab),ADD INDEX IF NOT EXISTS idx_maquina_geo (id_Geo),ADD INDEX IF NOT EXISTS idx_maquina_sensores (id_Sensores),ADD COLUMN IF NOT EXISTS Sensores LONGTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;',
+            'ALTER TABLE maquinas_listado ADD INDEX IF NOT EXISTS idx_maquina_estado (idEstado),ADD INDEX IF NOT EXISTS idx_maquina_tab (idTab),ADD INDEX IF NOT EXISTS idx_maquina_geo (id_Geo),ADD INDEX IF NOT EXISTS idx_maquina_sensores (id_Sensores),ADD COLUMN IF NOT EXISTS Sensores LONGTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,ADD COLUMN IF NOT EXISTS Alarmas LONGTEXT CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL;',
             'ALTER TABLE maquinas_listado_observaciones ADD INDEX IF NOT EXISTS idx_mlo_maquina (idMaquina),ADD INDEX IF NOT EXISTS idx_mlo_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_mlo_fecha (FechaCreacion);',
             'ALTER TABLE maquinas_listado_documentos ADD INDEX IF NOT EXISTS idx_mld_maquina (idMaquina),ADD INDEX IF NOT EXISTS idx_mld_vencimiento (FVencimiento);',
             'ALTER TABLE maquinas_listado_permisos_usuarios ADD INDEX IF NOT EXISTS idx_mld_usuario (idUsuario),ADD INDEX IF NOT EXISTS idx_mld_maquina (idMaquina);',
@@ -451,6 +493,9 @@ class maquinasInstaller extends ControllerInstaller {
 
         $Data = '
         core_estados(idEstado,Nombre)
+        core_tipos_alarmas(idTipoAlarma,Nombre)
+        core_tipos_alarmas_prioridad(idPrioridad,Nombre)
+        core_unidades_medida(idUniMed,Nombre)
         maquinas_listado(idMaquina,Nombre)
         maquinas_listado_componentes(idComponentes,idMaquina,idPadre,Nombre)
         maquinas_componentes_tareas(idTarea,Nombre)

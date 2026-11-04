@@ -7,15 +7,28 @@
 $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData']['idMaquina']);
 ?>
 <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12" data-aos="fade-up" data-aos-delay="600" data-aos-offset="200" data-aos-duration="500">
-
     <div class="card">
+
+        <?php
+        // Datos
+        $Title          = 'Resumen Máquinas';
+        $SubTitle       = 'Resumen de la Máquina '.($data['rowData']['Nombre'] ?? '');
+        $Text           = 'Información general y datos asociados a la Máquina';
+        $IMG            = $BASE.'/img/img-backgrounds/Maquinas_1.jpg';
+        $Title_color    = 25;
+        $SubTitle_color = 17;
+        $Text_color     = 40;
+        // Imprimo
+        echo $data['Fnc_WidgetsViews']->headerProfile($Title, $SubTitle, $Text, $IMG, $Title_color, $SubTitle_color, $Text_color);
+        ?>
+
         <div class="card-body pt-3">
 
             <ul class="nav nav-tabs nav-tabs-bordered d-grid d-md-flex justify-content-md-between">
                 <li class="nav-item flex-fill"><button class="nav-link w-100 active" data-bs-toggle="tab" data-bs-target="#resumen"><i class="bi bi-card-list"></i> Resumen</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-edit"><i class="bi bi-pencil-square"></i> Editar Datos</button></li>
                 <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-img"><i class="bi bi-image"></i> Cambiar Imagen</button></li>
-                <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
+                <?php if($data['UserData']["maquinasListadoVerDocumentos"] === 2){ ?>
                     <li class="nav-item flex-fill"><button class="nav-link w-100" data-bs-toggle="tab" data-bs-target="#resumen-documentos" onclick="tabDocumentosLoadList()"><i class="bi bi-file-text"></i> Documentos</button></li>
                 <?php } ?>
                 <li class="nav-item flex-fill dropdown">
@@ -24,10 +37,10 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </button>
                     <ul class="dropdown-menu view-more-menu w-100">
                         <li><button class="dropdown-item w-100" data-bs-toggle="tab" data-bs-target="#resumen-obs" onclick="tabObsLoadList()"><i class="bi bi-chat-dots"></i> Observaciones</button></li>
-                        <?php if($data['UserData']["maquinasListadoComponentes"]==2){ ?>
+                        <?php if($data['UserData']["maquinasListadoComponentes"] === 2){ ?>
                             <li><button class="dropdown-item w-100" data-bs-toggle="tab" data-bs-target="#resumen-componentes" onclick="tabComponentesLoadList()"><i class="bi bi-puzzle"></i> Componentes</button></li>
                         <?php } ?>
-                        <?php if($data['UserData']["maquinasListadoTelemetria"]==2){ ?>
+                        <?php if($data['UserData']["maquinasListadoTelemetria"] === 2){ ?>
                             <li><button class="dropdown-item w-100" data-bs-toggle="tab" data-bs-target="#resumen-tel-config"><i class="bi bi-tools"></i> Configuración</button></li>
                             <?php if($data['rowData']['id_Sensores']==1){ ?>
                                 <li><button class="dropdown-item w-100" data-bs-toggle="tab" data-bs-target="#resumen-tel-sensores" onclick="tabSensoresLoadList()"><i class="bi bi-diagram-3"></i> Sensores</button></li>
@@ -109,7 +122,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     <?php } ?>
                 </div>
 
-                <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
+                <?php if($data['UserData']["maquinasListadoVerDocumentos"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-documentos">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -137,7 +150,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </div>
                 </div>
 
-                <?php if($data['UserData']["maquinasListadoComponentes"]==2){ ?>
+                <?php if($data['UserData']["maquinasListadoComponentes"] === 2){ ?>
                     <div class="tab-pane fade" id="resumen-componentes">
                         <h5 class="text-color-red-dark">
                             <div class="d-grid gap-2 d-md-flex justify-content-md-between">
@@ -152,7 +165,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     </div>
                 <?php } ?>
 
-                <?php if($data['UserData']["maquinasListadoTelemetria"]==2){ ?>
+                <?php if($data['UserData']["maquinasListadoTelemetria"] === 2){ ?>
 
                     <div class="tab-pane fade" id="resumen-tel-config">
                         <h5 class="box-title text-color-red-dark">Configuración de <?php echo $data['rowData']['Nombre']; ?></h5>
@@ -287,7 +300,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         });
     }
 
-    <?php if($data['UserData']["maquinasListadoVerDocumentos"]==2){ ?>
+    <?php if($data['UserData']["maquinasListadoVerDocumentos"] === 2){ ?>
         /*********************************************************************/
         /*                            DOCUMENTOS                             */
         /*********************************************************************/
@@ -486,7 +499,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
         });
     }
 
-    <?php if($data['UserData']["maquinasListadoComponentes"]==2){ ?>
+    <?php if($data['UserData']["maquinasListadoComponentes"] === 2){ ?>
         /*********************************************************************/
         /*                            COMPONENTES                            */
         /*********************************************************************/
@@ -627,7 +640,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
             $(Fila).show();
         }
     <?php } ?>
-    <?php if($data['UserData']["maquinasListadoTelemetria"]==2){ ?>
+    <?php if($data['UserData']["maquinasListadoTelemetria"] === 2){ ?>
         /*********************************************************************/
         /*                            Componentes                             */
         /*********************************************************************/
@@ -846,7 +859,6 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                     let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$DataID['data']; ?>';
                     const Options = {
                         closeObject:'#PDloader',
-                        refreshTables:'true',
                     };
                     //Se envian los datos al formulario
                     UpdateContentId(Div, URL, Options);
@@ -859,22 +871,22 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 //Cargo el loader
                 $('#PDloader').show();
                 //Ejecuto
-                let Div       = '#modalContent-lg';
+                let Div       = '#modalContent-xl';
                 let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/new/'; ?>'+ID;
                 const Options = {
-                    showModal : '#viewModal-lg',
+                    showModal : '#viewModal-xl',
                     closeObject:'#PDloader',
                 };
                 //Se envian los datos al formulario
                 UpdateContentId(Div, URL, Options);
             }
             /************************************/
-            function tabAlarmasView(ID) {
+            function tabAlarmasView(uid) {
                 //Cargo el loader
                 $('#PDloader').show();
                 //Ejecuto
                 let Div       = '#modalContent-lg';
-                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/view/'; ?>'+ID;
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/view/'.$DataID['data']; ?>?uid='+encodeURIComponent(uid);
                 const Options = {
                     showModal : '#viewModal-lg',
                     closeObject:'#PDloader',
@@ -883,12 +895,12 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 UpdateContentId(Div, URL, Options);
             }
             /************************************/
-            function tabAlarmasEdit(ID) {
+            function tabAlarmasEdit(uid) {
                 //Cargo el loader
                 $('#PDloader').show();
                 //Ejecuto
                 let Div       = '#modalContent-lg';
-                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/getID/'; ?>'+ID;
+                let URL       = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/getID/'.$DataID['data']; ?>?uid='+encodeURIComponent(uid);
                 const Options = {
                     showModal : '#viewModal-lg',
                     closeObject:'#PDloader',
@@ -897,7 +909,7 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                 UpdateContentId(Div, URL, Options);
             }
             /************************************/
-            function tabAlarmasDel(ID, Dato) {
+            function tabAlarmasDel(uid, Dato) {
                 Swal.fire({
                     title: "Borrar Dato",
                     text: "Esta a punto de eliminar el dato " + Dato + ", ¿Desea continuar?",
@@ -915,19 +927,19 @@ $DataID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData'][
                         //Ejecuto
                         let Metodo      = 'DELETE';
                         let Direccion   = '<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas'; ?>';
-                        let Informacion = {"idAlarmas": ID};
+                        let Informacion = {"idMaquina": '<?php echo $DataID['data']; ?>', "uid": uid};
                         const Options     = {
                             UpdateDiv : [
-                                {Div:'#tabAlarmasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$DataID['data']; ?>', refreshTbl:'true'}
+                                {Div:'#tabAlarmasDataTable', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/alarmas/updateList/'.$DataID['data']; ?>'}
                             ],
                             showNoti:'Dato Borrado Correctamente',
                             closeObject:'#PDloader',
                         };
-                    //Se envian los datos al formulario
-                    SendDataForms(Metodo, Direccion, Informacion, Options);
-                }
-            });
-        }
+                        //Se envian los datos al formulario
+                        SendDataForms(Metodo, Direccion, Informacion, Options);
+                    }
+                });
+            }
     <?php } ?>
     <?php } ?>
 </script>
