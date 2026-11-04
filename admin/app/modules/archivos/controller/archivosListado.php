@@ -33,7 +33,15 @@ class archivosListado extends ControllerFiles {
         // del usuario. Los endpoints genéricos /core/fileExplorer/* solo validan esta
         // concesión (ScopeAccess::check) y nunca confían en un nivel enviado por el cliente.
         /************************************/
-        ScopeAccess::grant($f3, $this->controllerName, $this->getArrLevel($f3, $this->controllerName)['LevelAccess'] ?? 0);
+        $scope = ScopeAccess::grant($f3, $this->controllerName, $this->getArrLevel($f3, $this->controllerName)['LevelAccess'] ?? 0);
+
+        // Si el scope es vacío o el nivel es 0, la autorización falló - denegar acceso
+        if ($scope === '' || $this->getArrLevel($f3, $this->controllerName)['LevelAccess'] ?? 0 === 0) {
+            // Mostrar mensaje de autorización insuficiente y detener ejecución
+            // Esto evita que el usuario vea la pantalla pero no pueda operar
+            $f3->error(403, 'Acceso denegado: autorización insuficiente para acceder al explorador de archivos.');
+            return;
+        }
 
         //Datos enviados a la pagina
         $f3->data = [
@@ -46,7 +54,7 @@ class archivosListado extends ControllerFiles {
             'UserData'      => $this->getUserData($f3),
             'UserAccess'    => $this->getArrLevel($f3, $this->controllerName),
             /*===========   Funcionalidad   ===========*/
-            'Fnc_WidgetsCommon'    => new UIWidgetsCommon(),
+            'Fnc_WidgetsCommon'          => new UIWidgetsCommon(),
             'Fnc_WidgetsFileExplorer'    => new UIWidgetsFileExplorer(),
         ];
 
