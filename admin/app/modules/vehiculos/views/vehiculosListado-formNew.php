@@ -39,7 +39,11 @@
                     $data['Fnc_FormInputs']->formSelect([                 'Placeholder' => 'Tipo Carga',  'Name' => 'idTipoCarga',  'Value' => '','Required' => 1,'arrData' => $data['arrTipoCarga']]);
 
                     //datos ocultos
-                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado', 'Value' => 1, 'Required' => 2]); // Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'idEstado',          'Value' => 1,    'Required' => 2]); // Activo
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'AnoFab',            'Value' => 2005, 'Required' => 2]); // Año de Fabricación
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'CapacidadPersonas', 'Value' => 4,    'Required' => 2]); // Capacidad Pasajeros
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'Capacidad',         'Value' => 1,    'Required' => 2]); // Capacidad (Kilos)
+                    $data['Fnc_FormInputs']->formInputHidden(['Name' => 'MCubicos',          'Value' => 1,    'Required' => 2]); // Metros Cubicos (M3)
 
                     ?>
                 </div>

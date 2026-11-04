@@ -27,10 +27,14 @@
 <div class="modal-body">
 
     <?php
+    // Variables
     $Theme_color = 'summary-theme-color-2';
+    $sdata = '<strong>'.$data['rowData']['Usuario'].':</strong><br>'.$data['rowData']['Observacion'];
+    if(!empty($data['rowData']['FechaEdicion'])){ $sdata .= '<br><small class="text-muted">Editado por '.$data['rowData']['UsuarioEdicion'].' el '.$data['Fnc_DataDate']->fechaEstandar(substr($data['rowData']['FechaEdicion'], 0, 10)).'</small>';}
+    // Se arman los datos
     $arrData = [
         ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-calendar-event', 'Icon_color' => 10,'Title' => 'Fecha Creacion', 'Text' => $data['Fnc_DataDate']->fechaEstandar($data['rowData']['FechaCreacion'])],
-        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text', 'Icon_color' => 10,'Title' => 'Observación',    'Text' => '<strong>'.$data['rowData']['Usuario'].':</strong><br>'.$data['rowData']['Observacion']],
+        ['Theme_color' => $Theme_color, 'Icon' => 'bi bi-chat-left-text', 'Icon_color' => 10,'Title' => 'Observación',    'Text' => $sdata],
     ];
     echo '<div class="row">';
         $OptionsTable['Cols'] = 1;
@@ -40,7 +44,7 @@
 
 </div>
 <?php
-if($data['UserData']["sistemaModalCloseBTN"]==2){
+if($data['UserData']["sistemaModalCloseBTN"] === 2){
     echo '
     <div class="modal-footer">
         <div class="d-grid gap-2 d-md-flex justify-content-md-end w-100">

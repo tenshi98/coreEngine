@@ -59,6 +59,10 @@ class vehiculosInstaller extends ControllerInstaller {
     public function InstallModule(){
 
         /************************************/
+        // Verifico si se ejecuta otro hilo
+        $DBConn = $this->getDBConn();
+
+        /************************************/
         // Se inicia la transacción
         $this->Base_transactionBegin();
 
@@ -83,6 +87,10 @@ class vehiculosInstaller extends ControllerInstaller {
                 if ($xTable['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($xTable['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $xTable['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $xTable['error']);
                 }
@@ -104,11 +112,19 @@ class vehiculosInstaller extends ControllerInstaller {
                 if ($ResponseExec['status'] === false) {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback();
+                    // Se diferencian los errores de validación de los de base de datos
+                    if (is_array($ResponseExec['error'] ?? null)) {
+                        Response::error('Datos inválidos', 400, $ResponseExec['error']);
+                    }
                     // Se reporta el error
                     Response::error('Error al operar con la Base de Datos', 500, $ResponseExec['error']);
                 }
             }
         }
+
+        /************************************/
+        // Transacción solo para los DML (semillas + permisos/rutas)
+        $this->Base_transactionBegin();
 
         /*******************************************************/
         /*                 SE GENERAN LAS RUTAS                */
@@ -123,19 +139,38 @@ class vehiculosInstaller extends ControllerInstaller {
             'RutaWeb'        => 'administracion/vehiculos/listado',  // Ruta web de la transaccion
             'RutaController' => 'vehiculosListado',                  // Controlador de la transaccion
         ];
+
         /************************************/
         // Verifico si existe
         if($arrPermisos){
 
             /************************************/
-            // Se inicia la transacción
-            $this->Base_installModule($arrPermisos);
+            // Se instala el módulo con sus permisos y rutas
+            $this->Base_installModule($arrPermisos, $DBConn);
+
+            /************************************/
+            // Verifico si la transacción sigue activa (Base_installModule()
+            // hace rollback interno en caso de error, por lo que si la
+            // transacción ya no está activa, falló y no debemos hacer commit)
+            if (!$this->Base_inTransaction()) {
+                // La transacción fue revertida internamente, no hacer commit
+                return false;
+            }
 
         }
 
         /************************************/
         // Se confirma la transaccion
-        $this->Base_transactionCommit();
+        $ResponseCommit = $this->Base_transactionCommit();
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if ($ResponseCommit['status'] === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            return false;
+        }
 
         /************************************/
         // Retorno True por defecto
@@ -177,12 +212,15 @@ class vehiculosInstaller extends ControllerInstaller {
         }, $routes);
     }
 
+    /*******************************************************************/
+    // Definicion de rutas por permiso
+    /*******************************************************************/
     public function getRouteDefinitions(int $type): array {
         return match ($type) {
             1 => [
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/listAll',                       'RutaController' => 'vehiculosListado->listAll',                  'Descripcion' => 'Listar Toda la Información',                   'idLevelLimit' => 1, 'Controller' => 'vehiculosListado'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/vehiculos/listado/search',                        'RutaController' => 'vehiculosListado->UpdateList',               'Descripcion' => 'Filtrar datos',                                'idLevelLimit' => 1, 'Controller' => 'vehiculosListado'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/updateList',                    'RutaController' => 'vehiculosListado->UpdateList',               'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 2, 'Controller' => 'vehiculosListado'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/updateList',                    'RutaController' => 'vehiculosListado->UpdateList',               'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 1, 'Controller' => 'vehiculosListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/exportar',                      'RutaController' => 'vehiculosListado->export',                   'Descripcion' => 'Listar Todas las vehiculos para exportarlas',  'idLevelLimit' => 3, 'Controller' => 'vehiculosListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/view/@id',                      'RutaController' => 'vehiculosListado->View',                     'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 1, 'Controller' => 'vehiculosListado'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/resumen/@id',                   'RutaController' => 'vehiculosListado->Resumen',                  'Descripcion' => 'Mostrar Resúmen',                              'idLevelLimit' => 2, 'Controller' => 'vehiculosListado'],
@@ -200,7 +238,7 @@ class vehiculosInstaller extends ControllerInstaller {
                 ['idMetodo' => 3, 'RutaWeb' => 'administracion/vehiculos/listado/observaciones',                 'RutaController' => 'vehiculosListadoObservaciones->Delete',      'Descripcion' => 'Borrar dato y archivos',                       'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoObservaciones'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/documentos/new/@id',            'RutaController' => 'vehiculosListadoDocumentos->New',            'Descripcion' => 'Mostrar modal nuevo',                          'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/documentos/updateList/@id',     'RutaController' => 'vehiculosListadoDocumentos->UpdateList',     'Descripcion' => 'Actualizar Lista',                             'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoDocumentos'],
-                ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/documentos/view/@id',           'RutaController' => 'vehiculosListadoDocumentos->View',           'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoDocumentos'],
+                ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/documentos/view/@id',           'RutaController' => 'vehiculosListadoDocumentos->View',           'Descripcion' => 'Mostrar Detallado',                            'idLevelLimit' => 1, 'Controller' => 'vehiculosListadoDocumentos'],
                 ['idMetodo' => 1, 'RutaWeb' => 'administracion/vehiculos/listado/documentos/getID/@id',          'RutaController' => 'vehiculosListadoDocumentos->GetID',          'Descripcion' => 'Información para el formulario edición',       'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/vehiculos/listado/documentos',                    'RutaController' => 'vehiculosListadoDocumentos->Insert',         'Descripcion' => 'Crear Información',                            'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoDocumentos'],
                 ['idMetodo' => 2, 'RutaWeb' => 'administracion/vehiculos/listado/documentos/update',             'RutaController' => 'vehiculosListadoDocumentos->Update',         'Descripcion' => 'Editar por post (modificar y subir archivos)', 'idLevelLimit' => 2, 'Controller' => 'vehiculosListadoDocumentos'],
@@ -217,9 +255,9 @@ class vehiculosInstaller extends ControllerInstaller {
 
         /************************************/
         // Se obtiene el nombre de los Controladores utilizados
-        $RutaController  = '"vehiculosListado"';
-        $RutaController .= ',"vehiculosListadoObservaciones"';
-        $RutaController .= ',"vehiculosListadoDocumentos"';
+        $RutaController  = 'vehiculosListado';
+        $RutaController .= ',vehiculosListadoObservaciones';
+        $RutaController .= ',vehiculosListadoDocumentos';
 
         /************************************/
         // Retorno los datos

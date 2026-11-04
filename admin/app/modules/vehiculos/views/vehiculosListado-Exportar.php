@@ -13,7 +13,7 @@
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             <?php echo $data['TableTitle']; ?>
                             <?php if($data['UserAccess']['LevelAccess']>=3){ ?>
-                                <button type="button" class="btn btn-success"    onclick="exportTableToExcel('tableData', 'Entidades')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>
+                                <button type="button" class="btn btn-success"    onclick="exportTableToExcel('tableData', 'Vehiculos')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>
                             <?php } ?>
                         </div>
                     </h5>
@@ -23,31 +23,21 @@
                             <thead>
                                 <tr>
                                     <th scope="col">Nombre</th>
-                                    <th scope="col">Nick</th>
-                                    <th scope="col">Rut</th>
-                                    <th scope="col">Ciudad</th>
-                                    <th scope="col">Comuna</th>
-                                    <th scope="col">Sector</th>
-                                    <th scope="col">Dirección</th>
-                                    <th scope="col">Fecha Nacimiento</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Celular</th>
-                                    <th scope="col">Teléfono</th>
-                                    <th scope="col">Web</th>
-                                    <th scope="col">Giro</th>
                                     <th scope="col">Tipo</th>
-                                    <th scope="col">Tipo Entidad</th>
+                                    <th scope="col">Marca</th>
+                                    <th scope="col">Modelo</th>
+                                    <th scope="col">Patente</th>
+                                    <th scope="col">Número de serie</th>
+                                    <th scope="col">Año de Fabricación</th>
+                                    <th scope="col">Capacidad Pasajeros</th>
+                                    <th scope="col">Capacidad (Kilos)</th>
+                                    <th scope="col">Metros Cúbicos (M3)</th>
+                                    <th scope="col">Tipo de Carga</th>
+                                    <th scope="col">Latitud</th>
+                                    <th scope="col">Longitud</th>
+                                    <th scope="col">Velocidad</th>
+                                    <th scope="col">Última Actualización</th>
                                     <th scope="col">Estado</th>
-                                    <th scope="col">Sexo</th>
-                                    <th scope="col">Rep Legal Nombre</th>
-                                    <th scope="col">Rep Legal Rut</th>
-                                    <th scope="col">Rep Legal Email</th>
-                                    <th scope="col">Rep Legal Celular</th>
-                                    <th scope="col">Rep Legal Teléfono</th>
-                                    <th scope="col">X (twiter)</th>
-                                    <th scope="col">Facebook</th>
-                                    <th scope="col">Instagram</th>
-                                    <th scope="col">Linkedin</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -56,38 +46,27 @@
                                 if(is_array($data['arrList'])&&!empty($data['arrList'])){
                                     // Recorro
                                     foreach($data['arrList'] as $crud){
-                                        // Se obtiene el nombre o la razón social
-                                        switch ($crud['idTipoEntidad']) {
-                                            case 1: $Entidad = $crud['ApellidoPat'].' '.$crud['ApellidoMat'].', '.$crud['Nombre']; break; //Persona Natural
-                                            case 2: $Entidad = $crud['RazonSocial']; break;                                               //Empresas
-                                        } ?>
+                                        // Se arma la fecha y hora de la ultima actualizacion
+                                        $UltimaActualizacion = !empty($crud['LastUpdateFecha'])
+                                                             ? $data['Fnc_DataDate']->fechaEstandar($crud['LastUpdateFecha']).' '.$crud['LastUpdateHora']
+                                                             : ''; ?>
                                         <tr>
-                                            <td><?php echo $Entidad; ?></td>
-                                            <td><?php echo $crud['Nick']; ?></td>
-                                            <td><?php echo $crud['Rut']; ?></td>
-                                            <td><?php echo $crud['Ciudad']; ?></td>
-                                            <td><?php echo $crud['Comuna']; ?></td>
-                                            <td><?php echo $crud['Sector']; ?></td>
-                                            <td><?php echo $crud['Direccion']; ?></td>
-                                            <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FNacimiento']); ?></td>
-                                            <td><?php echo $crud['Email']; ?></td>
-                                            <td><?php echo $data['Fnc_DataNumbers']->formatPhone($crud['Fono1']); ?></td>
-                                            <td><?php echo $data['Fnc_DataNumbers']->formatPhone($crud['Fono2']); ?></td>
-                                            <td><?php echo $crud['Web']; ?></td>
-                                            <td><?php echo $crud['Giro']; ?></td>
+                                            <td><?php echo $crud['Nombre']; ?></td>
                                             <td><?php echo $crud['Tipo']; ?></td>
-                                            <td><?php echo $crud['TipoEntidad']; ?></td>
+                                            <td><?php echo $crud['Marca']; ?></td>
+                                            <td><?php echo $crud['Modelo']; ?></td>
+                                            <td><?php echo $crud['Patente']; ?></td>
+                                            <td><?php echo $crud['Num_serie']; ?></td>
+                                            <td><?php echo $crud['AnoFab']; ?></td>
+                                            <td><?php echo $crud['CapacidadPersonas']; ?></td>
+                                            <td><?php echo $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($crud['Capacidad']); ?></td>
+                                            <td><?php echo $data['Fnc_DataNumbers']->cantidadesDecimalesJustos($crud['MCubicos']); ?></td>
+                                            <td><?php echo $crud['TipoCarga']; ?></td>
+                                            <td><?php echo $crud['Latitud']; ?></td>
+                                            <td><?php echo $crud['Longitud']; ?></td>
+                                            <td><?php echo $crud['Velocidad']; ?></td>
+                                            <td><?php echo $UltimaActualizacion; ?></td>
                                             <td><?php echo $crud['Estado']; ?></td>
-                                            <td><?php echo $crud['Sexo']; ?></td>
-                                            <td><?php echo $crud['RepLegalNombre']; ?></td>
-                                            <td><?php echo $crud['RepLegalRut']; ?></td>
-                                            <td><?php echo $crud['RepLegalEmail']; ?></td>
-                                            <td><?php echo $data['Fnc_DataNumbers']->formatPhone($crud['RepLegalFono1']); ?></td>
-                                            <td><?php echo $data['Fnc_DataNumbers']->formatPhone($crud['RepLegalFono2']); ?></td>
-                                            <td><?php echo $crud['Social_X']; ?></td>
-                                            <td><?php echo $crud['Social_Facebook']; ?></td>
-                                            <td><?php echo $crud['Social_Instagram']; ?></td>
-                                            <td><?php echo $crud['Social_Linkedin']; ?></td>
                                         </tr>
                                     <?php } ?>
                                 <?php } ?>
