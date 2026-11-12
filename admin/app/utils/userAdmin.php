@@ -212,6 +212,7 @@ if($f3->get('SESSION.DataInfo.UserType')==1){
     $f3->route('GET /Core/plataforma/instalacion/checkModuleData/@Controller', 'sistemaInstalacion->checkModuleData');   //Revisar las rutas deL instalador contra la BD
     $f3->route('GET /Core/plataforma/instalacion/checkModuleBBDD/@Controller', 'sistemaInstalacion->checkModuleBBDD');   //Revisar las rutas de la BD contra el instalador
     $f3->route('PUT /Core/plataforma/instalacion/installModule',               'sistemaInstalacion->installModule');     //Instalacion de modulos
+    $f3->route('PUT /Core/plataforma/instalacion/updateModule', 'sistemaInstalacion->updateModule'); //Actualizacion de modulos
     $f3->route('PUT /Core/plataforma/instalacion/uninstallModule',             'sistemaInstalacion->uninstallModule');   //Desinstalacion de modulos
     $f3->route('GET /Core/plataforma/rutas/listado',                           'sistemaRutas->Resumen');                 // Listar las rutas disponibles
     /*************************************************************/
