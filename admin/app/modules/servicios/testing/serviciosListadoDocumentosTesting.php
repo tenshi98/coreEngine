@@ -968,6 +968,98 @@ class serviciosListadoDocumentosTesting extends ControllerBase {
      *
      * @return array Resultado por caso
      */
+/******************************************************************************/
+    /*                                  VISTAS                                    */
+    /******************************************************************************/
+    /**     * Renderiza la vista `-List` con datos sinteticos y verifica la estructura,
+     * endpoints, formulario de busqueda, botones por nivel y matriz de permisos.
+     *
+     * @return array Resultado por caso
+     */
+    public function vistaListadoTest($f3){
+        $results = [];
+        $BASE    = (string)$f3->get('BASE');
+        if (trim($BASE) === '') {
+            $BASE = '/admin';
+        }
+
+        /*====================================*/
+        // Vista List propio del controlador
+        /*====================================*/
+        $rutaList = $this->rutaModulo('../views/'.self::CONTROLADOR.'-List.php');
+        $html = $this->renderizarVista($rutaList, $this->datosSinteticos(1), $BASE, $f3);
+
+        $this->addCase($results, 'listado_render', $html !== '', 'la vista List no produjo HTML');
+        $this->addCase($results, 'listado_contenedor', str_contains($html, 'id="listTableData"'),
+            'falta el contenedor de la tabla');
+        $this->addCase($results, 'listado_form_busqueda', str_contains($html, 'id="FormSearchData"'),
+            'no se dibuja el formulario de busqueda');
+        $this->addCase($results, 'listado_form_nuevo', str_contains($html, 'newFormModal'),
+            'no se dibuja el modal de alta');
+        $this->addCase($results, 'listado_titulo', str_contains($html, 'Servicios'),
+            'no se muestra el titulo de la tabla');
+        $this->addCase($results, 'listado_columnas', str_contains($html, '>Nombre<') && str_contains($html, '>Fecha<'),
+            'la tabla no declara las columnas Nombre y Fecha');
+        $this->addCase($results, 'listado_endpoint_ver', str_contains($html, '/view/'),
+            'falta el endpoint de detalle');
+        $this->addCase($results, 'listado_endpoint_editar', str_contains($html, '/getID/'),
+            'falta el endpoint del formulario de edicion');
+        $this->addCase($results, 'listado_endpoint_actualizar', str_contains($html, '/updateList'),
+            'falta el endpoint de refresco de la tabla');
+        $this->addCase($results, 'listado_endpoint_buscar',
+            str_contains($html, '/search') && str_contains($html, "'POST'"),
+            'el formulario de busqueda no apunta a /search con POST');
+        $this->addCase($results, 'listado_sin_resumen', !str_contains($html, '/resumen/'),
+            'un catalogo sin resumen no debe enlazar /resumen/');
+        $this->addCase($results, 'listado_sin_crear_nivel1', !str_contains($html, 'Crear Nuevo</button>'),
+            'con nivel 1 el listado no ofrece crear registros');
+        $this->addCase($results, 'listado_sin_editar_nivel1', !str_contains($html, 'bi-pencil-square'),
+            'con nivel 1 el listado no ofrece editar registros');
+        $this->addCase($results, 'listado_sin_borrar_nivel1', !str_contains($html, 'bi-trash'),
+            'con nivel 1 el listado no ofrece borrar registros');
+
+        /*====================================*/
+        // El boton "Crear Nuevo" exige nivel >= 3 (segundo render)
+        /*====================================*/
+        $htmlNivel3 = $this->renderizarVista($rutaList, $this->datosSinteticos(3), $BASE, $f3);
+        $this->addCase($results, 'listado_crear_nivel3', str_contains($htmlNivel3, 'Crear Nuevo</button>'),
+            'con nivel 3 el listado no ofrece crear registros');
+
+        /*====================================*/
+        // Matriz de permisos de las acciones por fila
+        /*====================================*/
+        $rutaUpdateList = $this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php');
+        $matriz = [
+            1 => ['ver' => true,  'editar' => false, 'borrar' => false],
+            2 => ['ver' => true,  'editar' => true,  'borrar' => false],
+            3 => ['ver' => true,  'editar' => true,  'borrar' => false],
+            4 => ['ver' => true,  'editar' => true,  'borrar' => true],
+        ];
+        foreach ($matriz as $nivel => $esperado) {
+            $dataFila = $this->datosSinteticos($nivel);
+            $htmlFila = $this->renderizarVista($rutaUpdateList, $dataFila, $BASE, $f3);
+            $this->addCase($results, 'filas_render_nivel'.$nivel, $htmlFila !== '',
+                'UpdateList no produjo HTML con nivel '.$nivel);
+            $this->addCase($results, 'filas_ver_nivel'.$nivel,
+                $esperado['ver'] === str_contains($htmlFila, 'bi-eye'),
+                'nivel '.$nivel.' no ofrece ver el registro');
+            $this->addCase($results, 'filas_editar_nivel'.$nivel,
+                $esperado['editar'] === str_contains($htmlFila, 'bi-pencil-square'),
+                'nivel '.$nivel.' no ofrece editar el registro');
+            $this->addCase($results, 'filas_borrar_nivel'.$nivel,
+                $esperado['borrar'] === str_contains($htmlFila, 'bi-trash'),
+                'nivel '.$nivel.' no ofrece borrar el registro');
+        }
+
+        /************************************/
+        // Retorno los datos
+        return $results;
+
+    }
+
+    /******************************************************************************/
+    /*                                  VISTAS                                    */
+    /******************************************************************************/
     public function seguridadVistasTest(){
 
         $results = [];

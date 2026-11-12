@@ -60,6 +60,30 @@ class entidadesListadoTesting extends ControllerBase {
     }
 
     /*******************************************************************/
+    // Extrae el cuerpo de un metodo publico para contar sentencias dentro de ese metodo
+    /*******************************************************************/
+    private function cuerpoMetodo(string $codigo, string $metodo): string{
+        $inicio = 'public function '.$metodo.'(';
+        $pos = strpos($codigo, $inicio);
+        if ($pos === false) {
+            return '';
+        }
+        $fragmento = substr($codigo, $pos + strlen($inicio));
+        $llave = strpos($fragmento, '{');
+        if ($llave === false) {
+            return '';
+        }
+        $cuerpo = substr($fragmento, $llave + 1);
+        foreach (["\n    public function ", "\n    private function ", "\n    protected function "] as $declaracion) {
+            $corte = strpos($cuerpo, $declaracion);
+            if ($corte !== false) {
+                $cuerpo = substr($cuerpo, 0, $corte);
+            }
+        }
+        return $cuerpo;
+    }
+
+    /*******************************************************************/
     // Ruta absoluta dentro del modulo (la carpeta testing/ es la base)
     /*******************************************************************/
     private function rutaModulo(string $sub = ''): string{
@@ -558,11 +582,12 @@ class entidadesListadoTesting extends ControllerBase {
         /*====================================*/
         $this->addCase($results, 'delete_verbo', str_contains($codigo, "REQUEST_METHOD'] !== 'DELETE'"),
             'Delete() no valida el verbo HTTP DELETE');
+        $cuerpoDelete = $this->cuerpoMetodo($codigo, 'Delete');
         $this->addCase($results, 'delete_transaccion',
-            substr_count($codigo, 'Base_transactionBegin()') === 1
-            && substr_count($codigo, 'Base_transactionCommit()') === 1
-            && substr_count($codigo, 'Base_transactionRollback()') === 0,
-            'Delete() debe abrir una transaccion, confirmarla; los fallos pasan a failOperation (0 rollback inline)');
+            substr_count($cuerpoDelete, 'Base_transactionBegin()') === 1
+            && substr_count($cuerpoDelete, 'Base_transactionCommit()') === 1
+            && substr_count($cuerpoDelete, 'Base_transactionRollback()') === 2,
+            'Delete() abre una transaccion, la confirma y revierte en sus dos catch ante fallo');
         $this->addCase($results, 'delete_cascada',
             str_contains($codigo, "'table' => 'entidades_listado_cargas'")
             && str_contains($codigo, "'table' => 'entidades_listado_contactos'")
@@ -588,20 +613,20 @@ class entidadesListadoTesting extends ControllerBase {
         /*====================================*/
         $this->addCase($results, 'respuesta_exito', substr_count($codigo, 'Response::success(') === 4,
             'se esperaban 4 Response::success() (Insert, Update, Delete y delFiles)');
-        $this->addCase($results, 'respuesta_405', substr_count($codigo, "Response::error('Error en el Request Method', 405)") === 3,
-            'Update/Delete/delFiles deben responder 405 ante un verbo incorrecto');
+        $this->addCase($results, 'respuesta_405', substr_count($codigo, "Response::error('Error en el Request Method', 405)") === 4,
+            'Insert/Update/Delete/delFiles deben responder 405 ante un verbo incorrecto');
         $this->addCase($results, 'respuesta_400', substr_count($codigo, "Response::error('Registro inválido', 400)") === 4,
             'View/Resumen/ResumenUpdate e Insert deben responder 400 ante un ID invalido');
-        $this->addCase($results, 'respuesta_500', substr_count($codigo, 'failOperation(') === 5,
-            'se esperaban 5 puntos failOperation (Insert, Update, Delete x2 y delFiles)');
+        $this->addCase($results, 'respuesta_500', substr_count($codigo, "Response::error('Error al operar con la Base de Datos', 500") === 9,
+            'se esperaban respuestas 500 ante fallos de base de datos en los metodos de escritura');
 
         /*====================================*/
         // IDs cifrados en las vistas
         /*====================================*/
         $this->addCase($results, 'id_descifrado_vistas', substr_count($codigo, "encryptDecrypt('decrypt', \$params['id'])") === 3,
             'View/Resumen/ResumenUpdate deben descifrar $params[\'id\']');
-        $this->addCase($results, 'id_valido_vistas', substr_count($codigo, "isValidDecrypted(\$EntidadID, 'id')") === 3,
-            'View/Resumen/ResumenUpdate deben validar el ID con isValidDecrypted()');
+        $this->addCase($results, 'id_valido_vistas', substr_count($codigo, "isValidDecrypted(\$EntidadID, 'id')") === 4,
+            'View/Resumen/ResumenUpdate e Insert deben validar el ID con isValidDecrypted()');
 
         /************************************/
         // Retorno los datos

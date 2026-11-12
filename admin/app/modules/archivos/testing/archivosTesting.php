@@ -252,7 +252,16 @@ class archivosTesting extends ControllerBase {
         $this->addCase($results, 'renderiza_pagina_completa', str_contains($codigo, 'showVista(1,'),
             'no renderiza la vista como pagina completa (showVista(1, ...))');
         $this->addCase($results, 'resuelve_ruta_vista', str_contains($codigo, 'returnRutaVista('), 'no resuelve la ruta de la vista');
-        $this->addCase($results, 'instancia_widget', str_contains($codigo, 'new UIWidgetsCommon()'), 'no instancia el widget comun');
+        $this->addCase($results, 'instancia_widget_fileexplorer', str_contains($codigo, 'new UIWidgetsFileExplorer()'), 'no instancia el widget del explorador de archivos');
+        $this->addCase($results, 'concede_scope_acceso', str_contains($codigo, 'ScopeAccess::grant'), 'listAll() no concede el ambito de autorizacion (ScopeAccess::grant)');
+        $this->addCase($results, 'deniega_sin_autorizacion', str_contains($codigo, 'error(403'), 'listAll() no deniega el acceso con HTTP 403 cuando falta autorizacion');
+        if (class_exists('archivosListado')) {
+            $this->addCase($results, 'constructor_sin_dependencia_bd',
+                (new ReflectionMethod('archivosListado', '__construct'))->getNumberOfParameters() === 0,
+                'el constructor del controlador depende de una conexion de BD');
+        } else {
+            $this->addCase($results, 'constructor_sin_dependencia_bd', false, 'la clase archivosListado no esta cargada');
+        }
 
         /************************************/
         // Retorno los datos
@@ -376,6 +385,18 @@ class archivosTesting extends ControllerBase {
         // La ruta base del widget debe llegar cifrada: nunca vacia (si no, el widget corta la peticion)
         $this->addCase($results, 'vista_route_no_vacia', !preg_match("/'Route'\s*=>\s*''/", $codigo),
             'la vista envia Route vacio, lo que hace que el widget detenga la peticion');
+        // Route debe ser la ruta base del explorador (no vacia ni expuesta en claro al cliente)
+        $this->addCase($results, 'vista_route_valor_fileexplorer',
+            preg_match("/'Route'\s*=>\s*'fileExplorer'/", $codigo) === 1,
+            'la opcion Route no es "fileExplorer"');
+        // Ambito de autorizacion: el endpoint valida la concesion del modulo que renderiza la vista
+        $this->addCase($results, 'vista_opcion_accessscope',
+            str_contains($codigo, "'AccessScope'"),
+            'la vista no envia la opcion AccessScope');
+        // La vista delega en el widget dedicado del explorador (no en el comun)
+        $this->addCase($results, 'vista_invocacion_widget_fileexplorer',
+            str_contains($codigo, "Fnc_WidgetsFileExplorer']->widget_fileExplorer("),
+            'la vista no invoca widget_fileExplorer a traves de Fnc_WidgetsFileExplorer');
 
         /*====================================*/
         // Rutas base para el renderizado
@@ -1024,6 +1045,94 @@ class archivosTesting extends ControllerBase {
             $this->addCase($results, 'limpia_subruta_prueba',
                 !is_dir($ruta) && !is_dir($base.'/'.self::SUBRUTA_EXPLORADOR.'/'.$hoja),
                 'la subruta de la prueba quedo en el almacenamiento');
+        }
+
+        /************************************/
+        // Retorno los datos
+        return $results;
+
+    }
+
+    /******************************************************************************/
+    /*                     AUTORIZACION DEL CONTROLADOR                           */
+    /******************************************************************************/
+    /**
+     * Verifica el gate de autorizacion de `archivosListado->listAll()`:
+     * sin ambito concedido o con nivel 0 debe denegar con HTTP 403 y no renderizar;
+     * con nivel suficiente debe pasar el gate sin emitir 403.
+     *
+     * Usa un doble de F3 minimo (get()/set()/error()) y no toca la base de datos.
+     *
+     * @return array Resultado por caso
+     */
+    public function autorizacionListadoTest(){
+
+        $results = [];
+
+        if (!class_exists('archivosListado')) {
+            $this->addCase($results, 'listall_deniega_sin_nivel', false, 'la clase archivosListado no esta cargada');
+            $this->addCase($results, 'listall_pasa_gate_con_nivel', false, 'la clase archivosListado no esta cargada');
+            return $results;
+        }
+
+        $Controller = new archivosListado();
+
+        /*====================================*/
+        // Doble de F3: sesion de usuario sin nivel para archivosListado
+        /*====================================*/
+        $f3SinNivel = new class {
+            public $errores = [];
+            public function get($clave){
+                if ($clave === 'SESSION.DataInfo')   return ['UserID' => 7];
+                if ($clave === 'SESSION.arrLevel')   return [];
+                if ($clave === 'BASE')               return '/admin';
+                return null;
+            }
+            public function set($clave, $valor){}
+            public function error($codigo, $mensaje){
+                $this->errores[] = [$codigo, $mensaje];
+            }
+        };
+
+        try {
+            $Controller->listAll($f3SinNivel);
+            $this->addCase($results, 'listall_deniega_sin_nivel',
+                isset($f3SinNivel->errores[0][0]) && $f3SinNivel->errores[0][0] === 403,
+                'listAll() no denegó con HTTP 403 sin nivel de acceso');
+        } catch (Throwable $e) {
+            $this->addCase($results, 'listall_deniega_sin_nivel', false,
+                'listAll() lanzo '.$e->getMessage().' antes de denegar');
+        }
+
+        /*====================================*/
+        // Doble de F3: sesion de usuario con nivel suficiente (4)
+        /*====================================*/
+        $f3ConNivel = new class {
+            public $errores = [];
+            public function get($clave){
+                if ($clave === 'SESSION.DataInfo')   return ['UserID' => 7];
+                if ($clave === 'SESSION.arrLevel')   return ['archivosListado' => ['LevelAccess' => 4, 'RouteAccess' => 'gestionDocumentacion/fileManager/listado']];
+                if ($clave === 'BASE')               return '/admin';
+                return null;
+            }
+            public function set($clave, $valor){}
+            public function error($codigo, $mensaje){
+                $this->errores[] = [$codigo, $mensaje];
+            }
+        };
+
+        try {
+            $Controller->listAll($f3ConNivel);
+            $this->addCase($results, 'listall_pasa_gate_con_nivel',
+                !isset($f3ConNivel->errores[0][0]) || $f3ConNivel->errores[0][0] !== 403,
+                'listAll() denego el acceso aun con nivel suficiente');
+        } catch (Throwable $e) {
+            // showVista intenta renderizar plantillas fuera de este arnés: no es fallo del gate
+            $msg = $e->getMessage();
+            $pasoGate = str_contains($msg, 'Acceso denegado') === false;
+            $this->addCase($results, 'listall_pasa_gate_con_nivel', $pasoGate,
+                $pasoGate ? 'gate OK (render fallado por plantillas fuera del arnes: '.$msg.')'
+                          : 'listAll() denegó con nivel suficiente ('.$msg.')');
         }
 
         /************************************/

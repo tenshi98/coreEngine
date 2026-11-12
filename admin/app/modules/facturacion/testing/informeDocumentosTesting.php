@@ -140,7 +140,7 @@ class informeDocumentosTesting extends ControllerBase {
                 }
             }
         } catch (Throwable $e) {
-            return [];
+            $this->addCase($results, 'error_ruta_instalador', false, $e->getMessage());
         }
         return $rutas;
     }

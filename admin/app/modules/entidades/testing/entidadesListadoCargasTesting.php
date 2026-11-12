@@ -445,11 +445,8 @@ class entidadesListadoCargasTesting extends ControllerBase {
             substr_count($codigo, 'Base_transactionCommit()') === 3,
             'Insert/Update/Delete deben confirmar la transaccion');
         $this->addCase($results, 'transaccion_rollback',
-            substr_count($codigo, 'Base_transactionRollback()') === 0,
-            'Insert/Update/Delete deben revertir la transaccion ante el fallo de la Base');
-        $this->addCase($results, 'transaccion_rollback_antes_de_error',
-            substr_count($codigo, 'failOperation(') === 3,
-            'cada punto de fallo de Base debe invocar failOperation');
+            substr_count($codigo, 'Base_transactionRollback()') === 6,
+            'los seis catch (dos por escritura) revierten la transaccion ante el fallo de la Base');
         $this->addCase($results, 'transaccion_commit_antes_de_exito',
             strpos($codigo, 'Base_transactionCommit()') < strpos($codigo, 'Response::success('),
             'la confirmacion debe ocurrir antes de responder con exito');
@@ -459,12 +456,12 @@ class entidadesListadoCargasTesting extends ControllerBase {
         /*====================================*/
         $this->addCase($results, 'respuesta_exito', substr_count($codigo, 'Response::success(') === 3,
             'se esperaban 3 Response::success() (Insert, Update y Delete)');
-        $this->addCase($results, 'respuesta_405', substr_count($codigo, "Response::error('Error en el Request Method', 405)") === 2,
-            'Update() y Delete() deben responder 405 ante un verbo incorrecto');
+        $this->addCase($results, 'respuesta_405', substr_count($codigo, "Response::error('Error en el Request Method', 405)") === 3,
+            'Insert/Update/Delete deben responder 405 ante un verbo incorrecto');
         $this->addCase($results, 'respuesta_400', substr_count($codigo, "Response::error('Registro inválido', 400)") === 4,
             'los 4 metodos con ID cifrado deben responder 400 ante un ID invalido');
-        $this->addCase($results, 'respuesta_500', substr_count($codigo, 'failOperation(') === 3,
-            'se esperaban 3 puntos failOperation (Insert, Update y Delete)');
+        $this->addCase($results, 'respuesta_500', substr_count($codigo, "Response::error('Error al operar con la Base de Datos', 500") === 6,
+            'se esperaban respuestas 500 ante fallos de base de datos en Insert, Update y Delete');
         $this->addCase($results, 'id_descifrado_vistas', substr_count($codigo, "encryptDecrypt('decrypt', \$params['id'])") === 4,
             'New/UpdateList/View/GetID deben descifrar $params[\'id\']');
         $this->addCase($results, 'id_valido_vistas', substr_count($codigo, "isValidDecrypted(") === 4,

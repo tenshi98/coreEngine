@@ -505,7 +505,7 @@ class informeProductosTesting extends ControllerBase {
         $this->addCase($results, 'metadatos_pagina',
             str_contains($codigo, "'PageTitle'") && str_contains($codigo, "'TableTitle'"),
             'listAll() no asigna PageTitle y TableTitle');
-        $this->addCase($results, 'fallback_errores', substr_count($codigo, 'mergeResponses(') === 3,
+        $this->addCase($results, 'fallback_errores', substr_count($codigo, 'mergeResponses(') === 4,
             'el controlador no agrupa las respuestas fallidas con mergeResponses()');
 
         /*====================================*/
