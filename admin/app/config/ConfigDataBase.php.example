@@ -20,6 +20,13 @@ define('ENV_DB_MYSQL1_DATABASE', getenv('DB_MYSQL1_DATABASE'));
 define('ENV_DB_MYSQL1_CHARSET', getenv('DB_MYSQL1_CHARSET'));
 define('ENV_DB_MYSQL1_PORT', (int) getenv('DB_MYSQL1_PORT'));
 
+define('ENV_DB_MCP_HOSTNAME', getenv('DB_MCP_HOSTNAME'));
+define('ENV_DB_MCP_USERNAME', getenv('DB_MCP_USERNAME'));
+define('ENV_DB_MCP_PASSWORD', getenv('DB_MCP_PASSWORD'));
+define('ENV_DB_MCP_DATABASE', getenv('DB_MCP_DATABASE'));
+define('ENV_DB_MCP_CHARSET', getenv('DB_MCP_CHARSET'));
+define('ENV_DB_MCP_PORT', (int) getenv('DB_MCP_PORT'));
+
 define('ENV_DB_POSTGRES1_HOSTNAME', getenv('DB_POSTGRES1_HOSTNAME'));
 define('ENV_DB_POSTGRES1_USERNAME', getenv('DB_POSTGRES1_USERNAME'));
 define('ENV_DB_POSTGRES1_PASSWORD', getenv('DB_POSTGRES1_PASSWORD'));
@@ -58,6 +65,16 @@ class ConfigDataBase{
         'DATABASE' => ENV_DB_MYSQL1_DATABASE,
         'CHARSET'  => ENV_DB_MYSQL1_CHARSET,
         'PORT'     => ENV_DB_MYSQL1_PORT,
+    ];
+    /*****************************************************/
+    // Variables para MySQL (cuenta de solo lectura del servidor MCP)
+    const MySQL_MCP = [
+        'HOSTNAME' => ENV_DB_MCP_HOSTNAME,
+        'USERNAME' => ENV_DB_MCP_USERNAME,
+        'PASSWORD' => ENV_DB_MCP_PASSWORD,
+        'DATABASE' => ENV_DB_MCP_DATABASE,
+        'CHARSET'  => ENV_DB_MCP_CHARSET,
+        'PORT'     => ENV_DB_MCP_PORT,
     ];
     /*****************************************************/
     // Variables para MySQL
