@@ -58,21 +58,8 @@ class crudResumenObservaciones extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCrud,Email',
-            'table'   => 'core_test_crud',
-            'join'    => '',
-            'where'   => 'idCrud = ?',
-            'params'  => [$CrudID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
+        // Se obtienen los datos
+        $rowData = $this->getDataDetailCrud($CrudID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -127,30 +114,8 @@ class crudResumenObservaciones extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                core_test_crud_observaciones.idObservaciones,
-                core_test_crud_observaciones.Observacion,
-                core_test_crud_observaciones.FechaCreacion,
-                core_test_crud_observaciones.FechaEdicion,
-                usuarios_listado.Nombre AS Usuario,
-                usuarios_edicion.Nombre AS UsuarioEdicion',
-            'table'   => 'core_test_crud_observaciones',
-            'join'    => '
-                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
-                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
-            'where'   => 'core_test_crud_observaciones.idCrud = ?',
-            'params'  => [$CrudID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'core_test_crud_observaciones.idObservaciones ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams          = ['query' => $query];
-        // Ejecuto la query
-        $arrObservaciones = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $arrObservaciones = $this->getDataList('core_test_crud_observaciones.idCrud = ?', [$CrudID['data']]);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -204,29 +169,8 @@ class crudResumenObservaciones extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                core_test_crud_observaciones.idObservaciones,
-                core_test_crud_observaciones.Observacion,
-                core_test_crud_observaciones.FechaCreacion,
-                core_test_crud_observaciones.FechaEdicion,
-                usuarios_listado.Nombre AS Usuario,
-                usuarios_edicion.Nombre AS UsuarioEdicion',
-            'table'   => 'core_test_crud_observaciones',
-            'join'    => '
-                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
-                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
-            'where'   => 'core_test_crud_observaciones.idObservaciones = ?',
-            'params'  => [$ObservacionesID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
+        // Se obtienen los datos
+        $rowData = $this->getDataDetail($ObservacionesID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -281,21 +225,8 @@ class crudResumenObservaciones extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idObservaciones,idCrud,Observacion,FechaCreacion',
-            'table'   => 'core_test_crud_observaciones',
-            'join'    => '',
-            'where'   => 'idObservaciones = ?',
-            'params'  => [$ObservacionesID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
+        // Se obtienen los datos
+        $rowData = $this->getDataEdit($ObservacionesID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -328,6 +259,118 @@ class crudResumenObservaciones extends ControllerBase {
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
+    }
+
+    /******************************************************************************/
+    /*                            CONSULTAS INTERNAS                              */
+    /******************************************************************************/
+    /*******************************************************************/
+    // Se obtiene la lista
+    /*******************************************************************/
+    private function getDataList($filter, $params = []){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                core_test_crud_observaciones.idObservaciones,
+                core_test_crud_observaciones.Observacion,
+                core_test_crud_observaciones.FechaCreacion,
+                core_test_crud_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
+            'table'   => 'core_test_crud_observaciones',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
+            'where'   => $filter,
+            'params'  => $params,
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'core_test_crud_observaciones.idObservaciones ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getDataDetail($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                core_test_crud_observaciones.idObservaciones,
+                core_test_crud_observaciones.Observacion,
+                core_test_crud_observaciones.FechaCreacion,
+                core_test_crud_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
+            'table'   => 'core_test_crud_observaciones',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
+            'where'   => 'core_test_crud_observaciones.idObservaciones = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetByID($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen los datos editables (formulario de edicion)
+    /*******************************************************************/
+    private function getDataEdit($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idObservaciones,idCrud,Observacion,FechaCreacion',
+            'table'   => 'core_test_crud_observaciones',
+            'join'    => '',
+            'where'   => 'idObservaciones = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetByID($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtiene el registro padre (core_test_crud)
+    /*******************************************************************/
+    private function getDataDetailCrud($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idCrud,Email',
+            'table'   => 'core_test_crud',
+            'join'    => '',
+            'where'   => 'idCrud = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetByID($xParams);
     }
 
     /******************************************************************************/
@@ -502,6 +545,7 @@ class crudResumenObservaciones extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

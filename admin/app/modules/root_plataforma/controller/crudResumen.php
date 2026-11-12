@@ -46,22 +46,8 @@ class crudResumen extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCrud,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
-            'table'   => 'core_test_crud',
-            'join'    => '',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $arrList = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $arrList = $this->getDataList('');
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -119,7 +105,7 @@ class crudResumen extends ControllerBase {
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_between);
         if($RespDataBetween!=''){
-            Response::error($RespDataBetween, 500);
+            Response::error($RespDataBetween, 400);
         }
         /************************************/
         // Agrego variable busqueda
@@ -131,22 +117,8 @@ class crudResumen extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCrud,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
-            'table'   => 'core_test_crud',
-            'join'    => '',
-            'where'   => $whereInt,
-            'params'  => $whereParams,
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'Email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $arrList = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $arrList = $this->getDataList($whereInt, $whereParams);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -203,47 +175,9 @@ class crudResumen extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra,Direccion_img,File',
-            'table'   => 'core_test_crud',
-            'join'    => '',
-            'where'   => 'idCrud = ?',
-            'params'  => [$CrudID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
-
-        /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                core_test_crud_observaciones.idObservaciones,
-                core_test_crud_observaciones.Observacion,
-                core_test_crud_observaciones.FechaCreacion,
-                core_test_crud_observaciones.FechaEdicion,
-                usuarios_listado.Nombre AS Usuario,
-                usuarios_edicion.Nombre AS UsuarioEdicion',
-            'table'   => 'core_test_crud_observaciones',
-            'join'    => '
-                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
-                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
-            'where'   => 'core_test_crud_observaciones.idCrud = ?',
-            'params'  => [$CrudID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'core_test_crud_observaciones.idObservaciones ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams          = ['query' => $query];
-        // Ejecuto la query
-        $arrObservaciones = $this->Base_GetList($xParams);
+        // Se obtienen los datos
+        $rowData          = $this->getDataDetail($CrudID['data']);
+        $arrObservaciones = $this->getDataDetailObs($CrudID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -260,7 +194,7 @@ class crudResumen extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 'Fnc_WidgetsCommon'    => $this->WidgetsCommon,
-                'Fnc_WidgetsViews'  => $this->WidgetsViews,
+                'Fnc_WidgetsViews'     => $this->WidgetsViews,
                 /*=========== Datos Consultados ===========*/
                 'rowData'          => $rowData['data'],
                 'arrObservaciones' => $arrObservaciones['data'],
@@ -299,21 +233,8 @@ class crudResumen extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCrud,idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra,Direccion_img,File',
-            'table'   => 'core_test_crud',
-            'join'    => '',
-            'where'   => 'idCrud = ?',
-            'params'  => [$CrudID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
+        // Se obtienen los datos
+        $rowData = $this->getDataDetail($CrudID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -377,21 +298,8 @@ class crudResumen extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => 'idCrud,idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra,Direccion_img,File',
-            'table'   => 'core_test_crud',
-            'join'    => '',
-            'where'   => 'idCrud = ?',
-            'params'  => [$CrudID['data']],
-            'group'   => '',
-            'having'  => '',
-            'order'   => ''
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $rowData = $this->Base_GetByID($xParams);
+        // Se obtienen los datos
+        $rowData = $this->getDataDetail($CrudID['data']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -425,6 +333,88 @@ class crudResumen extends ControllerBase {
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
+    }
+
+    /******************************************************************************/
+    /*                            CONSULTAS INTERNAS                              */
+    /******************************************************************************/
+    /*******************************************************************/
+    // Se obtiene la lista
+    /*******************************************************************/
+    private function getDataList($filter, $params = []){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idCrud,Email,Numero,Rut,Patente,Fecha,Hora,Palabra',
+            'table'   => 'core_test_crud',
+            'join'    => '',
+            'where'   => $filter,
+            'params'  => $params,
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'Email ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen los detalles
+    /*******************************************************************/
+    private function getDataDetail($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => 'idCrud,idUsuario,Email,Numero,Rut,Patente,Fecha,Hora,Palabra,Direccion_img,File',
+            'table'   => 'core_test_crud',
+            'join'    => '',
+            'where'   => 'idCrud = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => ''
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetByID($xParams);
+    }
+
+    /*******************************************************************/
+    // Se obtienen las observaciones
+    /*******************************************************************/
+    private function getDataDetailObs($ID){
+
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                core_test_crud_observaciones.idObservaciones,
+                core_test_crud_observaciones.Observacion,
+                core_test_crud_observaciones.FechaCreacion,
+                core_test_crud_observaciones.FechaEdicion,
+                usuarios_listado.Nombre AS Usuario,
+                usuarios_edicion.Nombre AS UsuarioEdicion',
+            'table'   => 'core_test_crud_observaciones',
+            'join'    => '
+                LEFT JOIN usuarios_listado                     ON usuarios_listado.idUsuario  = core_test_crud_observaciones.idUsuario
+                LEFT JOIN usuarios_listado AS usuarios_edicion ON usuarios_edicion.idUsuario  = core_test_crud_observaciones.idUsuarioEdicion',
+            'where'   => 'core_test_crud_observaciones.idCrud = ?',
+            'params'  => [$ID],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'core_test_crud_observaciones.idObservaciones ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        //Se retornan los datos
+        return $this->Base_GetList($xParams);
     }
 
     /******************************************************************************/
@@ -626,6 +616,7 @@ class crudResumen extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -719,6 +710,7 @@ class crudResumen extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataPut
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
