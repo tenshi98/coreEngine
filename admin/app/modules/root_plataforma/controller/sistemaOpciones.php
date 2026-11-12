@@ -229,6 +229,7 @@ class sistemaOpciones extends ControllerBase {
             'order'   => 'Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -665,6 +666,7 @@ class sistemaOpciones extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataPut
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

@@ -502,6 +502,7 @@ class bodegasListadoObservaciones extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

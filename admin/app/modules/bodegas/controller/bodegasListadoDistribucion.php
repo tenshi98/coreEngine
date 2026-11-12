@@ -94,6 +94,7 @@ class bodegasListadoDistribucion extends ControllerBase {
             'order'   => 'bodegas_zonas.Orden ASC, bodegas_zonas.idZona ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -179,6 +180,7 @@ class bodegasListadoDistribucion extends ControllerBase {
             'order'   => 'bodegas_zonas.Orden ASC, bodegas_pasillos.Orden ASC, bodegas_racks.Orden ASC, bodegas_niveles.Nivel ASC, bodegas_posiciones.Numero ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -331,6 +333,7 @@ class bodegasListadoDistribucion extends ControllerBase {
             'order'   => 'bodegas_zonas.Orden ASC, bodegas_pasillos.Orden ASC, bodegas_racks.Orden ASC, bodegas_niveles.Nivel ASC, bodegas_posiciones.Numero ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

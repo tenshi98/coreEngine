@@ -1178,6 +1178,7 @@ class maquinasListadoComponentes extends ControllerBase {
             'table'     => 'maquinas_componentes_tareas_rel',
             'rows'      => array_values($arrRows),
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

@@ -99,6 +99,7 @@ class gestionDocumentosGuias extends ControllerBase {
             'order'   => 'idFacturacion ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -198,6 +199,7 @@ class gestionDocumentosGuias extends ControllerBase {
             'order'   => 'facturacion_listado_guias.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -383,6 +385,7 @@ class gestionDocumentosGuias extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

@@ -77,6 +77,7 @@ class sistemaRutas extends ControllerBase {
             'order'   => 'idRutas ASC',
             'limit'   => 9999
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

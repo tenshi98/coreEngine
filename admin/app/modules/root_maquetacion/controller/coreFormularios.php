@@ -86,6 +86,7 @@ class coreFormularios extends ControllerBase {
             'order'   => 'core_ubicacion_ciudad.Nombre ASC, core_ubicacion_comunas.Nombre ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

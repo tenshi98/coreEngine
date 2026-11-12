@@ -203,6 +203,7 @@ class bodegasListadoRacks extends ControllerBase {
             'order'   => 'bodegas_racks.Orden ASC, bodegas_racks.idRack ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -897,6 +898,7 @@ class bodegasListadoRacks extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

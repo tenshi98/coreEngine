@@ -635,6 +635,7 @@ class bodegasListadoZonas extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => ['idZona' => $dataDelete['idZona'] ?? '']
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

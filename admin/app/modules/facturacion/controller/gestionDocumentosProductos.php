@@ -782,6 +782,7 @@ class gestionDocumentosProductos extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $PostData
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

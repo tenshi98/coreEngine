@@ -204,6 +204,7 @@ class gestionDocumentosPagos extends ControllerBase {
             'order'   => 'facturacion_listado_pagos.idPago ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -579,6 +580,7 @@ class gestionDocumentosPagos extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
