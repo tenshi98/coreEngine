@@ -207,6 +207,7 @@ class sistemaInstalacion extends ControllerBase {
             'order'   => 'idRutas ASC',
             'limit'   => 9999
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -309,6 +310,7 @@ class sistemaInstalacion extends ControllerBase {
             'order'   => 'idRutas ASC',
             'limit'   => 9999
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -368,6 +370,51 @@ class sistemaInstalacion extends ControllerBase {
         if($DataModule===true){
             //Se llama y ejecuta la instalacion
             $ControllerData = new $dataPut['Controller'];
+            $Response       = $ControllerData->InstallModule();
+            //si es la respuesta esperada
+            if ($Response){
+                // Devuelvo true con código 200 (OK)
+                Response::success(true);
+            //si no lo es
+            } else {
+                // Si es un array (errores o datos no esperados) o cualquier otra cosa no numérica,
+                // se asume que es un error o una respuesta que debe enviarse con código 500 (Error del Servidor)
+                Response::error('Error al operar con la Base de Datos', 500, $Response['error'] ?? '');
+            }
+        }else{
+            Response::error('Instalador no existe', 500);
+        }
+
+    }
+
+    /*******************************************************************/
+    // Actualizacion del Modulo (re-ejecuta InstallModule sobre un modulo instalado)
+    /*******************************************************************/
+    public function updateModule(){
+
+        /************************************/
+        // Validación del método HTTP
+        if ($_SERVER['REQUEST_METHOD'] !== 'PUT') {
+            Response::error('Error en el Request Method', 405);
+        }
+
+        /************************************/
+        // Obtener datos
+        parse_str(file_get_contents("php://input"),$dataPut);
+
+        /************************************/
+        //Se consulta
+        $DataModule = method_exists($dataPut['Controller'] ?? '', 'InstallModule');
+        //si el metodo existe
+        if($DataModule===true){
+            //Se instancia el instalador
+            $ControllerData = new $dataPut['Controller'];
+            //Se verifica que el modulo este instalado
+            $nData = $ControllerData->GetCountDataModule();
+            if (!is_numeric($nData) || $nData == 0){
+                Response::error('Módulo no instalado', 400);
+            }
+            //Se llama y ejecuta la instalacion (solo crea lo que falta)
             $Response       = $ControllerData->InstallModule();
             //si es la respuesta esperada
             if ($Response){
