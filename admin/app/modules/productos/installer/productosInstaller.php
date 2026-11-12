@@ -349,7 +349,7 @@ class productosInstaller extends ControllerInstaller {
         ];
 
         /************************************/
-        // Retorno True por defecto
+        // Retorno la respuesta de la consulta
         return $arrTables;
 
     }
@@ -371,7 +371,7 @@ class productosInstaller extends ControllerInstaller {
         ];
 
         /************************************/
-        // Retorno True por defecto
+        // Retorna las optimizaciones
         return $arrOptimizations;
 
     }
