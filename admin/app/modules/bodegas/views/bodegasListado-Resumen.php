@@ -487,7 +487,7 @@ $BodegasID = $data['Fnc_Codification']->encryptDecrypt('encrypt', $data['rowData
                 let Informacion = {"idZona": ID};
                 const Options     = {
                     UpdateDiv : [
-                        {Div:'#tabDistEstructura', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/estructura/'; ?>'+BodegasID['data']}
+                        {Div:'#tabDistEstructura', fromData:'<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/distribucion/estructura/'.$BodegasID['data']; ?>'}
                     ],
                     showNoti:'Zona Borrada Correctamente',
                     closeObject:'#PDloader',
