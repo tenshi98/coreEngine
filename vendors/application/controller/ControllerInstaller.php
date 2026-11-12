@@ -435,30 +435,55 @@ class ControllerInstaller {
         // Recorro los datos
         foreach ($arrPermisos as $permiso) {
             /************************************/
-            // Se genera el chequeo
-            $dataCheck_1 = $this->dataCheck_1($permiso);
-
-            /************************************/
-            // Se genera la query
+            // Se busca el permiso ya instalado (clave RutaWeb + RutaController, D-29)
             $query = [
-                'data'      => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
-                'required'  => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
-                'unique'    => 'Nombre-RutaWeb-RutaController',
-                'encode'    => '',
-                'table'     => 'core_permisos_listado',
-                'Post'      => $permiso
+                'data'   => 'idPermisos',
+                'table'  => 'core_permisos_listado',
+                'where'  => 'RutaWeb = ? AND RutaController = ?',
+                'params' => [$permiso['RutaWeb'] ?? '', $permiso['RutaController'] ?? ''],
             ];
-            // Preparo los datos
-            $xParams    = ['DataCheck' => $dataCheck_1, 'query' => $query];
             // Ejecuto la query
-            $permisosID = $this->Base_insert($xParams);
+            $permisoActual = $this->queryBuilder->queryRow($query, $DBConn);
             /************************************/
             // Si falla la ejecucion, se revierte de inmediato
-            if ($permisosID['status'] === false) {
+            if ($permisoActual['status'] === false) {
                 // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
                 // Se reporta el error
-                Response::error('Error al operar con la Base de Datos', 500, $permisosID['error']);
+                Response::error('Error al operar con la Base de Datos', 500, $permisoActual['error']);
+            }
+
+            /************************************/
+            // Si existe, se reutiliza sin insertarlo ni modificarlo
+            if (!empty($permisoActual['data']['idPermisos'])) {
+                $permisosID = ['status' => true, 'data' => $permisoActual['data']['idPermisos']];
+            } else {
+                /************************************/
+                // Se genera el chequeo
+                $dataCheck_1 = $this->dataCheck_1($permiso);
+
+                /************************************/
+                // Se genera la query
+                $query = [
+                    'data'      => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
+                    'required'  => 'idPermisosCat,idEstado,idTipo,Nombre,Descripcion,idLevelLimit,RutaWeb,RutaController',
+                    'unique'    => 'Nombre-RutaWeb-RutaController',
+                    'encode'    => '',
+                    'table'     => 'core_permisos_listado',
+                    'Post'      => $permiso
+                ];
+                // Preparo los datos
+                $xParams    = ['DataCheck' => $dataCheck_1, 'query' => $query];
+                // Ejecuto la query
+                $permisosID = $this->Base_insert($xParams);
+                /************************************/
+                // Si falla la ejecucion, se revierte de inmediato
+                if ($permisosID['status'] === false) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    // Se reporta el error
+                    Response::error('Error al operar con la Base de Datos', 500, $permisosID['error']);
+                }
             }
             /************************************/
             // Listar las rutas
@@ -472,6 +497,30 @@ class ControllerInstaller {
             if($arrRutas){
                 // Recorro los datos
                 foreach ($arrRutas as $rutas) {
+                    /************************************/
+                    // Se busca la ruta ya instalada (clave unique RutaWeb + RutaController)
+                    $query = [
+                        'data'   => 'idRutas',
+                        'table'  => 'core_permisos_listado_rutas',
+                        'where'  => 'RutaWeb = ? AND RutaController = ?',
+                        'params' => [$rutas['RutaWeb'] ?? '', $rutas['RutaController'] ?? ''],
+                    ];
+                    // Ejecuto la query
+                    $rutaActual = $this->queryBuilder->queryRow($query, $DBConn);
+                    /************************************/
+                    // Si falla la ejecucion, se revierte de inmediato
+                    if ($rutaActual['status'] === false) {
+                        // Se revierte la transaccion activa (no-op si no hay transaccion)
+                        $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                        // Se reporta el error
+                        Response::error('Error al operar con la Base de Datos', 500, $rutaActual['error']);
+                    }
+                    /************************************/
+                    // Si ya existe, se salta
+                    if (!empty($rutaActual['data']['idRutas'])) {
+                        continue;
+                    }
+
                     /************************************/
                     // Se genera el chequeo
                     $dataCheck_2 = $this->dataCheck_2($rutas);

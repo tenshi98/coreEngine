@@ -50,6 +50,38 @@
         });
     }
     /************************************/
+    function updateModule(Controller) {
+        Swal.fire({
+            title: "Actualizar Modulo",
+            text: "Esta a punto de actualizar este modulo (se crea solo lo que falta, sin perder datos), ¿Desea continuar?",
+            icon: "warning",
+            confirmButtonColor: "#81A1C1",
+            confirmButtonText: "<i class='bi bi-check-circle'></i> Si, actualizar",
+            showCancelButton: true,
+            cancelButtonText: "<i class='bi bi-x-circle'></i> Cancelar",
+            cancelButtonColor: "#EA5757",
+            reverseButtons: true,
+        }).then((result) => {
+            if (result.isConfirmed) {
+                //Cargo el loader
+                $('#PDloader').show();
+                //Ejecuto
+                let Metodo      = 'PUT';
+                let Direccion   = '<?php echo $BASE.'/Core/plataforma/instalacion/updateModule'; ?>';
+                let Informacion = {"Controller": Controller };
+                const Options     = {
+                    UpdateDiv : [
+                        {Div:'#DivResumen', fromData:'<?php echo $BASE.'/Core/plataforma/instalacion/resumenUpdate';?>', refreshTbl:'false'}
+                    ],
+                    showNoti:'Modulo Actualizado Correctamente',
+                    closeObject:'#PDloader',
+                };
+                //Se envian los datos al formulario
+                SendDataForms(Metodo, Direccion, Informacion, Options);
+            }
+        });
+    }
+    /************************************/
     function uninstallModule(Controller) {
         Swal.fire({
             title: "Instalar Modulo",

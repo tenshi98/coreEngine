@@ -52,6 +52,7 @@
                     <div class="btn-group-vertical" role="group">';
                         if($module['countPermisos']!=0){
                             echo '
+                            <button type="button" onclick="updateModule(\''.$module['Controller'].'\')" class="btn btn-success    btn-sm tooltiplink" data-title="Actualizar el modulo sin perder datos"><i class="bi bi-arrow-repeat"></i> Actualizar Modulo</button>
                             <button type="button" onclick="uninstallModule(\''.$module['Controller'].'\')" class="btn btn-danger     btn-sm tooltiplink" data-title="Desinstalar Modulo completamente"><i class="bi bi-trash"></i> Desinstalar Modulo</button>
                             <button type="button" onclick="checkModuleData(\''.$module['Controller'].'\')" class="btn btn-primary    btn-sm tooltiplink" data-title="Hacer checkeo instalador vs base datos"><i class="bi bi-eye"></i> Checkear Instalador vs BBDD</button>
                             <button type="button" onclick="checkModuleBBDD(\''.$module['Controller'].'\')" class="btn btn-secondary  btn-sm tooltiplink" data-title="Hacer checkeo base datos vs instalador"><i class="bi bi-eye"></i> Checkear BBDD vs Instalador</button>
