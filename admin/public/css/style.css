@@ -24,6 +24,7 @@ textarea {resize:none !important;	}
 .form-select:required{background:url(../img/required.png) no-repeat 5px center!important;background-color: #fff !important;}
 .popover.clockpicker-popover {z-index: 10010!important;}
 .table tr th, .table tr td {color: var(--body-color) !important;}
+.table thead tr th, .table tbody tr td {font-size:14px;}
 .formHelp {font-size: 0.875rem;margin-top: 0.25rem;}
 .btn:disabled,.btn[disabled],.btn.disabled {cursor: not-allowed;}
 .select-bloqueado, .select-bloqueado:required {pointer-events: none!important;background-color: #e9ecef!important;}
