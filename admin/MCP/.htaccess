@@ -1,0 +1,10 @@
+#### Proteger el propio htaccess
+<Files .htaccess>
+    Require all denied
+</Files>
+#### No permitir el listado de archivos
+Options -Indexes
+#### Archivos internos que nunca se sirven por web
+<FilesMatch "^(bootstrap\.php|.*\.md|.*\.json)$">
+    Require all denied
+</FilesMatch>

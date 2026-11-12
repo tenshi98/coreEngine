@@ -1,0 +1,28 @@
+#### Fragmento OBLIGATORIO para la raiz del host (D-1): descubrimiento OAuth del MCP de coreEngine
+#### Spec: projects/mcp-oauth/specs/technical.md §3.4. Guia de conexion: admin/MCP/docs/CONEXION.md
+####
+#### RFC 8414 §3.1 y RFC 9728 §3.1 insertan la ruta del issuer y del recurso tras /.well-known/ en la RAIZ DEL HOST,
+#### y la especificacion MCP 2025-06-18 exige que los clientes descubran asi. Sin este fragmento, los clientes
+#### OAuth no encuentran los metadatos (las rutas dentro de oauth/ solo sirven de respaldo).
+####
+#### Instalacion: copiar el bloque en el .htaccess de la raiz del host (DocumentRoot) o en el <VirtualHost>, y
+#### sustituir <RUTA_MCP> por la ruta de MCP_PUBLIC_URL (sin barra final):
+####   - produccion:  /admin/MCP
+####   - desarrollo:  /coreEngine/admin/MCP
+#### Requiere mod_rewrite. Si va en el <VirtualHost> (no en un .htaccess), anteponer "/" a cada patron
+#### (^/\.well-known/...), porque en ese contexto la ruta conserva la barra inicial.
+####
+#### Comprobacion (dev, <origen> = http://localhost):
+####   curl -i <origen>/.well-known/oauth-protected-resource/coreEngine/admin/MCP/public
+####   curl -i <origen>/.well-known/oauth-authorization-server/coreEngine/admin/MCP/oauth
+#### Ambas deben responder 200 con su JSON.
+
+RewriteEngine On
+
+#### Con insercion de ruta (RFC 9728 §3.1 y RFC 8414 §3.1)
+RewriteRule ^\.well-known/oauth-protected-resource<RUTA_MCP>/public/?$ <RUTA_MCP>/oauth/index.php?wk=prm [L,QSA]
+RewriteRule ^\.well-known/oauth-authorization-server<RUTA_MCP>/oauth/?$ <RUTA_MCP>/oauth/index.php?wk=as [L,QSA]
+
+#### Sin ruta (clientes de la especificacion MCP 2025-03-26)
+RewriteRule ^\.well-known/oauth-protected-resource/?$ <RUTA_MCP>/oauth/index.php?wk=prm [L,QSA]
+RewriteRule ^\.well-known/oauth-authorization-server/?$ <RUTA_MCP>/oauth/index.php?wk=as [L,QSA]

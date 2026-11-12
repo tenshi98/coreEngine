@@ -1,0 +1,24 @@
+#### Proteger el propio htaccess
+<Files .htaccess>
+    Require all denied
+</Files>
+#### Archivos ocultos
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
+#### Cuerpo maximo de la peticion: 1 MiB
+LimitRequestBody 1048576
+#### No permitir el listado de archivos
+Options -Indexes
+#### Propaga la cabecera Authorization a PHP
+<IfModule mod_setenvif.c>
+    SetEnvIf Authorization "(.+)" HTTP_AUTHORIZATION=$1
+</IfModule>
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
+    #### index.php se sirve tal cual (evita el bucle de reescritura)
+    RewriteRule ^index\.php$ - [L]
+    #### Todo lo demas se reescribe a index.php
+    RewriteRule .* index.php [L,QSA]
+</IfModule>

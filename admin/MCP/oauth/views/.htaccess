@@ -1,0 +1,8 @@
+#### Proteger el propio htaccess
+<Files .htaccess>
+    Require all denied
+</Files>
+#### No permitir el listado de archivos
+Options -Indexes
+#### denegar el acceso
+Require all denied
