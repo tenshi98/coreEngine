@@ -127,7 +127,7 @@ class informeProductos extends ControllerBase {
             // Busco errores de la consulta
             $result = $this->mergeResponses([$arrBodegas,$arrProductos]);
             // Despliegue de errores
-            $this->showError(2, $f3, $result);
+            $this->showError(1, $f3, $result);
         }
 
     }
@@ -439,19 +439,25 @@ class informeProductos extends ControllerBase {
         }
 
         /************************************/
-        // Se genera la query - PRODUCTO STOCK (SEGURO)
-        // Ya no consulta kanban_tareas, kanban_tareas_tareas, kanban_tareas_participantes
+        // Stock total del producto: suma de las columnas por bodega (Cantidad_idBodegas_N)
+        $SumStock = [];
+        for ($i = 1; $i <= 25; $i++) {
+            $SumStock[] = 'COALESCE(bodegas_productos_stocks.Cantidad_idBodegas_'.$i.',0)';
+        }
+
+        /************************************/
+        // Se genera la query
         $query = [
             'data'    => '
-                bodegas_productos_stocks.idStock,
-                bodegas_productos_stocks.idProducto,
-                productos.Titulo AS ProductoNombre,
-                productos.Codigo AS ProductoCodigo,
-                bodegas_productos_stocks.cantidad AS StockActual,
-                bodegas_productos_stocks.cantidad_minima AS StockMinimo',
-            'table'   => 'bodegas_productos_stocks',
-            'join'    =>'LEFT JOIN productos ON productos.idProducto = bodegas_productos_stocks.idProducto',
-            'where'   => 'bodegas_productos_stocks.idProducto = ?',
+                productos_listado.idProducto,
+                productos_listado.Nombre AS ProductoNombre,
+                productos_listado.Codigo AS ProductoCodigo,
+                productos_listado.StockLimite AS StockMinimo,
+                ('.implode(' + ', $SumStock).') AS StockActual,
+                CURDATE() AS FechaRegistro',
+            'table'   => 'productos_listado',
+            'join'    => 'LEFT JOIN bodegas_productos_stocks ON bodegas_productos_stocks.idProducto = productos_listado.idProducto',
+            'where'   => 'productos_listado.idProducto = ?',
             'params'  => [$productId['data']],
             'group'   => '',
             'having'  => '',
@@ -489,7 +495,7 @@ class informeProductos extends ControllerBase {
         // Si no hay resultados
         } else {
             // Busco errores de la consulta
-            $result = $rowData;
+            $result = $this->mergeResponses([$rowData]);
             // Despliegue de errores
             $this->showError(2, $f3, $result);
         }
