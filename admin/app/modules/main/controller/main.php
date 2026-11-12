@@ -264,31 +264,45 @@ class main extends ControllerBase {
         //Se filtran para obtener datos unicos
         $MainViewData = array_values(array_unique($MainViewData));
 
-        /************************************/
-        // Datos enviados a la pagina
-        $f3->data = [
-            /*=========== Datos de la Pagina ===========*/
-            'PageTitle'       => 'Principal',
-            'PageDescription' => 'Principal',
-            'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
-            'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
-            /*===========  Datos del usuario ===========*/
-            'UserData'        => $this->getUserData($f3),
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_ServerServer'    => $this->ServerServer,
-            'Fnc_DataDate'        => $this->DataDate,
-            'Fnc_WidgetsCommon'   => new UIWidgetsCommon(),
-            'Fnc_WidgetsFeed'     => new UIWidgetsFeed(),
-            'Fnc_WidgetsMedia'    => new UIWidgetsMedia(),
-            'Fnc_WidgetsWeather'  => new UIWidgetsWeather(),
-            /*=========== Datos Consultados ===========*/
-            'MainViewData'    => $MainViewData,
-            'MainViewBlocks'  => $MainViewBlocks,
-        ];
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if (is_array($MainViewData) && is_array($MainViewBlocks)) {
 
+            /************************************/
+            // Datos enviados a la pagina
+            $f3->data = [
+                /*=========== Datos de la Pagina ===========*/
+                'PageTitle'       => 'Principal',
+                'PageDescription' => 'Principal',
+                'PageAuthor'      => ConfigAPP::SOFTWARE['SoftwareName'],
+                'PageKeywords'    => ConfigAPP::SOFTWARE['SoftwareName'],
+                /*===========  Datos del usuario ===========*/
+                'UserData'        => $this->getUserData($f3),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_ServerServer'    => $this->ServerServer,
+                'Fnc_DataDate'        => $this->DataDate,
+                'Fnc_WidgetsCommon'   => new UIWidgetsCommon(),
+                'Fnc_WidgetsFeed'     => new UIWidgetsFeed(),
+                'Fnc_WidgetsMedia'    => new UIWidgetsMedia(),
+                'Fnc_WidgetsWeather'  => new UIWidgetsWeather(),
+                /*=========== Datos Consultados ===========*/
+                'MainViewData'    => $MainViewData,
+                'MainViewBlocks'  => $MainViewBlocks,
+            ];
+
+            /************************************/
+            // Se instancia la vista
+            $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
         /************************************/
-        // Se instancia la vista
-        $this->showVista(1, $this->returnRutaVista(__DIR__, 'app').'/main-principal.php');
+        // Si no hay resultados
+        } else {
+            // Despliegue de errores
+            $this->showError(2, $f3, 'Error en la consulta');
+        }
+
+
     }
 
     /*******************************************************************/

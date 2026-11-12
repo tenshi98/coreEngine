@@ -153,21 +153,34 @@ class bodegasWidgets extends ControllerBase {
 
         }
 
-        /************************************/
-        // Datos enviados a la pagina
-        $f3->data = [
-            /*===========  Datos del usuario ===========*/
-            'UserData'      => $this->getUserData($f3),
-            /*===========   Funcionalidad   ===========*/
-            'Fnc_CommonData'      => $this->CommonData,
-            'Fnc_DataDate'        => $this->DataDate,
-            'Fnc_DataNumbers'     => $this->DataNumbers,
-            /*=========== Datos Consultados ===========*/
-            'MainViewData'    => $MainViewData,
-        ];
+        /*******************************************************************/
+        /*                         Imprimir Datos                          */
+        /*******************************************************************/
+        // Si hay resultados
+        if (is_array($MainViewData)) {
 
-        // Se instancia la vista
-        $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/widgets-stock-update.php');
+            /************************************/
+            // Datos enviados a la pagina
+            $f3->data = [
+                /*===========  Datos del usuario ===========*/
+                'UserData'      => $this->getUserData($f3),
+                /*===========   Funcionalidad   ===========*/
+                'Fnc_CommonData'      => $this->CommonData,
+                'Fnc_DataDate'        => $this->DataDate,
+                'Fnc_DataNumbers'     => $this->DataNumbers,
+                /*=========== Datos Consultados ===========*/
+                'MainViewData'    => $MainViewData,
+            ];
+
+            /************************************/
+            // Se instancia la vista
+            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/widgets-stock-update.php');
+        /************************************/
+        // Si no hay resultados
+        } else {
+            // Despliegue de errores
+            $this->showError(2, $f3, 'Error en la consulta');
+        }
     }
 
 }
