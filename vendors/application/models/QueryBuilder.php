@@ -1210,7 +1210,7 @@ class QueryBuilder{
         $comentario = str_replace("'", "''", (string)($query['comentario'] ?? ''));
 
         // Construcción de la sentencia DDL (Data Definition Language) con parámetros fijos de motor y codificación
-        $ActionSQL = 'CREATE TABLE `'.$query['table'].'` ('.$query['data'].', PRIMARY KEY (`'.$query['primaryKey'].'`) USING BTREE) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci COMMENT = \''.$comentario.'\' ROW_FORMAT = DYNAMIC;';
+        $ActionSQL = 'CREATE TABLE IF NOT EXISTS `'.$query['table'].'` ('.$query['data'].', PRIMARY KEY (`'.$query['primaryKey'].'`) USING BTREE) ENGINE = InnoDB AUTO_INCREMENT = 1 CHARACTER SET = latin1 COLLATE = latin1_swedish_ci COMMENT = \''.$comentario.'\' ROW_FORMAT = DYNAMIC;';
 
         /***************   Mostrar Query   ***************/
         // Retorna la sentencia SQL
