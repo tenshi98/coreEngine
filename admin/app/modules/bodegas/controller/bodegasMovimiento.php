@@ -237,7 +237,7 @@ class bodegasMovimiento extends ControllerBase {
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_bod_between);
         if($RespDataBetween!=''){
-            Response::error($RespDataBetween, 500);
+            Response::error($RespDataBetween, 400);
         }
         /************************************/
         // Agrego variable busqueda
