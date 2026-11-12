@@ -105,7 +105,7 @@
                     d.Module   = d.Module   || Module;
                     d.Test     = d.Test     || Test;
                     d.TestName = d.TestName || Nombre;
-                    d.Estado   = d.Estado   || 'EXITOSA';
+                    d.Estado   = d.Estado   || 'ERROR';
                     d.Mensaje  = d.Mensaje  || ((response && response.message) ? response.message : 'Prueba ejecutada');
                     renderResultadoModal(d);
                 }).fail(function (jqXHR) {

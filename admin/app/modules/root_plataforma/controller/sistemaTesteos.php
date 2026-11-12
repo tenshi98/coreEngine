@@ -635,9 +635,15 @@ class sistemaTesteos extends ControllerBase {
         }
 
         /************************************/
-        // Se adjuntan los avisos (warnings) generados durante la prueba
+        // Se adjuntan los avisos (warnings) generados durante la prueba.
+        // Un aviso nunca deja la prueba en EXITOSA: como minimo es ADVERTENCIA.
         if(!empty($GLOBALS['TESTEOS_AVISOS'])){
-            $result['Info'] = trim($result['Info'].' | Avisos: '.implode(' | ', array_slice($GLOBALS['TESTEOS_AVISOS'], 0, 5)));
+            $avisos = array_slice($GLOBALS['TESTEOS_AVISOS'], 0, 5);
+            $result['Info'] = trim($result['Info'].' | Avisos: '.implode(' | ', $avisos));
+            if($result['Estado']==='EXITOSA'){
+                $result['Estado']  = 'ADVERTENCIA';
+                $result['Mensaje'] = 'La prueba genero avisos durante la ejecucion';
+            }
         }
         $GLOBALS['TESTEOS_AVISOS'] = [];
 
@@ -657,85 +663,139 @@ class sistemaTesteos extends ControllerBase {
     private function normalizeResult($data){
 
         /************************************/
-        // Variable inicial
+        // Estado inicial: ERROR. Solo un array con casos validos puede ser EXITOSA.
         $result = [
-            'Estado'    => 'EXITOSA',
-            'Mensaje'   => 'Prueba ejecutada correctamente',
+            'Estado'    => 'ERROR',
+            'Mensaje'   => 'La prueba no devolvio un resultado valido',
             'Resultado' => '',
             'Info'      => '',
         ];
 
         /************************************/
-        // Segun el tipo de respuesta
+        // Booleano suelto: no demuestra casos
         if(is_bool($data)){
-            /************************************/
-            // executeTest() devuelve true / false
             $result['Resultado'] = $data ? 'true' : 'false';
-            if($data===false){
-                $result['Estado']  = 'ERROR';
-                $result['Mensaje'] = 'La prueba finalizo con false';
-            }
-
-        /************************************/
-        } elseif($data === null){
-            /************************************/
-            // Sin respuesta
-            $result['Estado']    = 'ADVERTENCIA';
-            $result['Mensaje']   = 'La prueba no devolvio resultado';
-            $result['Resultado'] = 'null';
-
-        /************************************/
-        } elseif(is_array($data)){
-            /************************************/
-            // Arreglo de casos (ej. csrfTest): [caso => 'OK'|'FALLO: ...']
-            $result['Resultado'] = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-            $hasFail  = false;
-            $hasOk    = false;
-            $arrFails = [];
-            foreach ($data as $key => $value) {
-                $text = is_scalar($value) ? (string)$value : '';
-                if(preg_match('/FALLO|ERROR|FAIL/i', $text)===1){
-                    $hasFail   = true;
-                    $arrFails[] = $key.': '.$text;
-                } elseif(preg_match('/OK|EXITO|PASS/i', $text)===1){
-                    $hasOk = true;
-                }
-            }
-            if($hasFail){
-                $result['Estado']    = 'ERROR';
-                $result['Mensaje']   = 'La prueba tiene casos fallidos';
-                $result['Info']      = implode(' | ', $arrFails);
-            } elseif($hasOk){
-                $result['Estado']    = 'EXITOSA';
-                $result['Mensaje']   = 'Todos los casos pasaron correctamente';
-            } elseif(empty($data)){
-                $result['Estado']    = 'ADVERTENCIA';
-                $result['Mensaje']   = 'La prueba no devolvio casos';
-            }
-
-        /************************************/
-        } elseif(is_string($data)){
-            /************************************/
-            // Cadena
-            $result['Resultado'] = $data;
-            if($data===''){
-                $result['Estado']    = 'ADVERTENCIA';
-                $result['Mensaje']   = 'La prueba devolvio una cadena vacia';
-            } elseif(preg_match('/^(FALLO|ERROR|FAIL)/i', $data)===1){
-                $result['Estado']    = 'ERROR';
-                $result['Mensaje']   = 'La prueba reporto un fallo';
-            }
-
-        /************************************/
-        } else {
-            /************************************/
-            // Escalar u objeto
-            $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
-            $result['Resultado'] = ($encoded===false) ? gettype($data) : $encoded;
+            $result['Mensaje']   = 'La prueba devolvio un booleano sin casos; use un array con addCase()';
+            return $result;
         }
 
         /************************************/
-        // Retorno los datos
+        // Sin respuesta
+        if($data === null){
+            $result['Estado']    = 'ADVERTENCIA';
+            $result['Mensaje']   = 'La prueba no devolvio resultado';
+            $result['Resultado'] = 'null';
+            return $result;
+        }
+
+        /************************************/
+        // Arreglo de casos (ej. csrfTest): [caso => 'OK'|'FALLO: ...']
+        if(is_array($data)){
+            $result['Resultado'] = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+
+            /************************************/
+            // Sin casos
+            if(empty($data)){
+                $result['Estado']  = 'ADVERTENCIA';
+                $result['Mensaje'] = 'La prueba no devolvio casos';
+                return $result;
+            }
+
+            $hasOk        = false;
+            $arrFails     = [];
+            $arrInvalidos = [];
+
+            foreach($data as $key => $value){
+                $caso = (string)$key;
+
+                /************************************/
+                // Booleano dentro del array: true=OK, false=FALLO
+                if(is_bool($value)){
+                    if($value){
+                        $hasOk = true;
+                    } else {
+                        $arrFails[] = $caso.': false';
+                    }
+                    continue;
+                }
+
+                /************************************/
+                // Cualquier valor que no sea string es invalido
+                if(!is_string($value)){
+                    $arrInvalidos[] = $caso.': '.gettype($value);
+                    continue;
+                }
+
+                $text = trim($value);
+
+                /************************************/
+                // Fallo explicito (en cualquier posicion del texto)
+                if(preg_match('/FALLO|ERROR|FAIL/i', $text)===1){
+                    $arrFails[] = $caso.': '.$text;
+                    continue;
+                }
+
+                /************************************/
+                // Caso correcto
+                if(preg_match('/OK|EXITO|PASS/i', $text)===1){
+                    $hasOk = true;
+                    continue;
+                }
+
+                /************************************/
+                // Valor no reconocido
+                $arrInvalidos[] = $caso.': '.$text;
+            }
+
+            /************************************/
+            // Un fallo o un valor invalido manda sobre cualquier OK
+            if(!empty($arrFails) || !empty($arrInvalidos)){
+                $result['Estado']  = 'ERROR';
+                $result['Mensaje'] = 'La prueba tiene casos fallidos o no validos';
+                $partes = [];
+                if(!empty($arrFails)){
+                    $partes[] = 'Fallos: '.implode(' | ', $arrFails);
+                }
+                if(!empty($arrInvalidos)){
+                    $partes[] = 'Invalidos: '.implode(' | ', $arrInvalidos);
+                }
+                $result['Info'] = implode(' || ', $partes);
+                return $result;
+            }
+
+            /************************************/
+            // Sin ningun caso OK no hay exito
+            if(!$hasOk){
+                $result['Mensaje'] = 'La prueba no devolvio casos validos';
+                $result['Info']    = 'Use addCase() para registrar cada caso';
+                return $result;
+            }
+
+            /************************************/
+            // Todos los casos correctos
+            $result['Estado']  = 'EXITOSA';
+            $result['Mensaje'] = 'Todos los casos pasaron correctamente';
+            return $result;
+        }
+
+        /************************************/
+        // Cadena suelta: no demuestra casos
+        if(is_string($data)){
+            $result['Resultado'] = $data;
+            if($data===''){
+                $result['Estado']  = 'ADVERTENCIA';
+                $result['Mensaje'] = 'La prueba devolvio una cadena vacia';
+                return $result;
+            }
+            $result['Mensaje'] = 'La prueba devolvio una cadena sin casos; use un array con addCase()';
+            return $result;
+        }
+
+        /************************************/
+        // Escalar u objeto: tipo no soportado
+        $encoded = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);
+        $result['Resultado'] = ($encoded===false) ? gettype($data) : $encoded;
+        $result['Mensaje']   = 'La prueba devolvio un tipo no soportado; use un array con addCase()';
         return $result;
     }
 
