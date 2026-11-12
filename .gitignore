@@ -17,7 +17,7 @@ credentials.json
 auth.json
 *password*
 *secret*
-*token*
+
 
 # ⚙️ Configuración local y entornos
 *.local
@@ -95,3 +95,13 @@ docker-compose.local.yml
 
 # 🔄 Ignorar contenido carpetas
 /admin/public/security
+
+# Permitir acceso a las carpetas superiores
+!/coreEngine/
+!/coreEngine/admin/
+!/coreEngine/admin/app/
+!/coreEngine/admin/app/modules/
+
+# Permitir carpeta tokens y su contenido
+!/coreEngine/admin/app/modules/tokens/
+!/coreEngine/admin/app/modules/tokens/**
