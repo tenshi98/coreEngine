@@ -3,5 +3,3 @@
 Order allow,deny
 Deny from all
 </Files>
-#### denegar el acceso
-deny from all
