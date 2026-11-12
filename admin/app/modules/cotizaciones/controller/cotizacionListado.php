@@ -199,7 +199,7 @@ class cotizacionListado extends ControllerBase {
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_between);
         if($RespDataBetween!=''){
-            Response::error($RespDataBetween, 500);
+            Response::error($RespDataBetween, 400);
         }
         /************************************/
         // Agrego variable busqueda
@@ -337,6 +337,7 @@ class cotizacionListado extends ControllerBase {
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -521,6 +522,7 @@ class cotizacionListado extends ControllerBase {
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -1042,6 +1044,19 @@ class cotizacionListado extends ControllerBase {
         }
 
         /************************************/
+        // Se recalculan los totales dentro de la misma transaccion (antes del commit)
+        $ResponseCotizacion = $this->updateCotizacion(4, $Response['data'], $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error($ResponseCotizacion['message'], 500, $ResponseCotizacion['error'] ?? '');
+        }
+
+        /************************************/
         // Se confirma la transacción
         $ResponseCommit = $this->Base_transactionCommit();
 
@@ -1052,19 +1067,6 @@ class cotizacionListado extends ControllerBase {
             $this->Base_transactionRollback();
             // Se reporta el error
             Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
-        }
-
-        /************************************/
-        // Se actualizan los datos de la factura
-        $ResponseCotizacion = $this->updateCotizacion(4, $Response['data'], $this->getDBConn());
-
-        /************************************/
-        // Si falla la la ejecucion, se revierte de inmediato
-        if($ResponseCotizacion['code'] != 200){
-            // Se revierte la transaccion activa (no-op si no hay transaccion)
-            $this->Base_transactionRollback();
-            // Se reporta el error
-            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
         }
 
         /************************************/
@@ -1142,6 +1144,27 @@ class cotizacionListado extends ControllerBase {
         }
 
         /************************************/
+        // Se recalculan los totales dentro de la misma transaccion (antes del commit).
+        // Base_update devuelve data=[], por lo que el id se toma del POST
+        $CotizacionID = filter_var($_POST['idCotizacion'] ?? null, FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]]);
+        if ($CotizacionID === false) {
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error('Registro inválido', 400);
+        }
+        $ResponseCotizacion = $this->updateCotizacion(4, $CotizacionID, $this->getDBConn());
+
+        /************************************/
+        // Si falla la la ejecucion, se revierte de inmediato
+        if($ResponseCotizacion['code'] != 200){
+            // Se revierte la transaccion activa (no-op si no hay transaccion)
+            $this->Base_transactionRollback();
+            // Se reporta el error
+            Response::error($ResponseCotizacion['message'], 500, $ResponseCotizacion['error'] ?? '');
+        }
+
+        /************************************/
         // Se confirma la transacción
         $ResponseCommit = $this->Base_transactionCommit();
 
@@ -1152,19 +1175,6 @@ class cotizacionListado extends ControllerBase {
             $this->Base_transactionRollback();
             // Se reporta el error
             Response::error('Error al operar con la Base de Datos', 500, $ResponseCommit['error'] ?? '');
-        }
-
-        /************************************/
-        // Se actualizan los datos de la factura
-        $ResponseCotizacion = $this->updateCotizacion(4, $Response['data'], $this->getDBConn());
-
-        /************************************/
-        // Si falla la la ejecucion, se revierte de inmediato
-        if($ResponseCotizacion['code'] != 200){
-            // Se revierte la transaccion activa (no-op si no hay transaccion)
-            $this->Base_transactionRollback();
-            // Se reporta el error
-            Response::error($ResponseCotizacion['message'], $ResponseCotizacion['code'], $ResponseCotizacion['error'] ?? '');
         }
 
         /************************************/
@@ -1201,6 +1211,7 @@ class cotizacionListado extends ControllerBase {
             'SubCarpeta'  => '',
             'Post'        => $dataDelete
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query

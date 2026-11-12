@@ -236,6 +236,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'idFacturacion ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -331,7 +332,7 @@ class gestionDocumentos extends ControllerBase {
         // Se validan las fechas
         $RespDataBetween = $this->searchValidateDates($WhereData_between);
         if($RespDataBetween!=''){
-            Response::error($RespDataBetween, 500);
+            Response::error($RespDataBetween, 400);
         }
         /************************************/
         // Agrego variable busqueda
@@ -503,6 +504,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -577,6 +579,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'facturacion_listado_guias.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -602,6 +605,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'facturacion_listado_pagos.idPago ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -762,6 +766,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -836,6 +841,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'facturacion_listado_guias.idExistencia ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -861,6 +867,7 @@ class gestionDocumentos extends ControllerBase {
             'order'   => 'facturacion_listado_pagos.idPago ASC',
             'limit'   => ConfigAPP::APP["N_MaxItems"]
         ];
+        /************************************/
         // Preparo los datos
         $xParams  = ['query' => $query];
         // Ejecuto la query
@@ -1201,7 +1208,7 @@ class gestionDocumentos extends ControllerBase {
         if ($ndata_2 != 0 && isset($_POST['idTipo'])) {
             $bodegaSeleccionada = (
                 ($_POST['idTipo'] == 1 && !empty($_POST['idBodegasIngreso'])) ||
-                ($_POST['idTipo'] === 2 && !empty($_POST['idBodegasEgreso']))
+                ($_POST['idTipo'] == 2 && !empty($_POST['idBodegasEgreso']))
             );
             if (!$bodegaSeleccionada) {
                 $DataVal['Count'] = 0;
@@ -1597,7 +1604,7 @@ class gestionDocumentos extends ControllerBase {
             if (isset($PostData['idTipo'])) {
                 if ($PostData['idTipo'] == 1 && isset($PostData['idBodegasIngreso'])) {
                     $idBodegas = $PostData['idBodegasIngreso'];
-                } elseif ($PostData['idTipo'] === 2 && isset($PostData['idBodegasEgreso'])) {
+                } elseif ($PostData['idTipo'] == 2 && isset($PostData['idBodegasEgreso'])) {
                     $idBodegas = $PostData['idBodegasEgreso'];
                 }
             }
@@ -1928,7 +1935,7 @@ class gestionDocumentos extends ControllerBase {
                     // Se revierte la transaccion activa (no-op si no hay transaccion)
                     $this->Base_transactionRollback(['newBDConn' => $DBConn]);
                     // Se reporta el error
-                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $Response['error'] ?? ''];
+                    return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $respDelRel['error'] ?? ''];
                 }
             }
         }
@@ -1997,28 +2004,41 @@ class gestionDocumentos extends ControllerBase {
             $rowMovimiento = $this->Base_GetByID($xParams);
 
             /************************************/
-            // Se obtiene el ID
-            $MovimientoID_Del = $this->Codification->encryptDecrypt('encrypt', $rowMovimiento['data']['idMovimiento']);
-            // Se verifica
-            if (!$this->isValidDecrypted($MovimientoID_Del, 'text')) {
+            // Si falla la consulta, se revierte de inmediato
+            if ($rowMovimiento['status'] !== true) {
                 // Se revierte la transaccion activa (no-op si no hay transaccion)
                 $this->Base_transactionRollback(['newBDConn' => $DBConn]);
                 // Se reporta el error
-                return ['code' => 400, 'message' => 'Registro inválido'];
+                return ['code' => 500, 'message' => 'Error al operar con la Base de Datos', 'error' => $rowMovimiento['error'] ?? ''];
             }
-            // Se agrega respuesta
-            $arrTareas = ['idMovimiento' => $MovimientoID_Del['data'],];
 
             /************************************/
-            // Se instancia
-            $bodegasMovimiento = new bodegasMovimiento();
-            $bodegasMov        = $bodegasMovimiento->removeMov($arrTareas, $DBConn);
-            // Si falla la ejecucion, se revierte de inmediato
-            if($bodegasMov['code'] != 200){
-                // Se revierte la transaccion activa (no-op si no hay transaccion)
-                $this->Base_transactionRollback(['newBDConn' => $DBConn]);
-                // Se reporta el error
-                return $bodegasMov;
+            // Solo se revierte el movimiento si el documento tiene uno asociado
+            if (!empty($rowMovimiento['data']['idMovimiento'])) {
+                /************************************/
+                // Se obtiene el ID
+                $MovimientoID_Del = $this->Codification->encryptDecrypt('encrypt', $rowMovimiento['data']['idMovimiento']);
+                // Se verifica
+                if (!$this->isValidDecrypted($MovimientoID_Del, 'text')) {
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    // Se reporta el error
+                    return ['code' => 400, 'message' => 'Registro inválido'];
+                }
+                // Se agrega respuesta
+                $arrTareas = ['idMovimiento' => $MovimientoID_Del['data'],];
+
+                /************************************/
+                // Se instancia
+                $bodegasMovimiento = new bodegasMovimiento();
+                $bodegasMov        = $bodegasMovimiento->removeMov($arrTareas, $DBConn);
+                // Si falla la ejecucion, se revierte de inmediato
+                if($bodegasMov['code'] != 200){
+                    // Se revierte la transaccion activa (no-op si no hay transaccion)
+                    $this->Base_transactionRollback(['newBDConn' => $DBConn]);
+                    // Se reporta el error
+                    return $bodegasMov;
+                }
             }
 
         }
