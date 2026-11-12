@@ -3,7 +3,7 @@
 /*                                              Se define la clase                                                 */
 /*******************************************************************************************************************/
 /**
- * Reglas compartidas del módulo reserva_limpieza (ADR-0005).
+ * Reglas compartidas del módulo reserva_servicios (ADR-0005).
  *
  * Concentra el cálculo de precio, la cobertura, la disponibilidad, la retención
  * temporal y el alta transaccional que usan tanto el backoffice como el portal
@@ -11,7 +11,7 @@
  *
  * @package vendors/application/functions
  */
-class FunctionsReservaLimpieza {
+class FunctionsReservaServicios {
 
     /*******************************************************************************************************************/
     /*                                                                                                                 */
@@ -26,6 +26,49 @@ class FunctionsReservaLimpieza {
     public const USUARIO_SISTEMA_WEB = 1;
     /** Zona horaria de la operación. */
     public const ZONA_HORARIA = 'America/Santiago';
+    /** reserva_servicios_promociones_tipos.idTipo: descuento porcentual. */
+    public const PROMOCION_PORCENTAJE = 1;
+    /** reserva_servicios_promociones_tipos.idTipo: descuento de monto fijo. */
+    public const PROMOCION_MONTO = 2;
+    /** reserva_servicios_bloqueos_tipos.idTipo: bloqueo manual de agenda. */
+    public const BLOQUEO_MANUAL = 1;
+    /** reserva_servicios_bloqueos_tipos.idTipo: retención temporal del portal. */
+    public const BLOQUEO_RETENCION = 2;
+    /** reserva_servicios_origen.idOrigen: reserva creada desde el portal web. */
+    public const ORIGEN_WEB = 2;
+    /** reserva_servicios_asignacion.idRequiereAsignacion: requiere aprobación. */
+    public const ASIGNACION_APROBACION = 1;
+    /** reserva_servicios_asignacion.idRequiereAsignacion: confirmación automática. */
+    public const ASIGNACION_OK = 2;
+    /**
+     * Formato del Valor de una promoción por idTipo (prefijo/sufijo). Un tipo
+     * nuevo = una entrada del mapa, sin tocar formatearValorPromocion().
+     */
+    private const FORMATO_VALOR_PROMOCION = [
+        self::PROMOCION_PORCENTAJE => ['prefijo' => '',   'sufijo' => ' %'],
+        self::PROMOCION_MONTO      => ['prefijo' => '$ ', 'sufijo' => ''],
+    ];
+    /**
+     * Matriz de transiciones de estado de la reserva (functional.md §3).
+     * Clave: estado actual. Valor: estados de destino permitidos.
+     */
+    public const TRANSICIONES = [
+        1  => [2, 14],
+        2  => [3, 14, 15],
+        3  => [4, 14],
+        4  => [5, 14],
+        5  => [6, 14],
+        6  => [7, 14],
+        7  => [8, 9, 14],
+        8  => [9, 14],
+        9  => [10, 15],
+        10 => [11, 15],
+        11 => [12, 15],
+        12 => [13],
+        13 => [10, 11, 15],
+        14 => [],
+        15 => [6, 7, 10, 11, 14],
+    ];
 
     /*******************************************************************************************************************/
     /*                                                                                                                 */
@@ -49,7 +92,7 @@ class FunctionsReservaLimpieza {
      *
      * @example
      * ```php
-     * $helper = new FunctionsReservaLimpieza($DBConn, new QueryBuilder());
+     * $helper = new FunctionsReservaServicios($DBConn, new QueryBuilder());
      * ```
      */
     public function __construct($DBConn = null, $queryBuilder = null) {
@@ -91,7 +134,7 @@ class FunctionsReservaLimpieza {
         $query = [
             'data'   => 't.idTarifa, t.idServicio, t.Variante,
                          COALESCE(NULLIF(t.Etiqueta, \'\'), s.Nombre) AS NombreServicio,
-                         t.Valor, t.DuracionMin, t.RequiereInspeccion, t.VigenciaDesde, t.VigenciaHasta',
+                         t.Valor, t.DuracionMin, t.idRequiereInspeccion, t.VigenciaDesde, t.VigenciaHasta',
             'table'  => 'reserva_servicios_tarifas t',
             'join'   => 'INNER JOIN servicios_listado s ON s.idServicio = t.idServicio',
             'where'  => 't.idServicio = ? AND t.Variante = ? AND t.Activo = 1
@@ -136,7 +179,7 @@ class FunctionsReservaLimpieza {
         /************************************/
         // Consulta
         $query = [
-            'data'   => 'idPromocion, Nombre, Tipo, Valor, MinimoServicios, VigenciaDesde, VigenciaHasta',
+            'data'   => 'idPromocion, Nombre, idTipo, Valor, MinimoServicios, VigenciaDesde, VigenciaHasta',
             'table'  => 'reserva_servicios_promociones',
             'join'   => '',
             'where'  => 'Activo = 1 AND MinimoServicios <= ?
@@ -277,7 +320,7 @@ class FunctionsReservaLimpieza {
                 'Number'         => $number,
                 'ValorUnitario'  => $valorUnit,
                 'ValorTotal'     => $valorTotal,
-                'RequiereInspeccion' => (int) $t['RequiereInspeccion'],
+                'idRequiereInspeccion' => (int) $t['idRequiereInspeccion'],
             ];
             $subtotal      += $valorTotal;
             $duracionTotal += $duracion;
@@ -458,11 +501,11 @@ class FunctionsReservaLimpieza {
             // Se elimina una retención previa de la misma reserva
             if ($idReserva !== null && $idReserva > 0) {
                 $this->queryBuilder->queryExecute(
-                    'DELETE FROM reserva_limpieza_bloqueos WHERE idReservaServicio = ? AND Tipo = ?',
+                    'DELETE FROM reserva_servicios_bloqueos WHERE idReservaServicio = ? AND idTipo = ?',
                     $this->DBConn,
                     false,
                     false,
-                    [$idReserva, 'retencion']
+                    [$idReserva, self::BLOQUEO_RETENCION]
                 );
             }
 
@@ -471,13 +514,13 @@ class FunctionsReservaLimpieza {
                 ->modify('+'.self::HOLD_MINUTOS.' minutes')
                 ->format('Y-m-d H:i:s');
             $insert = $this->queryBuilder->queryExecute(
-                'INSERT INTO reserva_limpieza_bloqueos
-                    (idEntidadTrabajador, idReservaServicio, Tipo, Fecha, Hora_Inicio, Hora_Termino, Expira, idUsuario, Motivo)
+                'INSERT INTO reserva_servicios_bloqueos
+                    (idEntidadTrabajador, idReservaServicio, idTipo, Fecha, Hora_Inicio, Hora_Termino, Expira, idUsuario, Motivo)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
                 $this->DBConn,
                 false,
                 false,
-                [$idTrabajador, $idReserva, 'retencion', $fecha, $this->normalizarHora($horaInicio), $horaTermino, $expira, self::USUARIO_SISTEMA_WEB, 'Retención temporal del portal']
+                [$idTrabajador, $idReserva, self::BLOQUEO_RETENCION, $fecha, $this->normalizarHora($horaInicio), $horaTermino, $expira, self::USUARIO_SISTEMA_WEB, 'Retención temporal del portal']
             );
             if ($insert['status'] !== true) {
                 $this->DBConn->rollBack();
@@ -515,11 +558,11 @@ class FunctionsReservaLimpieza {
     public function limpiarRetencionesVencidas(): void {
         try {
             $this->queryBuilder->queryExecute(
-                'DELETE FROM reserva_limpieza_bloqueos WHERE Tipo = ? AND Expira IS NOT NULL AND Expira <= NOW()',
+                'DELETE FROM reserva_servicios_bloqueos WHERE idTipo = ? AND Expira IS NOT NULL AND Expira <= NOW()',
                 $this->DBConn,
                 false,
                 false,
-                ['retencion']
+                [self::BLOQUEO_RETENCION]
             );
         } catch (Exception $e) {
             // La limpieza es best-effort: no se propaga el error.
@@ -608,7 +651,7 @@ class FunctionsReservaLimpieza {
             false,
             [
                 $idUsuario, $idEntidad, $fecha, $fecha, $semana, $mes, $ano, $hora,
-                (string) ($datos['observaciones'] ?? 'Cotización generada desde reserva de limpieza'),
+                (string) ($datos['observaciones'] ?? 'Cotización generada desde reserva de servicios'),
                 round((float) ($datos['neto'] ?? 0), 2),
                 round((float) ($datos['iva'] ?? 0), 2),
                 round((float) ($datos['total'] ?? 0), 2),
@@ -654,7 +697,9 @@ class FunctionsReservaLimpieza {
      * cliente (entidad tipo 2), reserva, líneas con snapshot, evento, liberación
      * de la retención y cotización.
      *
-     * @param array $datos  Datos de la reserva y del cliente.
+     * @param array $datos  Datos de la reserva y del cliente. Catálogos por id:
+     *                      idRequiereAsignacion (1 aprobación, 2 OK; por defecto 1)
+     *                      e idCanal (opcional).
      * @param array $lineas Líneas con idServicio, Variante y Number.
      *
      * @return array{status:bool,data:mixed,message:string,error:string|null}
@@ -667,7 +712,8 @@ class FunctionsReservaLimpieza {
         $horaInicio     = $this->normalizarHora((string) ($datos['Hora_Inicio'] ?? ''));
         $idComuna       = (int) ($datos['idComuna'] ?? 0);
         $idUsuario      = (int) ($datos['idUsuario'] ?? self::USUARIO_SISTEMA_WEB);
-        $modalidad      = (string) ($datos['Modalidad'] ?? 'aprobacion');
+        $idAsignacion   = (int) ($datos['idRequiereAsignacion'] ?? self::ASIGNACION_APROBACION);
+        $idCanal        = (int) ($datos['idCanal'] ?? 0);
         $idTrabajador   = isset($datos['idEntidadTrabajador']) ? (int) $datos['idEntidadTrabajador'] : 0;
         $idRetencion    = isset($datos['idBloqueo']) ? (int) $datos['idBloqueo'] : 0;
 
@@ -688,8 +734,8 @@ class FunctionsReservaLimpieza {
 
         /************************************/
         // Una línea con inspección previa nunca se confirma sola
-        if ((int) $c['requiereInspeccion'] === 1) {
-            $modalidad = 'aprobacion';
+        if ((int) $c['requiereInspeccion'] === 1 || !in_array($idAsignacion, [self::ASIGNACION_APROBACION, self::ASIGNACION_OK], true)) {
+            $idAsignacion = self::ASIGNACION_APROBACION;
         }
 
         /************************************/
@@ -704,18 +750,18 @@ class FunctionsReservaLimpieza {
             $this->limpiarRetencionesVencidas();
             if ($idRetencion > 0) {
                 $this->queryBuilder->queryExecute(
-                    'DELETE FROM reserva_limpieza_bloqueos WHERE idBloqueo = ? AND Tipo = ?',
+                    'DELETE FROM reserva_servicios_bloqueos WHERE idBloqueo = ? AND idTipo = ?',
                     $this->DBConn,
                     false,
                     false,
-                    [$idRetencion, 'retencion']
+                    [$idRetencion, self::BLOQUEO_RETENCION]
                 );
             }
 
             // Trabajador libre (si no viene asignado, se busca uno)
             $sinTrabajador = false;
             if ($idTrabajador <= 0) {
-                $libre = $this->buscarTrabajadorLibre($fecha, $horaInicio, $horaTermino);
+                $libre = $this->buscarTrabajadorLibre($fecha, $horaInicio, $horaTermino, $idComuna);
                 if ($libre['status'] !== true) {
                     // Sin trabajador libre la reserva no se rechaza: queda
                     // solicitada y el backoffice la asigna al confirmar (estado 1).
@@ -760,10 +806,10 @@ class FunctionsReservaLimpieza {
             $hoy    = $ahora->format('Y-m-d');
             $observ = trim((string) ($datos['Observaciones'] ?? ''));
             $insert = $this->queryBuilder->queryExecute(
-                'INSERT INTO reserva_limpieza_listado
+                'INSERT INTO reserva_servicios_listado
                     (idEstadoReserva, idCotizacion, idFacturacion, idPromocion, idEntidadCliente,
                      idEntidadTrabajador, idComuna, idUsuarioCreador, idUsuarioResponsable,
-                     CodigoSeguimiento, Origen, Modalidad, CanalContacto, Direccion, Referencia,
+                     CodigoSeguimiento, idOrigen, idRequiereAsignacion, idCanal, Direccion, Referencia,
                      Fecha, Hora_Inicio, Hora_Termino, DuracionMin, Observaciones, Recargo, Descuento,
                      ValorNeto, IVA, ValorTotal, UltimoContacto, ProximaAccion, fecha_auto,
                      Creacion_fecha, Creacion_Semana, Creacion_mes, Creacion_ano, Creacion_hora)
@@ -775,7 +821,7 @@ class FunctionsReservaLimpieza {
                     1, null, null, $c['idPromocion'], $idEntidad,
                     $idTrabajador > 0 ? $idTrabajador : null, $idComuna, $idUsuario,
                     (int) ($datos['idUsuarioResponsable'] ?? 0) ?: null,
-                    $codigo, 'web', $modalidad, (string) ($datos['CanalContacto'] ?? 'web'),
+                    $codigo, self::ORIGEN_WEB, $idAsignacion, $idCanal > 0 ? $idCanal : null,
                     (string) ($datos['Direccion'] ?? ''), (string) ($datos['Referencia'] ?? ''),
                     $fecha, $horaInicio, $horaTermino, (int) $c['duracionMin'], $observ !== '' ? $observ : null,
                     $c['recargo'], $c['descuento'], $c['neto'], $c['iva'], $c['total'],
@@ -792,16 +838,16 @@ class FunctionsReservaLimpieza {
             // Líneas con snapshot
             foreach ($c['lineas'] as $linea) {
                 $detalle = $this->queryBuilder->queryExecute(
-                    'INSERT INTO reserva_limpieza_servicios
-                        (idReservaServicio, idServicio, idTarifa, NombreServicio, Variante,
+                    'INSERT INTO reserva_servicios_listado_servicios
+                        (idReservaServicio, idTarifa, NombreServicio,
                          DuracionMin, Number, ValorUnitario, ValorTotal)
-                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+                     VALUES (?, ?, ?, ?, ?, ?, ?)',
                     $this->DBConn,
                     false,
                     false,
                     [
-                        $idReserva, $linea['idServicio'], $linea['idTarifa'], $linea['NombreServicio'],
-                        $linea['Variante'], $linea['DuracionMin'], $linea['Number'],
+                        $idReserva, $linea['idTarifa'], $linea['NombreServicio'],
+                        $linea['DuracionMin'], $linea['Number'],
                         $linea['ValorUnitario'], $linea['ValorTotal'],
                     ]
                 );
@@ -813,7 +859,7 @@ class FunctionsReservaLimpieza {
 
             // Evento
             $evento = $this->queryBuilder->queryExecute(
-                'INSERT INTO reserva_limpieza_eventos
+                'INSERT INTO reserva_servicios_listado_eventos
                     (idReservaServicio, idUsuario, idEstadoAnterior, idEstadoNuevo, Evento, Motivo, FechaCreacion, HoraCreacion)
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
                 $this->DBConn,
@@ -843,7 +889,7 @@ class FunctionsReservaLimpieza {
             }
             $idCotizacion = (int) $cotizacion['data']['idCotizacion'];
             $this->queryBuilder->queryExecute(
-                'UPDATE reserva_limpieza_listado SET idCotizacion = ? WHERE idReservaServicio = ?',
+                'UPDATE reserva_servicios_listado SET idCotizacion = ? WHERE idReservaServicio = ?',
                 $this->DBConn,
                 false,
                 false,
@@ -872,6 +918,58 @@ class FunctionsReservaLimpieza {
         }
     }
 
+    /******************************************************************************/
+    /**
+     * Valida que un cambio de estado esté permitido por la matriz de transiciones.
+     *
+     * No consulta la base de datos ni valida motivo, nivel de acceso ni
+     * disponibilidad: eso es responsabilidad del llamador (T2).
+     *
+     * @param int $idEstadoActual Estado actual de la reserva.
+     * @param int $idEstadoNuevo  Estado de destino solicitado.
+     *
+     * @return array{status:bool,data:mixed,message:string,error:string|null}
+     *
+     * @example
+     * ```php
+     * $r = $helper->validarTransicion(4, 5); // status true
+     * $r = $helper->validarTransicion(14, 5); // status false
+     * ```
+     */
+    public function validarTransicion(int $idEstadoActual, int $idEstadoNuevo): array {
+        $permitidos = self::TRANSICIONES[$idEstadoActual] ?? null;
+        if ($permitidos === null || !in_array($idEstadoNuevo, $permitidos, true)) {
+            return $this->fail('Transición no permitida', 'TRANSICION_NO_PERMITIDA');
+        }
+        return $this->ok(['Desde' => $idEstadoActual, 'Hacia' => $idEstadoNuevo], 'Transición permitida');
+    }
+
+    /******************************************************************************/
+    /**
+     * Formatea el Valor de una promoción según su tipo (función pura, sin BD).
+     *
+     * Usa el mapa FORMATO_VALOR_PROMOCION: Porcentaje -> '25,50 %'; Monto ->
+     * '$ 25.000,50'; tipo ausente del mapa o no numérico -> solo el número con
+     * 2 decimales. Devuelve texto sin escapar (el escape HTML lo hace la vista).
+     *
+     * @param mixed $idTipo reserva_servicios_promociones_tipos.idTipo.
+     * @param mixed $valor  Valor de la promoción (no numérico se trata como 0).
+     *
+     * @return string
+     *
+     * @example
+     * ```php
+     * FunctionsReservaServicios::formatearValorPromocion(1, 25.5);    // '25,50 %'
+     * FunctionsReservaServicios::formatearValorPromocion(2, 25000.5); // '$ 25.000,50'
+     * FunctionsReservaServicios::formatearValorPromocion(99, 25000.5); // '25.000,50'
+     * ```
+     */
+    public static function formatearValorPromocion($idTipo, $valor): string {
+        $formato = is_numeric($idTipo) ? (self::FORMATO_VALOR_PROMOCION[(int) $idTipo] ?? null) : null;
+        $numero = number_format(is_numeric($valor) ? (float) $valor : 0.0, 2, ',', '.');
+        return ($formato['prefijo'] ?? '') . $numero . ($formato['sufijo'] ?? '');
+    }
+
     /*******************************************************************************************************************/
     /*                                                                                                                 */
     /*                                              Metodos Privados                                                   */
@@ -879,29 +977,38 @@ class FunctionsReservaLimpieza {
     /*******************************************************************************************************************/
     /******************************************************************************/
     /**
-     * Busca la primera entidad trabajadora activa sin conflicto en el rango.
+     * Busca la primera entidad trabajadora activa de la comuna sin conflicto en el rango.
+     *
+     * Solo considera a los trabajadores asignados a la cobertura activa de la
+     * comuna (reserva_servicios_cobertura_trabajadores).
      *
      * @param string $fecha       Fecha Y-m-d.
      * @param string $horaInicio  Hora H:i:s.
      * @param string $horaTermino Hora H:i:s.
+     * @param int    $idComuna    Comuna del servicio.
      *
      * @return array
      */
-    private function buscarTrabajadorLibre(string $fecha, string $horaInicio, string $horaTermino): array {
+    private function buscarTrabajadorLibre(string $fecha, string $horaInicio, string $horaTermino, int $idComuna): array {
         $sql = 'SELECT e.idEntidad
                 FROM entidades_listado e
                 WHERE e.idTipo = 3 AND e.idEstado = 1
+                  AND EXISTS (
+                      SELECT 1 FROM reserva_servicios_cobertura_trabajadores ct
+                      INNER JOIN reserva_servicios_cobertura co ON co.idCobertura = ct.idCobertura
+                      WHERE ct.idTrabajador = e.idEntidad AND co.idComuna = ? AND co.Activo = 1
+                  )
                   AND NOT EXISTS (
-                      SELECT 1 FROM reserva_limpieza_listado rl
-                      INNER JOIN reserva_limpieza_estados re ON re.idEstadoReserva = rl.idEstadoReserva
+                      SELECT 1 FROM reserva_servicios_listado rl
+                      INNER JOIN reserva_servicios_estados re ON re.idEstadoReserva = rl.idEstadoReserva
                       WHERE rl.idEntidadTrabajador = e.idEntidad AND rl.Fecha = ?
                         AND rl.Hora_Inicio < ? AND rl.Hora_Termino > ? AND re.BloqueaAgenda = 1
                   )
                   AND NOT EXISTS (
-                      SELECT 1 FROM reserva_limpieza_bloqueos b
+                      SELECT 1 FROM reserva_servicios_bloqueos b
                       WHERE b.idEntidadTrabajador = e.idEntidad AND b.Fecha = ?
                         AND b.Hora_Inicio < ? AND b.Hora_Termino > ?
-                        AND (b.Tipo = ? OR (b.Tipo = ? AND b.Expira > NOW()))
+                        AND (b.idTipo = ? OR (b.idTipo = ? AND b.Expira > NOW()))
                   )
                 ORDER BY e.idEntidad ASC
                 LIMIT 1';
@@ -910,7 +1017,7 @@ class FunctionsReservaLimpieza {
             $this->DBConn,
             false,
             true,
-            [$fecha, $horaTermino, $horaInicio, $fecha, $horaTermino, $horaInicio, 'bloqueo', 'retencion']
+            [$idComuna, $fecha, $horaTermino, $horaInicio, $fecha, $horaTermino, $horaInicio, self::BLOQUEO_MANUAL, self::BLOQUEO_RETENCION]
         );
         if ($result['status'] !== true) {
             return $this->fail('No fue posible consultar trabajadores disponibles', 'TRABAJADOR_CONSULTA');
@@ -929,8 +1036,8 @@ class FunctionsReservaLimpieza {
      */
     private function buscarConflictoReserva(int $idTrabajador, string $fecha, string $horaInicio, string $horaTermino, ?int $excluirId): array {
         $sql = 'SELECT rl.idReservaServicio, rl.Hora_Inicio, rl.Hora_Termino
-                FROM reserva_limpieza_listado rl
-                INNER JOIN reserva_limpieza_estados re ON re.idEstadoReserva = rl.idEstadoReserva
+                FROM reserva_servicios_listado rl
+                INNER JOIN reserva_servicios_estados re ON re.idEstadoReserva = rl.idEstadoReserva
                 WHERE rl.idEntidadTrabajador = ? AND rl.Fecha = ?
                   AND rl.Hora_Inicio < ? AND rl.Hora_Termino > ?
                   AND re.BloqueaAgenda = 1';
@@ -954,12 +1061,12 @@ class FunctionsReservaLimpieza {
      * @return array
      */
     private function buscarConflictoBloqueo(int $idTrabajador, string $fecha, string $horaInicio, string $horaTermino, ?int $excluirId): array {
-        $sql = 'SELECT b.idBloqueo, b.Tipo, b.Hora_Inicio, b.Hora_Termino, b.Expira
-                FROM reserva_limpieza_bloqueos b
+        $sql = 'SELECT b.idBloqueo, b.idTipo, b.Hora_Inicio, b.Hora_Termino, b.Expira
+                FROM reserva_servicios_bloqueos b
                 WHERE b.idEntidadTrabajador = ? AND b.Fecha = ?
                   AND b.Hora_Inicio < ? AND b.Hora_Termino > ?
-                  AND (b.Tipo = ? OR (b.Tipo = ? AND b.Expira > NOW()))';
-        $params = [$idTrabajador, $fecha, $horaTermino, $horaInicio, 'bloqueo', 'retencion'];
+                  AND (b.idTipo = ? OR (b.idTipo = ? AND b.Expira > NOW()))';
+        $params = [$idTrabajador, $fecha, $horaTermino, $horaInicio, self::BLOQUEO_MANUAL, self::BLOQUEO_RETENCION];
         if ($excluirId !== null && $excluirId > 0) {
             $sql .= ' AND (b.idReservaServicio IS NULL OR b.idReservaServicio <> ?)';
             $params[] = $excluirId;
@@ -1176,9 +1283,9 @@ class FunctionsReservaLimpieza {
      * @return float Beneficio en pesos.
      */
     private function calcularBeneficioPromocion(array $promo, float $subtotal): float {
-        $tipo  = (string) ($promo['Tipo'] ?? 'monto');
+        $tipo  = (int) ($promo['idTipo'] ?? self::PROMOCION_MONTO);
         $valor = (float) ($promo['Valor'] ?? 0);
-        if ($tipo === 'porcentaje') {
+        if ($tipo === self::PROMOCION_PORCENTAJE) {
             $porcentaje = min(max($valor, 0), 100);
             if ($subtotal > 0) {
                 return round($subtotal * $porcentaje / 100, 2);
@@ -1198,7 +1305,7 @@ class FunctionsReservaLimpieza {
      */
     private function requiereInspeccion(array $lineas): int {
         foreach ($lineas as $linea) {
-            if ((int) ($linea['RequiereInspeccion'] ?? 0) === 1) {
+            if ((int) ($linea['idRequiereInspeccion'] ?? 0) === 1) {
                 return 1;
             }
         }
