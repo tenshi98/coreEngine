@@ -540,58 +540,175 @@ class UIWidgetsCommon {
 
     /******************************************************************************/
     /**
-     * Genera un widget tipo countdown.
+     * Imprime una cuenta regresiva (días, horas, minutos y segundos) hacia una fecha destino.
      *
-     * @param string $FechaDestino Fecha límite en formato strtotime compatible.
-     * @param array $Opciones Opciones adicionales: 'titulo', 'fecha', 'clase', 'id'.
+     * Con fecha inválida imprime una alerta (alertPostData); con fecha pasada muestra 00:00:00 y el estado
+     * "vencido". El título y las clases se escapan (RN-004); el id se sanea a [A-Za-z0-9_-].
      *
-     * @return void Imprime el HTML del widget.
+     * @param string $FechaDestino Fecha destino en formato compatible con strtotime().
+     * @param array  $Opciones     'titulo' (rótulo), 'clase' (clases CSS extra) e 'id' (id del contenedor).
+     *
+     * @return void Imprime el HTML + JS del widget (o la alerta de error).
      *
      * @example
      * ```php
      * $Common = new UIWidgetsCommon();
-     * $Common->widgetCountdown('2024-12-31', ['titulo' => 'Evento en:']);
+     * $Common->widgetCountdown('2030-12-31 23:59:59', ['titulo' => 'Cierre del año', 'id' => 'cd_cierre']);
+     * // imprime la cuenta regresiva; con fecha pasada muestra 00:00:00 vencido
      * ```
-     *
      */
     public function widgetCountdown(string $FechaDestino, array $Opciones = []){
 
         /**********************  Definiciones   **********************/
-        $titulo     = $Opciones['titulo'] ?? '';
-        $fecha      = $Opciones['fecha'] ?? '';
+        $titulo = htmlspecialchars((string)($Opciones['titulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $clase  = $this->_widgetClass($Opciones['clase'] ?? '');
+        $id     = $this->_widgetId($Opciones['id'] ?? '', 'countdown_');
+        $time   = (trim($FechaDestino) === '') ? false : strtotime($FechaDestino);
 
         /**********************  Validaciones   **********************/
-        if($titulo === ''){
-            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el titulo.');
-            return;
-        }
-        if($fecha === ''){
-            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado la fecha.');
+        if($time === false){
+            echo $this->alertPostData(4, 4, 'bi bi-exclamation-circle', 1, 'La fecha destino de la cuenta regresiva no es valida.');
             return;
         }
 
         /********************** Si todo esta ok **********************/
-        //Genero el widget de countdown
-        $tiempo = strtotime($fecha);
-        $ahora  = time();
-        $restante = max(0, $tiempo - $ahora);
-        $dias   = floor($restante / 86400);
-        $horas  = floor(($restante % 3600) / 3600);
-        $minutos = floor(($restante % 3600) / 60);
+        //Segundos restantes (nunca negativos) y desglose inicial
+        $restante = max(0, $time - time());
+        $dias     = intdiv($restante, 86400);
+        $horas    = intdiv($restante % 86400, 3600);
+        $minutos  = intdiv($restante % 3600, 60);
         $segundos = $restante % 60;
+        $vencido  = ($restante === 0) ? '<span class="badge bg-danger ms-2">vencido</span>' : '';
+        $cabecera = ($titulo !== '') ? '<h6 class="card-title mb-2">'.$titulo.'</h6>' : '';
 
-        //Escapar HTML para seguridad (RN-004)
-        $titulo = htmlspecialchars($titulo);
-
+        /**********************  Retorno datos  **********************/
         //Imprimir dato
         echo '
-        <div class="widget widget-countdown">
-            <h4>'.$titulo.'</h4>
-            <div class="countdown">
-                <span class="dias">'.$dias.'d </span>
-                <span class="horas">'.$horas.'h </span>
-                <span class="minutos">'.$minutos.'m </span>
-                <span class="segundos">'.$segundos.'s </span>
+        <div class="card text-center '.$clase.'" id="'.$id.'" data-target="'.($time * 1000).'">
+            <div class="card-body">
+                '.$cabecera.'
+                <div class="d-flex justify-content-center gap-3">
+                    <div><span class="fs-3 fw-bold" data-unit="d">'.str_pad((string)$dias, 2, '0', STR_PAD_LEFT).'</span><small class="d-block text-muted">dias</small></div>
+                    <div><span class="fs-3 fw-bold" data-unit="h">'.str_pad((string)$horas, 2, '0', STR_PAD_LEFT).'</span><small class="d-block text-muted">horas</small></div>
+                    <div><span class="fs-3 fw-bold" data-unit="m">'.str_pad((string)$minutos, 2, '0', STR_PAD_LEFT).'</span><small class="d-block text-muted">min</small></div>
+                    <div><span class="fs-3 fw-bold" data-unit="s">'.str_pad((string)$segundos, 2, '0', STR_PAD_LEFT).'</span><small class="d-block text-muted">seg</small></div>
+                </div>
+                <div class="mt-2" data-state>'.$vencido.'</div>
+            </div>
+        </div>
+        <script>
+        (function() {
+            var box = document.getElementById('.json_encode($id).');
+            if (!box) { return; }
+            var target = parseInt(box.getAttribute("data-target"), 10);
+            function pad(n) { return (n < 10 ? "0" : "") + n; }
+            function tick() {
+                var left = Math.max(0, Math.floor((target - Date.now()) / 1000));
+                box.querySelector("[data-unit=d]").textContent = pad(Math.floor(left / 86400));
+                box.querySelector("[data-unit=h]").textContent = pad(Math.floor((left % 86400) / 3600));
+                box.querySelector("[data-unit=m]").textContent = pad(Math.floor((left % 3600) / 60));
+                box.querySelector("[data-unit=s]").textContent = pad(left % 60);
+                if (left === 0) {
+                    box.querySelector("[data-state]").innerHTML = \'<span class="badge bg-danger ms-2">vencido</span>\';
+                    clearInterval(timer);
+                }
+            }
+            var timer = setInterval(tick, 1000);
+            tick();
+        })();
+        </script>';
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Imprime un estado vacío centrado con icono, título y mensaje.
+     *
+     * Título y mensaje se escapan con htmlspecialchars (RN-004); el icono se sanea a [a-z0-9_-]
+     * (por defecto 'bi-inbox'). Con título vacío imprime una alerta (alertPostData).
+     *
+     * @param string $Titulo   Título del estado vacío (obligatorio).
+     * @param string $Mensaje  Mensaje secundario (opcional).
+     * @param array  $Opciones 'icono' (clase Bootstrap Icons, ej. 'bi-folder'), 'clase' e 'id'.
+     *
+     * @return void Imprime el HTML del widget (o la alerta de error).
+     *
+     * @example
+     * ```php
+     * $Common = new UIWidgetsCommon();
+     * $Common->widgetEmptyState('Sin resultados', 'Prueba con otro filtro.', ['icono' => 'bi-search']);
+     * // imprime el bloque centrado con icono bi-search
+     * ```
+     */
+    public function widgetEmptyState(string $Titulo, string $Mensaje = '', array $Opciones = []){
+
+        /**********************  Validaciones   **********************/
+        if(trim($Titulo) === ''){
+            echo $this->alertPostData(4, 4, 'bi bi-exclamation-circle', 1, 'No ha ingresado el titulo del estado vacio.');
+            return;
+        }
+
+        /**********************  Definiciones   **********************/
+        $titulo  = htmlspecialchars($Titulo, ENT_QUOTES, 'UTF-8');
+        $mensaje = htmlspecialchars($Mensaje, ENT_QUOTES, 'UTF-8');
+        $icono   = preg_replace('/[^a-z0-9_-]/', '', strtolower((string)($Opciones['icono'] ?? '')));
+        if($icono === ''){ $icono = 'bi-inbox'; }
+        $clase   = $this->_widgetClass($Opciones['clase'] ?? '');
+        $idAttr  = isset($Opciones['id']) ? ' id="'.$this->_widgetId($Opciones['id'], 'empty_').'"' : '';
+
+        /**********************  Retorno datos  **********************/
+        //Imprimir dato
+        echo '
+        <div class="text-center text-muted py-5 '.$clase.'"'.$idAttr.'>
+            <i class="bi '.$icono.' display-4 d-block mb-2"></i>
+            <h5>'.$titulo.'</h5>'.
+            ($mensaje !== '' ? '<p class="mb-0">'.$mensaje.'</p>' : '').'
+        </div>';
+
+    }
+
+    /******************************************************************************/
+    /**
+     * Imprime una barra de progreso Bootstrap con atributos de accesibilidad.
+     *
+     * El porcentaje se acota a 0..100 (NaN o negativo = 0). Sin 'color' se elige por umbral:
+     * <34 danger, <67 warning, resto success. El color se limita al catálogo Bootstrap.
+     *
+     * @param float $Porcentaje Porcentaje de avance.
+     * @param array $Opciones   'color' (primary|secondary|success|info|warning|danger), 'titulo', 'clase', 'id'.
+     *
+     * @return void Imprime el HTML de la barra.
+     *
+     * @example
+     * ```php
+     * $Common = new UIWidgetsCommon();
+     * $Common->widgetProgress(72.5, ['titulo' => 'Avance']); // barra verde al 72.5%
+     * $Common->widgetProgress(150);                           // se acota a 100
+     * ```
+     */
+    public function widgetProgress(float $Porcentaje, array $Opciones = []){
+
+        /**********************  Definiciones   **********************/
+        //Acotado (NaN -> 0)
+        $valor   = is_nan($Porcentaje) ? 0.0 : min(100.0, max(0.0, $Porcentaje));
+        $valor   = round($valor, 2);
+        $colores = ['primary', 'secondary', 'success', 'info', 'warning', 'danger'];
+        $color   = (string)($Opciones['color'] ?? '');
+        if(!in_array($color, $colores, true)){
+            $color = ($valor < 34) ? 'danger' : (($valor < 67) ? 'warning' : 'success');
+        }
+        $titulo  = htmlspecialchars((string)($Opciones['titulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $clase   = $this->_widgetClass($Opciones['clase'] ?? '');
+        $idAttr  = isset($Opciones['id']) ? ' id="'.$this->_widgetId($Opciones['id'], 'progress_').'"' : '';
+        $cabecera = ($titulo !== '') ? '<div class="d-flex justify-content-between mb-1"><small>'.$titulo.'</small><small>'.$valor.'%</small></div>' : '';
+
+        /**********************  Retorno datos  **********************/
+        //Imprimir dato
+        echo '
+        <div class="'.$clase.'"'.$idAttr.'>
+            '.$cabecera.'
+            <div class="progress" role="progressbar" aria-valuenow="'.$valor.'" aria-valuemin="0" aria-valuemax="100">
+                <div class="progress-bar bg-'.$color.'" style="width: '.$valor.'%"></div>
             </div>
         </div>';
 
@@ -599,159 +716,200 @@ class UIWidgetsCommon {
 
     /******************************************************************************/
     /**
-     * Genera un widget de estado vacío.
+     * Imprime un carrusel Bootstrap a partir de una lista de ítems.
      *
-     * @param string $Titulo Título del widget.
-     * @param string $Mensaje Mensaje del widget (opcional).
-     * @param array $Opciones Opciones adicionales: 'icono', 'clase', 'id'.
+     * Cada ítem admite 'imagen' (URL http/https o ruta relativa), 'titulo' y 'texto'; todo se escapa
+     * (RN-004). Con lista vacía imprime una alerta de sin datos (alertPostData). Con un solo ítem se
+     * omiten los indicadores.
      *
-     * @return void Imprime el HTML del widget.
+     * @param array $Items    Ítems [['imagen'=>url,'titulo'=>'...','texto'=>'...'], ...].
+     * @param array $Opciones 'id', 'controles' (bool, default true), 'indicadores' (bool, default true), 'intervalo' (ms, default 5000).
      *
-     * @example
-     * ```php
-     * $Common = new UIWidgetsCommon();
-     * $Common->widgetEmptyState('Sin datos', '', ['icono' => 'bi bi-inbox']);
-     * ```
-     *
-     */
-    public function widgetEmptyState(string $Titulo, string $Mensaje = '', array $Opciones = []){
-
-        /**********************  Validaciones   **********************/
-        if($Titulo === ''){
-            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el titulo.');
-            return;
-        }
-
-        /********************** Si todo esta ok **********************/
-        //Escapar HTML para seguridad (RN-004)
-        $titulo = htmlspecialchars($Titulo);
-
-        //Imprimir dato
-        echo '
-        <div class="widget widget-empty">
-            <h4>'.$titulo.'</h4>
-            <p>No hay datos para mostrar.</p>
-        </div>';
-
-    }
-
-    /******************************************************************************/
-    /**
-     * Genera un widget de progreso.
-     *
-     * @param float $Porcentaje Porcentaje de progreso (0-100).
-     * @param array $Opciones Opciones adicionales: 'titulo', 'color', 'id'.
-     *
-     * @return void Imprime el HTML del widget.
+     * @return void Imprime el HTML del carrusel (o la alerta de sin datos).
      *
      * @example
      * ```php
      * $Common = new UIWidgetsCommon();
-     * $Common->widgetProgress(75, ['titulo' => 'Progreso']);
+     * $Common->widgetCarousel([
+     *     ['imagen' => '/img/a.jpg', 'titulo' => 'Uno', 'texto' => 'Primera diapositiva'],
+     *     ['imagen' => '/img/b.jpg', 'titulo' => 'Dos'],
+     * ], ['id' => 'car_home', 'intervalo' => 4000]);
      * ```
-     *
-     */
-    public function widgetProgress(float $Porcentaje, array $Opciones = []){
-
-        /**********************  Validaciones   **********************/
-        if(!isset($Opciones['porcentaje']) || !is_numeric($Opciones['porcentaje'])){
-            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el porcentaje.');
-            return;
-        }
-        $porcentaje = min(100, max(0, (int)$Opciones['porcentaje']));
-
-        /********************** Si todo esta ok **********************/
-        //Escapar HTML para seguridad (RN-004)
-        $titulo = htmlspecialchars($Opciones['titulo'] ?? '');
-
-        //Imprimir dato
-        echo '
-        <div class="widget widget-progress">
-            <h4>'.$titulo.'</h4>
-            <div class="progress-bar" style="width: '.$porcentaje.'%"></div>
-        </div>';
-
-    }
-
-    /******************************************************************************/
-    /**
-     * Genera un widget de carrusel.
-     *
-     * @param array $Items Arreglo de items con 'titulo' y 'contenido'.
-     * @param array $Opciones Opciones adicionales: 'id', 'controles', 'indicadores', 'intervalo'.
-     *
-     * @return void Imprime el HTML del widget.
-     *
-     * @example
-     * ```php
-     * $Common = new UIWidgetsCommon();
-     * $Common->widgetCarousel(['items' => [['titulo' => 'Slide 1', 'contenido' => 'Contenido del slide 1']]], ['id' => 'miCarrousel']);
-     * ```
-     *
      */
     public function widgetCarousel(array $Items, array $Opciones = []){
 
         /**********************  Validaciones   **********************/
-        if(!isset($Opciones['items']) || !is_array($Opciones['items'])){
-            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado los items.');
+        $Items = array_values(array_filter($Items, 'is_array'));
+        if(count($Items) === 0){
+            echo $this->alertPostData(5, 4, 'bi bi-exclamation-triangle-fill', 0, 'No hay elementos para mostrar en el carrusel.');
             return;
         }
 
+        /**********************  Definiciones   **********************/
+        $id          = $this->_widgetId($Opciones['id'] ?? '', 'carousel_');
+        $controles   = (bool)($Opciones['controles'] ?? true);
+        $indicadores = (bool)($Opciones['indicadores'] ?? true) && count($Items) > 1;
+        $intervalo   = max(0, (int)($Opciones['intervalo'] ?? 5000));
+        $slides = '';
+        $dots   = '';
+
         /********************** Si todo esta ok **********************/
-        //Escapar HTML para seguridad (RN-004)
-        $itemsHtml = '';
-        foreach($Opciones['items'] as $item){
-            $titulo = isset($item['titulo']) ? htmlspecialchars($item['titulo']) : '';
-            $contenido = isset($item['contenido']) ? htmlspecialchars($item['contenido']) : '';
-            $itemsHtml .= '<div class="carousel-item">'.$contenido.'</div>';
+        foreach($Items as $i => $item){
+            $imagen = trim((string)($item['imagen'] ?? ''));
+            //Solo http(s) o rutas relativas (descarta javascript:, data:, etc.)
+            if($imagen !== '' && preg_match('#^[a-z][a-z0-9+.-]*:#i', $imagen) && !preg_match('#^https?://#i', $imagen)){
+                $imagen = '';
+            }
+            $imagen = htmlspecialchars($imagen, ENT_QUOTES, 'UTF-8');
+            $titulo = htmlspecialchars((string)($item['titulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+            $texto  = htmlspecialchars((string)($item['texto'] ?? ''), ENT_QUOTES, 'UTF-8');
+            $active = ($i === 0) ? ' active' : '';
+            $slides .= '
+                <div class="carousel-item'.$active.'">'.
+                    ($imagen !== '' ? '<img src="'.$imagen.'" class="d-block w-100" alt="'.$titulo.'">' : '').
+                    (($titulo !== '' || $texto !== '') ? '<div class="carousel-caption d-none d-md-block">'.
+                        ($titulo !== '' ? '<h5>'.$titulo.'</h5>' : '').
+                        ($texto !== '' ? '<p>'.$texto.'</p>' : '').'</div>' : '').'
+                </div>';
+            $dots .= '<button type="button" data-bs-target="#'.$id.'" data-bs-slide-to="'.$i.'"'.
+                     ($i === 0 ? ' class="active" aria-current="true"' : '').' aria-label="Diapositiva '.($i + 1).'"></button>';
         }
 
+        /**********************  Retorno datos  **********************/
         //Imprimir dato
-        echo '<div class="widget widget-carousel">'.$itemsHtml.'</div>';
+        echo '
+        <div id="'.$id.'" class="carousel slide" data-bs-ride="carousel" data-bs-interval="'.$intervalo.'">'.
+            ($indicadores ? '<div class="carousel-indicators">'.$dots.'</div>' : '').'
+            <div class="carousel-inner">'.$slides.'
+            </div>'.
+            ($controles ? '
+            <button class="carousel-control-prev" type="button" data-bs-target="#'.$id.'" data-bs-slide="prev"><span class="carousel-control-prev-icon" aria-hidden="true"></span><span class="visually-hidden">Anterior</span></button>
+            <button class="carousel-control-next" type="button" data-bs-target="#'.$id.'" data-bs-slide="next"><span class="carousel-control-next-icon" aria-hidden="true"></span><span class="visually-hidden">Siguiente</span></button>' : '').'
+        </div>';
 
     }
 
     /******************************************************************************/
     /**
-     * Genera un widget para copiar al portapapeles.
+     * Imprime un botón que copia un texto al portapapeles (navigator.clipboard con fallback execCommand).
      *
-     * @param string $Texto Texto a copiar al portapapeles.
-     * @param array $Opciones Opciones adicionales: 'etiqueta', 'clase'.
+     * El texto se escapa en el atributo data-copy y se deja visible en un code (sin JS el texto sigue
+     * disponible). Con texto vacío imprime una alerta (alertPostData). Tras copiar muestra "¡Copiado!".
      *
-     * @return void Imprime el HTML del widget.
+     * @param string $Texto    Texto a copiar (obligatorio).
+     * @param array  $Opciones 'etiqueta' (texto del botón, default 'Copiar'), 'clase' (clases del botón) e 'id'.
+     *
+     * @return void Imprime el HTML + JS del widget (o la alerta de error).
      *
      * @example
      * ```php
      * $Common = new UIWidgetsCommon();
-     * $Common->widgetCopyToClipboard('Texto para copiar', ['etiqueta' => 'Copiar']);
+     * $Common->widgetCopyToClipboard('https://mi-sitio.cl/ref/123', ['etiqueta' => 'Copiar enlace']);
+     * // imprime code + botón que copia el enlace
      * ```
-     *
      */
     public function widgetCopyToClipboard(string $Texto, array $Opciones = []){
 
         /**********************  Validaciones   **********************/
-        if($Opciones['texto'] ?? '' === ''){
-            echo $this->alertPostData(4, 4, 'exclamation-circle', 1, 'No ha ingresado el texto.');
+        if(trim($Texto) === ''){
+            echo $this->alertPostData(4, 4, 'bi bi-exclamation-circle', 1, 'No ha ingresado el texto a copiar.');
             return;
         }
 
-        /********************** Si todo esta ok **********************/
-        //Escapar HTML para seguridad (RN-004)
-        $texto = htmlspecialchars($Opciones['texto']);
+        /**********************  Definiciones   **********************/
+        $id       = $this->_widgetId($Opciones['id'] ?? '', 'copy_');
+        $etiqueta = htmlspecialchars((string)(($Opciones['etiqueta'] ?? '') !== '' ? $Opciones['etiqueta'] : 'Copiar'), ENT_QUOTES, 'UTF-8');
+        $clase    = $this->_widgetClass($Opciones['clase'] ?? '');
+        if($clase === ''){ $clase = 'btn btn-sm btn-outline-secondary'; }
+        $texto    = htmlspecialchars($Texto, ENT_QUOTES, 'UTF-8');
 
-        //Imprimir dato con botón de copiar (usando clipboard.js o similar)
+        /**********************  Retorno datos  **********************/
+        //Imprimir dato
         echo '
-        <div class="widget widget-clipboard">
-            <input type="text" value="'.$texto.'" id="clipboardInput" readonly>
-            <button class="btn-clipboard" onclick="copyToClipboard()">Copiar</button>
-            <script>
-                function copyToClipboard() {
-                    navigator.clipboard.writeText(document.getElementById("clipboardInput").value);
-                    alert(' . json_encode('Texto copiado exitosamente') . ');
+        <span class="d-inline-flex align-items-center gap-2">
+            <code>'.$texto.'</code>
+            <button type="button" id="'.$id.'" class="'.$clase.'" data-copy="'.$texto.'">'.$etiqueta.'</button>
+        </span>
+        <script>
+        (function() {
+            var btn = document.getElementById('.json_encode($id).');
+            if (!btn) { return; }
+            var original = btn.textContent;
+            function done() {
+                btn.textContent = "¡Copiado!";
+                setTimeout(function() { btn.textContent = original; }, 1500);
+            }
+            function fallback(text) {
+                var ta = document.createElement("textarea");
+                ta.value = text;
+                ta.style.position = "fixed";
+                ta.style.opacity = "0";
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand("copy"); done(); } catch (e) {}
+                document.body.removeChild(ta);
+            }
+            btn.addEventListener("click", function() {
+                var text = btn.getAttribute("data-copy");
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(text).then(done, function() { fallback(text); });
+                } else {
+                    fallback(text);
                 }
-            </script>
-        </div>';
+            });
+        })();
+        </script>';
 
     }
+
+	/*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              Metodos Privados                                                   */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+	/******************************************************************************/
+	/**
+	 * Sanea una lista de clases CSS dejando solo [A-Za-z0-9 _-].
+	 *
+	 * @param mixed $Clase Clases informadas por el usuario.
+	 *
+	 * @return string Clases saneadas ('' si no queda nada).
+	 *
+	 * @example
+	 * ```php
+	 * $this->_widgetClass('mt-3 "><script>'); // 'mt-3 script'
+	 * ```
+	 */
+	private function _widgetClass($Clase): string {
+
+		/**********************  Retorno datos  **********************/
+		return trim(preg_replace('/[^A-Za-z0-9 _-]/', '', (string)$Clase));
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Sanea un id HTML a [A-Za-z0-9_-]; si queda vacío genera uno único con el prefijo indicado.
+	 *
+	 * @param mixed  $Id      Id informado por el usuario.
+	 * @param string $Prefijo Prefijo del id autogenerado.
+	 *
+	 * @return string Id seguro para atributos HTML y selectores.
+	 *
+	 * @example
+	 * ```php
+	 * $this->_widgetId('mi id!', 'copy_'); // 'miid'
+	 * $this->_widgetId('', 'copy_');       // 'copy_a1b2c3d4e5f6'
+	 * ```
+	 */
+	private function _widgetId($Id, string $Prefijo): string {
+
+		/**********************  Definiciones   **********************/
+		$id = preg_replace('/[^A-Za-z0-9_-]/', '', (string)$Id);
+
+		/**********************  Retorno datos  **********************/
+		return ($id !== '') ? $id : $Prefijo.bin2hex(random_bytes(6));
+
+	}
 
 }
