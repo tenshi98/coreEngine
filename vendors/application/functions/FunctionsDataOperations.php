@@ -362,9 +362,11 @@ class FunctionsDataOperations {
 		}
 
 		/********************** Si todo esta ok **********************/
-		// DateTime aplica la suma de meses con ajuste automático de fin de mes
-		$d = new DateTime($Fecha);
-		$d->modify('+' . $Meses . ' months');
+		// Se recorta a fin de mes (evita el desborde de DateTime: 31-ene +1 mes = 02-mar)
+		$d   = new DateTime($Fecha);
+		$dia = (int)$d->format('j');
+		$d->modify('first day of +' . $Meses . ' months');
+		$d->setDate((int)$d->format('Y'), (int)$d->format('n'), min($dia, (int)$d->format('t')));
 
 		/********************** Retorno datos  **********************/
 		// Se devuelve en el mismo formato que se recibió
@@ -378,7 +380,7 @@ class FunctionsDataOperations {
 	 *
 	 * Respeta el formato de entrada: acepta fecha simple 'Y-m-d' o fecha/hora
 	 * 'Y-m-d H:i:s' y devuelve el resultado en ese mismo formato. Ante el
-	 * desborde de días aplica el ajuste de fin de mes de DateTime.
+	 * desborde de días recorta al último día del mes resultante.
 	 *
 	 * @param string $Fecha Fecha base ('Y-m-d' o 'Y-m-d H:i:s').
 	 * @param int $Meses Cantidad de meses a restar (no negativa).
@@ -417,9 +419,11 @@ class FunctionsDataOperations {
 		}
 
 		/********************** Si todo esta ok **********************/
-		// DateTime aplica la resta de meses con ajuste automático de fin de mes
-		$d = new DateTime($Fecha);
-		$d->modify('-' . $Meses . ' months');
+		// Se recorta a fin de mes (evita el desborde de DateTime: 31-ene +1 mes = 02-mar)
+		$d   = new DateTime($Fecha);
+		$dia = (int)$d->format('j');
+		$d->modify('first day of -' . $Meses . ' months');
+		$d->setDate((int)$d->format('Y'), (int)$d->format('n'), min($dia, (int)$d->format('t')));
 
 		/********************** Retorno datos  **********************/
 		// Se devuelve en el mismo formato que se recibió
