@@ -17,7 +17,7 @@ class FunctionsServerShell {
      * Implementa validaciones de seguridad para IPs y URLs antes de la ejecución.
      *
      * @param string $tarea Dato de entrada (IP o URL) según el tipo de tarea.
-     * @param int $Type Identificador del tipo de tarea (1: Iptables, 2: Wget, 3: Personalizado).
+     * @param int $Type Identificador del tipo de tarea (1: Iptables, 2: Wget, 3: Quitar IP del firewall); otro valor devuelve error sin ejecutar shell.
      *
      * @return array Resultado con éxito y datos, o error: ['success' => bool, 'data' => string].
 	 *
@@ -91,6 +91,10 @@ class FunctionsServerShell {
                         return ['success' => false, 'data' => 'Verifique el dato solicitado, no es una IP.'];
                     }
                     break;
+                /*************************/
+                // Tipo desconocido: no se ejecuta nada en el shell
+                default:
+                    return ['success' => false, 'data' => 'Tipo de tarea no válido ('.$Type.').'];
             }
 
             // Intento de ejecución del comando construido en la terminal del sistema operativo
