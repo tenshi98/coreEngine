@@ -74,6 +74,10 @@ class bodegasMovimiento extends ControllerBase {
         $TipoDocs = $this->TipoIngreso($idTipoIngreso);
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -91,8 +95,8 @@ class bodegasMovimiento extends ControllerBase {
             'params'  => [$idTipoIngreso],
             'group'   => '',
             'having'  => '',
-            'order'   => 'bodegas_movimientos.Creacion_fecha DESC, bodegas_movimientos.Creacion_hora DESC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'bodegas_movimientos.Creacion_fecha DESC, bodegas_movimientos.Creacion_hora DESC, bodegas_movimientos.idMovimiento DESC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -175,6 +179,10 @@ class bodegasMovimiento extends ControllerBase {
         if($arrList['status'] === true && $arrBodegas['status'] === true && $arrProductos['status'] === true && $arrDocumentos['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -193,7 +201,9 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_ServerServer'    => $this->ServerServer,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
                 'arrBodegas'      => $arrBodegas['data'],
                 'arrProductos'    => $arrProductos['data'],
                 'arrDocumentos'   => $arrDocumentos['data'],
@@ -258,6 +268,10 @@ class bodegasMovimiento extends ControllerBase {
         $whereParams = array_merge($whereParams, [$idTipoIngreso]);
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -276,8 +290,8 @@ class bodegasMovimiento extends ControllerBase {
             'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
-            'order'   => 'bodegas_movimientos.Creacion_fecha DESC, bodegas_movimientos.Creacion_hora DESC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'bodegas_movimientos.Creacion_fecha DESC, bodegas_movimientos.Creacion_hora DESC, bodegas_movimientos.idMovimiento DESC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -291,6 +305,10 @@ class bodegasMovimiento extends ControllerBase {
         if ($arrList['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -302,13 +320,22 @@ class bodegasMovimiento extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
                 'idTipoIngreso'   => $idTipoIngreso,
             ];
 
             /************************************/
             // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

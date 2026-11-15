@@ -140,6 +140,10 @@ class gestionDocumentosItems extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se verifica movimiento
         $tsrxName = $this->tsrxName($idTipo);
 
@@ -171,7 +175,7 @@ class gestionDocumentosItems extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'idExistencia ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'limit'   => $page['limit']
         ];
         /************************************/
         // Preparo los datos
@@ -186,6 +190,10 @@ class gestionDocumentosItems extends ControllerBase {
         if($rowData['status'] === true && $arrItems['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrItems['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -196,13 +204,22 @@ class gestionDocumentosItems extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
                 'rowData'     => $rowData['data'],
-                'arrItems'    => $arrItems['data'],
+                'arrItems'    => $more['rows'],
+                'hasMore'    => $more['hasMore'],
+                'nextOffset' => $more['next'],
+                'DataID'     => $params['id'],
                 'idTipo'      => $idTipo,
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Items-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Items-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Items-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

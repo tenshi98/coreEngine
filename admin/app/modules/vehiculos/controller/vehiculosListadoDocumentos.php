@@ -147,6 +147,10 @@ class vehiculosListadoDocumentos extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -161,8 +165,8 @@ class vehiculosListadoDocumentos extends ControllerBase {
             'params'  => [$VehiculoID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_tipos_vehiculos_documentos.Nombre ASC, vehiculos_listado_documentos.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'core_tipos_vehiculos_documentos.Nombre ASC, vehiculos_listado_documentos.Nombre ASC, vehiculos_listado_documentos.idDocumentos ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams       = ['query' => $query];
@@ -176,6 +180,10 @@ class vehiculosListadoDocumentos extends ControllerBase {
         if ($arrDocumentos['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrDocumentos['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -185,12 +193,21 @@ class vehiculosListadoDocumentos extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrDocumentos' => $arrDocumentos['data'],
+                'arrDocumentos' => $more['rows'],
+                'hasMore'       => $more['hasMore'],
+                'nextOffset'    => $more['next'],
+                'moreId'        => $params['id'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Documentos-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Documentos-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Documentos-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

@@ -46,8 +46,12 @@ class usuariosListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
-        $arrList = $this->getDataList('usuarios_listado.idTipoUsuario!=1');
+        $arrList = $this->getDataList('usuarios_listado.idTipoUsuario!=1', [], $page['limit']);
 
         /************************************/
         // Se genera la query
@@ -110,6 +114,10 @@ class usuariosListado extends ControllerBase {
         if($arrList['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrTipoUsuario['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -126,7 +134,9 @@ class usuariosListado extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
                 'arrCiudad'       => $arrCiudad['data'],
                 'arrComuna'       => $arrComuna['data'],
                 'arrTipoUsuario'  => $arrTipoUsuario['data'],
@@ -176,14 +186,22 @@ class usuariosListado extends ControllerBase {
         $whereParams = array_merge($whereParams, [1]);
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
-        $arrList = $this->getDataList($whereInt, $whereParams);
+        $arrList = $this->getDataList($whereInt, $whereParams, $page['limit']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -197,12 +215,20 @@ class usuariosListado extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -692,7 +718,7 @@ class usuariosListado extends ControllerBase {
     /*******************************************************************/
     // Se obtiene la lista
     /*******************************************************************/
-    private function getDataList($filter, $params = []){
+    private function getDataList($filter, $params = [], $limit = null){
 
         /************************************/
         // Se genera la query
@@ -710,8 +736,8 @@ class usuariosListado extends ControllerBase {
             'params'  => $params,
             'group'   => '',
             'having'  => '',
-            'order'   => 'usuarios_listado.email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'usuarios_listado.email ASC, usuarios_listado.idUsuario ASC',
+            'limit'   => ($limit ?? ConfigAPP::APP["N_MaxItems"])
         ];
         // Preparo los datos
         $xParams = ['query' => $query];

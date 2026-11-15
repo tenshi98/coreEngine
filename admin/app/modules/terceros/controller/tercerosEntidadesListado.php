@@ -44,6 +44,10 @@ class tercerosEntidadesListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -67,8 +71,8 @@ class tercerosEntidadesListado extends ControllerBase {
             'params'  => [2],
             'group'   => '',
             'having'  => '',
-            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC, entidades_listado.idEntidad ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -190,6 +194,10 @@ class tercerosEntidadesListado extends ControllerBase {
         if($arrList['status'] === true && $arrTipoEntidad['status'] === true && $arrSexo['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true && $arrSector['status'] === true && $arrEstado['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -205,7 +213,9 @@ class tercerosEntidadesListado extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
                 'arrTipoEntidad'  => $arrTipoEntidad['data'],
                 'arrSexo'         => $arrSexo['data'],
                 'arrCiudad'       => $arrCiudad['data'],
@@ -258,6 +268,10 @@ class tercerosEntidadesListado extends ControllerBase {
         $whereParams = array_merge($whereParams, [2]);
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -281,8 +295,8 @@ class tercerosEntidadesListado extends ControllerBase {
             'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
-            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC, entidades_listado.idEntidad ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -296,6 +310,10 @@ class tercerosEntidadesListado extends ControllerBase {
         if ($arrList['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -306,12 +324,20 @@ class tercerosEntidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

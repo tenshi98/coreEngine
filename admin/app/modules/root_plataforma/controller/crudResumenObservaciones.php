@@ -114,14 +114,22 @@ class crudResumenObservaciones extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se obtienen los datos
-        $arrObservaciones = $this->getDataList('core_test_crud_observaciones.idCrud = ?', [$CrudID['data']]);
+        $arrObservaciones = $this->getDataList('core_test_crud_observaciones.idCrud = ?', [$CrudID['data']], $page['limit']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($arrObservaciones['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrObservaciones['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -133,12 +141,21 @@ class crudResumenObservaciones extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrObservaciones' => $arrObservaciones['data'],
+                'arrObservaciones' => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
+                'moreId'     => $params['id'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Observaciones-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -267,7 +284,7 @@ class crudResumenObservaciones extends ControllerBase {
     /*******************************************************************/
     // Se obtiene la lista
     /*******************************************************************/
-    private function getDataList($filter, $params = []){
+    private function getDataList($filter, $params = [], $limit = null){
 
         /************************************/
         // Se genera la query
@@ -288,7 +305,7 @@ class crudResumenObservaciones extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'core_test_crud_observaciones.idObservaciones ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'limit'   => ($limit ?? ConfigAPP::APP["N_MaxItems"])
         ];
         // Preparo los datos
         $xParams = ['query' => $query];

@@ -4,7 +4,11 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<table class="table table-sm table-hover datatable">
+<table class="table table-sm table-hover datatable"
+       data-more-url="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/planes/updateList/'.($data['moreId'] ?? ''); ?>"
+       data-has-more="<?php echo !empty($data['hasMore']) ? '1' : '0'; ?>"
+       data-next-offset="<?php echo (int) ($data['nextOffset'] ?? 0); ?>"
+       data-more-method="GET">
     <thead>
         <tr>
             <th scope="col">Servicio</th>
@@ -15,32 +19,6 @@
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Verifico si hay datos
-        if(is_array($data['arrPlanes'])&&!empty($data['arrPlanes'])){
-            // Recorro los datos
-            foreach($data['arrPlanes'] as $crud){
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idPlan']);
-                $Entidad     = addslashes($crud['Servicio']);
-                $level       = $data['UserAccess']['LevelAccess']; ?>
-                <tr>
-                    <td><?php echo $crud['Servicio']; ?></td>
-                    <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Fecha']); ?></td>
-                    <td><?php echo $data['Fnc_DataNumbers']->Valores($crud['Monto'], 0); ?></td>
-                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <?php
-                            //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="tabPlanesView(\''.$encryptedId['data'].'\')"                              class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 2) {echo '<button type="button" onclick="tabPlanesEdit(\''.$encryptedId['data'].'\')"                              class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>';}
-                            if ($level >= 4) {echo '<button type="button" onclick="tabPlanesDel(\''.$encryptedId['data'].'\', \''.addslashes($Entidad).'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
-                            ?>
-                        </div>
-                    </td>
-                </tr>
-            <?php } ?>
-        <?php } ?>
+        <?php require(__DIR__.'/tercerosEntidadesListado-Resumen-Planes-UpdateListRows.php'); ?>
     </tbody>
 </table>

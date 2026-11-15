@@ -138,6 +138,10 @@ class cotizacionListadoProductos extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -155,7 +159,7 @@ class cotizacionListadoProductos extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado_productos.idExistencia ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams      = ['query' => $query];
@@ -169,6 +173,10 @@ class cotizacionListadoProductos extends ControllerBase {
         if ($arrProductos['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrProductos['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -178,12 +186,21 @@ class cotizacionListadoProductos extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrProductos'    => $arrProductos['data'],
+                'arrProductos'    => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
+                'moreId'          => $params['id'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Productos-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

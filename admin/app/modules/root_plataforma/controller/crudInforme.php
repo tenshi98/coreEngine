@@ -94,14 +94,22 @@ class crudInforme extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se obtienen los datos
-        $arrList = $this->getDataList($whereInt, $whereParams);
+        $arrList = $this->getDataList($whereInt, $whereParams, $page['limit']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -116,12 +124,20 @@ class crudInforme extends ControllerBase {
                 'Fnc_DataNumbers'     => $this->DataNumbers,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'        => $arrList['data'],
+                'arrList'        => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -195,7 +211,7 @@ class crudInforme extends ControllerBase {
     /*******************************************************************/
     // Se obtiene la lista
     /*******************************************************************/
-    private function getDataList($filter, $params = []){
+    private function getDataList($filter, $params = [], $limit = null){
 
         /************************************/
         // Se genera la query
@@ -207,8 +223,8 @@ class crudInforme extends ControllerBase {
             'params'  => $params,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'Email ASC, idCrud ASC',
+            'limit'   => ($limit ?? ConfigAPP::APP["N_MaxItems"])
         ];
         // Preparo los datos
         $xParams = ['query' => $query];

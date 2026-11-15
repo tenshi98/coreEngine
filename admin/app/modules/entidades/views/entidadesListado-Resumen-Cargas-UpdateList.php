@@ -4,7 +4,11 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<table class="table table-sm table-hover datatable">
+<table class="table table-sm table-hover datatable"
+       data-more-url="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/cargas/updateList/'.($data['moreId'] ?? ''); ?>"
+       data-has-more="<?php echo !empty($data['hasMore']) ? '1' : '0'; ?>"
+       data-next-offset="<?php echo (int) ($data['nextOffset'] ?? 0); ?>"
+       data-more-method="GET">
     <thead>
         <tr>
             <th scope="col">Nombre</th>
@@ -13,26 +17,6 @@
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Verifico si hay datos
-        if(is_array($data['arrCargas'])&&!empty($data['arrCargas'])){
-            // Recorro los datos
-            foreach($data['arrCargas'] as $crud){
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idCargas']);
-                $Entidad     = addslashes($crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']); ?>
-                <tr>
-                    <td><?php echo $crud['ApellidoPat'].' '.$crud['ApellidoMat'].' '.$crud['Nombre']; ?></td>
-                    <td><?php echo $crud['Parentesco']; ?></td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button type="button" onclick="tabCargasView('<?php echo $encryptedId['data']; ?>')"                             class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
-                            <button type="button" onclick="tabCargasEdit('<?php echo $encryptedId['data']; ?>')"                             class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
-                            <button type="button" onclick="tabCargasDel( '<?php echo $encryptedId['data']; ?>', '<?php echo $Entidad; ?>')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            <?php } ?>
-        <?php } ?>
+        <?php require(__DIR__.'/entidadesListado-Resumen-Cargas-UpdateListRows.php'); ?>
     </tbody>
 </table>

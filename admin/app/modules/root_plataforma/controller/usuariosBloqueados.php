@@ -38,6 +38,10 @@ class usuariosBloqueados extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'Fecha,Hora,DateTime,Email,Password,IP_Client,Agent_Transp',
@@ -47,8 +51,8 @@ class usuariosBloqueados extends ControllerBase {
             'params'  => [],
             'group'   => '',
             'having'  => '',
-            'order'   => 'Fecha ASC, Hora ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'Fecha ASC, Hora ASC, idAcceso ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -60,6 +64,10 @@ class usuariosBloqueados extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -78,7 +86,9 @@ class usuariosBloqueados extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
             ];
 
             /************************************/
@@ -100,6 +110,10 @@ class usuariosBloqueados extends ControllerBase {
     public function UpdateList($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => 'Fecha,Hora,DateTime,Email,Password,IP_Client,Agent_Transp',
@@ -109,8 +123,8 @@ class usuariosBloqueados extends ControllerBase {
             'params'  => [],
             'group'   => '',
             'having'  => '',
-            'order'   => 'Fecha ASC, Hora ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'Fecha ASC, Hora ASC, idAcceso ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -124,6 +138,10 @@ class usuariosBloqueados extends ControllerBase {
         if ($arrList['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -135,12 +153,20 @@ class usuariosBloqueados extends ControllerBase {
                 'Fnc_DataDate'        => $this->DataDate,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuariosBloqueados-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

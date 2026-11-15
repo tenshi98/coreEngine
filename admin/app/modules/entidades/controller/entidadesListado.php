@@ -44,6 +44,10 @@ class entidadesListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: primer bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -69,8 +73,8 @@ class entidadesListado extends ControllerBase {
             'params'  => [],
             'group'   => '',
             'having'  => '',
-            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC, entidades_listado.idEntidad ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -210,6 +214,10 @@ class entidadesListado extends ControllerBase {
         if($arrList['status'] === true && $arrEstado['status'] === true && $arrSector['status'] === true && $arrSexo['status'] === true && $arrTipo['status'] === true && $arrTipoEntidad['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -225,7 +233,9 @@ class entidadesListado extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
                 'arrEstado'       => $arrEstado['data'],
                 'arrSector'       => $arrSector['data'],
                 'arrSexo'         => $arrSexo['data'],
@@ -276,6 +286,10 @@ class entidadesListado extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -301,8 +315,8 @@ class entidadesListado extends ControllerBase {
             'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
-            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC, entidades_listado.idEntidad ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -316,6 +330,10 @@ class entidadesListado extends ControllerBase {
         if ($arrList['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -326,12 +344,20 @@ class entidadesListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -348,61 +374,8 @@ class entidadesListado extends ControllerBase {
     public function export($f3){
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                entidades_listado.Nombre,
-                entidades_listado.ApellidoPat,
-                entidades_listado.ApellidoMat,
-                entidades_listado.RazonSocial,
-                entidades_listado.Nick,
-                entidades_listado.Rut,
-                entidades_listado.Direccion,
-                entidades_listado.FNacimiento,
-                entidades_listado.Email,
-                entidades_listado.Fono1,
-                entidades_listado.Fono2,
-                entidades_listado.Web,
-                entidades_listado.Giro,
-                entidades_listado.RepLegalNombre,
-                entidades_listado.RepLegalRut,
-                entidades_listado.RepLegalEmail,
-                entidades_listado.RepLegalFono1,
-                entidades_listado.RepLegalFono2,
-                entidades_listado.Social_X,
-                entidades_listado.Social_Facebook,
-                entidades_listado.Social_Instagram,
-                entidades_listado.Social_Linkedin,
-                entidades_listado.idTipoEntidad,
-
-                core_estados.Nombre AS Estado,
-                entidades_sectores.Nombre AS Sector,
-                core_sexo.Nombre AS Sexo,
-                core_tipos_entidad.Nombre AS Tipo,
-                core_tipos_entidades.Nombre AS TipoEntidad,
-                core_ubicacion_ciudad.Nombre AS Ciudad,
-                core_ubicacion_comunas.Nombre AS Comuna',
-            'table'   => 'entidades_listado',
-            'join'    => '
-                LEFT JOIN core_estados           ON core_estados.idEstado               = entidades_listado.idEstado
-                LEFT JOIN entidades_sectores     ON entidades_sectores.idSector         = entidades_listado.idSector
-                LEFT JOIN core_sexo              ON core_sexo.idSexo                    = entidades_listado.idSexo
-                LEFT JOIN core_tipos_entidad     ON core_tipos_entidad.idTipo           = entidades_listado.idTipo
-                LEFT JOIN core_tipos_entidades   ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad
-                LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad      = entidades_listado.idCiudad
-                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna     = entidades_listado.idComuna
-                ',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $arrList = $this->Base_GetList($xParams);
+        // Misma consulta que exportExcel (getDataExport)
+        $arrList = $this->getDataExport();
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -441,6 +414,127 @@ class entidadesListado extends ControllerBase {
             // Despliegue de errores
             $this->showError(1, $f3, $result);
         }
+    }
+
+    /*******************************************************************/
+    // Exportar a Excel real (.xlsx generado en el servidor, ADR-0021)
+    // POST, nivel 3. La página -Exportar no filtra: se exporta lo mismo que muestra
+    /*******************************************************************/
+    public function exportExcel($f3, $params = null){
+
+        /************************************/
+        // Solo POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            (new FunctionsExportExcel())->auditReject($this->controllerName, '', 405);
+            Response::error('Método no permitido', 405);
+        }
+
+        /************************************/
+        // Límite de exportaciones por usuario (1 simultánea + 10/min)
+        $Export = new FunctionsExportExcel();
+        $userId = (string) ($f3->get('SESSION.DataInfo.UserID') ?: ($_SERVER['REMOTE_ADDR'] ?? '0'));
+        $limite = $Export->acquire($userId);
+        if ($limite !== '') {
+            $Export->auditReject($this->controllerName, '', 429);
+            Response::error($limite, 429);
+        }
+        // Sin filtros que validar: la exportación cuenta para el límite de frecuencia
+        $Export->commit();
+
+        /************************************/
+        // Misma consulta que la vista -Exportar (mismo orden) leída por bloques hasta N_MaxExportRows
+        $maxRows = FunctionsExportExcel::maxRows();
+        $arrList = $this->getDataExport($maxRows);
+        if ($arrList['status'] !== true) {
+            $Export->release();
+            $Export->auditReject($this->controllerName, '', 500);
+            Response::error('No se pudo generar la exportación', 500);
+        }
+        $data = (is_array($arrList['data']) ? $arrList['data'] : []);
+        // La consulta trae una fila extra solo para detectar que hay más datos
+        $truncated = count($data) > $maxRows;
+        if ($truncated) { $data = array_slice($data, 0, $maxRows); }
+
+        /************************************/
+        // Columnas = columnas de la vista -Exportar
+        $columns = [
+            ['key' => 'Nombre',         'label' => 'Nombre',            'type' => 'text', 'width' => 35],
+            ['key' => 'Nick',           'label' => 'Nick',              'type' => 'text'],
+            ['key' => 'Rut',            'label' => 'Rut',               'type' => 'text'],
+            ['key' => 'Ciudad',         'label' => 'Ciudad',            'type' => 'text'],
+            ['key' => 'Comuna',         'label' => 'Comuna',            'type' => 'text'],
+            ['key' => 'Sector',         'label' => 'Sector',            'type' => 'text'],
+            ['key' => 'Direccion',      'label' => 'Dirección',         'type' => 'text', 'width' => 35],
+            ['key' => 'FNacimiento',    'label' => 'Fecha Nacimiento',  'type' => 'date'],
+            ['key' => 'Email',          'label' => 'Email',             'type' => 'text'],
+            ['key' => 'Fono1',          'label' => 'Celular',           'type' => 'text'],
+            ['key' => 'Fono2',          'label' => 'Teléfono',          'type' => 'text'],
+            ['key' => 'Web',            'label' => 'Web',               'type' => 'text'],
+            ['key' => 'Giro',           'label' => 'Giro',              'type' => 'text'],
+            ['key' => 'Tipo',           'label' => 'Tipo',              'type' => 'text'],
+            ['key' => 'TipoEntidad',    'label' => 'Tipo Entidad',      'type' => 'text'],
+            ['key' => 'Estado',         'label' => 'Estado',            'type' => 'text'],
+            ['key' => 'Sexo',           'label' => 'Sexo',              'type' => 'text'],
+            ['key' => 'RepLegalNombre', 'label' => 'Rep Legal Nombre',  'type' => 'text'],
+            ['key' => 'RepLegalRut',    'label' => 'Rep Legal Rut',     'type' => 'text'],
+            ['key' => 'RepLegalEmail',  'label' => 'Rep Legal Email',   'type' => 'text'],
+            ['key' => 'RepLegalFono1',  'label' => 'Rep Legal Celular', 'type' => 'text'],
+            ['key' => 'RepLegalFono2',  'label' => 'Rep Legal Teléfono','type' => 'text'],
+            ['key' => 'Social_X',       'label' => 'X (twiter)',        'type' => 'text'],
+            ['key' => 'Social_Facebook','label' => 'Facebook',          'type' => 'text'],
+            ['key' => 'Social_Instagram','label' => 'Instagram',        'type' => 'text'],
+            ['key' => 'Social_Linkedin','label' => 'Linkedin',          'type' => 'text'],
+        ];
+
+        /************************************/
+        // Filas: valores crudos de la consulta (el formato lo aplica el helper)
+        $rows = [];
+        foreach ($data as $r) {
+            // Nombre de la entidad: persona natural (1) o razón social (2), igual que la vista
+            if ((int) ($r['idTipoEntidad'] ?? 0) === 1) {
+                $entidad = trim(($r['ApellidoPat'] ?? '').' '.($r['ApellidoMat'] ?? '').', '.($r['Nombre'] ?? ''));
+            } else {
+                $entidad = trim((string) ($r['RazonSocial'] ?? ''));
+            }
+            $rows[] = [
+                'Nombre'          => $entidad,
+                'Nick'            => $r['Nick'] ?? '',
+                'Rut'             => $r['Rut'] ?? '',
+                'Ciudad'          => $r['Ciudad'] ?? '',
+                'Comuna'          => $r['Comuna'] ?? '',
+                'Sector'          => $r['Sector'] ?? '',
+                'Direccion'       => $r['Direccion'] ?? '',
+                'FNacimiento'     => $r['FNacimiento'] ?? null,
+                'Email'           => $r['Email'] ?? '',
+                'Fono1'           => $r['Fono1'] ?? '',
+                'Fono2'           => $r['Fono2'] ?? '',
+                'Web'             => $r['Web'] ?? '',
+                'Giro'            => $r['Giro'] ?? '',
+                'Tipo'            => $r['Tipo'] ?? '',
+                'TipoEntidad'     => $r['TipoEntidad'] ?? '',
+                'Estado'          => $r['Estado'] ?? '',
+                'Sexo'            => $r['Sexo'] ?? '',
+                'RepLegalNombre'  => $r['RepLegalNombre'] ?? '',
+                'RepLegalRut'     => $r['RepLegalRut'] ?? '',
+                'RepLegalEmail'   => $r['RepLegalEmail'] ?? '',
+                'RepLegalFono1'   => $r['RepLegalFono1'] ?? '',
+                'RepLegalFono2'   => $r['RepLegalFono2'] ?? '',
+                'Social_X'        => $r['Social_X'] ?? '',
+                'Social_Facebook' => $r['Social_Facebook'] ?? '',
+                'Social_Instagram'=> $r['Social_Instagram'] ?? '',
+                'Social_Linkedin' => $r['Social_Linkedin'] ?? '',
+            ];
+        }
+
+        /************************************/
+        // Descarga: audita (Q11), emite el archivo y termina. Nombre fijo del servidor.
+        $userData = $this->getUserData($f3);
+        $Export->download('Entidades', [[ 'title' => 'Entidades', 'columns' => $columns, 'rows' => $rows ]], [
+            'filters'   => [],
+            'user'      => (string) ($userData['UserName'] ?? ''),
+            'truncated' => $truncated,
+            'audit'     => ['controller' => $this->controllerName, 'userId' => $userId],
+        ]);
     }
 
     /*******************************************************************/
@@ -1526,6 +1620,72 @@ class entidadesListado extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
+    /*******************************************************************/
+    // Consulta compartida por export (vista) y exportExcel (Excel): una sola fuente
+    /*******************************************************************/
+    private function getDataExport(?int $maxRows = null): array{
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                entidades_listado.Nombre,
+                entidades_listado.ApellidoPat,
+                entidades_listado.ApellidoMat,
+                entidades_listado.RazonSocial,
+                entidades_listado.Nick,
+                entidades_listado.Rut,
+                entidades_listado.Direccion,
+                entidades_listado.FNacimiento,
+                entidades_listado.Email,
+                entidades_listado.Fono1,
+                entidades_listado.Fono2,
+                entidades_listado.Web,
+                entidades_listado.Giro,
+                entidades_listado.RepLegalNombre,
+                entidades_listado.RepLegalRut,
+                entidades_listado.RepLegalEmail,
+                entidades_listado.RepLegalFono1,
+                entidades_listado.RepLegalFono2,
+                entidades_listado.Social_X,
+                entidades_listado.Social_Facebook,
+                entidades_listado.Social_Instagram,
+                entidades_listado.Social_Linkedin,
+                entidades_listado.idTipoEntidad,
+
+                core_estados.Nombre AS Estado,
+                entidades_sectores.Nombre AS Sector,
+                core_sexo.Nombre AS Sexo,
+                core_tipos_entidad.Nombre AS Tipo,
+                core_tipos_entidades.Nombre AS TipoEntidad,
+                core_ubicacion_ciudad.Nombre AS Ciudad,
+                core_ubicacion_comunas.Nombre AS Comuna',
+            'table'   => 'entidades_listado',
+            'join'    => '
+                LEFT JOIN core_estados           ON core_estados.idEstado               = entidades_listado.idEstado
+                LEFT JOIN entidades_sectores     ON entidades_sectores.idSector         = entidades_listado.idSector
+                LEFT JOIN core_sexo              ON core_sexo.idSexo                    = entidades_listado.idSexo
+                LEFT JOIN core_tipos_entidad     ON core_tipos_entidad.idTipo           = entidades_listado.idTipo
+                LEFT JOIN core_tipos_entidades   ON core_tipos_entidades.idTipoEntidad  = entidades_listado.idTipoEntidad
+                LEFT JOIN core_ubicacion_ciudad  ON core_ubicacion_ciudad.idCiudad      = entidades_listado.idCiudad
+                LEFT JOIN core_ubicacion_comunas ON core_ubicacion_comunas.idComuna     = entidades_listado.idComuna
+                ',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'entidades_listado.idEstado ASC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC, entidades_listado.RazonSocial ASC, entidades_listado.idEntidad ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Excel: lectura por bloques hasta el tope de exportación (la vista -Exportar usa un solo bloque)
+        if ($maxRows !== null) {
+            return $this->Base_GetListChunked($query, $maxRows);
+        }
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        return $this->Base_GetList($xParams);
+    }
+
     /*******************************************************************/
     // Se validan los datos
     /*******************************************************************/

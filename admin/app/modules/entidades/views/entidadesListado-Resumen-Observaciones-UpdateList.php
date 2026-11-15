@@ -4,7 +4,11 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<table class="table table-sm table-hover datatable">
+<table class="table table-sm table-hover datatable"
+       data-more-url="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/observaciones/updateList/'.($data['moreId'] ?? ''); ?>"
+       data-has-more="<?php echo !empty($data['hasMore']) ? '1' : '0'; ?>"
+       data-next-offset="<?php echo (int) ($data['nextOffset'] ?? 0); ?>"
+       data-more-method="GET">
     <thead>
         <tr>
             <th scope="col" style="width: 100px;">Fecha Creacion</th>
@@ -13,28 +17,6 @@
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Verifico si hay datos
-        if(is_array($data['arrObservaciones'])&&!empty($data['arrObservaciones'])){
-            // Recorro los datos
-            foreach($data['arrObservaciones'] as $crud){
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idObservaciones']); ?>
-                <tr>
-                    <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['FechaCreacion']); ?></td>
-                    <td>
-                        <?php echo '<strong>'.$crud['Usuario'].':</strong><br>'.$crud['Observacion']; ?>
-                        <?php if(!empty($crud['FechaEdicion'])){ ?><br><small class="text-muted">Editado por <?php echo $crud['UsuarioEdicion']; ?> el <?php echo $data['Fnc_DataDate']->fechaEstandar(substr($crud['FechaEdicion'], 0, 10)); ?></small><?php } ?>
-                    </td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <button type="button" onclick="tabObsView('<?php echo $encryptedId['data']; ?>')"                 class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>
-                            <button type="button" onclick="tabObsEdit('<?php echo $encryptedId['data']; ?>')"                 class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>
-                            <button type="button" onclick="tabObsDel( '<?php echo $encryptedId['data']; ?>', 'Observacion')"  class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>
-            <?php } ?>
-        <?php } ?>
+        <?php require(__DIR__.'/entidadesListado-Resumen-Observaciones-UpdateListRows.php'); ?>
     </tbody>
 </table>

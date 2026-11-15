@@ -4,7 +4,10 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<table class="table table-sm table-hover datatable">
+<table class="table table-sm table-hover datatable"
+       data-more-url="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/search'; ?>"
+       data-has-more="<?php echo !empty($data['hasMore']) ? '1' : '0'; ?>"
+       data-next-offset="<?php echo (int) ($data['nextOffset'] ?? 0); ?>">
     <thead>
         <tr>
             <th scope="col">Email</th>
@@ -15,33 +18,6 @@
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Verifico si hay datos
-        if(is_array($data['arrList'])&&!empty($data['arrList'])){
-            // Recorro los datos
-            foreach($data['arrList'] as $crud){
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idUsuario']);
-                $level       = $data['UserAccess']['LevelAccess'];
-                $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId['data'];
-                $Entidad     = addslashes($crud['Nombre']); ?>
-                <tr>
-                    <td><?php echo $crud['email']; ?></td>
-                    <td><?php echo $crud['Nombre']; ?></td>
-                    <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Ultimo_acceso']); ?></td>
-                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <?php
-                            //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId['data'].'\')"                  class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 2) {echo '<a href="'.$route.'"                                                                             class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>';}
-                            if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId['data'].'\', \''.$Entidad.'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
-                            ?>
-                        </div>
-                    </td>
-                </tr>
-            <?php } ?>
-        <?php } ?>
+        <?php require(__DIR__.'/usuariosListado-UpdateListRows.php'); ?>
     </tbody>
 </table>

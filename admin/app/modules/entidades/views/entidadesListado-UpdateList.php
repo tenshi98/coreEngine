@@ -4,7 +4,10 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<table class="table table-sm table-hover datatable">
+<table class="table table-sm table-hover datatable"
+       data-more-url="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/search'; ?>"
+       data-has-more="<?php echo !empty($data['hasMore']) ? '1' : '0'; ?>"
+       data-next-offset="<?php echo (int) ($data['nextOffset'] ?? 0); ?>">
     <thead>
         <tr>
             <th scope="col">Tipo</th>
@@ -16,44 +19,6 @@
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Verifico si hay datos
-        if(is_array($data['arrList'])&&!empty($data['arrList'])){
-            // Recorro los datos
-            foreach($data['arrList'] as $crud){
-                // Se obtiene el nombre o la razón social
-                $Entidad  = '';
-                $Entidad .= !empty($crud['Nick'])
-                            ? '<strong>'.$crud['Nick'].'</strong> | '
-                            : '';
-                // Se obtiene el nombre o la razón social
-                switch ($crud['idTipoEntidad']) {
-                    case 1: $Entidad .= $crud['ApellidoPat'].' '.$crud['ApellidoMat'].', '.$crud['Nombre']; break; //Persona Natural
-                    case 2: $Entidad .= $crud['RazonSocial']; break;                                               //Empresas
-                }
-
-                // Variables
-                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idEntidad']);
-                $level       = $data['UserAccess']['LevelAccess'];
-                $route       = $BASE.'/'.$data['UserAccess']['RouteAccess'].'/resumen/'.$encryptedId['data']; ?>
-                <tr>
-                    <td><?php echo $crud['Tipo']; ?></td>
-                    <td><?php echo $crud['TipoEntidad']; ?></td>
-                    <td><?php echo $Entidad; ?></td>
-                    <td><?php echo $crud['Sector']; ?></td>
-                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
-                    <td>
-                        <div class="btn-group" role="group">
-                            <?php
-                            //Valido
-                            if ($level >= 1) {echo '<button type="button" onclick="listTableDataView(\''.$encryptedId['data'].'\')"                              class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
-                            if ($level >= 2) {echo '<a href="'.$route.'"                                                                                         class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></a>';}
-                            if ($level >= 4) {echo '<button type="button" onclick="listTableDataDel(\''.$encryptedId['data'].'\', \''.addslashes($Entidad).'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
-                            ?>
-                        </div>
-                    </td>
-                </tr>
-            <?php } ?>
-        <?php } ?>
+        <?php require(__DIR__.'/entidadesListado-UpdateListRows.php'); ?>
     </tbody>
 </table>

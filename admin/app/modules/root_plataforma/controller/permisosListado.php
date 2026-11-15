@@ -46,6 +46,10 @@ class permisosListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -69,8 +73,8 @@ class permisosListado extends ControllerBase {
             'params'  => [],
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC, core_permisos_listado.idPermisos ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams     = ['query' => $query];
@@ -193,6 +197,10 @@ class permisosListado extends ControllerBase {
         if($arrPermisos['status'] === true && $arrPermisosCat['status'] === true && $arrEstados['status'] === true && $arrTipos['status'] === true && $arrLevelLimit['status'] === true && $arrMetodo['status'] === true && $arrObjetivo['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrPermisos['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -209,7 +217,9 @@ class permisosListado extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrPermisos'     => $arrPermisos['data'],
+                'arrPermisos'     => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
                 'arrPermisosCat'  => $arrPermisosCat['data'],
                 'arrEstados'      => $arrEstados['data'],
                 'arrTipos'        => $arrTipos['data'],
@@ -235,6 +245,10 @@ class permisosListado extends ControllerBase {
     // Actualizar Listar
     /*******************************************************************/
     public function UpdateList($f3){
+
+        /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
 
         /************************************/
         // Variables
@@ -282,8 +296,8 @@ class permisosListado extends ControllerBase {
             'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_listado.Nombre ASC, core_permisos_listado.idPermisos ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams     = ['query' => $query];
@@ -297,6 +311,10 @@ class permisosListado extends ControllerBase {
         if ($arrPermisos['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrPermisos['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -308,12 +326,21 @@ class permisosListado extends ControllerBase {
                 'Fnc_Codification'    => $this->Codification,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrPermisos'     => $arrPermisos['data'],
+                'arrPermisos'     => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
             ];
 
             /************************************/
             // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -516,6 +543,10 @@ class permisosListado extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -570,8 +601,8 @@ class permisosListado extends ControllerBase {
             'params'  => [$PermisosID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC, core_permisos_listado_rutas.idRutas ASC',
+            'limit'   => $page['limit']
         ];
         /************************************/
         // Preparo los datos
@@ -694,6 +725,10 @@ class permisosListado extends ControllerBase {
         // Si hay resultados
         if($rowData['status'] === true && $arrRutas['status'] === true && $arrPermisosCat['status'] === true && $arrEstados['status'] === true && $arrTipos['status'] === true && $arrLevelLimit['status'] === true && $arrMetodo['status'] === true && $arrObjetivo['status'] === true){
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrRutas['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -712,7 +747,10 @@ class permisosListado extends ControllerBase {
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
                 'rowData'         => $rowData['data'],
-                'arrRutas'        => $arrRutas['data'],
+                'arrRutas'        => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
+                'moreId'          => $params['id'],
                 'arrPermisosCat'  => $arrPermisosCat['data'],
                 'arrEstados'      => $arrEstados['data'],
                 'arrTipos'        => $arrTipos['data'],

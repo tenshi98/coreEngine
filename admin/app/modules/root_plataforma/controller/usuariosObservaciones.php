@@ -58,6 +58,10 @@ class usuariosObservaciones extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -76,7 +80,7 @@ class usuariosObservaciones extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'usuarios_listado_observaciones.idObservaciones ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams          = ['query' => $query];
@@ -90,6 +94,10 @@ class usuariosObservaciones extends ControllerBase {
         if ($arrObservaciones['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrObservaciones['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -99,12 +107,21 @@ class usuariosObservaciones extends ControllerBase {
                 'Fnc_Codification'  => $this->Codification,
                 'Fnc_DataDate'      => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrObservaciones' => $arrObservaciones['data'],
+                'arrObservaciones' => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
+                'moreId'     => $params['id'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/usuarios-Resumen-Observaciones-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

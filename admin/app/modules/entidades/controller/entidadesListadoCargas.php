@@ -199,6 +199,10 @@ class entidadesListadoCargas extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -213,8 +217,8 @@ class entidadesListadoCargas extends ControllerBase {
             'params'  => [$EntidadID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'entidades_listado_cargas.ApellidoPat ASC, entidades_listado_cargas.ApellidoMat ASC, entidades_listado_cargas.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'entidades_listado_cargas.ApellidoPat ASC, entidades_listado_cargas.ApellidoMat ASC, entidades_listado_cargas.Nombre ASC, entidades_listado_cargas.idCargas ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams   = ['query' => $query];
@@ -228,6 +232,10 @@ class entidadesListadoCargas extends ControllerBase {
         if ($arrCargas['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrCargas['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -236,12 +244,21 @@ class entidadesListadoCargas extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'     => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrCargas' => $arrCargas['data'],
+                'arrCargas' => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
+                'moreId'     => $params['id'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Cargas-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Cargas-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Cargas-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

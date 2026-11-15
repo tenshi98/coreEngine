@@ -56,6 +56,10 @@ class permisosListadoRutas extends ControllerBase {
         }
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -75,8 +79,8 @@ class permisosListadoRutas extends ControllerBase {
             'params'  => [$PermisosID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'core_permisos_listado_rutas.Controller ASC, core_permisos_listado_rutas.idLevelLimit ASC, core_permisos_listado_rutas.idRutas ASC',
+            'limit'   => $page['limit']
         ];
         /************************************/
         // Preparo los datos
@@ -91,6 +95,10 @@ class permisosListadoRutas extends ControllerBase {
         if ($arrRutas['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrRutas['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -100,12 +108,22 @@ class permisosListadoRutas extends ControllerBase {
                 'Fnc_Codification' => $this->Codification,
                 'Fnc_CommonData'   => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrRutas'     => $arrRutas['data'],
+                'arrRutas'     => $more['rows'],
+                'hasMore'      => $more['hasMore'],
+                'nextOffset'   => $more['next'],
+                'moreId'       => $params['id'],
             ];
 
             /************************************/
             // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosListado-Resumen-Rutas-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

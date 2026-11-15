@@ -40,14 +40,22 @@ class maquinasSensoresGrupos extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: primer bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
-        $arrList = $this->getDataList('');
+        $arrList = $this->getDataList('', [], $page);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -65,7 +73,9 @@ class maquinasSensoresGrupos extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
             ];
 
             /************************************/
@@ -109,14 +119,22 @@ class maquinasSensoresGrupos extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
-        $arrList = $this->getDataList($whereInt, $whereParams);
+        $arrList = $this->getDataList($whereInt, $whereParams, $page);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -129,12 +147,20 @@ class maquinasSensoresGrupos extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'  => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'       => $arrList['data'],
+                'arrList'       => $more['rows'],
+                'hasMore'       => $more['hasMore'],
+                'nextOffset'    => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -286,7 +312,7 @@ class maquinasSensoresGrupos extends ControllerBase {
     /*******************************************************************/
     // Se obtiene la lista
     /*******************************************************************/
-    private function getDataList($filter, $params = []){
+    private function getDataList($filter, $params = [], $page = []){
 
         /************************************/
         // Se genera la query
@@ -298,8 +324,8 @@ class maquinasSensoresGrupos extends ControllerBase {
             'params'  => $params,
             'group'   => '',
             'having'  => '',
-            'order'   => 'Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'Nombre ASC, idGrupo ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];

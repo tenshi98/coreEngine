@@ -57,6 +57,10 @@ class cotizacionListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -76,7 +80,7 @@ class cotizacionListado extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -144,6 +148,10 @@ class cotizacionListado extends ControllerBase {
         if($arrList['status'] === true && $arrEntidades['status'] === true && $arrProductos['status'] === true && $arrServicios['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -163,7 +171,9 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_ServerServer'    => $this->ServerServer,
                 'Fnc_CommonData'      => $this->CommonData,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
                 'arrEntidades'    => $arrEntidades['data'],
                 'arrProductos'    => $arrProductos['data'],
                 'arrServicios'    => $arrServicios['data'],
@@ -211,6 +221,10 @@ class cotizacionListado extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -230,7 +244,7 @@ class cotizacionListado extends ControllerBase {
             'group'   => '',
             'having'  => '',
             'order'   => 'cotizacion_listado.Creacion_fecha DESC, cotizacion_listado.idCotizacion DESC, entidades_listado.ApellidoPat ASC, entidades_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -242,6 +256,10 @@ class cotizacionListado extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -256,12 +274,20 @@ class cotizacionListado extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrList'  => $arrList['data'],
+                'arrList'  => $more['rows'],
+                'hasMore'  => $more['hasMore'],
+                'nextOffset' => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

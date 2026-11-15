@@ -1,0 +1,33 @@
+<?php
+/** @var string $BASE */  // Variable global para datos de F3
+/** @var array $data */   // Variable global para datos de F3
+/** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
+
+?>
+        <?php
+        // Verifico si hay datos
+        if(is_array($data['arrMaq'])&&!empty($data['arrMaq'])){
+            // Recorro los datos
+            foreach($data['arrMaq'] as $crud){
+                // Variables
+                $encryptedId = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['idMaq']);
+                $Entidad     = addslashes($crud['Maquina']);
+                $level       = $data['UserAccess']['LevelAccess']; ?>
+                <tr>
+                    <td><?php echo $crud['Maquina']; ?></td>
+                    <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Fecha']); ?></td>
+                    <td><?php echo '<span class="badge-sp1 badge-sp1-'.$crud['EstadoColor'].'">'.$crud['Estado'].'</span>'; ?></td>
+                    <td>
+                        <div class="btn-group" role="group">
+                            <?php
+                            //Valido
+                            if ($level >= 1) {echo '<button type="button" onclick="tabMaquinasView(\''.$encryptedId['data'].'\')"                              class="btn btn-primary   btn-sm tooltiplink" data-title="Ver Información"><i class="bi bi-eye"></i></button>';}
+                            if ($level >= 2) {echo '<button type="button" onclick="tabMaquinasEdit(\''.$encryptedId['data'].'\')"                              class="btn btn-secondary btn-sm tooltiplink" data-title="Editar Información"><i class="bi bi-pencil-square"></i></button>';}
+                            if ($level >= 4) {echo '<button type="button" onclick="tabMaquinasDel(\''.$encryptedId['data'].'\', \''.addslashes($Entidad).'\')" class="btn btn-danger    btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>';}
+                            ?>
+                        </div>
+                    </td>
+                </tr>
+            <?php } ?>
+        <?php } ?>
+    

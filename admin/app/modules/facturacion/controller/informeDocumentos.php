@@ -157,6 +157,10 @@ class informeDocumentos extends ControllerBase {
     public function UpdateList($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Variables
         $WhereData_int     = 'idDocumentos,idEntidad,idEstadoPago,idTipo';  // Datos búsqueda exacta
         $WhereData_string  = 'N_Doc';                                       // Datos búsqueda relativa
@@ -206,8 +210,8 @@ class informeDocumentos extends ControllerBase {
             'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
-            'order'   => 'facturacion_listado.Creacion_fecha DESC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'facturacion_listado.Creacion_fecha DESC, facturacion_listado.idFacturacion DESC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -219,6 +223,10 @@ class informeDocumentos extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -233,12 +241,20 @@ class informeDocumentos extends ControllerBase {
                 'Fnc_DataDate'         => $this->DataDate,
                 'Fnc_DataNumbers'      => $this->DataNumbers,
                 /*=========== Datos Consultados ===========*/
-                'arrList'       => $arrList['data'],
+                'arrList'       => $more['rows'],
+                'hasMore'       => $more['hasMore'],
+                'nextOffset'    => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

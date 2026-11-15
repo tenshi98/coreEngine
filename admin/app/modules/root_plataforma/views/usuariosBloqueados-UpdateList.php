@@ -4,7 +4,11 @@
 /** @var \F3 $f3 */       // Instancia global de Fat-Free Framework (opcional, si la usas)
 
 ?>
-<table class="table table-sm table-hover datatable">
+<table class="table table-sm table-hover datatable"
+       data-more-url="<?php echo $BASE.'/'.$data['UserAccess']['RouteAccess'].'/updateList'; ?>"
+       data-has-more="<?php echo !empty($data['hasMore']) ? '1' : '0'; ?>"
+       data-next-offset="<?php echo (int) ($data['nextOffset'] ?? 0); ?>"
+       data-more-method="GET">
     <thead>
         <tr>
             <th scope="col" style="width: 100px;">Fecha</th>
@@ -17,37 +21,6 @@
         </tr>
     </thead>
     <tbody>
-        <?php
-        // Verifico si hay datos
-        if(is_array($data['arrList'])&&!empty($data['arrList'])){
-            // Recorro los datos
-            foreach($data['arrList'] as $crud){
-                // Variables
-                $encryptedEmail = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['Email']);
-                $EntidadEmail   = addslashes($crud['Email']);
-                // Variables
-                $encryptedIP = $data['Fnc_Codification']->encryptDecrypt('encrypt', $crud['IP_Client']);
-                $EntidadIP   = addslashes($crud['IP_Client']); ?>
-                <tr>
-                    <td><?php echo $data['Fnc_DataDate']->fechaEstandar($crud['Fecha']); ?></td>
-                    <td><?php echo $crud['Hora']; ?></td>
-                    <td><?php echo $crud['DateTime']; ?></td>
-                    <td>
-                        <?php echo $crud['Email']; ?>
-                        <div class="btn-group" role="group">
-                            <button type="button" onclick="TDdelBTN_1('<?php echo $encryptedEmail['data']; ?>','<?php echo $EntidadEmail; ?>')"  class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                    <td><?php echo $crud['Password']; ?></td>
-                    <td>
-                        <?php echo $crud['IP_Client']; ?>
-                        <div class="btn-group" role="group">
-                            <button type="button" onclick="TDdelBTN_2('<?php echo $encryptedIP['data']; ?>','<?php echo $EntidadIP; ?>')"  class="btn btn-danger btn-sm tooltiplink" data-title="Borrar Información"><i class="bi bi-trash"></i></button>
-                        </div>
-                    </td>
-                    <td><?php echo $crud['Agent_Transp']; ?></td>
-                </tr>
-            <?php } ?>
-        <?php } ?>
+        <?php require(__DIR__.'/usuariosBloqueados-UpdateListRows.php'); ?>
     </tbody>
 </table>

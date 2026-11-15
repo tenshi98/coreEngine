@@ -146,6 +146,10 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         $arrMenu  = $f3->get('SESSION.arrMenu');
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -162,8 +166,8 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
             'params'  => [$EntidadID['data']],
             'group'   => '',
             'having'  => '',
-            'order'   => 'terceros_entidades_listado_usuarios.email ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'terceros_entidades_listado_usuarios.email ASC, terceros_entidades_listado_usuarios.idUsuario ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams     = ['query' => $query];
@@ -200,6 +204,10 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
         if($arrUsuarios['status'] === true && is_array($MainViewData)){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrUsuarios['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*===========  Datos del usuario ===========*/
@@ -209,13 +217,22 @@ class tercerosEntidadesListadoUsuarios extends ControllerBase {
                 'Fnc_Codification'     => $this->Codification,
                 'Fnc_DataDate'         => $this->DataDate,
                 /*=========== Datos Consultados ===========*/
-                'arrUsuarios'  => $arrUsuarios['data'],
+                'arrUsuarios'  => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
+                'moreId'     => $params['id'],
                 'MainViewData' => $MainViewData,
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Usuarios-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Usuarios-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-Resumen-Usuarios-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {

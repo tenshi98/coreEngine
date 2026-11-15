@@ -13,13 +13,13 @@
                         <div class="d-grid gap-2 d-md-flex justify-content-md-between">
                             <?php echo $data['TableTitle']; ?>
                             <?php if($data['UserAccess']['LevelAccess']>=3){ ?>
-                                <button type="button" class="btn btn-success"    onclick="exportTableToExcel('tableData', 'Entidades')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>
+                                <button type="button" class="btn btn-success" data-export-url="<?php echo htmlspecialchars($BASE.'/'.$data['UserAccess']['RouteAccess'].'/exportExcel', ENT_QUOTES, 'UTF-8'); ?>" data-export-filename="Entidades" onclick="exportExcelServer(this)"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>
                             <?php } ?>
                         </div>
                     </h5>
                     <div class="clearfix"></div>
                     <div class="table-responsive">
-                        <table class="table table-sm table-hover" id="tableData">
+                        <table class="table table-sm table-hover">
                             <thead>
                                 <tr>
                                     <th scope="col">Nombre</th>

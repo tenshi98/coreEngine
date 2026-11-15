@@ -46,6 +46,10 @@ class vehiculosListado extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -64,8 +68,8 @@ class vehiculosListado extends ControllerBase {
             'params'  => [],
             'group'   => '',
             'having'  => '',
-            'order'   => 'vehiculos_listado.idEstado ASC, core_tipos_vehiculos.Nombre ASC, vehiculos_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'vehiculos_listado.idEstado ASC, core_tipos_vehiculos.Nombre ASC, vehiculos_listado.Nombre ASC, vehiculos_listado.idVehiculo ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -133,6 +137,10 @@ class vehiculosListado extends ControllerBase {
         if($arrList['status'] === true && $arrTipo['status'] === true && $arrTipoCarga['status'] === true && $arrEstado['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -148,7 +156,9 @@ class vehiculosListado extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'       => $arrList['data'],
+                'arrList'       => $more['rows'],
+                'hasMore'       => $more['hasMore'],
+                'nextOffset'    => $more['next'],
                 'arrTipo'       => $arrTipo['data'],
                 'arrTipoCarga'  => $arrTipoCarga['data'],
                 'arrEstado'     => $arrEstado['data'],
@@ -195,6 +205,10 @@ class vehiculosListado extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
         $query = [
             'data'    => '
@@ -213,8 +227,8 @@ class vehiculosListado extends ControllerBase {
             'params'  => $whereParams,
             'group'   => '',
             'having'  => '',
-            'order'   => 'vehiculos_listado.idEstado ASC, core_tipos_vehiculos.Nombre ASC, vehiculos_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'vehiculos_listado.idEstado ASC, core_tipos_vehiculos.Nombre ASC, vehiculos_listado.Nombre ASC, vehiculos_listado.idVehiculo ASC',
+            'limit'   => $page['limit']
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
@@ -228,6 +242,10 @@ class vehiculosListado extends ControllerBase {
         if ($arrList['status'] === true) {
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -238,12 +256,20 @@ class vehiculosListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -260,44 +286,8 @@ class vehiculosListado extends ControllerBase {
     public function export($f3){
 
         /************************************/
-        // Se genera la query
-        $query = [
-            'data'    => '
-                vehiculos_listado.Nombre,
-                vehiculos_listado.Marca,
-                vehiculos_listado.Modelo,
-                vehiculos_listado.Num_serie,
-                vehiculos_listado.AnoFab,
-                vehiculos_listado.Patente,
-                vehiculos_listado.CapacidadPersonas,
-                vehiculos_listado.Capacidad,
-                vehiculos_listado.MCubicos,
-                vehiculos_listado.Direccion_img,
-                vehiculos_listado.Latitud,
-                vehiculos_listado.Longitud,
-                vehiculos_listado.Velocidad,
-                vehiculos_listado.LastUpdateFecha,
-                vehiculos_listado.LastUpdateHora,
-                core_tipos_vehiculos.Nombre AS Tipo,
-                core_tipos_vehiculos_carga.Nombre AS TipoCarga,
-                core_estados.Nombre AS Estado,
-                core_estados.Color AS EstadoColor',
-            'table'   => 'vehiculos_listado',
-            'join'    => '
-                LEFT JOIN core_tipos_vehiculos        ON core_tipos_vehiculos.idTipo              = vehiculos_listado.idTipo
-                LEFT JOIN core_estados                ON core_estados.idEstado                    = vehiculos_listado.idEstado
-                LEFT JOIN core_tipos_vehiculos_carga  ON core_tipos_vehiculos_carga.idTipoCarga   = vehiculos_listado.idTipoCarga',
-            'where'   => '',
-            'params'  => [],
-            'group'   => '',
-            'having'  => '',
-            'order'   => 'vehiculos_listado.idEstado ASC, core_tipos_vehiculos.Nombre ASC, vehiculos_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
-        ];
-        // Preparo los datos
-        $xParams = ['query' => $query];
-        // Ejecuto la query
-        $arrList = $this->Base_GetList($xParams);
+        // Misma consulta que exportExcel (getDataExport)
+        $arrList = $this->getDataExport();
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
@@ -336,6 +326,103 @@ class vehiculosListado extends ControllerBase {
             // Despliegue de errores
             $this->showError(1, $f3, $result);
         }
+    }
+
+    /*******************************************************************/
+    // Exportar a Excel real (.xlsx generado en el servidor, ADR-0021)
+    // POST, nivel 3. La página -Exportar no filtra: se exporta lo mismo que muestra
+    /*******************************************************************/
+    public function exportExcel($f3, $params = null){
+
+        /************************************/
+        // Solo POST
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            (new FunctionsExportExcel())->auditReject($this->controllerName, '', 405);
+            Response::error('Método no permitido', 405);
+        }
+
+        /************************************/
+        // Límite de exportaciones por usuario (1 simultánea + 10/min)
+        $Export = new FunctionsExportExcel();
+        $userId = (string) ($f3->get('SESSION.DataInfo.UserID') ?: ($_SERVER['REMOTE_ADDR'] ?? '0'));
+        $limite = $Export->acquire($userId);
+        if ($limite !== '') {
+            $Export->auditReject($this->controllerName, '', 429);
+            Response::error($limite, 429);
+        }
+        // Sin filtros que validar: la exportación cuenta para el límite de frecuencia
+        $Export->commit();
+
+        /************************************/
+        // Misma consulta que la vista -Exportar (mismo orden) leída por bloques hasta N_MaxExportRows
+        $maxRows = FunctionsExportExcel::maxRows();
+        $arrList = $this->getDataExport($maxRows);
+        if ($arrList['status'] !== true) {
+            $Export->release();
+            $Export->auditReject($this->controllerName, '', 500);
+            Response::error('No se pudo generar la exportación', 500);
+        }
+        $data = (is_array($arrList['data']) ? $arrList['data'] : []);
+        // La consulta trae una fila extra solo para detectar que hay más datos
+        $truncated = count($data) > $maxRows;
+        if ($truncated) { $data = array_slice($data, 0, $maxRows); }
+
+        /************************************/
+        // Columnas = columnas de la vista -Exportar (sin la imagen ni el color del estado)
+        $columns = [
+            ['key' => 'Nombre', 'label' => 'Nombre', 'type' => 'text'],
+            ['key' => 'Tipo', 'label' => 'Tipo', 'type' => 'text'],
+            ['key' => 'Marca', 'label' => 'Marca', 'type' => 'text'],
+            ['key' => 'Modelo', 'label' => 'Modelo', 'type' => 'text'],
+            ['key' => 'Patente', 'label' => 'Patente', 'type' => 'text'],
+            ['key' => 'Num_serie', 'label' => 'Número de serie', 'type' => 'text'],
+            ['key' => 'AnoFab', 'label' => 'Año de Fabricación', 'type' => 'int'],
+            ['key' => 'CapacidadPersonas', 'label' => 'Capacidad Pasajeros', 'type' => 'int'],
+            ['key' => 'Capacidad', 'label' => 'Capacidad (Kilos)', 'type' => 'decimal', 'decimals' => 2],
+            ['key' => 'MCubicos', 'label' => 'Metros Cúbicos (M3)', 'type' => 'decimal', 'decimals' => 2],
+            ['key' => 'TipoCarga', 'label' => 'Tipo de Carga', 'type' => 'text'],
+            ['key' => 'Latitud', 'label' => 'Latitud', 'type' => 'decimal', 'decimals' => 6],
+            ['key' => 'Longitud', 'label' => 'Longitud', 'type' => 'decimal', 'decimals' => 6],
+            ['key' => 'Velocidad', 'label' => 'Velocidad', 'type' => 'decimal', 'decimals' => 2],
+            ['key' => 'UltimaActualizacion', 'label' => 'Última Actualización', 'type' => 'datetime'],
+            ['key' => 'Estado', 'label' => 'Estado', 'type' => 'text'],
+        ];
+
+        /************************************/
+        // Filas: valores crudos de la consulta (el formato lo aplica el helper)
+        $rows = [];
+        foreach ($data as $r) {
+            // Fecha y hora de la última actualización en un único valor fecha-hora
+            $ultima = !empty($r['LastUpdateFecha']) ? trim($r['LastUpdateFecha'].' '.($r['LastUpdateHora'] ?? '')) : null;
+            $rows[] = [
+                'Nombre' => $r['Nombre'] ?? '',
+                'Tipo' => $r['Tipo'] ?? '',
+                'Marca' => $r['Marca'] ?? '',
+                'Modelo' => $r['Modelo'] ?? '',
+                'Patente' => $r['Patente'] ?? '',
+                'Num_serie' => $r['Num_serie'] ?? '',
+                'AnoFab' => $r['AnoFab'] ?? null,
+                'CapacidadPersonas' => $r['CapacidadPersonas'] ?? null,
+                'Capacidad' => $r['Capacidad'] ?? null,
+                'MCubicos' => $r['MCubicos'] ?? null,
+                'TipoCarga' => $r['TipoCarga'] ?? '',
+                'Latitud' => $r['Latitud'] ?? null,
+                'Longitud' => $r['Longitud'] ?? null,
+                'Velocidad' => $r['Velocidad'] ?? null,
+                'UltimaActualizacion' => $ultima,
+                'Estado' => $r['Estado'] ?? '',
+            ];
+        }
+
+        /************************************/
+        // Descarga: audita (Q11), emite el archivo y termina. Nombre fijo del servidor.
+        $userData = $this->getUserData($f3);
+        $Export->download('Vehiculos', [[ 'title' => 'Vehículos', 'columns' => $columns, 'rows' => $rows ]], [
+            'filters'   => [],
+            'user'      => (string) ($userData['UserName'] ?? ''),
+            'truncated' => $truncated,
+            'audit'     => ['controller' => $this->controllerName, 'userId' => $userId],
+        ]);
     }
 
     /*******************************************************************/
@@ -1057,6 +1144,55 @@ class vehiculosListado extends ControllerBase {
     /******************************************************************************/
     /*                             Métodos privados                               */
     /******************************************************************************/
+    /*******************************************************************/
+    // Consulta compartida por export (vista) y exportExcel (Excel): una sola fuente
+    /*******************************************************************/
+    private function getDataExport(?int $maxRows = null): array{
+        /************************************/
+        // Se genera la query
+        $query = [
+            'data'    => '
+                vehiculos_listado.Nombre,
+                vehiculos_listado.Marca,
+                vehiculos_listado.Modelo,
+                vehiculos_listado.Num_serie,
+                vehiculos_listado.AnoFab,
+                vehiculos_listado.Patente,
+                vehiculos_listado.CapacidadPersonas,
+                vehiculos_listado.Capacidad,
+                vehiculos_listado.MCubicos,
+                vehiculos_listado.Direccion_img,
+                vehiculos_listado.Latitud,
+                vehiculos_listado.Longitud,
+                vehiculos_listado.Velocidad,
+                vehiculos_listado.LastUpdateFecha,
+                vehiculos_listado.LastUpdateHora,
+                core_tipos_vehiculos.Nombre AS Tipo,
+                core_tipos_vehiculos_carga.Nombre AS TipoCarga,
+                core_estados.Nombre AS Estado,
+                core_estados.Color AS EstadoColor',
+            'table'   => 'vehiculos_listado',
+            'join'    => '
+                LEFT JOIN core_tipos_vehiculos        ON core_tipos_vehiculos.idTipo              = vehiculos_listado.idTipo
+                LEFT JOIN core_estados                ON core_estados.idEstado                    = vehiculos_listado.idEstado
+                LEFT JOIN core_tipos_vehiculos_carga  ON core_tipos_vehiculos_carga.idTipoCarga   = vehiculos_listado.idTipoCarga',
+            'where'   => '',
+            'params'  => [],
+            'group'   => '',
+            'having'  => '',
+            'order'   => 'vehiculos_listado.idEstado ASC, core_tipos_vehiculos.Nombre ASC, vehiculos_listado.Nombre ASC, vehiculos_listado.idVehiculo ASC',
+            'limit'   => ConfigAPP::APP["N_MaxItems"]
+        ];
+        // Excel: lectura por bloques hasta el tope de exportación (la vista -Exportar usa un solo bloque)
+        if ($maxRows !== null) {
+            return $this->Base_GetListChunked($query, $maxRows);
+        }
+        // Preparo los datos
+        $xParams = ['query' => $query];
+        // Ejecuto la query
+        return $this->Base_GetList($xParams);
+    }
+
     /*******************************************************************/
     // Se validan los datos
     /*******************************************************************/

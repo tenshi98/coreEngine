@@ -40,8 +40,12 @@ class permisosCategorias extends ControllerBase {
     public function listAll($f3){
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
-        $arrCategoria = $this->getDataList('core_permisos_categorias.idPermisosCat!=0');
+        $arrCategoria = $this->getDataList('core_permisos_categorias.idPermisosCat!=0', [], $page['limit']);
 
         /************************************/
         // Se genera la query
@@ -68,6 +72,10 @@ class permisosCategorias extends ControllerBase {
         if($arrCategoria['status'] === true && $arrColores['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrCategoria['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -83,7 +91,9 @@ class permisosCategorias extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrCategoria'    => $arrCategoria['data'],
+                'arrCategoria'    => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
                 'arrColores'      => $arrColores['data'],
             ];
 
@@ -128,8 +138,12 @@ class permisosCategorias extends ControllerBase {
         $whereInt = $r['where']; $whereParams = $r['params'];
 
         /************************************/
+        // Carga incremental: offset y tamaño de bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+
+        /************************************/
         // Se genera la query
-        $arrCategoria = $this->getDataList($whereInt, $whereParams);
+        $arrCategoria = $this->getDataList($whereInt, $whereParams, $page['limit']);
 
         /************************************/
         // Se genera la query
@@ -156,6 +170,10 @@ class permisosCategorias extends ControllerBase {
         if($arrCategoria['status'] === true && $arrColores['status'] === true){
 
             /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrCategoria['data'], $page);
+
+            /************************************/
             // Datos enviados a la pagina
             $f3->data = [
                 /*=========== Datos de la Pagina ===========*/
@@ -166,13 +184,21 @@ class permisosCategorias extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrCategoria'    => $arrCategoria['data'],
+                'arrCategoria'    => $more['rows'],
+                'hasMore' => $more['hasMore'],
+                'nextOffset' => $more['next'],
                 'arrColores'      => $arrColores['data'],
             ];
 
             /************************************/
-            // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosCategorias-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosCategorias-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/permisosCategorias-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -348,7 +374,7 @@ class permisosCategorias extends ControllerBase {
     /*******************************************************************/
     // Se obtiene la lista
     /*******************************************************************/
-    private function getDataList($filter, $params = []){
+    private function getDataList($filter, $params = [], $limit = null){
 
         /************************************/
         // Se genera la query
@@ -366,8 +392,8 @@ class permisosCategorias extends ControllerBase {
             'params'  => $params,
             'group'   => '',
             'having'  => '',
-            'order'   => 'core_permisos_categorias.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'core_permisos_categorias.Nombre ASC, core_permisos_categorias.idPermisosCat ASC',
+            'limit'   => ($limit ?? ConfigAPP::APP["N_MaxItems"])
         ];
         // Preparo los datos
         $xParams      = ['query' => $query];

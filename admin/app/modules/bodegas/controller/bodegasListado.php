@@ -41,7 +41,9 @@ class bodegasListado extends ControllerBase {
 
         /************************************/
         // Se obtienen los datos
-        $arrList   = $this->getDataList('idBodegas!=0');
+        // Carga incremental: primer bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+        $arrList = $this->getDataList('idBodegas!=0', [], $page['limit']);
         $arrEstado = $this->getEstados();
         $arrCiudad = $this->getCiudad();
         $arrComuna = $this->getComunas();
@@ -51,6 +53,10 @@ class bodegasListado extends ControllerBase {
         /*******************************************************************/
         // Si hay resultados
         if($arrList['status'] === true && $arrEstado['status'] === true && $arrCiudad['status'] === true && $arrComuna['status'] === true){
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -68,7 +74,9 @@ class bodegasListado extends ControllerBase {
                 'Fnc_FormInputs'      => $this->FormInputs,
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
                 'arrEstado'       => $arrEstado['data'],
                 'arrCiudad'       => $arrCiudad['data'],
                 'arrComuna'       => $arrComuna['data'],
@@ -116,13 +124,19 @@ class bodegasListado extends ControllerBase {
 
         /************************************/
         // Se obtienen los datos
-        $arrList     = $this->getDataList($whereInt, $whereParams);
+        // Carga incremental: primer bloque (N_MaxItems + 1 fila para saber si hay más)
+        $page = $this->getPageParams();
+        $arrList = $this->getDataList($whereInt, $whereParams, $page['limit']);
 
         /*******************************************************************/
         /*                         Imprimir Datos                          */
         /*******************************************************************/
         // Si hay resultados
         if ($arrList['status'] === true) {
+
+            /************************************/
+            // Se recorta la fila extra y se calcula si quedan más datos
+            $more = $this->sliceMore($arrList['data'], $page);
 
             /************************************/
             // Datos enviados a la pagina
@@ -135,12 +149,21 @@ class bodegasListado extends ControllerBase {
                 /*===========   Funcionalidad   ===========*/
                 'Fnc_Codification'    => $this->Codification,
                 /*=========== Datos Consultados ===========*/
-                'arrList'         => $arrList['data'],
+                'arrList'         => $more['rows'],
+                'hasMore'         => $more['hasMore'],
+                'nextOffset'      => $more['next'],
             ];
 
             /************************************/
             // Se instancia la vista
-            $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            // Fragmento (solo filas) para la carga incremental, o tabla completa
+            if ($page['fragment']) {
+                header('X-Has-More: '.($more['hasMore'] ? '1' : '0'));
+                header('X-Next-Offset: '.$more['next']);
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateListRows.php');
+            } else {
+                $this->showVista(2, $this->returnRutaVista(__DIR__, 'app').'/'.$this->controllerName.'-UpdateList.php');
+            }
         /************************************/
         // Si no hay resultados
         } else {
@@ -335,7 +358,7 @@ class bodegasListado extends ControllerBase {
     /*******************************************************************/
     // Se obtiene la lista
     /*******************************************************************/
-    private function getDataList($filter, $params = []){
+    private function getDataList($filter, $params = [], $limit = null){
 
         /************************************/
         // Se genera la query
@@ -352,12 +375,12 @@ class bodegasListado extends ControllerBase {
             'params'  => $params,
             'group'   => '',
             'having'  => '',
-            'order'   => 'bodegas_listado.idEstado ASC, bodegas_listado.Nombre ASC',
-            'limit'   => ConfigAPP::APP["N_MaxItems"]
+            'order'   => 'bodegas_listado.idEstado ASC, bodegas_listado.Nombre ASC, bodegas_listado.idBodegas ASC',
+            'limit'   => $limit ?? ConfigAPP::APP["N_MaxItems"]
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
-        //Se retornan los datos
+        // Se retornan los datos
         return $this->Base_GetList($xParams);
     }
 
@@ -396,7 +419,7 @@ class bodegasListado extends ControllerBase {
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
-        //Se retornan los datos
+        // Se retornan los datos
         return $this->Base_GetByID($xParams);
     }
 
@@ -427,7 +450,7 @@ class bodegasListado extends ControllerBase {
         ];
         // Preparo los datos
         $xParams = ['query' => $query];
-        //Se retornan los datos
+        // Se retornan los datos
         return $this->Base_GetList($xParams);
     }
 
@@ -476,7 +499,7 @@ class bodegasListado extends ControllerBase {
         ];
         // Preparo los datos
         $xParams   = ['query' => $query];
-        //Se retornan los datos
+        // Se retornan los datos
         return $this->Base_GetList($xParams);
 
     }
@@ -501,7 +524,7 @@ class bodegasListado extends ControllerBase {
         ];
         // Preparo los datos
         $xParams   = ['query' => $query];
-        //Se retornan los datos
+        // Se retornan los datos
         return $this->Base_GetList($xParams);
 
     }
