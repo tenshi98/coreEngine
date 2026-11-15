@@ -17,7 +17,7 @@
  *                 delegado, el bloque de botones comentado y la escritura
  *                 muerta `select.dataset.valorPrevio`.
  *   4. Rendim.  : addElement ya no re-inicializa Select2 de los clones previos
- *                 (era O(n^2)); exportTableToExcel usa Blob + createObjectURL.
+ *                 (era O(n^2)).
  *   5. Calidad  : sin variables globales implicitas (`Valor`), parseInt con
  *                 radix y control de NaN, escapeHtml completo, logs de traza
  *                 silenciados y activables con window.DEBUG_FNCS = true.
@@ -142,7 +142,9 @@
         const datatables = contenedor.querySelectorAll('.datatable');
         datatables.forEach(datatable => {
             try {
-                new simpleDatatables.DataTable(datatable, {
+                //Carga incremental: se lee antes de que el plugin reemplace el <table>
+                const cfgMas = leerConfigCargaIncremental(datatable);
+                const dtInst = new simpleDatatables.DataTable(datatable, {
                     perPage: 100,
                     perPageSelect: [5, 10, 25, 50, 100, ["Todas", -1]],
                     labels: {
@@ -155,11 +157,170 @@
                         info: "Mostrando {start} a {end} de {rows} entradas"
                     }
                 });
+                if (cfgMas) { iniciarCargaIncremental(dtInst, cfgMas); }
             } catch (error) {
                 //Si una tabla ya estaba inicializada no se corta el refresco del resto
                 warnFNCS('initDataTables: no se pudo inicializar la tabla', error);
             }
         });
+    }
+
+    /**********************************************************/
+    //CARGA INCREMENTAL de tablas (mas alla de N_MaxItems).
+    //La tabla del servidor declara data-more-url (ruta .../search), data-has-more
+    //("1" = quedan filas) y data-next-offset. Al llegar a la ultima pagina, o con
+    //los botones "Cargar mas"/"Cargar todo", se pide el siguiente bloque por POST
+    //(mismo filtro guardado por guardarFiltrosExport + _offset + _rows=1) y las filas
+    //entran por dt.insert(), de modo que busqueda, orden y paginado siguen vivos.
+    const CARGA_MAX_BLOQUES = 400; //tope de seguridad de "Cargar todo"
+    const tablasIncrementales = new WeakSet();
+
+    function leerConfigCargaIncremental(tabla) {
+        if (!tabla || !tabla.getAttribute) { return null; }
+        const urlAttr = tabla.getAttribute('data-more-url') || '';
+        if (!urlAttr || tabla.getAttribute('data-has-more') !== '1') { return null; }
+        if (tablasIncrementales.has(tabla)) { return null; }
+        //Solo mismo origen y http/https (mismo criterio que exportExcelServer)
+        let url = '';
+        try {
+            const resuelta = new URL(urlAttr, location.href);
+            if (resuelta.origin !== location.origin ||
+                (resuelta.protocol !== 'http:' && resuelta.protocol !== 'https:')) {
+                throw new Error('origen no permitido');
+            }
+            url = resuelta.pathname + resuelta.search;
+        } catch (e) {
+            warnFNCS('carga incremental: data-more-url no valida');
+            return null;
+        }
+        tablasIncrementales.add(tabla);
+        return {
+            url: url,
+            urlAttr: urlAttr,
+            //GET para rutas updateList (sin /search); POST con filtro para /search
+            get: String(tabla.getAttribute('data-more-method') || '').toUpperCase() === 'GET',
+            hasMore: true,
+            next: parseInt(tabla.getAttribute('data-next-offset'), 10) || 0,
+            loading: false
+        };
+    }
+
+    //Filtro vigente de la lista (instantanea guardada al buscar); '' si no hay
+    function filtroCargaIncremental(cfg) {
+        const mapa = window.EXPORT_FILTERS || {};
+        const claves = [cfg.urlAttr.replace(/search$/, ''), cfg.url.replace(/search$/, '')];
+        for (let i = 0; i < claves.length; i++) {
+            if (typeof mapa[claves[i]] === 'string') { return mapa[claves[i]]; }
+        }
+        return '';
+    }
+
+    //Pide un bloque y lo inserta en el plugin. Devuelve una promesa<bool> (true = ok)
+    function cargarMasFilas(dt, cfg, barra) {
+        if (cfg.loading || !cfg.hasMore) { return Promise.resolve(false); }
+        cfg.loading = true;
+        actualizarBarraCarga(dt, cfg, barra);
+        const filtro = cfg.get ? '' : filtroCargaIncremental(cfg);
+        const cuerpo = (filtro ? filtro + '&' : '') + '_offset=' + encodeURIComponent(cfg.next) + '&_rows=1';
+        const enviar = function (intento) {
+            const cabeceras = {
+                'X-CSRF-Token': currentCsrfToken(),
+                'X-Requested-With': 'XMLHttpRequest'
+            };
+            const opciones = { method: cfg.get ? 'GET' : 'POST', credentials: 'same-origin', headers: cabeceras };
+            let destino = cfg.url;
+            if (cfg.get) {
+                destino += (destino.indexOf('?') === -1 ? '?' : '&') + cuerpo;
+            } else {
+                cabeceras['Content-Type'] = 'application/x-www-form-urlencoded';
+                opciones.body = cuerpo;
+            }
+            return fetch(destino, opciones).then(function (resp) {
+                if (resp.status === 419 && intento === 0) {
+                    return resp.text().then(function (texto) {
+                        const j = parseJsonSeguro(texto);
+                        const nuevo = resp.headers.get('X-CSRF-Token') ||
+                                      ((j && j.data && j.data.Token) ? j.data.Token : '');
+                        if (!nuevo) { throw new Error('La sesión expiró. Recarga la página e inténtalo de nuevo.'); }
+                        adoptarTokenCsrf(nuevo);
+                        return enviar(1);
+                    });
+                }
+                if (!resp.ok) {
+                    return resp.text().then(function (texto) {
+                        const j = parseJsonSeguro(texto);
+                        throw new Error((j && typeof j.message === 'string' && j.message) ? j.message : 'No se pudieron cargar más datos.');
+                    });
+                }
+                return resp.text().then(function (texto) {
+                    return { html: texto, hasMore: resp.headers.get('X-Has-More') === '1',
+                             next: parseInt(resp.headers.get('X-Next-Offset'), 10) };
+                });
+            });
+        };
+        return enviar(0).then(function (res) {
+            //Filas del fragmento -> arreglo de celdas (HTML) que acepta dt.insert()
+            const tmp = document.createElement('tbody');
+            tmp.innerHTML = res.html;
+            const filas = Array.prototype.map.call(tmp.rows, function (tr) {
+                return Array.prototype.map.call(tr.cells, function (td) { return td.innerHTML; });
+            });
+            if (filas.length) { dt.insert({ data: filas }); }
+            cfg.hasMore = res.hasMore && filas.length > 0;
+            cfg.next    = isNaN(res.next) ? cfg.next + filas.length : res.next;
+            return true;
+        }).catch(function (error) {
+            notiBubble(error && error.message ? error.message : 'No se pudieron cargar más datos.', 'error', false);
+            return false;
+        }).then(function (ok) {
+            cfg.loading = false;
+            actualizarBarraCarga(dt, cfg, barra);
+            return ok;
+        });
+    }
+
+    function actualizarBarraCarga(dt, cfg, barra) {
+        if (!barra) { return; }
+        if (!cfg.hasMore) { barra.remove(); return; }
+        const total = (dt && dt.data && dt.data.data) ? dt.data.data.length : 0;
+        const info  = barra.querySelector('[data-more-info]');
+        if (info) {
+            info.textContent = total + ' filas cargadas, hay más datos. El buscador de la tabla solo '
+                             + 'busca entre las filas cargadas; use "Filtrar" para buscar en toda la base.';
+        }
+        barra.querySelectorAll('button').forEach(function (b) { b.disabled = cfg.loading; });
+    }
+
+    function iniciarCargaIncremental(dt, cfg) {
+        const contenedor = dt && dt.wrapperDOM;
+        if (!contenedor || !contenedor.parentNode) { return; }
+        const barra = document.createElement('div');
+        barra.className = 'd-flex flex-wrap align-items-center gap-2 mt-2';
+        barra.innerHTML = '<span class="small text-muted flex-grow-1" data-more-info></span>'
+            + '<button type="button" class="btn btn-sm btn-outline-primary" data-more-one><i class="bi bi-arrow-down-circle"></i> Cargar más</button>'
+            + '<button type="button" class="btn btn-sm btn-outline-secondary" data-more-all><i class="bi bi-arrow-down-square"></i> Cargar todo</button>';
+        contenedor.parentNode.insertBefore(barra, contenedor.nextSibling);
+        barra.querySelector('[data-more-one]').addEventListener('click', function () {
+            cargarMasFilas(dt, cfg, barra);
+        });
+        barra.querySelector('[data-more-all]').addEventListener('click', function () {
+            let n = 0;
+            const siguiente = function () {
+                if (!cfg.hasMore || ++n > CARGA_MAX_BLOQUES) { return; }
+                return cargarMasFilas(dt, cfg, barra).then(function (ok) { if (ok) { return siguiente(); } });
+            };
+            siguiente();
+        });
+        //Auto: al llegar a la ultima pagina se pide el siguiente bloque
+        const alFinal = function () {
+            const paginas = dt.pages ? dt.pages.length : 0;
+            if (cfg.hasMore && !cfg.loading && paginas > 0 && dt._currentPage >= paginas) {
+                cargarMasFilas(dt, cfg, barra);
+            }
+        };
+        dt.on('datatable.page', alFinal);
+        dt.on('datatable.perpage', alFinal);
+        actualizarBarraCarga(dt, cfg, barra);
     }
 
     /**********************************************************/
@@ -265,6 +426,38 @@
     }
 
     /**********************************************************/
+    //Exportar a Excel: guarda una instantanea (urlencoded, sin _token) del
+    //cuerpo enviado a una ruta .../search. La clave es la ruta sin el sufijo
+    //"search" (conserva la barra final). exportExcelServer() reenvia esa
+    //instantanea, no el formulario editado despues de filtrar.
+    function guardarFiltrosExport(Metodo, Direccion, Informacion) {
+        try {
+            if (String(Metodo || '').toUpperCase() !== 'POST') { return; }
+            const ruta = String(Direccion || '');
+            if (!/\/search$/.test(ruta)) { return; }
+            let cuerpo = '';
+            if (typeof Informacion === 'string') {
+                cuerpo = Informacion;
+            } else if (typeof FormData !== 'undefined' && Informacion instanceof FormData) {
+                const params = new URLSearchParams();
+                Informacion.forEach(function (valor, clave) {
+                    //Los archivos no son filtros
+                    if (typeof valor === 'string') { params.append(clave, valor); }
+                });
+                cuerpo = params.toString();
+            } else if (Informacion && typeof Informacion === 'object') {
+                cuerpo = $.param(Informacion);
+            }
+            //El _token no se guarda: se envia siempre el vigente por cabecera
+            cuerpo = cuerpo.replace(/(^|&)_token=[^&]*/g, '').replace(/^&/, '');
+            window.EXPORT_FILTERS = window.EXPORT_FILTERS || {};
+            window.EXPORT_FILTERS[ruta.replace(/search$/, '')] = cuerpo;
+        } catch (error) {
+            warnFNCS('guardarFiltrosExport: no se pudo guardar la instantanea', error);
+        }
+    }
+
+    /**********************************************************/
     //Envia el formulario por AJAX.
     //Centraliza SendDataForms y SendDataFormsFiles (eran el mismo codigo con
     //processData/contentType como unica diferencia).
@@ -275,6 +468,8 @@
     function sendAjaxForm(esArchivo, Metodo, Direccion, Informacion, Options) {
         //log
         logFNCS('SendDataForms: ingreso');
+        //Exportar a Excel: instantanea de los filtros del ultimo /search
+        guardarFiltrosExport(Metodo, Direccion, Informacion);
         //Primer intento
         enviarFormulario(0);
 
@@ -455,6 +650,14 @@
     function UpdateContentId(Div, URL, Options = null) {
         //Blindaje: el parametro es opcional, pero el callback usa Options.x
         Options = Options || {};
+        //Un refresco sin filtro (.../updateList) invalida el filtro guardado: la carga
+        //incremental y la exportacion no deben reutilizar una busqueda ya quitada
+        try {
+            const rutaLista = String(URL).split('?')[0];
+            if (window.EXPORT_FILTERS && /\/updateList$/.test(rutaLista)) {
+                delete window.EXPORT_FILTERS[rutaLista.replace(/updateList$/, '')];
+            }
+        } catch (e) { /* sin efecto */ }
         $(Div).load(URL, function (responseTxt, statusTxt, xhr) {
             if (statusTxt == "success") {
                 //log
@@ -545,49 +748,121 @@
     }
 
     /**********************************************************/
-    //permite exportar a excel
-    function exportTableToExcel(tableID, filename = ''){
-        //Localizo la tabla (antes lanzaba TypeError si no existia)
-        const tableSelect = document.getElementById(tableID);
-        if (!tableSelect) {
-            warnFNCS('exportTableToExcel: no existe la tabla "' + tableID + '"');
+    //Exportar a Excel real (.xlsx generado en el servidor).
+    //btn: boton con data-export-url (ruta POST .../exportExcel) y
+    //data-export-filename (respaldo del nombre). Reenvia la instantanea de
+    //filtros del ultimo /search (cuerpo vacio si no hay: vistas sin /search).
+    //fetch no pasa por $.ajaxSetup: el token CSRF se envia explicito y, ante
+    //419, se adopta el token vigente y se reintenta UNA vez.
+    function exportExcelServer(btn) {
+        if (!btn || !btn.getAttribute) { return; }
+        const urlAttr = btn.getAttribute('data-export-url') || '';
+        //Solo mismo origen y http/https: se resuelve con el parser del navegador
+        //(cubre `/\host`, `\\host`, `//host`, esquemas javascript:/data:, vacio)
+        let url = '';
+        try {
+            const resuelta = new URL(urlAttr, location.href);
+            if (!urlAttr || resuelta.origin !== location.origin ||
+                (resuelta.protocol !== 'http:' && resuelta.protocol !== 'https:')) {
+                throw new Error('origen no permitido');
+            }
+            url = resuelta.pathname + resuelta.search;
+        } catch (e) {
+            warnFNCS('exportExcelServer: data-export-url ausente o no valida');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: 'error', title: 'Exportar a Excel', text: 'La URL de exportación no es válida.' });
+            }
             return;
         }
-        const dataType = 'application/vnd.ms-excel';
-        // Optimiza el reemplazo de caracteres especiales usando un objeto de mapeo y expresión regular
-        const charMap = {
-            'á': '&aacute;', 'Á': '&Aacute;',
-            'é': '&eacute;', 'É': '&Eacute;',
-            'í': '&iacute;', 'Í': '&Iacute;',
-            'ó': '&oacute;', 'Ó': '&Oacute;',
-            'ú': '&uacute;', 'Ú': '&Uacute;',
-            'º': '&ordm;',
-            'ñ': '&ntilde;', 'Ñ': '&Ntilde;'
+        //Bloqueo de doble clic
+        if (btn.disabled || (typeof ejecutandoForm !== 'undefined' && ejecutandoForm && ejecutandoForm.valor)) { return; }
+        const respaldo = String(btn.getAttribute('data-export-filename') || 'exportacion')
+                            .replace(/[^A-Za-z0-9_-]/g, '') || 'exportacion';
+        const claveFiltros = url.replace(/\/exportExcel(\/.*)?$/, '') + '/';
+        const filtros = (window.EXPORT_FILTERS && typeof window.EXPORT_FILTERS[claveFiltros] === 'string')
+                        ? window.EXPORT_FILTERS[claveFiltros] : '';
+
+        const liberar = function () {
+            btn.disabled = false;
+            if (typeof ejecutandoForm !== 'undefined' && ejecutandoForm) { ejecutandoForm.valor = false; }
         };
-        let tableHTML = tableSelect.outerHTML.replace(/[áÁéÉíÍóÓúÚºñÑ]/g, match => charMap[match]);
-        //se eliminan los saltos de linea
-        tableHTML = tableHTML.replace(/<br *\/?>/gi, ' | ');
+        const avisar = function (icono, mensaje) {
+            //Texto plano (no html): el mensaje del servidor no se interpreta
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({ icon: icono, title: 'Exportar a Excel', text: mensaje });
+            } else {
+                warnFNCS('exportExcelServer: ' + mensaje);
+            }
+        };
+        const nombreDesde = function (disposicion) {
+            const m = /filename\*?=(?:UTF-8'')?"?([^";]+)"?/i.exec(disposicion || '');
+            let nombre = '';
+            if (m) { try { nombre = decodeURIComponent(m[1]); } catch (e) { nombre = m[1]; } }
+            nombre = nombre.replace(/[^A-Za-z0-9._-]/g, '');
+            return nombre || (respaldo + '.xlsx');
+        };
 
-        // Specify file name
-        filename = filename ? filename + '.xls' : 'excel_data.xls';
+        btn.disabled = true;
+        if (typeof ejecutandoForm !== 'undefined' && ejecutandoForm) { ejecutandoForm.valor = true; }
 
-        //Se usa siempre Blob + createObjectURL: funciona en los navegadores
-        //actuales, permite el BOM (acentos correctos en Excel) y evita el
-        //data-URI, que obligaba a reemplazar los espacios por %20.
-        const blob         = new Blob(['\ufeff', tableHTML], { type: dataType });
-        const url          = URL.createObjectURL(blob);
-        const downloadLink = document.createElement("a");
+        const enviar = function (intento) {
+            return fetch(url, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'X-CSRF-Token': currentCsrfToken(),
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: filtros
+            }).then(function (resp) {
+                //419: token vigente en cabecera o cuerpo JSON; reintento unico
+                if (resp.status === 419 && intento === 0) {
+                    return resp.text().then(function (texto) {
+                        const cuerpo = parseJsonSeguro(texto);
+                        const nuevo = resp.headers.get('X-CSRF-Token') ||
+                                      ((cuerpo && cuerpo.data && cuerpo.data.Token) ? cuerpo.data.Token : '');
+                        if (!nuevo) { return { error: 'La sesión expiró. Recarga la página e inténtalo de nuevo.' }; }
+                        adoptarTokenCsrf(nuevo);
+                        return enviar(1);
+                    });
+                }
+                const tipo = (resp.headers.get('Content-Type') || '').toLowerCase();
+                if (!resp.ok || tipo.indexOf('application/json') !== -1) {
+                    return resp.text().then(function (texto) {
+                        const cuerpo = parseJsonSeguro(texto);
+                        const msg = (cuerpo && typeof cuerpo.message === 'string' && cuerpo.message)
+                                    ? cuerpo.message : 'No se pudo generar el archivo.';
+                        return { error: msg };
+                    });
+                }
+                return resp.blob().then(function (blob) {
+                    return {
+                        blob: blob,
+                        nombre: nombreDesde(resp.headers.get('Content-Disposition')),
+                        truncado: resp.headers.get('X-Export-Truncated') === '1'
+                    };
+                });
+            });
+        };
 
-        // Setting the file name
-        downloadLink.href     = url;
-        downloadLink.download = filename;
-
-        //se agrega al documento y se dispara la descarga
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        //se limpia el DOM y la memoria
-        document.body.removeChild(downloadLink);
-        setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+        enviar(0).then(function (res) {
+            if (res.error) { avisar('error', res.error); return; }
+            const urlBlob = URL.createObjectURL(res.blob);
+            const enlace  = document.createElement('a');
+            enlace.href     = urlBlob;
+            enlace.download = res.nombre;
+            document.body.appendChild(enlace);
+            enlace.click();
+            document.body.removeChild(enlace);
+            setTimeout(function () { URL.revokeObjectURL(urlBlob); }, 1000);
+            if (res.truncado) {
+                avisar('warning', 'El resultado superó el máximo de filas y el archivo se truncó. Acota los filtros para exportar todo.');
+            }
+        }).catch(function (error) {
+            warnFNCS('exportExcelServer: fallo de red', error);
+            avisar('error', 'No se pudo generar el archivo.');
+        }).then(liberar);
     }
 
     /**********************************************************/
@@ -833,7 +1108,7 @@
     window.showConfirmRedirect        = showConfirmRedirect;
     window.appendFiles                = appendFiles;
     window.return_value               = return_value;
-    window.exportTableToExcel         = exportTableToExcel;
+    window.exportExcelServer          = exportExcelServer;
     window._marcarOpcion              = _marcarOpcion;
     window._buscarOpcion              = _buscarOpcion;
     window.seleccionarOpcionYBloquear = seleccionarOpcionYBloquear;
