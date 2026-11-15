@@ -558,7 +558,8 @@ class FunctionsDataValidations {
 
         /********************** Evaluación **********************/
         if ($IncluirHoy) {
-            $resultado = $fechaParsed >= $tiempoActual;
+            // Se compara por fecha (Y-m-d): hoy cuenta como válido aunque la hora ya pasó
+            $resultado = date('Y-m-d', $fechaParsed) >= date('Y-m-d', $tiempoActual);
         } else {
             $resultado = $fechaParsed > $tiempoActual;
         }
