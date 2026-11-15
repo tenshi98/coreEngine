@@ -5,6 +5,8 @@ require_once __DIR__ . '/EnvLoader.php';
 /*                              Variables de entorno (credenciales de almacenamiento)                              */
 /*******************************************************************************************************************/
 define('ENV_SOFTWARE_NAME', getenv('SOFTWARE_NAME'));
+// Tope de filas de una exportación a Excel (variable de entorno MAX_EXPORT_ROWS; por defecto 20000)
+define('ENV_MAX_EXPORT_ROWS', (int) (getenv('MAX_EXPORT_ROWS') ?: 20000));
 define('ENV_SOFTWARE_SLOGAN', getenv('SOFTWARE_SLOGAN'));
 define('ENV_SOFTWARE_COMPANYNAME', getenv('SOFTWARE_COMPANYNAME'));
 define('ENV_SOFTWARE_COMPANYEMAIL', getenv('SOFTWARE_COMPANYEMAIL'));
@@ -63,6 +65,13 @@ class ConfigAPP{
          * Por defecto 1000 antes de paginar
          **********************************************************************/
         'N_MaxItems'              => 2500,
+
+        /***********************************************************************
+         * Filas máximas de una exportación a Excel (más allá de N_MaxItems).
+         * Se lee por bloques de N_MaxItems; FunctionsExportExcel::maxRows()
+         * lo acota entre N_MaxItems y 100000. Env: MAX_EXPORT_ROWS.
+         **********************************************************************/
+        'N_MaxExportRows'         => ENV_MAX_EXPORT_ROWS,
 
         /***********************************************************************
          * Seguridad
