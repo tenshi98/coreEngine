@@ -12,6 +12,7 @@ Diagrama entidad-relación del **núcleo** (`core_*`, `usuarios_*`) y del módul
 - [Diagrama ER](#diagrama-er)
 - [Convenciones y reglas](#convenciones-y-reglas)
 - [DDL y migraciones](#ddl-y-migraciones)
+- [Documentación relacionada](#documentación-relacionada)
 
 ---
 

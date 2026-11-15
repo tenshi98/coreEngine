@@ -18,6 +18,7 @@ coreEngine implementa un sistema de gestión de sesiones y acceso centrado en la
 - [Archivos y subidas](#archivos-y-subidas)
 - [Auditoría y errores](#auditoría-y-errores)
 - [Recomendaciones de despliegue](#recomendaciones-de-despliegue)
+- [Documentación relacionada](#documentación-relacionada)
 
 ---
 

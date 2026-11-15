@@ -12,6 +12,7 @@ Estrategia de operación de coreEngine: crecimiento, integración, control de ca
 - [Respaldo de información y recuperación](#respaldo-de-información-y-recuperación)
 - [Monitoreo y logs](#monitoreo-y-logs)
 - [Mantenimiento y actualización de módulos](#mantenimiento-y-actualización-de-módulos)
+- [Documentación relacionada](#documentación-relacionada)
 
 ---
 
@@ -54,6 +55,16 @@ Para integrarse en ecosistemas universitarios o corporativos existentes (ERPs, C
 3. **Sincronización asíncrona con webhooks y colas:**
    - Colas de mensajes (RabbitMQ o Redis Queue) para procesar eventos institucionales en segundo plano (sincronización de matrículas, actualización de roles, notificaciones masivas) sin afectar los tiempos de respuesta.
 
+#### Puntos Adicionales de Integración
+
+4. **Versionado y Estándares de API:**
+   - Extensión de la capa de controladores (`ControllerBase.php`) para habilitar endpoints Web API RESTful formateados en JSON, resguardados mediante los tokens de autenticación configurados en `ConfigToken.php`.
+   - Documentación estandarizada de la API mediante especificaciones **OpenAPI 3.0 (Swagger)** para facilitar la integración con sistemas externos y generadores de clientes.
+
+5. **Sincronización Asíncrona Avanzada:**
+   - Implementación de colas de mensajes (RabbitMQ o Redis Queue) para procesar eventos institucionales en segundo plano (sincronización periódica de matrículas, actualización de roles de personal o notificaciones masivas) sin afectar los tiempos de respuesta al usuario.
+   - Webhooks configurables para notificaciones en tiempo real ante eventos críticos (creación de reservas, cambios de estado, pagos exitosos).
+
 ---
 
 ## Control de cambios
@@ -74,6 +85,30 @@ La gestión de cambios sigue un flujo normado para garantizar la estabilidad en 
   - Verificación de estándares de código (PSR-12).
   - Pruebas unitarias e integrales del motor de consultas (`QueryBuilder`).
 - **Despliegue sin interrupción (zero-downtime):** enlaces simbólicos o despliegue azul/verde (*Blue-Green Deployment*) para no cortar sesiones activas.
+
+#### Pasos Específicos del Pipeline CI/CD
+
+El pipeline automatizado en cada Pull Request o Merge ejecuta las siguientes validaciones:
+
+1. **Análisis Estático y Comprobación Sintáctica:**
+   - Ejecución de `php -l` en todos los archivos PHP modificados.
+   - Verificación de estándares de código (PSR-12) usando herramientas como `php-cs-fixer`.
+   - Análisis de dependencias y verificación de que no se introduzcan versiones incompatibles de `vendors/libs/`.
+
+2. **Pruebas Unitarias e Integrales:**
+   - Ejecución del motor de consultas `QueryBuilder` con casos de prueba definidos.
+   - Pruebas de integridad de transaccionales (`lockRowsForUpdate`, rollback behavior).
+   - Pruebas de validación de datos `CheckData` para reglas de negocio críticas.
+
+3. **Despliegue Sin Interrupción (Zero-Downtime):**
+   - Uso de enlaces simbólicos atómicos para intercambiar versiones (`current` → `new`).
+   - Despliegue azul-verde (*Blue-Green Deployment*) donde el nuevo entorno se sube y se valida antes de cortar el tráfico al anterior.
+   - Migración segura de base de datos con scripts de versiónamiento (Flyway o similar) que son idempotentes (consultando `skills/mysql/SKILL.md` §Procedimiento).
+
+4. **Validación de Seguridad:**
+   - Revisión automática de que los nuevos endpoints incluyen validación CSRF.
+   - Verificación de que las contraseñas usan hashing bcrypt/Argon2 (`FunctionsSecurityPasswords.php`).
+   - Comprobación de que no hay SQL concatenado con datos de entrada (revisando `QueryBuilder` usage).
 
 ### Documentación e histórico
 
@@ -101,6 +136,31 @@ La estrategia de respaldo y continuidad de negocio mitiga la pérdida de datos p
 
 - **RPO (Recovery Point Objective):** máximo 1 hora de pérdida de datos en el peor escenario.
 - **RTO (Recovery Time Objective):** restablecimiento completo en menos de 2 horas tras un fallo catastrófico, mediante infraestructura como código (Docker / Terraform) y procedimientos de restauración automatizados.
+
+#### Implementación Técnica de Respaldos
+
+1. **Dumps Diarios Automatizados:**
+   - Scripts cron que ejecutan `mysqldump` con flags `--single-transaction` para consistencia sin bloqueos.
+   - Compresión con `gzip` nivel 9 y cifrado AES-256 antes del transferencia.
+   - Almacenamiento en destino: `Amazon S3 Glacier` con clasificación de almacenamiento para datos accedidos raramente.
+
+2. **Recuperación en el Punto en el Tiempo (PITR):**
+   - Habilitación del registro binario de MySQL (`log_bin`) con formato ROW.
+   - Configuración de retención de logs por 24 horas para recuperación a segundos específicos.
+   - Scripts de recuperación que replayan logs hasta el timestamp deseado:
+     ```bash
+     mysqlbinlog --start-datetime="2024-01-15 14:30:00" --stop-datetime="2024-01-15 14:31:00" \
+       mysql-bin.000001 | mysql -u admin -p core_engine
+     ```
+
+3. **Versionamiento y Replicación entre Regiones (Cross-Region Replication):**
+   - **S3:** Activación de `Versioning` y configuración de `Replication Rules` a bucket en región `us-east-1`.
+   - **GCS:** Configuración de `Bucket Policy` con retención `WORM` (Write Once Read Many) por 10 años.
+   - **Verificación de integridad:** Hash SHA-256 de cada dump comparado contra registro en `docs/history/` tras cada transferencia.
+
+4. **Objetivos Definidos:**
+   - **RPO (Recovery Point Objective):** Máximo 1 hora de pérdida de datos → logra esto con dumps cada 55 minutos.
+   - **RTO (Recovery Time Objective):** Restablecimiento completo en menos de 2 horas → prototipado con scripts de restauración que toman ~45 minutos en entornos testeados.
 
 ---
 

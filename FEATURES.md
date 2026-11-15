@@ -8,6 +8,9 @@ Documento de funcionalidades de la plataforma: catálogo único de módulos (fun
 
 - [Módulos](#módulos)
 - [Dependencias entre módulos](#dependencias-entre-módulos)
+- [Orden de instalación sugerido](#orden-de-instalación-sugerido)
+- [Otras dependencias](#otras-dependencias)
+- [Documentación relacionada](#documentación-relacionada)
 
 ---
 

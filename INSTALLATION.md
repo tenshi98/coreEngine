@@ -17,6 +17,7 @@ Instrucciones para la configuración inicial, importación de base de datos y de
 - [7. Permisos seguros de `upload`](#7-permisos-seguros-de-upload)
 - [8. Verificación final](#8-verificación-final)
 - [9. Troubleshooting](#9-troubleshooting)
+- [Documentación relacionada](#documentación-relacionada)
 
 ---
 
@@ -35,6 +36,98 @@ Instrucciones para la configuración inicial, importación de base de datos y de
   - `json`: respuestas JSON y JWT.
   - `fileinfo`: validación de tipos MIME en la subida de archivos.
   - Exportación a Excel: `ctype`, `dom`, `filter`, `iconv`, `libxml`, `simplexml`, `xml`, `xmlreader`, `xmlwriter`, `zip`, `zlib`.
+
+---
+
+## Referencia Consolidada de Parámetros de Configuración
+
+A continuación se detalla la ubicación y los parámetros críticos de cada archivo de configuración principal:
+
+### ConfigAPP.php (`admin/app/config/ConfigAPP.php`)
+
+**Constante SOFTWARE:**
+- `SoftwareName`: Nombre comercial de la aplicación
+- `SoftwareSlogan`: Slogan del software
+- `CompanyName`: Razón social de la compañía
+- `CompanyEmail`: Correo corporativo
+- `CompanyCredits`: Créditos del software
+
+**Constante APP (Parámetros Generales):**
+- `N_MaxItems`: Número máximo de registros sin paginar (default: 2500)
+- `N_MaxExportRows`: Filas máximas de una exportación a Excel (se acota entre N_MaxItems y 100000, default: 20000)
+- `checkBruteConections`: Intentos de login fallidos antes de banear IP (default: 5)
+- `checkBruteMaxConections`: Reincidencias antes de enviar IP a lista negra (default: 20)
+
+**Seguridad APP:**
+- `auditLoggerPath`: Ruta base de archivos de auditoría
+- `rateLimiterFileIP`: Archivo de rate limit por IP
+- `rateLimiterFileUser`: Archivo de rate limit por usuario
+- `rateLimiterGuestMaxAttempts`: 20 intentos / 60 s (usuarios desconocidos)
+- `rateLimiterGuestWindowSeconds`: 60
+- `rateLimiterUserMaxAttempts`: 240 intentos / 480 s (usuarios logueados)
+- `rateLimiterUserWindowSeconds`: 480
+- `errorLogFile`: Archivo de errores
+- `csrfEnabled`: Activa validación CSRF
+- `csrfTokenName`: Campo POST del token (`_token`)
+- `csrfHeaderName`: Cabecera AJAX del token (`X-CSRF-Token`)
+- `csrfExcludeVerbs`: Verbos exentos (`GET`, `HEAD`, `OPTIONS`)
+- `csrfExcludeRoutes`: Rutas exentas (instalador `/install/*`)
+
+**Almacenamiento (uploadServer):**
+- `local`: Disco del servidor (`uploadFolder`, `uploadUrl`)
+- `s3`: Amazon S3/compatible (`s3Key`, `s3Secret`, `s3Region`, `s3Bucket`, `s3Prefix`, `s3Endpoint`)
+- `gcs`: Google Cloud Storage (`gcsProjectId`, `gcsKeyFile`, `gcsBucket`, `gcsPrefix`)
+- `sftp`: Servidor remoto SFTP/SSH (`sftpHost`, `sftpPort`, `sftpUser`, etc.)
+
+### ConfigDataBase.php (`admin/app/config/ConfigDataBase.php`)
+
+| Constante | Motor | Campos Críticos |
+|---|---|---|
+| `MySQL_ADMIN` | MySQL principal (administración) | `HOSTNAME`, `USERNAME`, `PASSWORD`, `DATABASE`, `CHARSET` (`utf8mb4`), `PORT` (`3306`) |
+| `MySQL_1` | MySQL de la aplicación | Misma estructura que MySQL_ADMIN |
+| `MySQL_MCP` | MySQL solo lectura del MCP | Mismo estructura, solo lectura |
+| `PostGreSQL_1` | PostgreSQL | `HOSTNAME`, `USERNAME`, `PASSWORD`, `DATABASE`, `PORT` |
+| `SQLite_1` | SQLite | `ROUTE` (ruta absoluta al archivo `.sqlite`) |
+| `MongoDB_1` | MongoDB | `HOST`, `DATABASE` |
+| `Jig_1` | Jig (BD ligera en disco) | `ROUTE` |
+| `Redis_1` | Redis | `ROUTE` |
+
+### ConfigMail.php (`admin/app/config/ConfigMail.php`)
+
+| Perfil | Campos Críticos |
+|---|---|
+| `SMTPSender` | `SERVERURL`, `SERVERPORT` (465 SSL / 587 TLS), `SERVERSECURE` (`SSL`/`TLS`), `USEREMAIL`, `USERNAME`, `PASSWORD` |
+| `GmailSender` | `SERVERURL` (`smtp.gmail.com`), `SERVERPORT` (`465`), `SERVERSECURE` (`SSL`), `USEREMAIL`, `USERNAME`, `PASSWORD` (contraseña de aplicación Google) |
+| `SendingBlueSender` | `SERVERURL` (`https://api.brevo.com/v3/smtp/email`), `SERVERAPI` (API Key v3 Brevo/Sendinblue) |
+
+### ConfigToken.php (`admin/app/config/ConfigToken.php`)
+
+**Constante JWT:**
+- `TOKEN_AUTHENTICATION`: `true` / `false` (activa/desactiva autenticación por token)
+- `SECRET_KEY`: Clave secreta para cifrado de tokens (env `JWT_SECRET_KEY`)
+- `TIME_TO_LIVE`: Tiempo vida token en segundos (`86400` default)
+
+**Constante ENCODE_KEYS:**
+- `KEY_1` … `KEY_11`: Claves de cifrado en capas para comunicaciones sensibles (env `ENCODE_KEY_1` … `ENCODE_KEY_11`). `KEY_1` para uso interno.
+
+---
+
+### Variables de Entorno `.env`
+
+Todas las anteriores se resuelven desde el archivo `.env` (`admin/app/config/.env`) mediante `EnvLoader.php`. Variables principales por grupo:
+
+| Grupo | Variables |
+|---|---|
+| Software | `SOFTWARE_NAME`, `SOFTWARE_SLOGAN`, `SOFTWARE_COMPANYNAME`, `SOFTWARE_COMPANYEMAIL`, `SOFTWARE_COMPANYCREDITS`, `SOFTWARE_URL`, `SOFTWARE_MAINFOLDER` |
+| Base de datos | `DB_ADMIN_*`, `DB_MYSQL1_*`, `DB_MCP_*`, `DB_POSTGRES1_*`, `DB_SQLITE1_ROUTE`, `DB_MONGO1_*`, `DB_JIG1_ROUTE`, `DB_REDIS1_ROUTE` |
+| Almacenamiento S3 | `S3_KEY`, `S3_SECRET`, `S3_REGION`, `S3_BUCKET`, `S3_PREFIX`, `S3_ENDPOINT` |
+| Almacenamiento GCS | `GCS_PROJECT_ID`, `GCS_BUCKET`, `GCS_PREFIX` |
+| Almacenamiento SFTP | `SFTP_HOST`, `SFTP_PORT`, `SFTP_USER`, `SFTP_PASSWORD`, `SFTP_KEY_PASS`, `SFTP_BASE_PATH`, `SFTP_BASE_URL` |
+| Exportación | `MAX_EXPORT_ROWS` (default 20000, techo 100000) |
+| Correo | `MAIL_SMTP_*`, `MAIL_GMAIL_*`, `MAIL_SENDINGBLUE_*` |
+| Token | `JWT_SECRET_KEY`, `ENCODE_KEY_1` … `ENCODE_KEY_11` |
+
+**Regla importante:** `ConfigAPP.php` y `ConfigDataBase.php` resuelven sus valores desde `.env` mediante `EnvLoader.php`. **No escribir credenciales directamente en el código** si pueden usar `.env`.
 
 ---
 

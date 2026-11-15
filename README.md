@@ -1,5 +1,13 @@
 # Documentación del Proyecto
 
+## Tabla de contenidos
+
+- [Explicación General](#explicación-general)
+- [Requisitos del Sistema](#requisitos-del-sistema)
+- [Demo Plataforma](#demo-plataforma)
+- [Estructura de la Documentación Generada](#estructura-de-la-documentación-generada)
+- [Documentación relacionada](#documentación-relacionada)
+
 ## Explicación General
 
 Plataforma Básica enfocada al manejo e interacción con los distintos módulos instalados, algunos independientes de otros, y otros dependientes de la instalación de otros módulos.
@@ -13,7 +21,6 @@ Es un monólito modular estructurado en:
 - **Backoffice** en `admin/` (módulos en `admin/app/modules/`)
 - **Sitios públicos** en `sites_*/`
 - **Capa de IA** (`agents/`, `skills/`, `projects/`, `docs/`)
-
 
 ---
 
@@ -67,11 +74,13 @@ A continuación se detalla cada documento creado para este proyecto, con una bre
 | 7 | **agentes.md** | Agentes y roles | Conceptos fundamentales: Agent (QUIEN), Skill (CÓMO), Spec (QUÉ), Task (QUÉ), Validation (CÓMO), Docs (VERDAD), History (MEMORIA), ChangeLog (Blog). Contrato común y flujo SDD. |
 | 8 | **README.md** | Este archivo | **Vista actual** — presentando esta explicación general y acceso a los demás documentos. |
 
-## Próximos Pasos
+## Documentación relacionada
 
-1. Revisar la documentación arquitecural en `arquitectura.md` para comprender la estructura del sistema.
-2. Consultar `instalacion.md` si se necesita desplegar o configurar el entorno.
-3. Revisar `modulos.md` para entender los módulos disponibles y sus dependencias.
-4. Usar `flujo-peticion.md` para depurar rutas o problemas de seguridad.
-5. Consultar `bbdd.md` para diseño de nuevas tablas o relaciones.
-6. Revisar `configuracion.md` para ajustes de parámetros del sistema.
+- [README.md](README.md) — visión general, demo, SDD y reglas.
+- [AGENTES.md](AGENTES.md) — agents, skills, specs y tasks.
+- [ARCHITECTURE.md](ARCHITECTURE.md) — arquitectura, componentes de seguridad y capa de datos.
+- [DATABASE.md](DATABASE.md) — modelo de datos y diagrama ER.
+- [FEATURES.md](FEATURES.md) — funcionalidades y módulos con capturas.
+- [INSTALLATION.md](INSTALLATION.md) — requisitos, instalación y configuración.
+- [OPERATIONS.md](OPERATIONS.md) — escalabilidad, cambios, backups y DRP.
+- [SECURITY.md](SECURITY.md) — modelo de seguridad, permisos y niveles de acceso.

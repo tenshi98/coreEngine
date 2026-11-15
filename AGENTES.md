@@ -1,4 +1,13 @@
 
+## Tabla de contenidos
+
+- [Conceptos: agents, skills, specs y tasks](#conceptos-agents-skills-specs-y-tasks)
+- [Flujo SDD obligatorio](#flujo-sdd-obligatorio)
+- [Guía para futuros desarrollos](#guía-para-futuros-desarrollos)
+- [Reglas irreductibles](#reglas-irreductibles)
+- [Punto de entrada rápido](#punto-de-entrada-rápido)
+- [Documentación relacionada](#documentación-relacionada)
+
 ## Conceptos: agents, skills, specs y tasks
 
 | Concepto | Qué es | Dónde vive |

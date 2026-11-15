@@ -20,6 +20,7 @@ Documento público de arquitectura. La **verdad interna** que usan los agentes v
 - [Tecnologías backend](#tecnologías-backend)
 - [Escalabilidad](#escalabilidad)
 - [Reglas de integración](#reglas-de-integración)
+- [Documentación relacionada](#documentación-relacionada)
 
 ---
 
@@ -317,47 +318,49 @@ Carpetas de `admin/app/` que no son módulos de negocio pero forman parte del es
 
 ## Tecnologías frontend
 
-Bibliotecas servidas desde `admin/public/vendor/` (sin npm). **No añadir otras.**
+### Lista Completa de Bibliotecas Frontend
 
-| Librería | Descripción breve |
-|---|---|
-| **PDFObject** | Script JS para incrustar documentos PDF en páginas HTML mediante HTML5. |
-| **ViewerJS** | Visor de documentos en línea (PDF, OpenDocument) renderizados en HTML5/JS sin plugins externos. |
-| **aos (Animate On Scroll)** | Animaciones desencadenadas al hacer scroll. |
-| **apexcharts** | Gráficos vectoriales interactivos y dashboards en tiempo real. |
-| **audio_player** | Reproductor multimedia HTML5 estilizado para audio local o remoto. |
-| **autosize** | Autoajuste de la altura de `<textarea>` según el texto. |
-| **bootstrap** | Framework CSS/JS responsivo (Bootstrap 5), base de la UI. |
-| **bootstrap-icons** | Iconos vectoriales oficiales de Bootstrap. |
-| **bootstrap_colorpicker** | Selector de color integrado con inputs de Bootstrap. |
-| **bootstrap_fileinput** | Subida de archivos con vista previa, drag & drop y barra de progreso. |
-| **bootstrap_touchspin** | Spinner numérico con botones incrementales/decrementales. |
-| **boxicons** | Colección de iconos vectoriales para interfaces modernas. |
-| **chart.js** | Gráficos estadísticos sobre HTML5 Canvas (barras, líneas, dona, etc.). |
-| **clock_timepicker** | Selector de horas con reloj analógico interactivo. |
-| **echarts** | Apache ECharts: visualización de datos de alto rendimiento. |
-| **form_validator** | Validación de formularios en el cliente. |
-| **fullcalendar** | Calendario interactivo para agendas, reservas, citas y eventos. |
-| **glyphicons** | Iconos tipográficos clásicos. |
-| **jstree** | Árbol jerárquico interactivo sobre jQuery. |
-| **leaflet** | Mapas interactivos georreferenciados. |
-| **material_datetimepicker** | Selector de fecha y hora con estética Material Design. |
-| **mejs-player** | MediaElement.js: reproductor universal HTML5 de audio y video. |
-| **meteo** | Widget de datos climáticos e informes meteorológicos. |
-| **php-email-form** | Envío AJAX de formularios de contacto con feedback de estado. |
-| **plotly_js** | Gráficos científicos y analíticos avanzados. |
-| **popover-ex** | Extensión de los popovers de Bootstrap. |
-| **printerDocs** | Impresión de documentos y reportes con formato limpio. |
-| **prism** | Resaltador de sintaxis para bloques de código. |
-| **radio_player** | Reproductor de streaming de radio y audio continuo. |
-| **remixicon** | Iconos vectoriales neutros y elegantes. |
-| **rss_reader** | Lector cliente de noticias RSS/Atom. |
-| **rut_validate** | Validador y formateador del RUT/RUN chileno. |
-| **select2** | Select avanzado con búsqueda, selección múltiple y AJAX. |
-| **simple-datatables** | Tablas HTML ordenables, paginadas y con buscador, sin jQuery. |
-| **sweetalert2** | Alertas y confirmaciones estilizadas (`Swal.fire`). |
-| **tinymce** | Editor de texto enriquecido WYSIWYG. |
-| **upload_and_crop_image** | Subida, recorte y previsualización de imágenes. |
+Las bibliotecas servidas desde `admin/public/vendor/` (sin npm). **No añadir otras.**
+
+| Librería | Descripción Breve |
+| :--- | :--- |
+| **PDFObject** | Script de JavaScript para incrustar documentos PDF directamente en páginas HTML mediante elementos HTML5. |
+| **ViewerJS** | Visor de documentos en línea (PDF, OpenDocument) renderizados en HTML5/JS sin depender de plugins externos. |
+| **aos (Animate On Scroll)** | Librería de animaciones desencadenadas al desplazarse (scroll) por la página web. |
+| **apexcharts** | Librería moderna para la generación de gráficos vectoriales interactivos y dashboards en tiempo real. |
+| **audio_player** | Reproductor multimedia HTML5 estilizado para reproducción de archivos de audio local o remoto. |
+| **autosize** | Utilidad ligera para autoajustar la altura de campos `<textarea>` según la cantidad de texto ingresado. |
+| **bootstrap** | Framework de diseño CSS/JS responsivo (Bootstrap 5) base para la maquetación y la UI general. |
+| **bootstrap-icons** | Set de iconos vectoriales oficial de Bootstrap para elementos de menú, botones y acciones. |
+| **bootstrap_colorpicker** | Componente selector de color (colorpicker) integrado con inputs de formularios de Bootstrap. |
+| **bootstrap_fileinput** | Plugin de subida de archivos avanzado con vista previa de imágenes, arrastrar y soltar (drag & drop) y barra de progreso. |
+| **bootstrap_touchspin** | Componente spinner para números que agrega botones incrementales/decrementales táctiles a campos numéricos. |
+| **boxicons** | Colección de iconos vectoriales de alta calidad para interfaces web modernas. |
+| **chart.js** | Librería popular basada en HTML5 Canvas para el renderizado de gráficos estadísticos (barras, líneas, dona, etc.). |
+| **clock_timepicker** | Selector de horas con formato de reloj analógico interactivo para selección rápida de tiempo. |
+| **echarts** | Apache ECharts, motor interactivo de visualización de datos de alto rendimiento y gráficos complejos. |
+| **form_validator** | Motor de validación de formularios en el cliente para verificar formatos y campos obligatorios antes del envío. |
+| **fullcalendar** | Componente de calendario interactivo para la gestión de agendas, reservas, citas y eventos. |
+| **glyphicons** | Fuentes e iconos tipográficos clásicos para botones e indicadores de interfaz. |
+| **jstree** | Plugin de jQuery para representar y gestionar estructuras de datos en árbol jerárquico e interactivo. |
+| **leaflet** | Biblioteca de código abierto para mapas interactivos georreferenciados y manipulación de coordenadas. |
+| **material_datetimepicker** | Selector de fechas y horas con estética inspirada en el diseño Material Design. |
+| **mejs-player** | MediaElement.js, reproductor universal HTML5 para contenido de audio y video con controles personalizados. |
+| **meteo** | Widget / componente para visualizar datos climáticos e informes meteorológicos. |
+| **php-email-form** | Controlador JS para envío AJAX de formularios de contacto con retroalimentación visual de estado. |
+| **plotly_js** | Librería de gráficos científicos y analíticos avanzados para representación de datos complejos. |
+| **popover-ex** | Extensión para mejorar y personalizar los avisos contextuales (popovers) de Bootstrap. |
+| **printerDocs** | Módulo de impresión de documentos y reportes con formatos limpios para impresora. |
+| **prism** | Resaltador de sintaxis de código fuente ligero y extensible para bloques de código HTML/JS/PHP. |
+| **radio_player** | Componente reproductor de streaming para emisiones de radio e transmisiones de audio continuo. |
+| **remixicon** | Sistema de iconos vectoriales neutros y elegantes para la interfaz de usuario. |
+| **rss_reader** | Parseador y lector cliente de noticias en formatos RSS/Atom. |
+| **rut_validate** | Validador y formateador automático del Rol Único Tributario (RUT / RUN) chileno. |
+| **select2** | Reemplazo avanzado de la etiqueta `<select>` de HTML, añadiendo soporte de búsqueda, selección múltiple y AJAX. |
+| **simple-datatables** | Alternativa liviana sin jQuery para crear tablas HTML ordenables, paginadas y con buscador. |
+| **sweetalert2** | Reemplazo estético y personalizable para las alertas de JavaScript emergentes (`alert`, `confirm`). |
+| **tinymce** | Editor de texto enriquecido (WYSIWYG) completo para la edición e inserción de contenido HTML en formularios. |
+| **upload_and_crop_image** | Herramienta para subir, recortar y previsualizar imágenes antes de enviarlas al servidor. |
 
 ### Reglas de maquetación
 
@@ -442,7 +445,31 @@ Detalle: `docs/architecture/ui/libs.md`.
 
 ## Escalabilidad
 
-Resumen: la arquitectura ligera de F3 mantiene un consumo bajo (~1-2 MB por petición) y permite escalar en cuatro fases: almacenamiento stateless en S3/GCS + CDN, sesiones y caché en Redis, réplicas de lectura MySQL y contenedores con auto-scaling. Detalle y estrategia de integración/operación: [OPERATIONS.md](OPERATIONS.md#escalabilidad).
+### Estrategia Detalle de Escalabilidad en 4 Fases
+
+La arquitectura ligera de F3 mantiene un consumo bajo (~1-2 MB por petición) y permite escalar mediante las siguientes fases ordenadas:
+
+#### Fase 1: Desacoplamiento del Almacenamiento de Archivos (Stateless Web Nodes)
+- **Estado actual:** Almacenamiento local en `public/upload`.
+- **Evolución:** Activar los drivers ya implementados (`FileManager.php` / `ConfigAPP.php`) para utilizar repositorios de objetos en la nube como **Amazon S3** o **Google Cloud Storage (GCS)**, junto a una CDN (Content Delivery Network) como Cloudflare o AWS CloudFront. Esto elimina el estado local en los servidores web y acelera la entrega de archivos multimedia globales.
+- **Dependencias:** `StorageDriverFactory`, `FileManager`, drivers S3/GCS en `vendors/libs/`.
+
+#### Fase 2: Manejo de Sesiones Distribuido y Caching con Redis
+- **Estado actual:** Sesiones PHP basadas en servidor o cookies/tokens individuales.
+- **Evolución:** Configurar **Redis** como almacén centralizado de sesiones y caché de aplicación mediante la clave `Redis_1` de `ConfigDataBase.php` y la librería `predis/` ya disponible en `vendors/libs/predis`. Esto permite la distribución de peticiones mediante un balanceador de carga (Nginx, AWS ALB o HAProxy) hacia múltiples instancias de servidor web sin perder el estado del usuario (*Stateless Horizontal Scaling*).
+- **Dependencias:** `Redis_1` en `ConfigDataBase`, `predis` en `vendors/libs/`.
+
+#### Fase 3: Escalamiento de la Capa de Datos (Base de Datos)
+- **Estado actual:** Instancia relacional MySQL principal.
+- **Evolución:** Implementar **Réplicas de Lectura (Read Replicas)** en MySQL/MariaDB. Aprovechando las múltiples claves de conexión definidas en `ConfigDataBase.php` (`MySQL_ADMIN`, `MySQL_1`), las consultas de lectura masiva (reportes, consultas de catálogo, calendarios) se derivarán a los nodos réplica, reservando el nodo primario para escrituras y transacciones críticas.
+- **Dependencias:** `MySQL_ADMIN`, `MySQL_1` en `ConfigDataBase`, `QueryBuilder` para routing de lectura.
+
+#### Fase 4: Contenedores y Auto-Scaling
+- **Estado actual:** Aplicación en servidores virtuales o bare metal.
+- **Evolución:** Empaquetar la aplicación en contenedores **Docker** bajo orquestación con **Kubernetes (K8s)** o **AWS ECS**, permitiendo el escalado y desescalado automático (*Auto-Scaling*) de pods/contenedores según la demanda de CPU y memoria.
+- **Dependencias:** Docker, K8s/ECS, métricas de monitoring.
+
+Detalle y estrategia de integración/operación: [OPERATIONS.md](OPERATIONS.md#escalabilidad).
 
 ---
 
