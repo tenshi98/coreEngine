@@ -408,6 +408,11 @@ class FileUploader {
             ? substr($originalName, 0, -(strlen($clientExt) + 1))
             : $originalName;
 
+        // Anti doble extensión (archivo.php.jpg): los puntos del nombre base se reemplazan por '_'
+        // para que ninguna extensión ejecutable quede en una posición intermedia del nombre final.
+        $base         = str_replace('.', '_', $base);
+        $originalName = $clientExt !== '' ? $base . '.' . $clientExt : $base;
+
         // Extensión efectiva: si se deriva del MIME real, se prioriza.
         $forced = $mimeExt !== null && $mimeExt !== '';
         $ext    = $forced ? $mimeExt : $clientExt;
