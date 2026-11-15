@@ -348,8 +348,15 @@ class gestionDocumentosItemsTesting extends ControllerBase {
         $this->addCase($results, 'getid_por_existencia',
             str_contains($codigo, "'data'    => 'idExistencia,idFacturacion,Item,Number,ValorTotal'") && str_contains($codigo, "'where'   => 'idExistencia = ?'"),
             'GetID() no consulta el item por idExistencia');
-        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 1,
-            'solo UpdateList() debe acotar el numero de filas con N_MaxItems');
+        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 0,
+            'ninguna consulta debe quedar acotada por N_MaxItems: la lista pagina por bloques (ADR-0022)');
+        // Carga incremental (ADR-0022): cada lista toma el limite de getPageParams() y recorta con sliceMore()
+        $this->addCase($results, 'carga_incremental',
+            substr_count($codigo, '$this->getPageParams()') === 1 && substr_count($codigo, '\'limit\'   => $page[\'limit\']') === 1 && substr_count($codigo, '$this->sliceMore(') === 1,
+            'se esperaban 1 lista(s) con getPageParams(), limite de bloque y sliceMore()');
+        $this->addCase($results, 'carga_incremental_fragmento',
+            substr_count($codigo, "header('X-Has-More: ") === 1 && substr_count($codigo, "header('X-Next-Offset: ") === 1 && substr_count($codigo, '-UpdateListRows.php') === 1,
+            'UpdateList() debe responder el fragmento de filas con X-Has-More y X-Next-Offset');
 
         /************************************/
         // Retorno los datos
@@ -572,7 +579,7 @@ class gestionDocumentosItemsTesting extends ControllerBase {
         $comillas = $this->datosSinteticos(2);
         $comillas['arrItems'][0]['Item'] = "Item d'prueba";
         $tablaComillas = $this->renderizarVista($rutaTabla, $comillas, $BASE, $f3);
-        $this->addCase($results, 'tabla_escapa_comillas', str_contains($tablaComillas, "Item d\\'prueba"),
+        $this->addCase($results, 'tabla_escapa_comillas', str_contains($tablaComillas, "Item d\'prueba"),
             'la etiqueta del borrado no escapa las comillas simples');
 
         /*====================================*/
@@ -851,7 +858,8 @@ class gestionDocumentosItemsTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));  // filas en el parcial (ADR-0022)
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, 'addslashes('),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idExistencia'])"),

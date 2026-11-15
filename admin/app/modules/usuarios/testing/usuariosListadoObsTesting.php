@@ -400,8 +400,10 @@ class usuariosListadoObsTesting extends ControllerBase {
             str_contains($this->cuerpoMetodo('New'), "'Fnc_FormInputs'") && str_contains($this->cuerpoMetodo('New'), "'Fnc_ServerServer'"),
             'New() no entrega los inputs y la fecha del servidor al formulario');
         $this->addCase($results, 'updatelist_orden_observaciones',
-            str_contains($this->cuerpoMetodo('UpdateList'), "'limit'   => ConfigAPP::APP[\"N_MaxItems\"]"),
-            'UpdateList() debe limitar la cantidad de filas con N_MaxItems');
+            str_contains($this->cuerpoMetodo('UpdateList'), "'limit'   => \$page['limit']")
+                && str_contains($this->cuerpoMetodo('UpdateList'), '$this->getPageParams()')
+                && str_contains($this->cuerpoMetodo('UpdateList'), '$this->sliceMore('),
+            'UpdateList() debe limitar la cantidad de filas por bloques con getPageParams()/sliceMore() (carga incremental, ADR-0022)');
         $this->addCase($results, 'updatelist_datos_tabla',
             str_contains($this->cuerpoMetodo('UpdateList'), "'arrObservaciones'") && str_contains($this->cuerpoMetodo('UpdateList'), "'Fnc_DataDate'"),
             'UpdateList() no entrega observaciones y formateador de fechas');
@@ -1041,7 +1043,8 @@ class usuariosListadoObsTesting extends ControllerBase {
                 str_contains($codigo, "encryptDecrypt('encrypt', \$data['rowData']['idUsuario'])"),
                 $sufijo.' no cifra el ID del usuario para la URL de refresco');
         }
-        $tabla = $this->codigoFuente($this->rutaVista('UpdateList'));
+        // La tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+        $tabla = $this->codigoFuente($this->rutaVista('UpdateList')).$this->codigoFuente($this->rutaVista('UpdateListRows'));
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idObservaciones'])"),
             'UpdateList.php no cifra el ID antes de pintarlo en las acciones');
         $this->addCase($results, 'tabla_fecha_formateada', str_contains($tabla, 'fechaEstandar('),

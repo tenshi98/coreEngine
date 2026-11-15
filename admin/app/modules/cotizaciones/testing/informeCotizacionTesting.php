@@ -286,7 +286,7 @@ class informeCotizacionTesting extends ControllerBase {
             'listAll() no usa showVista(1)');
         $this->addCase($results, 'tipoview_UpdateList', str_contains($codigo, 'showVista(2,'),
             'UpdateList() no usa showVista(2)');
-        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 2,
+        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 3,
             'las vistas no resuelven su ruta con returnRutaVista()');
         $this->addCase($results, 'usuario_en_vistas', substr_count($codigo, 'getUserData($f3)') === 2,
             'las vistas no obtienen los datos del usuario');
@@ -305,8 +305,11 @@ class informeCotizacionTesting extends ControllerBase {
         $this->addCase($results, 'listado_catalogo_entidades',
             str_contains($codigo, "'table'   => 'entidades_listado'") && str_contains($codigo, "'where'   => 'idEstado = ?'"),
             'listAll() no carga el catalogo de entidades activas');
-        $this->addCase($results, 'listado_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 2,
-            'las dos consultas deben acotar el numero de filas');
+        $this->addCase($results, 'listado_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 1,
+            'la consulta del catalogo de entidades debe acotar el numero de filas');
+        $this->addCase($results, 'listado_carga_incremental', substr_count($codigo, "'limit'   => \$page['limit']") === 1 && str_contains($codigo, '$this->getPageParams()')
+            && str_contains($codigo, '$this->sliceMore(') && str_contains($codigo, "header('X-Has-More: ") && str_contains($codigo, "'-UpdateListRows.php'"),
+            'UpdateList() debe acotar las filas con la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
 
         /*====================================*/
         // Busqueda: columnas, validacion de fechas y WHERE preparado
@@ -695,8 +698,8 @@ class informeCotizacionTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::CONTROLADOR.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 2,
-            'se esperaban 2 vistas del informe y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 3,
+            'se esperaban 3 vistas (incluye -UpdateListRows) del informe y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -717,7 +720,7 @@ class informeCotizacionTesting extends ControllerBase {
         /*====================================*/
         // Cifrado de los IDs y formato de datos en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idCotizacion'])"),
             'UpdateList no cifra idCotizacion en la accion Ver');
         $this->addCase($results, 'tabla_fecha_estandar', str_contains($tabla, 'fechaEstandar('),

@@ -393,7 +393,10 @@ class cotizacionListadoTesting extends ControllerBase {
             && str_contains($codigo, "'table'   => 'servicios_listado'"),
             'listAll() no consulta los catalogos de entidades, productos y servicios');
         $this->addCase($results, 'listado_limite', str_contains($codigo, 'ConfigAPP::APP["N_MaxItems"]'),
-            'las consultas del listado no acotan el numero de filas');
+            'las consultas de catalogo del listado no acotan el numero de filas');
+        $this->addCase($results, 'listado_carga_incremental', substr_count($codigo, "'limit'   => \$page['limit']") === 2 && str_contains($codigo, '$this->getPageParams()')
+            && str_contains($codigo, '$this->sliceMore(') && str_contains($codigo, "header('X-Has-More: ") && str_contains($codigo, "'-UpdateListRows.php'"),
+            'listAll() y UpdateList() deben acotar las filas con la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
 
         /*====================================*/
         // Busqueda: columnas y validacion de fechas
@@ -1212,7 +1215,7 @@ class cotizacionListadoTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado de los datos pintados en el listado
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_documento', str_contains($tabla, 'addslashes('),
             'UpdateList.php no escapa la etiqueta del documento que viaja al JavaScript');
         $this->addCase($results, 'tabla_fecha_estandar', str_contains($tabla, 'fechaEstandar('),

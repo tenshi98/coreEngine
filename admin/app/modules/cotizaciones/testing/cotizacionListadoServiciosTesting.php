@@ -303,9 +303,9 @@ class cotizacionListadoServiciosTesting extends ControllerBase {
         $this->contratoPresentacion($results, 'UpdateList', 'UpdateList');
         $this->contratoPresentacion($results, 'GetID', 'formEdit');
 
-        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 3,
-            'las tres vistas deben servirse como modal/parcial con showVista(2,)');
-        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 3,
+        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 4,
+            'las tres vistas (UpdateList con 2 salidas: tabla y filas) deben servirse como modal/parcial con showVista(2,)');
+        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 4,
             'las vistas no resuelven su ruta con returnRutaVista()');
         $this->addCase($results, 'errores_showerror', substr_count($codigo, 'showError(2, $f3, $result)') === 3,
             'las vistas no maneja el fallo de consulta con showError()');
@@ -333,7 +333,10 @@ class cotizacionListadoServiciosTesting extends ControllerBase {
         $this->addCase($results, 'consulta_servicio_por_existencia', str_contains($codigo, "'where'   => 'idExistencia = ?'"),
             'GetID() no consulta el servicio por idExistencia');
         $this->addCase($results, 'consultas_limite', str_contains($codigo, 'ConfigAPP::APP["N_MaxItems"]'),
-            'el listado no acota el numero de filas');
+            'los catalogos (New y GetID) no acotan el numero de filas');
+        $this->addCase($results, 'listado_carga_incremental', substr_count($codigo, "'limit'   => \$page['limit']") === 1 && str_contains($codigo, '$this->getPageParams()')
+            && str_contains($codigo, '$this->sliceMore(') && str_contains($codigo, "header('X-Has-More: ") && str_contains($codigo, "'-UpdateListRows.php'"),
+            'el listado debe acotar las filas con la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
 
         /************************************/
         // Retorno los datos
@@ -795,8 +798,8 @@ class cotizacionListadoServiciosTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 3,
-            'se esperaban 3 vistas de servicios y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 4,
+            'se esperaban 4 vistas (incluye -UpdateListRows) de servicios y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -817,7 +820,7 @@ class cotizacionListadoServiciosTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, 'addslashes('),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idExistencia'])"),

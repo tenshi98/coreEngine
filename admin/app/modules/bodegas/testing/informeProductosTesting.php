@@ -489,12 +489,12 @@ class informeProductosTesting extends ControllerBase {
 
         $this->addCase($results, 'tipoview_pagina', str_contains($codigo, 'showVista(1,'),
             'listAll() no renderiza pagina completa con showVista(1)');
-        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 2,
-            'UpdateList() y View() no renderizan modal con showVista(2)');
+        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 3,
+            'UpdateList() (fragmento de filas y tabla completa) y View() no renderizan modal con showVista(2)');
         $this->addCase($results, 'tipoview_impresion', str_contains($codigo, 'showVista(3,'),
             'Print() no renderiza la pantalla de impresion con showVista(3)');
-        $this->addCase($results, 'rutavista', substr_count($codigo, 'returnRutaVista(') === 4,
-            'los cuatro metodos no resuelven la ruta con returnRutaVista()');
+        $this->addCase($results, 'rutavista', substr_count($codigo, 'returnRutaVista(') === 5,
+            'los cuatro metodos (UpdateList con dos vistas) no resuelven la ruta con returnRutaVista()');
         $this->addCase($results, 'errores_ruta', substr_count($codigo, 'showError(2,') === 3,
             'los metodos de modal no manejan la ruta de error con showError()');
         $this->addCase($results, 'usuario', substr_count($codigo, 'getUserData($f3)') >= 4,
@@ -872,8 +872,8 @@ class informeProductosTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::CONTROLADOR.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 4,
-            'se encontraron '.count($arrVistas).' vistas (esperadas 4)');
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 5,
+            'se encontraron '.count($arrVistas).' vistas (esperadas 5, incluido UpdateListRows)');
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -904,7 +904,8 @@ class informeProductosTesting extends ControllerBase {
         /*====================================*/
         // Escape de los datos pintados en el detalle
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'matriz_escape_identificador',
             str_contains($tabla, "encryptDecrypt('encrypt'"),
             'UpdateList.php no cifra los identificadores antes de pintarlos');

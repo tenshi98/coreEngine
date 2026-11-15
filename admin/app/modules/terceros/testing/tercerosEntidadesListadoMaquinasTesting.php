@@ -46,7 +46,7 @@ class tercerosEntidadesListadoMaquinasTesting extends ControllerBase {
     // Niveles de permiso del catalogo (1=ver, 2=editar, 3=crear, 4=borrar)
     private const NIVELES          = [1, 2, 3, 4];
     // Vistas propias de este controlador (sufijo tras VISTA_BASE.'-')
-    private const VISTAS_PROPIAS   = ['Resumen-Maquinas-formNew', 'Resumen-Maquinas-formEdit', 'Resumen-Maquinas-UpdateList', 'Resumen-Maquinas-View'];
+    private const VISTAS_PROPIAS   = ['Resumen-Maquinas-formNew', 'Resumen-Maquinas-formEdit', 'Resumen-Maquinas-UpdateList', 'Resumen-Maquinas-UpdateListRows', 'Resumen-Maquinas-View'];
 
     /*******************************************************************/
     // Constructor
@@ -412,8 +412,8 @@ class tercerosEntidadesListadoMaquinasTesting extends ControllerBase {
             'UpdateList() no une el nombre de la maquina y el estado');
         $this->addCase($results, 'lista_orden', str_contains($lista, 'terceros_entidades_listado_maquinas.Fecha DESC'),
             'UpdateList() no ordena por fecha descendente');
-        $this->addCase($results, 'lista_limite', str_contains($lista, 'N_MaxItems'),
-            'UpdateList() no acota la cantidad de filas con N_MaxItems');
+        $this->addCase($results, 'lista_limite', str_contains($lista, "'limit'   => \$page['limit']") && str_contains($lista, '$this->getPageParams()') && str_contains($lista, '$this->sliceMore(') && !str_contains($lista, 'N_MaxItems'),
+            'UpdateList() debe acotar las filas por bloques con getPageParams()/sliceMore() (carga incremental, ADR-0022)');
         $this->addCase($results, 'lista_entrega_datos', str_contains($lista, "'arrMaq'") && str_contains($lista, "'Fnc_DataDate'"),
             'UpdateList() no entrega arrMaq y Fnc_DataDate a la vista');
 
@@ -1101,7 +1101,9 @@ class tercerosEntidadesListadoMaquinasTesting extends ControllerBase {
         /*====================================*/
         // Los identificadores de la tabla viajan cifrados y el rotulo del borrado se escapa
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaVista('Resumen-Maquinas-UpdateList'));
+        // La tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+        $tabla = $this->codigoFuente($this->rutaVista('Resumen-Maquinas-UpdateList'))
+            . $this->codigoFuente($this->rutaVista('Resumen-Maquinas-UpdateListRows'));
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt'"),
             'UpdateList no cifra el ID de la asignacion antes de pintarlo');
         $this->addCase($results, 'tabla_escape_rotulo_borrado', str_contains($tabla, 'addslashes('),

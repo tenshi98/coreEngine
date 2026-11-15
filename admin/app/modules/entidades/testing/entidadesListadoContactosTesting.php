@@ -323,8 +323,8 @@ class entidadesListadoContactosTesting extends ControllerBase {
         $this->contratoPresentacion($results, 'View', 'View');
         $this->contratoPresentacion($results, 'GetID', 'formEdit');
 
-        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 4,
-            'las cuatro vistas deben servirse como modal/parcial con showVista(2,)');
+        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 5,
+            'las cuatro vistas deben servirse como modal/parcial con showVista(2,): UpdateList() usa dos (tabla completa y fragmento de filas, ADR-0022)');
         $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 4,
             'las vistas no resuelven su ruta con returnRutaVista()');
         $this->addCase($results, 'errores_showerror', substr_count($codigo, 'showError(2, $f3, $result)') === 4,
@@ -355,14 +355,14 @@ class entidadesListadoContactosTesting extends ControllerBase {
         $this->addCase($results, 'listado_por_entidad', str_contains($codigo, "'where'   => 'entidades_listado_contactos.idEntidad = ?'"),
             'UpdateList() no filtra los contactos por entidad');
         $this->addCase($results, 'listado_ordenado',
-            str_contains($codigo, "'order'   => 'entidades_listado_contactos.ApellidoPat ASC, entidades_listado_contactos.ApellidoMat ASC, entidades_listado_contactos.Nombre ASC'"),
+            str_contains($codigo, "'order'   => 'entidades_listado_contactos.ApellidoPat ASC, entidades_listado_contactos.ApellidoMat ASC, entidades_listado_contactos.Nombre ASC, entidades_listado_contactos.idContacto ASC'"),
             'UpdateList() no ordena los contactos por apellidos y nombre');
         $this->addCase($results, 'detalle_por_contacto', str_contains($codigo, "'where'   => 'entidades_listado_contactos.idContacto = ?'"),
             'View() no consulta el contacto por idContacto');
         $this->addCase($results, 'getid_por_contacto', str_contains($codigo, "'where'   => 'idContacto = ?'") && str_contains($codigo, 'entidades_listado.idTipo'),
             'GetID() no consulta el contacto por idContacto junto al tipo de su entidad');
-        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 8,
-            'se esperaban 8 consultas de lista acotadas por N_MaxItems');
+        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 7 && substr_count($codigo, "'limit'   => \$page['limit']") === 1 && str_contains($codigo, '$this->getPageParams()'),
+            'se esperaban 7 consultas acotadas por N_MaxItems y la de UpdateList() por getPageParams() (carga incremental, ADR-0022)');
 
         /************************************/
         // Retorno los datos
@@ -872,8 +872,8 @@ class entidadesListadoContactosTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 4,
-            'se esperaban 4 vistas de contactos y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 5,
+            'se esperaban 5 vistas (incluye el parcial -UpdateListRows, ADR-0022) de contactos y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -894,7 +894,8 @@ class entidadesListadoContactosTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php')) // la tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+            . $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, 'addslashes('),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idContacto'])"),

@@ -42,7 +42,7 @@ class serviciosListadoTesting extends ControllerBase {
     private const NIVELES          = [1, 2, 3, 4];
     /*=========== Vistas propias del controlador ===========*/
     private const VISTAS           = [
-        'List', 'UpdateList', 'View', 'formNew', 'formSearch', 'Resumen', 'Resumen-Update',
+        'List', 'UpdateList', 'UpdateListRows', 'View', 'formNew', 'formSearch', 'Resumen', 'Resumen-Update',
     ];
     /*=========== Controladores del modulo (instalador) ===========*/
     private const CONTROLADORES    = [
@@ -489,8 +489,14 @@ class serviciosListadoTesting extends ControllerBase {
         $this->addCase($results, 'listall_catalogos',
             str_contains($cuerpo, "'table'   => 'core_estados'") && str_contains($cuerpo, "'table'   => 'servicios_categorias'"),
             'listAll() no carga los catalogos de estados y categorias');
-        $this->addCase($results, 'listall_limite', substr_count($cuerpo, 'ConfigAPP::APP["N_MaxItems"]') === 3,
-            'las 3 consultas de listAll() deben acotarse con N_MaxItems');
+        $this->addCase($results, 'listall_limite', substr_count($cuerpo, 'ConfigAPP::APP["N_MaxItems"]') === 2,
+            'las 2 consultas de catalogo de listAll() deben acotarse con N_MaxItems');
+        $this->addCase($results, 'listall_carga_incremental', substr_count($cuerpo, "'limit'   => \$page['limit']") === 1 && str_contains($cuerpo, '$this->getPageParams()') && str_contains($cuerpo, '$this->sliceMore('),
+            'listAll() debe leer el primer bloque con la carga incremental (limit $page, getPageParams, sliceMore)');
+        $cuerpoUpd = $this->cuerpoMetodo('UpdateList');
+        $this->addCase($results, 'updatelist_carga_incremental', substr_count($cuerpoUpd, "'limit'   => \$page['limit']") === 1 && str_contains($cuerpoUpd, '$this->getPageParams()') && str_contains($cuerpoUpd, '$this->sliceMore(')
+            && str_contains($cuerpoUpd, "header('X-Has-More: ") && str_contains($cuerpoUpd, "'-UpdateListRows.php'"),
+            'UpdateList() debe usar la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
         $this->addCase($results, 'listall_errores_fusionados',
             str_contains($cuerpo, 'mergeResponses([$arrList,$arrEstado,$arrCategoria])'),
             'listAll() no fusiona las respuestas de sus 3 consultas');
@@ -1574,8 +1580,8 @@ class serviciosListadoTesting extends ControllerBase {
         /*====================================*/
         // Vistas propias (se excluyen las de Documentos y Observaciones)
         /*====================================*/
-        $this->addCase($results, 'hay_vistas', count(self::VISTAS) === 7,
-            'se esperan 7 vistas propias del controlador '.self::CONTROLADOR);
+        $this->addCase($results, 'hay_vistas', count(self::VISTAS) === 8,
+            'se esperan 8 vistas (incluye -UpdateListRows) propias del controlador '.self::CONTROLADOR);
 
         foreach (self::VISTAS as $vista) {
             $nombre = self::CONTROLADOR.'-'.$vista.'.php';

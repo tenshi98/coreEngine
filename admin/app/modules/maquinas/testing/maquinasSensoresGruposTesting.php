@@ -316,7 +316,7 @@ class maquinasSensoresGruposTesting extends ControllerBase {
                 $nombre.' contiene una consulta SQL embebida');
         }
 
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_entidad', str_contains($tabla, 'addslashes('),
             'UpdateList.php no escapa la etiqueta de la entidad');
 

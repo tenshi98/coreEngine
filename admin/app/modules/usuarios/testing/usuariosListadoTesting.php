@@ -1354,7 +1354,9 @@ class usuariosListadoTesting extends ControllerBase {
         /*====================================*/
         // Escape e identificadores en el listado
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        // La tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))
+            . $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_entidad', str_contains($tabla, 'addslashes('),
             'UpdateList.php no escapa la etiqueta de la entidad usada en el JavaScript de borrado');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idUsuario'])"),

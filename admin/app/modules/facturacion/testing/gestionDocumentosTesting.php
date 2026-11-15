@@ -451,8 +451,15 @@ class gestionDocumentosTesting extends ControllerBase {
             'UpdateList() no valida las fechas con searchValidateDates()');
         $this->addCase($results, 'busqueda_where_preparado', substr_count($codigo, '$this->searchWhere(') === 3,
             'UpdateList() no construye el WHERE con los tres tipos de searchWhere()');
-        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 22,
-            'se esperaban 22 consultas de lista acotadas por N_MaxItems');
+        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 20,
+            'se esperaban 20 consultas de catalogo/detalle acotadas por N_MaxItems (listAll y UpdateList paginan por bloques)');
+        // Carga incremental (ADR-0022): cada lista toma el limite de getPageParams() y recorta con sliceMore()
+        $this->addCase($results, 'carga_incremental',
+            substr_count($codigo, '$this->getPageParams()') === 2 && substr_count($codigo, '\'limit\'   => $page[\'limit\']') === 2 && substr_count($codigo, '$this->sliceMore(') === 2,
+            'se esperaban 2 lista(s) con getPageParams(), limite de bloque y sliceMore()');
+        $this->addCase($results, 'carga_incremental_fragmento',
+            substr_count($codigo, "header('X-Has-More: ") === 1 && substr_count($codigo, "header('X-Next-Offset: ") === 1 && substr_count($codigo, '-UpdateListRows.php') === 1,
+            'UpdateList() debe responder el fragmento de filas con X-Has-More y X-Next-Offset');
         $this->addCase($results, 'detalle_subrecursos',
             str_contains($codigo, "'where'   => 'facturacion_listado_productos.idFacturacion = ?'")
             && str_contains($codigo, "'where'   => 'facturacion_listado_servicios.idFacturacion = ?'")
@@ -916,7 +923,7 @@ class gestionDocumentosTesting extends ControllerBase {
         $comillas = $this->datosSinteticos(4);
         $comillas['arrList'][0]['Documento'] = "Factura d'prueba";
         $tablaComillas = $this->renderizarVista($rutaTabla, $comillas, $BASE, $f3);
-        $this->addCase($results, 'tabla_escapa_comillas', str_contains($tablaComillas, "Factura d\\'prueba 1001"),
+        $this->addCase($results, 'tabla_escapa_comillas', str_contains($tablaComillas, "Factura d\'prueba 1001"),
             'la etiqueta del borrado no escapa las comillas simples');
 
         $vacio = $this->datosSinteticos(4);
@@ -1287,7 +1294,8 @@ class gestionDocumentosTesting extends ControllerBase {
         /*====================================*/
         // Escape, cifrado y formato en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));  // filas en el parcial (ADR-0022)
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, 'addslashes($crud[\'Documento\']'),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idFacturacion'])"),

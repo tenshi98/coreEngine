@@ -338,10 +338,10 @@ class kanbanTablerosTesting extends ControllerBase {
         }
         $this->addCase($results, 'tipoview_listAll', substr_count($codigo, 'showVista(1,') === 1,
             'listAll() debe usar showVista(1) (pagina completa)');
-        $this->addCase($results, 'tipoview_fragmentos', substr_count($codigo, 'showVista(2,') === 3,
-            'UpdateList(), View() y GetID() deben usar showVista(2) (fragmentos)');
-        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 4,
-            'las cuatro vistas deben resolver su ruta con returnRutaVista()');
+        $this->addCase($results, 'tipoview_fragmentos', substr_count($codigo, 'showVista(2,') === 4,
+            'UpdateList() (tabla y filas), View() y GetID() deben usar showVista(2) (4 llamadas)');
+        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 5,
+            'las cuatro vistas (UpdateList con 2 salidas: tabla y filas) deben resolver su ruta con returnRutaVista()');
         $this->addCase($results, 'usuario_en_vistas', substr_count($codigo, 'getUserData($f3)') === 4,
             'las vistas no obtienen los datos del usuario');
         $this->addCase($results, 'nivel_en_vistas', substr_count($codigo, 'getArrLevel($f3, $this->controllerName)') === 4,
@@ -364,14 +364,17 @@ class kanbanTablerosTesting extends ControllerBase {
             substr_count($codigo, 'LEFT JOIN core_estados_colores   ON core_estados_colores.idColor = kanban_estados.idColor') === 3
             && substr_count($codigo, 'LEFT JOIN core_opciones          ON core_opciones.idOpciones     = kanban_estados.idCierre') === 3,
             'listAll(), UpdateList() y View() deben unir el color y la opcion de cierre');
-        $this->addCase($results, 'listado_orden_prioridad', substr_count($codigo, "'order'   => 'kanban_estados.idPrioridad ASC'") === 2,
+        $this->addCase($results, 'listado_orden_prioridad', substr_count($codigo, "'order'   => 'kanban_estados.idPrioridad ASC, kanban_estados.idKanbanEstado ASC'") === 2,
             'listAll() y UpdateList() deben ordenar por prioridad');
         $this->addCase($results, 'listado_catalogos',
             str_contains($codigo, "'table'   => 'core_estados_colores'") && str_contains($codigo, "'table'   => 'core_opciones'")
             && substr_count($codigo, "'order'   => 'Nombre ASC'") === 4,
             'listAll() y GetID() deben cargar los catalogos de colores y cierre ordenados por Nombre');
-        $this->addCase($results, 'consultas_acotadas', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 6,
-            'las 6 consultas de listado deben acotar el numero de filas');
+        $this->addCase($results, 'consultas_acotadas', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 4,
+            'las 4 consultas de catalogo (listAll y GetID) deben acotar el numero de filas con N_MaxItems');
+        $this->addCase($results, 'listado_carga_incremental', substr_count($codigo, "'limit'   => \$page['limit']") === 2 && str_contains($codigo, '$this->getPageParams()')
+            && str_contains($codigo, '$this->sliceMore(') && str_contains($codigo, "header('X-Has-More: ") && str_contains($codigo, "'-UpdateListRows.php'"),
+            'listAll() y UpdateList() deben usar la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
 
         /*====================================*/
         // Busqueda: columnas, validacion de fechas y WHERE preparado
@@ -1053,8 +1056,8 @@ class kanbanTablerosTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::CONTROLADOR.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 6,
-            'se esperaban 6 vistas de kanbanTableros y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 7,
+            'se esperaban 7 vistas (incluye -UpdateListRows) de kanbanTableros y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -1075,7 +1078,7 @@ class kanbanTablerosTesting extends ControllerBase {
         /*====================================*/
         // Cifrado de los IDs y acciones por nivel en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idKanbanEstado'])"),
             'UpdateList no cifra idKanbanEstado en las acciones');
         $this->addCase($results, 'tabla_acciones_por_nivel',

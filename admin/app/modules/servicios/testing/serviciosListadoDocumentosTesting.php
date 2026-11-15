@@ -347,9 +347,9 @@ class serviciosListadoDocumentosTesting extends ControllerBase {
         $this->contratoPresentacion($results, 'View', 'View');
         $this->contratoPresentacion($results, 'GetID', 'formEdit');
 
-        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 4,
+        $this->addCase($results, 'tipoview_modal', substr_count($codigo, 'showVista(2,') === 5,
             'las cuatro vistas deben servirse como modal/parcial con showVista(2,)');
-        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 4,
+        $this->addCase($results, 'rutavista_resuelta', substr_count($codigo, 'returnRutaVista(__DIR__') === 5,
             'las vistas no resuelven su ruta con returnRutaVista()');
         $this->addCase($results, 'errores_showerror', substr_count($codigo, 'showError(2, $f3, $result)') === 4,
             'las vistas no manejan el fallo de consulta con showError()');
@@ -377,8 +377,9 @@ class serviciosListadoDocumentosTesting extends ControllerBase {
             'GetID() no consulta los campos editables del documento');
         $this->addCase($results, 'getid_sin_archivo', !preg_match("/'data'\s*=>\s*'idDocumentos,idServicio,Nombre,NombreArchivo/", $codigo),
             'GetID() expone el nombre del archivo en el formulario de edicion');
-        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 1,
-            'solo UpdateList() debe acotar el numero de filas con N_MaxItems');
+        $this->addCase($results, 'consultas_limite', substr_count($codigo, "'limit'   => \$page['limit']") === 1 && str_contains($codigo, '$this->getPageParams()')
+            && str_contains($codigo, '$this->sliceMore(') && str_contains($codigo, "header('X-Has-More: ") && str_contains($codigo, "'-UpdateListRows.php'"),
+            'solo UpdateList() debe acotar las filas con la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
         $this->addCase($results, 'sin_catalogos', substr_count($codigo, 'Base_GetList(') === 1,
             'los documentos no usan catalogos: solo UpdateList() lista con Base_GetList()');
 
@@ -1068,8 +1069,8 @@ class serviciosListadoDocumentosTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 4,
-            'se esperaban 4 vistas de documentos y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 5,
+            'se esperaban 5 vistas (incluye -UpdateListRows) de documentos y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -1090,7 +1091,7 @@ class serviciosListadoDocumentosTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, 'addslashes('),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idDocumentos'])"),

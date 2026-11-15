@@ -307,7 +307,7 @@ class serviciosListadoObservacionesTesting extends ControllerBase {
         /*====================================*/
         // Vistas del sub-recurso (nombres reales Resumen-Observaciones)
         /*====================================*/
-        $arrVistas = ['formEdit', 'formNew', 'UpdateList', 'View'];
+        $arrVistas = ['formEdit', 'formNew', 'UpdateList', 'UpdateListRows', 'View'];
         $this->addCase($results, 'hay_vistas',
             count(glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php'))) === count($arrVistas),
             'el sub-recurso debe tener exactamente '.count($arrVistas).' vistas '.self::VISTA_BASE.'-*');
@@ -410,8 +410,9 @@ class serviciosListadoObservacionesTesting extends ControllerBase {
             'UpdateList() no resuelve el autor y el editor de cada observacion');
         $this->addCase($results, 'lista_orden', str_contains($lista, "'order'   => 'servicios_listado_observaciones.idObservaciones ASC'"),
             'UpdateList() no ordena por idObservaciones ascendente');
-        $this->addCase($results, 'lista_limite', str_contains($lista, 'ConfigAPP::APP["N_MaxItems"]'),
-            'UpdateList() no limita con N_MaxItems');
+        $this->addCase($results, 'lista_limite', substr_count($lista, "'limit'   => \$page['limit']") === 1 && str_contains($lista, '$this->getPageParams()')
+            && str_contains($lista, '$this->sliceMore(') && str_contains($lista, "header('X-Has-More: ") && str_contains($lista, "'-UpdateListRows.php'"),
+            'UpdateList() debe limitar con la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
 
         $view = $this->cuerpoMetodo('View');
         $this->addCase($results, 'view_filtra_observacion',
@@ -1195,8 +1196,8 @@ class serviciosListadoObservacionesTesting extends ControllerBase {
         // Vistas involucradas (nombres reales Resumen-Observaciones)
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 4,
-            'se esperaban 4 vistas '.self::VISTA_BASE.'-* y hay '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 5,
+            'se esperaban 5 vistas (incluye -UpdateListRows) '.self::VISTA_BASE.'-* y hay '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);

@@ -66,6 +66,10 @@ class entidadesListadoTesting extends ControllerBase {
         $inicio = 'public function '.$metodo.'(';
         $pos = strpos($codigo, $inicio);
         if ($pos === false) {
+            $inicio = 'private function '.$metodo.'(';
+            $pos = strpos($codigo, $inicio);
+        }
+        if ($pos === false) {
             return '';
         }
         $fragmento = substr($codigo, $pos + strlen($inicio));
@@ -424,8 +428,8 @@ class entidadesListadoTesting extends ControllerBase {
             'las 6 vistas deben agrupar respuestas con mergeResponses()');
         $this->addCase($results, 'nivel_en_vistas', substr_count($codigo, 'getArrLevel($f3, $this->controllerName)') === 6,
             'las 6 vistas deben resolver el nivel de acceso');
-        $this->addCase($results, 'usuario_en_vistas', substr_count($codigo, 'getUserData($f3)') === 7,
-            'se esperaban 7 lecturas de getUserData($f3) (6 vistas y View)');
+        $this->addCase($results, 'usuario_en_vistas', substr_count($codigo, 'getUserData($f3)') === 8,
+            'se esperaban 8 lecturas de getUserData($f3) (6 vistas, View y exportExcel)');
 
         /*====================================*/
         // Metadatos y catalogos del listado
@@ -446,8 +450,8 @@ class entidadesListadoTesting extends ControllerBase {
         $this->addCase($results, 'listado_catalogos_estado_exito',
             str_contains($codigo, '$arrList[\'status\'] && $arrEstado[\'status\'] && $arrSector[\'status\'] && $arrSexo[\'status\'] && $arrTipo[\'status\'] && $arrTipoEntidad[\'status\'] && $arrCiudad[\'status\'] && $arrComuna[\'status\']'),
             'listAll() no exige que todas las consultas hayan respondido antes de pintar');
-        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 21,
-            'se esperaban 21 consultas de lista acotadas por N_MaxItems');
+        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 19,
+            'se esperaban 19 consultas de lista acotadas por N_MaxItems (listAll/UpdateList usan getPageParams())');
 
         /*====================================*/
         // Busqueda: columnas, validacion de fechas y WHERE preparado
@@ -468,7 +472,8 @@ class entidadesListadoTesting extends ControllerBase {
         /*====================================*/
         // Exportar: solo lectura y sin limite de campos sensibles
         /*====================================*/
-        $export = substr($codigo, (int)strpos($codigo, 'public function export('), 4500);
+        // La consulta vive en getDataExport() (compartida por export() y exportExcel())
+        $export = $this->cuerpoMetodo($codigo, 'export').$this->cuerpoMetodo($codigo, 'getDataExport');
         $this->addCase($results, 'export_sin_password', !str_contains($export, 'entidades_listado.password'),
             'export() consulta la contrasena de la entidad');
         $this->addCase($results, 'export_sin_escritura', !str_contains($export, 'Base_insert') && !str_contains($export, 'Base_update') && !str_contains($export, 'Base_delete'),
@@ -658,6 +663,7 @@ class entidadesListadoTesting extends ControllerBase {
             'busqueda'       => ['2 '.self::RUTA_WEB.'/search',           'entidadesListado->UpdateList',    1],
             'refrescar'      => ['1 '.self::RUTA_WEB.'/updateList',       'entidadesListado->UpdateList',    2],
             'exportar'       => ['1 '.self::RUTA_WEB.'/exportar',         'entidadesListado->export',        3],
+            'exportar_excel' => ['2 '.self::RUTA_WEB.'/exportExcel',      'entidadesListado->exportExcel',   3],
             'ver'            => ['1 '.self::RUTA_WEB.'/view/@id',         'entidadesListado->View',          1],
             'resumen'        => ['1 '.self::RUTA_WEB.'/resumen/@id',      'entidadesListado->Resumen',       2],
             'resumen_update' => ['1 '.self::RUTA_WEB.'/resumenUpdate/@id', 'entidadesListado->ResumenUpdate', 2],
@@ -689,8 +695,8 @@ class entidadesListadoTesting extends ControllerBase {
         // Rutas propias del controlador y matriz de verbos
         /*====================================*/
         $propias = array_filter($rutas, static function ($r) { return $r[2] === 'entidadesListado'; });
-        $this->addCase($results, 'rutas_propias_completas', count($propias) === 11,
-            'se esperaban 11 rutas de '.self::CONTROLADOR.' y hay '.count($propias));
+        $this->addCase($results, 'rutas_propias_completas', count($propias) === 12,
+            'se esperaban 12 rutas de '.self::CONTROLADOR.' y hay '.count($propias));
         foreach ($propias as $clave => $datos) {
             $verbo = (int)substr($clave, 0, 1);
             if (str_ends_with($datos[0], '->Insert') || str_ends_with($datos[0], '->Update')) {
@@ -711,6 +717,105 @@ class entidadesListadoTesting extends ControllerBase {
             'el instalador no declara el permiso con su ruta y controlador');
         $this->addCase($results, 'instalador_desinstala_controlador', str_contains($instalador, "\$RutaController .= ',\"entidadesListado\"'"),
             'RutaController() no lista entidadesListado y dejaria rutas huerfanas al desinstalar');
+
+        /************************************/
+        // Retorno los datos
+        return $results;
+
+    }
+
+    /******************************************************************************/
+    /*                       EXPORTACION A EXCEL (SERVIDOR)                       */
+    /******************************************************************************/
+    /**
+     * Verifica la exportacion a Excel real (`exportExcel`, POST, ADR-0021): `exportExcel` termina la
+     * peticion (`exit`), por eso no se ejecuta; se comprueba su codigo, ruta, boton y columnas.
+     *
+     * @return array Resultado por caso
+     */
+    public function exportacionServidorTest(){
+
+        $results = [];
+        $src     = $this->fuenteControlador();
+        $exp     = $this->cuerpoMetodo($src, 'exportExcel');
+        $vista   = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-Exportar.php'));
+        $lista   = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-List.php'));
+        $inst    = $this->codigoFuente($this->rutaModulo('../installer/entidadesInstaller.php'));
+
+        /*=========== Metodo: POST, orden y reglas ===========*/
+        $this->addCase($results, 'export_metodo_post', str_contains($exp, "\$_SERVER['REQUEST_METHOD'] !== 'POST'") && str_contains($exp, "Response::error('Método no permitido', 405)"),
+            'exportExcel debe exigir POST (405)');
+        $this->addCase($results, 'export_usa_getDataExport', str_contains($exp, '$this->getDataExport(') && str_contains($this->cuerpoMetodo($src, 'export'), '$this->getDataExport()'),
+            'export() y exportExcel() deben compartir getDataExport()');
+        $this->addCase($results, 'export_sin_filtro', !str_contains($exp, 'armarFiltro') && !str_contains($exp, '$_POST') && !str_contains($exp, '$_GET'),
+            'la pagina -Exportar no filtra: exportExcel no debe leer parametros');
+        $pos = [];
+        foreach (['REQUEST_METHOD', '->auditReject(', '->acquire(', '429', '$Export->commit()', '$this->getDataExport(', '$Export->release()', '->download('] as $marca) {
+            $pos[] = strpos($exp, $marca);
+        }
+        $ordenado = !in_array(false, $pos, true);
+        for ($i = 1; $ordenado && $i < count($pos); $i++) { $ordenado = $pos[$i] > $pos[$i - 1]; }
+        $this->addCase($results, 'export_orden_limite_consulta', $ordenado, 'orden: verbo, limite (429), commit, consulta, descarga');
+        $this->addCase($results, 'export_auditReject_405_429', str_contains($exp, "->auditReject(\$this->controllerName, '', 405);") && str_contains($exp, "\$Export->auditReject(\$this->controllerName, '', 429);"),
+            'los rechazos 405 y 429 deben auditarse (H-04)');
+        $this->addCase($results, 'export_commit_sin_filtro', substr_count($exp, '$Export->commit()') === 1 && strpos($exp, '$Export->commit()') > strpos($exp, "Response::error(\$limite, 429)"),
+            'sin filtros, commit() va justo tras superar el limite');
+        $this->addCase($results, 'export_500_release_audit', (bool) preg_match("/\\\$Export->release\\(\\);\\s*\\\$Export->auditReject\\(\\\$this->controllerName, '', 500\\);\\s*Response::error\\('No se pudo generar la exportación', 500\\)/", $exp),
+            'el 500 debe liberar, auditar y responder generico');
+        $this->addCase($results, 'export_consulta_error_500', str_contains($exp, "Response::error('No se pudo generar la exportación', 500)"),
+            'un fallo de consulta debe responder 500 generico');
+        $this->addCase($results, 'export_limite_Q12', str_contains($exp, '$Export->acquire($userId)') && str_contains($exp, 'Response::error($limite, 429)'),
+            'exportExcel debe aplicar el limite de frecuencia/concurrencia y responder 429');
+        $this->addCase($results, 'export_auditoria_Q11', str_contains($exp, "'audit'     => ['controller' => \$this->controllerName, 'userId' => \$userId]"),
+            'exportExcel debe pedir la auditoria al descargar');
+        $this->addCase($results, 'export_truncado', str_contains($exp, 'count($data) > $maxRows') && str_contains($exp, 'FunctionsExportExcel::maxRows()'),
+            'debe avisar el truncado al superar el tope N_MaxExportRows');
+        $this->addCase($results, 'export_hoja_filtros', str_contains($exp, "'filters'   => []") && str_contains($exp, "'user'      => (string) (\$userData['UserName']"),
+            'la hoja Filtros debe llevar el usuario (sin filtros)');
+        $this->addCase($results, 'export_nombre_fijo', str_contains($exp, "->download('Entidades'") && !preg_match('/download\(\s*\$_(POST|GET|REQUEST)/', $exp),
+            'el nombre del archivo lo fija el servidor');
+        $this->addCase($results, 'export_sin_formatear_en_php', !str_contains($exp, 'number_format') && !str_contains($exp, 'htmlspecialchars') && !str_contains($exp, 'fechaEstandar') && !str_contains($exp, 'formatPhone'),
+            'las filas deben ser valores crudos');
+        $this->addCase($results, 'export_sin_password', !str_contains($exp, 'password') && !str_contains($this->cuerpoMetodo($src, 'getDataExport'), 'password'),
+            'la exportacion no debe incluir la contrasena');
+        $this->addCase($results, 'export_sin_legado', !preg_match('/PhpSpreadsheet|PHPExcel|fputcsv|ZipArchive|Content-Disposition/', $src) && str_contains($src, 'new FunctionsExportExcel()'),
+            'el controlador usa el helper; no debe usar librerias ni cabeceras de descarga');
+
+        /*=========== Columnas = columnas de la vista ===========*/
+        $claves  = ['Nombre', 'Nick', 'Rut', 'Ciudad', 'Comuna', 'Sector', 'Direccion', 'FNacimiento', 'Email', 'Fono1', 'Fono2', 'Web', 'Giro', 'Tipo', 'TipoEntidad', 'Estado', 'Sexo', 'RepLegalNombre', 'RepLegalRut', 'RepLegalEmail', 'RepLegalFono1', 'RepLegalFono2', 'Social_X', 'Social_Facebook', 'Social_Instagram', 'Social_Linkedin'];
+        $okCols  = preg_match_all("/\['key' => '([A-Za-z_0-9]+)',\s*'label' => '([^']+)',\s*'type' => '([a-z]+)'/", $exp, $m) === 26 && $m[1] === $claves;
+        $this->addCase($results, 'export_columnas_vista', $okCols, 'exportExcel debe declarar las 26 columnas de la vista, en su orden');
+        $this->addCase($results, 'export_columnas_tipos', $okCols && $m[3][7] === 'date' && count(array_unique(array_diff_key($m[3], [7 => 1]))) === 1,
+            'tipos: FNacimiento como date y el resto text');
+        $okVista = $okCols;
+        if ($okCols) {
+            preg_match_all('/<th scope="col">([^<]+)<\/th>/', $vista, $th);
+            $okVista = count($th[1]) === 26;
+            foreach ($th[1] as $i => $cab) {
+                $okVista = $okVista && trim(html_entity_decode($cab)) === $m[2][$i];
+            }
+        }
+        $this->addCase($results, 'export_columnas_igual_cabecera_vista', $okVista, 'las etiquetas deben ser las cabeceras de la vista -Exportar');
+
+        /*=========== Ruta: unica POST, nivel 3 ===========*/
+        $rutas = $this->rutasInstalador();
+        $clave = '2 '.self::RUTA_WEB.'/exportExcel';
+        $this->addCase($results, 'export_ruta_nivel_3', isset($rutas[$clave]) && $rutas[$clave][0] === 'entidadesListado->exportExcel' && $rutas[$clave][1] === 3,
+            'la ruta POST exportExcel debe exigir nivel 3');
+        $this->addCase($results, 'ruta_exportExcel_unica_post', substr_count($inst, "'RutaWeb' => 'administracion/entidades/listado/exportExcel'") === 1 && !isset($rutas['1 '.self::RUTA_WEB.'/exportExcel']),
+            'exportExcel debe publicarse una sola vez y solo con POST');
+
+        /*=========== Vista: boton servidor, sin tabla oculta ni legado ===========*/
+        $this->addCase($results, 'export_boton_Exportar', str_contains($vista, 'exportExcelServer(this)') && str_contains($vista, "'/exportExcel'") && substr_count($vista, 'exportExcelServer(') === 1,
+            'la vista -Exportar debe tener un unico boton exportExcelServer');
+        $this->addCase($results, 'export_boton_url_RouteAccess', str_contains($vista, "\$BASE.'/'.\$data['UserAccess']['RouteAccess'].'/exportExcel'"),
+            'la URL del boton debe construirse con RouteAccess');
+        $this->addCase($results, 'export_boton_nivel_3_en_vista', (bool) preg_match("/LevelAccess'\]>=3\)\{ \?>\s*<button[^\n]*exportExcelServer/", $vista),
+            'el boton solo se muestra con nivel >= 3');
+        $this->addCase($results, 'export_boton_no_en_List', !str_contains($lista, 'exportExcelServer'),
+            'el listado no debe ofrecer el boton exportExcel');
+        $this->addCase($results, 'export_sin_tableData', !str_contains($vista, 'tableData'), 'sin tabla/id tableData de exportacion');
+        $this->addCase($results, 'export_sin_exportTableToExcel', !str_contains($vista, 'exportTableToExcel'), 'sin exportTableToExcel');
 
         /************************************/
         // Retorno los datos
@@ -1049,19 +1154,19 @@ class entidadesListadoTesting extends ControllerBase {
         $datosExport = $this->datosSinteticos(3);
         $datosExport['arrList'] = [array_merge($datosExport['rowData'], ['Estado' => 'Activo'])];
         $html = $this->renderizarVista($rutaExport, $datosExport, $BASE, $f3);
-        $this->addCase($results, 'export_render', $html !== '' && str_contains($html, 'id="tableData"'),
-            'la vista Exportar no dibuja la tabla tableData');
+        $this->addCase($results, 'export_render', $html !== '' && str_contains($html, '<table'),
+            'la vista Exportar no dibuja la tabla');
         $this->addCase($results, 'export_columnas',
             str_contains($html, '>Rut<') && str_contains($html, '>Email<') && str_contains($html, '>Estado<'),
             'la vista Exportar no declara las columnas Rut, Email y Estado');
         $this->addCase($results, 'export_datos', str_contains($html, 'Entidad Prueba SpA') && str_contains($html, '76.000.000-0'),
             'la vista Exportar no pinta la entidad sintetica');
-        $this->addCase($results, 'export_boton_nivel3', str_contains($html, "exportTableToExcel('tableData', 'Entidades')"),
-            'con nivel 3 la vista Exportar no ofrece exportar a Excel');
+        $this->addCase($results, 'export_boton_nivel3', str_contains($html, 'onclick="exportExcelServer(this)"') && str_contains($html, '/exportExcel"') && str_contains($html, 'data-export-filename="Entidades"'),
+            'con nivel 3 la vista Exportar no ofrece exportar a Excel (exportExcelServer)');
         $datosExport1 = $datosExport;
         $datosExport1['UserAccess']['LevelAccess'] = 1;
         $html1 = $this->renderizarVista($rutaExport, $datosExport1, $BASE, $f3);
-        $this->addCase($results, 'export_sin_boton_nivel1', $html1 !== '' && !str_contains($html1, 'exportTableToExcel('),
+        $this->addCase($results, 'export_sin_boton_nivel1', $html1 !== '' && !str_contains($html1, 'exportExcelServer(') && !str_contains($html1, 'exportTableToExcel('),
             'con nivel 1 la vista Exportar ofrece exportar a Excel');
         $this->addCase($results, 'export_sin_password', !str_contains($html, 'Contraseña') && !stripos($html, 'password'),
             'la vista Exportar expone la contrasena');
@@ -1233,8 +1338,8 @@ class entidadesListadoTesting extends ControllerBase {
         $arrVistas = array_values(array_filter($arrVistas, static function ($r) {
             return !preg_match('/-Resumen-(Cargas|Contactos|Documentos|Observaciones)-/', basename($r));
         }));
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 8,
-            'se esperaban 8 vistas propias de '.self::CONTROLADOR.' y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 9,
+            'se esperaban 9 vistas propias (incluye el parcial -UpdateListRows, ADR-0022) de '.self::CONTROLADOR.' y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -1258,7 +1363,8 @@ class entidadesListadoTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php')) // la tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+            . $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, 'addslashes($Entidad)'),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idEntidad'])"),

@@ -287,6 +287,7 @@ class productosCategoriasTesting extends ControllerBase {
         $arrVistas = [
             'productosCategorias-List.php',
             'productosCategorias-UpdateList.php',
+            'productosCategorias-UpdateListRows.php',
             'productosCategorias-View.php',
             'productosCategorias-formNew.php',
             'productosCategorias-formEdit.php',
@@ -1088,7 +1089,7 @@ class productosCategoriasTesting extends ControllerBase {
         /*====================================*/
         // Escape antes de pintar
         /*====================================*/
-        $vistaListado = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $vistaListado = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape', str_contains($vistaListado, 'addslashes('),
             'UpdateList no escapa el nombre antes de pasarlo al JS de borrado');
         $this->addCase($results, 'tabla_id_cifrado',

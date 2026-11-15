@@ -691,8 +691,8 @@ class bodegasListadoObservacionesTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 4,
-            'se encontraron '.count($arrVistas).' vistas (esperadas 4)');
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 5,
+            'se encontraron '.count($arrVistas).' vistas (esperadas 5, incluido UpdateListRows)');
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -713,7 +713,8 @@ class bodegasListadoObservacionesTesting extends ControllerBase {
         /*====================================*/
         // Escape de los datos pintados en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_fecha', str_contains($tabla, 'fechaEstandar('),
             'UpdateList.php no normaliza la fecha antes de pintarla');
         $this->addCase($results, 'tabla_autor_negrita', str_contains($tabla, '<strong>'),

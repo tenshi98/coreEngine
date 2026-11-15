@@ -367,8 +367,8 @@ class vehiculosListadoDocumentosTesting extends ControllerBase {
         // Las vistas del controlador no se confunden con las de otros sub-controladores
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::VISTA_BASE.'-*.php')) ?: [];
-        $this->addCase($results, 'vistas_esperadas', count($arrVistas) === 4,
-            'se encontraron '.count($arrVistas).' vistas '.self::VISTA_BASE.'-* (esperadas 4)');
+        $this->addCase($results, 'vistas_esperadas', count($arrVistas) === 5,
+            'se encontraron '.count($arrVistas).' vistas '.self::VISTA_BASE.'-* (esperadas 5, incluye -UpdateListRows)');
 
         /************************************/
         // Retorno los datos
@@ -435,8 +435,9 @@ class vehiculosListadoDocumentosTesting extends ControllerBase {
         $lista = $this->cuerpoMetodo('UpdateList');
         $this->addCase($results, 'lista_filtra_por_vehiculo', str_contains($lista, "vehiculos_listado_documentos.idVehiculo = ?"),
             'UpdateList() no filtra los documentos por vehiculo');
-        $this->addCase($results, 'lista_limite', str_contains($lista, 'N_MaxItems'),
-            'UpdateList() no limita las filas con ConfigAPP::APP["N_MaxItems"]');
+        $this->addCase($results, 'lista_limite', substr_count($lista, "'limit'   => \$page['limit']") === 1 && str_contains($lista, '$this->getPageParams()')
+            && str_contains($lista, '$this->sliceMore(') && str_contains($lista, "header('X-Has-More: ") && str_contains($lista, "'-UpdateListRows.php'"),
+            'UpdateList() debe limitar las filas con la carga incremental (limit $page, getPageParams, sliceMore, X-Has-More y -UpdateListRows)');
 
         $view = $this->cuerpoMetodo('View');
         $this->addCase($results, 'view_filtra_por_documento', str_contains($view, "vehiculos_listado_documentos.idDocumentos = ?"),
@@ -1129,7 +1130,7 @@ class vehiculosListadoDocumentosTesting extends ControllerBase {
         /*====================================*/
         // Escape e ID cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_entidad', str_contains($tabla, 'addslashes('),
             'UpdateList.php no escapa el nombre en la accion de borrar');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt'"),

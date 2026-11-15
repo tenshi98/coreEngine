@@ -314,10 +314,10 @@ class entidadesSectoresTesting extends ControllerBase {
         /*====================================*/
         $this->addCase($results, 'listado_tabla', substr_count($codigo, "'table'   => 'entidades_sectores'") === 4,
             'listAll, UpdateList, View y GetID deben consultar entidades_sectores');
-        $this->addCase($results, 'listado_ordenado', substr_count($codigo, "'order'   => 'Nombre ASC'") === 2,
-            'listAll() y UpdateList() deben ordenar por Nombre');
-        $this->addCase($results, 'listado_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 2,
-            'listAll() y UpdateList() deben acotar el numero de filas con N_MaxItems');
+        $this->addCase($results, 'listado_ordenado', substr_count($codigo, "'order'   => 'Nombre ASC, idSector ASC'") === 2,
+            'listAll() y UpdateList() deben ordenar por Nombre y, de forma determinista, por idSector');
+        $this->addCase($results, 'listado_limite', substr_count($codigo, "'limit'   => \$page['limit']") === 2 && substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 0 && substr_count($codigo, '$this->getPageParams()') === 2,
+            'listAll() y UpdateList() deben acotar el numero de filas con getPageParams() (carga incremental, ADR-0022)');
         $this->addCase($results, 'detalle_por_sector', substr_count($codigo, "'where'   => 'idSector = ?'") === 2,
             'View() y GetID() deben consultar por idSector con parametros preparados');
         $this->addCase($results, 'getid_campos', str_contains($codigo, "'data'    => 'idSector,Nombre'"),
@@ -897,8 +897,8 @@ class entidadesSectoresTesting extends ControllerBase {
         // Vistas involucradas
         /*====================================*/
         $arrVistas = glob($this->rutaModulo('../views/'.self::CONTROLADOR.'-*.php')) ?: [];
-        $this->addCase($results, 'hay_vistas', count($arrVistas) === 6,
-            'se esperaban 6 vistas de '.self::CONTROLADOR.' y se encontraron '.count($arrVistas));
+        $this->addCase($results, 'hay_vistas', count($arrVistas) === 7,
+            'se esperaban 7 vistas (incluye el parcial -UpdateListRows, ADR-0022) de '.self::CONTROLADOR.' y se encontraron '.count($arrVistas));
 
         foreach ($arrVistas as $ruta) {
             $nombre = basename($ruta);
@@ -919,7 +919,8 @@ class entidadesSectoresTesting extends ControllerBase {
         /*====================================*/
         // Escape y cifrado en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php')) // la tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+            . $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_etiqueta', str_contains($tabla, "addslashes(\$crud['Nombre'])"),
             'UpdateList no escapa la etiqueta que viaja al JavaScript');
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idSector'])"),

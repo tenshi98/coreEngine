@@ -316,8 +316,15 @@ class informeDocumentosTesting extends ControllerBase {
             && str_contains($codigo, "'table'   => 'core_estados_pago'") && str_contains($codigo, "'table'   => 'core_facturacion_tipo'")
             && str_contains($codigo, "'order'   => 'Nombre ASC'"),
             'listAll() no carga los catalogos de entidades, documentos, estados de pago y tipos de movimiento');
-        $this->addCase($results, 'listado_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 5,
-            'las 5 consultas (4 catalogos y la busqueda) deben acotar el numero de filas');
+        $this->addCase($results, 'listado_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 4,
+            'las 4 consultas de catalogos deben acotar el numero de filas (la busqueda pagina por bloques)');
+        // Carga incremental (ADR-0022): cada lista toma el limite de getPageParams() y recorta con sliceMore()
+        $this->addCase($results, 'carga_incremental',
+            substr_count($codigo, '$this->getPageParams()') === 1 && substr_count($codigo, '\'limit\'   => $page[\'limit\']') === 1 && substr_count($codigo, '$this->sliceMore(') === 1,
+            'se esperaban 1 lista(s) con getPageParams(), limite de bloque y sliceMore()');
+        $this->addCase($results, 'carga_incremental_fragmento',
+            substr_count($codigo, "header('X-Has-More: ") === 1 && substr_count($codigo, "header('X-Next-Offset: ") === 1 && substr_count($codigo, '-UpdateListRows.php') === 1,
+            'UpdateList() debe responder el fragmento de filas con X-Has-More y X-Next-Offset');
 
         /*====================================*/
         // Busqueda: columnas, validacion de fechas y WHERE preparado
@@ -735,7 +742,8 @@ class informeDocumentosTesting extends ControllerBase {
         /*====================================*/
         // Cifrado de los IDs y formato de datos en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));  // filas en el parcial (ADR-0022)
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idFacturacion'])"),
             'UpdateList no cifra idFacturacion en la accion Ver');
         $this->addCase($results, 'tabla_fecha_estandar', str_contains($tabla, 'fechaEstandar('),

@@ -376,8 +376,15 @@ class gestionDocumentosProductosTesting extends ControllerBase {
             && str_contains($codigo, 'LEFT JOIN bodegas_listado       ON bodegas_listado.idBodegas             = facturacion_listado_productos.idBodegas')
             && str_contains($codigo, "'where'   => 'facturacion_listado_productos.idExistencia = ?'"),
             'GetID() no une el tipo de movimiento, la bodega y el producto del detalle');
-        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 3,
-            'se esperaban 3 consultas de lista acotadas por N_MaxItems');
+        $this->addCase($results, 'consultas_limite', substr_count($codigo, 'ConfigAPP::APP["N_MaxItems"]') === 2,
+            'se esperaban 2 consultas de catalogo acotadas por N_MaxItems (la lista pagina por bloques)');
+        // Carga incremental (ADR-0022): cada lista toma el limite de getPageParams() y recorta con sliceMore()
+        $this->addCase($results, 'carga_incremental',
+            substr_count($codigo, '$this->getPageParams()') === 1 && substr_count($codigo, '\'limit\'   => $page[\'limit\']') === 1 && substr_count($codigo, '$this->sliceMore(') === 1,
+            'se esperaban 1 lista(s) con getPageParams(), limite de bloque y sliceMore()');
+        $this->addCase($results, 'carga_incremental_fragmento',
+            substr_count($codigo, "header('X-Has-More: ") === 1 && substr_count($codigo, "header('X-Next-Offset: ") === 1 && substr_count($codigo, '-UpdateListRows.php') === 1,
+            'UpdateList() debe responder el fragmento de filas con X-Has-More y X-Next-Offset');
 
         /************************************/
         // Retorno los datos
@@ -965,7 +972,8 @@ class gestionDocumentosProductosTesting extends ControllerBase {
         /*====================================*/
         // Cifrado y formato en la tabla
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-UpdateListRows.php'));  // filas en el parcial (ADR-0022)
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt', \$crud['idExistencia'])"),
             'UpdateList no cifra idExistencia en las acciones');
         $this->addCase($results, 'tabla_cantidades_formateadas', str_contains($tabla, 'Cantidades(') && str_contains($tabla, 'Valores('),

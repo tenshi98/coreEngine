@@ -42,7 +42,7 @@ class tercerosEntidadesListadoTesting extends ControllerBase {
     // Niveles de permiso del catalogo (1=ver, 2=editar, 3=crear, 4=borrar)
     private const NIVELES          = [1, 2, 3, 4];
     // Vistas propias de este controlador (el prefijo es compartido con los sub-controladores)
-    private const VISTAS_PROPIAS   = ['List', 'UpdateList', 'View', 'Resumen', 'Resumen-Update', 'formSearch'];
+    private const VISTAS_PROPIAS   = ['List', 'UpdateList', 'UpdateListRows', 'View', 'Resumen', 'Resumen-Update', 'formSearch'];
 
     /*******************************************************************/
     // Constructor
@@ -458,8 +458,8 @@ class tercerosEntidadesListadoTesting extends ControllerBase {
             'listAll() no agrupa las respuestas fallidas con mergeResponses()');
         $this->addCase($results, 'listado_solo_clientes', str_contains($listAll, "'where'   => 'entidades_listado.idTipo = ?'"),
             'listAll() no limita el listado al tipo de entidad cliente (idTipo)');
-        $this->addCase($results, 'listado_limite', str_contains($listAll, 'N_MaxItems'),
-            'listAll() no acota la cantidad de filas con N_MaxItems');
+        $this->addCase($results, 'listado_limite', str_contains($listAll, 'N_MaxItems') && str_contains($listAll, "'limit'   => \$page['limit']") && str_contains($listAll, '$this->getPageParams()') && str_contains($listAll, '$this->sliceMore('),
+            'listAll() debe acotar la lista principal con getPageParams()/sliceMore() (carga incremental, ADR-0022) y los catalogos con N_MaxItems');
         $catalogos = ['core_estados', 'entidades_sectores', 'core_sexo', 'core_tipos_entidades', 'core_ubicacion_ciudad', 'core_ubicacion_comunas'];
         foreach ($catalogos as $tabla) {
             $this->addCase($results, 'listado_catalogo_'.$tabla, str_contains($listAll, "'table'   => '".$tabla."'"),
@@ -1334,7 +1334,9 @@ class tercerosEntidadesListadoTesting extends ControllerBase {
         /*====================================*/
         // Los identificadores de la tabla viajan cifrados
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaVista('UpdateList'));
+        // La tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+        $tabla = $this->codigoFuente($this->rutaVista('UpdateList'))
+            . $this->codigoFuente($this->rutaVista('UpdateListRows'));
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt'"),
             'UpdateList.php no cifra el ID de la entidad antes de pintarlo');
 

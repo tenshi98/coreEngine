@@ -327,16 +327,19 @@ class productosListadoTesting extends ControllerBase {
         $arrVistas = [
             'productosListado-List.php',
             'productosListado-UpdateList.php',
+            'productosListado-UpdateListRows.php',
             'productosListado-View.php',
             'productosListado-Resumen.php',
             'productosListado-Resumen-Update.php',
             'productosListado-formNew.php',
             'productosListado-formSearch.php',
             'productosListado-Resumen-Documentos-UpdateList.php',
+            'productosListado-Resumen-Documentos-UpdateListRows.php',
             'productosListado-Resumen-Documentos-View.php',
             'productosListado-Resumen-Documentos-formNew.php',
             'productosListado-Resumen-Documentos-formEdit.php',
             'productosListado-Resumen-Observaciones-UpdateList.php',
+            'productosListado-Resumen-Observaciones-UpdateListRows.php',
             'productosListado-Resumen-Observaciones-View.php',
             'productosListado-Resumen-Observaciones-formNew.php',
             'productosListado-Resumen-Observaciones-formEdit.php',
@@ -1259,7 +1262,7 @@ class productosListadoTesting extends ControllerBase {
         /*====================================*/
         // Escape antes de pintar
         /*====================================*/
-        $vistaListado = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'));
+        $vistaListado = $this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateList.php'))."\n".$this->codigoFuente($this->rutaModulo('../views/'.self::CONTROLADOR.'-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape', str_contains($vistaListado, 'addslashes('),
             'UpdateList no escapa el nombre del producto antes de pintarlo');
         $this->addCase($results, 'tabla_id_cifrado',

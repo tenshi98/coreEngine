@@ -1084,7 +1084,8 @@ class bodegasMovimientoProductosTesting extends ControllerBase {
         /*====================================*/
         // Escape de los datos pintados en la tabla de productos
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-Resumen-Productos-UpdateList.php'));
+        $tabla = $this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-Resumen-Productos-UpdateList.php'))
+            .$this->codigoFuente($this->rutaModulo('../views/'.self::VISTA_BASE.'-Resumen-Productos-UpdateListRows.php'));
         $this->addCase($results, 'tabla_escape_fecha_o_entidad',
             str_contains($tabla, 'addslashes('),
             'la tabla de productos no escapa la entidad');

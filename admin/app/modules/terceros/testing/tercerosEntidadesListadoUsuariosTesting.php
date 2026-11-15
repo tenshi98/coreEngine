@@ -47,7 +47,7 @@ class tercerosEntidadesListadoUsuariosTesting extends ControllerBase {
     // Niveles de permiso del catalogo (1=ver, 2=editar, 3=crear, 4=borrar)
     private const NIVELES          = [1, 2, 3, 4];
     // Vistas propias de este controlador (sufijo tras VISTA_BASE.'-')
-    private const VISTAS_PROPIAS   = ['Resumen-Usuarios-formNew', 'Resumen-Usuarios-formEdit', 'Resumen-Usuarios-UpdateList', 'Resumen-Usuarios-View'];
+    private const VISTAS_PROPIAS   = ['Resumen-Usuarios-formNew', 'Resumen-Usuarios-formEdit', 'Resumen-Usuarios-UpdateList', 'Resumen-Usuarios-UpdateListRows', 'Resumen-Usuarios-View'];
 
     /*******************************************************************/
     // Constructor
@@ -431,8 +431,8 @@ class tercerosEntidadesListadoUsuariosTesting extends ControllerBase {
             'UpdateList() consulta la clave de los usuarios');
         $this->addCase($results, 'lista_orden', str_contains($lista, 'terceros_entidades_listado_usuarios.email ASC'),
             'UpdateList() no ordena por email');
-        $this->addCase($results, 'lista_limite', str_contains($lista, 'N_MaxItems'),
-            'UpdateList() no acota la cantidad de filas con N_MaxItems');
+        $this->addCase($results, 'lista_limite', str_contains($lista, "'limit'   => \$page['limit']") && str_contains($lista, '$this->getPageParams()') && str_contains($lista, '$this->sliceMore(') && !str_contains($lista, 'N_MaxItems'),
+            'UpdateList() debe acotar las filas por bloques con getPageParams()/sliceMore() (carga incremental, ADR-0022)');
         $this->addCase($results, 'lista_menu_sesion', str_contains($lista, "\$f3->get('SESSION.arrMenu')"),
             'UpdateList() no lee el menu de la sesion para los permisos de maquinas');
         $this->addCase($results, 'lista_contador_maquinas',
@@ -1250,7 +1250,9 @@ class tercerosEntidadesListadoUsuariosTesting extends ControllerBase {
         /*====================================*/
         // Los identificadores de la tabla viajan cifrados y el rotulo del borrado se escapa
         /*====================================*/
-        $tabla = $this->codigoFuente($this->rutaVista('Resumen-Usuarios-UpdateList'));
+        // La tabla y sus filas (parcial -UpdateListRows, ADR-0022)
+        $tabla = $this->codigoFuente($this->rutaVista('Resumen-Usuarios-UpdateList'))
+            . $this->codigoFuente($this->rutaVista('Resumen-Usuarios-UpdateListRows'));
         $this->addCase($results, 'tabla_id_cifrado', str_contains($tabla, "encryptDecrypt('encrypt'"),
             'UpdateList no cifra el ID de la asignacion antes de pintarlo');
         $this->addCase($results, 'tabla_escape_rotulo_borrado', str_contains($tabla, 'addslashes('),
