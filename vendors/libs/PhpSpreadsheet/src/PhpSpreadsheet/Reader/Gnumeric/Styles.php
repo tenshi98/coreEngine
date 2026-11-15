@@ -18,8 +18,15 @@ class Styles
 
     protected bool $readDataOnly;
 
-    /** @var array<string, string[]> */
-    public static array $mappings = [
+    /**
+     * @deprecated 5.10.0 No longer used, replaced by const which is not user-accessible.
+     *
+     * @var array<string[]>
+     */
+    public static array $mappings = self::MAPPINGS;
+
+    /** @internal */
+    public const MAPPINGS = [
         'borderStyle' => [
             '0' => Border::BORDER_NONE,
             '1' => Border::BORDER_THIN,
@@ -130,14 +137,10 @@ class Styles
             $styleArray['borders']['diagonal'] = self::parseBorderAttributes($srssb->Diagonal->attributes());
             $styleArray['borders']['diagonalDirection'] = Borders::DIAGONAL_BOTH;
         } elseif (isset($srssb->Diagonal)) {
-            // No idea what Phpstan objects to,
-            // especially since it has no problem with identical
-            // statement just above
-            $styleArray['borders']['diagonal'] = self::parseBorderAttributes($srssb->Diagonal->attributes()); // @phpstan-ignore-line
+            $styleArray['borders']['diagonal'] = self::parseBorderAttributes($srssb->Diagonal->attributes());
             $styleArray['borders']['diagonalDirection'] = Borders::DIAGONAL_UP;
         } elseif (isset($srssb->{'Rev-Diagonal'})) {
-            // No idea what Phpstan objects to
-            $styleArray['borders']['diagonal'] = self::parseBorderAttributes($srssb->{'Rev-Diagonal'}->attributes()); // @phpstan-ignore-line
+            $styleArray['borders']['diagonal'] = self::parseBorderAttributes($srssb->{'Rev-Diagonal'}->attributes());
             $styleArray['borders']['diagonalDirection'] = Borders::DIAGONAL_DOWN;
         }
     }
@@ -147,6 +150,7 @@ class Styles
     {
         $ucDirection = ucfirst($direction);
         if (isset($srssb->$ucDirection)) {
+            // https://github.com/phpstan/phpstan/issues/14925
             /** @var SimpleXMLElement */
             $temp = $srssb->$ucDirection;
             $styleArray['borders'][$direction] = self::parseBorderAttributes($temp->attributes());
@@ -164,19 +168,19 @@ class Styles
         return $rotation;
     }
 
-    /** @param mixed[][] $styleArray */
+    /** @param array<array<mixed>|string> $styleArray */
     private static function addStyle(array &$styleArray, string $key, string $value): void
     {
-        if (array_key_exists($value, self::$mappings[$key])) {
-            $styleArray[$key] = self::$mappings[$key][$value]; //* @phpstan-ignore-line
+        if (array_key_exists($value, self::MAPPINGS[$key])) {
+            $styleArray[$key] = self::MAPPINGS[$key][$value];
         }
     }
 
     /** @param mixed[][] $styleArray */
     private static function addStyle2(array &$styleArray, string $key1, string $key, string $value): void
     {
-        if (array_key_exists($value, self::$mappings[$key])) {
-            $styleArray[$key1][$key] = self::$mappings[$key][$value];
+        if (array_key_exists($value, self::MAPPINGS[$key])) {
+            $styleArray[$key1][$key] = self::MAPPINGS[$key][$value];
         }
     }
 
