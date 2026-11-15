@@ -11,7 +11,8 @@ class QueryBuilder{
 	/*******************************************************************************************************************/
 	/******************************************************************************/
 	//Definiciones
-	private $FileManager;
+	/** @var FileManager|null Gestor de archivos; se crea solo al usarse (carga perezosa). */
+	private $FileManager = null;
 	private $Codification;
 	private $CommonData;
     private $Passwords;
@@ -26,10 +27,26 @@ class QueryBuilder{
 	/******************************************************************************/
 	//Instancias
 	public function __construct() {
-		$this->FileManager  = new FileManager();
 		$this->Codification = new FunctionsSecurityCodification();
 		$this->CommonData   = new FunctionsCommonData();
         $this->Passwords    = new FunctionsSecurityPasswords();
+	}
+
+	/******************************************************************************/
+	/**
+	 * Retorna el gestor de archivos, creándolo la primera vez que se necesita.
+	 *
+	 * Las operaciones sin archivos no requieren configuración de almacenamiento:
+	 * así un sitio que no sube archivos no falla por una clave ausente como
+	 * uploadFolder.
+	 *
+	 * @return FileManager
+	 */
+	private function getFileManager(): FileManager {
+		if ($this->FileManager === null) {
+			$this->FileManager = new FileManager();
+		}
+		return $this->FileManager;
 	}
 
 	/*******************************************************************************************************************/
@@ -899,7 +916,7 @@ class QueryBuilder{
 
             // Éxito: recién ahora se borran los archivos del disco (solo si había rutas)
             if (!empty($rowFiles)) {
-                $delFile = $this->FileManager->deleteFilesMassive($query['files'], $query['SubCarpeta'], $rowFiles);
+                $delFile = $this->getFileManager()->deleteFilesMassive($query['files'], $query['SubCarpeta'], $rowFiles);
                 if ($delFile !== true) { error_log('queryDelete: no se pudieron borrar los archivos de '.$query['table']); }
             }
 
@@ -1130,7 +1147,7 @@ class QueryBuilder{
                     if (isset($query['Post'][$file])  && $query['Post'][$file]  !== '') {
                         /************************************/
                         // Solicita al gestor de archivos la eliminación del recurso en el disco
-                        $delFile  = $this->FileManager->deleteFile($query['Post'][$file], $query['SubCarpeta']);
+                        $delFile  = $this->getFileManager()->deleteFile($query['Post'][$file], $query['SubCarpeta']);
                         /************************************/
                         // Si falla la eliminación física, interrumpe el proceso y retorna el error
                         if($delFile !== true){
@@ -1885,11 +1902,11 @@ class QueryBuilder{
         if (!empty($_FILES) || $CountFileExist != 0) {
             $isUpdate = ($action === 'update');
 
-            /*************** Validación Física ***************/
+            /*************** Validación física ***************/
             // Llama al FileManager para verificar tipos permitidos, pesos máximos y existencia
             $dataFiles = $isUpdate
-                ? $this->FileManager->validateFiles($_FILES, $query['files'], $query['Post'])
-                : $this->FileManager->validateFiles($_FILES, $query['files']);
+                ? $this->getFileManager()->validateFiles($_FILES, $query['files'], $query['Post'])
+                : $this->getFileManager()->validateFiles($_FILES, $query['files']);
 
             // Si la validación falla, retorna el error para detener la operación principal (Insert/Update)
             if (!isset($dataFiles['success']) || $dataFiles['success'] !== true) {
@@ -1901,8 +1918,8 @@ class QueryBuilder{
             /*************** Carga (Upload) ***************/
             // Ejecuta el movimiento de archivos al servidor y genera los fragmentos de SQL
             $newFileName = $isUpdate
-                ? $this->FileManager->uploadFile($_FILES, $query['files'], $query['Post'])
-                : $this->FileManager->uploadFile($_FILES, $query['files']);
+                ? $this->getFileManager()->uploadFile($_FILES, $query['files'], $query['Post'])
+                : $this->getFileManager()->uploadFile($_FILES, $query['files']);
 
             // Si algún archivo falló realmente al subirse (no simplemente ausente),
             // se detiene la operación principal (Insert/Update) para no guardar el
