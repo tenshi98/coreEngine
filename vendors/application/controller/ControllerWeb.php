@@ -25,6 +25,34 @@ class ControllerWeb {
 	/*******************************************************************************************************************/
 	/************************************************************************************************************/
     /**
+     * Punto de entrada central de seguridad (hook de Fat-Free Framework).
+     *
+     * F3 invoca automáticamente este método antes de ejecutar cualquier acción de
+     * un controlador enrutado (formato 'controlador->metodo'). Se utiliza para
+     * aplicar la protección CSRF en un único lugar y para publicar el token en las
+     * vistas ($CSRF_TOKEN).
+     *
+     * Importante: al ejecutarse sólo en el despacho del router, las llamadas
+     * internas entre controladores (por ejemplo `$otro->metodo(...)`) NO pasan por
+     * aquí y por tanto no vuelven a validar el token. Es el mismo criterio que usa
+     * el backoffice con `ControllerBase::beforeroute()`: el contexto validado
+     * pertenece al punto de entrada (la petición HTTP) y lo heredan las llamadas
+     * internas, sin necesidad de cambiar las firmas de los métodos.
+     *
+     * @param \Base|null $f3     Instancia de Fat-Free Framework.
+     * @param array|null $params Parámetros capturados de la ruta (tokens @name).
+     *
+     * @return void
+     */
+    public function beforeroute($f3 = null, $params = null){
+
+        // Verificación central de CSRF (solo métodos de escritura)
+        CsrfToken::guard($f3);
+
+    }
+
+    /************************************************************************************************************/
+    /**
      * Procesa y envía un correo electrónico utilizando el protocolo SMTP.
      *
      * Esta función extrae la información de configuración del sistema y redes sociales

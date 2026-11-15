@@ -1105,6 +1105,116 @@ class ControllerBase {
 
     /************************************************************************************************************/
     /**
+     * Tamaño de bloque de las listas (ConfigAPP::APP['N_MaxItems']).
+     *
+     * Los sitios (`sites_*`) tienen su propio ConfigAPP y algunos no declaran la clave
+     * (p. ej. `sites_frucomex_web`): sin ella se usa 2500 en lugar de un bloque de 1 fila.
+     *
+     * @return int Filas por bloque (>= 1).
+     */
+    protected function getMaxItems(): int {
+        $n = (int) (ConfigAPP::APP['N_MaxItems'] ?? 0);
+        return $n > 0 ? $n : 2500;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Parámetros de carga incremental de una lista (más allá de N_MaxItems).
+     *
+     * Lee `_offset` (entero >= 0) y `_rows` ('1' = devolver solo el fragmento de filas)
+     * del POST (rutas `/search`) o del GET (rutas `updateList`). El LIMIT pide una fila extra (N_MaxItems + 1) para saber si hay más
+     * datos sin ejecutar un COUNT; recortar con sliceMore().
+     *
+     * @return array ['offset'=>int, 'size'=>int, 'limit'=>string, 'fragment'=>bool]
+     *
+     * @example
+     * ```php
+     *  $page = $this->getPageParams();
+     *  $query['limit'] = $page['limit'];
+     *  $arrList = $this->Base_GetList(['query' => $query]);
+     *  $more = $this->sliceMore($arrList['data'], $page);
+     * ```
+     */
+    protected function getPageParams(): array {
+        // POST (rutas /search) o GET (rutas updateList sin /search)
+        $src    = ($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST' ? $_POST : $_GET;
+        $offset = 0;
+        if (isset($src['_offset']) && is_string($src['_offset']) && ctype_digit($src['_offset'])) {
+            $offset = min((int) $src['_offset'], 100000000);
+        }
+        $size = $this->getMaxItems();
+        return [
+            'offset'   => $offset,
+            'size'     => $size,
+            'limit'    => $offset.','.($size + 1),
+            'fragment' => (isset($src['_rows']) && $src['_rows'] === '1'),
+        ];
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Lee una lista completa por bloques de N_MaxItems filas (para exportaciones).
+     *
+     * Pide como máximo $maxRows + 1 filas (la sobrante solo sirve para detectar que
+     * hay más datos: el llamador la recorta y marca "truncado"). La consulta debe
+     * tener un ORDER BY determinista (con la clave primaria como último criterio) para
+     * que los bloques consecutivos no repitan ni salten filas. Ignora 'limit' de $query.
+     *
+     * @param array $query   Array-query (data, table, join, where, params, group, having, order).
+     * @param int   $maxRows Filas máximas a devolver (la consulta trae hasta $maxRows + 1).
+     * @return array Respuesta de Base_GetList (status, data) con todas las filas, o el primer error.
+     *
+     * @example
+     * ```php
+     *  $max     = FunctionsExportExcel::maxRows();
+     *  $arrList = $this->Base_GetListChunked($query, $max);
+     *  $data    = array_slice($arrList['data'], 0, $max);
+     *  $truncated = count($arrList['data']) > $max;
+     * ```
+     */
+    protected function Base_GetListChunked(array $query, int $maxRows): array {
+        $size   = $this->getMaxItems();
+        $want   = max(1, $maxRows) + 1;
+        $all    = [];
+        $offset = 0;
+        $last   = ['status' => true, 'data' => []];
+        while (count($all) < $want) {
+            $take       = min($size, $want - count($all));
+            $q          = $query;
+            $q['limit'] = $offset.','.$take;
+            $xParams    = ['query' => $q];
+            $last       = $this->Base_GetList($xParams);
+            if ($last['status'] !== true) {
+                return $last;
+            }
+            $rows = is_array($last['data']) ? $last['data'] : [];
+            foreach ($rows as $row) { $all[] = $row; }
+            if (count($rows) < $take) { break; }
+            $offset += $take;
+        }
+        $last['data'] = $all;
+        return $last;
+    }
+
+    /************************************************************************************************************/
+    /**
+     * Recorta la fila extra pedida por getPageParams() y calcula el siguiente offset.
+     *
+     * @param mixed $rows Filas devueltas por la consulta (se tolera null/no array).
+     * @param array $page Resultado de getPageParams().
+     * @return array ['rows'=>array, 'hasMore'=>bool, 'next'=>int]
+     */
+    protected function sliceMore($rows, array $page): array {
+        $rows    = is_array($rows) ? $rows : [];
+        $hasMore = count($rows) > $page['size'];
+        if ($hasMore) {
+            $rows = array_slice($rows, 0, $page['size']);
+        }
+        return ['rows' => $rows, 'hasMore' => $hasMore, 'next' => $page['offset'] + count($rows)];
+    }
+
+    /************************************************************************************************************/
+    /**
      * Construye dinámicamente condiciones SQL para una cláusula WHERE a partir
      * de parámetros recibidos mediante POST.
      *
