@@ -705,12 +705,12 @@ class UIWidgetsViews {
 	 *
 	 * Este método construye dinámicamente un componente visual compuesto por:
 	 * - Un contenedor tipo "card"
-	 * - Un encabezado con título y botón de exportación a Excel
+	 * - Un encabezado con título (sin botón de exportación)
 	 * - Una tabla responsive con encabezados y filas generadas desde los datos
 	 *
 	 * Características principales:
 	 * - Si el arreglo está vacío, retorna un mensaje de advertencia
-	 * - Genera un ID único para la tabla (utilizado para exportación)
+	 * - No ofrece exportación a Excel (los datos provienen de SQL generado por IA, sin filtro reutilizable)
 	 * - Usa las claves del primer elemento como encabezados de la tabla
 	 * - Escapa los valores para prevenir inyección HTML
 	 *
@@ -728,7 +728,7 @@ class UIWidgetsViews {
 	 *     ['Nombre' => 'Ana',   'Cargo' => 'Admin'],
 	 *     ['Nombre' => 'Luis',  'Cargo' => 'Vendedor'],
 	 * ]);
-	 * // devuelve el HTML de la card con la tabla y el botón 'Exportar a Excel'
+	 * // devuelve el HTML de la card con la tabla, sin botón de exportación
 	 * ```
 	 */
 	public function arrayToBootstrapTable(array $data) {
@@ -742,29 +742,22 @@ class UIWidgetsViews {
 			return $WidgetsCommon->alertPostData(5, 4, 'bi bi-exclamation-triangle-fill', 0, $Btn_Text);
 		}
 
-		// Genera un identificador único para la tabla
-		$tableId  = 'table_' . uniqid();
-
-		// Genera un nombre de archivo basado en fecha y hora para exportación
-		$fileName = 'detalle_' . date('Ymd_His');
-
 		// Obtiene los encabezados a partir de las claves del primer elemento del arreglo
 		$headers = array_keys(reset($data));
 
 		// Inicializa el contenedor principal tipo card
 		$html  = '<div class="card card-custom mb-3 shadow-sm">';
 
-		// Construye el encabezado del card con título y botón de exportación
+		// Construye el encabezado del card con título
 		$html .= '<div class="card-header d-flex justify-content-between align-items-center">';
 		$html .= '<span>Tabla de datos</span>';
-		$html .= '<button type="button" class="btn btn-sm btn-success" onclick="exportTableToExcel(\'' . $tableId . '\', \'' . $fileName . '\')"><i class="ri-file-excel-2-line"></i> Exportar a Excel</button>';
 		$html .= '</div>';
 
 		// Inicia el contenedor responsive para la tabla
 		$html .= '<div class="table-responsive">';
 
-		// Abre la tabla con el ID generado
-		$html .= '<table id="' . $tableId . '" class="table table-borderless mb-0">';
+		// Abre la tabla
+		$html .= '<table class="table table-borderless mb-0">';
 
 		// Construye la sección THEAD con los encabezados
 		$html .= '<thead class="table-light"><tr>';
@@ -1226,6 +1219,270 @@ class UIWidgetsViews {
 		}else{
 			echo $alerts;
 		}
+
+	}
+
+	/*******************************************************************************************************************/
+	/*                                                                                                                 */
+	/*                                              7. Componentes                                                     */
+	/*                                                                                                                 */
+	/*******************************************************************************************************************/
+	/******************************************************************************/
+	/**
+	 * Imprime una línea de tiempo vertical con punto de conexión y badge de fecha por evento.
+	 *
+	 * Todo el texto se escapa (RN-004); el icono se sanea a [a-z0-9 _-]; 'color' (1..7) usa la paleta
+	 * _colorsBG() (por defecto 7). Con lista vacía imprime un mensaje de vacío.
+	 *
+	 * @param array $Eventos  Eventos [['fecha'=>'...','titulo'=>'...','texto'=>'...','icono'=>'bi bi-check'], ...].
+	 * @param array $Opciones 'color' (1..7, default 7).
+	 *
+	 * @return void Imprime el HTML de la línea de tiempo.
+	 *
+	 * @example
+	 * ```php
+	 * $WidgetsViews = new UIWidgetsViews();
+	 * $WidgetsViews->timeline([
+	 *     ['fecha' => '2026-01-10', 'titulo' => 'Alta', 'texto' => 'Cliente creado', 'icono' => 'bi bi-person-plus'],
+	 *     ['fecha' => '2026-02-01', 'titulo' => 'Primer pedido'],
+	 * ], ['color' => 2]);
+	 * ```
+	 */
+	public function timeline(array $Eventos, array $Opciones = []): void {
+
+		/**********************  Definiciones   **********************/
+		$Eventos = array_values(array_filter($Eventos, 'is_array'));
+		$color   = $this->_componentColor($Opciones);
+
+		/**********************  Verificaciones   **********************/
+		if (count($Eventos) === 0) {
+			echo '<p class="text-muted">No hay eventos para mostrar.</p>';
+			return;
+		}
+
+		/********************** Si todo esta ok **********************/
+		$html = '<div class="position-relative ps-4 border-start">';
+		foreach ($Eventos as $ev) {
+			$fecha  = htmlspecialchars((string)($ev['fecha'] ?? ''), ENT_QUOTES, 'UTF-8');
+			$titulo = htmlspecialchars((string)($ev['titulo'] ?? ''), ENT_QUOTES, 'UTF-8');
+			$texto  = htmlspecialchars((string)($ev['texto'] ?? ''), ENT_QUOTES, 'UTF-8');
+			$icono  = trim(preg_replace('/[^a-z0-9 _-]/', '', strtolower((string)($ev['icono'] ?? ''))));
+			$html  .= '
+			<div class="mb-4 position-relative">
+				<span class="position-absolute top-0 translate-middle-x rounded-circle '.$color.' d-flex align-items-center justify-content-center" style="left:-1.5rem;width:1.25rem;height:1.25rem;">'.
+					($icono !== '' ? '<i class="'.$icono.' text-white" style="font-size:.7rem;"></i>' : '').'</span>'.
+				($fecha !== '' ? '<span class="badge '.$color.' mb-1">'.$fecha.'</span>' : '').
+				($titulo !== '' ? '<h6 class="mb-1">'.$titulo.'</h6>' : '').
+				($texto !== '' ? '<p class="mb-0 text-muted">'.$texto.'</p>' : '').'
+			</div>';
+		}
+		$html .= '</div>';
+
+		/**********************  Retorno datos  **********************/
+		echo $html;
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Imprime un stepper horizontal con estados completado / actual / pendiente.
+	 *
+	 * $Actual se acota a 1..n. Con lista de pasos vacía no imprime nada. Los rótulos se escapan (RN-004).
+	 *
+	 * @param array $Pasos    Rótulos de los pasos ['Datos', 'Pago', 'Confirmación'].
+	 * @param int   $Actual   Paso actual (1..n).
+	 * @param array $Opciones 'color' (1..7, default 7).
+	 *
+	 * @return void Imprime el HTML del stepper (nada si no hay pasos).
+	 *
+	 * @example
+	 * ```php
+	 * $WidgetsViews = new UIWidgetsViews();
+	 * $WidgetsViews->stepper(['Datos', 'Pago', 'Confirmacion'], 2); // paso 1 completado, 2 actual, 3 pendiente
+	 * ```
+	 */
+	public function stepper(array $Pasos, int $Actual = 1, array $Opciones = []): void {
+
+		/**********************  Definiciones   **********************/
+		$Pasos = array_values($Pasos);
+		$n     = count($Pasos);
+		$color = $this->_componentColor($Opciones);
+
+		/**********************  Verificaciones   **********************/
+		if ($n === 0) { return; }
+
+		/********************** Si todo esta ok **********************/
+		$Actual = min($n, max(1, $Actual));
+		$html   = '<div class="d-flex align-items-start w-100">';
+		foreach ($Pasos as $i => $paso) {
+			$num    = $i + 1;
+			$label  = htmlspecialchars((string)(is_scalar($paso) ? $paso : ''), ENT_QUOTES, 'UTF-8');
+			$estado = ($num < $Actual) ? 'completado' : (($num === $Actual) ? 'actual' : 'pendiente');
+			$circle = ($estado === 'pendiente') ? 'bg-light text-muted border' : $color.' text-white';
+			$cont   = ($estado === 'completado') ? '<i class="bi bi-check-lg"></i>' : (string)$num;
+			$html  .= '
+			<div class="flex-fill text-center position-relative stepper-step stepper-'.$estado.'"'.($estado === 'actual' ? ' aria-current="step"' : '').'>
+				<span class="d-inline-flex align-items-center justify-content-center rounded-circle '.$circle.'" style="width:2rem;height:2rem;">'.$cont.'</span>
+				<div class="small mt-1'.($estado === 'actual' ? ' fw-bold' : '').'">'.$label.'</div>
+			</div>';
+		}
+		$html .= '</div>';
+
+		/**********************  Retorno datos  **********************/
+		echo $html;
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Imprime avatares superpuestos; el exceso sobre el máximo visible se resume en un badge "+N".
+	 *
+	 * Sin imagen se muestran las iniciales del nombre. Nombres e imágenes se escapan (RN-004); solo se
+	 * aceptan imágenes http(s) o rutas relativas. Con lista vacía no imprime nada.
+	 *
+	 * @param array $Usuarios Usuarios [['nombre'=>'Ana Pérez','imagen'=>'/img/ana.jpg'], ...].
+	 * @param array $Opciones 'max' (visibles, default 4, mínimo 1) y 'color' (1..7, fondo de iniciales).
+	 *
+	 * @return void Imprime el HTML de los avatares (nada si no hay usuarios).
+	 *
+	 * @example
+	 * ```php
+	 * $WidgetsViews = new UIWidgetsViews();
+	 * $WidgetsViews->avatarStack([
+	 *     ['nombre' => 'Ana Perez', 'imagen' => '/img/ana.jpg'],
+	 *     ['nombre' => 'Luis Soto'],
+	 * ], ['max' => 3]); // 2 avatares (el segundo con iniciales LS)
+	 * ```
+	 */
+	public function avatarStack(array $Usuarios, array $Opciones = []): void {
+
+		/**********************  Definiciones   **********************/
+		$Usuarios = array_values(array_filter($Usuarios, 'is_array'));
+		$total    = count($Usuarios);
+		$max      = max(1, (int)($Opciones['max'] ?? 4));
+		$color    = $this->_componentColor($Opciones);
+
+		/**********************  Verificaciones   **********************/
+		if ($total === 0) { return; }
+
+		/********************** Si todo esta ok **********************/
+		$html = '<div class="d-inline-flex align-items-center">';
+		foreach (array_slice($Usuarios, 0, $max) as $i => $u) {
+			$nombre = trim((string)($u['nombre'] ?? ''));
+			$imagen = trim((string)($u['imagen'] ?? ''));
+			if ($imagen !== '' && preg_match('#^[a-z][a-z0-9+.-]*:#i', $imagen) && !preg_match('#^https?://#i', $imagen)) {
+				$imagen = '';
+			}
+			$nameEsc = htmlspecialchars($nombre, ENT_QUOTES, 'UTF-8');
+			$style   = 'width:2.5rem;height:2.5rem;'.($i > 0 ? 'margin-left:-.75rem;' : '');
+			if ($imagen !== '') {
+				$html .= '<img src="'.htmlspecialchars($imagen, ENT_QUOTES, 'UTF-8').'" alt="'.$nameEsc.'" title="'.$nameEsc.'" class="rounded-circle border border-2 border-white" style="'.$style.'object-fit:cover;">';
+			} else {
+				$iniciales = '';
+				foreach (array_slice(preg_split('/\s+/u', $nombre, -1, PREG_SPLIT_NO_EMPTY), 0, 2) as $parte) {
+					$iniciales .= mb_strtoupper(mb_substr($parte, 0, 1, 'UTF-8'), 'UTF-8');
+				}
+				$html .= '<span class="rounded-circle border border-2 border-white d-inline-flex align-items-center justify-content-center text-white small '.$color.'" style="'.$style.'" title="'.$nameEsc.'">'.htmlspecialchars($iniciales !== '' ? $iniciales : '?', ENT_QUOTES, 'UTF-8').'</span>';
+			}
+		}
+		if ($total > $max) {
+			$html .= '<span class="rounded-circle border border-2 border-white d-inline-flex align-items-center justify-content-center bg-light text-muted small" style="width:2.5rem;height:2.5rem;margin-left:-.75rem;">+'.($total - $max).'</span>';
+		}
+		$html .= '</div>';
+
+		/**********************  Retorno datos  **********************/
+		echo $html;
+
+	}
+
+	/******************************************************************************/
+	/**
+	 * Imprime una tabla con fila expandible: cada fila de datos puede llevar una fila de detalle
+	 * (celda con colspan) que se despliega y pliega al pulsar el boton de la primera columna.
+	 *
+	 * Cabecera de estilo table_v7 (fondo de la paleta _colorsBG, por defecto 7). Todo el texto (cabecera,
+	 * celdas y detalle) se escapa (RN-004). Las claves de cada fila que no estan en la cabecera se
+	 * ignoran, salvo 'detalle' (texto de la fila expandible; sin el, la fila no muestra boton). JS inline
+	 * minimo (delegacion de eventos, sin dependencias) con un id de tabla unico por llamada.
+	 * Errores: sin filas o cabecera ausente/invalida se imprime una alerta via alertPostData().
+	 *
+	 * @param array $arrData Filas [['nombre'=>'Ana','cargo'=>'Admin','detalle'=>'Ficha ampliada'], ...].
+	 * @param array $Options 'header' (obligatorio): lista de rotulos o ['clave'=>'Rotulo']; en una lista
+	 *              la clave de cada columna es el propio rotulo. 'color' (1..7, default 7).
+	 *
+	 * @return void Imprime el HTML de la tabla o la alerta de error.
+	 *
+	 * @example
+	 * ```php
+	 * $WidgetsViews = new UIWidgetsViews();
+	 * $WidgetsViews->table_v8([
+	 *     ['nombre' => 'Ana',  'cargo' => 'Admin',    'detalle' => 'Alta 2024, sucursal Norte'],
+	 *     ['nombre' => 'Luis', 'cargo' => 'Vendedor'],
+	 * ], ['header' => ['nombre' => 'Nombre', 'cargo' => 'Cargo'], 'color' => 2]);
+	 * // 2 filas de datos; la de Ana con boton y fila de detalle oculta (colspan 3)
+	 * ```
+	 */
+	public function table_v8(array $arrData, array $Options = []): void {
+
+		/**********************  Definiciones   **********************/
+		static $seq = 0;
+		$seq++;
+		$arrData = array_values(array_filter($arrData, 'is_array'));
+		$header  = [];
+		foreach ((array)($Options['header'] ?? []) as $key => $label) {
+			if (!is_scalar($label)) { continue; }
+			$header[is_int($key) ? (string)$label : (string)$key] = (string)$label;
+		}
+		$color = $this->_componentColor($Options);
+
+		/**********************  Verificaciones   **********************/
+		if (count($header) === 0 || count($arrData) === 0) {
+			$WidgetsCommon = new UIWidgetsCommon();
+			echo $WidgetsCommon->alertPostData(5, 4, 'bi bi-exclamation-triangle-fill', 0, count($header) === 0 ? 'Debe indicar las columnas en $Options[\'header\'].' : 'No hay datos disponibles.');
+			return;
+		}
+
+		/********************** Si todo esta ok **********************/
+		$id      = 'table_v8_'.$seq.'_'.bin2hex(random_bytes(3));
+		$colspan = count($header) + 1;
+		$html    = '<div class="table-responsive"><table class="table table-hover align-middle" id="'.$id.'"><thead class="'.$color.' text-white"><tr><th style="width:2.5rem;"></th>';
+		foreach ($header as $label) {
+			$html .= '<th>'.htmlspecialchars($label, ENT_QUOTES, 'UTF-8').'</th>';
+		}
+		$html .= '</tr></thead><tbody>';
+		foreach ($arrData as $i => $row) {
+			$detalle = trim((string)(is_scalar($row['detalle'] ?? null) ? $row['detalle'] : ''));
+			$html   .= '<tr><td>'.($detalle !== ''
+				? '<button type="button" class="btn btn-sm btn-link p-0" data-detail="'.$id.'_'.$i.'" aria-expanded="false" aria-label="Mostrar detalle">&#9656;</button>'
+				: '').'</td>';
+			foreach (array_keys($header) as $key) {
+				$cell  = $row[$key] ?? '';
+				$html .= '<td>'.htmlspecialchars((string)(is_scalar($cell) ? $cell : ''), ENT_QUOTES, 'UTF-8').'</td>';
+			}
+			$html .= '</tr>';
+			if ($detalle !== '') {
+				$html .= '<tr id="'.$id.'_'.$i.'" class="d-none"><td colspan="'.$colspan.'" class="bg-light">'.htmlspecialchars($detalle, ENT_QUOTES, 'UTF-8').'</td></tr>';
+			}
+		}
+		$html .= '</tbody></table></div>
+		<script>
+		(function() {
+			var t = document.getElementById('.json_encode($id).');
+			if (!t) { return; }
+			t.addEventListener("click", function(e) {
+				var b = e.target.closest("button[data-detail]");
+				if (!b) { return; }
+				var r = document.getElementById(b.getAttribute("data-detail"));
+				if (!r) { return; }
+				var open = r.classList.toggle("d-none") === false;
+				b.setAttribute("aria-expanded", open ? "true" : "false");
+				b.innerHTML = open ? "&#9662;" : "&#9656;";
+			});
+		})();
+		</script>';
+
+		/**********************  Retorno datos  **********************/
+		echo $html;
 
 	}
 
@@ -1802,5 +2059,28 @@ class UIWidgetsViews {
 
 	}
 
+	/******************************************************************************/
+	/**
+	 * Resuelve la clase de fondo de los componentes (timeline, stepper, avatarStack) desde Opciones['color'].
+	 *
+	 * @param array $Options Opciones del componente; 'color' admite 1..7 (paleta _colorsBG), default 7.
+	 *
+	 * @return string Clase CSS de fondo (bg-standart-*).
+	 *
+	 * @example
+	 * ```php
+	 * $this->_componentColor(['color' => 2]); // 'bg-standart-green'
+	 * $this->_componentColor([]);             // 'bg-standart-blue'
+	 * ```
+	 */
+	private function _componentColor($Options): string {
+
+		/**********************  Definiciones   **********************/
+		$id = (int)$this->_option($Options, 'color', 7);
+
+		/**********************  Retorno datos  **********************/
+		return $this->_colorsBG(($id >= 1 && $id <= 7) ? $id : 7);
+
+	}
 
 }
