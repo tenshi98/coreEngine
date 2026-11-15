@@ -1,6 +1,10 @@
-# coreEngine — Documentación del Proyecto
+# Documentación del Proyecto
 
 ## Explicación General
+
+Plataforma Básica enfocada al manejo e interacción con los distintos módulos instalados, algunos independientes de otros, y otros dependientes de la instalación de otros módulos.
+
+Esta plataforma está diseñada específicamente para pequeñas y medianas empresas (PyMEs) con infraestructura de alojamiento estándar, compatible con entornos LAMP/LEMP (servidores Apache o Nginx, PHP y MySQL).
 
 **coreEngine** es una plataforma multi-sitio en **PHP 8 + Fat-Free Framework (F3) + MySQL**, organizada para trabajar con IA bajo **Spec-Driven Development (SDD)** sin romper la arquitectura existente.
 
@@ -10,14 +14,43 @@ Es un monólito modular estructurado en:
 - **Sitios públicos** en `sites_*/`
 - **Capa de IA** (`agents/`, `skills/`, `projects/`, `docs/`)
 
-### Prioridad Absoluta
 
-```text
-ARQUITECTURA EXISTENTE > CONVENCIONES EXISTENTES > REQUISITOS DEL NUEVO PROYECTO > NUEVAS ABSTRACCIONES
-```
+---
 
-### Regla Final
-> Primero comprender. Después especificar. Después diseñar. Después programar. Finalmente validar y documentar.
+## Requisitos del Sistema
+
+Para desplegar y ejecutar correctamente la plataforma, el servidor debe cumplir con los siguientes requisitos:
+
+- **Servidor Web:** Apache 2.4+ o Nginx (con el módulo de reescritura de URLs `mod_rewrite` habilitado).
+- **Entorno PHP:** PHP 8.0 o superior.
+- **Base de Datos:** MySQL 5.7+ / MariaDB 10.3+ (soporte nativo ampliable a PostgreSQL, SQLite, MongoDB o Redis).
+- **Extensiones PHP Requeridas:**
+  - `pdo` y `pdo_mysql`: Para la conexión y gestión persistente de base de datos.
+  - `gd`: Para el procesamiento, redimensionamiento y recorte de imágenes.
+  - `curl`: Para integraciones HTTP, servicios de mail y APIs externas.
+  - `mbstring`: Manejo de cadenas de texto multibyte y codificaciones UTF-8.
+  - `openssl`: Para cifrado seguro y generación de tokens de seguridad.
+  - `json`: Procesamiento de respuestas JSON y tokens JWT.
+  - `fileinfo`: Validación de tipos MIME en la subida segura de archivos.
+- **Extensiones para Exportación a Excel Requeridas:**
+  - `ctype` y `filter`: Validación y filtrado de datos, comprobación de tipos de caracteres y verificación de valores antes de su procesamiento.
+  - `dom`, `libxml`, `simplexml`, `xml`, `xmlreader` y `xmlwriter`: Lectura, generación, análisis y manipulación de estructuras XML utilizadas en documentos y formatos de intercambio de datos.
+  - `fileinfo`: Identificación y validación de tipos MIME de archivos para verificar su formato.
+  - `iconv` y `mbstring`: Conversión de codificaciones y manejo de cadenas multibyte, garantizando la compatibilidad con caracteres especiales y UTF-8.
+  - `zip` y `zlib`: Compresión, descompresión y gestión de archivos ZIP, utilizados en la estructura interna de documentos Excel .xlsx.
+
+
+---
+
+## Demo Plataforma
+
+| Dato | Descripción |
+|-----------|-------------|
+| URL Demo | [democoreengine.digitalcreations.cl](https://democoreengine.digitalcreations.cl/) |
+| Usuario | demo1@example.com |
+| Contraseña | 1234 |
+
+---
 
 ## Estructura de la Documentación Generada
 
@@ -34,47 +67,6 @@ A continuación se detalla cada documento creado para este proyecto, con una bre
 | 7 | **agentes.md** | Agentes y roles | Conceptos fundamentales: Agent (QUIEN), Skill (CÓMO), Spec (QUÉ), Task (QUÉ), Validation (CÓMO), Docs (VERDAD), History (MEMORIA), ChangeLog (Blog). Contrato común y flujo SDD. |
 | 8 | **README.md** | Este archivo | **Vista actual** — presentando esta explicación general y acceso a los demás documentos. |
 
-## Flujo SDD Obligatorio
-
-```text
-REQUISITOS → ANÁLISIS → ESPECIFICACIÓN → ARQUITECTURA → DISEÑO DE BASE DE DATOS
-→ DISEÑO API → TASKS → [APROBACIÓN] → IMPLEMENTACIÓN → TESTING → REVISIÓN → VALIDACIÓN → DOCUMENTACIÓN
-```
-
-No se implementa con requisitos/specs insuficientemente definidos ni sin spec aprobada.
-
-## Conceptos Clave
-
-| Concepto | Significado |
-|---|---|
-| **Agent** | QUIÉN realiza el trabajo (roles en `agents/`; sin conocimiento procedural técnico) |
-| **Skill** | CÓMO se realiza determinado trabajo (conocimiento en `skills/`; no define roles) |
-| **Spec** | QUÉ se debe construir (`projects/<p>/specs/`) |
-| **Project** | DÓNDE se define el trabajo (`projects/<p>/`) |
-| **Task** | QUÉ unidad concreta ejecutar (`projects/<p>/tasks/<ID>.md`) |
-| **Validation** | CÓMO verificamos que está correcto (`projects/<p>/validation/validation.md`) |
-
-## Punto de Entrada Rápido
-
-- **¿Qué se carga al principio?** → `AGENTS.md` §0 paso 1: `skills/caveman/SKILL.md` (modo de respuesta) + `skills/boost-prompt/SKILL.md` (refinar petición si es ambigua o SDD)
-- **¿Qué abarca esta petición?** → Puntual = solo lo pedido, sin tocar `projects/`; SDD = flujo completo
-- **¿Qué tareas hay pendientes?** → `AGENTS.md` §2 (grep canónico) + `docs/history/PENDIENTES.md`
-- **¿Qué se decidió antes sobre X?** → `docs/history/DECISIONES.md` + `docs/history/INDEX.md`
-- **¿Auditar arquitectura?** → `docs/architecture/README.md` (mapa) + `docs/architecture/core/`
-- **¿Crear o modificar una transacción de tipo X?** → `skills/transactions/SKILL.md` + `docs/architecture/transactions/README.md`
-- **¿Exportar a Excel?** → `skills/excel/SKILL.md` + `docs/architecture/ui/export-excel.md`
-- **¿Crear especificación?** → `agents/architect/instructions.md` + `skills/sdd/SKILL.md`
-- **¿Implementar?** → `agents/developer/instructions.md` + `skills/transactions|php|mysql|api/SKILL.md`
-- **¿Tocar BD?** → `agents/database/instructions.md` + `skills/mysql/SKILL.md`
-- **¿Revisar / depurar?** → `agents/reviewer|debugger/instructions.md` + `skills/review|testing|debugging/SKILL.md`
-- **¿No sé qué agent usar?** → `agents/triage/instructions.md` (clasifica y enruta)
-- **¿Crear pruebas?** → `agents/tester/instructions.md` + `skills/testing/SKILL.md`
-- **¿Auditar seguridad?** → `agents/security/instructions.md` + `skills/security-audit/SKILL.md`
-- **¿Cambiar una pantalla?** → `agents/frontend/instructions.md` + `skills/frontend/SKILL.md`
-- **¿Por qué se decidió X a nivel de arquitectura?** → `docs/architecture/decisions/` (ADR)
-- **¿Documentar un cambio?** → `agents/documentation/instructions.md` + `docs/history/README.md` + `docs/change_logs/README.md`
-- **¿Ver ejemplo completo?** → `projects/example/` (README + requirements + specs + architecture + tasks + validation)
-
 ## Próximos Pasos
 
 1. Revisar la documentación arquitecural en `arquitectura.md` para comprender la estructura del sistema.
@@ -83,11 +75,3 @@ No se implementa con requisitos/specs insuficientemente definidos ni sin spec ap
 4. Usar `flujo-peticion.md` para depurar rutas o problemas de seguridad.
 5. Consultar `bbdd.md` para diseño de nuevas tablas o relaciones.
 6. Revisar `configuracion.md` para ajustes de parámetros del sistema.
-
----
-
-*Documentación generada el: Sat Nov 14 2026*
-*Total de archivos: 8 documentos de referencia*
-*Imágenes catalogadas: 34 del directorio src/*
-
----

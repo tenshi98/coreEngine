@@ -66,8 +66,20 @@ coreEngine es una plataforma **multi-sitio** en **PHP 8** sobre **Fat-Free Frame
 
 ### Extensiones PHP
 
-- Base: `pdo`, `pdo_mysql`, `json`, `mbstring`, `openssl`, `curl`, `gd`, `fileinfo`.
-- Exportación a Excel (`FunctionsExportExcel::missingExtensions()`): `ctype`, `dom`, `fileinfo`, `filter`, `iconv`, `libxml`, `mbstring`, `simplexml`, `xml`, `xmlreader`, `xmlwriter`, `zip`, `zlib`.
+- **Extensiones PHP Requeridas:**
+  - `pdo` y `pdo_mysql`: Para la conexión y gestión persistente de base de datos.
+  - `gd`: Para el procesamiento, redimensionamiento y recorte de imágenes.
+  - `curl`: Para integraciones HTTP, servicios de mail y APIs externas.
+  - `mbstring`: Manejo de cadenas de texto multibyte y codificaciones UTF-8.
+  - `openssl`: Para cifrado seguro y generación de tokens de seguridad.
+  - `json`: Procesamiento de respuestas JSON y tokens JWT.
+  - `fileinfo`: Validación de tipos MIME en la subida segura de archivos.
+- **Extensiones para Exportación a Excel Requeridas:**
+  - `ctype` y `filter`: Validación y filtrado de datos, comprobación de tipos de caracteres y verificación de valores antes de su procesamiento.
+  - `dom`, `libxml`, `simplexml`, `xml`, `xmlreader` y `xmlwriter`: Lectura, generación, análisis y manipulación de estructuras XML utilizadas en documentos y formatos de intercambio de datos.
+  - `fileinfo`: Identificación y validación de tipos MIME de archivos para verificar su formato.
+  - `iconv` y `mbstring`: Conversión de codificaciones y manejo de cadenas multibyte, garantizando la compatibilidad con caracteres especiales y UTF-8.
+  - `zip` y `zlib`: Compresión, descompresión y gestión de archivos ZIP, utilizados en la estructura interna de documentos Excel .xlsx.
 
 ### Librerías Office vendorizadas
 
@@ -84,17 +96,17 @@ Porque es el framework más limpio disponible y uno de los que tiene el mejor be
 
 **Benchmarks — respuestas por segundo:**
 
-![Benchmark de respuestas por segundo 1](src/img_31.png)
+![Benchmark de respuestas por segundo 1](https://github.com/tenshi98/coreEngine/blob/main/src/img_31.png)
 
-![Benchmark de respuestas por segundo 2](src/img_32.png)
+![Benchmark de respuestas por segundo 2](https://github.com/tenshi98/coreEngine/blob/main/src/img_32.png)
 
 **Latencia:**
 
-![Benchmark de latencia](src/img_33.png)
+![Benchmark de latencia](https://github.com/tenshi98/coreEngine/blob/main/src/img_33.png)
 
 **Sobrecarga:**
 
-![Benchmark de sobrecarga](src/img_34.png)
+![Benchmark de sobrecarga](https://github.com/tenshi98/coreEngine/blob/main/src/img_34.png)
 
 ---
 
