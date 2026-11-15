@@ -238,6 +238,7 @@ class FunctionsDataText {
      * ```php
      * $DataText->slugUrl('¡Hola, Mundo!');   // Devuelve 'hola-mundo'
      * $DataText->slugUrl('Café con Leche');  // Devuelve 'cafe-con-leche'
+     * $DataText->slugUrl('Ñandú Grande');    // Devuelve 'nandu-grande'
      * ```
      *
      */
@@ -250,10 +251,13 @@ class FunctionsDataText {
 
         /********************** Proceso de Normalizacion **********************/
         // Minúsculas, sin tildes (cuando iconv está disponible) y recorte de bordes
-        $slug = strtolower(trim((string)$texto));
+        $slug = trim((string)$texto);
+        $slug = function_exists('mb_strtolower') ? mb_strtolower($slug, 'UTF-8') : strtolower($slug);
         if (function_exists('iconv')) {
             $slug = (string)iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $slug);
         }
+        // Tras transliterar se vuelve a minúsculas (algunas transliteraciones devuelven mayúsculas)
+        $slug = strtolower($slug);
         // Cualquier secuencia no alfanumérica se colapsa en un único guion
         $slug = (string)preg_replace('/[^a-z0-9]+/i', '-', $slug);
         $slug = trim($slug, '-');
