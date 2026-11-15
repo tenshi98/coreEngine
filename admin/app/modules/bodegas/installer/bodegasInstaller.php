@@ -18,7 +18,7 @@ class bodegasInstaller extends ControllerInstaller {
         $queryBuilder  = new QueryBuilder();
         $checkData     = new CheckData();
         /*================== Instancias =================*/
-        $this->controllerName     = 'bodegasInstaller';
+        $this->controllerName = 'bodegasInstaller';
         /*========== Datos para la clase padre ==========*/
         parent::__construct($DB_conn_1, $queryBuilder, $checkData);
     }
@@ -228,6 +228,16 @@ class bodegasInstaller extends ControllerInstaller {
             'RutaWeb'        => 'gestionBodegas/productos/listado',                            // Ruta web de la transaccion
             'RutaController' => 'informeProductos',                                            // Controlador de la transaccion
         ];
+        $arrPermisos[] = [
+            'idPermisosCat'  => '3',                                                                                    // Gestión Bodegas y Productos
+            'idEstado'       => '1',                                                                                    // Activo
+            'idTipo'         => '3',                                                                                    // Informe
+            'Nombre'         => 'Reposición Predictiva',                                                                // Nombre de la transaccion
+            'Descripcion'    => 'Permite ver la demanda semanal predicha de los productos y sugerir su reposición',     // Descripcion de la transaccion
+            'idLevelLimit'   => '2',                                                                                    // Ver / Editar (excepción ADR-0020: Recalcular)
+            'RutaWeb'        => 'gestionBodegas/productos/reposicion',                                                  // Ruta web de la transaccion
+            'RutaController' => 'informeReposicion',                                                                    // Controlador de la transaccion
+        ];
 
         /************************************/
         // Verifico si existe
@@ -412,6 +422,12 @@ class bodegasInstaller extends ControllerInstaller {
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/productos/listado/view/@idProducto/@idBodegas',  'RutaController' => 'informeProductos->View',         'Descripcion' => 'Mostrar Detallado',   'idLevelLimit' => 1, 'Controller' => 'informeProductos'],
                 ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/productos/listado/print/@id',                    'RutaController' => 'informeProductos->Print',        'Descripcion' => 'Pantalla imprimir',   'idLevelLimit' => 1, 'Controller' => 'informeProductos'],
             ],
+            6 => [
+                ['idMetodo' => 1, 'RutaWeb' =>  'gestionBodegas/productos/reposicion/listAll',    'RutaController' => 'informeReposicion->listAll',    'Descripcion' => 'Filtro de búsqueda',     'idLevelLimit' => 1, 'Controller' => 'informeReposicion'],
+                ['idMetodo' => 2, 'RutaWeb' =>  'gestionBodegas/productos/reposicion/search',     'RutaController' => 'informeReposicion->UpdateList', 'Descripcion' => 'Filtrar datos',          'idLevelLimit' => 1, 'Controller' => 'informeReposicion'],
+                ['idMetodo' => 2, 'RutaWeb' =>  'gestionBodegas/productos/reposicion/recalcular', 'RutaController' => 'informeReposicion->Recalcular', 'Descripcion' => 'Recalcular predicción',  'idLevelLimit' => 2, 'Controller' => 'informeReposicion'],
+                ['idMetodo' => 2, 'RutaWeb' =>  'gestionBodegas/productos/reposicion/exportExcel', 'RutaController' => 'informeReposicion->exportExcel', 'Descripcion' => 'Exportar Excel',          'idLevelLimit' => 1, 'Controller' => 'informeReposicion'],
+            ],
             default => [],
         };
     }
@@ -433,6 +449,7 @@ class bodegasInstaller extends ControllerInstaller {
         $RutaController .= ',bodegasMovimientoEgreso';
         $RutaController .= ',bodegasMovimientoTraspaso';
         $RutaController .= ',informeProductos';
+        $RutaController .= ',informeReposicion';
 
         /************************************/
         // Retorno los datos
@@ -488,7 +505,7 @@ class bodegasInstaller extends ControllerInstaller {
             'comentario' => 'Creado desde el Instalador',
         ];
         /*******************************************************/
-        /*        DISTRIBUCION FISICA (zonas, pasillos, ...)    */
+        /*        DISTRIBUCION FISICA (zonas, pasillos, ...)   */
         /*******************************************************/
         $arrTables[] = [
             'table'      => 'bodegas_zonas_tipos',
@@ -532,6 +549,21 @@ class bodegasInstaller extends ControllerInstaller {
             'primaryKey' => 'idPosicion',
             'comentario' => 'Creado desde el Instalador',
         ];
+        /*******************************************************/
+        /*                     PREDICCIONES                    */
+        /*******************************************************/
+        $arrTables[] = [
+            'table'      => 'bodegas_pred_ejecuciones',
+            'data'       => '`idEjecucion` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`Informe` varchar(32) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,`idUsuario` int(10) unsigned NOT NULL,`Estado` tinyint(3) unsigned NOT NULL DEFAULT 1,`Activa` tinyint(3) unsigned NULL DEFAULT NULL,`Algoritmo` varchar(64) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`FechaInicio` datetime NOT NULL,`FechaFin` datetime NULL DEFAULT NULL,`DuracionMs` int(10) unsigned NULL DEFAULT NULL,`MuestrasOrigen` int(10) unsigned NOT NULL DEFAULT 0,`Muestras` int(10) unsigned NOT NULL DEFAULT 0,`Metricas` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Modelo` text CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL,`Mensaje` varchar(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NULL DEFAULT NULL',
+            'primaryKey' => 'idEjecucion',
+            'comentario' => 'Creado desde el Instalador',
+        ];
+        $arrTables[] = [
+            'table'      => 'bodegas_pred_reposicion',
+            'data'       => '`idPrediccion` bigint(20) unsigned NOT NULL AUTO_INCREMENT,`idEjecucion` bigint(20) unsigned NOT NULL,`idProducto` int(10) unsigned NOT NULL,`SemanasUsadas` tinyint(3) unsigned NOT NULL,`DemandaMedia` decimal(12,2) NOT NULL,`DemandaPredicha` decimal(12,2) NOT NULL,`Pendiente` decimal(12,4) NOT NULL,`StockActual` decimal(12,2) NOT NULL,`StockLimite` decimal(12,2) NULL DEFAULT NULL,`Cobertura` decimal(8,2) NULL DEFAULT NULL,`Sugerida` decimal(12,2) NOT NULL DEFAULT 0,`Alerta` tinyint(3) unsigned NOT NULL',
+            'primaryKey' => 'idPrediccion',
+            'comentario' => 'Creado desde el Instalador',
+        ];
 
         /************************************/
         // Retorno la respuesta de la consulta
@@ -562,6 +594,8 @@ class bodegasInstaller extends ControllerInstaller {
             'ALTER TABLE bodegas_zonas_tipos ADD UNIQUE INDEX IF NOT EXISTS uk_bzonatipos_nombre (Nombre);',
             'ALTER TABLE bodegas_posiciones_estados ADD UNIQUE INDEX IF NOT EXISTS uk_bposestado_nombre (Nombre);',
             'ALTER TABLE bodegas_productos_stocks ADD UNIQUE INDEX IF NOT EXISTS uk_stocks_producto (idProducto);',
+            'ALTER TABLE bodegas_pred_ejecuciones ADD UNIQUE INDEX IF NOT EXISTS uk_bej_activa (Informe, Activa),ADD INDEX IF NOT EXISTS idx_bej_estado (Informe, Estado, FechaInicio);',
+            'ALTER TABLE bodegas_pred_reposicion ADD INDEX IF NOT EXISTS idx_bpred_rep_ejecucion (idEjecucion, Alerta),ADD INDEX IF NOT EXISTS idx_bpred_rep_producto (idProducto);',
         ];
 
         /************************************/
@@ -610,7 +644,7 @@ class bodegasInstaller extends ControllerInstaller {
         core_tipos_usuario(idTipoUsuario,Nombre)
         core_estados_ingreso(idEstadoIngreso,Nombre)
         bodegas_listado(idBodegas,Nombre)
-        productos_listado(idProducto,idUniMed,Nombre)
+        productos_listado(idProducto,idUniMed,Nombre,StockLimite,idEstado)
         core_unidades_medida(idUniMed,Nombre)
         core_estados(idEstado,Nombre)
         core_ubicacion_ciudad(idCiudad,Nombre)
