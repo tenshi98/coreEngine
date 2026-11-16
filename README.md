@@ -5,7 +5,6 @@
 - [Explicación General](#explicación-general)
 - [Requisitos del Sistema](#requisitos-del-sistema)
 - [Demo Plataforma](#demo-plataforma)
-- [Estructura de la Documentación Generada](#estructura-de-la-documentación-generada)
 - [Documentación relacionada](#documentación-relacionada)
 
 ## Explicación General
@@ -58,21 +57,6 @@ Para desplegar y ejecutar correctamente la plataforma, el servidor debe cumplir 
 | Contraseña | 1234 |
 
 ---
-
-## Estructura de la Documentación Generada
-
-A continuación se detalla cada documento creado para este proyecto, con una breve descripción y acceso directo:
-
-| # | Archivo | Tema Principal | Para Qué Sirve |
-|---|---|---|---|
-| 1 | **arquitectura.md** | Arquitectura del sistema | Estructura completa: stack, componentes, flujo de petición, tipos de transacción, vistas, seguridad y arreglo de 34 imágenes del proyecto. |
-| 2 | **instalacion.md** | Instalación y configuración | Guía paso a paso: importación de base de datos, ConfigAPP, ConfigData, ConfigMail, permisos seguros de upload y verificación final. |
-| 3 | **configuracion.md** | Configuración de parámetros | Parámetros detallados de ConfigAPP.php, ConfigData.php, ConfigMail.php y ConfigToken.php con sus valores por defecto y críticos. |
-| 4 | **modulos.md** | Módulos del backoffice | Inventario de 33 módulos con responsabilidades, dependencias (I/T/W/F), estructura canónica y módulos sin installer. |
-| 5 | **bbdd.md** | Diagrama de base de datos | Diagrama ER completo con 58 tablas, descripciones de campos clave, índices y relaciones importantes. |
-| 6 | **flujo-peticion.md** | Flujo de petición | Bootstrap completo (`admin/public/index.php`), diagnóstico rápido de problemas, puntos de entrada y flujo de seguridad anti-intrusión. |
-| 7 | **agentes.md** | Agentes y roles | Conceptos fundamentales: Agent (QUIEN), Skill (CÓMO), Spec (QUÉ), Task (QUÉ), Validation (CÓMO), Docs (VERDAD), History (MEMORIA), ChangeLog (Blog). Contrato común y flujo SDD. |
-| 8 | **README.md** | Este archivo | **Vista actual** — presentando esta explicación general y acceso a los demás documentos. |
 
 ## Documentación relacionada
 
