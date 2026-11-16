@@ -97,17 +97,17 @@ Porque es el framework más limpio disponible y uno de los que tiene el mejor be
 
 **Benchmarks — respuestas por segundo:**
 
-![Benchmark de respuestas por segundo 1](https://github.com/tenshi98/coreEngine/blob/main/src/img_31.png)
+![Benchmark de respuestas por segundo 1](https://github.com/tenshi98/coreEngine/blob/main/docs/screenshots/architecture_benchmarks_1.png)
 
-![Benchmark de respuestas por segundo 2](https://github.com/tenshi98/coreEngine/blob/main/src/img_32.png)
+![Benchmark de respuestas por segundo 2](https://github.com/tenshi98/coreEngine/blob/main/docs/screenshots/architecture_benchmarks_2.png)
 
 **Latencia:**
 
-![Benchmark de latencia](https://github.com/tenshi98/coreEngine/blob/main/src/img_33.png)
+![Benchmark de latencia](https://github.com/tenshi98/coreEngine/blob/main/docs/screenshots/architecture_latencia.png)
 
 **Sobrecarga:**
 
-![Benchmark de sobrecarga](https://github.com/tenshi98/coreEngine/blob/main/src/img_34.png)
+![Benchmark de sobrecarga](https://github.com/tenshi98/coreEngine/blob/main/docs/screenshots/architecture_sobrecarga.png)
 
 ---
 
