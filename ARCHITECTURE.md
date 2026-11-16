@@ -1,4 +1,4 @@
-# Arquitectura de coreEngine
+# Arquitectura
 
 Documento público de arquitectura. La **verdad interna** que usan los agentes vive en `docs/architecture/` (mapa en `docs/architecture/README.md`); este documento resume y enlaza esa verdad para lectores humanos.
 

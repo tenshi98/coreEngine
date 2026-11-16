@@ -1,3 +1,6 @@
+# Agentes
+
+Conceptos fundamentales: Agent (QUIEN), Skill (CÓMO), Spec (QUÉ), Task (QUÉ), Validation (CÓMO), Docs (VERDAD), History (MEMORIA), ChangeLog (Blog). Contrato común y flujo SDD.
 
 ## Tabla de contenidos
 
